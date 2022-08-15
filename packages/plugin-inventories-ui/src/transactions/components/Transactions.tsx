@@ -1,5 +1,8 @@
 import React from 'react';
-import { __, Wrapper } from '@erxes/ui/src';
+// erxes
+import { __ } from '@erxes/ui/src/utils';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+// local
 import Actionbar from './Actionbar';
 import List from '../containers/List';
 import { SUBMENU } from '../../constants';

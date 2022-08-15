@@ -1,21 +1,19 @@
 import React from 'react';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import Datetime from '@nateradebaugh/react-datetime';
-import {
-  __,
-  Wrapper,
-  Box,
-  ControlLabel,
-  FormGroup,
-  FormControl,
-  Form as CommonForm,
-  FlexContent
-} from '@erxes/ui/src';
-import { FlexItem } from '@erxes/ui-settings/src/styles';
+// erxes
+import { __, router } from '@erxes/ui/src/utils/core';
+import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import Box from '@erxes/ui/src/components/Box';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
+import FormGroup from '@erxes/ui/src/components/form/Group';
+import FormControl from '@erxes/ui/src/components/form/Control';
+import CommonForm from '@erxes/ui/src/components/form/Form';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
-import { router } from '@erxes/ui/src/utils/core';
+// local
 import { SidebarContent } from '../../styles';
 
 type Props = {

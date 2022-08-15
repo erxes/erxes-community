@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 // erxes
+import { __ } from '@erxes/ui/src/utils';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import FormControl from '@erxes/ui/src/components/form/Control';
@@ -7,7 +8,6 @@ import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Table from '@erxes/ui/src/components/table';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { __ } from '@erxes/ui/src/utils';
 import { IProductCategory } from '@erxes/ui-products/src/types';
 import { IRouterProps, IQueryParams } from '@erxes/ui/src/types';
 // local

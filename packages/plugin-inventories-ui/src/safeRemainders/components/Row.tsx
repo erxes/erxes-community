@@ -1,8 +1,15 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { __, ActionButtons, Button, Icon, Label, Tip } from '@erxes/ui/src';
+// erxes
+import { __ } from '@erxes/ui/src/utils';
+import ActionButtons from '@erxes/ui/src/components/ActionButtons';
+import Button from '@erxes/ui/src/components/Button';
+import Icon from '@erxes/ui/src/components/Icon';
+import Label from '@erxes/ui/src/components/Label';
+import Tip from '@erxes/ui/src/components/Tip';
 import { DateWrapper } from '@erxes/ui/src/styles/main';
 import { renderUserFullName } from '@erxes/ui/src/utils/core';
+// local
 import { ISafeRemainder } from '../types';
 
 type Props = {
