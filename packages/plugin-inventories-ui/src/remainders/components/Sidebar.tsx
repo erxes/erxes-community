@@ -1,8 +1,13 @@
 import React from 'react';
-import { __, Wrapper, Box, FormGroup, ControlLabel } from '@erxes/ui/src';
+// erxes
+import { __, router } from '@erxes/ui/src/utils/core';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import Box from '@erxes/ui/src/components/Box';
+import FormGroup from '@erxes/ui/src/components/form/Group';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
-import { router } from '@erxes/ui/src/utils/core';
+// local
 import CategoryFilter from '../containers/CategoryFilter';
 import { SidebarContent } from '../../styles';
 
@@ -11,7 +16,7 @@ type Props = {
   history: any;
 };
 
-const Sidebar = (props: Props) => {
+export default function Sidebar(props: Props) {
   const { queryParams, history } = props;
 
   const setFilter = (name: string, value: any) => {
@@ -20,7 +25,7 @@ const Sidebar = (props: Props) => {
 
   return (
     <Wrapper.Sidebar>
-      <Box title={__('Filter')} isOpen={true} name="showFilter">
+      <Box title={__('Selectors')} isOpen={true} name="showSelectors">
         <SidebarContent>
           <FormGroup>
             <ControlLabel>Branch</ControlLabel>
@@ -49,6 +54,4 @@ const Sidebar = (props: Props) => {
       <CategoryFilter />
     </Wrapper.Sidebar>
   );
-};
-
-export default Sidebar;
+}

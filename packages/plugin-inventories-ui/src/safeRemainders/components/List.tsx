@@ -1,15 +1,15 @@
 import React from 'react';
-import {
-  __,
-  Wrapper,
-  BarItems,
-  Button,
-  Pagination,
-  Table,
-  DataWithLoader,
-  ModalTrigger
-} from '@erxes/ui/src';
+// erxes
+import { __ } from '@erxes/ui/src/utils/core';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import Button from '@erxes/ui/src/components/Button';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import Table from '@erxes/ui/src/components/table';
+import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import EmptyState from '@erxes/ui/src/components/EmptyState';
 import { IRouterProps } from '@erxes/ui/src/types';
+// local
 import { ISafeRemainder } from '../types';
 import { SUBMENU } from '../../constants';
 import Form from '../containers/Form';
@@ -26,7 +26,7 @@ interface IProps extends IRouterProps {
 }
 
 class List extends React.Component<IProps, {}> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
   }
 
@@ -47,23 +47,21 @@ class List extends React.Component<IProps, {}> {
     const { loading, queryParams, history, totalCount } = this.props;
 
     const trigger = (
-      <Button btnStyle="success" icon="plus-circle" size="small">
+      <Button btnStyle="success" icon="plus-circle">
         Add safe remainder
       </Button>
     );
 
-    const modalContent = props => <Form {...props} history={history} />;
+    const modalContent = (props: any) => <Form {...props} history={history} />;
 
     let actionBarRight = (
-      <BarItems>
-        <ModalTrigger
-          title="Add Product/Services"
-          trigger={trigger}
-          autoOpenKey="showProductModal"
-          content={modalContent}
-          size="lg"
-        />
-      </BarItems>
+      <ModalTrigger
+        title="Add Product/Services"
+        trigger={trigger}
+        autoOpenKey="showAddSafeRemainderModal"
+        content={modalContent}
+        size="lg"
+      />
     );
 
     let content = (
@@ -100,8 +98,13 @@ class List extends React.Component<IProps, {}> {
             data={content}
             loading={loading}
             count={totalCount}
-            emptyText="There is no data"
-            emptyImage="/images/actions/5.svg"
+            emptyContent={
+              <EmptyState
+                image="/images/actions/5.svg"
+                text="No transactions"
+                size=""
+              />
+            }
           />
         }
       />

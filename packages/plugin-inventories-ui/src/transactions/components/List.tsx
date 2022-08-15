@@ -1,5 +1,10 @@
 import React from 'react';
-import { __, Table, DataWithLoader, EmptyState } from '@erxes/ui/src';
+// erxes
+import { __ } from '@erxes/ui/src/utils/core';
+import Table from '@erxes/ui/src/components/table';
+import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
+import EmptyState from '@erxes/ui/src/components/EmptyState';
+// local
 import Row from './Row';
 
 type Props = {
@@ -22,7 +27,6 @@ const List = (props: Props) => {
             <th>{__('Department')}</th>
             <th>{__('Content Type')}</th>
             <th>{__('Created at')}</th>
-            <th>{__('Created by')}</th>
           </tr>
         </thead>
         <tbody>{renderRow()}</tbody>
@@ -35,8 +39,13 @@ const List = (props: Props) => {
       loading={loading}
       count={data.length}
       data={renderTable()}
-      emptyText="No transactions"
-      emptyImage="/images/actions/5.svg"
+      emptyContent={
+        <EmptyState
+          image="/images/actions/5.svg"
+          text="No transactions"
+          size=""
+        />
+      }
     />
   );
 };

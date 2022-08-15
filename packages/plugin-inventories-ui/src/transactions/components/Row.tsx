@@ -12,17 +12,14 @@ const Row = (props: Props) => {
 
   return (
     <tr>
-      <td>{((data && data.branchDetail) || {}).title || 'Branch'}</td>
-      <td>{((data && data.departmentDetail) || {}).title || 'Department'}</td>
+      <td>{((data && data.branch) || {}).title || 'Branch'}</td>
+      <td>{((data && data.department) || {}).title || 'Department'}</td>
       <td>{data && data.contentType}</td>
       <td>
         <Icon icon="calender" />{' '}
         <DateWrapper>
           {dayjs(data.createdAt).format('ll') || 'Created at'}
         </DateWrapper>
-      </td>
-      <td>
-        <b>{data && data.createdUser ? data.createdUser.username : ''}</b>
       </td>
     </tr>
   );

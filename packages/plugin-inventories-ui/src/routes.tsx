@@ -5,7 +5,7 @@ import { Route } from 'react-router-dom';
 
 const Remainders = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - LiveRemainders" */ './remainders/containers/ProductList'
+    /* webpackChunkName: "List - LiveRemainders" */ './remainders/containers/List'
   )
 );
 
@@ -17,7 +17,7 @@ const SafeRemainders = asyncComponent(() =>
 
 const SafeRemainderDetails = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - SafeRemainders" */ './safeRemainders/containers/Details'
+    /* webpackChunkName: "List - SafeRemainders" */ './safeRemainderDetails/containers/List'
   )
 );
 
@@ -26,11 +26,6 @@ const Transactions = asyncComponent(() =>
     /* webpackChunkName: "Transactions" */ './transactions/components/Transactions'
   )
 );
-
-const remainders = ({ location, history }) => {
-  const queryParams = queryString.parse(location.search);
-  return <Remainders queryParams={queryParams} history={history} />;
-};
 
 const safeRemainders = ({ location, history }) => {
   const queryParams = queryString.parse(location.search);
@@ -58,7 +53,7 @@ const routes = () => {
         exact={true}
         path="/inventories/remainders/"
         key="/inventories/remainders/"
-        component={remainders}
+        component={Remainders}
       />
 
       <Route

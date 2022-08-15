@@ -26,13 +26,13 @@ class Form extends React.Component<Props> {
         }
 
         history.push(
-          `/inventories/safe-remainders/details/${data.createSafeRemainder._id}`
+          `/inventories/safe-remainders/details/${data.safeRemainderAdd._id}`
         );
       };
 
       return (
         <ButtonMutate
-          mutation={mutations.createSafeRemainder}
+          mutation={mutations.safeRemainderAdd}
           variables={values}
           callback={callBack}
           refetchQueries={getRefetchQueries()}

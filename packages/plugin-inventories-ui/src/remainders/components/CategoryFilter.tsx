@@ -1,6 +1,9 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { __, Box, Icon, router } from '@erxes/ui/src';
+// erxes
+import { __, router } from '@erxes/ui/src/utils/core';
+import Box from '@erxes/ui/src/components/Box';
+import Icon from '@erxes/ui/src/components/Icon';
 import { FieldStyle, SidebarList } from '@erxes/ui/src/layout/styles';
 
 type Props = {

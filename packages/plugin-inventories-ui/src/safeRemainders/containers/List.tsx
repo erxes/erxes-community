@@ -91,7 +91,7 @@ class ProductListContainer extends React.Component<FinalProps> {
     const {
       safeRemaindersQuery,
       queryParams,
-      removeSafeRemainder
+      safeRemainderRemove
     } = this.props;
 
     if (safeRemaindersQuery.loading) {
@@ -101,7 +101,7 @@ class ProductListContainer extends React.Component<FinalProps> {
     const removeRemainder = (remainder: ISafeRemainder) => {
       confirm(`This action will remove the remainder. Are you sure?`)
         .then(() => {
-          removeSafeRemainder({ variables: { _id: remainder._id } })
+          safeRemainderRemove({ variables: { _id: remainder._id } })
             .then(() => {
               Alert.success('You successfully deleted a census');
               safeRemaindersQuery.refetch();
@@ -181,9 +181,9 @@ export default withProps<Props>(
       })
     }),
     graphql<Props, RemoveSafeRemainderMutationResponse, { _id: string }>(
-      gql(mutations.removeSafeRemainder),
+      gql(mutations.safeRemainderRemove),
       {
-        name: 'removeSafeRemainder',
+        name: 'safeRemainderRemove',
         options: () => ({
           refetchQueries: ['safeRemaindersQuery']
         })
