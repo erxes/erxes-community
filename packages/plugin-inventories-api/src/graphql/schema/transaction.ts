@@ -1,18 +1,19 @@
 export const types = `
-  type Transaction @key(fields: "_id") @cacheControl(maxAge: 3) {
+  type Transaction @key(fields: "_id") {
     _id: String
 
-    contentType: String
+    branch: Branch
+    branchId: String
+    department: Department
+    departmentId: String
     contentId: String
+    contentType: String
     status: String
 
     createdAt: Date
   }
 
   input TransactionProductInput {
-    branchId: String
-    departmentId: String
-    transactionId: String
     productId: String
     count: Float
     uomId: String
@@ -22,16 +23,20 @@ export const types = `
 
 export const queries = `
   transactions(
+    branchId: String,
+    departmentId: String,
     contentType: String,
     contentId: String,
     status: String,
-    date: Date
+    createdAt: Date
   ): [Transaction]
   transactionDetail(_id: String): Transaction
 `;
 
 export const mutations = `
   transactionAdd(
+    branchId: String,
+    departmentId: String,
     contentType: String,
     contentId: String,
     status: String,

@@ -7,6 +7,8 @@ export interface ITransactionCreateParams extends ITransaction {
 }
 
 export interface ITransaction {
+  branchId: string;
+  departmentId: string;
   status: string;
   contentType: string;
   contentId: string;
@@ -21,6 +23,9 @@ export const transactionSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
 
+    branchId: field({ type: String, default: '', label: 'Branch' }),
+    departmentId: field({ type: String, default: '', label: 'Department' }),
+
     status: field({ type: String, label: 'Status' }),
     contentType: field({ type: String, label: 'Content Type' }),
     contentId: field({ type: String, label: 'Content ID' }),
@@ -32,8 +37,8 @@ export const transactionSchema = schemaHooksWrapper(
 
 // for transactionSchema query. increases search speed, avoids in-memory sorting
 transactionSchema.index({
-  contentType: 1,
-  contentId: 1,
   branchId: 1,
-  departmentId: 1
+  departmentId: 1,
+  contentType: 1,
+  contentId: 1
 });

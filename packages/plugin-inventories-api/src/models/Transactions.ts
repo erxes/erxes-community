@@ -37,9 +37,18 @@ export const loadTransactionClass = (models: IModels) => {
      * @returns Created response
      */
     public static async createTransaction(params: ITransactionCreateParams) {
-      const { status, contentType, contentId, products } = params;
+      const {
+        departmentId,
+        branchId,
+        status,
+        contentType,
+        contentId,
+        products
+      } = params;
 
       const transaction = await models.Transactions.create({
+        departmentId,
+        branchId,
         status,
         contentType,
         contentId,
@@ -48,24 +57,34 @@ export const loadTransactionClass = (models: IModels) => {
 
       const bulkOps: any[] = [];
 
-      products.map(async (item: ITransactionItem) => {
+      products.map(async (item: any) => {
         const filter: any = { productId: item.productId };
-        if (item.departmentId) filter.departmentId = item.departmentId;
-        if (item.branchId) filter.branchId = item.branchId;
+        if (departmentId) filter.departmentId = departmentId;
+        if (branchId) filter.branchId = branchId;
+        if (item.remainderId) filter.remainderId = item.remainderId;
 
         const remainder: any = await models.Remainders.findOne(filter);
 
-        if (!remainder) throw new Error('Remainder not found!');
+        if (!remainder) return new Error('Remainder not found!');
+
+        const safeRemainderItem: any = await models.SafeRemainderItems.findOne(
+          filter
+        );
+
+        if (!safeRemainderItem)
+          return new Error('Safe remainder item not found!');
+
+        await models.SafeRemainderItems.updateOne(filter, {
+          $set: { preCount: item.count }
+        });
 
         const result = await models.Remainders.updateRemainder(remainder._id, {
           count: item.isDebit ? item.count : -1 * item.count
         });
 
-        if (!result) throw new Error('Remainder update failed!');
+        if (!result) return new Error('Remainder update failed!');
 
         bulkOps.push({
-          branchId: item.branchId,
-          departmentId: item.departmentId,
           transactionId: result._id,
           productId: item.productId,
           count: item.count,

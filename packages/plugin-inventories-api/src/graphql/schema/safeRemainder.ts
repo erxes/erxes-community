@@ -1,20 +1,4 @@
 export const types = `
-  extend type Branch @key(fields: "_id") {
-    _id: String! @external
-  }
-
-  extend type Department @key(fields: "_id") {
-    _id: String! @external
-  }
-
-  extend type User @key(fields: "_id") {
-    _id: String! @external
-  }
-
-  extend type Product @key(fields: "_id") {
-    _id: String! @external
-  }
-
   type SafeRemainder @key(fields: "_id") {
     _id: String!
     branch: Branch
@@ -43,8 +27,8 @@ export const types = `
 
 export const queries = `
   safeRemainders(
-    departmentId: String,
     branchId: String
+    departmentId: String,
     productId: String,
     searchValue: String,
     beginDate: Date,
