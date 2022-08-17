@@ -1,4 +1,5 @@
 import { IUserDocument } from '@erxes/api-utils/src/types';
+import { paginate } from '@erxes/api-utils/src';
 import { Model } from 'mongoose';
 import * as _ from 'underscore';
 import { IModels, IContext } from '../connectionResolver';
@@ -7,11 +8,13 @@ import { SAFE_REMAINDER_STATUSES } from './definitions/constants';
 import {
   ISafeRemainder,
   ISafeRemainderDocument,
+  ISafeRemaindersParams,
   safeRemainderSchema
 } from './definitions/safeRemainders';
 
 export interface ISafeRemainderModel extends Model<ISafeRemainderDocument> {
   getRemainder(_id: string): Promise<ISafeRemainderDocument>;
+  getRemainders(params: ISafeRemaindersParams): Promise<JSON>;
   createRemainder(
     subdomain: string,
     params: ISafeRemainder,
@@ -41,6 +44,71 @@ export const loadSafeRemainderClass = (models: IModels) => {
     }
 
     /**
+     * Get all remainders
+     * @param params many things
+     * @returns Found object
+     */
+    public static async getRemainders(params: ISafeRemaindersParams) {
+      const query: any = {};
+
+      if (params.departmentId) {
+        query.departmentId = params.departmentId;
+      }
+
+      if (params.branchId) {
+        query.branchId = params.branchId;
+      }
+
+      if (params.searchValue) {
+        const regexOption = {
+          $regex: `.*${params.searchValue}.*`,
+          $options: 'i'
+        };
+
+        query.$or = [
+          {
+            name: regexOption
+          },
+          {
+            code: regexOption
+          }
+        ];
+      }
+
+      const dateQuery: any = {};
+      if (params.beginDate) {
+        dateQuery.$gte = new Date(params.beginDate);
+      }
+      if (params.endDate) {
+        dateQuery.$lte = new Date(params.endDate);
+      }
+
+      if (Object.keys(dateQuery).length) {
+        query.date = dateQuery;
+      }
+
+      if (params.productId) {
+        let allRemainders = await models.SafeRemainders.find(query).lean();
+        const remIds = allRemainders.map(r => r._id);
+
+        const items = await models.SafeRemainderItems.find({
+          remainderId: { $in: remIds },
+          productId: params.productId
+        }).lean();
+
+        const lastRemIds = new Set(items.map(i => i.remainderId) || []);
+        query._id = { $in: lastRemIds };
+      }
+
+      return {
+        totalCount: await models.SafeRemainders.find(query).count(),
+        remainders: await paginate(models.SafeRemainders.find(query), {
+          ...params
+        })
+      };
+    }
+
+    /**
      * Create safe remainder
      * @param subdomain
      * @param params New data to create
@@ -49,14 +117,14 @@ export const loadSafeRemainderClass = (models: IModels) => {
      */
     public static async createRemainder(
       subdomain: string,
-      params: ISafeRemainder,
+      params: any,
       userId: string
     ) {
       const {
+        branchId,
+        departmentId,
         date,
         description,
-        departmentId,
-        branchId,
         productCategoryId
       } = params;
 

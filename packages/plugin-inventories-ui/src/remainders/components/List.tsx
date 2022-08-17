@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 // erxes
 import { __ } from '@erxes/ui/src/utils';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Table from '@erxes/ui/src/components/table';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
-import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { IProductCategory } from '@erxes/ui-products/src/types';
-import { IRouterProps, IQueryParams } from '@erxes/ui/src/types';
+import { BarItems } from '@erxes/ui/src/layout/styles';
+
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 // local
 import Row from './Row';
 import Sidebar from './Sidebar';
@@ -18,60 +20,44 @@ import { SUBMENU } from '../../constants';
 import { IRemainderProduct } from '../types';
 
 type Props = {
-  history: any;
-  queryParams: any;
   products: IRemainderProduct[];
   totalCount: number;
   loading: boolean;
   searchValue: string;
-  currentCategory: IProductCategory;
   departmentId: string;
   branchId: string;
   isAllSelected: boolean;
   bulk: any[];
-  handleFilter: (filterParams: IQueryParams) => void;
-  handleSelect: (values: string[] | string, key: string) => void;
-  handleSearch: (event: any) => void;
-  isFiltered: () => boolean;
-  clearFilter: () => void;
   recalculate: (
     products: any[],
     departmentId: string,
     branchId: string,
     emptyBulk: () => void
   ) => void;
+  handleSearch: (event: any) => void;
+  handleFilter: (key: string, value: any) => void;
   emptyBulk: () => void;
   toggleBulk: () => void;
   toggleAll: (targets: IRemainderProduct[], containerId: string) => void;
 };
 
-export default function List(props: Props) {
+export default function ListComponent(props: Props) {
   const {
-    history,
-    queryParams,
     products,
     totalCount,
     loading,
-    currentCategory,
+    searchValue,
     departmentId,
     branchId,
     isAllSelected,
     bulk,
-    handleSearch,
-    handleSelect,
-    handleFilter,
     recalculate,
+    handleSearch,
+    handleFilter,
     emptyBulk,
     toggleBulk,
     toggleAll
   } = props;
-
-  const moveCursorAtTheEnd = (event: any) => {
-    const tempValue = event.target.value;
-
-    event.target.value = '';
-    event.target.value = tempValue;
-  };
 
   const renderRow = () => {
     return products.map((product: IRemainderProduct) => (
@@ -85,30 +71,44 @@ export default function List(props: Props) {
   };
 
   let actionButtons = (
-    <FormControl
-      type="text"
-      placeholder={__('Type to search')}
-      onChange={handleSearch}
-      defaultValue={queryParams.searchValue}
-      autoFocus={true}
-      onFocus={moveCursorAtTheEnd}
-    />
-  );
-
-  if (bulk.length > 0) {
-    actionButtons = (
+    <BarItems>
+      <SelectBranches
+        label="Choose branch"
+        name="selectedBranchIds"
+        initialValue={branchId}
+        onSelect={(branchId: any) => handleFilter('branchId', branchId)}
+        multi={false}
+        customOption={{ value: '', label: 'All branches' }}
+      />
+      <SelectDepartments
+        label="Choose department"
+        name="selectedDepartmentIds"
+        initialValue={departmentId}
+        onSelect={(departmentId: any) =>
+          handleFilter('departmentId', departmentId)
+        }
+        multi={false}
+        customOption={{ value: '', label: 'All departments' }}
+      />
+      <FormControl
+        type="text"
+        placeholder={__('Type to search')}
+        onChange={handleSearch}
+        defaultValue={searchValue}
+        autoFocus={true}
+      />
       <Button
-        btnStyle="simple"
+        btnStyle="primary"
         size="small"
-        icon="tag-alt"
+        icon="calcualtor"
         onClick={() => recalculate(bulk, departmentId, branchId, emptyBulk)}
       >
-        {__('Recalculate remainder')}
+        {__('Recalculate')}
       </Button>
-    );
-  }
+    </BarItems>
+  );
 
-  const renderContent = (
+  const content = (
     <Table>
       <thead>
         <tr>
@@ -136,11 +136,12 @@ export default function List(props: Props) {
       header={
         <Wrapper.Header title={__('Remainder of Products')} submenu={SUBMENU} />
       }
-      leftSidebar={<Sidebar queryParams={queryParams} history={history} />}
+      flowJobBar={<Wrapper.FlowJobBar right={actionButtons} />}
+      leftSidebar={<Sidebar />}
       footer={<Pagination count={totalCount} />}
       content={
         <DataWithLoader
-          data={renderContent}
+          data={content}
           loading={loading}
           count={totalCount}
           emptyContent={

@@ -11,7 +11,7 @@ type Props = {
   loading: boolean;
 };
 
-const CategoryFilter = (props: Props) => {
+export default function CategoryFilter(props: Props) {
   const { categories = [] } = props;
   const history = useHistory();
   const paramKey = 'categoryId';
@@ -49,7 +49,7 @@ const CategoryFilter = (props: Props) => {
                     ? 'active'
                     : ''
                 }
-                onClick={handleOnClick.bind(this, paramKey, item._id)}
+                onClick={() => handleOnClick(paramKey, item._id)}
               >
                 <FieldStyle>{item.name}</FieldStyle>
               </a>
@@ -59,6 +59,4 @@ const CategoryFilter = (props: Props) => {
       </SidebarList>
     </Box>
   );
-};
-
-export default CategoryFilter;
+}

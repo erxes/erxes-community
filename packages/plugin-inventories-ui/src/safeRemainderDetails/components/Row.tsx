@@ -15,9 +15,10 @@ type Props = {
 };
 
 export default function Row(props: Props) {
+  const timer: any = useRef(null);
   const { item, updateItem, removeItem } = props;
   const { product, modifiedAt, count, preCount, uom, status } = item;
-  const timer: any = useRef(null);
+  // states
   const [diff, setDiff] = useState<number>(count - preCount);
   const [remainder, setRemainder] = useState<number>(count);
   const [statusDisplay, setStatusDisplay] = useState<string>('new');

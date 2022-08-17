@@ -3,17 +3,16 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-apollo';
 import queryString from 'query-string';
 import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
 // erxes
 import Bulk from '@erxes/ui/src/components/Bulk';
 import Alert from '@erxes/ui/src/utils/Alert';
-import * as router from '@erxes/ui/src/utils/router';
-import { IQueryParams } from '@erxes/ui/src/types';
+import { router } from '@erxes/ui/src/utils';
 // local
 import ListComponent from '../components/List';
 import { queries, mutations } from '../graphql';
-import { FILTER_PARAMS } from '../../constants';
 
-export default function List() {
+function ListContainer() {
   const history = useHistory();
   const location = useLocation();
   const queryParams = queryString.parse(location.search);
@@ -41,41 +40,15 @@ export default function List() {
   const handleSearch = (event: any) => {
     const searchValue = event.target.value;
 
-    if (!searchValue) {
-      return router.removeParams(history, 'search');
+    if (searchValue.length === 0) {
+      return router.removeParams(history, 'searchValue');
     }
 
     router.setParams(history, { searchValue });
   };
 
-  const handleSelect = (values: string[] | string, key: string) => {
-    if (queryParams[key] === values) {
-      return router.removeParams(history, key);
-    }
-
-    return router.setParams(history, { [key]: values });
-  };
-
-  const handleFilter = (filterParams: IQueryParams) => {
-    for (const key of Object.keys(filterParams)) {
-      if (filterParams[key]) {
-        router.setParams(history, { [key]: filterParams[key] });
-      } else {
-        router.removeParams(history, key);
-      }
-    }
-
-    return router;
-  };
-
-  const isFiltered = (): boolean => {
-    for (const param in queryParams) {
-      if (FILTER_PARAMS.includes(param)) {
-        return true;
-      }
-    }
-
-    return false;
+  const handleFilter = (key: string, value: any) => {
+    router.setParams(history, { [key]: value });
   };
 
   const clearFilter = () => {
@@ -94,6 +67,11 @@ export default function List() {
       productIds.push(product._id);
     });
 
+    if (products.length === 0) {
+      Alert.error('Select products!');
+      return;
+    }
+
     if (departmentId.length === 0) {
       Alert.error('Department is required!');
       return;
@@ -107,7 +85,7 @@ export default function List() {
     remaindersUpdate({
       variables: { productIds, departmentId, branchId }
     })
-      .then((response: any) => {
+      .then(() => {
         emptyBulk();
         refetch();
         Alert.success('Request successful!');
@@ -129,9 +107,7 @@ export default function List() {
   const departmentId = queryParams.departmentId || '';
   const branchId = queryParams.branchId || '';
 
-  const updatedProps = {
-    history,
-    queryParams,
+  const componentProps = {
     products,
     totalCount,
     loading: remainderProductsQuery.loading,
@@ -139,16 +115,16 @@ export default function List() {
     departmentId,
     branchId,
     recalculate,
-    handleFilter: handleFilter,
-    handleSelect: handleSelect,
-    handleSearch: handleSearch,
-    isFiltered: isFiltered(),
-    clearFilter: clearFilter
+    handleSearch,
+    handleFilter,
+    clearFilter
   };
 
-  const renderContent = (props: any) => {
-    return <ListComponent {...updatedProps} {...props} />;
-  };
+  const renderContent = (bulkProps: any) => (
+    <ListComponent {...componentProps} {...bulkProps} />
+  );
 
   return <Bulk content={renderContent} refetch={refetch} />;
 }
+
+export default compose()(ListContainer);

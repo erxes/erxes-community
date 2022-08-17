@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import dayjs from 'dayjs';
 import Datetime from '@nateradebaugh/react-datetime';
 // erxes
@@ -6,144 +8,121 @@ import { __, router } from '@erxes/ui/src/utils/core';
 import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Box from '@erxes/ui/src/components/Box';
+import CommonForm from '@erxes/ui/src/components/form/Form';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import CommonForm from '@erxes/ui/src/components/form/Form';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 // local
 import { SidebarContent } from '../../styles';
 
-type Props = {
-  queryParams: any;
-  history: any;
-};
+export default function Sidebar() {
+  // Hooks
+  const timer: any = useRef(null);
+  const history = useHistory();
+  const location = useLocation();
+  const queryParams = queryString.parse(location.search);
 
-const Sidebar = (props: Props) => {
-  let timer: NodeJS.Timer;
-  const { queryParams, history } = props;
-
+  // Methods
   const setFilter = (name: string, value: any) => {
     router.removeParams(history, 'page');
     router.setParams(history, { [name]: value });
   };
 
-  const onChangeDate = (label: string, date: any) => {
-    const cDate = dayjs(date).format('YYYY-MM-DD HH:mm');
-    setFilter(label, cDate);
-  };
-
-  const moveCursorAtTheEnd = (event: any) => {
-    const tempValue = event.target.value;
-
-    event.target.value = '';
-    event.target.value = tempValue;
+  const handleChangeDate = (label: string, date: any) => {
+    const _date = dayjs(date).format('YYYY-MM-DD HH:mm');
+    setFilter(label, _date);
   };
 
   const search = (event: any) => {
-    if (timer) {
-      clearTimeout(timer);
+    if (timer.current) {
+      clearTimeout(timer.current);
     }
 
     const searchValue = event.target.value;
 
-    timer = setTimeout(() => {
+    timer.current = setTimeout(() => {
       setFilter('searchValue', searchValue);
     }, 500);
   };
 
   const renderContent = () => (
-    <Box title={'Filters'} isOpen={true} name="showFilters">
-      <SidebarContent>
-        <FlexContent>
-          <FlexItem>
-            <FormGroup>
-              <ControlLabel>{__('Search')}</ControlLabel>
-              <FormControl
-                type="text"
-                placeholder={__('Type to search')}
-                onChange={search}
-                defaultValue={queryParams.searchValue}
-                autoFocus={true}
-                onFocus={moveCursorAtTheEnd}
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>{__('Begin Date')}</ControlLabel>
-              <Datetime
-                inputProps={{ placeholder: 'Click to select a date' }}
-                dateFormat="YYYY MM DD"
-                timeFormat=""
-                viewMode={'days'}
-                closeOnSelect
-                utc
-                input
-                value={queryParams.beginDate || null}
-                onChange={date => onChangeDate('beginDate', date)}
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>{__('End Date')}</ControlLabel>
-              <Datetime
-                inputProps={{ placeholder: 'Click to select a date' }}
-                dateFormat="YYYY MM DD"
-                timeFormat=""
-                viewMode={'days'}
-                closeOnSelect
-                utc
-                input
-                value={queryParams.endDate || null}
-                onChange={date => onChangeDate('endDate', date)}
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>{__('Branch')}</ControlLabel>
-              <SelectBranches
-                label="Choose branch"
-                name="selectedBranchIds"
-                initialValue={queryParams.branchId}
-                onSelect={branchId => setFilter('branchId', branchId)}
-                multi={false}
-                customOption={{ value: '', label: 'All branches' }}
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>{__('Department')}</ControlLabel>
-              <SelectDepartments
-                label="Choose department"
-                name="selectedDepartmentIds"
-                initialValue={queryParams.departmentId}
-                onSelect={departmentId =>
-                  setFilter('departmentId', departmentId)
-                }
-                multi={false}
-                customOption={{ value: '', label: 'All departments' }}
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>{__('Product')}</ControlLabel>
-              <SelectProducts
-                label="Choose product"
-                name="selectedProductId"
-                initialValue={queryParams.productId}
-                onSelect={productId => setFilter('productId', productId)}
-                multi={false}
-                customOption={{ value: '', label: 'All products' }}
-              />
-            </FormGroup>
-          </FlexItem>
-        </FlexContent>
-      </SidebarContent>
-    </Box>
+    <FlexContent>
+      <FlexItem>
+        <FormGroup>
+          <ControlLabel>{__('Begin Date')}</ControlLabel>
+          <Datetime
+            inputProps={{ placeholder: 'Click to select a date' }}
+            dateFormat="YYYY MM DD"
+            timeFormat=""
+            viewMode={'days'}
+            closeOnSelect
+            utc
+            input
+            value={queryParams.beginDate || null}
+            onChange={date => handleChangeDate('beginDate', date)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>{__('End Date')}</ControlLabel>
+          <Datetime
+            inputProps={{ placeholder: 'Click to select a date' }}
+            dateFormat="YYYY MM DD"
+            timeFormat=""
+            viewMode={'days'}
+            closeOnSelect
+            utc
+            input
+            value={queryParams.endDate || null}
+            onChange={date => handleChangeDate('endDate', date)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>{__('Branch')}</ControlLabel>
+          <SelectBranches
+            label="Choose branch"
+            name="selectedBranchIds"
+            initialValue={queryParams.branchId}
+            onSelect={branchId => setFilter('branchId', branchId)}
+            multi={false}
+            customOption={{ value: '', label: 'All branches' }}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>{__('Department')}</ControlLabel>
+          <SelectDepartments
+            label="Choose department"
+            name="selectedDepartmentIds"
+            initialValue={queryParams.departmentId}
+            onSelect={departmentId => setFilter('departmentId', departmentId)}
+            multi={false}
+            customOption={{ value: '', label: 'All departments' }}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>{__('Product')}</ControlLabel>
+          <SelectProducts
+            label="Choose product"
+            name="selectedProductId"
+            initialValue={queryParams.productId}
+            onSelect={productId => setFilter('productId', productId)}
+            multi={false}
+            customOption={{ value: '', label: 'All products' }}
+          />
+        </FormGroup>
+      </FlexItem>
+    </FlexContent>
   );
 
   return (
     <Wrapper.Sidebar>
-      <CommonForm renderContent={renderContent} />
+      <Box title={'Filters'} isOpen={true} name="showFilters">
+        <SidebarContent>
+          <CommonForm renderContent={renderContent} />
+        </SidebarContent>
+      </Box>
     </Wrapper.Sidebar>
   );
-};
-
-export default Sidebar;
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
 // erxes
 import { __ } from '@erxes/ui/src/utils';
@@ -14,12 +15,14 @@ import { ISafeRemainder } from '../types';
 
 type Props = {
   remainder: ISafeRemainder;
-  history: any;
-  removeRemainder: (remainder: ISafeRemainder) => void;
+  removeItem: (remainder: ISafeRemainder) => void;
 };
 
-const Row = (props: Props) => {
-  const { remainder, history, removeRemainder } = props;
+export default function Row(props: Props) {
+  const { remainder = {} as ISafeRemainder, removeItem } = props;
+
+  // Hooks
+  const history = useHistory();
 
   const {
     date,
@@ -74,7 +77,7 @@ const Row = (props: Props) => {
           <Tip text="Delete" placement="top">
             <Button
               btnStyle="link"
-              onClick={() => removeRemainder(remainder)}
+              onClick={() => removeItem(remainder)}
               icon="times-circle"
             />
           </Tip>
@@ -82,6 +85,4 @@ const Row = (props: Props) => {
       </td>
     </tr>
   );
-};
-
-export default Row;
+}

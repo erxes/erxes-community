@@ -73,10 +73,11 @@ export default function List(props: Props) {
   const actionbarRight = (
     <Button
       btnStyle="success"
+      icon="check-circle"
       size="small"
       onClick={() => createTransaction(safeRemainderItems)}
     >
-      {__('Confirm')}
+      {__('Submit')}
     </Button>
   );
 
@@ -101,7 +102,7 @@ export default function List(props: Props) {
           }
         />
       }
-      actionBar={<Wrapper.ActionBar right={actionbarRight} />}
+      flowJobBar={<Wrapper.FlowJobBar right={actionbarRight} />}
       leftSidebar={<Sidebar safeRemainder={safeRemainder} />}
       footer={<Pagination count={totalCount} />}
     />
