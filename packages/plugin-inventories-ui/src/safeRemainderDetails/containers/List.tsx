@@ -49,9 +49,12 @@ function ListContainer() {
   /**
    * Mutations
    */
-  const [transactionAdd] = useMutation(gql(mutations.transactionAdd), {
-    refetchQueries: ['safeRemainderItemsQuery']
-  });
+  const [safeRemainderSubmit] = useMutation(
+    gql(mutations.safeRemainderSubmit),
+    {
+      refetchQueries: ['safeRemainderItemsQuery']
+    }
+  );
   const [safeRemainderItemEdit] = useMutation(
     gql(mutations.safeRemainderItemEdit),
     {
@@ -86,19 +89,22 @@ function ListContainer() {
       .catch((error: any) => Alert.error(error.message));
   };
 
-  const createTransaction = (data: any) => {
+  const submitItems = (data: any) => {
     let products: any = [];
+
+    console.log(data);
 
     data.map((item: any) => {
       products.push({
         productId: item.productId,
         count: item.count,
+        preCount: item.preCount,
         uomId: item.uomId,
         isDebit: true
       });
     });
 
-    transactionAdd({
+    safeRemainderSubmit({
       variables: {
         branchId: safeRemainder.branchId,
         departmentId: safeRemainder.departmentId,
@@ -140,7 +146,7 @@ function ListContainer() {
     safeRemainder,
     safeRemainderItems,
     totalCount,
-    createTransaction,
+    submitItems,
     updateItem,
     removeItem
   };

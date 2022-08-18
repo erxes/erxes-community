@@ -5,19 +5,16 @@ import {
 import { IContext } from '../../../connectionResolver';
 
 const safeRemainderQueries = {
-  /**
-   * Get one tag
-   */
+  safeRemainders: async (_root: any, params: any, { models }: IContext) => {
+    return await models.SafeRemainders.getRemainders(params);
+  },
+
   safeRemainderDetail: async (
     _root: any,
     { _id }: { _id: string },
     { models }: IContext
   ) => {
     return await models.SafeRemainders.getRemainder(_id);
-  },
-
-  safeRemainders: async (_root: any, params: any, { models }: IContext) => {
-    return await models.SafeRemainders.getRemainders(params);
   }
 };
 

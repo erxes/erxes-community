@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Datetime from '@nateradebaugh/react-datetime';
 // erxes
 import { __ } from '@erxes/ui/src/utils';
-import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import Button from '@erxes/ui/src/components/Button';
 import CommonForm from '@erxes/ui/src/components/form/Form';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
+import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';

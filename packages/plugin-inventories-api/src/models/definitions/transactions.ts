@@ -1,9 +1,14 @@
 import { Document, Schema } from 'mongoose';
-import { ITransactionItem } from './transactionItems';
 import { field, schemaHooksWrapper } from './utils';
 
 export interface ITransactionCreateParams extends ITransaction {
-  products: ITransactionItem[];
+  products: {
+    productId: string;
+    count: number;
+    preCount: number;
+    uomId: string;
+    isDebit: boolean;
+  }[];
 }
 
 export interface ITransaction {

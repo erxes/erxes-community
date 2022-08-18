@@ -1,20 +1,21 @@
-import { IUserDocument } from '@erxes/api-utils/src/types';
 import { paginate } from '@erxes/api-utils/src';
 import { Model } from 'mongoose';
 import * as _ from 'underscore';
-import { IModels, IContext } from '../connectionResolver';
-import { sendProductsMessage } from '../messageBroker';
+import { IModels } from '../connectionResolver';
+import { sendProductsMessage, sendInventoriesMessage } from '../messageBroker';
 import { SAFE_REMAINDER_STATUSES } from './definitions/constants';
 import {
+  ISafeRemaindersParams,
+  ISafeRemainderSubmitParams,
   ISafeRemainder,
   ISafeRemainderDocument,
-  ISafeRemaindersParams,
   safeRemainderSchema
 } from './definitions/safeRemainders';
 
 export interface ISafeRemainderModel extends Model<ISafeRemainderDocument> {
   getRemainder(_id: string): Promise<ISafeRemainderDocument>;
   getRemainders(params: ISafeRemaindersParams): Promise<JSON>;
+  submitRemainder(subdomain: string, params: any): Promise<JSON>;
   createRemainder(
     subdomain: string,
     params: ISafeRemainder,
@@ -109,6 +110,26 @@ export const loadSafeRemainderClass = (models: IModels) => {
     }
 
     /**
+     * Submit remainder and create transaction
+     * @param subdmoain
+     * @param params Data to create transaction
+     * @returns Created response
+     */
+    public static async submitRemainder(
+      subdomain: string,
+      params: ISafeRemainderSubmitParams
+    ) {
+      const result = await sendInventoriesMessage({
+        subdomain,
+        action: 'transactionAdd',
+        data: params,
+        isRPC: true
+      });
+
+      return result;
+    }
+
+    /**
      * Create safe remainder
      * @param subdomain
      * @param params New data to create
@@ -167,7 +188,7 @@ export const loadSafeRemainderClass = (models: IModels) => {
       for (const product of products) {
         const live =
           liveRemainders.find((remainder: any) => {
-            remainder.productId === product._id;
+            return remainder.productId === product._id;
           }) || {};
 
         bulkOps.push({
@@ -209,6 +230,7 @@ export const loadSafeRemainderClass = (models: IModels) => {
           modifiedBy: userId
         }
       });
+
       return await this.getRemainder(_id);
     }
 

@@ -1,6 +1,15 @@
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 
+export interface ISafeRemainderSubmitParams {
+  branchId: string;
+  departmentId: string;
+  status: string;
+  contentType: string;
+  contentId: string;
+  products: any[];
+}
+
 export interface ISafeRemaindersParams {
   beginDate?: Date;
   endDate?: Date;

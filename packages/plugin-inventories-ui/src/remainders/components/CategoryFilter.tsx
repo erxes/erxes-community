@@ -24,15 +24,16 @@ export default function CategoryFilter(props: Props) {
     router.setParams(history, { [key]: value });
   };
 
-  const extraButtons = router.getParam(history, 'categoryId') && (
-    <a href="#cancel" tabIndex={0} onClick={handleClear}>
-      <Icon icon="cancel-1" />
-    </a>
-  );
+  const renderExtraButtons = () =>
+    router.getParam(history, 'categoryId') && (
+      <a href="#cancel" tabIndex={0} onClick={handleClear}>
+        <Icon icon="cancel-1" />
+      </a>
+    );
 
   return (
     <Box
-      extraButtons={extraButtons}
+      extraButtons={renderExtraButtons()}
       title={__('Filter by category')}
       name="showFilterByCategory"
       isOpen={true}

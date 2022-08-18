@@ -1,15 +1,15 @@
 import { safeRemainderItemFields } from './queries';
 
-const transactionAdd = `
-  mutation TransactionAdd(
+const safeRemainderSubmit = `
+  mutation safeRemainderSubmit(
     $branchId: String,
     $departmentId: String,
     $contentId: String,
     $contentType: String,
     $status: String,
-    $products: [TransactionProductInput]
+    $products: [SafeRemainderSubmitProduct]
   ) {
-    transactionAdd(
+    safeRemainderSubmit(
       branchId: $branchId,
       departmentId: $departmentId,
       contentId: $contentId,
@@ -47,7 +47,7 @@ const safeRemainderItemRemove = `
 `;
 
 export default {
-  transactionAdd,
+  safeRemainderSubmit,
   safeRemainderItemEdit,
   safeRemainderItemRemove
 };

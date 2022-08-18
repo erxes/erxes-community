@@ -13,6 +13,31 @@ export const types = `
     createdAt: Date
   }
 
+  type TransactionDetail @key(fields: "_id") {
+    _id: String
+
+    branch: Branch
+    branchId: String
+    department: Department
+    departmentId: String
+    contentId: String
+    contentType: String
+    status: String
+    createdAt: Date
+
+    transactionItems: [TransactionItem]
+  }
+
+  type TransactionItem {
+    productId: String
+    transactionId: String
+    isDebit: Boolean
+    count: Float
+    uomId: String
+
+    modifiedAt: Date
+  }
+
   input TransactionProductInput {
     productId: String
     count: Float
@@ -30,7 +55,7 @@ export const queries = `
     status: String,
     createdAt: Date
   ): [Transaction]
-  transactionDetail(_id: String): Transaction
+  transactionDetail(_id: String): TransactionDetail
 `;
 
 export const mutations = `

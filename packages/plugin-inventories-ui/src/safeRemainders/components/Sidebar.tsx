@@ -5,13 +5,13 @@ import dayjs from 'dayjs';
 import Datetime from '@nateradebaugh/react-datetime';
 // erxes
 import { __, router } from '@erxes/ui/src/utils/core';
-import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Box from '@erxes/ui/src/components/Box';
+import Icon from '@erxes/ui/src/components/Icon';
 import CommonForm from '@erxes/ui/src/components/form/Form';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormGroup from '@erxes/ui/src/components/form/Group';
-import FormControl from '@erxes/ui/src/components/form/Control';
+import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
@@ -20,7 +20,6 @@ import { SidebarContent } from '../../styles';
 
 export default function Sidebar() {
   // Hooks
-  const timer: any = useRef(null);
   const history = useHistory();
   const location = useLocation();
   const queryParams = queryString.parse(location.search);
@@ -31,21 +30,30 @@ export default function Sidebar() {
     router.setParams(history, { [name]: value });
   };
 
+  const clearFilter = () => {
+    router.removeParams(history, 'beginDate');
+    router.removeParams(history, 'endDate');
+    router.removeParams(history, 'branchId');
+    router.removeParams(history, 'departmentId');
+    router.removeParams(history, 'productId');
+  };
+
+  const isFiltered = (): boolean => {
+    if (
+      router.getParam(history, 'beginDate') ||
+      router.getParam(history, 'endDate') ||
+      router.getParam(history, 'branchId') ||
+      router.getParam(history, 'departmentId') ||
+      router.getParam(history, 'productId')
+    )
+      return true;
+
+    return false;
+  };
+
   const handleChangeDate = (label: string, date: any) => {
     const _date = dayjs(date).format('YYYY-MM-DD HH:mm');
     setFilter(label, _date);
-  };
-
-  const search = (event: any) => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-    }
-
-    const searchValue = event.target.value;
-
-    timer.current = setTimeout(() => {
-      setFilter('searchValue', searchValue);
-    }, 500);
   };
 
   const renderContent = () => (
@@ -116,9 +124,20 @@ export default function Sidebar() {
     </FlexContent>
   );
 
+  const renderExtraButtons = () => (
+    <a href="#cancel" tabIndex={0} onClick={clearFilter}>
+      <Icon icon="cancel-1" />
+    </a>
+  );
+
   return (
     <Wrapper.Sidebar>
-      <Box title={'Filters'} isOpen={true} name="showFilters">
+      <Box
+        title={'Filters'}
+        isOpen={true}
+        name="showFilters"
+        extraButtons={isFiltered() && renderExtraButtons()}
+      >
         <SidebarContent>
           <CommonForm renderContent={renderContent} />
         </SidebarContent>

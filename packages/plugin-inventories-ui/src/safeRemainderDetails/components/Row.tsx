@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
 // erxes
 import ActionButtons from '@erxes/ui/src/components/ActionButtons';
@@ -18,6 +18,7 @@ export default function Row(props: Props) {
   const timer: any = useRef(null);
   const { item, updateItem, removeItem } = props;
   const { product, modifiedAt, count, preCount, uom, status } = item;
+
   // states
   const [diff, setDiff] = useState<number>(count - preCount);
   const [remainder, setRemainder] = useState<number>(count);
@@ -79,6 +80,11 @@ export default function Row(props: Props) {
       updateItem(item._id, value + preCount, 'checked');
     }, 300);
   };
+
+  // Update diff when remainder updates
+  useEffect(() => {
+    setDiff(count - preCount);
+  }, [count, preCount]);
 
   return (
     <tr>

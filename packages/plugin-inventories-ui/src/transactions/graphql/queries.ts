@@ -34,6 +34,29 @@ const transactions = `
   }
 `;
 
+const transactionDetail = `
+  query TransactionDetail($id: String) {
+    transactionDetail(_id: $id) {
+      _id
+      branchId
+      contentId
+      contentType
+      createdAt
+      departmentId
+      status
+      transactionItems {
+        count
+        isDebit
+        modifiedAt
+        productId
+        transactionId
+        uomId
+      }
+    }
+  }
+`;
+
 export default {
-  transactions
+  transactions,
+  transactionDetail
 };

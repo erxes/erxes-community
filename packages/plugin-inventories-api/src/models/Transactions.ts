@@ -2,15 +2,14 @@ import { Model } from 'mongoose';
 import * as _ from 'underscore';
 import { IModels } from '../connectionResolver';
 import {
-  ITransaction,
   ITransactionCreateParams,
   ITransactionDocument,
   transactionSchema
 } from './definitions/transactions';
-import { ITransactionItem } from './definitions/transactionItems';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(_id: string): Promise<ITransactionDocument>;
+  getTransactionDetail(_id: string): Promise<JSON>;
   createTransaction(
     params: ITransactionCreateParams
   ): Promise<ITransactionDocument>;
@@ -29,6 +28,31 @@ export const loadTransactionClass = (models: IModels) => {
       if (!result) throw new Error('Transaction not found!');
 
       return result;
+    }
+
+    /**
+     * Get transaction detailed
+     * @param _id Transaction ID
+     * @returns Found object with array of transaction items
+     */
+    public static async getTransactionDetail(_id: string) {
+      const result: any = await models.Transactions.findById(_id);
+
+      if (!result) throw new Error('Transaction not found!');
+
+      const transactionItems: any =
+        (await models.TransactionItems.find({ transactionId: _id })) || [];
+
+      return {
+        _id: result._id,
+        branchId: result.branchId,
+        departmentId: result.departmentId,
+        contentType: result.contentType,
+        contentId: result.contentId,
+        status: result.status,
+        createdAt: result.createdAt,
+        transactionItems
+      };
     }
 
     /**
@@ -57,7 +81,7 @@ export const loadTransactionClass = (models: IModels) => {
 
       const bulkOps: any[] = [];
 
-      products.map(async (item: any) => {
+      for await (const item of products) {
         const filter: any = { productId: item.productId };
         if (departmentId) filter.departmentId = departmentId;
         if (branchId) filter.branchId = branchId;
@@ -66,14 +90,14 @@ export const loadTransactionClass = (models: IModels) => {
 
         if (!remainder) return new Error('Remainder not found!');
 
-        const safeRemainderItem: any = await models.SafeRemainderItems.findOne(
+        const safeRemainderItem: any[] = await models.SafeRemainderItems.find(
           filter
         );
 
         if (!safeRemainderItem)
           return new Error('Safe remainder item not found!');
 
-        await models.SafeRemainderItems.updateOne(filter, {
+        await models.SafeRemainderItems.updateMany(filter, {
           $set: { preCount: item.count }
         });
 
@@ -84,15 +108,15 @@ export const loadTransactionClass = (models: IModels) => {
         if (!result) return new Error('Remainder update failed!');
 
         bulkOps.push({
-          transactionId: result._id,
+          transactionId: transaction._id,
           productId: item.productId,
-          count: item.count,
+          count: item.count - item.preCount,
           uomId: item.uomId,
-          isDebit: true,
+          isDebit: item.count - item.preCount > 0,
 
           modifiedAt: new Date()
         });
-      });
+      }
 
       await models.TransactionItems.insertMany(bulkOps);
 

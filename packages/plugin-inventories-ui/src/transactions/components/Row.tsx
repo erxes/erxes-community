@@ -2,11 +2,19 @@ import React from 'react';
 import dayjs from 'dayjs';
 // erxes
 import { __ } from '@erxes/ui/src/utils/core';
+import AsyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import Icon from '@erxes/ui/src/components/Icon';
 import Button from '@erxes/ui/src/components/Button';
 import Tip from '@erxes/ui/src/components/Tip';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import { DateWrapper } from '@erxes/ui/src/styles/main';
+// local
+
+const RowModalContent = AsyncComponent(() =>
+  import(
+    /* webpackChunkName: "LogModalContainer" */ '../containers/RowModalContent'
+  )
+);
 
 type Props = {
   data: any;
@@ -15,17 +23,7 @@ type Props = {
 const Row = (props: Props) => {
   const { data } = props;
 
-  const content = () => (
-    <div>
-      {((data && data.branch) || {}).title || 'Branch'}
-      <br />
-      {((data && data.department) || {}).title || 'Department'}
-      <br />
-      {data && data.contentType}
-      <br />
-      {dayjs(data.createdAt).format('ll') || 'Created at'}
-    </div>
-  );
+  const content = () => <RowModalContent data={data} />;
 
   return (
     <tr>

@@ -23,11 +23,20 @@ export const types = `
     remainders: [SafeRemainder],
     totalCount: Float,
   }
+
+  input SafeRemainderSubmitProduct {
+    transactionId: String
+    productId: String
+    preCount: Float
+    count: Float
+    uomId: String
+    isDebit: Boolean
+  }
 `;
 
 export const queries = `
   safeRemainders(
-    branchId: String
+    branchId: String,
     departmentId: String,
     productId: String,
     searchValue: String,
@@ -50,4 +59,12 @@ export const mutations = `
     productCategoryId: String
   ): SafeRemainder
   safeRemainderRemove(_id: String!): JSON
+  safeRemainderSubmit(
+    branchId: String,
+    departmentId: String,
+    status: String,
+    contentType: String,
+    contentId: String,
+    products: [SafeRemainderSubmitProduct]
+  ): JSON
 `;
