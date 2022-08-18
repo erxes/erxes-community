@@ -21,7 +21,7 @@ export default function Row(props: Props) {
   // states
   const [diff, setDiff] = useState<number>(count - preCount);
   const [remainder, setRemainder] = useState<number>(count);
-  const [statusDisplay, setStatusDisplay] = useState<string>('new');
+  const [statusDisplay, setStatusDisplay] = useState<string>(status || 'new');
 
   const displayNumber = (value: number) => {
     return (value || 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -39,14 +39,13 @@ export default function Row(props: Props) {
     if (timer.current) {
       clearTimeout(timer.current);
     }
-    event.preventDefault();
 
-    const checked = event.target.checked;
+    const checked = event.target.checked ? 'checked' : 'new';
 
-    setStatusDisplay(checked ? 'checked' : 'new');
+    setStatusDisplay(checked);
 
     timer.current = setTimeout(() => {
-      updateItem(item._id, remainder, status);
+      updateItem(item._id, remainder, checked);
     }, 100);
   };
 
@@ -55,8 +54,6 @@ export default function Row(props: Props) {
       clearTimeout(timer.current);
     }
 
-    event.preventDefault();
-
     const value = Number(event.target.value);
 
     setDiff(value - preCount);
@@ -64,8 +61,8 @@ export default function Row(props: Props) {
     setStatusDisplay('checked');
 
     timer.current = setTimeout(() => {
-      updateItem(item._id, remainder, status);
-    }, 500);
+      updateItem(item._id, value, 'checked');
+    }, 300);
   };
 
   const handleDiffChange = (event: any) => {
@@ -73,16 +70,14 @@ export default function Row(props: Props) {
       clearTimeout(timer.current);
     }
 
-    event.preventDefault();
-
     const value = Number(event.target.value);
     setDiff(value);
     setRemainder(value + preCount);
     setStatusDisplay('checked');
 
     timer.current = setTimeout(() => {
-      updateItem(item._id, remainder, status);
-    }, 500);
+      updateItem(item._id, value + preCount, 'checked');
+    }, 300);
   };
 
   return (
@@ -97,7 +92,7 @@ export default function Row(props: Props) {
 
       <td>
         <FormControl
-          checked={statusDisplay !== 'new'}
+          checked={statusDisplay === 'checked'}
           componentClass="checkbox"
           onChange={handleCheckChange}
         />

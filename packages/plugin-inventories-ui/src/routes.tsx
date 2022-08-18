@@ -1,50 +1,31 @@
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
-import queryString from 'query-string';
 import React from 'react';
 import { Route } from 'react-router-dom';
+// erxes
+import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 
-const Remainders = asyncComponent(() =>
+const remainders = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - LiveRemainders" */ './remainders/containers/List'
+    /* webpackChunkName: 'List - LiveRemainders' */ './remainders/containers/List'
   )
 );
 
-const SafeRemainders = asyncComponent(() =>
+const safeRemainders = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - SafeRemainders" */ './safeRemainders/containers/List'
+    /* webpackChunkName: 'List - SafeRemainders' */ './safeRemainders/containers/List'
   )
 );
 
-const SafeRemainderDetails = asyncComponent(() =>
+const safeRemainderDetails = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - SafeRemainders" */ './safeRemainderDetails/containers/List'
+    /* webpackChunkName: 'List - SafeRemainders' */ './safeRemainderDetails/containers/List'
   )
 );
 
-const Transactions = asyncComponent(() =>
+const transactions = asyncComponent(() =>
   import(
-    /* webpackChunkName: "Transactions" */ './transactions/components/Transactions'
+    /* webpackChunkName: 'List - Transactions' */ './transactions/containers/List'
   )
 );
-
-const safeRemainders = ({ location, history }) => {
-  const queryParams = queryString.parse(location.search);
-  return <SafeRemainders queryParams={queryParams} history={history} />;
-};
-
-const safeRemainderDetails = ({ match, location, history }) => {
-  const id = match.params.id;
-  const queryParams = queryString.parse(location.search);
-
-  return (
-    <SafeRemainderDetails id={id} queryParams={queryParams} history={history} />
-  );
-};
-
-const transactions = ({ location, history }) => {
-  const queryParams = queryString.parse(location.search);
-  return <Transactions queryParams={queryParams} history={history} />;
-};
 
 const routes = () => {
   return (
@@ -53,7 +34,7 @@ const routes = () => {
         exact={true}
         path="/inventories/remainders/"
         key="/inventories/remainders/"
-        component={Remainders}
+        component={remainders}
       />
 
       <Route

@@ -61,7 +61,6 @@ export const loadTransactionClass = (models: IModels) => {
         const filter: any = { productId: item.productId };
         if (departmentId) filter.departmentId = departmentId;
         if (branchId) filter.branchId = branchId;
-        if (item.remainderId) filter.remainderId = item.remainderId;
 
         const remainder: any = await models.Remainders.findOne(filter);
 

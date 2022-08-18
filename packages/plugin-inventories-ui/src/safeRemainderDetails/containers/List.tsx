@@ -1,21 +1,20 @@
 import React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-apollo';
 import queryString from 'query-string';
 import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
 // erxes
 import Alert from '@erxes/ui/src/utils/Alert';
 // local
 import { queries, mutations } from '../graphql';
 import ListComponent from '../components/List';
 
-type Props = {
-  id: string;
-};
-
-export default function ListContainer(props: Props) {
-  const { id } = props;
+function ListContainer() {
+  // Hooks
   const location = useLocation();
+  const { id } = useParams();
+
   const queryParams = queryString.parse(location.search);
 
   /**
@@ -137,7 +136,6 @@ export default function ListContainer(props: Props) {
     0;
 
   const componentProps = {
-    ...props,
     loading: safeRemainderItemsQuery.loading,
     safeRemainder,
     safeRemainderItems,
@@ -149,3 +147,5 @@ export default function ListContainer(props: Props) {
 
   return <ListComponent {...componentProps} />;
 }
+
+export default compose()(ListContainer);

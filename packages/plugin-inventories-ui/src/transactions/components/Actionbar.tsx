@@ -33,7 +33,7 @@ const Actionbar = () => {
     />
   );
 
-  return <Wrapper.ActionBar right={renderRight()} />;
+  return <Wrapper.FlowJobBar right={renderRight()} />;
 };
 
 export default Actionbar;
