@@ -93,7 +93,7 @@ export default function ListComponent(props: Props) {
       header={
         <Wrapper.Header title={__('Safe Remainders')} submenu={SUBMENU} />
       }
-      flowJobBar={<Wrapper.FlowJobBar right={actionBarRight} />}
+      actionBar={<Wrapper.ActionBar right={actionBarRight} />}
       leftSidebar={<Sidebar />}
       footer={<Pagination count={totalCount} />}
       content={

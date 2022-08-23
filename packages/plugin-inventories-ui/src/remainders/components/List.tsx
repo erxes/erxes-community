@@ -136,7 +136,7 @@ export default function ListComponent(props: Props) {
       header={
         <Wrapper.Header title={__('Remainder of Products')} submenu={SUBMENU} />
       }
-      flowJobBar={<Wrapper.FlowJobBar right={actionButtons} />}
+      actionBar={<Wrapper.ActionBar right={actionButtons} />}
       leftSidebar={<Sidebar />}
       footer={<Pagination count={totalCount} />}
       content={

@@ -111,7 +111,7 @@ export const loadSafeRemainderClass = (models: IModels) => {
 
     /**
      * Submit remainder and create transaction
-     * @param subdmoain
+     * @param subdomain
      * @param params Data to create transaction
      * @returns Created response
      */
