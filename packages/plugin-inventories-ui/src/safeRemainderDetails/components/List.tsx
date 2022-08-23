@@ -102,7 +102,7 @@ export default function List(props: Props) {
           }
         />
       }
-      flowJobBar={<Wrapper.FlowJobBar right={actionbarRight} />}
+      actionBar={<Wrapper.ActionBar right={actionbarRight} />}
       leftSidebar={<Sidebar safeRemainder={safeRemainder} />}
       footer={<Pagination count={totalCount} />}
     />
