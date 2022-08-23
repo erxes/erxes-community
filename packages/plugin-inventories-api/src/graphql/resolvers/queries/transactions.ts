@@ -15,9 +15,7 @@ const transactionQueries = {
     { _id }: { _id: string },
     { models }: IContext
   ) => {
-    const result = await models.Transactions.getTransactionDetail(_id);
-
-    return result;
+    return await models.Transactions.getTransactionDetail(_id);
   }
 };
 
