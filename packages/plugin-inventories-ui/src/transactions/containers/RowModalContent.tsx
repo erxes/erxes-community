@@ -19,12 +19,14 @@ const RowModalContentContainer = (props: Props) => {
     fetchPolicy: 'network-only'
   });
 
+  const transactionDetailData = transactionDetail.data
+    ? transactionDetail.data.transactionDetail
+    : [];
+
   return (
     <RowModalContentComponent
       loading={transactionDetail.loading}
-      detail={
-        transactionDetail.data ? transactionDetail.data.transactionDetail : []
-      }
+      data={transactionDetailData}
     />
   );
 };
