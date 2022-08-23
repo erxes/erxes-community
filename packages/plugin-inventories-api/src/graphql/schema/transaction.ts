@@ -29,6 +29,7 @@ export const types = `
   }
 
   type TransactionItem {
+    product: Product
     productId: String
     transactionId: String
     isDebit: Boolean

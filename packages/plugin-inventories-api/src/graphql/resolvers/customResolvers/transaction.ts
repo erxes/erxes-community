@@ -1,5 +1,5 @@
 import { IContext } from '../../../connectionResolver';
-import { sendCoreMessage } from '../../../messageBroker';
+import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
 import { ITransactionDocument } from '../../../models/definitions/transactions';
 
 export default {
@@ -8,7 +8,7 @@ export default {
     _,
     { subdomain }: IContext
   ) {
-    return await sendCoreMessage({
+    return sendCoreMessage({
       subdomain,
       action: 'departments.findOne',
       data: {
@@ -27,5 +27,26 @@ export default {
       },
       isRPC: true
     });
+  },
+
+  async product(transaction: any, _, { subdomain }: IContext) {
+    const result: any = [];
+
+    transaction.transactionItems.map((item: any) => {
+      result.push(
+        sendProductsMessage({
+          subdomain,
+          action: 'findOne',
+          data: {
+            _id: item.productId
+          },
+          isRPC: true
+        })
+      );
+    });
+
+    console.log(result);
+
+    return result;
   }
 };
