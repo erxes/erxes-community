@@ -1,18 +1,25 @@
 import * as mongoose from 'mongoose';
 import { mainDb } from './configs';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
-import { IChatMessageDocument, IChatDocument } from './models/definitions/chat'; // IChatMessageDocument  IChatDocument
+import {
+  IChatMessageDocument,
+  IChatDocument,
+  IUserStatusDocument
+} from './models/definitions/chat'; // IChatMessageDocument  IChatDocument
 import {
   loadChatClass, // loadChatClass
   loadChatMessageClass, // loadChatMessageClass
   IChatModel, // IChatModel
-  IChatMessageModel // IChatMessageModel
+  IChatMessageModel, // IChatMessageModel
+  IUserStatusModel,
+  loadUserStatusClass
 } from './models/chat';
 import { MongoClient } from 'mongodb';
 
 export interface IModels {
   ChatMessages: IChatMessageModel;
   Chats: IChatModel;
+  UserStatus: IUserStatusModel;
 }
 
 export interface IContext extends IMainContext {
@@ -46,6 +53,9 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     'chat',
     loadChatClass(models)
   );
-
+  models.UserStatus = db.model<IUserStatusDocument, IUserStatusModel>(
+    'chat-user-status',
+    loadUserStatusClass(models)
+  );
   return models;
 };
