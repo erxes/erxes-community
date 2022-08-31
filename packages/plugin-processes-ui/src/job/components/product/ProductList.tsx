@@ -139,6 +139,7 @@ class List extends React.Component<IProps, State> {
         />
         <ModalTrigger
           title="Add Job"
+          size="lg"
           trigger={trigger}
           autoOpenKey="showProductModal"
           content={modalContent}

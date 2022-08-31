@@ -52,8 +52,6 @@ export interface IProductsData {
   quantity: number;
   uomId: string;
   uom?: any;
-  branchId?: string;
-  departmentId?: string;
 }
 
 export interface IProductsDataDocument extends IProductsData {

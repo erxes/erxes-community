@@ -1,19 +1,4 @@
-import { DURATION_TYPES, JOB_TYPE_CHOISES } from '../../../constants';
-import {
-  FormColumn,
-  FormWrapper,
-  ModalFooter
-} from '@erxes/ui/src/styles/main';
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import {
-  IConfigsMap,
-  IJobCategory,
-  IJobRefer,
-  IProduct,
-  IProductsDataDocument,
-  IUom
-} from '../../types';
-
+import ActionButtons from '@erxes/ui/src/components/ActionButtons';
 import Button from '@erxes/ui/src/components/Button';
 import CategoryForm from '../../containers/productCategory/CategoryForm';
 import CommonForm from '@erxes/ui/src/components/form/Form';
@@ -22,11 +7,25 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import Icon from '@erxes/ui/src/components/Icon';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
 import React from 'react';
-import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
+import Tip from '@erxes/ui/src/components/Tip';
+import withTableWrapper from '@erxes/ui/src/components/table/withTableWrapper';
 import { __ } from '@erxes/ui/src/utils';
+import { DURATION_TYPES, JOB_TYPE_CHOISES } from '../../../constants';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import {
+  IConfigsMap,
+  IJobCategory,
+  IJobRefer,
+  IProduct,
+  IProductsData,
+  IUom
+} from '../../types';
+import { ModalFooter } from '@erxes/ui/src/styles/main';
+import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
+import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
+import { TableOver } from '../../../styles';
 
 type Props = {
   jobRefer?: IJobRefer;
@@ -38,8 +37,8 @@ type Props = {
 };
 
 type State = {
-  needProducts: IProductsDataDocument[];
-  resultProducts: IProductsDataDocument[];
+  needProducts: IProductsData[];
+  resultProducts: IProductsData[];
   categoryId: string;
 };
 
@@ -53,8 +52,8 @@ class Form extends React.Component<Props, State> {
     const { needProducts, resultProducts } = productRefer;
 
     this.state = {
-      needProducts: needProducts ? needProducts : [],
-      resultProducts: resultProducts ? resultProducts : [],
+      needProducts: needProducts || [],
+      resultProducts: resultProducts || [],
       categoryId: ''
     };
 
@@ -63,8 +62,8 @@ class Form extends React.Component<Props, State> {
 
   generateDoc = (values: {
     _id?: string;
-    needProducts: IProductsDataDocument[];
-    resultProducts: IProductsDataDocument[];
+    needProducts: IProductsData[];
+    resultProducts: IProductsData[];
   }) => {
     const { jobRefer } = this.props;
     const finalValues = values;
@@ -123,32 +122,28 @@ class Form extends React.Component<Props, State> {
     );
   }
 
-  renderProductServiceTrigger(product?: IProduct) {
+  renderProductServiceTrigger() {
     let content = (
       <div>
         {__('Choose Product & service ')} <Icon icon="plus-circle" />
       </div>
     );
 
-    // if product selected
-    if (product) {
-      content = (
-        <div>
-          {product.name} <Icon icon="pen-1" />
-        </div>
-      );
-    }
-
     return <ProductButton>{content}</ProductButton>;
   }
 
-  renderProductModal = (currentProduct?: IProduct, type = '') => {
+  renderProductModal = (type: 'needProducts' | 'resultProducts') => {
     const productOnChange = (products: IProduct[]) => {
       const { uoms, configsMap } = this.props;
-      const defaultUom = (configsMap || {}).default_uom || '';
-      // const selectedProducts = products && products.length === 1 ? products[0] : products;
 
-      for (const product of products) {
+      const currentProducts = this.state[type];
+      const currentProductIds = currentProducts.map(p => p.productId);
+      const chosenProductIds = products.map(p => p._id);
+      const defaultUom = (configsMap || {}).default_uom || '';
+
+      for (const product of products.filter(
+        p => !currentProductIds.includes(p._id)
+      ) || []) {
         const productId = product ? product._id : '';
         const uomId = product.uomId ? product.uomId : defaultUom;
         const uom = (uoms || []).find(e => e._id === uomId);
@@ -158,19 +153,24 @@ class Form extends React.Component<Props, State> {
           productId,
           quantity: 1,
           uomId,
-          branchId: '',
-          departmentId: '',
           product,
           uom
         };
 
-        const currentProducts = this.state[type];
-
         currentProducts.push(inputData);
-
-        this.setState({ [type]: currentProducts } as any);
       }
+
+      this.setState({
+        [type]:
+          currentProducts.filter(p => chosenProductIds.includes(p.productId)) ||
+          []
+      } as any);
     };
+
+    const currentProducts =
+      type === 'needProducts'
+        ? this.state.needProducts
+        : this.state.resultProducts;
 
     const content = props => (
       <ProductChooser
@@ -180,7 +180,7 @@ class Form extends React.Component<Props, State> {
         categoryId={this.state.categoryId}
         data={{
           name: 'Product',
-          products: currentProduct ? [currentProduct] : []
+          products: (currentProducts || []).map(p => p.product || p.productId)
         }}
         limit={10}
       />
@@ -189,7 +189,7 @@ class Form extends React.Component<Props, State> {
     return (
       <ModalTrigger
         title="Choose product & service"
-        trigger={this.renderProductServiceTrigger(currentProduct)}
+        trigger={this.renderProductServiceTrigger()}
         size="lg"
         content={content}
       />
@@ -206,89 +206,103 @@ class Form extends React.Component<Props, State> {
 
     products.sort();
 
-    return products.map(product => {
-      const subUoms = product.product.subUoms ? product.product.subUoms : [];
-      const defaultUomId = product.product.uomId
-        ? product.product.uomId
-        : (configsMap || {}).default_uom;
+    return (
+      <withTableWrapper.Wrapper>
+        <TableOver
+          whiteSpace="nowrap"
+          hover={true}
+          bordered={true}
+          responsive={true}
+          wideHeader={true}
+        >
+          <thead>
+            <tr>
+              <th>{__('Product')}</th>
+              <th>{__('Quantity')}</th>
+              <th>{__('UOM')}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => {
+              const subUoms = product.product.subUoms
+                ? product.product.subUoms
+                : [];
+              const defaultUomId = product.product.uomId
+                ? product.product.uomId
+                : (configsMap || {}).default_uom;
 
-      const productUoms = subUoms.map(e => e.uomId);
-      const mergedUoms = [...productUoms, defaultUomId];
+              const productUoms = subUoms.map(e => e.uomId);
+              const mergedUoms = [...productUoms, defaultUomId];
 
-      // const filtered = uoms.filter(u => (mergedUoms.includes(u._id)));
+              const filtered: any[] =
+                mergedUoms.map(e => {
+                  const uomOne = (uoms || []).find(u => u._id === e);
+                  return uomOne;
+                }) || [];
 
-      const filtered: any[] =
-        mergedUoms.map(e => {
-          const uomOne = (uoms || []).find(u => u._id === e);
-          return uomOne;
-        }) || [];
-
-      console.log('filtered uoms: ', filtered);
-      console.log('product: ', product);
-      return (
-        <>
-          <FormWrapper>
-            <FormColumn>
-              <FormGroup>
-                <FormControl
-                  value={product ? product.product.name : ''}
-                  disabled={true}
-                />
-              </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <Row>
-                <FormGroup>
-                  <FormControl
-                    value={product ? product.quantity : 0}
-                    type="number"
-                    onChange={this.onChange.bind(
-                      this,
-                      product._id,
-                      type,
-                      'quantity'
-                    )}
-                  />
-                </FormGroup>
-                {' /Qty/'}
-              </Row>
-            </FormColumn>
-            <FormColumn>
-              {/* <FormGroup>
-                <Row>
-                  <FormControl
-                    defaultValue={(uom ? uom.name : '') + ' /Uom/'}
-                    disabled={true}
-                  />
-                </Row>
-              </FormGroup> */}
-
-              <FormControl
-                componentClass="select"
-                value={product.uomId}
-                onChange={this.onChange.bind(this, product._id, type, 'uom')}
-              >
-                <option value="" />
-                {(filtered || []).map(u => (
-                  <option key={u._id} value={u._id}>
-                    {u.name}
-                  </option>
-                ))}
-              </FormControl>
-            </FormColumn>
-
-            <FormColumn>
-              <Button
-                btnStyle="simple"
-                uppercase={false}
-                icon="cancel-1"
-                onClick={this.onClickRemoveButton.bind(this, product._id, type)}
-              />
-            </FormColumn>
-          </FormWrapper>
-        </>
-      );
-    });
+              return (
+                <tr>
+                  <td>
+                    <FormControl
+                      value={product ? product.product.name : ''}
+                      disabled={true}
+                    />
+                  </td>
+                  <td>
+                    <FormControl
+                      value={product ? product.quantity : 0}
+                      align="right"
+                      type="number"
+                      onChange={this.onChange.bind(
+                        this,
+                        product._id,
+                        type,
+                        'quantity'
+                      )}
+                    />
+                  </td>
+                  <td>
+                    <FormControl
+                      componentClass="select"
+                      value={product.uomId}
+                      onChange={this.onChange.bind(
+                        this,
+                        product._id,
+                        type,
+                        'uom'
+                      )}
+                    >
+                      <option value="" />
+                      {(filtered || []).map(u => (
+                        <option key={u._id} value={u._id}>
+                          {u.name}
+                        </option>
+                      ))}
+                    </FormControl>
+                  </td>
+                  <td>
+                    <ActionButtons>
+                      <Tip text="Delete" placement="top">
+                        <Button
+                          btnStyle="link"
+                          onClick={this.onClickRemoveButton.bind(
+                            this,
+                            product._id,
+                            type
+                          )}
+                          icon="times-circle"
+                        />
+                      </Tip>
+                    </ActionButtons>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </TableOver>
+      </withTableWrapper.Wrapper>
+    );
   };
 
   renderContent = (formProps: IFormProps) => {
@@ -302,11 +316,7 @@ class Form extends React.Component<Props, State> {
       </Button>
     );
 
-    console.log('start renderContent');
-
     const { name, code, type, duration, durationType, categoryId } = object;
-
-    console.log(name, code, type, duration, durationType, categoryId);
 
     return (
       <>
@@ -399,18 +409,16 @@ class Form extends React.Component<Props, State> {
         </FormGroup>
 
         <FormGroup>
-          <ControlLabel required={true}>Need products</ControlLabel>
-          {this.renderProductModal(undefined, 'needProducts')}
+          <ControlLabel required={true}>Need products:</ControlLabel>
+          {this.renderProductModal('needProducts')}
+          {this.renderProducts('needProducts')}
         </FormGroup>
-
-        {this.renderProducts('needProducts')}
 
         <FormGroup>
-          <ControlLabel required={true}>Result products</ControlLabel>
-          {this.renderProductModal(undefined, 'resultProducts')}
+          <ControlLabel required={true}>Result products:</ControlLabel>
+          {this.renderProductModal('resultProducts')}
+          {this.renderProducts('resultProducts')}
         </FormGroup>
-
-        {this.renderProducts('resultProducts')}
 
         <ModalFooter>
           <Button
