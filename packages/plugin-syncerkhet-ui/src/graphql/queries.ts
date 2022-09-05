@@ -58,6 +58,32 @@ const commonOrderParamDefs = `
   createdEndDate: $createdEndDate
 `;
 
+const commonProductParams = `
+  $type: String,
+  $categoryId: String,
+  $searchValue: String,
+  $tag: String,
+  $page: Int,
+  $perPage: Int, 
+  $ids: [String],
+  $excludeIds: Boolean,
+  $pipelineId: String,
+  $boardId: String
+`;
+
+const commonProductParamsDefs = `
+  type: $type,
+  categoryId: $categoryId,
+  searchValue: $searchValue,
+  tag: $tag,
+  page: $page,
+  perPage: $perPage, 
+  ids: $ids,
+  excludeIds: $excludeIds,
+  pipelineId: $pipelineId,
+  boardId: $boardId 
+`;
+
 const checkSyncDeals = `
   query deals (
     ${commonDealParams}
@@ -111,10 +137,61 @@ const checkSyncOrders = `
   }
 `;
 
+const getProductsList = `
+  query Products(
+    ${commonProductParams}
+  ) {
+    products(
+      ${commonProductParamsDefs}
+    ) {
+      _id
+      name
+      code
+      type
+      description
+      sku
+      unitPrice
+      category {
+        _id
+        name
+        code
+      }
+      categoryId
+      customFieldsData
+      createdAt
+      tagIds
+      vendorId
+      supply
+      productCount
+      minimiumCount
+      uomId
+      subUoms
+    }
+  }
+`;
+
+const getCategoryList = `
+  query ProductCategories {
+    productCategories {
+      _id
+      name
+      description
+      parentId
+      code
+      order
+      status
+      isRoot
+      productCount
+    }
+  }
+`;
+
 export default {
   configs,
   checkSyncDeals,
   checkSyncDealsTotalCount,
   checkSyncOrdersTotalCount,
-  checkSyncOrders
+  checkSyncOrders,
+  getCategoryList,
+  getProductsList
 };

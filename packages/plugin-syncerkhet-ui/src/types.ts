@@ -46,3 +46,11 @@ export type ToSyncOrdersMutationResponse = {
     variables: { orderIds: string[] };
   }) => Promise<any>;
 };
+
+export type CategoriesQueryResponse = {
+  productCategories: any[];
+} & QueryResponse;
+
+export type ProductsQueryResponse = {
+  products: any[];
+} & QueryResponse;
