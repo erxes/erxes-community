@@ -243,7 +243,9 @@ export const initBroker = async cl => {
     });
 
     if (newOrder.type === 'delivery' && newOrder.branchId) {
-      const toPos = await models.Pos.findOne({ branchId: newOrder.branchId });
+      const toPos = await models.Pos.findOne({
+        branchId: newOrder.branchId
+      }).lean();
 
       // paid order info to offline pos
       if (toPos) {
@@ -366,6 +368,14 @@ export const initBroker = async cl => {
     return {
       status: 'success',
       data: await models.Pos.find(data).lean()
+    };
+  });
+
+  consumeRPCQueue('pos:configs.findOne', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+    return {
+      status: 'success',
+      data: await models.Pos.findOne(data).lean()
     };
   });
 };
