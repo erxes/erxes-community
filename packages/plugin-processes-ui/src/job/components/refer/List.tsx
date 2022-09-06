@@ -119,12 +119,6 @@ class List extends React.Component<IProps, State> {
       currentCategory
     } = this.props;
 
-    const triggerFormat = (
-      <Button btnStyle="success" icon="plus-circle">
-        {__('Add format jobs')}
-      </Button>
-    );
-
     const trigger = (
       <Button btnStyle="success" icon="plus-circle">
         {__('Add job')}
@@ -142,13 +136,6 @@ class List extends React.Component<IProps, State> {
           value={this.state.searchValue}
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
-        />
-        <ModalTrigger
-          title="Add format jobs"
-          size="lg"
-          trigger={triggerFormat}
-          autoOpenKey="showProductModal"
-          content={modalContent}
         />
         <ModalTrigger
           title="Add Job"

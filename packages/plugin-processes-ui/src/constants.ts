@@ -1,6 +1,8 @@
 export const JOB_TYPE_CHOISES = {
-  product: 'Product',
-  service: 'Service'
+  facture: 'Facture',
+  income: 'Income',
+  move: 'Move',
+  outlet: 'Outlet'
 };
 
 export const PRODUCT_CATEGORIES_STATUS = ['active', 'disabled', 'archived'];

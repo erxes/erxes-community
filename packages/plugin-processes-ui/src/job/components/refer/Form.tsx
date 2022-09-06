@@ -22,7 +22,11 @@ import {
   IProductsData,
   IUom
 } from '../../types';
-import { ModalFooter } from '@erxes/ui/src/styles/main';
+import {
+  FormColumn,
+  FormWrapper,
+  ModalFooter
+} from '@erxes/ui/src/styles/main';
 import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
 import { TableOver } from '../../../styles';
@@ -37,6 +41,7 @@ type Props = {
 };
 
 type State = {
+  jobType: string;
   needProducts: IProductsData[];
   resultProducts: IProductsData[];
   categoryId: string;
@@ -46,18 +51,15 @@ class Form extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    console.log('contsructor: ', props.jobRefer);
-
     const productRefer = props.jobRefer || ({} as IJobRefer);
     const { needProducts, resultProducts } = productRefer;
 
     this.state = {
+      jobType: productRefer.type || 'facture',
       needProducts: needProducts || [],
       resultProducts: resultProducts || [],
       categoryId: ''
     };
-
-    console.log('constructor end');
   }
 
   generateDoc = (values: {
@@ -67,10 +69,34 @@ class Form extends React.Component<Props, State> {
   }) => {
     const { jobRefer } = this.props;
     const finalValues = values;
-    const { needProducts, resultProducts } = this.state;
+    const { needProducts, resultProducts, jobType } = this.state;
 
     if (jobRefer) {
       finalValues._id = jobRefer._id;
+    }
+
+    if (jobType === 'income') {
+      return {
+        ...finalValues,
+        needProducts: [],
+        resultProducts
+      };
+    }
+
+    if (jobType === 'outlet') {
+      return {
+        ...finalValues,
+        needProducts,
+        resultProducts: []
+      };
+    }
+
+    if (jobType === 'move') {
+      return {
+        ...finalValues,
+        needProducts,
+        resultProducts: needProducts
+      };
     }
 
     return {
@@ -160,11 +186,10 @@ class Form extends React.Component<Props, State> {
         currentProducts.push(inputData);
       }
 
-      this.setState({
-        [type]:
-          currentProducts.filter(p => chosenProductIds.includes(p.productId)) ||
-          []
-      } as any);
+      const chosenProducts =
+        currentProducts.filter(p => chosenProductIds.includes(p.productId)) ||
+        [];
+      this.setState({ [type]: chosenProducts } as any);
     };
 
     const currentProducts =
@@ -182,7 +207,6 @@ class Form extends React.Component<Props, State> {
           name: 'Product',
           products: (currentProducts || []).map(p => p.product || p.productId)
         }}
-        limit={10}
       />
     );
 
@@ -196,7 +220,7 @@ class Form extends React.Component<Props, State> {
     );
   };
 
-  renderProducts = type => {
+  renderProducts = (type: 'needProducts' | 'resultProducts') => {
     const products =
       type === 'needProducts'
         ? this.state.needProducts
@@ -305,6 +329,56 @@ class Form extends React.Component<Props, State> {
     );
   };
 
+  renderProductsGroup = () => {
+    const { jobType } = this.state;
+
+    if (jobType === 'income') {
+      return (
+        <FormGroup>
+          <ControlLabel required={true}>Result products:</ControlLabel>
+          {this.renderProductModal('resultProducts')}
+          {this.renderProducts('resultProducts')}
+        </FormGroup>
+      );
+    }
+
+    if (jobType === 'outlet') {
+      return (
+        <FormGroup>
+          <ControlLabel required={true}>Need products:</ControlLabel>
+          {this.renderProductModal('needProducts')}
+          {this.renderProducts('needProducts')}
+        </FormGroup>
+      );
+    }
+
+    if (jobType === 'move') {
+      return (
+        <FormGroup>
+          <ControlLabel required={true}>Move products:</ControlLabel>
+          {this.renderProductModal('needProducts')}
+          {this.renderProducts('needProducts')}
+        </FormGroup>
+      );
+    }
+
+    return (
+      <>
+        <FormGroup>
+          <ControlLabel required={true}>Need products:</ControlLabel>
+          {this.renderProductModal('needProducts')}
+          {this.renderProducts('needProducts')}
+        </FormGroup>
+
+        <FormGroup>
+          <ControlLabel required={true}>Result products:</ControlLabel>
+          {this.renderProductModal('resultProducts')}
+          {this.renderProducts('resultProducts')}
+        </FormGroup>
+      </>
+    );
+  };
+
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal, jobRefer, jobCategories } = this.props;
     const { values, isSubmitted } = formProps;
@@ -320,105 +394,115 @@ class Form extends React.Component<Props, State> {
 
     return (
       <>
-        <FormGroup>
-          <ControlLabel required={true}>Name</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="name"
-            defaultValue={name}
-            autoFocus={true}
-            required={true}
-          />
-        </FormGroup>
+        <FormWrapper>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Name</ControlLabel>
+              <FormControl
+                {...formProps}
+                name="name"
+                defaultValue={name}
+                autoFocus={true}
+                required={true}
+              />
+            </FormGroup>
+          </FormColumn>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Code</ControlLabel>
+              <FormControl
+                {...formProps}
+                name="code"
+                defaultValue={code}
+                required={true}
+              />
+            </FormGroup>
+          </FormColumn>
+        </FormWrapper>
+        <FormWrapper>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Category</ControlLabel>
+              <Row>
+                <FormControl
+                  {...formProps}
+                  name="categoryId"
+                  componentClass="select"
+                  defaultValue={categoryId}
+                  required={true}
+                >
+                  <option value="" />
+                  {jobCategories.map(categoryMap => (
+                    <option key={categoryMap._id} value={categoryMap._id}>
+                      {categoryMap.name}
+                    </option>
+                  ))}
+                </FormControl>
 
-        <FormGroup>
-          <ControlLabel required={true}>Code</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="code"
-            defaultValue={code}
-            required={true}
-          />
-        </FormGroup>
+                {this.renderFormTrigger(trigger)}
+              </Row>
+            </FormGroup>
+          </FormColumn>
 
-        <FormGroup>
-          <ControlLabel required={true}>Type</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="type"
-            componentClass="select"
-            defaultValue={type}
-            required={true}
-          >
-            {Object.keys(JOB_TYPE_CHOISES).map((typeName, index) => (
-              <option key={index} value={typeName}>
-                {typeName}
-              </option>
-            ))}
-          </FormControl>
-        </FormGroup>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Type</ControlLabel>
+              <FormControl
+                {...formProps}
+                name="type"
+                componentClass="select"
+                defaultValue={type}
+                required={true}
+                onChange={e =>
+                  this.setState({
+                    jobType: (e.currentTarget as HTMLInputElement).value
+                  })
+                }
+              >
+                {Object.keys(JOB_TYPE_CHOISES).map(value => (
+                  <option key={value} value={value}>
+                    {JOB_TYPE_CHOISES[value]}
+                  </option>
+                ))}
+              </FormControl>
+            </FormGroup>
+          </FormColumn>
+        </FormWrapper>
+        <FormWrapper>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Duration Type</ControlLabel>
+              <FormControl
+                {...formProps}
+                name="durationType"
+                componentClass="select"
+                defaultValue={durationType}
+                required={true}
+              >
+                {Object.keys(DURATION_TYPES).map((typeName, index) => (
+                  <option key={index} value={typeName}>
+                    {typeName}
+                  </option>
+                ))}
+              </FormControl>
+            </FormGroup>
+          </FormColumn>
 
-        <FormGroup>
-          <ControlLabel required={true}>Category</ControlLabel>
-          <Row>
-            <FormControl
-              {...formProps}
-              name="categoryId"
-              componentClass="select"
-              defaultValue={categoryId}
-              required={true}
-            >
-              <option value="" />
-              {jobCategories.map(categoryMap => (
-                <option key={categoryMap._id} value={categoryMap._id}>
-                  {categoryMap.name}
-                </option>
-              ))}
-            </FormControl>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel required={true}>Duration</ControlLabel>
+              <FormControl
+                {...formProps}
+                name="duration"
+                defaultValue={duration}
+                required={true}
+                type="number"
+              />
+            </FormGroup>
+          </FormColumn>
+        </FormWrapper>
 
-            {this.renderFormTrigger(trigger)}
-          </Row>
-        </FormGroup>
-
-        <FormGroup>
-          <ControlLabel required={true}>Duration Type</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="durationType"
-            componentClass="select"
-            defaultValue={durationType}
-            required={true}
-          >
-            {Object.keys(DURATION_TYPES).map((typeName, index) => (
-              <option key={index} value={typeName}>
-                {typeName}
-              </option>
-            ))}
-          </FormControl>
-        </FormGroup>
-
-        <FormGroup>
-          <ControlLabel required={true}>Duration</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="duration"
-            defaultValue={duration}
-            required={true}
-            type="number"
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <ControlLabel required={true}>Need products:</ControlLabel>
-          {this.renderProductModal('needProducts')}
-          {this.renderProducts('needProducts')}
-        </FormGroup>
-
-        <FormGroup>
-          <ControlLabel required={true}>Result products:</ControlLabel>
-          {this.renderProductModal('resultProducts')}
-          {this.renderProducts('resultProducts')}
-        </FormGroup>
+        {this.renderProductsGroup()}
 
         <ModalFooter>
           <Button
