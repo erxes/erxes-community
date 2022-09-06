@@ -11,10 +11,10 @@ import { __, Alert, confirm, router } from '@erxes/ui/src/utils';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { BarItems } from '@erxes/ui/src/layout/styles';
 import React from 'react';
-import Form from '../../containers/product/ProductForm';
-import CategoryList from '../../containers/productCategory/CategoryList';
+import Form from '../../containers/refer/Form';
+import CategoryList from '../../containers/category/List';
 import { IJobRefer, IProductCategory } from '../../types';
-import Row from './ProductRow';
+import Row from './Row';
 import { menuContacts } from '../../../constants';
 
 interface IProps extends IRouterProps {
@@ -119,9 +119,15 @@ class List extends React.Component<IProps, State> {
       currentCategory
     } = this.props;
 
+    const triggerFormat = (
+      <Button btnStyle="success" icon="plus-circle">
+        {__('Add format jobs')}
+      </Button>
+    );
+
     const trigger = (
       <Button btnStyle="success" icon="plus-circle">
-        Add job
+        {__('Add job')}
       </Button>
     );
 
@@ -136,6 +142,13 @@ class List extends React.Component<IProps, State> {
           value={this.state.searchValue}
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
+        />
+        <ModalTrigger
+          title="Add format jobs"
+          size="lg"
+          trigger={triggerFormat}
+          autoOpenKey="showProductModal"
+          content={modalContent}
         />
         <ModalTrigger
           title="Add Job"

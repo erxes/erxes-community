@@ -8,7 +8,7 @@ import TextInfo from '@erxes/ui/src/components/TextInfo';
 import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from '@erxes/ui/src/utils';
 
-import ProductForm from '../../containers/product/ProductForm';
+import ProductForm from '../../containers/refer/Form';
 import { IJobRefer } from '../../types';
 
 type Props = {

@@ -13,7 +13,7 @@ import {
 import { mutations, queries } from '../../graphql';
 
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
-import From from '../../components/product/ProductForm';
+import From from '../../components/refer/Form';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import React from 'react';
 import gql from 'graphql-tag';

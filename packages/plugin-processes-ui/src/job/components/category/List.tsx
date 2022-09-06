@@ -11,7 +11,7 @@ import { SidebarList } from '@erxes/ui/src/layout/styles';
 import { ActionButtons, SidebarListItem } from '@erxes/ui-settings/src/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CategoryForm from '../../containers/productCategory/CategoryForm';
+import CategoryForm from '../../containers/category/Form';
 import { IJobCategory } from '../../types';
 
 const { Section } = Wrapper.Sidebar;

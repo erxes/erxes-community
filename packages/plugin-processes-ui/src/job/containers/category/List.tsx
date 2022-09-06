@@ -3,7 +3,7 @@ import * as compose from 'lodash.flowright';
 import { Alert, confirm, withProps } from '@erxes/ui/src/utils';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import List from '../../components/productCategory/CategoryList';
+import List from '../../components/category/List';
 import { mutations, queries } from '../../graphql';
 import {
   JobCategoriesCountQueryResponse,
