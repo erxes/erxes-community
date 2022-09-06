@@ -1,12 +1,31 @@
 export const FLOWJOBS = [
   {
     type: 'job',
+    icon: 'puzzle',
     label: 'Job',
     description: '',
+    isAvailable: true
+  },
+  {
+    type: 'income',
+    icon: 'shoppingcart',
+    label: 'Single income',
+    description: '',
+    isAvailable: true
+  },
+  {
+    type: 'outlet',
+    icon: 'leaf',
+    label: 'Single outlet',
+    description: '',
     jobReferId: '',
-    nextJobIds: [],
-    quantity: 1,
-    assignUserIds: [],
+    isAvailable: true
+  },
+  {
+    type: 'move',
+    icon: 'exchange-alt',
+    label: 'Single move',
+    description: '',
     isAvailable: true
   }
 ];
