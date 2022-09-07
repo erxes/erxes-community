@@ -1,5 +1,6 @@
 export const JOB_TYPE_CHOISES = {
   facture: 'Facture',
+  end: 'End Point',
   income: 'Income',
   move: 'Move',
   outlet: 'Outlet'

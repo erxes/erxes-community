@@ -99,6 +99,15 @@ class Form extends React.Component<Props, State> {
       };
     }
 
+    if (jobType === 'end') {
+      return {
+        ...finalValues,
+        needProducts,
+        resultProducts:
+          resultProducts.length > 1 ? resultProducts[0] : resultProducts
+      };
+    }
+
     return {
       ...finalValues,
       needProducts,
@@ -207,6 +216,9 @@ class Form extends React.Component<Props, State> {
           name: 'Product',
           products: (currentProducts || []).map(p => p.product || p.productId)
         }}
+        limit={
+          this.state.jobType === 'end' && type === 'resultProducts' ? 1 : 50
+        }
       />
     );
 
