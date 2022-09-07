@@ -54,3 +54,11 @@ export type CategoriesQueryResponse = {
 export type ProductsQueryResponse = {
   products: any[];
 } & QueryResponse;
+
+export type ErkhetProductsQueryResponse = {
+  getProductsErkhet: any[];
+} & QueryResponse;
+
+export type ErkhetCategoriesQueryResponse = {
+  getCategoriesErkhet: any[];
+} & QueryResponse;

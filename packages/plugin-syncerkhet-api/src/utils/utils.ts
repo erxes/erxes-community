@@ -24,3 +24,7 @@ export const getConfig = async (subdomain, code, defaultValue?) => {
     isRPC: true
   });
 };
+
+export const arrayPaginate = (array, page_size, page_number) => {
+  return array.slice((page_number - 1) * page_size, page_number * page_size);
+};

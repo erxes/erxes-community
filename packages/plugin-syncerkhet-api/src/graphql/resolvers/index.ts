@@ -1,12 +1,14 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
 import checkSyncedMutations from './mutations/checkSynced';
 
-import {} from './queries';
+import erkhetQueries from './queries/inventory';
 
 const resolvers: any = async _serviceDiscovery => ({
   ...customScalars,
 
-  Query: {},
+  Query: {
+    ...erkhetQueries
+  },
 
   Mutation: {
     ...checkSyncedMutations

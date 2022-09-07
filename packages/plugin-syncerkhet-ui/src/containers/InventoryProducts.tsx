@@ -10,7 +10,7 @@ import { mutations, queries } from '../graphql';
 import { router, withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryProducts from '../components/inventoryProducts/InventoryProducts';
-import { ProductsQueryResponse } from '../types';
+import { ErkhetProductsQueryResponse, ProductsQueryResponse } from '../types';
 
 type Props = {
   queryParams: any;
@@ -19,6 +19,7 @@ type Props = {
 
 type FinalProps = {
   getProductsListQuery: ProductsQueryResponse;
+  getErkhetProductsListQuery: ErkhetProductsQueryResponse;
 } & Props &
   IRouterProps;
 
@@ -32,16 +33,19 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getProductsListQuery } = this.props;
+    const { getProductsListQuery, getErkhetProductsListQuery } = this.props;
 
-    if (getProductsListQuery.loading) {
+    if (getProductsListQuery.loading || getErkhetProductsListQuery.loading) {
       return <Spinner />;
     }
     const products = getProductsListQuery.products || [];
+    const erkhetProducts =
+      getErkhetProductsListQuery.getProductsErkhet.slice(0, 50) || [];
     const updatedProps = {
       ...this.props,
       loading: getProductsListQuery.loading,
-      products
+      products,
+      erkhetProducts
     };
 
     const content = props => <InventoryProducts {...props} {...updatedProps} />;
@@ -51,11 +55,7 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
 }
 
 const generateParams = ({ queryParams }) => {
-  const pageInfo = router.generatePaginationParams(queryParams || {});
-
   return {
-    sortField: queryParams.sortField,
-    sortDirection: Number(queryParams.sortDirection) || undefined,
     page: queryParams.page ? parseInt(queryParams.page, 10) : 1,
     perPage: queryParams.perPage ? parseInt(queryParams.perPage, 10) : 20
   };
@@ -67,6 +67,16 @@ export default withProps<Props>(
       gql(queries.getProductsList),
       {
         name: 'getProductsListQuery',
+        options: ({ queryParams }) => ({
+          variables: generateParams({ queryParams }),
+          fetchPolicy: 'network-only'
+        })
+      }
+    ),
+    graphql<{ queryParams: any }, ErkhetProductsQueryResponse>(
+      gql(queries.getErkhetProductsList),
+      {
+        name: 'getErkhetProductsListQuery',
         options: ({ queryParams }) => ({
           variables: generateParams({ queryParams }),
           fetchPolicy: 'network-only'

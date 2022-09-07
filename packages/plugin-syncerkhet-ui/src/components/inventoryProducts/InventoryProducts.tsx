@@ -5,11 +5,22 @@ import Table from '@erxes/ui/src/components/table';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { VerticalDivider, VLeftSplit, VRightSplit, VSplit } from '../../styles';
 import { Title } from '@erxes/ui-settings/src/styles';
-import Row from './InventoryProductsRow';
+import Button from '@erxes/ui/src/components/Button';
+import ErxesRow from './InventoryProductsErxesRow';
+import ErkhetRow from './InventoryProductsErkhetRow';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 
 type Props = {
   loading: boolean;
   products: any[];
+  erkhetProducts: any[];
+  history: any;
+  queryParams: any;
+  isAllSelected: boolean;
+  bulk: any[];
+  toggleBulk: () => void;
+  emptyBulk: () => void;
+  toggleAll: (targets: any[], containerId: string) => void;
 };
 
 type State = {};
@@ -28,20 +39,32 @@ class InventoryProducts extends React.Component<Props, State> {
     this.state = {};
   }
 
-  renderRow = () => {
-    const { products } = this.props;
+  renderErxesRow = () => {
+    const { products, toggleBulk, bulk } = this.props;
 
     return products.map(p => (
-      <Row
+      <ErxesRow
         history={history}
         key={p._id}
         product={p}
-        // toggleBulk={toggleBulk}
-        // isChecked={bulk.includes(product)}
+        toggleBulk={toggleBulk}
+        isChecked={bulk.includes(p)}
       />
     ));
   };
 
+  renderErkhetRow = () => {
+    const { erkhetProducts } = this.props;
+
+    return erkhetProducts.map(p => (
+      <ErkhetRow history={history} key={p._id} product={p} />
+    ));
+  };
+
+  onChange = () => {
+    const { toggleAll, products } = this.props;
+    toggleAll(products, 'products');
+  };
   renderErkhetSide = () => {
     const header = <Wrapper.ActionBar left={<Title>Erkhet Products</Title>} />;
     return (
@@ -50,30 +73,42 @@ class InventoryProducts extends React.Component<Props, State> {
         <Table hover={true}>
           <thead>
             <tr>
-              <th style={{ width: 60 }}>
-                <FormControl
-                  checked={true}
-                  componentClass="checkbox"
-                  onChange={() => {}}
-                />
-              </th>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
-              <th>{__('Type')}</th>
-              <th>{__('Category code')}</th>
-              <th>{__('Product count')}</th>
+              <th>{__('Category')}</th>
+              <th>{__('Bar code')}</th>
+              <th>{__('Weight')}</th>
               <th>{__('Unit Price')}</th>
             </tr>
           </thead>
-          {/* <tbody>{this.renderRow()}</tbody> */}
+          <tbody>{this.renderErkhetRow()}</tbody>
         </Table>
       </>
     );
   };
 
   renderErxesSide = () => {
-    const { products } = this.props;
-    const header = <Wrapper.ActionBar left={<Title>Erxes Products</Title>} />;
+    const { isAllSelected, bulk } = this.props;
+    const syncButton = (
+      <>
+        {bulk.length > 0 && (
+          <Button
+            btnStyle="success"
+            size="small"
+            icon="check-1"
+            onClick={() => {}}
+          >
+            Sync
+          </Button>
+        )}
+      </>
+    );
+    const header = (
+      <Wrapper.ActionBar
+        left={<Title>Erxes Products</Title>}
+        right={syncButton}
+      />
+    );
     return (
       <>
         {header}
@@ -82,9 +117,9 @@ class InventoryProducts extends React.Component<Props, State> {
             <tr>
               <th style={{ width: 60 }}>
                 <FormControl
-                  checked={true}
+                  checked={isAllSelected}
                   componentClass="checkbox"
-                  onChange={() => {}}
+                  onChange={this.onChange}
                 />
               </th>
               <th>{__('Code')}</th>
@@ -95,7 +130,7 @@ class InventoryProducts extends React.Component<Props, State> {
               <th>{__('Unit Price')}</th>
             </tr>
           </thead>
-          <tbody>{this.renderRow()}</tbody>
+          <tbody>{this.renderErxesRow()}</tbody>
         </Table>
       </>
     );
@@ -115,12 +150,12 @@ class InventoryProducts extends React.Component<Props, State> {
         header={
           <Wrapper.Header
             title={__(`Check product`)}
-            // queryParams={queryParams}
+            queryParams={this.props.queryParams}
             submenu={menuPos}
           />
         }
         content={content}
-        // footer={<Pagination count={totalCount} />}
+        // footer={<Pagination count={4} />}
       />
     );
   }

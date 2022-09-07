@@ -10,7 +10,10 @@ import { mutations, queries } from '../graphql';
 import { router, withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryCategory from '../components/inventoryCategory/InventoryCategory';
-import { CategoriesQueryResponse } from '../types';
+import {
+  CategoriesQueryResponse,
+  ErkhetCategoriesQueryResponse
+} from '../types';
 type Props = {
   queryParams: any;
   history: any;
@@ -18,6 +21,7 @@ type Props = {
 
 type FinalProps = {
   getCategoriesListQuery: CategoriesQueryResponse;
+  getErkhetCategoriesListQuery: ErkhetCategoriesQueryResponse;
 } & Props &
   IRouterProps;
 
@@ -31,15 +35,22 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getCategoriesListQuery } = this.props;
-    if (getCategoriesListQuery.loading) {
+    const { getCategoriesListQuery, getErkhetCategoriesListQuery } = this.props;
+    if (
+      getCategoriesListQuery.loading ||
+      getErkhetCategoriesListQuery.loading
+    ) {
       return <Spinner />;
     }
     const categories = getCategoriesListQuery.productCategories || [];
+    const erkhetCategories =
+      getErkhetCategoriesListQuery.getCategoriesErkhet || [];
+
     const updatedProps = {
       ...this.props,
       loading: getCategoriesListQuery.loading,
-      categories
+      categories,
+      erkhetCategories
     };
 
     const content = props => <InventoryCategory {...props} {...updatedProps} />;
@@ -49,11 +60,13 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
 }
 
 const generateParams = ({ queryParams }) => {
-  const pageInfo = router.generatePaginationParams(queryParams || {});
-
   return {
-    sortField: queryParams.sortField,
-    sortDirection: Number(queryParams.sortDirection) || undefined,
+    erkhetPage: queryParams.erkhetPage
+      ? parseInt(queryParams.erkhetPage, 10)
+      : 1,
+    erkhetPerPage: queryParams.erkhetPerPage
+      ? parseInt(queryParams.erkhetPerPage, 10)
+      : 20,
     page: queryParams.page ? parseInt(queryParams.page, 10) : 1,
     perPage: queryParams.perPage ? parseInt(queryParams.perPage, 10) : 20
   };
@@ -65,6 +78,16 @@ export default withProps<Props>(
       gql(queries.getCategoryList),
       {
         name: 'getCategoriesListQuery',
+        options: ({ queryParams }) => ({
+          variables: generateParams({ queryParams }),
+          fetchPolicy: 'network-only'
+        })
+      }
+    ),
+    graphql<{ queryParams: any }, ErkhetCategoriesQueryResponse>(
+      gql(queries.getErkhetCategoriesList),
+      {
+        name: 'getErkhetCategoriesListQuery',
         options: ({ queryParams }) => ({
           variables: generateParams({ queryParams }),
           fetchPolicy: 'network-only'
