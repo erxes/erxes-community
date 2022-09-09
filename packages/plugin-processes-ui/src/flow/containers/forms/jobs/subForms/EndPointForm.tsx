@@ -1,6 +1,6 @@
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
-import JobForm from '../../../../components/forms/jobs/subForms/JobForm';
+import EndPointForm from '../../../../components/forms/jobs/subForms/EndPointForm';
 import React, { useState } from 'react';
 import { graphql } from 'react-apollo';
 import { IJob } from '../../../../types';
@@ -26,7 +26,7 @@ type FinalProps = {
 } & Props &
   IRouterProps;
 
-const JobFormContainer = (props: FinalProps) => {
+const EndPointFormContainer = (props: FinalProps) => {
   const { currentUser, jobRefersAllQuery } = props;
 
   const [saveLoading] = useState(false);
@@ -40,7 +40,7 @@ const JobFormContainer = (props: FinalProps) => {
     jobRefers
   };
 
-  return <JobForm {...updatedProps} />;
+  return <EndPointForm {...updatedProps} />;
 };
 
 export default withProps<Props>(
@@ -53,5 +53,5 @@ export default withProps<Props>(
         }
       })
     })
-  )(withRouter<FinalProps>(JobFormContainer))
+  )(withRouter<FinalProps>(EndPointFormContainer))
 );
