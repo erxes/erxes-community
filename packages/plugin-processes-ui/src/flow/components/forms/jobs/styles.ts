@@ -42,7 +42,6 @@ export const Attributes = styled.ul`
 `;
 
 export const FlowJobBox = styledTS<{
-  isFavourite: boolean;
   isAvailable: boolean;
 }>(styled(TriggerBox))`
     flex-direction: row;
@@ -86,7 +85,7 @@ export const FlowJobBox = styledTS<{
       right: ${dimensions.coreSpacing}px;
 
       > i {
-        color: ${props => props.isFavourite && colors.colorCoreOrange}
+        color: colors.colorCoreOrange
       }
     }
   `;

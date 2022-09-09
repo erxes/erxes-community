@@ -1,6 +1,6 @@
 import React from 'react';
-import { IJob } from '../../../../flow/types';
-import Form from '../../../components/forms/actions/FlowJobsForm';
+import { IJob } from '../../../types';
+import Form from '../../../components/forms/jobs/FlowJobsForm';
 
 type Props = {
   onClickFlowJob: (flowJob: IJob) => void;

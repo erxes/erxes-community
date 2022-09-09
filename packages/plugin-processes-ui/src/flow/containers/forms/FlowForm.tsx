@@ -1,26 +1,22 @@
-import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
+import FlowForm from '../../components/forms/FlowForm';
+import gql from 'graphql-tag';
 import React, { useState } from 'react';
-import { graphql } from 'react-apollo';
-import { withRouter } from 'react-router-dom';
-
-import { IUser } from '@erxes/ui/src/auth/types';
-import Spinner from '@erxes/ui/src/components/Spinner';
-import { IRouterProps } from '@erxes/ui/src/types';
 import { Alert, router, withProps } from '@erxes/ui/src/utils';
-
-import {
-  mutations as flowMutations,
-  queries as flowQueries
-} from '../../../flow/graphql';
 import {
   FlowDetailQueryResponse,
   FlowsEditMutationResponse,
   IFlowDocument
 } from '../../../flow/types';
-import { queries as jobQueries } from '../../../job/graphql';
-import { JobRefersAllQueryResponse } from '../../../job/types';
-import FlowForm from '../../components/forms/FlowForm';
+import { graphql } from 'react-apollo';
+import { IRouterProps } from '@erxes/ui/src/types';
+import { IUser } from '@erxes/ui/src/auth/types';
+import {
+  mutations as flowMutations,
+  queries as flowQueries
+} from '../../../flow/graphql';
+import { withRouter } from 'react-router-dom';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   id: string;
@@ -29,21 +25,14 @@ type Props = {
 
 type FinalProps = {
   flowDetailQuery: FlowDetailQueryResponse;
-  jobRefersAllQuery: JobRefersAllQueryResponse;
   currentUser: IUser;
   saveAsTemplateMutation: any;
 } & Props &
   FlowsEditMutationResponse &
   IRouterProps;
 
-const AutomationDetailsContainer = (props: FinalProps) => {
-  const {
-    flowDetailQuery,
-    currentUser,
-    history,
-    flowsEdit,
-    jobRefersAllQuery
-  } = props;
+const FlowDetailsContainer = (props: FinalProps) => {
+  const { flowDetailQuery, currentUser, history, flowsEdit } = props;
 
   const [saveLoading, setLoading] = useState(false);
 
@@ -70,20 +59,17 @@ const AutomationDetailsContainer = (props: FinalProps) => {
       });
   };
 
-  if (flowDetailQuery.loading || jobRefersAllQuery.loading) {
-    return <Spinner objective={true} />;
+  if (flowDetailQuery.loading) {
+    return <Spinner />;
   }
-
-  const flowDetail = flowDetailQuery.flowDetail;
-  const jobRefers = jobRefersAllQuery.jobRefersAll || [];
+  const flowDetail = flowDetailQuery.flowDetail || {};
 
   const updatedProps = {
     ...props,
     flow: flowDetail,
     currentUser,
     save,
-    saveLoading,
-    jobRefers
+    saveLoading
   };
 
   return <FlowForm {...updatedProps} />;
@@ -98,9 +84,6 @@ const refetchQueries = [
 
 export default withProps<Props>(
   compose(
-    graphql<Props, JobRefersAllQueryResponse>(gql(jobQueries.jobRefersAll), {
-      name: 'jobRefersAllQuery'
-    }),
     graphql<Props, FlowDetailQueryResponse, { _id: string }>(
       gql(flowQueries.flowDetail),
       {
@@ -121,5 +104,5 @@ export default withProps<Props>(
         })
       }
     )
-  )(withRouter<FinalProps>(AutomationDetailsContainer))
+  )(withRouter<FinalProps>(FlowDetailsContainer))
 );

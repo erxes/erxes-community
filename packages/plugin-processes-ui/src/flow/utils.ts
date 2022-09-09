@@ -96,8 +96,7 @@ export const connection = (
   flowJobs: IJob[],
   info: any,
   flowJobId: any,
-  type: string,
-  findLastFlowJob: any
+  type: string
 ) => {
   const sourceId = info.sourceId;
 
@@ -125,8 +124,6 @@ export const connection = (
       }
 
       sourceFlowJob.nextJobIds = jobIds;
-
-      findLastFlowJob();
 
       innerFlowJobs.push(sourceFlowJob);
     }

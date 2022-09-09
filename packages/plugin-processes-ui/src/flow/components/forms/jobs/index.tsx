@@ -2,7 +2,8 @@ import Button from '@erxes/ui/src/components/Button';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import { IJob } from '../../../../flow/types';
+import { IJob } from '../../../types';
+import JobForm from '../../../containers/forms/jobs/subForms/JobForm';
 
 type Props = {
   onSave: () => void;

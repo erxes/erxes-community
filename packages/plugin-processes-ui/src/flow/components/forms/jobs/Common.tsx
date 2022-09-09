@@ -4,7 +4,7 @@ import Button from '@erxes/ui/src/components/Button';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { Alert, __ } from '@erxes/ui/src/utils';
 
-import { IJob } from '../../../../flow/types';
+import { IJob } from '../../../types';
 import { ScrolledContent } from '../../../styles';
 import { FlowJobFooter } from './styles';
 

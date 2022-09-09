@@ -7,10 +7,10 @@ import Info from '@erxes/ui/src/components/Info';
 import Label from '@erxes/ui/src/components/Label';
 import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 
-import { IJob } from '../../../../flow/types';
-import { IJobRefer } from '../../../../job/types';
-import { DrawerDetail, FlowJobTabs } from '../../../styles';
-import Common from './Common';
+import { IJob } from '../../../../types';
+import { IJobRefer } from '../../../../../job/types';
+import { DrawerDetail, FlowJobTabs } from '../../../../styles';
+import Common from '../Common';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs';
@@ -45,7 +45,7 @@ type State = {
   currentTab: string;
 };
 
-class Delay extends React.Component<Props, State> {
+class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
@@ -404,4 +404,4 @@ class Delay extends React.Component<Props, State> {
   }
 }
 
-export default Delay;
+export default JobForm;

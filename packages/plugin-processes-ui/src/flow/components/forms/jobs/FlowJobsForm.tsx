@@ -1,14 +1,12 @@
-import React from 'react';
-
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import Icon from '@erxes/ui/src/components/Icon';
+import React from 'react';
 import Tip from '@erxes/ui/src/components/Tip';
-
-import { IJob } from '../../../../flow/types';
-import { FLOWJOBS } from '../../../constants';
-import { ScrolledContent } from '../../../styles';
-import { FlowJobBox } from './styles';
 import { __ } from '@erxes/ui/src/utils';
+import { FlowJobBox } from './styles';
+import { FLOWJOBS } from '../../../constants';
+import { IJob } from '../../../types';
+import { ScrolledContent } from '../../../styles';
 
 type Props = {
   onClickFlowJob: (flowJob: IJob) => void;
@@ -55,14 +53,13 @@ class FlowJobsForm extends React.Component<Props, State> {
     );
   };
 
-  renderBox(flowJob, isFavourite, index) {
+  renderBox(flowJob, index) {
     const { onClickFlowJob } = this.props;
 
     return (
       <FlowJobBox
         key={index}
         onClick={onClickFlowJob.bind(this, flowJob)}
-        isFavourite={isFavourite}
         isAvailable={flowJob.isAvailable}
       >
         <Icon icon={flowJob.icon} size={30} />
@@ -71,47 +68,17 @@ class FlowJobsForm extends React.Component<Props, State> {
           {!flowJob.isAvailable && <span>{__('Coming soon')}</span>}
           <p>{__(flowJob.description)}</p>
         </div>
-        <Tip
-          text={isFavourite ? __('Unfavourite') : __('Favourite')}
-          placement="top"
-        >
-          <div
-            className="favourite-flowJob"
-            onClick={this.onFavourite.bind(this, flowJob)}
-          >
-            <Icon icon="star" size={20} />
-          </div>
-        </Tip>
       </FlowJobBox>
     );
   }
 
   renderContent() {
-    const localStorageFlowJobs = JSON.parse(
-      localStorage.getItem('automations_favourite_flowJobs') || '[]'
-    );
-
-    const flowJobs =
-      this.state.currentTab === 'favourite' ? localStorageFlowJobs : FLOWJOBS;
-
-    if (flowJobs.length === 0 && localStorageFlowJobs.length === 0) {
-      return (
-        <EmptyState
-          image="/images/actions/8.svg"
-          text="Add your favourite flowJobs"
-          size="small"
-        />
-      );
-    }
+    const flowJobs = FLOWJOBS;
 
     return flowJobs.map((flowJob, index) => {
-      const isFavourite = localStorageFlowJobs.some(
-        item => item.type === flowJob.type
-      );
-
       return (
         <React.Fragment key={index}>
-          {this.renderBox(flowJob, isFavourite, index)}
+          {this.renderBox(flowJob, index)}
         </React.Fragment>
       );
     });
