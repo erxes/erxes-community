@@ -7,6 +7,13 @@ export const FLOWJOBS = [
     isAvailable: true
   },
   {
+    type: 'endPoint',
+    icon: 'flower',
+    label: 'End Point Job',
+    description: '',
+    isAvailable: true
+  },
+  {
     type: 'income',
     icon: 'shoppingcart',
     label: 'Single income',
@@ -25,6 +32,13 @@ export const FLOWJOBS = [
     type: 'move',
     icon: 'exchange-alt',
     label: 'Single move',
+    description: '',
+    isAvailable: true
+  },
+  {
+    type: 'flow',
+    icon: 'trees',
+    label: 'Sub flow',
     description: '',
     isAvailable: true
   }

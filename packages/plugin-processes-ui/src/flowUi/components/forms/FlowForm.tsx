@@ -4,7 +4,7 @@ import Icon from '@erxes/ui/src/components/Icon';
 import jquery from 'jquery';
 import Label from '@erxes/ui/src/components/Label';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import NewJobForm from './actions/NewJobForm';
+import JobForm from './actions/JobForm';
 import PageContent from '@erxes/ui/src/layout/components/PageContent';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
 import React from 'react';
@@ -15,6 +15,7 @@ import { __, Alert } from '@erxes/ui/src/utils';
 import {
   ActionBarButtonsWrapper,
   BackButton,
+  BackIcon,
   Container,
   FlowFormContainer,
   RightDrawerContainer,
@@ -803,6 +804,7 @@ class AutomationForm extends React.Component<Props, State> {
     } = this.state;
 
     const { jobRefers } = this.props;
+    const onBackAction = () => this.setState({ showFlowJob: false });
 
     if (currentTab === 'flowJobs') {
       const { flowJobs } = this.state;
@@ -816,7 +818,10 @@ class AutomationForm extends React.Component<Props, State> {
 
         return (
           <>
-            <NewJobForm
+            <BackIcon onClick={onBackAction}>
+              <Icon icon="angle-left" size={20} /> {__('Back to actions')}
+            </BackIcon>
+            <JobForm
               activeFlowJob={checkedActiveFlowJob}
               addFlowJob={this.addFlowJob}
               closeModal={this.onBackFlowJob}
