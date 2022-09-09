@@ -4,6 +4,7 @@ import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import { IJob } from '../../../types';
 import JobForm from '../../../containers/forms/jobs/subForms/JobForm';
+import EndPointForm from '../../../containers/forms/jobs/subForms/EndPointForm';
 
 type Props = {
   onSave: () => void;
@@ -42,5 +43,6 @@ class DefaultForm extends React.Component<Props> {
 
 export const ActionForms = {
   default: DefaultForm,
-  job: JobForm
+  job: JobForm,
+  endPoint: EndPointForm
 };

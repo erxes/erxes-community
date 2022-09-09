@@ -4,6 +4,7 @@ import { ActionForms } from '.';
 
 type Props = {
   activeFlowJob: IJob;
+  flowJobs: IJob[];
   addFlowJob: (action: IJob, actionId?: string, config?: any) => void;
   closeModal: () => void;
 };

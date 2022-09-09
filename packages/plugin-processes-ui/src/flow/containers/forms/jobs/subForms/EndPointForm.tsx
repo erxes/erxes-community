@@ -46,7 +46,12 @@ const JobFormContainer = (props: FinalProps) => {
 export default withProps<Props>(
   compose(
     graphql<Props, JobRefersAllQueryResponse>(gql(queries.jobRefersAll), {
-      name: 'jobRefersAllQuery'
+      name: 'jobRefersAllQuery',
+      options: ({ id }) => ({
+        variables: {
+          type: 'endPoint'
+        }
+      })
     })
   )(withRouter<FinalProps>(JobFormContainer))
 );

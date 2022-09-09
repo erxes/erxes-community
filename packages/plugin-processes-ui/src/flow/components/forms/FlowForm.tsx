@@ -697,7 +697,7 @@ class FlowForm extends React.Component<Props, State> {
   };
 
   renderTabContent() {
-    const { showFlowJob, activeFlowJob } = this.state;
+    const { showFlowJob, activeFlowJob, flowJobs } = this.state;
 
     const onBackAction = () => this.setState({ showFlowJob: false });
 
@@ -717,6 +717,7 @@ class FlowForm extends React.Component<Props, State> {
             activeFlowJob={checkedActiveFlowJob}
             addFlowJob={this.addFlowJob}
             closeModal={this.onBackFlowJob}
+            flowJobs={flowJobs}
           />
         </>
       );

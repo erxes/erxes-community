@@ -1,24 +1,23 @@
-import React from 'react';
-import { IProduct } from '@erxes/ui-products/src/types';
-import { ControlLabel } from '@erxes/ui/src/components/form';
+import Common from '../Common';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import Info from '@erxes/ui/src/components/Info';
 import Label from '@erxes/ui/src/components/Label';
-import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
-
-import { IJob } from '../../../../types';
-import { IJobRefer } from '../../../../../job/types';
-import { DrawerDetail, FlowJobTabs } from '../../../../styles';
-import Common from '../Common';
+import React from 'react';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
-import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs';
 import { __ } from '@erxes/ui/src/utils';
+import { ControlLabel } from '@erxes/ui/src/components/form';
+import { DrawerDetail, FlowJobTabs } from '../../../../styles';
+import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
+import { IJob } from '../../../../types';
+import { IJobRefer } from '../../../../../job/types';
+import { IProduct } from '@erxes/ui-products/src/types';
+import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs';
 
 type Props = {
   closeModal: () => void;
-  onSave: () => void;
+  // onSave: () => void;s
   activeFlowJob?: IJob;
   jobRefers: IJobRefer[];
   flowJobs: IJob[];
@@ -187,7 +186,7 @@ class JobForm extends React.Component<Props, State> {
   }
 
   renderContent() {
-    const { jobRefers, flowJobs, activeFlowJob } = this.props;
+    const { jobRefers, activeFlowJob, flowJobs } = this.props;
     const activeFlowJobId =
       activeFlowJob && activeFlowJob.id ? activeFlowJob.id : '';
     const beforeFlowJobs = flowJobs.filter(e =>
