@@ -30,14 +30,14 @@ const toSyncOrders = `
 `;
 
 const toSyncProducts = `
-  mutation toSyncProducts($productCodes: [String], $productIds: [String]) {
-    toSyncOrders(productCodes: $productCodes, productIds: $productIds)
+  mutation toSyncProducts($productCodes: [String], $productIds: [String], $operation: String) {
+    toSyncOrders(productCodes: $productCodes, productIds: $productIds, operation: $operation)
   }
 `;
 
 const toSyncCategories = `
-  mutation toSyncCategories($categoryCodes: [String], $categoryIds: [String]) {
-    toSyncCategories(categoryCodes: $categoryCodes, categoryIds: $categoryIds)
+  mutation toSyncCategories($categoryCodes: [String], $categoryIds: [String], $operation: String) {
+    toSyncCategories(categoryCodes: $categoryCodes, categoryIds: $categoryIds, operation: $operation)
   }
 `;
 

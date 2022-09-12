@@ -37,12 +37,13 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   render() {
     const { getCategoriesListQuery } = this.props;
     const toSyncCategories = (
+      categoryCodes: string[],
       categoryIds: string[],
-      categoryCodes: string[]
+      operation: string
     ) => {
       this.props
         .toSyncCategories({
-          variables: { categoryCodes, categoryIds }
+          variables: { categoryCodes, categoryIds, operation }
         })
         .then(response => {
           console.log(response);
@@ -97,7 +98,7 @@ export default withProps<Props>(
     graphql<
       Props,
       ToSyncCategoriesMutationResponse,
-      { categoryIds: string[]; categoryCodes: string[] }
+      { categoryIds: string[]; categoryCodes: string[]; operation: string }
     >(gql(mutations.toSyncCategories), {
       name: 'toSyncCategories'
     })

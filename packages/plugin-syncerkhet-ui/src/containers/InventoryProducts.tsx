@@ -38,10 +38,14 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   render() {
     const { getProductsListQuery } = this.props;
 
-    const toSyncProducts = (productIds: string[], productCodes: string[]) => {
+    const toSyncProducts = (
+      productCodes: string[],
+      productIds: string[],
+      operation: string
+    ) => {
       this.props
         .toSyncProducts({
-          variables: { productCodes, productIds }
+          variables: { productCodes, productIds, operation }
         })
         .then(response => {
           console.log(response);
@@ -90,7 +94,7 @@ export default withProps<Props>(
     graphql<
       Props,
       ToSyncProductsMutationResponse,
-      { productCodes: string[]; productIds: string[] }
+      { productCodes: string[]; productIds: string[]; operation: string }
     >(gql(mutations.toSyncProducts), {
       name: 'toSyncProducts'
     })

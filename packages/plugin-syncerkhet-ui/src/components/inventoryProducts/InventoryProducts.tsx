@@ -7,6 +7,7 @@ import { Title } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import Row from './InventoryProductsRow';
 import { BarItems } from '@erxes/ui/src/layout/styles';
+import { Alert, confirm } from '@erxes/ui/src/utils';
 
 type Props = {
   loading: boolean;
@@ -18,6 +19,11 @@ type Props = {
   toggleBulk: () => void;
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
+  toSyncProducts: (
+    productCodes: string[],
+    productIds: string[],
+    operation: string
+  ) => void;
 };
 
 type State = {};
@@ -56,7 +62,34 @@ class InventoryProducts extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk } = this.props;
+    const { isAllSelected, bulk, toSyncProducts } = this.props;
+    console.log(bulk);
+    const onClickCreate = () =>
+      confirm()
+        .then(() => {
+          toSyncProducts([], [], 'CREATE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
+
+    const onClickUpdate = () =>
+      confirm()
+        .then(() => {
+          toSyncProducts([], [], 'UPDATE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
+
+    const onClickDelete = () =>
+      confirm()
+        .then(() => {
+          toSyncProducts([], [], 'DELETE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
     const syncButton = (
       <>
         <BarItems>
@@ -64,7 +97,7 @@ class InventoryProducts extends React.Component<Props, State> {
             btnStyle="success"
             size="small"
             icon="check-1"
-            onClick={() => {}}
+            onClick={onClickCreate}
           >
             Create
           </Button>
@@ -74,7 +107,7 @@ class InventoryProducts extends React.Component<Props, State> {
                 btnStyle="warning"
                 size="small"
                 icon="check-1"
-                onClick={() => {}}
+                onClick={onClickUpdate}
               >
                 Update
               </Button>
@@ -82,7 +115,7 @@ class InventoryProducts extends React.Component<Props, State> {
                 btnStyle="primary"
                 size="small"
                 icon="check-1"
-                onClick={() => {}}
+                onClick={onClickDelete}
               >
                 Delete
               </Button>

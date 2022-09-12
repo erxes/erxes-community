@@ -4,6 +4,7 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { BarItems } from '@erxes/ui/src/layout/styles';
+import { Alert, confirm } from '@erxes/ui/src/utils';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import Row from './InventoryCategoryRow';
@@ -18,6 +19,11 @@ type Props = {
   toggleBulk: () => void;
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
+  toSyncCategories: (
+    categoryCodes: string[],
+    categoryIds: string[],
+    operation: string
+  ) => void;
 };
 
 type State = {};
@@ -55,7 +61,41 @@ class InventoryCategory extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk } = this.props;
+    const { isAllSelected, bulk, toSyncCategories } = this.props;
+    let category_codes;
+    let category_ids;
+    if (bulk.length > 0) {
+      category_codes = bulk.map(b => b.code);
+      category_ids = bulk.map(b => b._id);
+      console.log(category_codes);
+    }
+    const onClickCreate = () =>
+      confirm()
+        .then(() => {
+          toSyncCategories(category_codes || [], category_ids, 'CREATE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
+
+    const onClickUpdate = () =>
+      confirm()
+        .then(() => {
+          toSyncCategories(category_codes, category_ids, 'UPDATE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
+
+    const onClickDelete = () =>
+      confirm()
+        .then(() => {
+          toSyncCategories(category_codes, category_ids, 'DELETE');
+        })
+        .catch(error => {
+          Alert.error(error.message);
+        });
+
     const syncButton = (
       <>
         <BarItems>
@@ -63,7 +103,7 @@ class InventoryCategory extends React.Component<Props, State> {
             btnStyle="success"
             size="small"
             icon="check-1"
-            onClick={() => {}}
+            onClick={onClickCreate}
           >
             Create
           </Button>
@@ -73,7 +113,7 @@ class InventoryCategory extends React.Component<Props, State> {
                 btnStyle="warning"
                 size="small"
                 icon="check-1"
-                onClick={() => {}}
+                onClick={onClickUpdate}
               >
                 Update
               </Button>
@@ -81,7 +121,7 @@ class InventoryCategory extends React.Component<Props, State> {
                 btnStyle="primary"
                 size="small"
                 icon="check-1"
-                onClick={() => {}}
+                onClick={onClickDelete}
               >
                 Delete
               </Button>
