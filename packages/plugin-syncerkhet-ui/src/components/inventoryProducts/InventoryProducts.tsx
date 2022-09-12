@@ -11,7 +11,6 @@ import { BarItems } from '@erxes/ui/src/layout/styles';
 type Props = {
   loading: boolean;
   products: any[];
-  erkhetProducts: any[];
   history: any;
   queryParams: any;
   isAllSelected: boolean;
@@ -60,34 +59,36 @@ class InventoryProducts extends React.Component<Props, State> {
     const { isAllSelected, bulk } = this.props;
     const syncButton = (
       <>
-        {bulk.length > 0 && (
-          <BarItems>
-            <Button
-              btnStyle="success"
-              size="small"
-              icon="check-1"
-              onClick={() => {}}
-            >
-              Create
-            </Button>
-            <Button
-              btnStyle="warning"
-              size="small"
-              icon="check-1"
-              onClick={() => {}}
-            >
-              Update
-            </Button>
-            <Button
-              btnStyle="primary"
-              size="small"
-              icon="check-1"
-              onClick={() => {}}
-            >
-              Delete
-            </Button>
-          </BarItems>
-        )}
+        <BarItems>
+          <Button
+            btnStyle="success"
+            size="small"
+            icon="check-1"
+            onClick={() => {}}
+          >
+            Create
+          </Button>
+          {bulk.length > 0 && (
+            <>
+              <Button
+                btnStyle="warning"
+                size="small"
+                icon="check-1"
+                onClick={() => {}}
+              >
+                Update
+              </Button>
+              <Button
+                btnStyle="primary"
+                size="small"
+                icon="check-1"
+                onClick={() => {}}
+              >
+                Delete
+              </Button>
+            </>
+          )}
+        </BarItems>
       </>
     );
     const header = (

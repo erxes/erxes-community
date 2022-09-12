@@ -29,9 +29,23 @@ const toSyncOrders = `
   }
 `;
 
+const toSyncProducts = `
+  mutation toSyncProducts($productCodes: [String], $productIds: [String]) {
+    toSyncOrders(productCodes: $productCodes, productIds: $productIds)
+  }
+`;
+
+const toSyncCategories = `
+  mutation toSyncCategories($categoryCodes: [String], $categoryIds: [String]) {
+    toSyncCategories(categoryCodes: $categoryCodes, categoryIds: $categoryIds)
+  }
+`;
+
 export default {
   updateConfigs,
   toCheckSynced,
   toSyncDeals,
-  toSyncOrders
+  toSyncOrders,
+  toSyncCategories,
+  toSyncProducts
 };

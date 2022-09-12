@@ -7,10 +7,13 @@ import { Bulk } from '@erxes/ui/src/components';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { mutations, queries } from '../graphql';
-import { router, withProps } from '@erxes/ui/src/utils/core';
+import { withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryProducts from '../components/inventoryProducts/InventoryProducts';
-import { ErkhetProductsQueryResponse, ProductsQueryResponse } from '../types';
+import {
+  ProductsQueryResponse,
+  ToSyncProductsMutationResponse
+} from '../types';
 
 type Props = {
   queryParams: any;
@@ -19,9 +22,9 @@ type Props = {
 
 type FinalProps = {
   getProductsListQuery: ProductsQueryResponse;
-  getErkhetProductsListQuery: ErkhetProductsQueryResponse;
 } & Props &
-  IRouterProps;
+  IRouterProps &
+  ToSyncProductsMutationResponse;
 
 type State = {};
 
@@ -33,19 +36,30 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getProductsListQuery, getErkhetProductsListQuery } = this.props;
+    const { getProductsListQuery } = this.props;
 
-    if (getProductsListQuery.loading || getErkhetProductsListQuery.loading) {
+    const toSyncProducts = (productIds: string[], productCodes: string[]) => {
+      this.props
+        .toSyncProducts({
+          variables: { productCodes, productIds }
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(e => {
+          Alert.error(e.message);
+        });
+    };
+
+    if (getProductsListQuery.loading) {
       return <Spinner />;
     }
     const products = getProductsListQuery.products || [];
-    const erkhetProducts =
-      getErkhetProductsListQuery.getProductsErkhet.slice(0, 50) || [];
     const updatedProps = {
       ...this.props,
       loading: getProductsListQuery.loading,
       products,
-      erkhetProducts
+      toSyncProducts
     };
 
     const content = props => <InventoryProducts {...props} {...updatedProps} />;
@@ -73,15 +87,12 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<{ queryParams: any }, ErkhetProductsQueryResponse>(
-      gql(queries.getErkhetProductsList),
-      {
-        name: 'getErkhetProductsListQuery',
-        options: ({ queryParams }) => ({
-          variables: generateParams({ queryParams }),
-          fetchPolicy: 'network-only'
-        })
-      }
-    )
+    graphql<
+      Props,
+      ToSyncProductsMutationResponse,
+      { productCodes: string[]; productIds: string[] }
+    >(gql(mutations.toSyncProducts), {
+      name: 'toSyncProducts'
+    })
   )(withRouter<IRouterProps>(InventoryProductsContainer))
 );

@@ -7,12 +7,12 @@ import { Bulk } from '@erxes/ui/src/components';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { mutations, queries } from '../graphql';
-import { router, withProps } from '@erxes/ui/src/utils/core';
+import { withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryCategory from '../components/inventoryCategory/InventoryCategory';
 import {
   CategoriesQueryResponse,
-  ErkhetCategoriesQueryResponse
+  ToSyncCategoriesMutationResponse
 } from '../types';
 type Props = {
   queryParams: any;
@@ -21,9 +21,9 @@ type Props = {
 
 type FinalProps = {
   getCategoriesListQuery: CategoriesQueryResponse;
-  getErkhetCategoriesListQuery: ErkhetCategoriesQueryResponse;
 } & Props &
-  IRouterProps;
+  IRouterProps &
+  ToSyncCategoriesMutationResponse;
 
 type State = {};
 
@@ -35,22 +35,32 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getCategoriesListQuery, getErkhetCategoriesListQuery } = this.props;
-    if (
-      getCategoriesListQuery.loading ||
-      getErkhetCategoriesListQuery.loading
-    ) {
+    const { getCategoriesListQuery } = this.props;
+    const toSyncCategories = (
+      categoryIds: string[],
+      categoryCodes: string[]
+    ) => {
+      this.props
+        .toSyncCategories({
+          variables: { categoryCodes, categoryIds }
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(e => {
+          Alert.error(e.message);
+        });
+    };
+    if (getCategoriesListQuery.loading) {
       return <Spinner />;
     }
     const categories = getCategoriesListQuery.productCategories || [];
-    const erkhetCategories =
-      getErkhetCategoriesListQuery.getCategoriesErkhet || [];
 
     const updatedProps = {
       ...this.props,
       loading: getCategoriesListQuery.loading,
       categories,
-      erkhetCategories
+      toSyncCategories
     };
 
     const content = props => <InventoryCategory {...props} {...updatedProps} />;
@@ -84,15 +94,12 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<{ queryParams: any }, ErkhetCategoriesQueryResponse>(
-      gql(queries.getErkhetCategoriesList),
-      {
-        name: 'getErkhetCategoriesListQuery',
-        options: ({ queryParams }) => ({
-          variables: generateParams({ queryParams }),
-          fetchPolicy: 'network-only'
-        })
-      }
-    )
+    graphql<
+      Props,
+      ToSyncCategoriesMutationResponse,
+      { categoryIds: string[]; categoryCodes: string[] }
+    >(gql(mutations.toSyncCategories), {
+      name: 'toSyncCategories'
+    })
   )(withRouter<IRouterProps>(InventoryCategoryContainer))
 );
