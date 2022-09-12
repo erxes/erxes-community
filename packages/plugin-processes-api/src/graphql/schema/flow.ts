@@ -17,6 +17,7 @@ export const types = `
 
   input JobInput {
     id: String,
+    type: String,
     nextJobIds: [String],
     jobReferId: String,
     style: JSON,

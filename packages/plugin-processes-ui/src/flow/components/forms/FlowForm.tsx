@@ -300,6 +300,7 @@ class FlowForm extends React.Component<Props, State> {
         flowJobStatus: flowStatus,
         jobs: flowJobs.map(a => ({
           id: a.id,
+          type: a.type,
           nextJobIds: a.nextJobIds,
           jobReferId: a.jobReferId,
           label: a.label,
@@ -507,26 +508,25 @@ class FlowForm extends React.Component<Props, State> {
     return newId;
   };
 
-  addFlowJob = (
-    data?: IJob,
-    flowJobId?: string,
-    jobReferId?: string,
-    description?: string,
-    inBranchId?: string,
-    inDepartmentId?: string,
-    outBranchId?: string,
-    outDepartmentId?: string
-  ) => {
+  addFlowJob = (job: IJob, jobId?: string, config?: any) => {
+    const {
+      jobReferId,
+      inBranchId,
+      inDepartmentId,
+      outBranchId,
+      outDepartmentId
+    } = config;
+
     const { flowJobs } = this.state;
 
     let flowJob: IJob = {
-      ...(data || {}),
+      ...(job || {}),
       id: this.getNewId(flowJobs.map(a => a.id))
     };
     let flowJobIndex = -1;
 
-    if (flowJobId) {
-      flowJobIndex = flowJobs.findIndex(a => a.id === flowJobId);
+    if (jobId) {
+      flowJobIndex = flowJobs.findIndex(a => a.id === jobId);
 
       if (flowJobIndex !== -1) {
         flowJob = flowJobs[flowJobIndex];
@@ -548,7 +548,7 @@ class FlowForm extends React.Component<Props, State> {
     this.setState(
       { flowJobs, activeFlowJob: flowJob, flowJobEdited: true },
       () => {
-        if (!flowJobId) {
+        if (!jobId) {
           this.renderControl('flowJob', flowJob, this.onClickFlowJob);
         }
       }

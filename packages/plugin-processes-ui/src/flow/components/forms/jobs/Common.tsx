@@ -11,16 +11,7 @@ import { FlowJobFooter } from './styles';
 type Props = {
   closeModal: () => void;
   activeFlowJob?: IJob;
-  addFlowJob: (
-    data: IJob,
-    FlowJobId?: string,
-    jobReferId?: string,
-    description?: string,
-    inBranchId?: string,
-    inDepartmentId?: string,
-    outBranchId?: string,
-    outDepartmentId?: string
-  ) => void;
+  addFlowJob: (job: IJob, id?: string, config?: any) => void;
   jobReferId: string;
   description: string;
   inBranchId: string;
@@ -49,16 +40,14 @@ function Common(props: Props) {
       return Alert.error('has not active FlowJob');
     }
 
-    addFlowJob(
-      activeFlowJob,
-      activeFlowJob.id,
+    addFlowJob(activeFlowJob, activeFlowJob.id, {
       jobReferId,
       description,
       inBranchId,
       inDepartmentId,
       outBranchId,
       outDepartmentId
-    );
+    });
 
     closeModal();
   };

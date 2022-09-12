@@ -1,7 +1,5 @@
-import EmptyState from '@erxes/ui/src/components/EmptyState';
 import Icon from '@erxes/ui/src/components/Icon';
 import React from 'react';
-import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from '@erxes/ui/src/utils';
 import { FlowJobBox } from './styles';
 import { FLOWJOBS } from '../../../constants';

@@ -5,7 +5,7 @@ import { ActionForms } from '.';
 type Props = {
   activeFlowJob: IJob;
   flowJobs: IJob[];
-  addFlowJob: (action: IJob, actionId?: string, config?: any) => void;
+  addFlowJob: (job: IJob, jobId?: string, config?: any) => void;
   closeModal: () => void;
 };
 
@@ -21,7 +21,7 @@ class ActionDetailForm extends React.Component<Props> {
   render() {
     const { activeFlowJob } = this.props;
 
-    let { type = '' } = activeFlowJob;
+    let { type } = activeFlowJob;
 
     const Content = ActionForms[type] || ActionForms.default;
 

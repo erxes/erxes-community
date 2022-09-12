@@ -6,7 +6,7 @@ import {
 export type IProductCategory = IProductCategoryC & {};
 export interface IJob {
   id: string;
-  type?: string;
+  type: string;
   nextJobIds?: string[];
   jobReferId?: string;
   style?: object;

@@ -40,6 +40,7 @@ export interface IFlowDocument extends IFlow, Document {
 export const jobSchema = new Schema(
   {
     id: { type: String, required: true },
+    type: { type: String, required: true },
     nextJobIds: { type: [String] },
     style: { type: Object },
     label: { type: String, optional: true },

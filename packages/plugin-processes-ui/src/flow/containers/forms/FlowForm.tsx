@@ -75,12 +75,7 @@ const FlowDetailsContainer = (props: FinalProps) => {
   return <FlowForm {...updatedProps} />;
 };
 
-const refetchQueries = [
-  'flows',
-  'automationsMain',
-  'flowDetail',
-  'jobRefersAll'
-];
+const refetchQueries = ['flows', 'flowDetail', 'jobRefersAll'];
 
 export default withProps<Props>(
   compose(

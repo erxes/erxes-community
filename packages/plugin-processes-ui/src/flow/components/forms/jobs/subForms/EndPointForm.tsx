@@ -16,15 +16,7 @@ type Props = {
   flowJobs: IJob[];
   lastFlowJob?: IJob;
   flowProduct?: IProduct;
-  addFlowJob: (
-    data: IJob,
-    flowJobId?: string,
-    jobReferId?: string,
-    inBranchId?: string,
-    inDepartmentId?: string,
-    outBranchId?: string,
-    outDepartmentId?: string
-  ) => void;
+  addFlowJob: (job: IJob, id?: string, config?: any) => void;
 };
 
 type State = {

@@ -16,7 +16,7 @@ type Props = {
   queryParams: any;
   activeAction: IJob;
   flowJobs: IJob[];
-  addFlowJob: (action: IJob, id?: string, config?: any) => void;
+  addFlowJob: (job: IJob, id?: string, config?: any) => void;
   closeModal: () => void;
 };
 
