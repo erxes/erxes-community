@@ -3,12 +3,10 @@ import Button from '@erxes/ui/src/components/Button';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import { BarItems } from '@erxes/ui/src/layout/styles';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import { VerticalDivider, VLeftSplit, VRightSplit, VSplit } from '../../styles';
-import ErxesRow from './InventoryCategoryErxesRow';
-import ErkhetRow from './InventoryCategoryErkhetRow';
-import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import Row from './InventoryCategoryRow';
 
 type Props = {
   loading: boolean;
@@ -39,10 +37,10 @@ class InventoryCategory extends React.Component<Props, State> {
     this.state = {};
   }
 
-  renderErxesRow = () => {
+  renderRow = () => {
     const { categories, toggleBulk, bulk } = this.props;
     return categories.map(category => (
-      <ErxesRow
+      <Row
         history={history}
         key={category._id}
         category={category}
@@ -52,59 +50,48 @@ class InventoryCategory extends React.Component<Props, State> {
     ));
   };
 
-  renderErkhetRow = () => {
-    const { erkhetCategories } = this.props;
-    return erkhetCategories.map(category => (
-      <ErkhetRow history={history} key={category._id} category={category} />
-    ));
-  };
-
   onChange = () => {
     const { toggleAll, categories } = this.props;
     toggleAll(categories, 'categories');
   };
 
-  renderErkhetSide = () => {
-    const header = (
-      <Wrapper.ActionBar left={<Title>Erkhet Product Categories</Title>} />
-    );
-    return (
-      <>
-        {header}
-        <Table hover={true}>
-          <thead>
-            <tr>
-              <th>{__('Code')}</th>
-              <th>{__('Name')}</th>
-              <th>{__('Parent')}</th>
-              <th>{__('Order')}</th>
-            </tr>
-          </thead>
-          <tbody>{this.renderErkhetRow()}</tbody>
-        </Table>
-      </>
-    );
-  };
-
-  renderErxesSide = () => {
+  renderTable = () => {
     const { isAllSelected, bulk } = this.props;
     const syncButton = (
       <>
         {bulk.length > 0 && (
-          <Button
-            btnStyle="success"
-            size="small"
-            icon="check-1"
-            onClick={() => {}}
-          >
-            Sync
-          </Button>
+          <BarItems>
+            <Button
+              btnStyle="success"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Create
+            </Button>
+            <Button
+              btnStyle="warning"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Update
+            </Button>
+            <Button
+              btnStyle="primary"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Delete
+            </Button>
+          </BarItems>
         )}
       </>
     );
     const header = (
       <Wrapper.ActionBar
-        left={<Title>Erxes Product Categories</Title>}
+        left={<Title>Product Categories</Title>}
         right={syncButton}
       />
     );
@@ -128,19 +115,12 @@ class InventoryCategory extends React.Component<Props, State> {
               <th>{__('status')}</th>
             </tr>
           </thead>
-          <tbody>{this.renderErxesRow()}</tbody>
+          <tbody>{this.renderRow()}</tbody>
         </Table>
       </>
     );
   };
   render() {
-    const content = (
-      <VSplit>
-        <VLeftSplit>{this.renderErxesSide()}</VLeftSplit>
-        <VerticalDivider />
-        <VRightSplit>{this.renderErkhetSide()}</VRightSplit>
-      </VSplit>
-    );
     return (
       <Wrapper
         header={
@@ -150,7 +130,7 @@ class InventoryCategory extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        content={content}
+        content={this.renderTable()}
         // footer={<Pagination count={69} />}
       />
     );

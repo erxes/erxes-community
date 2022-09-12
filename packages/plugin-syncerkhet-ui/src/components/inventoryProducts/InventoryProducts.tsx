@@ -3,12 +3,10 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils/core';
 import Table from '@erxes/ui/src/components/table';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import { VerticalDivider, VLeftSplit, VRightSplit, VSplit } from '../../styles';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
-import ErxesRow from './InventoryProductsErxesRow';
-import ErkhetRow from './InventoryProductsErkhetRow';
-import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import Row from './InventoryProductsRow';
+import { BarItems } from '@erxes/ui/src/layout/styles';
 
 type Props = {
   loading: boolean;
@@ -39,11 +37,11 @@ class InventoryProducts extends React.Component<Props, State> {
     this.state = {};
   }
 
-  renderErxesRow = () => {
+  renderRow = () => {
     const { products, toggleBulk, bulk } = this.props;
 
     return products.map(p => (
-      <ErxesRow
+      <Row
         history={history}
         key={p._id}
         product={p}
@@ -53,61 +51,47 @@ class InventoryProducts extends React.Component<Props, State> {
     ));
   };
 
-  renderErkhetRow = () => {
-    const { erkhetProducts } = this.props;
-
-    return erkhetProducts.map(p => (
-      <ErkhetRow history={history} key={p._id} product={p} />
-    ));
-  };
-
   onChange = () => {
     const { toggleAll, products } = this.props;
     toggleAll(products, 'products');
   };
-  renderErkhetSide = () => {
-    const header = <Wrapper.ActionBar left={<Title>Erkhet Products</Title>} />;
-    return (
-      <>
-        {header}
-        <Table hover={true}>
-          <thead>
-            <tr>
-              <th>{__('Code')}</th>
-              <th>{__('Name')}</th>
-              <th>{__('Category')}</th>
-              <th>{__('Bar code')}</th>
-              <th>{__('Weight')}</th>
-              <th>{__('Unit Price')}</th>
-            </tr>
-          </thead>
-          <tbody>{this.renderErkhetRow()}</tbody>
-        </Table>
-      </>
-    );
-  };
 
-  renderErxesSide = () => {
+  renderTable = () => {
     const { isAllSelected, bulk } = this.props;
     const syncButton = (
       <>
         {bulk.length > 0 && (
-          <Button
-            btnStyle="success"
-            size="small"
-            icon="check-1"
-            onClick={() => {}}
-          >
-            Sync
-          </Button>
+          <BarItems>
+            <Button
+              btnStyle="success"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Create
+            </Button>
+            <Button
+              btnStyle="warning"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Update
+            </Button>
+            <Button
+              btnStyle="primary"
+              size="small"
+              icon="check-1"
+              onClick={() => {}}
+            >
+              Delete
+            </Button>
+          </BarItems>
         )}
       </>
     );
     const header = (
-      <Wrapper.ActionBar
-        left={<Title>Erxes Products</Title>}
-        right={syncButton}
-      />
+      <Wrapper.ActionBar left={<Title>Products</Title>} right={syncButton} />
     );
     return (
       <>
@@ -130,21 +114,13 @@ class InventoryProducts extends React.Component<Props, State> {
               <th>{__('Unit Price')}</th>
             </tr>
           </thead>
-          <tbody>{this.renderErxesRow()}</tbody>
+          <tbody>{this.renderRow()}</tbody>
         </Table>
       </>
     );
   };
 
   render() {
-    const content = (
-      <VSplit>
-        <VLeftSplit>{this.renderErxesSide()}</VLeftSplit>
-        <VerticalDivider />
-        <VRightSplit>{this.renderErkhetSide()}</VRightSplit>
-      </VSplit>
-    );
-
     return (
       <Wrapper
         header={
@@ -154,7 +130,7 @@ class InventoryProducts extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        content={content}
+        content={this.renderTable()}
         // footer={<Pagination count={4} />}
       />
     );

@@ -5,21 +5,20 @@ import React from 'react';
 import Button from '@erxes/ui/src/components/Button';
 
 type Props = {
-  product: any;
+  category: any;
   history: any;
   isChecked: boolean;
   //   isUnsynced: boolean;
   toggleBulk: (category: any, isChecked?: boolean) => void;
-  //   toSync: (dealIds: string[]) => void;
-  //   syncedInfo: any;
+  // toSync: (categoryIds: string[]) => void;
 };
 
-class ErxesRow extends React.Component<Props> {
+class Row extends React.Component<Props> {
   render() {
-    const { product, isChecked, toggleBulk } = this.props;
+    const { category, toggleBulk, isChecked } = this.props;
     const onChange = e => {
       if (toggleBulk) {
-        toggleBulk(product, e.target.checked);
+        toggleBulk(category, e.target.checked);
       }
     };
 
@@ -29,12 +28,12 @@ class ErxesRow extends React.Component<Props> {
 
     // const onClickSync = e => {
     //   e.stopPropagation();
-    //   this.props.toSync([deal._id]);
+    //   this.props.toSync([category._id]);
     // };
 
     const onTrClick = () => {};
 
-    const { name, code, type, unitPrice, category, productCount } = product;
+    const { name, code, order, productCount, status } = category;
 
     return (
       <tr onClick={onTrClick}>
@@ -47,13 +46,12 @@ class ErxesRow extends React.Component<Props> {
         </td>
         <td>{code}</td>
         <td>{name}</td>
-        <td>{type}</td>
-        <td>{category.code}</td>
+        <td>{order}</td>
         <td>{productCount}</td>
-        <td>{unitPrice}</td>
+        <td>{status}</td>
       </tr>
     );
   }
 }
 
-export default ErxesRow;
+export default Row;
