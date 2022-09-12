@@ -9,7 +9,7 @@ type Props = {
   closeModal: () => void;
 };
 
-class ActionDetailForm extends React.Component<Props> {
+class JobDetailForm extends React.Component<Props> {
   onSave = () => {
     const { addFlowJob, activeFlowJob, closeModal } = this.props;
 
@@ -29,4 +29,4 @@ class ActionDetailForm extends React.Component<Props> {
   }
 }
 
-export default ActionDetailForm;
+export default JobDetailForm;

@@ -12,12 +12,8 @@ type Props = {
   closeModal: () => void;
   activeFlowJob?: IJob;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
-  jobReferId: string;
   description: string;
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
+  config: any;
   children: React.ReactNode;
 };
 
@@ -26,13 +22,9 @@ function Common(props: Props) {
     addFlowJob,
     activeFlowJob,
     closeModal,
-    jobReferId,
     children,
     description,
-    inBranchId,
-    inDepartmentId,
-    outBranchId,
-    outDepartmentId
+    config
   } = props;
 
   const onSave = () => {
@@ -40,14 +32,7 @@ function Common(props: Props) {
       return Alert.error('has not active FlowJob');
     }
 
-    addFlowJob(activeFlowJob, activeFlowJob.id, {
-      jobReferId,
-      description,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    });
+    addFlowJob({ ...activeFlowJob, description }, activeFlowJob.id, config);
 
     closeModal();
   };

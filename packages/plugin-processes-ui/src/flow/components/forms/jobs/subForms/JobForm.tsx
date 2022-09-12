@@ -18,7 +18,7 @@ import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs';
 type Props = {
   closeModal: () => void;
   // onSave: () => void;s
-  activeFlowJob?: IJob;
+  activeFlowJob: IJob;
   jobRefers: IJobRefer[];
   flowJobs: IJob[];
   lastFlowJob?: IJob;
@@ -40,14 +40,15 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
+    const { config, description } = this.props.activeFlowJob || {};
+
     const {
       jobReferId,
-      description,
       inBranchId,
       inDepartmentId,
       outBranchId,
       outDepartmentId
-    } = this.props.activeFlowJob || {};
+    } = config;
 
     this.state = {
       jobReferId: jobReferId || '',
@@ -116,7 +117,9 @@ class JobForm extends React.Component<Props, State> {
     let beforeResultProducts: any = [];
     if (beforeFlowJobs.length > 0) {
       for (const before of beforeFlowJobs) {
-        const jobRefer = jobRefers.find(job => job._id === before.jobReferId);
+        const jobRefer = jobRefers.find(
+          job => job._id === before.config.jobReferId
+        );
         const resultProducts = jobRefer.resultProducts || [];
 
         const productNames = resultProducts.map(e =>
@@ -128,11 +131,13 @@ class JobForm extends React.Component<Props, State> {
     }
 
     return chosenFlowJobs.map(flowJob => {
-      if (!flowJob.jobReferId) {
+      if (!flowJob.config.jobReferId) {
         return [];
       }
 
-      const jobRefer = jobRefers.find(job => job._id === flowJob.jobReferId);
+      const jobRefer = jobRefers.find(
+        job => job._id === flowJob.config.jobReferId
+      );
       const needProducts = jobRefer.needProducts || [];
       const resultProducts = jobRefer.resultProducts || [];
 
@@ -189,7 +194,7 @@ class JobForm extends React.Component<Props, State> {
     };
 
     const findJobRefer = jobRefers.find(
-      job => job._id === (activeFlowJob || {}).jobReferId
+      job => job._id === (activeFlowJob || {}).config.jobReferId
     );
     const needProducts = (findJobRefer || {}).needProducts || [];
     const resultProducts = (findJobRefer || {}).resultProducts || [];
@@ -381,12 +386,14 @@ class JobForm extends React.Component<Props, State> {
 
     return (
       <Common
-        jobReferId={jobReferId}
         description={description}
-        inBranchId={inBranchId}
-        inDepartmentId={inDepartmentId}
-        outBranchId={outBranchId}
-        outDepartmentId={outDepartmentId}
+        config={{
+          jobReferId,
+          inBranchId,
+          inDepartmentId,
+          outBranchId,
+          outDepartmentId
+        }}
         {...this.props}
       >
         {this.renderContent()}

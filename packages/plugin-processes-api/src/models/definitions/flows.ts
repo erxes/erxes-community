@@ -42,16 +42,11 @@ export const jobSchema = new Schema(
     id: { type: String, required: true },
     type: { type: String, required: true },
     nextJobIds: { type: [String] },
+    config: { type: Object },
     style: { type: Object },
+    icon: { type: String, optional: true },
     label: { type: String, optional: true },
-    description: { type: String, optional: true },
-    jobReferId: { type: String },
-    quantity: { type: Number },
-    assignUserIds: { type: [String] },
-    inBranchId: { type: String },
-    inDepartmentId: { type: String },
-    outBranchId: { type: String },
-    outDepartmentId: { type: String }
+    description: { type: String, optional: true }
   },
   { _id: false }
 );

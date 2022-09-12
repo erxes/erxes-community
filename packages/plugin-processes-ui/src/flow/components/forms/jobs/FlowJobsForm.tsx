@@ -57,7 +57,7 @@ class FlowJobsForm extends React.Component<Props, State> {
     return (
       <FlowJobBox
         key={index}
-        onClick={onClickFlowJob.bind(this, flowJob)}
+        onClick={onClickFlowJob.bind(this, { ...flowJob, config: {} })}
         isAvailable={flowJob.isAvailable}
       >
         <Icon icon={flowJob.icon} size={30} />

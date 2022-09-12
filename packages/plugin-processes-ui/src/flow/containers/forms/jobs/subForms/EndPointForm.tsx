@@ -14,7 +14,7 @@ import { withRouter } from 'react-router-dom';
 type Props = {
   id: string;
   queryParams: any;
-  activeAction: IJob;
+  activeFlowJob: IJob;
   flowJobs: IJob[];
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   closeModal: () => void;

@@ -5,9 +5,8 @@ import {
   IUom as IUomC
 } from '@erxes/ui-products/src/types';
 
-import { IBranch, IDepartment } from '@erxes/ui-team/src/types';
-
 import { QueryResponse } from '@erxes/ui/src/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 export type IProductDoc = IProductDocC & {};
 

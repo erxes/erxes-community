@@ -47,6 +47,7 @@ import { IProduct } from '@erxes/ui-products/src/types';
 import { jsPlumb } from 'jsplumb';
 import { Link } from 'react-router-dom';
 import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
+import { FLOWJOBS } from '../../constants';
 
 const plumb: any = jsPlumb;
 let instance;
@@ -129,16 +130,16 @@ class FlowForm extends React.Component<Props, State> {
     jobRefers: IJobRefer[],
     lastFlowJob: IJob
   ) => {
-    const lastJobRefer = jobRefers.find(
-      jr => jr._id === (lastFlowJob.jobReferId || '')
-    );
+    const lastJobRefer =
+      jobRefers.find(jr => jr._id === (lastFlowJob.config.jobReferId || '')) ||
+      ({} as IJobRefer);
     const boforeFlowJobs = flowJobs.filter(fj =>
       (fj.nextJobIds || []).includes(lastFlowJob.id)
     );
 
     let response = true;
 
-    const lastNeedProducts = lastJobRefer?.needProducts;
+    const lastNeedProducts = lastJobRefer.needProducts;
 
     if (boforeFlowJobs.length === 0 && (lastNeedProducts || []).length > 0) {
       response = false;
@@ -147,7 +148,7 @@ class FlowForm extends React.Component<Props, State> {
     let productIds: string[] = [];
     for (const beforeFlowJob of boforeFlowJobs) {
       const beforeJobRefer = jobRefers.find(
-        jr => jr._id === (beforeFlowJob.jobReferId || '')
+        jr => jr._id === (beforeFlowJob.config.jobReferId || '')
       );
       const resultProducts = beforeJobRefer?.resultProducts;
       const ids = resultProducts?.map(rp => rp.productId);
@@ -158,7 +159,6 @@ class FlowForm extends React.Component<Props, State> {
 
     for (const lastNeedProduct of lastNeedProducts || []) {
       if (!productIds.includes(lastNeedProduct.productId)) {
-        console.log('false2 ' + lastJobRefer?.name);
         response = false;
       }
     }
@@ -178,7 +178,6 @@ class FlowForm extends React.Component<Props, State> {
       }
     }
 
-    console.log('false3 ' + lastJobRefer?.name + ' boolean: ' + response);
     return response;
   };
 
@@ -302,13 +301,9 @@ class FlowForm extends React.Component<Props, State> {
           id: a.id,
           type: a.type,
           nextJobIds: a.nextJobIds,
-          jobReferId: a.jobReferId,
           label: a.label,
-          description: a.description,
-          inBranchId: a.inBranchId,
-          inDepartmentId: a.inDepartmentId,
-          outBranchId: a.outBranchId,
-          outDepartmentId: a.outDepartmentId,
+          description: a.description || '',
+          config: a.config,
           style: jquery(`#flowJob-${a.id}`).attr('style')
         }))
       };
@@ -340,6 +335,13 @@ class FlowForm extends React.Component<Props, State> {
     if (Object.keys(flow).length) {
       save({ _id: flow._id, status: isActive ? 'active' : 'draft' });
     }
+  };
+
+  onAddActionConfig = config => {
+    const { activeFlowJob } = this.state;
+
+    activeFlowJob.config = config;
+    this.setState({ activeFlowJob });
   };
 
   onChange = e => {
@@ -432,6 +434,7 @@ class FlowForm extends React.Component<Props, State> {
   onChangeCategory = (categoryId: string) => {
     this.setState({ categoryId });
   };
+
   renderProductServiceTrigger(product?: IProduct) {
     let content = (
       <div>
@@ -491,8 +494,7 @@ class FlowForm extends React.Component<Props, State> {
   toggleDrawer = (type: string) => {
     this.setState({
       showDrawer: !this.state.showDrawer,
-      currentTab: type,
-      activeFlowJob: {} as IJob
+      currentTab: type
     });
   };
 
@@ -509,35 +511,24 @@ class FlowForm extends React.Component<Props, State> {
   };
 
   addFlowJob = (job: IJob, jobId?: string, config?: any) => {
-    const {
-      jobReferId,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = config;
-
     const { flowJobs } = this.state;
 
     let flowJob: IJob = {
-      ...(job || {}),
+      ...job,
       id: this.getNewId(flowJobs.map(a => a.id))
     };
+
     let flowJobIndex = -1;
 
     if (jobId) {
       flowJobIndex = flowJobs.findIndex(a => a.id === jobId);
 
       if (flowJobIndex !== -1) {
-        flowJob = flowJobs[flowJobIndex];
+        flowJob = { ...flowJobs[flowJobIndex], ...job };
       }
     }
 
-    flowJob.jobReferId = jobReferId || '';
-    flowJob.inBranchId = inBranchId || '';
-    flowJob.inDepartmentId = inDepartmentId || '';
-    flowJob.outBranchId = outBranchId || '';
-    flowJob.outDepartmentId = outDepartmentId || '';
+    flowJob.config = { ...flowJob.config, ...config };
 
     if (flowJobIndex !== -1) {
       flowJobs[flowJobIndex] = flowJob;
@@ -574,7 +565,13 @@ class FlowForm extends React.Component<Props, State> {
             </div>
           </div>
           <div>
-            <i class="icon-2"></i>
+            <i class="icon-${
+              (
+                FLOWJOBS.find(f => f.type === item.type) || {
+                  icon: 'sync-exclamation'
+                }
+              ).icon
+            }"></i>
             ${item.label}
           </div>
         </div>
@@ -702,19 +699,13 @@ class FlowForm extends React.Component<Props, State> {
     const onBackAction = () => this.setState({ showFlowJob: false });
 
     if (showFlowJob && activeFlowJob) {
-      const checkArray = Object.keys(activeFlowJob);
-      let checkedActiveFlowJob = activeFlowJob;
-      if (!checkArray.includes('nextJobIds')) {
-        checkedActiveFlowJob = { ...activeFlowJob, nextJobIds: [] };
-      }
-
       return (
         <>
           <BackIcon onClick={onBackAction}>
             <Icon icon="angle-left" size={20} /> {__('Back to actions')}
           </BackIcon>
           <JobDetailForm
-            activeFlowJob={checkedActiveFlowJob}
+            activeFlowJob={activeFlowJob}
             addFlowJob={this.addFlowJob}
             closeModal={this.onBackFlowJob}
             flowJobs={flowJobs}

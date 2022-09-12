@@ -11,7 +11,7 @@ import { IProduct } from '@erxes/ui-products/src/types';
 
 type Props = {
   closeModal: () => void;
-  activeFlowJob?: IJob;
+  activeFlowJob: IJob;
   jobRefers: IJobRefer[];
   flowJobs: IJob[];
   lastFlowJob?: IJob;
@@ -33,14 +33,15 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
+    const { config, description } = props.activeFlowJob;
+
     const {
       jobReferId,
-      description,
       inBranchId,
       inDepartmentId,
       outBranchId,
       outDepartmentId
-    } = this.props.activeFlowJob || {};
+    } = config;
 
     this.state = {
       jobReferId: jobReferId || '',
@@ -111,12 +112,14 @@ class JobForm extends React.Component<Props, State> {
 
     return (
       <Common
-        jobReferId={jobReferId}
         description={description}
-        inBranchId={inBranchId}
-        inDepartmentId={inDepartmentId}
-        outBranchId={outBranchId}
-        outDepartmentId={outDepartmentId}
+        config={{
+          jobReferId,
+          inBranchId,
+          inDepartmentId,
+          outBranchId,
+          outDepartmentId
+        }}
         {...this.props}
       >
         {this.renderContent()}

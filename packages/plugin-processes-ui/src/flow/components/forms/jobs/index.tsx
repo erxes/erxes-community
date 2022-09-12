@@ -9,18 +9,18 @@ import EndPointForm from '../../../containers/forms/jobs/subForms/EndPointForm';
 type Props = {
   onSave: () => void;
   closeModal: () => void;
-  activeAction: IJob;
+  activeFlowJob: IJob;
   addAction: (action: IJob, actionId?: string, config?: any) => void;
 };
 
 class DefaultForm extends React.Component<Props> {
   render() {
-    const { activeAction, onSave, closeModal } = this.props;
+    const { activeFlowJob, onSave, closeModal } = this.props;
 
     return (
       <>
         <div>
-          {__('contents')} {activeAction.type}
+          {__('contents')} {activeFlowJob.type}
         </div>
         <ModalFooter>
           <Button
