@@ -38,8 +38,8 @@ export interface IJobRefer {
   type: string;
   status?: string;
   categoryId?: string;
-  duration: number;
-  durationType: string;
+  duration?: number;
+  durationType?: string;
   needProducts?: any[];
   resultProducts?: any[];
 }
@@ -51,6 +51,7 @@ export interface IProductsData {
   quantity: number;
   uomId: string;
   uom?: any;
+  proportion?: number;
 }
 
 export interface IProductsDataDocument extends IProductsData {
@@ -72,6 +73,7 @@ export type JobRefersAllQueryResponse = {
 
 export type JobRefersQueryResponse = {
   jobRefers: IJobRefer[];
+  refetch: (variables?: { searchValue?: string; perPage?: number }) => void;
 } & QueryResponse;
 
 export type jobReferTotalCountQueryResponse = {

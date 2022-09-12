@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import { IJob } from '../../../../types';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { IUser } from '@erxes/ui/src/auth/types';
-import { JobRefersAllQueryResponse } from '../../../../../job/types';
+import { JobRefersQueryResponse } from '../../../../../job/types';
 import { queries } from '../../../../../job/graphql';
 import { withProps } from '@erxes/ui/src/utils';
 import { withRouter } from 'react-router-dom';
@@ -21,17 +21,17 @@ type Props = {
 };
 
 type FinalProps = {
-  jobRefersAllQuery: JobRefersAllQueryResponse;
+  jobRefersQuery: JobRefersQueryResponse;
   currentUser: IUser;
 } & Props &
   IRouterProps;
 
 const EndPointFormContainer = (props: FinalProps) => {
-  const { currentUser, jobRefersAllQuery } = props;
+  const { currentUser, jobRefersQuery } = props;
 
   const [saveLoading] = useState(false);
 
-  const jobRefers = jobRefersAllQuery.jobRefersAll || [];
+  const jobRefers = jobRefersQuery.jobRefers || [];
 
   const updatedProps = {
     ...props,
@@ -45,10 +45,11 @@ const EndPointFormContainer = (props: FinalProps) => {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, JobRefersAllQueryResponse>(gql(queries.jobRefersAll), {
-      name: 'jobRefersAllQuery',
-      options: ({ id }) => ({
+    graphql<Props, JobRefersQueryResponse>(gql(queries.jobRefers), {
+      name: 'jobRefersQuery',
+      options: ({ activeFlowJob }) => ({
         variables: {
+          ids: [activeFlowJob.config.jobReferId],
           type: 'endPoint'
         }
       })

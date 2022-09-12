@@ -1,6 +1,9 @@
 import Common from '../Common';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
+import Icon from '@erxes/ui/src/components/Icon';
+import JobReferChooser from '../../../../../job/containers/refer/Chooser';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import React from 'react';
 import { __ } from '@erxes/ui/src/utils';
 import { ControlLabel } from '@erxes/ui/src/components/form';
@@ -8,6 +11,7 @@ import { DrawerDetail } from '../../../../styles';
 import { IJob } from '../../../../types';
 import { IJobRefer } from '../../../../../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
+import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 
 type Props = {
   closeModal: () => void;
@@ -27,6 +31,7 @@ type State = {
   outBranchId: string;
   outDepartmentId: string;
   currentTab: string;
+  categoryId: string;
 };
 
 class JobForm extends React.Component<Props, State> {
@@ -50,7 +55,9 @@ class JobForm extends React.Component<Props, State> {
       inDepartmentId: inDepartmentId || '',
       outBranchId: outBranchId || '',
       outDepartmentId: outDepartmentId || '',
-      currentTab: 'inputs'
+      currentTab: 'inputs',
+
+      categoryId: ''
     };
   }
 
@@ -60,6 +67,25 @@ class JobForm extends React.Component<Props, State> {
     }
   }
 
+  renderJobTrigger(job?: IJobRefer) {
+    let content = (
+      <div>
+        {__('Choose Job')} <Icon icon="plus-circle" />
+      </div>
+    );
+
+    // if product selected
+    if (job) {
+      content = (
+        <div>
+          {job.name} <Icon icon="pen-1" />
+        </div>
+      );
+    }
+
+    return <ProductButton>{content}</ProductButton>;
+  }
+
   renderContent() {
     const { jobRefers } = this.props;
 
@@ -67,26 +93,34 @@ class JobForm extends React.Component<Props, State> {
       this.setState({ [type]: e.target.value } as any);
     };
 
-    const { jobReferId, description } = this.state;
+    const { description } = this.state;
+
+    const content = props => (
+      <JobReferChooser
+        {...props}
+        onSelect={pr => console.log(pr)}
+        onChangeCategory={categoryId => this.setState({ categoryId })}
+        categoryId={this.state.categoryId}
+        data={{
+          name: 'Jobs',
+          jobRefers
+        }}
+        limit={1}
+      />
+    );
 
     return (
       <DrawerDetail>
         <FormGroup>
           <ControlLabel>Jobs</ControlLabel>
-          <FormControl
-            name="type"
-            componentClass="select"
-            onChange={onChangeValue.bind(this, 'jobReferId')}
-            required={true}
-            value={jobReferId}
-          >
-            <option value="" />
-            {jobRefers.map(jobRefer => (
-              <option key={jobRefer._id} value={jobRefer._id}>
-                {jobRefer.name}
-              </option>
-            ))}
-          </FormControl>
+          <ModalTrigger
+            title="Choose a JOB"
+            trigger={this.renderJobTrigger(
+              jobRefers.length ? jobRefers[0] : undefined
+            )}
+            size="lg"
+            content={content}
+          />
         </FormGroup>
         <FormGroup>
           <ControlLabel>Description</ControlLabel>

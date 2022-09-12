@@ -104,7 +104,7 @@ class Form extends React.Component<Props, State> {
         ...finalValues,
         needProducts,
         resultProducts:
-          resultProducts.length > 1 ? resultProducts[0] : resultProducts
+          resultProducts.length > 1 ? [resultProducts[0]] : resultProducts
       };
     }
 
@@ -118,7 +118,6 @@ class Form extends React.Component<Props, State> {
   onClickRemoveButton = (id, type) => {
     const products = this.state[type];
     const filteredUoms = products.filter(product => product._id !== id);
-    console.log('remove product', id, type, products, filteredUoms);
 
     this.setState({ [type]: filteredUoms } as any);
   };
@@ -135,7 +134,7 @@ class Form extends React.Component<Props, State> {
     for (const product of products) {
       if (product._id === id) {
         if (formType !== 'uom') {
-          product.quantity = Number(value);
+          product[formType] = Number(value);
         } else {
           product.uomId = value;
         }
@@ -239,6 +238,7 @@ class Form extends React.Component<Props, State> {
         : this.state.resultProducts;
 
     const { uoms, configsMap } = this.props;
+    const { jobType } = this.state;
 
     products.sort();
 
@@ -256,6 +256,9 @@ class Form extends React.Component<Props, State> {
               <th>{__('Product')}</th>
               <th>{__('Quantity')}</th>
               <th>{__('UOM')}</th>
+              {type === 'resultProducts' &&
+                jobType === 'facture' &&
+                products.length > 1 && <th>{__('Proportion')}</th>}
               <th></th>
             </tr>
           </thead>
@@ -317,6 +320,23 @@ class Form extends React.Component<Props, State> {
                       ))}
                     </FormControl>
                   </td>
+                  {type === 'resultProducts' &&
+                    jobType === 'facture' &&
+                    products.length > 1 && (
+                      <td>
+                        <FormControl
+                          value={product ? product.proportion : 0}
+                          align="right"
+                          type="number"
+                          onChange={this.onChange.bind(
+                            this,
+                            product._id,
+                            type,
+                            'proportion'
+                          )}
+                        />
+                      </td>
+                    )}
                   <td>
                     <ActionButtons>
                       <Tip text="Delete" placement="top">
