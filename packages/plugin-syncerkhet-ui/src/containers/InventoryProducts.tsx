@@ -12,7 +12,7 @@ import { withRouter } from 'react-router-dom';
 import InventoryProducts from '../components/inventoryProducts/InventoryProducts';
 import {
   ProductsQueryResponse,
-  ToSyncProductsMutationResponse
+  ToCheckProductsMutationResponse
 } from '../types';
 
 type Props = {
@@ -24,7 +24,7 @@ type FinalProps = {
   getProductsListQuery: ProductsQueryResponse;
 } & Props &
   IRouterProps &
-  ToSyncProductsMutationResponse;
+  ToCheckProductsMutationResponse;
 
 type State = {};
 
@@ -38,14 +38,10 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   render() {
     const { getProductsListQuery } = this.props;
 
-    const toSyncProducts = (
-      productCodes: string[],
-      productIds: string[],
-      operation: string
-    ) => {
+    const toCheckProducts = (productCodes: string[]) => {
       this.props
-        .toSyncProducts({
-          variables: { productCodes, productIds, operation }
+        .toCheckProducts({
+          variables: { productCodes }
         })
         .then(response => {
           console.log(response);
@@ -63,7 +59,7 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
       ...this.props,
       loading: getProductsListQuery.loading,
       products,
-      toSyncProducts
+      toCheckProducts
     };
 
     const content = props => <InventoryProducts {...props} {...updatedProps} />;
@@ -91,12 +87,11 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<
-      Props,
-      ToSyncProductsMutationResponse,
-      { productCodes: string[]; productIds: string[]; operation: string }
-    >(gql(mutations.toSyncProducts), {
-      name: 'toSyncProducts'
-    })
+    graphql<Props, ToCheckProductsMutationResponse, { productCodes: string[] }>(
+      gql(mutations.toCheckProducts),
+      {
+        name: 'toCheckProducts'
+      }
+    )
   )(withRouter<IRouterProps>(InventoryProductsContainer))
 );

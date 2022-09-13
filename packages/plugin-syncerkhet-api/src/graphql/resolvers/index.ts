@@ -1,6 +1,6 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
 import checkSyncedMutations from './mutations/checkSynced';
-import productsMutations from './mutations/syncProducts';
+import inventoryMutations from './mutations/syncInventory';
 import erkhetQueries from './queries/inventory';
 
 const resolvers: any = async _serviceDiscovery => ({
@@ -12,7 +12,7 @@ const resolvers: any = async _serviceDiscovery => ({
 
   Mutation: {
     ...checkSyncedMutations,
-    ...productsMutations
+    ...inventoryMutations
   }
 });
 

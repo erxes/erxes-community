@@ -12,7 +12,7 @@ import { withRouter } from 'react-router-dom';
 import InventoryCategory from '../components/inventoryCategory/InventoryCategory';
 import {
   CategoriesQueryResponse,
-  ToSyncCategoriesMutationResponse
+  ToCheckCategoriesMutationResponse
 } from '../types';
 type Props = {
   queryParams: any;
@@ -23,7 +23,7 @@ type FinalProps = {
   getCategoriesListQuery: CategoriesQueryResponse;
 } & Props &
   IRouterProps &
-  ToSyncCategoriesMutationResponse;
+  ToCheckCategoriesMutationResponse;
 
 type State = {};
 
@@ -36,14 +36,10 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
 
   render() {
     const { getCategoriesListQuery } = this.props;
-    const toSyncCategories = (
-      categoryCodes: string[],
-      categoryIds: string[],
-      operation: string
-    ) => {
+    const toCheckCategories = (categoryCodes: string[]) => {
       this.props
-        .toSyncCategories({
-          variables: { categoryCodes, categoryIds, operation }
+        .toCheckCategories({
+          variables: { categoryCodes }
         })
         .then(response => {
           console.log(response);
@@ -61,7 +57,7 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
       ...this.props,
       loading: getCategoriesListQuery.loading,
       categories,
-      toSyncCategories
+      toCheckCategories
     };
 
     const content = props => <InventoryCategory {...props} {...updatedProps} />;
@@ -97,10 +93,10 @@ export default withProps<Props>(
     ),
     graphql<
       Props,
-      ToSyncCategoriesMutationResponse,
-      { categoryIds: string[]; categoryCodes: string[]; operation: string }
-    >(gql(mutations.toSyncCategories), {
-      name: 'toSyncCategories'
+      ToCheckCategoriesMutationResponse,
+      { categoryCodes: string[] }
+    >(gql(mutations.toCheckCategories), {
+      name: 'toCheckCategories'
     })
   )(withRouter<IRouterProps>(InventoryCategoryContainer))
 );

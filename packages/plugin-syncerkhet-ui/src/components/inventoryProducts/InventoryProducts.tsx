@@ -6,8 +6,6 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import Row from './InventoryProductsRow';
-import { BarItems } from '@erxes/ui/src/layout/styles';
-import { Alert, confirm } from '@erxes/ui/src/utils';
 
 type Props = {
   loading: boolean;
@@ -19,11 +17,7 @@ type Props = {
   toggleBulk: () => void;
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
-  toSyncProducts: (
-    productCodes: string[],
-    productIds: string[],
-    operation: string
-  ) => void;
+  toCheckProducts: (productCodes: string[]) => void;
 };
 
 type State = {};
@@ -62,66 +56,23 @@ class InventoryProducts extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk, toSyncProducts } = this.props;
-    console.log(bulk);
-    const onClickCreate = () =>
-      confirm()
-        .then(() => {
-          toSyncProducts([], [], 'CREATE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
-
-    const onClickUpdate = () =>
-      confirm()
-        .then(() => {
-          toSyncProducts([], [], 'UPDATE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
-
-    const onClickDelete = () =>
-      confirm()
-        .then(() => {
-          toSyncProducts([], [], 'DELETE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
+    const { isAllSelected, bulk, toCheckProducts } = this.props;
+    const onClickCheck = () => {
+      const codes = bulk.map(b => b.code);
+      toCheckProducts(codes);
+    };
     const syncButton = (
       <>
-        <BarItems>
+        {bulk.length > 0 && (
           <Button
-            btnStyle="success"
+            btnStyle="warning"
             size="small"
             icon="check-1"
-            onClick={onClickCreate}
+            onClick={onClickCheck}
           >
-            Create
+            Check
           </Button>
-          {bulk.length > 0 && (
-            <>
-              <Button
-                btnStyle="warning"
-                size="small"
-                icon="check-1"
-                onClick={onClickUpdate}
-              >
-                Update
-              </Button>
-              <Button
-                btnStyle="primary"
-                size="small"
-                icon="check-1"
-                onClick={onClickDelete}
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </BarItems>
+        )}
       </>
     );
     const header = (

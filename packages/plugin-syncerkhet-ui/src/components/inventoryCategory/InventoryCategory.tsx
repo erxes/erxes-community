@@ -19,11 +19,7 @@ type Props = {
   toggleBulk: () => void;
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
-  toSyncCategories: (
-    categoryCodes: string[],
-    categoryIds: string[],
-    operation: string
-  ) => void;
+  toCheckCategories: (categoryCodes: string[]) => void;
 };
 
 type State = {};
@@ -61,73 +57,27 @@ class InventoryCategory extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk, toSyncCategories } = this.props;
-    let category_codes;
-    let category_ids;
-    if (bulk.length > 0) {
-      category_codes = bulk.map(b => b.code);
-      category_ids = bulk.map(b => b._id);
-      console.log(category_codes);
-    }
-    const onClickCreate = () =>
-      confirm()
-        .then(() => {
-          toSyncCategories(category_codes || [], category_ids, 'CREATE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
+    const { isAllSelected, bulk } = this.props;
 
-    const onClickUpdate = () =>
-      confirm()
-        .then(() => {
-          toSyncCategories(category_codes, category_ids, 'UPDATE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
-
-    const onClickDelete = () =>
-      confirm()
-        .then(() => {
-          toSyncCategories(category_codes, category_ids, 'DELETE');
-        })
-        .catch(error => {
-          Alert.error(error.message);
-        });
-
+    const onClickSync = () => {
+      const codes = bulk.map(b => b.code);
+      console.log(codes);
+      this.props.toCheckCategories(codes);
+    };
     const syncButton = (
       <>
-        <BarItems>
-          <Button
-            btnStyle="success"
-            size="small"
-            icon="check-1"
-            onClick={onClickCreate}
-          >
-            Create
-          </Button>
-          {bulk.length > 0 && (
-            <>
-              <Button
-                btnStyle="warning"
-                size="small"
-                icon="check-1"
-                onClick={onClickUpdate}
-              >
-                Update
-              </Button>
-              <Button
-                btnStyle="primary"
-                size="small"
-                icon="check-1"
-                onClick={onClickDelete}
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </BarItems>
+        {bulk.length > 0 && (
+          <>
+            <Button
+              btnStyle="warning"
+              size="small"
+              icon="check-1"
+              onClick={onClickSync}
+            >
+              Check
+            </Button>
+          </>
+        )}
       </>
     );
     const header = (

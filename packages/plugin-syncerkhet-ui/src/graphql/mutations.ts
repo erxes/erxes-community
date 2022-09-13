@@ -29,15 +29,15 @@ const toSyncOrders = `
   }
 `;
 
-const toSyncProducts = `
-  mutation toSyncProducts($productCodes: [String], $productIds: [String], $operation: String) {
-    toSyncOrders(productCodes: $productCodes, productIds: $productIds, operation: $operation)
+const toCheckProducts = `
+  mutation toCheckProducts($productCodes: [String]) {
+    toCheckProducts(productCodes: $productCodes)
   }
 `;
 
-const toSyncCategories = `
-  mutation toSyncCategories($categoryCodes: [String], $categoryIds: [String], $operation: String) {
-    toSyncCategories(categoryCodes: $categoryCodes, categoryIds: $categoryIds, operation: $operation)
+const toCheckCategories = `
+  mutation toCheckCategories($categoryCodes: [String]) {
+    toCheckCategories(categoryCodes: $categoryCodes)
   }
 `;
 
@@ -46,6 +46,6 @@ export default {
   toCheckSynced,
   toSyncDeals,
   toSyncOrders,
-  toSyncCategories,
-  toSyncProducts
+  toCheckCategories,
+  toCheckProducts
 };

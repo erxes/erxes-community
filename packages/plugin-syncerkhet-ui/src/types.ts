@@ -33,22 +33,18 @@ export type ToSyncDealsMutationResponse = {
   toSyncDeals: (mutation: { variables: { dealIds: string[] } }) => Promise<any>;
 };
 
-export type ToSyncProductsMutationResponse = {
-  toSyncProducts: (mutation: {
+export type ToCheckProductsMutationResponse = {
+  toCheckProducts: (mutation: {
     variables: {
       productCodes: string[];
-      productIds: string[];
-      operation: string;
     };
   }) => Promise<any>;
 };
 
-export type ToSyncCategoriesMutationResponse = {
-  toSyncCategories: (mutation: {
+export type ToCheckCategoriesMutationResponse = {
+  toCheckCategories: (mutation: {
     variables: {
       categoryCodes: string[];
-      categoryIds: string[];
-      operation: string;
     };
   }) => Promise<any>;
 };
