@@ -1,14 +1,9 @@
 import { Title } from '@erxes/ui-settings/src/styles';
-import Box from '@erxes/ui/src/components/Box';
+import { Pagination } from '@erxes/ui/src/components';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import {
-  FieldStyle,
-  SidebarCounter,
-  SidebarList
-} from '@erxes/ui/src/layout/styles';
 import { router, __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import StatusFilter from '../StatusFilter';
@@ -25,6 +20,7 @@ type Props = {
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
   toCheckCategories: (categoryCodes: string[]) => void;
+  items: any;
 };
 
 type State = {};
@@ -62,9 +58,7 @@ class InventoryCategory extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk } = this.props;
-
-    const onClickSync = () => {
+    const onClickCheck = () => {
       const codes = this.props.categories.map(c => c.code);
       this.props.toCheckCategories(codes);
     };
@@ -74,7 +68,7 @@ class InventoryCategory extends React.Component<Props, State> {
           btnStyle="warning"
           size="small"
           icon="check-1"
-          onClick={onClickSync}
+          onClick={onClickCheck}
         >
           Check
         </Button>
@@ -114,14 +108,15 @@ class InventoryCategory extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        leftSidebar={
-          <StatusFilter
-            counts={{ create: 0, update: 0, delete: 0 } || ({} as any)}
+        leftSidebar={<StatusFilter items={this.props.items || ({} as any)} />}
+        content={
+          <DataWithLoader
+            data={this.renderTable()}
+            loading={this.props.loading}
           />
         }
-        content={<DataWithLoader data={this.renderTable()} loading={false} />}
         hasBorder
-        // footer={<Pagination count={69} />}
+        footer={<Pagination count={this.props.categories.length} />}
       />
     );
   }

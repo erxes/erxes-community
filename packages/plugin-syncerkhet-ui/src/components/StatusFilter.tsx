@@ -14,16 +14,16 @@ import { router, __ } from '@erxes/ui/src/utils/core';
 import Button from '@erxes/ui/src/components/Button';
 
 interface IProps extends IRouterProps {
-  counts: Counts;
+  items: any;
   emptyText?: string;
 }
 
-function StatusFilter({ history, counts, emptyText }: IProps) {
+function StatusFilter({ history, items, emptyText }: IProps) {
   const data = (
     <SidebarList>
       {statusFilters.map((status, index) => {
         const onClick = () => {
-          router.setParams(history, { status: status.key });
+          router.setParams(history, { stat: status.key });
           router.removeParams(history, 'page');
         };
 
@@ -33,14 +33,14 @@ function StatusFilter({ history, counts, emptyText }: IProps) {
               href="#filter"
               tabIndex={0}
               className={
-                router.getParam(history, 'status') === status.key
-                  ? 'active'
-                  : ''
+                router.getParam(history, 'stat') === status.key ? 'active' : ''
               }
               onClick={onClick}
             >
               <FieldStyle>{__(status.value)}</FieldStyle>
-              <SidebarCounter>{counts[status.key]}</SidebarCounter>
+              <SidebarCounter>
+                {items[status.key] ? items[status.key].count : 'NaN'}
+              </SidebarCounter>
             </a>
           </li>
         );

@@ -26,28 +26,37 @@ type FinalProps = {
   IRouterProps &
   ToCheckProductsMutationResponse;
 
-type State = {};
+type State = {
+  items: any;
+  loading: boolean;
+};
 
 class InventoryProductsContainer extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      items: {},
+      loading: false
+    };
   }
 
   render() {
     const { getProductsListQuery } = this.props;
-
+    const { items, loading } = this.state;
     const toCheckProducts = (productCodes: string[]) => {
+      this.setState({ loading: true });
       this.props
         .toCheckProducts({
           variables: { productCodes }
         })
         .then(response => {
-          console.log(response);
+          this.setState({ items: response.data.toCheckProducts });
+          this.setState({ loading: false });
         })
         .catch(e => {
           Alert.error(e.message);
+          this.setState({ loading: false });
         });
     };
 
@@ -57,9 +66,10 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
     const products = getProductsListQuery.products || [];
     const updatedProps = {
       ...this.props,
-      loading: getProductsListQuery.loading,
+      loading: getProductsListQuery.loading || loading,
       products,
-      toCheckProducts
+      toCheckProducts,
+      items
     };
 
     const content = props => <InventoryProducts {...props} {...updatedProps} />;

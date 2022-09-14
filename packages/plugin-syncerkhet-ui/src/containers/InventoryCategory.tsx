@@ -25,27 +25,37 @@ type FinalProps = {
   IRouterProps &
   ToCheckCategoriesMutationResponse;
 
-type State = {};
+type State = {
+  items: any;
+  loading: boolean;
+};
 
 class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      items: {},
+      loading: false
+    };
   }
 
   render() {
     const { getCategoriesListQuery } = this.props;
+    const { items, loading } = this.state;
     const toCheckCategories = (categoryCodes: string[]) => {
+      this.setState({ loading: true });
       this.props
         .toCheckCategories({
           variables: { categoryCodes }
         })
         .then(response => {
-          console.log(response);
+          this.setState({ items: response.data.toCheckCategories });
+          this.setState({ loading: false });
         })
         .catch(e => {
           Alert.error(e.message);
+          this.setState({ loading: false });
         });
     };
     if (getCategoriesListQuery.loading) {
@@ -55,9 +65,10 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
 
     const updatedProps = {
       ...this.props,
-      loading: getCategoriesListQuery.loading,
+      loading: getCategoriesListQuery.loading || loading,
       categories,
-      toCheckCategories
+      toCheckCategories,
+      items
     };
 
     const content = props => <InventoryCategory {...props} {...updatedProps} />;

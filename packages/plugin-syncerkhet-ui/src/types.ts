@@ -17,6 +17,12 @@ export type ConfigsQueryResponse = {
   refetch: () => void;
 };
 
+export const statusFilters = [
+  { key: 'create', value: 'Create' },
+  { key: 'update', value: 'Update' },
+  { key: 'delete', value: 'Delete' }
+];
+
 export type CheckSyncedDealsQueryResponse = {
   deals: any[];
 } & QueryResponse;

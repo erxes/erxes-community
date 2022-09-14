@@ -50,11 +50,18 @@ const inventoryMutations = {
     });
     const otherErkhetData = result.filter(r => !matchedErkhetData.includes(r));
 
-    const otherProducts = productCodes.filter(c => {
-      if (result.every(r => r.code !== c)) {
-        return c;
+    let otherProducts: any[] = [];
+    for (const code of productCodes) {
+      if (result.every(r => r.code !== code)) {
+        const response = await sendProductsMessage({
+          subdomain,
+          action: 'findOne',
+          data: { code: code },
+          isRPC: true
+        });
+        otherProducts.push(response);
       }
-    });
+    }
 
     return {
       create: {

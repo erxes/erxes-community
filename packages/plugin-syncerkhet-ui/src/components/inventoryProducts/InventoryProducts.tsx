@@ -6,6 +6,8 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import Row from './InventoryProductsRow';
+import { DataWithLoader, Pagination } from '@erxes/ui/src/components';
+import StatusFilter from '../StatusFilter';
 
 type Props = {
   loading: boolean;
@@ -18,6 +20,7 @@ type Props = {
   emptyBulk: () => void;
   toggleAll: (targets: any[], containerId: string) => void;
   toCheckProducts: (productCodes: string[]) => void;
+  items: any;
 };
 
 type State = {};
@@ -56,9 +59,9 @@ class InventoryProducts extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { bulk, toCheckProducts } = this.props;
+    const { toCheckProducts } = this.props;
     const onClickCheck = () => {
-      const codes = bulk.map(b => b.code);
+      const codes = this.props.products.map(c => c.code);
       toCheckProducts(codes);
     };
     const syncButton = (
@@ -106,8 +109,15 @@ class InventoryProducts extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        content={this.renderTable()}
-        // footer={<Pagination count={4} />}
+        leftSidebar={<StatusFilter items={this.props.items || ({} as any)} />}
+        content={
+          <DataWithLoader
+            data={this.renderTable()}
+            loading={this.props.loading}
+          />
+        }
+        hasBorder
+        footer={<Pagination count={this.props.products.length} />}
       />
     );
   }
