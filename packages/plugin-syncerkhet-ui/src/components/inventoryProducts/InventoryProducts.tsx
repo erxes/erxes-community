@@ -56,23 +56,21 @@ class InventoryProducts extends React.Component<Props, State> {
   };
 
   renderTable = () => {
-    const { isAllSelected, bulk, toCheckProducts } = this.props;
+    const { bulk, toCheckProducts } = this.props;
     const onClickCheck = () => {
       const codes = bulk.map(b => b.code);
       toCheckProducts(codes);
     };
     const syncButton = (
       <>
-        {bulk.length > 0 && (
-          <Button
-            btnStyle="warning"
-            size="small"
-            icon="check-1"
-            onClick={onClickCheck}
-          >
-            Check
-          </Button>
-        )}
+        <Button
+          btnStyle="warning"
+          size="small"
+          icon="check-1"
+          onClick={onClickCheck}
+        >
+          Check
+        </Button>
       </>
     );
     const header = (
@@ -84,13 +82,6 @@ class InventoryProducts extends React.Component<Props, State> {
         <Table hover={true}>
           <thead>
             <tr>
-              <th style={{ width: 60 }}>
-                <FormControl
-                  checked={isAllSelected}
-                  componentClass="checkbox"
-                  onChange={this.onChange}
-                />
-              </th>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
               <th>{__('Type')}</th>

@@ -1,12 +1,17 @@
 import { Title } from '@erxes/ui-settings/src/styles';
+import Box from '@erxes/ui/src/components/Box';
 import Button from '@erxes/ui/src/components/Button';
-import FormControl from '@erxes/ui/src/components/form/Control';
+import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { BarItems } from '@erxes/ui/src/layout/styles';
-import { Alert, confirm } from '@erxes/ui/src/utils';
-import { __ } from '@erxes/ui/src/utils/core';
+import {
+  FieldStyle,
+  SidebarCounter,
+  SidebarList
+} from '@erxes/ui/src/layout/styles';
+import { router, __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
+import StatusFilter from '../StatusFilter';
 import Row from './InventoryCategoryRow';
 
 type Props = {
@@ -60,24 +65,19 @@ class InventoryCategory extends React.Component<Props, State> {
     const { isAllSelected, bulk } = this.props;
 
     const onClickSync = () => {
-      const codes = bulk.map(b => b.code);
-      console.log(codes);
+      const codes = this.props.categories.map(c => c.code);
       this.props.toCheckCategories(codes);
     };
     const syncButton = (
       <>
-        {bulk.length > 0 && (
-          <>
-            <Button
-              btnStyle="warning"
-              size="small"
-              icon="check-1"
-              onClick={onClickSync}
-            >
-              Check
-            </Button>
-          </>
-        )}
+        <Button
+          btnStyle="warning"
+          size="small"
+          icon="check-1"
+          onClick={onClickSync}
+        >
+          Check
+        </Button>
       </>
     );
     const header = (
@@ -92,13 +92,6 @@ class InventoryCategory extends React.Component<Props, State> {
         <Table hover={true}>
           <thead>
             <tr>
-              <th style={{ width: 60 }}>
-                <FormControl
-                  checked={isAllSelected}
-                  componentClass="checkbox"
-                  onChange={this.onChange}
-                />
-              </th>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
               <th>{__('Order')}</th>
@@ -121,7 +114,13 @@ class InventoryCategory extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        content={this.renderTable()}
+        leftSidebar={
+          <StatusFilter
+            counts={{ create: 0, update: 0, delete: 0 } || ({} as any)}
+          />
+        }
+        content={<DataWithLoader data={this.renderTable()} loading={false} />}
+        hasBorder
         // footer={<Pagination count={69} />}
       />
     );

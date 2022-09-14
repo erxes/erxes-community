@@ -386,7 +386,7 @@ const SectionContainer = styledTS<{ hasShadow?: boolean }>(styled.div)`
   position: relative;
   margin-bottom: ${dimensions.unitSpacing}px;
   box-shadow: ${props => props.hasShadow && 'rgb(0 0 0 / 8%) 0px 0px 6px 0px'};
-
+  width: 300px;
   > div {
     margin-bottom: 0;
   }

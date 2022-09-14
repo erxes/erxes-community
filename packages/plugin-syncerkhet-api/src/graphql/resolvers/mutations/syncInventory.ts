@@ -1,6 +1,7 @@
 import { IContext } from '../../../connectionResolver';
 import { getConfig } from '../../../utils/utils';
 import { sendRequest } from '@erxes/api-utils/src/requests';
+import { sendProductsMessage } from '../../../messageBroker';
 
 const inventoryMutations = {
   async toCheckProducts(
@@ -49,6 +50,12 @@ const inventoryMutations = {
     });
     const otherErkhetData = result.filter(r => !matchedErkhetData.includes(r));
 
+    const otherProducts = productCodes.filter(c => {
+      if (result.every(r => r.code !== c)) {
+        return c;
+      }
+    });
+
     return {
       create: {
         count: otherErkhetData.length,
@@ -59,8 +66,8 @@ const inventoryMutations = {
         items: matchedErkhetData
       },
       delete: {
-        count: matchedErkhetData.length,
-        items: matchedErkhetData
+        count: otherProducts.length,
+        items: otherProducts
       }
     };
   },
@@ -103,14 +110,27 @@ const inventoryMutations = {
       };
     });
 
+    // for update
     const matchedErkhetData = result.filter(r => {
       if (categoryCodes.find(p => p === r.code)) {
         return r;
       }
     });
-
+    // for create
     const otherErkhetData = result.filter(r => !matchedErkhetData.includes(r));
-
+    // for delete
+    let otherCategories: any[] = [];
+    for (const code of categoryCodes) {
+      if (result.every(r => r.code !== code)) {
+        const response = await sendProductsMessage({
+          subdomain,
+          action: 'categories.findOne',
+          data: { code: code },
+          isRPC: true
+        });
+        otherCategories.push(response);
+      }
+    }
     return {
       create: {
         count: otherErkhetData.length,
@@ -121,8 +141,8 @@ const inventoryMutations = {
         items: matchedErkhetData
       },
       delete: {
-        count: matchedErkhetData.length,
-        items: matchedErkhetData
+        count: otherCategories.length,
+        items: otherCategories
       }
     };
   }

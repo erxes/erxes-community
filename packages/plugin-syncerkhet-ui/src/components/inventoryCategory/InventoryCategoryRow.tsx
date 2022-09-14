@@ -1,8 +1,5 @@
-import * as dayjs from 'dayjs';
 import { FormControl } from '@erxes/ui/src/components/form';
-import Tip from '@erxes/ui/src/components/Tip';
 import React from 'react';
-import Button from '@erxes/ui/src/components/Button';
 
 type Props = {
   category: any;
@@ -37,13 +34,6 @@ class Row extends React.Component<Props> {
 
     return (
       <tr onClick={onTrClick}>
-        <td onClick={onClick}>
-          <FormControl
-            checked={isChecked}
-            componentClass="checkbox"
-            onChange={onChange}
-          />
-        </td>
         <td>{code}</td>
         <td>{name}</td>
         <td>{order}</td>
