@@ -61,11 +61,6 @@ export const fieldsTypes = ({ products }) => `
     type: String
   }
 
-  type OptionsValuesType {
-    value: Int
-    label: String
-  }
-
   input objectListConfigInput {
     key: String
     label: String
@@ -86,7 +81,6 @@ export const fieldsTypes = ({ products }) => `
     associatedField: Field
     locationOptions: [LocationOption]
     objectListConfigs: [ObjectListConfig]
-
     ${
       products
         ? `
@@ -110,10 +104,6 @@ export const fieldsTypes = ({ products }) => `
     logicOperator: String
     logicValue: JSON
   }
-  input ObjectOptions {
-    value: Int
-    label: String
-  }
 
   input FieldItem {
     _id: String
@@ -121,7 +111,6 @@ export const fieldsTypes = ({ products }) => `
     logics: [LogicInput]
     locationOptions: [LocationOptionInput]
     objectListConfigs: [objectListConfigInput]
-    value: String
     ${fieldCommonFields}
   }
 
