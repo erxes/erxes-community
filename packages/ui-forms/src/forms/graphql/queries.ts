@@ -39,6 +39,10 @@ const fields = `
       pageNumber
       productCategoryId
       isDefinedByErxes
+      optionsValues {
+        label
+        value
+      },
     }
   }
 `;
