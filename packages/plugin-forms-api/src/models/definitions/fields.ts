@@ -48,11 +48,6 @@ const ObjectListSchema = new Schema({
   })
 });
 
-const optionsValuesSchema = new Schema({
-  label: field({ type: String, label: 'Risk Assessment Field Options Label' }),
-  value:field({type:String,label: 'Risk Assessment Field Options Value'})
-})
-
 interface IVisibility {
   isVisible?: boolean;
   isVisibleInDetail?: boolean;
@@ -63,11 +58,7 @@ interface IObjectListConfig {
   label: string;
   type: string;
 }
-interface IOptionsValueType{
-  key: number;
-  value: string;
-  label: string;
-}
+
 export interface IField extends IVisibility {
   contentType?: string;
   contentTypeId?: string;
@@ -79,7 +70,6 @@ export interface IField extends IVisibility {
   options?: string[];
   locationOptions?: ILocationOption[];
   objectListConfigs?: IObjectListConfig[];
-  optionsValues?:IOptionsValueType[];
   isRequired?: boolean;
   isDefinedByErxes?: boolean;
   isVisibleToCreate?: boolean;
@@ -165,10 +155,6 @@ export const fieldSchema = schemaWrapper(
       type: [ObjectListSchema],
       optional: true,
       label: 'object list config'
-    }),
-    optionsValues: field({
-      type:[optionsValuesSchema],
-      label: 'Risk Assessment Field Options object'
     }),
     isRequired: field({ type: Boolean, label: 'Is required' }),
     isDefinedByErxes: field({ type: Boolean, label: 'Is defined by erxes' }),
