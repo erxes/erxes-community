@@ -131,8 +131,6 @@ export const loadRiskAssessment = (model: IModels, subdomain: string) => {
         throw new Error('Not found risk assessment');
       }
 
-      console.log(_id);
-
       const result = await model.RiskAssessment.findByIdAndUpdate(_id, doc);
       if (!result) {
         throw new Error('Something went wrong');
