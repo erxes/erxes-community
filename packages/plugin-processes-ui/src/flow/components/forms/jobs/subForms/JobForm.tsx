@@ -28,6 +28,7 @@ type Props = {
 
 type State = {
   jobReferId: string;
+  name: string;
   description: string;
   inBranchId: string;
   inDepartmentId: string;
@@ -40,6 +41,7 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
+    const { jobRefers } = this.props;
     const { config, description } = this.props.activeFlowJob || {};
 
     const {
@@ -53,6 +55,7 @@ class JobForm extends React.Component<Props, State> {
     this.state = {
       jobReferId: jobReferId || '',
       description: description || '',
+      name: jobRefers.length ? jobRefers[0].name : '' || '',
       inBranchId: inBranchId || '',
       inDepartmentId: inDepartmentId || '',
       outBranchId: outBranchId || '',
@@ -377,6 +380,7 @@ class JobForm extends React.Component<Props, State> {
   render() {
     const {
       jobReferId,
+      name,
       description,
       inBranchId,
       inDepartmentId,
@@ -386,6 +390,7 @@ class JobForm extends React.Component<Props, State> {
 
     return (
       <Common
+        name={name}
         description={description}
         config={{
           jobReferId,

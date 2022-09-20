@@ -26,6 +26,7 @@ type Props = {
 type State = {
   jobReferId: string;
   description: string;
+  name: string;
   inBranchId: string;
   inDepartmentId: string;
   outBranchId: string;
@@ -38,6 +39,7 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
+    const { jobRefers } = props;
     const { config, description } = props.activeFlowJob;
 
     const {
@@ -51,6 +53,7 @@ class JobForm extends React.Component<Props, State> {
     this.state = {
       jobReferId: jobReferId || '',
       description: description || '',
+      name: jobRefers.length ? jobRefers[0].name : '' || '',
       inBranchId: inBranchId || '',
       inDepartmentId: inDepartmentId || '',
       outBranchId: outBranchId || '',
@@ -93,12 +96,21 @@ class JobForm extends React.Component<Props, State> {
       this.setState({ [type]: e.target.value } as any);
     };
 
+    const onChangeJob = prs => {
+      let pr: any = {};
+      if (!prs.length) {
+        pr = prs[0];
+      }
+
+      this.setState({ name: pr.name, jobReferId: pr._id });
+    };
+
     const { description } = this.state;
 
     const content = props => (
       <JobReferChooser
         {...props}
-        onSelect={pr => console.log(pr)}
+        onSelect={onChangeJob}
         onChangeCategory={categoryId => this.setState({ categoryId })}
         categoryId={this.state.categoryId}
         data={{
@@ -138,6 +150,7 @@ class JobForm extends React.Component<Props, State> {
     const {
       jobReferId,
       description,
+      name,
       inBranchId,
       inDepartmentId,
       outBranchId,
@@ -146,6 +159,7 @@ class JobForm extends React.Component<Props, State> {
 
     return (
       <Common
+        name={name}
         description={description}
         config={{
           jobReferId,
