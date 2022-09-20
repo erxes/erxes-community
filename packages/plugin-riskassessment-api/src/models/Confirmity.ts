@@ -13,7 +13,6 @@ export interface IRiskConfirmityModel extends Model<IRiskConfirmityDocument> {
   riskConfirmityUpdate(params: IRiskConfirmityParams): Promise<IRiskConfirmityDocument>;
   riskConfirmityRemove(cardId: string): Promise<IRiskConfirmityDocument>;
   riskConfirmityFormDetail(params): any;
-  riskAssessmentResult(params): any;
 }
 
 const generateFilter = (params: IRiskConfirmityParams) => {
@@ -101,7 +100,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       console.log(confimity);
 
       return await model.RiskConfimity.findOneAndUpdate(
-        confimity._id,
+        { _id: confimity._id },
         { ...confimity, riskAssessmentId },
         { new: true }
       );
@@ -164,7 +163,6 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       if (!cardId) {
         throw new Error('Card ID is required');
       }
-      // const { riskAssessmentId } = await model.RiskConfimity.findOne({ cardId }).lean();
       const { categoryId } = await model.RiskAssessment.findOne({ _id: riskAssessmentId }).lean();
 
       const { formId } = await model.RiskAssessmentCategory.findOne({ _id: categoryId }).lean();
@@ -195,19 +193,6 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       }
 
       return { fields, submissions: editedsubmissions, formId };
-    }
-
-    public static async riskAssessmentResult(params) {
-      const { cardId } = params;
-      if (await this.checkAllUsersSubmitted(cardId)) {
-        const formId = await this.getFormId(cardId);
-        calculateRiskAssessment(model, subdomain, cardId, formId);
-      }
-      // if (Object.keys(groupedSubmissions).length === assignedUsers.length) {
-      //   console.log('hell yeah');
-      // }
-
-      return ['dsa', 'dsadasdsadas'];
     }
 
     static async getAsssignedUsers(dealId: string) {

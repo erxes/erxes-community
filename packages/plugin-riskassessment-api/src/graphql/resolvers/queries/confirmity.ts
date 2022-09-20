@@ -14,9 +14,6 @@ const RiskConfimityQuries = {
 
   async riskConfirmityFormDetail(_root, params, { models }: IContext) {
     return await models.RiskConfimity.riskConfirmityFormDetail(params);
-  },
-  async riskAssessmentResult(_root, params: { cardId: string }, { models }: IContext) {
-    return await models.RiskConfimity.riskAssessmentResult(params);
   }
 };
 

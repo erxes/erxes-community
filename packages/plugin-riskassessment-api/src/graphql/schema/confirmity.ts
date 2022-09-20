@@ -26,7 +26,6 @@ export const queries = `
     riskConfirmityDetails(cardId:String) :[RiskConfirmityDetail]
     riskConfirmitySubmissions(dealId:String) :JSON
     riskConfirmityFormDetail(cardId:String,userId: String,riskAssessmentId:String) :RiskConfirmityFormDetailType
-    riskAssessmentResult(cardId:String):JSON
 `;
 
 export const mutations = `
