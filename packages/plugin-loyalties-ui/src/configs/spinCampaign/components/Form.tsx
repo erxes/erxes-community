@@ -1,22 +1,26 @@
+import React from 'react';
 import {
   Button,
-  ControlLabel, DateControl, Form as CommonForm,
+  ControlLabel,
+  Form as CommonForm,
   FormControl,
-  FormGroup, Uploader
+  FormGroup,
+  DateControl,
+  Uploader,
 } from '@erxes/ui/src/components';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
 import {
-  MainStyleDateContainer as DateContainer, MainStyleFormColumn as FormColumn,
+  MainStyleFormColumn as FormColumn,
   MainStyleFormWrapper as FormWrapper,
   MainStyleModalFooter as ModalFooter,
-  MainStyleScrollWrapper as ScrollWrapper
+  MainStyleScrollWrapper as ScrollWrapper,
+  MainStyleDateContainer as DateContainer
 } from '@erxes/ui/src/styles/eindex';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { extractAttachment, __ } from '@erxes/ui/src/utils';
-import React from 'react';
-import Select from 'react-select-plus';
-import { IVoucherCampaign } from '../../voucherCampaign/types';
 import { ISpinCampaign, ISpinCampaignAward } from '../types';
+import Select from 'react-select-plus';
+import { extractAttachment, __ } from '@erxes/ui/src/utils';
+import { IVoucherCampaign } from '../../voucherCampaign/types';
 
 type Props = {
   spinCampaign?: ISpinCampaign;
@@ -191,8 +195,6 @@ class Form extends React.Component<Props, State> {
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal } = this.props;
     const { values, isSubmitted } = formProps;
-
-    console.log(formProps);
 
     const trigger = (
       <Button btnStyle="primary" uppercase={false} icon="plus-circle">
