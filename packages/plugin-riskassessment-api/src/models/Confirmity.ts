@@ -98,10 +98,9 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       if (!confimity) {
         throw new Error('Confimity not found');
       }
-      console.log(confimity);
 
       return await model.RiskConfimity.findOneAndUpdate(
-        confimity._id,
+        { _id: confimity._id },
         { ...confimity, riskAssessmentId },
         { new: true }
       );
