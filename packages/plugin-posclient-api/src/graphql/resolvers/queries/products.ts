@@ -3,6 +3,7 @@ import { PRODUCT_STATUSES } from '../../../models/definitions/constants';
 import { IContext } from '../../types';
 import { IModels } from '../../../connectionResolver';
 import { escapeRegExp, paginate } from '@erxes/api-utils/src/core';
+import { sendInventoriesMessage } from '../../../messageBroker';
 
 interface IProductParams {
   type?: string;
@@ -72,7 +73,7 @@ const productQueries = {
   async poscProducts(
     _root,
     { type, categoryId, searchValue, ...paginationArgs }: IProductParams,
-    { models, config }: IContext
+    { models, subdomain, config }: IContext
   ) {
     let filter = await generateFilter(models, config.token, {
       type,
@@ -80,12 +81,34 @@ const productQueries = {
       searchValue
     });
 
-    return paginate(
+    const inventoryResponse = await sendInventoriesMessage({
+      subdomain,
+      action: 'remainders',
+      data: {
+        productCategoryId: categoryId,
+        departmentId: config.departmentId,
+        branchId: config.branchId
+      },
+      isRPC: true,
+      defaultValue: {}
+    });
+
+    const paginatedProducts = await paginate(
       models.Products.find(filter)
         .sort('code')
         .lean(),
       paginationArgs
     );
+
+    paginatedProducts.map((item: any) => {
+      for (const inventory of inventoryResponse) {
+        if (item._id === inventory.productId) item.count = inventory.count;
+      }
+
+      return item;
+    });
+
+    return paginatedProducts;
   },
 
   /**

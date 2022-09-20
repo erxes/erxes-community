@@ -35,6 +35,7 @@ export const types = `
     vendorId: String
     attachmentMore: Attachment
     category: PosProductCategory
+    count: Int
   }
 `;
 

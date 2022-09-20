@@ -212,6 +212,12 @@ export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessageWrapper('core', args);
 };
 
+export const sendInventoriesMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('inventories', args);
+};
+
 export const sendContactsMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
