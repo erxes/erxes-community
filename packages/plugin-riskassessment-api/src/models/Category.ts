@@ -6,7 +6,7 @@ import { sendFormsMessage } from '../messageBroker';
 import { IRiskAssessmentCategoryField, PaginateField } from './definitions/common';
 import {
   IRiskAssessmentCategoryDocument,
-  riskAssessmentCategorySchema,
+  riskAssessmentCategorySchema
 } from './definitions/riskassessment';
 
 export interface IRiskAssessmentCategoryModel extends Model<IRiskAssessmentCategoryDocument> {
@@ -22,7 +22,7 @@ export interface IRiskAssessmentCategoryModel extends Model<IRiskAssessmentCateg
   ): Promise<IRiskAssessmentCategoryDocument>;
   getAssessmentCategory(_id: string): Promise<IRiskAssessmentCategoryDocument>;
   getFormDetail(_id: string): Promise<IRiskAssessmentCategoryDocument>;
-  removeUnsavedRiskAssessmentCategoryForm(formId:string): Boolean
+  removeUnsavedRiskAssessmentCategoryForm(formId: string): Boolean;
 }
 
 const generateFilter = (params: IRiskAssessmentCategoryField & PaginateField) => {
@@ -85,10 +85,10 @@ export const loadAssessmentCategory = (models: IModels, subdomain: string) => {
         subdomain,
         action: 'findOne',
         data: {
-          _id: category.formId,
+          _id: category.formId
         },
         isRPC: true,
-        defaultValue: {},
+        defaultValue: {}
       });
 
       if (form) {
@@ -97,10 +97,10 @@ export const loadAssessmentCategory = (models: IModels, subdomain: string) => {
           action: 'fields.find',
           data: {
             contentId: form._id,
-            contentType: 'form',
+            contentType: 'form'
           },
           isRPC: true,
-          defaultValue: [],
+          defaultValue: []
         });
         category.formName = form.title;
       }
@@ -113,7 +113,24 @@ export const loadAssessmentCategory = (models: IModels, subdomain: string) => {
         throw new Error('Not found risk assessment category');
       }
 
+      const { _id, formId } = await models.RiskAssessmentCategory.findOne({
+        _id: params._id
+      }).lean();
+
       try {
+        const riskAssessments = await models.RiskAssessment.find({ categoryId: { $in: _id } });
+        const riskAssessmentIds = riskAssessments.map(p => p._id);
+        await models.RiskAssessment.deleteMany({ categoryId: _id });
+        await models.RiskConfimity.deleteMany({ riskAssessmentId: { $in: riskAssessmentIds } });
+        await sendFormsMessage({
+          subdomain,
+          action: 'removeForm',
+          data: {
+            formId
+          },
+          isRPC: true,
+          defaultValue: []
+        });
         return await models.RiskAssessmentCategory.findByIdAndDelete(params._id);
       } catch (error) {
         throw new Error(error.message);
@@ -149,22 +166,22 @@ export const loadAssessmentCategory = (models: IModels, subdomain: string) => {
         action: 'findOne',
         data: { _id },
         isRPC: true,
-        defaultValue: {},
+        defaultValue: {}
       });
 
       return form;
     }
 
-    public static async removeUnsavedRiskAssessmentCategoryForm(formId){
+    public static async removeUnsavedRiskAssessmentCategoryForm(formId) {
       try {
         const form = await sendFormsMessage({
           subdomain,
-          action:'removeForm',
-          data:{formId},
+          action: 'removeForm',
+          data: { formId },
           isRPC: true,
-          defaultValue:{}
-        })
-        return true
+          defaultValue: {}
+        });
+        return true;
       } catch (error) {
         throw new Error(error.message);
       }

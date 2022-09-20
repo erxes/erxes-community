@@ -52,7 +52,6 @@ export const calculateRiskAssessment = async (models, subdomain, cardId, formId)
   if (calculateMethod === 'Multiply') {
     sumNumber = 1;
   }
-
   for (const submission of submissions) {
     const { optionsValues } = fields.find(field => field._id === submission.fieldId);
     const fieldValue = optionsValues.find(option => option.label === submission.value);
@@ -76,11 +75,11 @@ export const calculateRiskAssessment = async (models, subdomain, cardId, formId)
           { _id: riskAssessmentId },
           { $set: { status: name, statusColor: color } },
           { new: true }
-          );
-        }
+        );
       }
+    }
     if (['>', '<'].includes(operator)) {
-      operator += '='
+      operator += '=';
       if (eval(sumNumber + operator + value)) {
         await models.RiskAssessment.findOneAndUpdate(
           { _id: riskAssessmentId },
