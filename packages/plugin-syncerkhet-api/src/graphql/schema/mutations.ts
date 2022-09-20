@@ -4,4 +4,6 @@ export const mutations = `
   toSyncOrders(orderIds: [String]): JSON
   toCheckProducts(productCodes: [String]): JSON
   toCheckCategories(categoryCodes: [String]): JSON
+  toSyncCategories(action: String, categories: [JSON]): JSON
+  toSyncProducts(action: String, products: [JSON]): JSON
 `;

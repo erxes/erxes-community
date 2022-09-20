@@ -6,13 +6,13 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import { Bulk } from '@erxes/ui/src/components';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { mutations, queries } from '../graphql';
+import { mutations } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryProducts from '../components/inventoryProducts/InventoryProducts';
 import {
-  ProductsQueryResponse,
-  ToCheckProductsMutationResponse
+  ToCheckProductsMutationResponse,
+  ToSyncProductsMutationResponse
 } from '../types';
 
 type Props = {
@@ -20,11 +20,10 @@ type Props = {
   history: any;
 };
 
-type FinalProps = {
-  getProductsListQuery: ProductsQueryResponse;
-} & Props &
+type FinalProps = {} & Props &
   IRouterProps &
-  ToCheckProductsMutationResponse;
+  ToCheckProductsMutationResponse &
+  ToSyncProductsMutationResponse;
 
 type State = {
   items: any;
@@ -42,13 +41,33 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getProductsListQuery } = this.props;
     const { items, loading } = this.state;
-    const toCheckProducts = (productCodes: string[]) => {
+    const toSyncProducts = (action: string, products: any[]) => {
+      this.setState({ loading: true });
+      this.props
+        .toSyncProducts({
+          variables: {
+            action: action,
+            products: products
+          }
+        })
+        .then(response => {
+          this.setState({ loading: false });
+          Alert.success('Success. Please check again.');
+        })
+        .finally(() => {
+          this.setState({ items: [] });
+        })
+        .catch(e => {
+          Alert.error(e.message);
+          this.setState({ loading: false });
+        });
+    };
+    const toCheckProducts = () => {
       this.setState({ loading: true });
       this.props
         .toCheckProducts({
-          variables: { productCodes }
+          variables: {}
         })
         .then(response => {
           this.setState({ items: response.data.toCheckProducts });
@@ -60,16 +79,15 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
         });
     };
 
-    if (getProductsListQuery.loading) {
+    if (loading) {
       return <Spinner />;
     }
-    const products = getProductsListQuery.products || [];
     const updatedProps = {
       ...this.props,
-      loading: getProductsListQuery.loading || loading,
-      products,
+      loading: loading,
       toCheckProducts,
-      items
+      items,
+      toSyncProducts
     };
 
     const content = props => <InventoryProducts {...props} {...updatedProps} />;
@@ -78,29 +96,18 @@ class InventoryProductsContainer extends React.Component<FinalProps, State> {
   }
 }
 
-const generateParams = ({ queryParams }) => {
-  return {
-    page: queryParams.page ? parseInt(queryParams.page, 10) : 1,
-    perPage: queryParams.perPage ? parseInt(queryParams.perPage, 10) : 20
-  };
-};
-
 export default withProps<Props>(
   compose(
-    graphql<{ queryParams: any }, ProductsQueryResponse>(
-      gql(queries.getProductsList),
-      {
-        name: 'getProductsListQuery',
-        options: ({ queryParams }) => ({
-          variables: generateParams({ queryParams }),
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
-    graphql<Props, ToCheckProductsMutationResponse, { productCodes: string[] }>(
+    graphql<Props, ToCheckProductsMutationResponse, {}>(
       gql(mutations.toCheckProducts),
       {
         name: 'toCheckProducts'
+      }
+    ),
+    graphql<Props, ToSyncProductsMutationResponse, {}>(
+      gql(mutations.toSyncProducts),
+      {
+        name: 'toSyncProducts'
       }
     )
   )(withRouter<IRouterProps>(InventoryProductsContainer))

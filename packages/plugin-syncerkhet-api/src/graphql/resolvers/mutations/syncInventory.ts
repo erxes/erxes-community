@@ -2,19 +2,27 @@ import { IContext } from '../../../connectionResolver';
 import { getConfig } from '../../../utils/utils';
 import { sendRequest } from '@erxes/api-utils/src/requests';
 import { sendProductsMessage } from '../../../messageBroker';
+import {
+  consumeInventory,
+  consumeInventoryCategory
+} from '../../../utils/consumeInventory';
 
 const inventoryMutations = {
-  async toCheckProducts(
-    _root,
-    { productCodes }: { productCodes: string[] },
-    { subdomain }: IContext
-  ) {
+  async toCheckProducts(_root, { subdomain }: IContext) {
     const config = await getConfig(subdomain, 'ERKHET', {});
 
     if (!config.apiToken || !config.apiKey || !config.apiSecret) {
       throw new Error('Erkhet config not found.');
     }
 
+    const products = await sendProductsMessage({
+      subdomain,
+      action: 'find',
+      data: {},
+      isRPC: true
+    });
+
+    const productCodes = products.map(p => p.code);
     if (!productCodes) {
       throw new Error('No product codes found.');
     }
@@ -34,14 +42,14 @@ const inventoryMutations = {
     }
     let result = JSON.parse(response).map(r => r.fields);
 
-    result = result.map(item => {
-      return {
-        code: item.code,
-        name: item.name,
-        unitPrice: item.unit_price,
-        categoryCode: item.category
-      };
-    });
+    // result = result.map(item => {
+    //   return {
+    //     code: item.code,
+    //     name: item.name,
+    //     unitPrice: item.unit_price,
+    //     categoryCode: item.category
+    //   };
+    // });
 
     const matchedErkhetData = result.filter(r => {
       if (productCodes.find(p => p === r.code)) {
@@ -78,16 +86,21 @@ const inventoryMutations = {
       }
     };
   },
-  async toCheckCategories(
-    _root,
-    { categoryCodes }: { categoryCodes: string[] },
-    { subdomain }: IContext
-  ) {
+  async toCheckCategories(_root, { subdomain }: IContext) {
     const config = await getConfig(subdomain, 'ERKHET', {});
 
     if (!config.apiToken || !config.apiKey || !config.apiSecret) {
       throw new Error('Erkhet config not found.');
     }
+
+    const categories = await sendProductsMessage({
+      subdomain,
+      action: 'categories.find',
+      data: {},
+      isRPC: true
+    });
+
+    const categoryCodes = categories.map(c => c.code);
 
     if (!categoryCodes) {
       throw new Error('No category codes found.');
@@ -108,14 +121,14 @@ const inventoryMutations = {
     }
     let result = JSON.parse(response).map(r => r.fields);
 
-    result = result.map(item => {
-      return {
-        code: item.code,
-        name: item.name,
-        unitPrice: item.unit_price,
-        categoryCode: item.category
-      };
-    });
+    // result = result.map(item => {
+    //   return {
+    //     code: item.code,
+    //     name: item.name,
+    //     unitPrice: item.unit_price,
+    //     categoryCode: item.category
+    //   };
+    // });
 
     // for update
     const matchedErkhetData = result.filter(r => {
@@ -152,6 +165,91 @@ const inventoryMutations = {
         items: otherCategories
       }
     };
+  },
+  async toSyncCategories(
+    _root,
+    { action, categories }: { action: string; categories: any[] },
+    { subdomain }: IContext
+  ) {
+    try {
+      switch (action) {
+        case 'CREATE': {
+          categories.forEach(async category => {
+            await consumeInventoryCategory(
+              subdomain,
+              category,
+              category.code,
+              'create'
+            );
+          });
+          break;
+        }
+        case 'UPDATE': {
+          categories.forEach(async category => {
+            await consumeInventoryCategory(
+              subdomain,
+              category,
+              category.code,
+              'update'
+            );
+          });
+          break;
+        }
+        case 'DELETE': {
+          categories.forEach(async category => {
+            await consumeInventoryCategory(
+              subdomain,
+              category,
+              category.code,
+              'delete'
+            );
+          });
+          break;
+        }
+        default:
+          break;
+      }
+      return {
+        status: 'success'
+      };
+    } catch (e) {
+      throw new Error('Error while syncing categories. ' + e);
+    }
+  },
+  async toSyncProducts(
+    _root,
+    { action, products }: { action: string; products: any[] },
+    { subdomain }: IContext
+  ) {
+    try {
+      switch (action) {
+        case 'CREATE': {
+          products.forEach(async product => {
+            await consumeInventory(subdomain, product, product.code, 'create');
+          });
+          break;
+        }
+        case 'UPDATE': {
+          products.forEach(async product => {
+            await consumeInventory(subdomain, product, product.code, 'update');
+          });
+          break;
+        }
+        case 'DELETE': {
+          products.forEach(async product => {
+            await consumeInventory(subdomain, product, product.code, 'delete');
+          });
+          break;
+        }
+        default:
+          break;
+      }
+      return {
+        status: 'success'
+      };
+    } catch (e) {
+      throw new Error('Error while syncing products. ' + e);
+    }
   }
 };
 export default inventoryMutations;

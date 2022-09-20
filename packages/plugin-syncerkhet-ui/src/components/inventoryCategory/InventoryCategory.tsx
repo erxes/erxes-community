@@ -1,25 +1,18 @@
-import { Title } from '@erxes/ui-settings/src/styles';
-import { Pagination } from '@erxes/ui/src/components';
+import { CollapseContent } from '@erxes/ui/src/components';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { router, __ } from '@erxes/ui/src/utils/core';
+import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import StatusFilter from '../StatusFilter';
 import Row from './InventoryCategoryRow';
 
 type Props = {
   loading: boolean;
-  categories: any[];
   history: any;
   queryParams: any;
-  isAllSelected: boolean;
-  bulk: any[];
-  toggleBulk: () => void;
-  emptyBulk: () => void;
-  toggleAll: (targets: any[], containerId: string) => void;
-  toCheckCategories: (categoryCodes: string[]) => void;
+  toCheckCategories: () => void;
+  toSyncCategories: (action: string, categories: any[]) => void;
   items: any;
 };
 
@@ -35,48 +28,46 @@ export const menuPos = [
 class InventoryCategory extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-
     this.state = {};
   }
 
-  renderRow = () => {
-    const { categories, toggleBulk, bulk } = this.props;
-    return categories.map(category => (
-      <Row
-        history={history}
-        key={category._id}
-        category={category}
-        toggleBulk={toggleBulk}
-        isChecked={bulk.includes(category)}
-      />
-    ));
+  renderRow = (data: any) => {
+    return data.map(c => <Row history={history} key={c.code} category={c} />);
   };
 
-  onChange = () => {
-    const { toggleAll, categories } = this.props;
-    toggleAll(categories, 'categories');
-  };
+  renderTable = (data: any, action: string) => {
+    const data_len = data.length;
 
-  renderTable = () => {
-    const onClickCheck = () => {
-      const codes = this.props.categories.map(c => c.code);
-      this.props.toCheckCategories(codes);
+    if (data_len > 20) {
+      data = data.slice(0, 20);
+    }
+
+    const onClickSync = () => {
+      this.props.toSyncCategories(action, data);
     };
     const syncButton = (
       <>
         <Button
-          btnStyle="warning"
+          btnStyle="primary"
           size="small"
           icon="check-1"
-          onClick={onClickCheck}
+          onClick={onClickSync}
         >
-          Check
+          Sync
         </Button>
       </>
     );
     const header = (
       <Wrapper.ActionBar
-        left={<Title>Product Categories</Title>}
+        left={
+          data_len > 20 ? (
+            <>20 of {data_len} </>
+          ) : (
+            <>
+              {data_len} of {data_len}
+            </>
+          )
+        }
         right={syncButton}
       />
     );
@@ -89,16 +80,92 @@ class InventoryCategory extends React.Component<Props, State> {
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
               <th>{__('Order')}</th>
-              <th>{__('Product count')}</th>
-              <th>{__('status')}</th>
+              <th>{__('Parent')}</th>
             </tr>
           </thead>
-          <tbody>{this.renderRow()}</tbody>
+          <tbody>{this.renderRow(data)}</tbody>
         </Table>
       </>
     );
   };
   render() {
+    const { items } = this.props;
+    const onClickCheck = () => {
+      this.props.toCheckCategories();
+    };
+    const checkButton = (
+      <>
+        <Button
+          btnStyle="warning"
+          size="small"
+          icon="check-1"
+          onClick={onClickCheck}
+        >
+          Check
+        </Button>
+      </>
+    );
+    const header = <Wrapper.ActionBar right={checkButton} />;
+    const content = (
+      <>
+        {header}
+        <br />
+        <CollapseContent
+          title={__(
+            'Create Categories' +
+              (items.create ? ':  ' + items.create.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.create
+                ? this.renderTable(items.create?.items, 'CREATE')
+                : []
+            }
+            loading={false}
+            count={3}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
+        <CollapseContent
+          title={__(
+            'Update categories' +
+              (items.update ? ':  ' + items.update.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.update ? this.renderTable(items.update.items, 'UPDATE') : []
+            }
+            loading={false}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
+        <CollapseContent
+          title={__(
+            'Delete categories' +
+              (items.delete ? ':  ' + items.delete.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.delete ? this.renderTable(items.delete.items, 'DELETE') : []
+            }
+            loading={false}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
+      </>
+    );
     return (
       <Wrapper
         header={
@@ -108,15 +175,8 @@ class InventoryCategory extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        leftSidebar={<StatusFilter items={this.props.items || ({} as any)} />}
-        content={
-          <DataWithLoader
-            data={this.renderTable()}
-            loading={this.props.loading}
-          />
-        }
+        content={<DataWithLoader data={content} loading={this.props.loading} />}
         hasBorder
-        footer={<Pagination count={this.props.categories.length} />}
       />
     );
   }

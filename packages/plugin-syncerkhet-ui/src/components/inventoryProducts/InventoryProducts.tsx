@@ -2,24 +2,16 @@ import React from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils/core';
 import Table from '@erxes/ui/src/components/table';
-import FormControl from '@erxes/ui/src/components/form/Control';
-import { Title } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import Row from './InventoryProductsRow';
-import { DataWithLoader, Pagination } from '@erxes/ui/src/components';
-import StatusFilter from '../StatusFilter';
+import { CollapseContent, DataWithLoader } from '@erxes/ui/src/components';
 
 type Props = {
   loading: boolean;
-  products: any[];
   history: any;
   queryParams: any;
-  isAllSelected: boolean;
-  bulk: any[];
-  toggleBulk: () => void;
-  emptyBulk: () => void;
-  toggleAll: (targets: any[], containerId: string) => void;
-  toCheckProducts: (productCodes: string[]) => void;
+  toCheckProducts: () => void;
+  toSyncProducts: (action: string, products: any[]) => void;
   items: any;
 };
 
@@ -39,32 +31,78 @@ class InventoryProducts extends React.Component<Props, State> {
     this.state = {};
   }
 
-  renderRow = () => {
-    const { products, toggleBulk, bulk } = this.props;
-
-    return products.map(p => (
-      <Row
-        history={history}
-        key={p._id}
-        product={p}
-        toggleBulk={toggleBulk}
-        isChecked={bulk.includes(p)}
-      />
-    ));
+  renderRow = (data: any) => {
+    if (data.length > 20) {
+      data = data.slice(0, 20);
+    }
+    return data.map(p => <Row history={history} key={p.code} product={p} />);
   };
 
-  onChange = () => {
-    const { toggleAll, products } = this.props;
-    toggleAll(products, 'products');
-  };
+  renderTable = (data: any, action: string) => {
+    const data_len = data.length;
 
-  renderTable = () => {
-    const { toCheckProducts } = this.props;
-    const onClickCheck = () => {
-      const codes = this.props.products.map(c => c.code);
-      toCheckProducts(codes);
+    if (data_len > 20) {
+      data = data.slice(0, 20);
+    }
+
+    const onClickSync = () => {
+      this.props.toSyncProducts(action, data);
     };
     const syncButton = (
+      <>
+        <Button
+          btnStyle="primary"
+          size="small"
+          icon="check-1"
+          onClick={onClickSync}
+        >
+          Sync
+        </Button>
+      </>
+    );
+
+    const header = (
+      <Wrapper.ActionBar
+        left={
+          data_len > 20 ? (
+            <>20 of {data_len} </>
+          ) : (
+            <>
+              {data_len} of {data_len}
+            </>
+          )
+        }
+        right={syncButton}
+      />
+    );
+    return (
+      <>
+        {header}
+        <Table hover={true}>
+          <thead>
+            <tr>
+              <th>{__('Code')}</th>
+              <th>{__('Name')}</th>
+              <th>{__('Barcode')}</th>
+              <th>{__('Category code')}</th>
+              <th>{__('Unit price')}</th>
+              <th>{__('Weight')}</th>
+            </tr>
+          </thead>
+          <tbody>{this.renderRow(data)}</tbody>
+        </Table>
+      </>
+    );
+  };
+
+  render() {
+    const { items, toCheckProducts } = this.props;
+
+    const onClickCheck = () => {
+      toCheckProducts();
+    };
+
+    const checkButton = (
       <>
         <Button
           btnStyle="warning"
@@ -76,30 +114,66 @@ class InventoryProducts extends React.Component<Props, State> {
         </Button>
       </>
     );
-    const header = (
-      <Wrapper.ActionBar left={<Title>Products</Title>} right={syncButton} />
-    );
-    return (
+
+    const header = <Wrapper.ActionBar right={checkButton} />;
+
+    const content = (
       <>
         {header}
-        <Table hover={true}>
-          <thead>
-            <tr>
-              <th>{__('Code')}</th>
-              <th>{__('Name')}</th>
-              <th>{__('Type')}</th>
-              <th>{__('Category code')}</th>
-              <th>{__('Product count')}</th>
-              <th>{__('Unit Price')}</th>
-            </tr>
-          </thead>
-          <tbody>{this.renderRow()}</tbody>
-        </Table>
+        <br />
+        <CollapseContent
+          title={__(
+            'Create products' + (items.create ? ':  ' + items.create.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.create
+                ? this.renderTable(items.create?.items, 'CREATE')
+                : []
+            }
+            loading={false}
+            count={3}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
+        <CollapseContent
+          title={__(
+            'Update products' + (items.update ? ':  ' + items.update.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.update ? this.renderTable(items.update.items, 'UPDATE') : []
+            }
+            loading={false}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
+        <CollapseContent
+          title={__(
+            'Delete products' + (items.delete ? ':  ' + items.delete.count : '')
+          )}
+        >
+          <DataWithLoader
+            data={
+              items.delete ? this.renderTable(items.delete.items, 'DELETE') : []
+            }
+            loading={false}
+            emptyText={'Please check first.'}
+            emptyIcon="leaf"
+            size="large"
+            objective={true}
+          />
+        </CollapseContent>
       </>
     );
-  };
-
-  render() {
     return (
       <Wrapper
         header={
@@ -109,15 +183,8 @@ class InventoryProducts extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        leftSidebar={<StatusFilter items={this.props.items || ({} as any)} />}
-        content={
-          <DataWithLoader
-            data={this.renderTable()}
-            loading={this.props.loading}
-          />
-        }
+        content={<DataWithLoader data={content} loading={this.props.loading} />}
         hasBorder
-        footer={<Pagination count={this.props.products.length} />}
       />
     );
   }

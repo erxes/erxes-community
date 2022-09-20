@@ -137,54 +137,6 @@ const checkSyncOrders = `
   }
 `;
 
-const getProductsList = `
-  query Products(
-    ${commonProductParams}
-  ) {
-    products(
-      ${commonProductParamsDefs}
-    ) {
-      _id
-      name
-      code
-      type
-      description
-      sku
-      unitPrice
-      category {
-        _id
-        name
-        code
-      }
-      categoryId
-      customFieldsData
-      createdAt
-      tagIds
-      vendorId
-      supply
-      productCount
-      minimiumCount
-      uomId
-      subUoms
-    }
-  }
-`;
-
-const getCategoryList = `
-  query ProductCategories {
-    productCategories {
-      _id
-      name
-      description
-      parentId
-      code
-      order
-      status
-      isRoot
-      productCount
-    }
-  }
-`;
 const commonErkhetProductsParams = `
   $perPage: Int,
   $page: Int
@@ -238,8 +190,6 @@ export default {
   checkSyncDealsTotalCount,
   checkSyncOrdersTotalCount,
   checkSyncOrders,
-  getCategoryList,
-  getProductsList,
   getErkhetCategoriesList,
   getErkhetProductsList
 };

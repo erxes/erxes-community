@@ -6,24 +6,23 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import { Bulk } from '@erxes/ui/src/components';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { mutations, queries } from '../graphql';
+import { mutations } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils/core';
 import { withRouter } from 'react-router-dom';
 import InventoryCategory from '../components/inventoryCategory/InventoryCategory';
 import {
-  CategoriesQueryResponse,
-  ToCheckCategoriesMutationResponse
+  ToCheckCategoriesMutationResponse,
+  ToSyncCategoriesMutationResponse
 } from '../types';
 type Props = {
   queryParams: any;
   history: any;
 };
 
-type FinalProps = {
-  getCategoriesListQuery: CategoriesQueryResponse;
-} & Props &
+type FinalProps = {} & Props &
   IRouterProps &
-  ToCheckCategoriesMutationResponse;
+  ToCheckCategoriesMutationResponse &
+  ToSyncCategoriesMutationResponse;
 
 type State = {
   items: any;
@@ -41,14 +40,34 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { getCategoriesListQuery } = this.props;
     const { items, loading } = this.state;
-    const toCheckCategories = (categoryCodes: string[]) => {
+
+    const toSyncCategories = (action: string, categories: any[]) => {
       this.setState({ loading: true });
       this.props
-        .toCheckCategories({
-          variables: { categoryCodes }
+        .toSyncCategories({
+          variables: {
+            action: action,
+            categories: categories
+          }
         })
+        .then(response => {
+          this.setState({ loading: false });
+          Alert.success('Success. Please check again.');
+        })
+        .finally(() => {
+          this.setState({ items: [] });
+        })
+        .catch(e => {
+          Alert.error(e.message);
+          this.setState({ loading: false });
+        });
+    };
+
+    const toCheckCategories = () => {
+      this.setState({ loading: true });
+      this.props
+        .toCheckCategories({ variables: {} })
         .then(response => {
           this.setState({ items: response.data.toCheckCategories });
           this.setState({ loading: false });
@@ -58,16 +77,16 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
           this.setState({ loading: false });
         });
     };
-    if (getCategoriesListQuery.loading) {
+
+    if (loading) {
       return <Spinner />;
     }
-    const categories = getCategoriesListQuery.productCategories || [];
 
     const updatedProps = {
       ...this.props,
-      loading: getCategoriesListQuery.loading || loading,
-      categories,
+      loading: loading,
       toCheckCategories,
+      toSyncCategories,
       items
     };
 
@@ -77,37 +96,19 @@ class InventoryCategoryContainer extends React.Component<FinalProps, State> {
   }
 }
 
-const generateParams = ({ queryParams }) => {
-  return {
-    erkhetPage: queryParams.erkhetPage
-      ? parseInt(queryParams.erkhetPage, 10)
-      : 1,
-    erkhetPerPage: queryParams.erkhetPerPage
-      ? parseInt(queryParams.erkhetPerPage, 10)
-      : 20,
-    page: queryParams.page ? parseInt(queryParams.page, 10) : 1,
-    perPage: queryParams.perPage ? parseInt(queryParams.perPage, 10) : 20
-  };
-};
-
 export default withProps<Props>(
   compose(
-    graphql<{ queryParams: any }, CategoriesQueryResponse>(
-      gql(queries.getCategoryList),
+    graphql<Props, ToCheckCategoriesMutationResponse, {}>(
+      gql(mutations.toCheckCategories),
       {
-        name: 'getCategoriesListQuery',
-        options: ({ queryParams }) => ({
-          variables: generateParams({ queryParams }),
-          fetchPolicy: 'network-only'
-        })
+        name: 'toCheckCategories'
       }
     ),
-    graphql<
-      Props,
-      ToCheckCategoriesMutationResponse,
-      { categoryCodes: string[] }
-    >(gql(mutations.toCheckCategories), {
-      name: 'toCheckCategories'
-    })
+    graphql<Props, ToSyncCategoriesMutationResponse, {}>(
+      gql(mutations.toSyncCategories),
+      {
+        name: 'toSyncCategories'
+      }
+    )
   )(withRouter<IRouterProps>(InventoryCategoryContainer))
 );

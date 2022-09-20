@@ -40,18 +40,22 @@ export type ToSyncDealsMutationResponse = {
 };
 
 export type ToCheckProductsMutationResponse = {
-  toCheckProducts: (mutation: {
-    variables: {
-      productCodes: string[];
-    };
-  }) => Promise<any>;
+  toCheckProducts: (mutation: { variables: {} }) => Promise<any>;
 };
 
 export type ToCheckCategoriesMutationResponse = {
-  toCheckCategories: (mutation: {
-    variables: {
-      categoryCodes: string[];
-    };
+  toCheckCategories: (mutation: { variables: {} }) => Promise<any>;
+};
+
+export type ToSyncCategoriesMutationResponse = {
+  toSyncCategories: (mutation: {
+    variables: { action: string; categories: any[] };
+  }) => Promise<any>;
+};
+
+export type ToSyncProductsMutationResponse = {
+  toSyncProducts: (mutation: {
+    variables: { action: string; products: any[] };
   }) => Promise<any>;
 };
 
@@ -68,19 +72,3 @@ export type ToSyncOrdersMutationResponse = {
     variables: { orderIds: string[] };
   }) => Promise<any>;
 };
-
-export type CategoriesQueryResponse = {
-  productCategories: any[];
-} & QueryResponse;
-
-export type ProductsQueryResponse = {
-  products: any[];
-} & QueryResponse;
-
-export type ErkhetProductsQueryResponse = {
-  getProductsErkhet: any[];
-} & QueryResponse;
-
-export type ErkhetCategoriesQueryResponse = {
-  getCategoriesErkhet: any[];
-} & QueryResponse;

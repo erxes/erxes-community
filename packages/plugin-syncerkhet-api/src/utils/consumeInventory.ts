@@ -107,10 +107,10 @@ export const consumeInventoryCategory = async (
         action: 'categories.createProductCategory',
         data: {
           doc: {
-            ...document,
-            parentId: parentCategory
-              ? parentCategory._id
-              : productCategory.parentId
+            ...document
+            // parentId: parentCategory
+            //   ? parentCategory._id
+            //   : productCategory.parentId
           }
         },
         isRPC: true
