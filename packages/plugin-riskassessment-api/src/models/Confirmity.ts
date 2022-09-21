@@ -202,9 +202,6 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
         const formId = await this.getFormId(cardId);
         calculateRiskAssessment(model, subdomain, cardId, formId);
       }
-      // if (Object.keys(groupedSubmissions).length === assignedUsers.length) {
-      //   console.log('hell yeah');
-      // }
 
       return ['dsa', 'dsadasdsadas'];
     }
