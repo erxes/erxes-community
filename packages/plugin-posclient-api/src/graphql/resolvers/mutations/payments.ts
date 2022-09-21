@@ -47,6 +47,9 @@ const paymentMutations = {
           amount: amount ? amount : order.totalAmount,
           callback_url: config.qpayConfig.callbackUrl
             ? `${config.qpayConfig.callbackUrl}?payment_id=${order._id}`
+            : '',
+          calback_url: config.qpayConfig.callbackUrl
+            ? `${config.qpayConfig.callbackUrl}?payment_id=${order._id}`
             : ''
         },
         tokenInfo.access_token,

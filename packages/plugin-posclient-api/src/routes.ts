@@ -28,18 +28,23 @@ export const posInitialSetup = async (req, res) => {
 };
 
 export const callBackQpay = async (req, res) => {
+  console.log('start callBackQpay');
+  console.log(req.query);
+
   const { SKIP_REDIS } = process.env;
   if (SKIP_REDIS) {
-    return;
+    return res.send();
   }
 
   const subdomain = getSubdomain(req);
+  console.log(subdomain);
 
   const models = await generateModels(subdomain);
 
   const { payment_id, qpay_payment_id } = req.query;
   if (!payment_id || !qpay_payment_id) {
-    return;
+    console.log('!payment_id || !qpay_payment_id');
+    return res.send();
   }
 
   const orderId = payment_id;
@@ -47,14 +52,15 @@ export const callBackQpay = async (req, res) => {
 
   const pos = await sendPosMessage({
     subdomain,
-    action: 'configs.find',
+    action: 'configs.findOne',
     data: { token: order.posToken },
     isRPC: true,
     defaultValue: {}
   });
 
   if (!pos.isOnline) {
-    return;
+    console.log('!pos.isOnline');
+    return res.send();
   }
 
   const paymentId = qpay_payment_id;
@@ -62,7 +68,8 @@ export const callBackQpay = async (req, res) => {
     senderInvoiceNo: orderId
   }).lean();
   if (!invoice) {
-    return;
+    console.log('!invoice');
+    return res.send();
   }
 
   await models.QPayInvoices.updateOne(
@@ -89,5 +96,6 @@ export const callBackQpay = async (req, res) => {
     paidMobileAmount
   );
 
-  return;
+  console.log('end callBackQpay');
+  return res.send();
 };
