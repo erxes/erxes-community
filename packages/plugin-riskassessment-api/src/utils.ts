@@ -54,8 +54,19 @@ export const calculateRiskAssessment = async (models, subdomain, cardId, formId)
   }
   for (const submission of submissions) {
     const { optionsValues } = fields.find(field => field._id === submission.fieldId);
-    const fieldValue = optionsValues.find(option => option.label === submission.value);
-
+    const optValues = optionsValues
+      .split('\n')
+      .map(item => {
+        if (item.match(/=/g)) {
+          const label = item?.substring(0, item.indexOf('='));
+          const value = parseInt(item.substring(item?.indexOf('=') + 1, item.length));
+          if (!Number.isNaN(value)) {
+            return { label, value };
+          }
+        }
+      }, [])
+      .filter(item => item);
+    const fieldValue = optValues.find(option => option.label === submission.value);
     switch (calculateMethod) {
       case 'Multiply':
         sumNumber *= parseInt(fieldValue.value);
@@ -64,7 +75,6 @@ export const calculateRiskAssessment = async (models, subdomain, cardId, formId)
         sumNumber += parseInt(fieldValue.value);
         break;
     }
-    // sumNumber += parseInt(fieldValue.value);
   }
 
   for (const { name, value, value2, logic, color } of calculateLogics) {
