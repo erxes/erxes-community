@@ -104,8 +104,6 @@ class Form extends React.Component<IProps, IState> {
       return <Spinner />;
     }
     const formTrigger = (
-      // <Button>
-      // </Button>
       <FormTriggerBtn selected={detail || doc.formId ? true : false}>
         <FormContainer row justifyCenter gapBetween={10}>
           <Icon

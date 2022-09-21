@@ -15,6 +15,5 @@ const RiskAssessmentQueries = {
   }
 };
 
-// requireLogin(RiskAssessmentQueries, 'getRiskAssesment');
 
 export default RiskAssessmentQueries;

@@ -22,6 +22,4 @@ const RiskAssessmentMutations = {
   },
 };
 
-// requireLogin(RiskAssessmentMutations,'addRiskAssesment')
-
 export default RiskAssessmentMutations;

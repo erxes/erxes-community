@@ -268,7 +268,6 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
             name="name"
             type="text"
             required={true}
-            // autoFocus={true}
             defaultValue={riskAssessment.name}
             onChange={handleState}
           />
@@ -278,7 +277,6 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
             {...formProps}
             name="description"
             componentClass="textarea"
-            // autoFocus={true}
             defaultValue={riskAssessment.description}
             onChange={handleState}
           />
