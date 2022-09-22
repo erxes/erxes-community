@@ -41,5 +41,5 @@ export default {
   editConfimityRiskAssessment,
   removeConfirmityRiskAssessment,
   formSubmissionsSave,
-  riskFormSaveSubmission,
+  riskFormSaveSubmission
 };

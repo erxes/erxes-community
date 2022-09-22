@@ -3,30 +3,27 @@ import { serviceDiscovery } from './configs';
 import { generateModels } from './connectionResolver';
 let client;
 
-export const initBroker = async (cl) => {
+export const initBroker = async cl => {
   client = cl;
 
-  const {consumeRPCQueue  } = client
+  const { consumeRPCQueue } = client;
 
-  consumeRPCQueue('riskassessment:riskConfirmities:find',async({subdomain,data})=>{
-    const models = await generateModels(subdomain)
+  consumeRPCQueue('riskassessment:riskConfirmities:find', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
 
     return {
-      data:await models.RiskConfimity.riskConfirmities(data),
-      status:'success'
-    }
-  })
-
+      data: await models.RiskConfimity.riskConfirmities(data),
+      status: 'success'
+    };
+  });
 };
 
-export const sendFormsMessage = async (
-  args: ISendMessageArgs
-): Promise<any> => {
+export const sendFormsMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessage({
     client,
     serviceDiscovery,
     serviceName: 'forms',
-    ...args,
+    ...args
   });
 };
 
@@ -35,7 +32,7 @@ export const sendCardsMessage = (args: ISendMessageArgs): Promise<any> => {
     client,
     serviceDiscovery,
     serviceName: 'cards',
-    ...args,
+    ...args
   });
 };
 export const sendCoreMessage = (args: ISendMessageArgs): Promise<any> => {
@@ -43,7 +40,7 @@ export const sendCoreMessage = (args: ISendMessageArgs): Promise<any> => {
     client,
     serviceDiscovery,
     serviceName: 'core',
-    ...args,
+    ...args
   });
 };
 
@@ -52,7 +49,7 @@ export const sendRiskAssessmentMessage = (args: ISendMessageArgs): Promise<any> 
     client,
     serviceDiscovery,
     serviceName: 'riskassessment',
-    ...args,
+    ...args
   });
 };
 

@@ -325,7 +325,7 @@ class AssessmentCategories extends React.Component<Props, State> {
 
   render() {
     return (
-      <Sidebar wide={true} hasBorder={true} noMargin>
+      <Sidebar wide={true} hasBorder={true}>
         <Section maxHeight={500} collapsible={this.props.totalCount > 9} noMargin noShadow>
           {this.rightActionBar}
           {this.renderCategoriesFilter()}

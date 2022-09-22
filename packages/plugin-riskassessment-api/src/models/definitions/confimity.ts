@@ -20,7 +20,7 @@ export const riskConfirmitySchema = new Schema({
   _id: field({ pkey: true }),
   cardId: field({ type: String, label: 'Card Id' }),
   riskAssessmentId: field({ type: String, label: 'Answer Risk assessment Ids' }),
-  createdAt: field({ type: Date, label: 'Created At', default: new Date() }),
+  createdAt: field({ type: Date, label: 'Created At', default: new Date() })
 });
 
 export const riskConfirmityFormSubmissionSchema = new Schema({
@@ -30,5 +30,5 @@ export const riskConfirmityFormSubmissionSchema = new Schema({
   formId: field({ type: String, label: 'Form ID' }),
   riskAssessmentId: field({ type: String, label: 'risk assessment ID' }),
   fieldId: field({ type: String, label: 'Form Field Id' }),
-  value: field({ type: String, lablel: 'Form Field Value' }),
+  value: field({ type: String, lablel: 'Form Field Value' })
 });

@@ -14,7 +14,7 @@ type Props = {
   refetch: () => void;
   refetchSubmissions: () => void;
   riskAssessmentId?: string;
-  isSubmitted?:boolean
+  isSubmitted?: boolean;
 };
 
 type FinalProps = {

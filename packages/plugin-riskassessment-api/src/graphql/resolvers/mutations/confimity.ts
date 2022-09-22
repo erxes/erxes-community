@@ -10,7 +10,7 @@ const RiskConfimityMutations = {
   },
   async removeRiskConfirmity(_root, { cardId }: { cardId: string }, { models }: IContext) {
     return await models.RiskConfimity.riskConfirmityRemove(cardId);
-  },
+  }
 };
 
 export default RiskConfimityMutations;

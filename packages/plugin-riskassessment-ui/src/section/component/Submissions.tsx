@@ -10,7 +10,7 @@ type Props = {
   formId: string;
   formSubmissionsSave: (doc: any) => any;
   closeModal: () => void;
-  isSubmitted?:boolean
+  isSubmitted?: boolean;
 };
 
 type State = {
@@ -21,7 +21,7 @@ class SubmissionsComponent extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      submissions: this.props.submissions || {},
+      submissions: this.props.submissions || {}
     };
 
     this.handleSumbmissionForm = this.handleSumbmissionForm.bind(this);
@@ -34,7 +34,7 @@ class SubmissionsComponent extends React.Component<Props, State> {
 
     formSubmissionsSave({
       formSubmissions: submissions,
-      formId,
+      formId
     });
   }
 
@@ -42,12 +42,12 @@ class SubmissionsComponent extends React.Component<Props, State> {
     const { fields } = this.props;
     const { submissions } = this.state;
 
-    const handleChange = (field) => {
+    const handleChange = field => {
       submissions[field._id] = field.value;
       this.setState({ submissions });
     };
 
-    return fields.map((field) => (
+    return fields.map(field => (
       <GenerateField
         isEditing={true}
         defaultValue={submissions[field._id]}
@@ -66,14 +66,14 @@ class SubmissionsComponent extends React.Component<Props, State> {
       <div>
         {this.renderForm()}
         {!isSubmitted && (
-        <ModalFooter>
-          <Button btnStyle='simple' onClick={closeModal}>
-            Cancel
-          </Button>
-          <Button btnStyle='success' onClick={this.handleSumbmissionForm}>
-            Submit
-          </Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button btnStyle="simple" onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button btnStyle="success" onClick={this.handleSumbmissionForm}>
+              Submit
+            </Button>
+          </ModalFooter>
         )}
       </div>
     );

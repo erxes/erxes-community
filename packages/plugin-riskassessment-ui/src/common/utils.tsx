@@ -10,7 +10,7 @@ export const DefaultWrapper = ({
   totalCount,
   content,
   sidebar,
-  isPaginationHide,
+  isPaginationHide
 }: {
   title: string;
   rightActionBar?: JSX.Element;
@@ -47,7 +47,7 @@ export const CustomFormGroup = ({
   label,
   required,
   row,
-  spaceBetween,
+  spaceBetween
 }: CustomFormGroupProps) => {
   return (
     <FormGroupRow horizontal={row} spaceBetween={spaceBetween}>
@@ -57,7 +57,7 @@ export const CustomFormGroup = ({
   );
 };
 
-export const subOption = (category) => {
+export const subOption = category => {
   const { order } = category;
   const foundedString = order.match(/[/]/gi);
   return '\u00A0 '.repeat(foundedString.length);

@@ -1,4 +1,4 @@
-name: Plugin tags UI CI
+name: Plugin riskassessment UI CI
 
 on:
   push:

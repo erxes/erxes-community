@@ -15,5 +15,4 @@ const RiskAssessmentQueries = {
   }
 };
 
-
 export default RiskAssessmentQueries;

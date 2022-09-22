@@ -1,5 +1,4 @@
 import { IContext } from '../../../connectionResolver';
-import { requireLogin } from '@erxes/api-utils/src';
 import { IRiskAssessmentField } from '../../../models/definitions/common';
 
 const RiskAssessmentMutations = {
@@ -19,7 +18,7 @@ const RiskAssessmentMutations = {
   ) {
     const result = await models.RiskAssessment.riskAssessmentUpdate(params);
     return result;
-  },
+  }
 };
 
 export default RiskAssessmentMutations;

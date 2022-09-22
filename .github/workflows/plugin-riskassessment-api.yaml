@@ -1,4 +1,4 @@
-name: Plugin tags Api CI
+name: Plugin riskassessment Api CI
 
 on:
   push:
