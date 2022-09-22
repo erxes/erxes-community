@@ -28,7 +28,7 @@ const inventoryMutations = {
     }
 
     const response = await sendRequest({
-      url: process.env + '/get-api/',
+      url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inventory',
@@ -98,7 +98,7 @@ const inventoryMutations = {
     }
 
     const response = await sendRequest({
-      url: process.env + '/get-api/',
+      url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inv_category',
