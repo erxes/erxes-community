@@ -16,23 +16,3 @@ export const ContentBox = styled.div`
   max-width: 640px;
   margin: 0 auto;
 `;
-
-export const VSplit = styled.div`
-  width: 100%;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-`;
-
-export const VLeftSplit = styled.div`
-  flex: 1;
-`;
-
-export const VRightSplit = styled.div`
-  flex: 1;
-`;
-
-export const VerticalDivider = styled.div`
-  border-left: 1px solid #2980b9;
-  height: 90vh;
-`;
