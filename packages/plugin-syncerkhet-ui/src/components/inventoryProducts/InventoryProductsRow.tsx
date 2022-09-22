@@ -11,16 +11,14 @@ class Row extends React.Component<Props> {
 
     const onTrClick = () => {};
 
-    const { name, code, barcode, category, unit_price, weight } = product;
+    const { name, code, barcode, unit_price } = product;
 
     return (
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
         <td>{barcode}</td>
-        <td>{category}</td>
-        <td>{unit_price}</td>
-        <td>{weight}</td>
+        <td>{parseFloat(unit_price)}</td>
       </tr>
     );
   }

@@ -79,8 +79,6 @@ class InventoryCategory extends React.Component<Props, State> {
             <tr>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
-              <th>{__('Order')}</th>
-              <th>{__('Parent')}</th>
             </tr>
           </thead>
           <tbody>{this.renderRow(data)}</tbody>

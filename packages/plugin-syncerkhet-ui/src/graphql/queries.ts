@@ -137,59 +137,10 @@ const checkSyncOrders = `
   }
 `;
 
-const commonErkhetProductsParams = `
-  $perPage: Int,
-  $page: Int
-`;
-const commonErkhetProductsParamsDefs = `
-  perPage: $perPage,
-  page: $page
-`;
-const getErkhetCategoriesList = `
-  query GetCategoriesErkhet(${commonErkhetProductsParams}) {
-    getCategoriesErkhet(${commonErkhetProductsParamsDefs}) {
-      code
-      name
-      parent
-      cost_account
-      sale_account
-      is_citytax
-      is_raw
-      citytax_row
-      is_service
-      is_sellable
-      order
-    }
-  }
-`;
-
-const getErkhetProductsList = `
-  query GetProductsErkhet(${commonErkhetProductsParams}) {
-    getProductsErkhet(${commonErkhetProductsParamsDefs}) {
-      code
-      name
-      category
-      barcodes
-      cost_account
-      sale_account
-      bulk_price
-      unit_price
-      vat_type
-      vat_type_code
-      group
-      brand
-      weight
-      extra
-    }
-  }
-`;
-
 export default {
   configs,
   checkSyncDeals,
   checkSyncDealsTotalCount,
   checkSyncOrdersTotalCount,
-  checkSyncOrders,
-  getErkhetCategoriesList,
-  getErkhetProductsList
+  checkSyncOrders
 };
