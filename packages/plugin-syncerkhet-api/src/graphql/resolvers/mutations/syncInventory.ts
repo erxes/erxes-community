@@ -15,11 +15,18 @@ const inventoryMutations = {
       throw new Error('Erkhet config not found.');
     }
 
+    const productsCount = await sendProductsMessage({
+      subdomain,
+      action: 'count',
+      data: {},
+      isRPC: true
+    });
+
     const products = await sendProductsMessage({
       subdomain,
       action: 'find',
       data: {
-        limit: Number.MAX_SAFE_INTEGER
+        limit: productsCount
       },
       isRPC: true
     });
@@ -40,7 +47,7 @@ const inventoryMutations = {
       }
     });
 
-    if (!response.length) {
+    if (!response && Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
     }
 
@@ -88,11 +95,18 @@ const inventoryMutations = {
       throw new Error('Erkhet config not found.');
     }
 
+    const categoriesCount = await sendProductsMessage({
+      subdomain,
+      action: 'categories.count',
+      data: {},
+      isRPC: true
+    });
+
     const categories = await sendProductsMessage({
       subdomain,
       action: 'categories.find',
       data: {
-        limit: Number.MAX_SAFE_INTEGER
+        limit: categoriesCount
       },
       isRPC: true
     });
@@ -113,7 +127,7 @@ const inventoryMutations = {
       }
     });
 
-    if (!response.length) {
+    if (!response || Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
     }
     let result = JSON.parse(response).map(r => r.fields);
