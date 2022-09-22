@@ -28,7 +28,7 @@ const inventoryMutations = {
     }
 
     const response = await sendRequest({
-      url: 'https://erkhet.biz/get-api/',
+      url: process.env + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inventory',
@@ -41,15 +41,6 @@ const inventoryMutations = {
       throw new Error('Erkhet data not found.');
     }
     let result = JSON.parse(response).map(r => r.fields);
-
-    // result = result.map(item => {
-    //   return {
-    //     code: item.code,
-    //     name: item.name,
-    //     unitPrice: item.unit_price,
-    //     categoryCode: item.category
-    //   };
-    // });
 
     const matchedErkhetData = result.filter(r => {
       if (productCodes.find(p => p === r.code)) {
@@ -107,7 +98,7 @@ const inventoryMutations = {
     }
 
     const response = await sendRequest({
-      url: 'https://erkhet.biz/get-api/',
+      url: process.env + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inv_category',
@@ -120,15 +111,6 @@ const inventoryMutations = {
       throw new Error('Erkhet data not found.');
     }
     let result = JSON.parse(response).map(r => r.fields);
-
-    // result = result.map(item => {
-    //   return {
-    //     code: item.code,
-    //     name: item.name,
-    //     unitPrice: item.unit_price,
-    //     categoryCode: item.category
-    //   };
-    // });
 
     // for update
     const matchedErkhetData = result.filter(r => {
