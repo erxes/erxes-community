@@ -18,11 +18,14 @@ const inventoryMutations = {
     const products = await sendProductsMessage({
       subdomain,
       action: 'find',
-      data: {},
+      data: {
+        limit: Number.MAX_SAFE_INTEGER
+      },
       isRPC: true
     });
 
     const productCodes = products.map(p => p.code);
+
     if (!productCodes) {
       throw new Error('No product codes found.');
     }
@@ -40,6 +43,7 @@ const inventoryMutations = {
     if (!response.length) {
       throw new Error('Erkhet data not found.');
     }
+
     let result = JSON.parse(response).map(r => r.fields);
 
     const matchedErkhetData = result.filter(r => {
@@ -87,7 +91,9 @@ const inventoryMutations = {
     const categories = await sendProductsMessage({
       subdomain,
       action: 'categories.find',
-      data: {},
+      data: {
+        limit: Number.MAX_SAFE_INTEGER
+      },
       isRPC: true
     });
 

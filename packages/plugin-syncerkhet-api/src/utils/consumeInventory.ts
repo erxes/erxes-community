@@ -110,7 +110,9 @@ export const consumeInventoryCategory = async (
             ...document,
             parentId: parentCategory
               ? parentCategory._id
-              : productCategory.parentId
+              : productCategory
+              ? productCategory.parentId
+              : ''
           }
         },
         isRPC: true
