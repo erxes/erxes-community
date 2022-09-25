@@ -11,14 +11,12 @@ class Row extends React.Component<Props> {
 
     const onTrClick = () => {};
 
-    const { name, code, order, parent } = category;
+    const { name, code } = category;
 
     return (
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
-        <td>{order}</td>
-        <td>{parent}</td>
       </tr>
     );
   }

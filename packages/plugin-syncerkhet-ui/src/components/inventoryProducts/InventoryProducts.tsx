@@ -84,9 +84,7 @@ class InventoryProducts extends React.Component<Props, State> {
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
               <th>{__('Barcode')}</th>
-              <th>{__('Category code')}</th>
               <th>{__('Unit price')}</th>
-              <th>{__('Weight')}</th>
             </tr>
           </thead>
           <tbody>{this.renderRow(data)}</tbody>

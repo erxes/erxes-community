@@ -15,20 +15,30 @@ const inventoryMutations = {
       throw new Error('Erkhet config not found.');
     }
 
-    const products = await sendProductsMessage({
+    const productsCount = await sendProductsMessage({
       subdomain,
-      action: 'find',
+      action: 'count',
       data: {},
       isRPC: true
     });
 
+    const products = await sendProductsMessage({
+      subdomain,
+      action: 'find',
+      data: {
+        limit: productsCount
+      },
+      isRPC: true
+    });
+
     const productCodes = products.map(p => p.code);
+
     if (!productCodes) {
       throw new Error('No product codes found.');
     }
 
     const response = await sendRequest({
-      url: 'https://erkhet.biz/get-api/',
+      url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inventory',
@@ -37,19 +47,11 @@ const inventoryMutations = {
       }
     });
 
-    if (!response.length) {
+    if (!response && Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
     }
-    let result = JSON.parse(response).map(r => r.fields);
 
-    // result = result.map(item => {
-    //   return {
-    //     code: item.code,
-    //     name: item.name,
-    //     unitPrice: item.unit_price,
-    //     categoryCode: item.category
-    //   };
-    // });
+    let result = JSON.parse(response).map(r => r.fields);
 
     const matchedErkhetData = result.filter(r => {
       if (productCodes.find(p => p === r.code)) {
@@ -93,10 +95,19 @@ const inventoryMutations = {
       throw new Error('Erkhet config not found.');
     }
 
+    const categoriesCount = await sendProductsMessage({
+      subdomain,
+      action: 'categories.count',
+      data: {},
+      isRPC: true
+    });
+
     const categories = await sendProductsMessage({
       subdomain,
       action: 'categories.find',
-      data: {},
+      data: {
+        limit: categoriesCount
+      },
       isRPC: true
     });
 
@@ -107,7 +118,7 @@ const inventoryMutations = {
     }
 
     const response = await sendRequest({
-      url: 'https://erkhet.biz/get-api/',
+      url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
       params: {
         kind: 'inv_category',
@@ -116,19 +127,10 @@ const inventoryMutations = {
       }
     });
 
-    if (!response.length) {
+    if (!response || Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
     }
     let result = JSON.parse(response).map(r => r.fields);
-
-    // result = result.map(item => {
-    //   return {
-    //     code: item.code,
-    //     name: item.name,
-    //     unitPrice: item.unit_price,
-    //     categoryCode: item.category
-    //   };
-    // });
 
     // for update
     const matchedErkhetData = result.filter(r => {

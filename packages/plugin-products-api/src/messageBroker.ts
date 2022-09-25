@@ -35,25 +35,6 @@ export const initBroker = async cl => {
   });
 
   consumeRPCQueue(
-    'products:find',
-    async ({ subdomain, data: { query, sort, regData } }) => {
-      const models = await generateModels(subdomain);
-
-      return {
-        data: regData
-          ? await models.Products.find({
-              ...query,
-              order: { $regex: new RegExp(regData) }
-            }).sort(sort)
-          : await models.Products.find(query)
-              .sort(sort)
-              .lean(),
-        status: 'success'
-      };
-    }
-  );
-
-  consumeRPCQueue(
     'products:categories.find',
     async ({ subdomain, data: { query, sort, regData } }) => {
       const models = await generateModels(subdomain);
@@ -172,6 +153,18 @@ export const initBroker = async cl => {
       status: 'success'
     };
   });
+
+  consumeRPCQueue(
+    'products:categories.count',
+    async ({ subdomain, data: { query } }) => {
+      const models = await generateModels(subdomain);
+
+      return {
+        data: await models.ProductCategories.find(query).countDocuments(),
+        status: 'success'
+      };
+    }
+  );
 
   consumeRPCQueue(
     'products:createProduct',
