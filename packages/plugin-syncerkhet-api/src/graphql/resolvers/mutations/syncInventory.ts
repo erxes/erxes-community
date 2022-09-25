@@ -43,9 +43,12 @@ const inventoryMutations = {
       params: {
         kind: 'inventory',
         api_key: config.apiKey,
-        api_secret: config.apiSecret
+        api_secret: config.apiSecret,
+        token: config.apiToken,
+        is_gen_fk: 'true'
       }
     });
+    console.log(response);
 
     if (!response && Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
@@ -88,6 +91,7 @@ const inventoryMutations = {
       }
     };
   },
+
   async toCheckCategories(_root, { subdomain }: IContext) {
     const config = await getConfig(subdomain, 'ERKHET', {});
 
@@ -123,7 +127,9 @@ const inventoryMutations = {
       params: {
         kind: 'inv_category',
         api_key: config.apiKey,
-        api_secret: config.apiSecret
+        api_secret: config.apiSecret,
+        token: config.apiToken,
+        is_gen_fk: 'true'
       }
     });
 
@@ -168,6 +174,7 @@ const inventoryMutations = {
       }
     };
   },
+
   async toSyncCategories(
     _root,
     { action, categories }: { action: string; categories: any[] },
@@ -176,36 +183,36 @@ const inventoryMutations = {
     try {
       switch (action) {
         case 'CREATE': {
-          categories.forEach(async category => {
+          for (const category of categories) {
             await consumeInventoryCategory(
               subdomain,
               category,
               category.code,
               'create'
             );
-          });
+          }
           break;
         }
         case 'UPDATE': {
-          categories.forEach(async category => {
+          for (const category of categories) {
             await consumeInventoryCategory(
               subdomain,
               category,
               category.code,
               'update'
             );
-          });
+          }
           break;
         }
         case 'DELETE': {
-          categories.forEach(async category => {
+          for (const category of categories) {
             await consumeInventoryCategory(
               subdomain,
               category,
               category.code,
               'delete'
             );
-          });
+          }
           break;
         }
         default:
@@ -218,6 +225,7 @@ const inventoryMutations = {
       throw new Error('Error while syncing categories. ' + e);
     }
   },
+
   async toSyncProducts(
     _root,
     { action, products }: { action: string; products: any[] },
@@ -226,21 +234,21 @@ const inventoryMutations = {
     try {
       switch (action) {
         case 'CREATE': {
-          products.forEach(async product => {
+          for (const product of products) {
             await consumeInventory(subdomain, product, product.code, 'create');
-          });
+          }
           break;
         }
         case 'UPDATE': {
-          products.forEach(async product => {
+          for (const product of products) {
             await consumeInventory(subdomain, product, product.code, 'update');
-          });
+          }
           break;
         }
         case 'DELETE': {
-          products.forEach(async product => {
+          for (const product of products) {
             await consumeInventory(subdomain, product, product.code, 'delete');
-          });
+          }
           break;
         }
         default:
@@ -254,4 +262,5 @@ const inventoryMutations = {
     }
   }
 };
+
 export default inventoryMutations;
