@@ -1,4 +1,4 @@
-import { Box, Button, ModalTrigger, Sidebar } from '@erxes/ui/src';
+import { Box, Button, ModalTrigger } from '@erxes/ui/src';
 import React from 'react';
 import { ContainerBox } from '../../../style';
 import Form from '../containers/Form';
@@ -12,8 +12,8 @@ class List extends React.Component<Props> {
     </Button>
   );
 
-  renderFormContent = () => {
-    return <Form />;
+  renderFormContent = props => {
+    return <Form {...props} />;
   };
 
   renderAddForm() {
@@ -28,12 +28,10 @@ class List extends React.Component<Props> {
 
   render() {
     return (
-      <Sidebar wide>
-        <ContainerBox gap={15} column horizontal vertical>
-          {this.renderAddForm()}
-          <Box title=' Groups'>shit</Box>
-        </ContainerBox>
-      </Sidebar>
+      <ContainerBox gap={15} column>
+        {this.renderAddForm()}
+        <Box title=' Groups'>shit</Box>
+      </ContainerBox>
     );
   }
 }

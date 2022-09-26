@@ -1,12 +1,14 @@
-import React from 'react';
 import {
-  Wrapper,
-  Spinner,
+  ControlLabel,
   DataWithLoader,
-  __,
+  FormGroup,
   Pagination,
-  ControlLabel
+  Spinner,
+  Wrapper,
+  __
 } from '@erxes/ui/src';
+import React from 'react';
+import { CommonFormGroupTypes } from './types';
 
 export const DefaultWrapper = ({
   title,
@@ -44,5 +46,14 @@ export const DefaultWrapper = ({
       leftSidebar={sidebar}
       footer={!isPaginationHide && <Pagination count={totalCount} />}
     />
+  );
+};
+
+export const CommonFormGroup = ({ children, label, required }: CommonFormGroupTypes) => {
+  return (
+    <FormGroup>
+      <ControlLabel required={required}>{label}</ControlLabel>
+      {children}
+    </FormGroup>
   );
 };

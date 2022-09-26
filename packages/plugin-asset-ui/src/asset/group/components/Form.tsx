@@ -1,14 +1,79 @@
+import { FormControl, Uploader } from '@erxes/ui/src';
+import CommonForm from '@erxes/ui/src/components/form/Form';
+import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
+import { ASSET_CATEGORY_STATUSES } from '../../../common/constant';
+import { CommonFormGroup } from '../../../common/utils';
 
-type Props = {};
+type Props = {
+  renderButton: (props: IButtonMutateProps) => JSX.Element;
+  closeModal: () => void;
+};
 
 class Form extends React.Component<Props> {
   constructor(props) {
     super(props);
   }
 
+  generateDocs(values) {
+    return { ...values };
+  }
+
+  renderForm(formProps: IFormProps) {
+    const { renderButton, closeModal } = this.props;
+    const { isSubmitted, values } = formProps;
+    return (
+      <>
+        <CommonFormGroup label='Name'>
+          <FormControl name='name' {...formProps} type='text' />
+        </CommonFormGroup>
+        <CommonFormGroup label='Code'>
+          <FormControl name='code' {...formProps} type='text' />
+        </CommonFormGroup>
+        <CommonFormGroup label='Description'>
+          <FormControl name='description' {...formProps} componentClass='textarea' />
+        </CommonFormGroup>
+
+        <FormWrapper>
+          <FormColumn>
+            <CommonFormGroup label='Status'>
+              <FormControl
+                name='status'
+                {...formProps}
+                componentClass='select'
+                options={ASSET_CATEGORY_STATUSES}
+              />
+            </CommonFormGroup>
+          </FormColumn>
+          <FormColumn>
+            <CommonFormGroup label='Image'>
+              <Uploader onChange={e => console.log(e)} defaultFileList={[]} />
+            </CommonFormGroup>
+          </FormColumn>
+        </FormWrapper>
+
+        <CommonFormGroup label='Parent Category'>
+          <FormControl
+            name='parentId'
+            {...formProps}
+            componentClass='select'
+            options={[]}
+          />
+        </CommonFormGroup>
+
+        {/* {renderButton({
+          name: 'Asset category',
+          values: this.generateDocs(values),
+          isSubmitted,
+          callback: closeModal
+        })} */}
+      </>
+    );
+  }
+
   render() {
-    return <div>shit</div>;
+    return <CommonForm renderContent={this.renderForm} />;
   }
 }
 
