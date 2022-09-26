@@ -1,13 +1,13 @@
 export const types = `
-  type {Name} {
+  type Asset {
     _id: String!
     name: String
   }
 `;
 
 export const queries = `
-  {name}s: [{Name}]
-  {name}sTotalCount: Int
+  Assets: [Asset]
+  AssetsTotalCount: Int
 `;
 
 const params = `
@@ -15,5 +15,5 @@ const params = `
 `;
 
 export const mutations = `
-  {name}sAdd(${params}): {Name}
+  AssetsAdd(${params}): Asset
 `;
