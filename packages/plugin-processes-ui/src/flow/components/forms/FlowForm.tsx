@@ -493,7 +493,8 @@ class FlowForm extends React.Component<Props, State> {
   handleClickOutside = event => {
     if (
       !this.usedPopup &&
-      this.wrapperRef && !this.wrapperRef.contains(event.target)
+      this.wrapperRef &&
+      !this.wrapperRef.contains(event.target)
     ) {
       this.setState({ showDrawer: false });
     }
@@ -724,7 +725,7 @@ class FlowForm extends React.Component<Props, State> {
       return (
         <>
           <BackIcon onClick={onBackAction}>
-            <Icon icon="angle-left" size={20} /> {__('Back to actions')}
+            <Icon icon="angle-left" size={20} /> {__('Back to jobs')}
           </BackIcon>
           <JobDetailForm
             activeFlowJob={activeFlowJob}
