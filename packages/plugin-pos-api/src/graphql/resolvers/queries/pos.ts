@@ -59,11 +59,16 @@ const generateFilterPosQuery = async (
     createdEndDate,
     paidDate,
     userId,
-    customerId
+    customerId,
+    posToken
   } = params;
 
   if (search) {
     query.number = { $regex: new RegExp(search) };
+  }
+
+  if (posToken) {
+    query.posToken = { $regex: new RegExp(search) };
   }
 
   if (customerId) {
