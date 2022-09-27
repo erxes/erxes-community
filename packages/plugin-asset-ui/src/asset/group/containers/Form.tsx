@@ -4,6 +4,7 @@ import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import Form from '../components/Form';
+import { mutations } from '../graphql';
 
 type Props = {
   closeModal: () => void;
@@ -14,26 +15,19 @@ class FormContainer extends React.Component<Props> {
     super(props);
   }
 
-  renderButton = ({
-    name,
-    values,
-    isSubmitted,
-    callback,
-    confirmationUpdate,
-    object
-  }: IButtonMutateProps) => {
+  renderButton = ({ name, values, isSubmitted, callback, confirmationUpdate, object }: IButtonMutateProps) => {
     const afterMutate = () => {
       if (callback) {
         callback();
       }
     };
 
-    let mutation = '';
+    let mutation = mutations.assetGroupAdd;
 
     let sucessAction = 'added';
 
     if (object) {
-      mutation = '';
+      mutation = mutations.assetGroupEdit;
       sucessAction = 'updated';
     }
 

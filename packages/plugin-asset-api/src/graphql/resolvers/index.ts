@@ -1,15 +1,15 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
 
-import mutations from './mutations';
-import queries from './queries';
+import { AssetGroup as assetGroupMutations } from './mutations';
+import { assetGroup as assetGroupQueries } from './queries';
 
 const resolvers: any = async serviceDiscovery => ({
   ...customScalars,
   Mutation: {
-    ...mutations
+    ...assetGroupMutations
   },
   Query: {
-    ...queries
+    ...assetGroupQueries
   }
 });
 

@@ -18,3 +18,9 @@ export const field = options => {
 
   return options;
 };
+
+export const schemaWrapper = schema => {
+  schema.add({ scopeBrandIds: [String] });
+
+  return schema;
+};

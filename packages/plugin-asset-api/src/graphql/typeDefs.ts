@@ -1,20 +1,31 @@
 import { gql } from 'apollo-server-express';
 
-import { types, queries, mutations } from './schema';
+import { types as assetGroupTypes, queries as assetGroupQueries, mutations as assetGroupmMtations } from './schema/assetGroup';
 
 const typeDefs = async _serviceDiscovery => {
   return gql`
     scalar JSON
     scalar Date
 
-    ${types}
+    enum CacheControlScope {
+      PUBLIC
+      PRIVATE
+    }
+
+    directive @cacheControl(
+      maxAge: Int
+      scope: CacheControlScope
+      inheritMaxAge: Boolean
+    ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+    ${assetGroupTypes}
     
     extend type Query {
-      ${queries}
+      ${assetGroupQueries}
     }
     
     extend type Mutation {
-      ${mutations}
+      ${assetGroupmMtations}
     }
   `;
 };

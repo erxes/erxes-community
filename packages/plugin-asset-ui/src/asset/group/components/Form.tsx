@@ -1,6 +1,6 @@
-import { FormControl, Uploader } from '@erxes/ui/src';
+import { Button, FormControl, Uploader } from '@erxes/ui/src';
 import CommonForm from '@erxes/ui/src/components/form/Form';
-import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
+import { FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
 import { ASSET_CATEGORY_STATUSES } from '../../../common/constant';
@@ -14,6 +14,8 @@ type Props = {
 class Form extends React.Component<Props> {
   constructor(props) {
     super(props);
+
+    this.renderForm = this.renderForm.bind(this);
   }
 
   generateDocs(values) {
@@ -23,6 +25,7 @@ class Form extends React.Component<Props> {
   renderForm(formProps: IFormProps) {
     const { renderButton, closeModal } = this.props;
     const { isSubmitted, values } = formProps;
+    // console.log(this.props);
     return (
       <>
         <CommonFormGroup label='Name'>
@@ -62,12 +65,18 @@ class Form extends React.Component<Props> {
           />
         </CommonFormGroup>
 
-        {/* {renderButton({
-          name: 'Asset category',
-          values: this.generateDocs(values),
-          isSubmitted,
-          callback: closeModal
-        })} */}
+        <ModalFooter>
+          <Button btnStyle='simple' onClick={closeModal}>
+            Cancel
+          </Button>
+
+          {renderButton({
+            name: 'Asset category',
+            values: this.generateDocs(values),
+            isSubmitted,
+            callback: closeModal
+          })}
+        </ModalFooter>
       </>
     );
   }

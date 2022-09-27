@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  ControlLabel,
-  Icon,
-  Sidebar as CommonSideBar,
-  Tip,
-  __
-} from '@erxes/ui/src';
+import { Box, Button, ControlLabel, Icon, Sidebar as CommonSideBar, Tip, __ } from '@erxes/ui/src';
 import React from 'react';
 import { ContainerBox } from '../../style';
 import GroupListContainer from '../group/containers/List';
@@ -35,7 +27,7 @@ class SideBar extends React.Component {
     return (
       <CommonSideBar>
         <ContainerBox column gap={5}>
-          <GroupListContainer />
+          <GroupListContainer {...this.props} />
           {this.renderFilter()}
         </ContainerBox>
       </CommonSideBar>
