@@ -16,14 +16,15 @@ export const getConfig = async (subdomain, code, defaultValue?) => {
   });
 };
 
-export const getPureDate = (date: Date) => {
+export const getPureDate = (date: Date, multiplier = 1) => {
   const ndate = new Date(date);
-  const diffTimeZone = Number(process.env.TIMEZONE || 0) * 1000 * 60 * 60;
+  const diffTimeZone =
+    multiplier * Number(process.env.TIMEZONE || 0) * 1000 * 60 * 60;
   return new Date(ndate.getTime() - diffTimeZone);
 };
 
 export const getFullDate = (date: Date) => {
-  const ndate = getPureDate(date);
+  const ndate = getPureDate(date, -1);
   const year = ndate.getFullYear();
   const month = ndate.getMonth();
   const day = ndate.getDate();
