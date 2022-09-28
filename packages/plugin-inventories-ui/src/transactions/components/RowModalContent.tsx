@@ -22,7 +22,7 @@ export default function RowModalContent(props: Props) {
     return (data.transactionItems || []).map((item: any, index: number) => {
       return (
         <tr key={index}>
-          <td>{item.productId || ''}</td>
+          <td>{(item.product && item.product.name) || ''}</td>
           <td>{item.count || ''}</td>
           <td>
             {item.isDebit ? (
