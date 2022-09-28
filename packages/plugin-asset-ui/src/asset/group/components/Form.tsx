@@ -3,12 +3,15 @@ import CommonForm from '@erxes/ui/src/components/form/Form';
 import { FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
-import { ASSET_CATEGORY_STATUSES } from '../../../common/constant';
-import { CommonFormGroup } from '../../../common/utils';
+import { ASSET_GROUP_STATUSES } from '../../../common/constant';
+import { IAssetGroup, IAssetGroupTypes } from '../../../common/types';
+import { CommonFormGroup, generateGroupOptions } from '../../../common/utils';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
+  group: IAssetGroupTypes;
+  groups: IAssetGroupTypes[];
 };
 
 class Form extends React.Component<Props> {
@@ -19,34 +22,39 @@ class Form extends React.Component<Props> {
   }
 
   generateDocs(values) {
-    return { ...values };
+    const { group } = this.props;
+
+    const finalValues = values;
+
+    if (group) {
+      finalValues._id = group._id;
+    }
+
+    return { ...finalValues };
   }
 
   renderForm(formProps: IFormProps) {
-    const { renderButton, closeModal } = this.props;
+    const { renderButton, closeModal, group, groups } = this.props;
     const { isSubmitted, values } = formProps;
-    // console.log(this.props);
+
+    const object = group || ({} as IAssetGroup);
+
     return (
       <>
         <CommonFormGroup label='Name'>
-          <FormControl name='name' {...formProps} type='text' />
+          <FormControl name='name' {...formProps} type='text' defaultValue={object.name} />
         </CommonFormGroup>
         <CommonFormGroup label='Code'>
-          <FormControl name='code' {...formProps} type='text' />
+          <FormControl name='code' {...formProps} type='text' defaultValue={object.code} />
         </CommonFormGroup>
         <CommonFormGroup label='Description'>
-          <FormControl name='description' {...formProps} componentClass='textarea' />
+          <FormControl name='description' {...formProps} componentClass='textarea' defaultValue={object.description} />
         </CommonFormGroup>
 
         <FormWrapper>
           <FormColumn>
             <CommonFormGroup label='Status'>
-              <FormControl
-                name='status'
-                {...formProps}
-                componentClass='select'
-                options={ASSET_CATEGORY_STATUSES}
-              />
+              <FormControl name='status' {...formProps} componentClass='select' options={ASSET_GROUP_STATUSES} defaultValue={object.status} />
             </CommonFormGroup>
           </FormColumn>
           <FormColumn>
@@ -56,13 +64,11 @@ class Form extends React.Component<Props> {
           </FormColumn>
         </FormWrapper>
 
-        <CommonFormGroup label='Parent Category'>
-          <FormControl
-            name='parentId'
-            {...formProps}
-            componentClass='select'
-            options={[]}
-          />
+        <CommonFormGroup label='Parent Group'>
+          <FormControl name='parentId' {...formProps} componentClass='select' defaultValue={object.parentId}>
+            <option value='' />
+            {generateGroupOptions(groups, object._id)}
+          </FormControl>
         </CommonFormGroup>
 
         <ModalFooter>
@@ -71,10 +77,11 @@ class Form extends React.Component<Props> {
           </Button>
 
           {renderButton({
-            name: 'Asset category',
+            name: 'Asset Group',
             values: this.generateDocs(values),
             isSubmitted,
-            callback: closeModal
+            callback: closeModal,
+            object: group
           })}
         </ModalFooter>
       </>

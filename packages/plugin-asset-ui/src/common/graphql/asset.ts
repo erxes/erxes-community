@@ -1,0 +1,32 @@
+export const assetParamsDef = `
+  $name: String,
+  $type: String,
+  $groupId: String,
+  $description: String,
+  $sku: String,
+  $unitPrice: Float,
+  $code: String
+  $customFieldsData: JSON,
+  $attachment: AttachmentInput,
+  $attachmentMore: [AttachmentInput],
+  $supply: String,
+  $assetCount: Int,
+  $minimiumCount: Int,
+  $vendorId: String,
+`;
+export const assetParams = `
+  name: $name,
+  type: $type,
+  groupId: $groupId,
+  description: $description,
+  sku: $sku,
+  unitPrice: $unitPrice,
+  code: $code,
+  customFieldsData: $customFieldsData,
+  attachment: $attachment,
+  attachmentMore: $attachmentMore,
+  supply: $supply,
+  assetCount: $assetCount,
+  minimiumCount: $minimiumCount,
+  vendorId: $vendorId,
+`;

@@ -1,76 +1,7 @@
 import { schemaWrapper, field } from './utils';
-import { Schema, Document } from 'mongoose';
-import { attachmentSchema, customFieldSchema, ICustomField } from '@erxes/api-utils/src/types';
-
-export interface IAsset {
-  name: string;
-  categoryId?: string;
-  categoryCode?: string;
-  type?: string;
-  description?: string;
-  sku?: string;
-  unitPrice?: number;
-  code: string;
-  customFieldsData?: ICustomField[];
-  productId?: string;
-  tagIds?: string[];
-  attachment?: any;
-  attachmentMore?: any[];
-  status?: string;
-  supply?: string;
-  productCount?: number;
-  minimiumCount?: number;
-  vendorId?: string;
-  vendorCode?: string;
-
-  mergedIds?: string[];
-}
-
-export interface IAssetDocument extends IAsset, Document {
-  _id: string;
-  createdAt: Date;
-}
-
-export interface IAssetGroup {
-  name: string;
-  code: string;
-  order: string;
-  description?: string;
-  parentId?: string;
-  attachment?: any;
-  status?: string;
-}
-
-export const ASSET_GROUP_STATUSES = {
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  ARCHIVED: 'archived',
-  ALL: ['active', 'disabled', 'archived']
-};
-
-export const ASSET_STATUSES = {
-  ACTIVE: 'active',
-  DELETED: 'deleted',
-  ALL: ['active', 'deleted']
-};
-
-export const ASSET_TYPES = {
-  ASSET: 'asset',
-  SERVICE: 'service',
-  ALL: ['asset', 'service']
-};
-
-export const ASSET_SUPPLY = {
-  UNIQUE: 'unique',
-  LIMITED: 'limited',
-  UNLIMITED: 'unlimited',
-  ALL: ['unique', 'limited', 'unlimited']
-};
-
-export interface IAssetGroupDocument extends IAssetGroup, Document {
-  _id: string;
-  createdAt: Date;
-}
+import { Schema } from 'mongoose';
+import { attachmentSchema, customFieldSchema } from '@erxes/api-utils/src/types';
+import { ASSET_GROUP_STATUSES, ASSET_STATUSES, ASSET_SUPPLY, ASSET_TYPES } from '../../common/constant/asset';
 
 export const assetGroupSchema = schemaWrapper(
   new Schema({
@@ -103,7 +34,7 @@ export const assetSchema = schemaWrapper(
     _id: field({ pkey: true }),
     name: field({ type: String, label: 'Name' }),
     code: field({ type: String, unique: true, label: 'Code' }),
-    categoryId: field({ type: String, label: 'Category' }),
+    groupId: field({ type: String, label: 'Group' }),
     type: field({
       type: String,
       enum: ASSET_TYPES.ALL,
@@ -149,9 +80,9 @@ export const assetSchema = schemaWrapper(
       esType: 'keyword',
       index: true
     }),
-    productCount: field({
+    assetCount: field({
       type: String,
-      label: 'Product Count',
+      label: 'Asset Count',
       default: '0'
     }),
     minimiumCount: field({

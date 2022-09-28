@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
 import { IAssetGroupQeuryResponse } from '../../../common/types';
+import { Alert, confirm } from '@erxes/ui/src';
 type Props = { history?: any; queryParams?: any };
 
 type FinalProps = {
@@ -18,14 +19,24 @@ class ListContainer extends React.Component<FinalProps> {
     const { assetGroups, assetGroupRemove } = this.props;
 
     const removeAssetGroup = _id => {
-      assetGroupRemove({ variables: { _id } });
+      confirm().then(() => {
+        assetGroupRemove({ variables: { _id } })
+          .then(() => {
+            assetGroups.refetch();
+            Alert.success(`You successfully deleted a asset group`);
+          })
+          .catch(e => {
+            Alert.error(e.message);
+          });
+      });
     };
 
     const updateProps = {
-      list: assetGroups.assetGroup?.list,
+      assetGroups: assetGroups.assetGroup?.list,
       totalCount: assetGroups.assetGroup?.totalCount,
       loading: assetGroups.loading,
-      remove: removeAssetGroup
+      remove: removeAssetGroup,
+      refetchAssetGroups: assetGroups.refetch
     };
 
     return <List {...updateProps} />;

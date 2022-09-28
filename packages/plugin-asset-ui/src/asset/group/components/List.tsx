@@ -7,10 +7,11 @@ import Form from '../containers/Form';
 import { Link } from 'react-router-dom';
 
 type Props = {
-  list: [IAssetGroupTypes];
+  assetGroups: IAssetGroupTypes[];
   totalCount: number;
   loading: boolean;
   remove: (_id) => any;
+  refetchAssetGroups: () => void;
 };
 
 class List extends React.Component<Props> {
@@ -21,14 +22,22 @@ class List extends React.Component<Props> {
   );
 
   renderFormContent = props => {
-    return <Form {...props} />;
+    const { refetchAssetGroups, assetGroups } = this.props;
+
+    const updatedProps = {
+      ...props,
+      refetchAssetGroups,
+      groups: assetGroups
+    };
+
+    return <Form {...updatedProps} />;
   };
 
   renderAddForm() {
     return <ModalTrigger title='Add Asset Group' trigger={this.addFormTrigger} content={this.renderFormContent} />;
   }
 
-  renderEditAction() {
+  renderEditAction(group) {
     const trigger = (
       <Button btnStyle='link'>
         <Tip text='Edit'>
@@ -38,19 +47,26 @@ class List extends React.Component<Props> {
     );
 
     const content = props => {
-      return <Form {...props} />;
+      const { refetchAssetGroups, assetGroups } = this.props;
+
+      const updatedProps = {
+        ...props,
+        refetchAssetGroups,
+        group,
+        groups: assetGroups
+      };
+
+      return <Form {...updatedProps} />;
     };
 
     return <ModalTrigger isAnimate title='Edit Asset Group' content={content} trigger={trigger} />;
   }
 
   renderRemoveAction(_id) {
-    const handleRemove = () => {
-      this.props.remove(_id);
-    };
+    const { remove } = this.props;
 
     return (
-      <Button btnStyle='link' onClick={handleRemove}>
+      <Button btnStyle='link' onClick={() => remove(_id)}>
         <Tip text='remove' placement='bottom'>
           <Icon icon='cancel-1' />
         </Tip>
@@ -59,21 +75,46 @@ class List extends React.Component<Props> {
   }
 
   renderContent() {
-    const { list, loading } = this.props;
+    const { assetGroups, loading } = this.props;
 
     if (loading) {
-      <Spinner objective />;
+      return <Spinner objective />;
     }
 
-    return list.map(item => (
-      <SidebarListItem key={item._id} isActive={false}>
-        <Link to='/'>{item.name}</Link>
-        <ActionButtons>
-          {this.renderEditAction()}
-          {this.renderRemoveAction(item._id)}
-        </ActionButtons>
-      </SidebarListItem>
-    ));
+    const result: React.ReactNode[] = [];
+
+    for (const group of assetGroups) {
+      const order = group.order;
+
+      const m = order.match(/[/]/gi);
+
+      let space = '';
+
+      if (m) {
+        space = '\u00a0\u00a0'.repeat(m.length);
+      }
+      const name = group.isRoot ? (
+        `${group.name} (${group.assetCount})`
+      ) : (
+        <span>
+          {group.name} ({group.assetCount})
+        </span>
+      );
+
+      result.push(
+        <SidebarListItem key={group._id} isActive={false}>
+          <Link to={`?orderId=${group._id}`}>
+            {space}
+            {name}
+          </Link>
+          <ActionButtons>
+            {this.renderEditAction(group)}
+            {this.renderRemoveAction(group._id)}
+          </ActionButtons>
+        </SidebarListItem>
+      );
+    }
+    return result;
   }
 
   renderGroupList() {
@@ -85,7 +126,7 @@ class List extends React.Component<Props> {
           data={this.renderContent()}
           loading={loading}
           count={totalCount}
-          emptyText='There is no risk asssessment category'
+          emptyText='There is no asset group'
           emptyIcon='folder-2'
           size='small'
         />

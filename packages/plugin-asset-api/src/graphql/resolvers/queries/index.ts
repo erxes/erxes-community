@@ -1,2 +1,3 @@
-import assetGroup from './group';
-export { assetGroup };
+import AssetGroup from './group';
+import Asset from './asset';
+export { AssetGroup, Asset };

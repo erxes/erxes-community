@@ -4,13 +4,22 @@ import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import Form from '../components/Form';
-import { mutations } from '../graphql';
+import { mutations, queries } from '../graphql';
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
+import __ from 'lodash';
+import { IAssetGroupTypes } from '../../../common/types';
 
 type Props = {
   closeModal: () => void;
+  refetchAssetGroups: () => void;
+  group: IAssetGroupTypes;
+  groups: IAssetGroupTypes[];
 };
 
-class FormContainer extends React.Component<Props> {
+type FinalProps = {} & Props;
+
+class FormContainer extends React.Component<FinalProps> {
   constructor(props) {
     super(props);
   }
@@ -18,6 +27,7 @@ class FormContainer extends React.Component<Props> {
   renderButton = ({ name, values, isSubmitted, callback, confirmationUpdate, object }: IButtonMutateProps) => {
     const afterMutate = () => {
       if (callback) {
+        this.props.refetchAssetGroups();
         callback();
       }
     };
@@ -45,9 +55,13 @@ class FormContainer extends React.Component<Props> {
   };
 
   render() {
+    const { closeModal, group, groups } = this.props;
+
     const updatedProps = {
       renderButton: this.renderButton,
-      closeModal: this.props.closeModal
+      closeModal,
+      group,
+      groups
     };
 
     return <Form {...updatedProps} />;

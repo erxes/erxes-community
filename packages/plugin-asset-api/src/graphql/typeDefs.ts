@@ -1,8 +1,11 @@
 import { gql } from 'apollo-server-express';
 
-import { types as assetGroupTypes, queries as assetGroupQueries, mutations as assetGroupmMtations } from './schema/assetGroup';
+import { types as assetTypes, queries as assetQueries, mutations as assetMutations } from './schema/asset';
 
-const typeDefs = async _serviceDiscovery => {
+const typeDefs = async serviceDiscovery => {
+  const tagsAvailable = await serviceDiscovery.isEnabled('tags');
+  const contactsAvailable = await serviceDiscovery.isEnabled('contacts');
+
   return gql`
     scalar JSON
     scalar Date
@@ -18,14 +21,14 @@ const typeDefs = async _serviceDiscovery => {
       inheritMaxAge: Boolean
     ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
-    ${assetGroupTypes}
+    ${assetTypes(tagsAvailable, contactsAvailable)}
     
     extend type Query {
-      ${assetGroupQueries}
+      ${assetQueries}
     }
     
     extend type Mutation {
-      ${assetGroupmMtations}
+      ${assetMutations}
     }
   `;
 };

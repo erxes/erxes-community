@@ -1,14 +1,6 @@
-import {
-  ControlLabel,
-  DataWithLoader,
-  FormGroup,
-  Pagination,
-  Spinner,
-  Wrapper,
-  __
-} from '@erxes/ui/src';
+import { ControlLabel, DataWithLoader, FormGroup, Pagination, Spinner, Wrapper, __ } from '@erxes/ui/src';
 import React from 'react';
-import { CommonFormGroupTypes } from './types';
+import { CommonFormGroupTypes, IAssetGroupTypes } from './types';
 
 export const DefaultWrapper = ({
   title,
@@ -56,4 +48,32 @@ export const CommonFormGroup = ({ children, label, required }: CommonFormGroupTy
       {children}
     </FormGroup>
   );
+};
+
+export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?: string, drawCode?: boolean) => {
+  const result: React.ReactNode[] = [];
+
+  for (const group of groups) {
+    const order = group.order;
+
+    const foundedString = order.match(/[/]/gi);
+
+    let space = '';
+
+    if (foundedString) {
+      space = '\u00A0 '.repeat(foundedString.length);
+    }
+
+    if (currentGroupId !== group._id) {
+      result.push(
+        <option key={group._id} value={group._id}>
+          {space}
+          {drawCode ? `${group.code} - ` : ''}
+          {group.name}
+        </option>
+      );
+    }
+  }
+
+  return result;
 };

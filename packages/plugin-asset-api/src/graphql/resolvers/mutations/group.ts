@@ -1,6 +1,6 @@
 import { IContext } from '../../../connectionResolver';
 import { putCreateLog, MODULE_NAMES, putUpdateLog, putDeleteLog } from '../../../logUtils';
-import { IAssetGroup } from '../../../models/definitions/asset';
+import { IAssetGroup } from '../../../common/types/asset';
 
 interface IAssetGroupEdit extends IAssetGroup {
   _id: string;
@@ -45,7 +45,7 @@ const assetGroupMutations = {
     return updated;
   },
 
-  async productCategoriesRemove(_root, { _id }: { _id: string }, { user, models, subdomain }: IContext) {
+  async assetGroupRemove(_root, { _id }: { _id: string }, { user, models, subdomain }: IContext) {
     const assetGroup = await models.AssetGroup.getAssetGroup({
       _id
     });

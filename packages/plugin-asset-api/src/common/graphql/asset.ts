@@ -1,0 +1,25 @@
+export const assetGroupParams = `
+  name: String!,
+  code: String!,
+  description: String,
+  parentId: String,
+  attachment: AttachmentInput,
+  status: String
+`;
+
+export const assetParams = `
+  name: String,
+  groupId: String,
+  type: String,
+  description: String,
+  sku: String,
+  unitPrice: Float,
+  code: String,
+  customFieldsData: JSON,
+  attachment: AttachmentInput,
+  attachmentMore: [AttachmentInput],
+  supply: String,
+  assetCount: Int,
+  minimiumCount: Int,
+  vendorId: String,
+`;
