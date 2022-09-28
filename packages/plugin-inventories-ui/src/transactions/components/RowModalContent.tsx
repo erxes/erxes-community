@@ -72,7 +72,7 @@ export default function RowModalContent(props: Props) {
       <Table>
         <thead>
           <tr>
-            <th>{__('PRODUCT ID')}</th>
+            <th>{__('PRODUCT TITLE')}</th>
             <th>{__('COUNT')}</th>
             <th>{__('DEBIT')}</th>
             <th>{__('MODIFIED AT')}</th>
