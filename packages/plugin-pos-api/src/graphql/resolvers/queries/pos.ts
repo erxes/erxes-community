@@ -59,16 +59,11 @@ const generateFilterPosQuery = async (
     createdEndDate,
     paidDate,
     userId,
-    customerId,
-    posToken
+    customerId
   } = params;
 
   if (search) {
     query.number = { $regex: new RegExp(search) };
-  }
-
-  if (posToken) {
-    query.posToken = { $regex: new RegExp(search) };
   }
 
   if (customerId) {
@@ -174,6 +169,12 @@ const queries = {
       commonQuerySelector,
       user._id
     );
+
+    const { posId } = params;
+    if (posId) {
+      const pos = await models.Pos.findOne({ _id: posId }).lean();
+      query.posToken = pos.token;
+    }
 
     let sort: any = { number: 1 };
     if (params.sortField && params.sortDirection) {

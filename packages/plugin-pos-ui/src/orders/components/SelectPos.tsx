@@ -5,7 +5,7 @@ import SelectWithSearch from '@erxes/ui/src/components/SelectWithSearch';
 import queries from '../../pos/graphql/queries';
 import { IPos } from '../../types';
 
-function generateCustomerOptions(array: IPos[] = []): IOption[] {
+function generatePosOptions(array: IPos[] = []): IOption[] {
   return array.map(item => {
     const pos = item || ({} as IPos);
     return {
@@ -39,10 +39,10 @@ export default ({
       label={label}
       queryName="posList"
       name={name}
-      customQuery={queries.posList}
       initialValue={defaultValue}
-      generateOptions={generateCustomerOptions}
+      generateOptions={generatePosOptions}
       onSelect={onSelect}
+      customQuery={queries.posList}
       customOption={customOption}
       multi={multi}
     />

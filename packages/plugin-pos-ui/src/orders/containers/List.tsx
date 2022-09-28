@@ -185,7 +185,7 @@ const generateParams = ({ queryParams }) => ({
   paidDate: queryParams.paidDate,
   userId: queryParams.userId,
   customerId: queryParams.customerId,
-  posToken: queryParams.posToken
+  posId: queryParams.posId
 });
 
 export default withProps<Props>(
