@@ -48,6 +48,7 @@ export const queries = `
     type: String,
     categoryId: String,
     searchValue: String,
+    branchId: String,
     page: Int,
     perPage: Int,
   ): [PoscProduct]

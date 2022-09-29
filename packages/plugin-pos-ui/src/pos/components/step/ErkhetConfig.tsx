@@ -7,14 +7,24 @@ import {
   FormGroup,
   Toggle
 } from '@erxes/ui/src';
-import { Block, BlockRow, FlexColumn, FlexItem } from '../../../styles';
+import {
+  Block,
+  BlockRow,
+  BlockRowUp,
+  FlexColumn,
+  FlexItem
+} from '../../../styles';
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
 import { IPos } from '../../../types';
 import Select from 'react-select-plus';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 
 type Props = {
-  onChange: (name: 'erkhetConfig' | 'checkRemainder', value: any) => void;
-  pos?: IPos;
+  onChange: (
+    name: 'pos' | 'erkhetConfig' | 'checkRemainder',
+    value: any
+  ) => void;
+  pos: IPos;
   checkRemainder: boolean;
 };
 
@@ -53,6 +63,12 @@ class ErkhetConfig extends React.Component<
 
   onChangeInput = (code: string, e) => {
     this.onChangeConfig(code, e.target.value);
+  };
+
+  onChangeInputSub = (code: string, key1: string, e) => {
+    const { config } = this.state;
+
+    this.onChangeConfig(code, { ...config[code], [key1]: e.target.value });
   };
 
   onChangeSwitch = e => {
@@ -113,6 +129,65 @@ class ErkhetConfig extends React.Component<
     );
   };
 
+  renderInputSub = (
+    key: string,
+    key1: string,
+    title: string,
+    description?: string,
+    type?: string
+  ) => {
+    const { config } = this.state;
+
+    return (
+      <FormGroup>
+        <ControlLabel>{title}</ControlLabel>
+        {description && <p>{__(description)}</p>}
+        <FormControl
+          defaultValue={(config[key] && config[key][key1]) || ''}
+          type={type || 'text'}
+          onChange={this.onChangeInputSub.bind(this, key, key1)}
+          required={true}
+        />
+      </FormGroup>
+    );
+  };
+
+  renderAccLoc() {
+    const { pos } = this.props;
+
+    if (!pos.isOnline) {
+      return (
+        <BlockRow>
+          {this.renderInput('account', 'Account', '')}
+          {this.renderInput('location', 'Location', '')}
+        </BlockRow>
+      );
+    }
+
+    return (
+      <>
+        {(pos.allowBranchIds || []).map(branchId => {
+          return (
+            <BlockRow key={branchId}>
+              <FormGroup>
+                <ControlLabel>Branch</ControlLabel>
+                <SelectBranches
+                  label="Choose branch"
+                  name="branchId"
+                  initialValue={branchId}
+                  onSelect={() => {}}
+                  multi={false}
+                />
+              </FormGroup>
+              {this.renderInputSub(`${branchId}`, 'account', 'Account', '')}
+              {this.renderInputSub(`${branchId}`, 'location', 'Location', '')}
+            </BlockRow>
+          );
+        })}
+      </>
+    );
+  }
+
   renderOther() {
     if (!this.state.config.isSyncErkhet) {
       return <></>;
@@ -140,10 +215,7 @@ class ErkhetConfig extends React.Component<
             />
           </FormGroup>
         </BlockRow>
-        <BlockRow>
-          {this.renderInput('account', 'Account', '')}
-          {this.renderInput('location', 'Location', '')}
-        </BlockRow>
+        {this.renderAccLoc()}
       </Block>
     );
   }
