@@ -21,10 +21,12 @@ type Props = {
   lastFlowJob?: IJob;
   flowProduct?: IProduct;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
+  setUsedPopup: (check: boolean) => void;
 };
 
 type State = {
   jobReferId: string;
+  jobRefer?: IJobRefer;
   description: string;
   inBranchId: string;
   inDepartmentId: string;
@@ -38,7 +40,10 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { config, description } = props.activeFlowJob;
+    const { jobRefers, activeFlowJob } = props;
+    const { config, description } = activeFlowJob;
+
+    const jobRefer = jobRefers.length && jobRefers[0];
 
     const {
       jobReferId,
@@ -50,6 +55,7 @@ class JobForm extends React.Component<Props, State> {
 
     this.state = {
       jobReferId: jobReferId || '',
+      jobRefer,
       description: description || '',
       inBranchId: inBranchId || '',
       inDepartmentId: inDepartmentId || '',
@@ -63,21 +69,27 @@ class JobForm extends React.Component<Props, State> {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.activeFlowJob !== this.props.activeFlowJob) {
-      this.setState({ jobReferId: nextProps.activeFlowJob.jobReferId });
+      this.setState({
+        jobReferId: nextProps.activeFlowJob.jobReferId,
+        description: nextProps.activeFlowJob.description
+      });
     }
   }
 
   renderJobTrigger(job?: IJobRefer) {
+    const onClick = () => {
+      this.props.setUsedPopup(true);
+    };
+
     let content = (
-      <div>
+      <div onClick={onClick}>
         {__('Choose Job')} <Icon icon="plus-circle" />
       </div>
     );
 
-    // if product selected
     if (job) {
       content = (
-        <div>
+        <div onClick={onClick}>
           {job.name} <Icon icon="pen-1" />
         </div>
       );
@@ -87,27 +99,45 @@ class JobForm extends React.Component<Props, State> {
   }
 
   renderContent() {
-    const { jobRefers } = this.props;
+    const { jobRefer, description } = this.state;
 
     const onChangeValue = (type, e) => {
       this.setState({ [type]: e.target.value } as any);
     };
 
-    const { description } = this.state;
+    const onChangeJob = prs => {
+      let pr: any;
+      if (!prs.length) {
+        this.setState({ jobReferId: '', jobRefer: undefined });
+        return;
+      }
 
-    const content = props => (
-      <JobReferChooser
-        {...props}
-        onSelect={pr => console.log(pr)}
-        onChangeCategory={categoryId => this.setState({ categoryId })}
-        categoryId={this.state.categoryId}
-        data={{
-          name: 'Jobs',
-          jobRefers
-        }}
-        limit={1}
-      />
-    );
+      pr = prs[0];
+      this.setState({ jobReferId: pr._id, jobRefer: pr });
+    };
+
+    const content = props => {
+      const onCloseModal = () => {
+        this.props.setUsedPopup(false);
+        props.closeModal();
+      };
+
+      return (
+        <JobReferChooser
+          {...props}
+          closeModal={onCloseModal}
+          onSelect={onChangeJob}
+          onChangeCategory={categoryId => this.setState({ categoryId })}
+          types={['end']}
+          categoryId={this.state.categoryId}
+          data={{
+            name: 'Jobs',
+            jobRefers: jobRefer ? [jobRefer] : []
+          }}
+          limit={1}
+        />
+      );
+    };
 
     return (
       <DrawerDetail>
@@ -115,9 +145,7 @@ class JobForm extends React.Component<Props, State> {
           <ControlLabel>Jobs</ControlLabel>
           <ModalTrigger
             title="Choose a JOB"
-            trigger={this.renderJobTrigger(
-              jobRefers.length ? jobRefers[0] : undefined
-            )}
+            trigger={this.renderJobTrigger(jobRefer)}
             size="lg"
             content={content}
           />
@@ -137,6 +165,7 @@ class JobForm extends React.Component<Props, State> {
   render() {
     const {
       jobReferId,
+      jobRefer,
       description,
       inBranchId,
       inDepartmentId,
@@ -146,6 +175,8 @@ class JobForm extends React.Component<Props, State> {
 
     return (
       <Common
+        {...this.props}
+        name={(jobRefer && jobRefer.name) || 'Unknown'}
         description={description}
         config={{
           jobReferId,
@@ -154,7 +185,6 @@ class JobForm extends React.Component<Props, State> {
           outBranchId,
           outDepartmentId
         }}
-        {...this.props}
       >
         {this.renderContent()}
       </Common>

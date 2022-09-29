@@ -97,6 +97,7 @@ const generateFilterPosQuery = async (
 
     const startDate = getFullDate(now);
     const endDate = getTomorrow(now);
+
     query.paidDate = { $gte: startDate, $lte: endDate };
   }
 
