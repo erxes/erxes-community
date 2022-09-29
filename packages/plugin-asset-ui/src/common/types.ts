@@ -1,6 +1,5 @@
 import { ICompany } from '@erxes/ui-contacts/src/companies/types';
-import { ITag } from '@erxes/ui-tags/src/types';
-import { IAttachment } from '@erxes/ui/src/types';
+import { IAttachment, QueryResponse } from '@erxes/ui/src/types';
 import React from 'react';
 
 export type CommonFormGroupTypes = {
@@ -22,16 +21,15 @@ export type IAssetGroupTypes = {
   assetCount: number;
 };
 
-export type IAssetGroupQuery = {
-  list: [IAssetGroupTypes];
-  totalCount: number;
-};
-
 export type IAssetGroupQeuryResponse = {
-  assetGroup: IAssetGroupQuery;
+  assetGroups: IAssetGroupTypes[];
   loading: boolean;
   refetch: () => void;
 };
+
+export type IAssetGroupsTotalCountResponse = {
+  assetGroupsTotalCount: number;
+} & QueryResponse;
 
 export type IAssetQueryResponse = {
   assets: IAsset[];
@@ -44,7 +42,10 @@ export type IAssetTotalCountQueryResponse = {
   loading: boolean;
   refetch: () => void;
 };
-
+export type IAssetDetailQueryResponse = {
+  assetDetail: IAsset;
+  loading: boolean;
+};
 export interface IAssetGroup {
   _id: string;
   name: string;
@@ -65,7 +66,6 @@ export interface IAsset {
   type: string;
   groupId: string;
   description: string;
-  getTags?: ITag[];
   sku: string;
   code: string;
   unitPrice: number;
@@ -97,9 +97,23 @@ export type IAssetGroupDetailQueryResponse = {
   loading: boolean;
 };
 
+export type MutationVariables = {
+  _id?: string;
+  type: string;
+  name?: string;
+  description?: string;
+  sku?: string;
+  createdAt?: Date;
+};
+
 export type AssetRemoveMutationResponse = {
   assetsRemove: (mutation: { variables: { assetIds: string[] } }) => Promise<any>;
 };
+
+export type AssetEditMutationResponse = {
+  editMutation: (mutation: { variables: MutationVariables }) => Promise<any>;
+};
+
 export type MergeMutationVariables = {
   assetIds: string[];
   assetFields: IAsset;

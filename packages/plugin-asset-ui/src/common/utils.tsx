@@ -1,37 +1,50 @@
-import { ControlLabel, DataWithLoader, FormGroup, Pagination, Spinner, Wrapper, __ } from '@erxes/ui/src';
+import {
+  ControlLabel,
+  DataWithLoader,
+  FormGroup,
+  Pagination,
+  Spinner,
+  Wrapper,
+  __
+} from '@erxes/ui/src';
 import React from 'react';
+import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAssetGroupTypes } from './types';
 
 export const DefaultWrapper = ({
   title,
   rightActionBar,
+  leftActionBar,
   loading,
   totalCount,
   content,
   sidebar,
-  isPaginationHide
+  isPaginationHide,
+  breadcrumb
 }: {
   title: string;
   rightActionBar?: JSX.Element;
+  leftActionBar?: JSX.Element;
   loading?: boolean;
   totalCount?: number;
   content: JSX.Element;
   sidebar?: JSX.Element;
   isPaginationHide?: boolean;
+  breadcrumb?: any[];
 }) => {
   if (loading) {
     return <Spinner objective />;
   }
   return (
     <Wrapper
-      header={<Wrapper.Header title={title} />}
-      actionBar={<Wrapper.ActionBar right={rightActionBar} />}
+      header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}
+      actionBar={<Wrapper.ActionBar left={leftActionBar} right={rightActionBar} />}
       content={
         <DataWithLoader
           loading={loading || false}
           data={content}
           count={totalCount}
-          emptyImage='/images/actions/5.svg'
+          emptyImage="/images/actions/5.svg"
           emptyText={__('No data of risk assessment')}
         />
       }
@@ -50,7 +63,11 @@ export const CommonFormGroup = ({ children, label, required }: CommonFormGroupTy
   );
 };
 
-export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?: string, drawCode?: boolean) => {
+export const generateGroupOptions = (
+  groups: IAssetGroupTypes[],
+  currentGroupId?: string,
+  drawCode?: boolean
+) => {
   const result: React.ReactNode[] = [];
 
   for (const group of groups) {
@@ -76,4 +93,30 @@ export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?
   }
 
   return result;
+};
+
+export const assetStatusChoises = __ => {
+  const options: Array<{ value: string; label: string }> = [];
+
+  for (const key of Object.keys(ASSET_GROUP_STATUS_FILTER)) {
+    options.push({
+      value: key,
+      label: __(ASSET_GROUP_STATUS_FILTER[key])
+    });
+  }
+
+  return options;
+};
+
+export const asssetTypeChoises = __ => {
+  const options: Array<{ value: string; label: string }> = [];
+
+  for (const key of Object.keys(ASSET_TYPE_CHOISES)) {
+    options.push({
+      value: key,
+      label: __(ASSET_TYPE_CHOISES[key])
+    });
+  }
+
+  return options;
 };

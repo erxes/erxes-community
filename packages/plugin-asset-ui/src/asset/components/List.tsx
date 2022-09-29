@@ -1,4 +1,14 @@
-import { BarItems, Button, FormControl, ModalTrigger, router, Table, __, confirm, Alert } from '@erxes/ui/src';
+import {
+  BarItems,
+  Button,
+  FormControl,
+  ModalTrigger,
+  router,
+  Table,
+  __,
+  confirm,
+  Alert
+} from '@erxes/ui/src';
 import React from 'react';
 import { IAsset, IAssetGroup } from '../../common/types';
 import { DefaultWrapper } from '../../common/utils';
@@ -7,9 +17,9 @@ import Row from './Row';
 import SideBar from './SideBar';
 import { Link } from 'react-router-dom';
 import { isEnabled } from '@erxes/ui/src/utils/core';
-import TaggerPopover from '@erxes/ui-tags/src/components/TaggerPopover';
-import { TAG_TYPES } from '@erxes/ui-tags/src/constants';
 import MergeAsset from './Merge';
+import { breadcrumb } from '../../common/constant';
+import { Title } from '@erxes/ui/src/styles/main';
 
 type Props = {
   assets: IAsset[];
@@ -24,7 +34,7 @@ type Props = {
   toggleAll: (targets: IAsset[], containerId: string) => void;
   loading: boolean;
   searchValue: string;
-  currentCategory: IAssetGroup;
+  currentGroup: IAssetGroup;
   mergeAssets: () => void;
   mergeAssetLoading;
 };
@@ -44,7 +54,7 @@ class List extends React.Component<Props, State> {
   }
 
   renderRightActionBarTrigger = (
-    <Button btnStyle='success' icon='plus-circle'>
+    <Button btnStyle="success" icon="plus-circle">
       Add Assets
     </Button>
   );
@@ -55,19 +65,27 @@ class List extends React.Component<Props, State> {
 
   renderRightActionBar = (
     <ModalTrigger
-      title='Add Assets'
+      title="Add Assets"
       trigger={this.renderRightActionBarTrigger}
       content={this.renderFormContent}
-      autoOpenKey='showListFormModal'
-      dialogClassName='transform'
-      size='lg'
+      autoOpenKey="showListFormModal"
+      dialogClassName="transform"
+      size="lg"
     />
   );
 
   renderRow() {
     const { assets, history, toggleBulk, bulk } = this.props;
 
-    return assets.map(asset => <Row history={history} key={asset._id} asset={asset} toggleBulk={toggleBulk} isChecked={bulk.includes(asset)} />);
+    return assets.map(asset => (
+      <Row
+        history={history}
+        key={asset._id}
+        asset={asset}
+        toggleBulk={toggleBulk}
+        isChecked={bulk.includes(asset)}
+      />
+    ));
   }
   onChange = () => {
     const { toggleAll, assets } = this.props;
@@ -82,7 +100,11 @@ class List extends React.Component<Props, State> {
         <thead>
           <tr>
             <th style={{ width: 60 }}>
-              <FormControl checked={isAllSelected} componentClass='checkbox' onChange={this.onChange} />
+              <FormControl
+                checked={isAllSelected}
+                componentClass="checkbox"
+                onChange={this.onChange}
+              />
             </th>
             <th>{__('Code')}</th>
             <th>{__('Name')}</th>
@@ -93,7 +115,6 @@ class List extends React.Component<Props, State> {
             <th>{__('Minimium count')}</th>
             <th>{__('Unit Price')}</th>
             <th>{__('SKU')}</th>
-            <th>{__('Tags')}</th>
             <th>{__('Actions')}</th>
           </tr>
         </thead>
@@ -104,7 +125,14 @@ class List extends React.Component<Props, State> {
 
   assetsMerge = props => {
     const { bulk, mergeAssets, mergeAssetLoading } = this.props;
-    return <MergeAsset {...props} objects={bulk} save={mergeAssets} mergeAssetLoading={mergeAssetLoading} />;
+    return (
+      <MergeAsset
+        {...props}
+        objects={bulk}
+        save={mergeAssets}
+        mergeAssetLoading={mergeAssetLoading}
+      />
+    );
   };
 
   search = e => {
@@ -139,20 +167,20 @@ class List extends React.Component<Props, State> {
   };
 
   render() {
-    const { bulk, emptyBulk } = this.props;
+    const { bulk, emptyBulk, queryParams, assetsCount, currentGroup, history } = this.props;
 
     let rightActionBar = (
       <BarItems>
         <FormControl
-          type='text'
+          type="text"
           placeholder={__('Type to search')}
           onChange={this.search}
           value={this.state.searchValue}
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
-        <Link to='/settings/importHistories?type=asset'>
-          <Button btnStyle='simple' icon='arrow-from-right'>
+        <Link to="/settings/importHistories?type=asset">
+          <Button btnStyle="simple" icon="arrow-from-right">
             {__('Import items')}
           </Button>
         </Link>
@@ -161,12 +189,6 @@ class List extends React.Component<Props, State> {
     );
 
     if (bulk.length > 0) {
-      const tagButton = (
-        <Button btnStyle='simple' size='small' icon='tag-alt'>
-          Tag
-        </Button>
-      );
-
       const onClick = () =>
         confirm()
           .then(() => {
@@ -177,7 +199,7 @@ class List extends React.Component<Props, State> {
           });
 
       const mergeButton = (
-        <Button btnStyle='primary' size='small' icon='merge'>
+        <Button btnStyle="primary" size="small" icon="merge">
           Merge
         </Button>
       );
@@ -185,31 +207,32 @@ class List extends React.Component<Props, State> {
       rightActionBar = (
         <BarItems>
           {bulk.length === 2 && (
-            <ModalTrigger title='Merge Asset' size='lg' dialogClassName='modal-1000w' trigger={mergeButton} content={this.assetsMerge} />
-          )}
-          {isEnabled('tags') && (
-            <TaggerPopover
-              type={TAG_TYPES.PRODUCT}
-              successCallback={emptyBulk}
-              targets={bulk}
-              trigger={tagButton}
-              refetchQueries={['assetCountByTags']}
+            <ModalTrigger
+              title="Merge Asset"
+              size="lg"
+              dialogClassName="modal-1000w"
+              trigger={mergeButton}
+              content={this.assetsMerge}
             />
           )}
-          <Button btnStyle='danger' size='small' icon='cancel-1' onClick={onClick}>
+          <Button btnStyle="danger" size="small" icon="cancel-1" onClick={onClick}>
             Remove
           </Button>
         </BarItems>
       );
     }
 
+    const leftActionBar = <Title>{currentGroup.name || 'All Assets'}</Title>;
+
     const updatedProps = {
       title: 'List Assets',
-      rightActionBar: rightActionBar,
+      rightActionBar,
+      leftActionBar,
       content: this.renderContent(),
-      sidebar: <SideBar />,
-      totalCount: this.props.assetsCount,
-      isPaginationHide: true
+      sidebar: <SideBar queryParams={queryParams} history={history} />,
+      totalCount: assetsCount,
+      isPaginationHide: true,
+      breadcrumb: breadcrumb
     };
 
     return <DefaultWrapper {...updatedProps} />;

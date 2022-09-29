@@ -1,9 +1,10 @@
 import typeDefs from './graphql/typeDefs';
-import resolvers from './graphql/resolvers';
+import resolvers from './dataloaders/resolvers';
 
 import { initBroker } from './messageBroker';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { generateModels } from './connectionResolver';
+import { generateAllDataLoaders } from './dataloaders';
 
 export let mainDb;
 export let debug;
@@ -26,6 +27,8 @@ export default {
 
     context.subdomain = req.hostname;
     context.models = models;
+
+    context.dataLoaders = generateAllDataLoaders(models, subdomain);
 
     return context;
   },

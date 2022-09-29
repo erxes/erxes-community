@@ -5,18 +5,25 @@ import List from '../components/List';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
-import { IAssetGroupQeuryResponse } from '../../../common/types';
+import { IAssetGroupQeuryResponse, IAssetGroupsTotalCountResponse } from '../../../common/types';
 import { Alert, confirm } from '@erxes/ui/src';
-type Props = { history?: any; queryParams?: any };
+type Props = { history?: any; queryParams: any };
 
 type FinalProps = {
   assetGroups: IAssetGroupQeuryResponse;
   assetGroupRemove: any;
+  assetGroupsTotalCount: IAssetGroupsTotalCountResponse;
 } & Props;
 
 class ListContainer extends React.Component<FinalProps> {
   render() {
-    const { assetGroups, assetGroupRemove } = this.props;
+    const {
+      assetGroups,
+      assetGroupsTotalCount,
+      assetGroupRemove,
+      queryParams,
+      history
+    } = this.props;
 
     const removeAssetGroup = _id => {
       confirm().then(() => {
@@ -32,29 +39,38 @@ class ListContainer extends React.Component<FinalProps> {
     };
 
     const updateProps = {
-      assetGroups: assetGroups.assetGroup?.list,
-      totalCount: assetGroups.assetGroup?.totalCount,
+      assetGroups: assetGroups.assetGroups,
+      totalCount: assetGroupsTotalCount.assetGroupsTotalCount,
       loading: assetGroups.loading,
       remove: removeAssetGroup,
-      refetchAssetGroups: assetGroups.refetch
+      refetchAssetGroups: assetGroups.refetch,
+      queryParams,
+      history
     };
 
     return <List {...updateProps} />;
   }
 }
 
+const getRefetchQueries = () => {
+  return ['assetGroup', 'assetGroupTotalCount', 'assets'];
+};
+
 export default withProps<Props>(
   compose(
     graphql<Props>(gql(queries.assetGroup), {
-      name: 'assetGroups'
-      // options: ({ queryParams }) => ({
-      //   variables: {
-      //     status: queryParams.status,
-      //     parentId: queryParams.parentId
-      //   },
-      //   // refetchQueries: getRefetchQueries(),
-      //   fetchPolicy: 'network-only'
-      // })
+      name: 'assetGroups',
+      options: ({ queryParams }) => ({
+        variables: {
+          status: queryParams?.status,
+          parentId: queryParams?.parentId
+        },
+        refetchQueries: getRefetchQueries(),
+        fetchPolicy: 'network-only'
+      })
+    }),
+    graphql<Props, IAssetGroupsTotalCountResponse>(gql(queries.assetGroupsTotalCount), {
+      name: 'assetGroupsTotalCount'
     }),
     graphql<Props>(gql(mutations.assetGroupRemove), {
       name: 'assetGroupRemove'

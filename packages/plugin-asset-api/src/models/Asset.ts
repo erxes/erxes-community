@@ -41,7 +41,12 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
           subdomain,
           action: 'companies.findOne',
           data: {
-            $or: [{ code: doc.vendorCode }, { primaryEmail: doc.vendorCode }, { primaryPhone: doc.vendorCode }, { primaryName: doc.vendorCode }]
+            $or: [
+              { code: doc.vendorCode },
+              { primaryEmail: doc.vendorCode },
+              { primaryPhone: doc.vendorCode },
+              { primaryName: doc.vendorCode }
+            ]
           },
           isRPC: true
         });
@@ -127,7 +132,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       let customFieldsData: ICustomField[] = [];
-      let tagIds: string[] = [];
       const name: string = assetFields.name || '';
       const type: string = assetFields.type || '';
       const description: string = assetFields.description || '';
@@ -138,13 +142,8 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       for (const assetId of assetIds) {
         const assetObj = await models.Asset.getAssets({ _id: assetId });
 
-        const assetTags = assetObj.tagIds || [];
-
         // merge custom fields data
         customFieldsData = [...customFieldsData, ...(assetObj.customFieldsData || [])];
-
-        // Merging assets tagIds
-        tagIds = tagIds.concat(assetTags);
 
         await models.Asset.findByIdAndUpdate(assetId, {
           $set: {
@@ -156,14 +155,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         });
       }
 
-      // Removing Duplicates
-      tagIds = Array.from(new Set(tagIds));
-
       // Creating asset with properties
       const asset = await models.Asset.createAsset({
         ...assetFields,
         customFieldsData,
-        tagIds,
         mergedIds: assetIds,
         name,
         type,

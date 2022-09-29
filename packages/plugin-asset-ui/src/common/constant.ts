@@ -1,3 +1,5 @@
+import { __ } from '@erxes/ui/src';
+
 export const ASSET_GROUP_STATUSES = [
   { label: 'Active', value: 'active' },
   { label: 'Disabled', value: 'disabled' },
@@ -37,3 +39,18 @@ export const ASSET_INFO = {
     { field: 'vendor', label: 'Vendor' }
   ]
 };
+
+export const ASSET_TYPE_CHOISES = {
+  asset: 'Asset',
+  service: 'Service'
+};
+
+export const ASSET_GROUP_STATUS_FILTER = {
+  disabled: 'Disabled',
+  archived: 'Archived'
+};
+
+export const breadcrumb = [
+  { title: __('Settings'), link: '/settings' },
+  { title: __('Product & Service') }
+];

@@ -11,7 +11,6 @@ const assetQueries = {
       type,
       groupId,
       searchValue,
-      tag,
       ids,
       excludeIds,
       pipelineId,
@@ -23,7 +22,6 @@ const assetQueries = {
       type: string;
       groupId: string;
       searchValue: string;
-      tag: string;
       page: number;
       perPage: number;
       pipelineId: string;
@@ -45,14 +43,17 @@ const assetQueries = {
         status: { $in: [null, 'active'] }
       });
 
-      const asset_group_ids = await models.AssetGroup.find({ order: { $regex: new RegExp(group.order) } }, { _id: 1 });
+      const asset_group_ids = await models.AssetGroup.find(
+        { order: { $regex: new RegExp(group.order) } },
+        { _id: 1 }
+      );
       filter.groupId = { $in: asset_group_ids };
     } else {
-      const notActiveCategories = await models.AssetGroup.find({
+      const notActiveGroups = await models.AssetGroup.find({
         status: { $nin: [null, 'active'] }
       });
 
-      filter.groupId = { $nin: notActiveCategories.map(e => e._id) };
+      filter.groupId = { $nin: notActiveGroups.map(e => e._id) };
     }
 
     if (ids && ids.length > 0) {
@@ -61,10 +62,6 @@ const assetQueries = {
         pagintationArgs.page = 1;
         pagintationArgs.perPage = 100;
       }
-    }
-
-    if (tag) {
-      filter.tagIds = { $in: [tag] };
     }
 
     // search =========
@@ -86,7 +83,6 @@ const assetQueries = {
         type,
         groupId,
         searchValue,
-        tag,
         ids,
         excludeIds,
         pipelineId,
@@ -113,6 +109,9 @@ const assetQueries = {
     }
 
     return models.Asset.find(filter).countDocuments();
+  },
+  assetDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+    return models.Asset.findOne({ _id }).lean();
   }
 };
 

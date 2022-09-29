@@ -19,7 +19,10 @@ export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
     flex-direction:${({ row }) => (row ? 'row' : '')} ${({ column }) => (column ? 'column' : '')};
     gap: ${({ gap }) => (gap ? `${gap}px` : '')};
     place-items: ${({ align }) => (align ? `${align}` : '')};
-    padding: ${({ horizontal, vertical }) => (horizontal && vertical ? '10px' : `${horizontal ? '10px' : '0px'} ${vertical ? '10px' : '0px'}`)};
+    padding: ${({ horizontal, vertical }) =>
+      horizontal && vertical
+        ? '10px'
+        : `${horizontal ? '10px' : '0px'} ${vertical ? '10px' : '0px'}`};
     justify-content: ${({ spaceBetween }) => (spaceBetween ? 'space-between' : '')}
 `;
 
@@ -30,4 +33,32 @@ export const InfoDetail = styled.p`
   font-weight: normal;
   color: ${colors.colorCoreGray};
   word-break: break-all;
+`;
+
+export const AssetContent = styled.div`
+  padding: 12px 22px;
+  word-break: break-word;
+  background: rgba(10, 30, 65, 0.05);
+  margin-top: 10px;
+  transition: background 0.3s ease;
+  border-radius: 3px;
+  min-height: 50px;
+  p {
+    color: ${colors.textPrimary};
+    font-size: 13px;
+  }
+  img,
+  table,
+  * {
+    max-width: 576px !important;
+  }
+  ul,
+  ol {
+    padding-left: 20px;
+    margin: 0 0 10px;
+  }
+  &:hover {
+    background: rgba(10, 30, 65, 0.08);
+    cursor: pointer;
+  }
 `;

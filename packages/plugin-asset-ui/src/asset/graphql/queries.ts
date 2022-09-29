@@ -1,5 +1,3 @@
-import { isEnabled } from '@erxes/ui/src/utils/core';
-
 const assetFields = `
   _id
   name
@@ -10,18 +8,6 @@ const assetFields = `
   description
   unitPrice
   sku
-  ${
-    isEnabled('tags')
-      ? `
-    getTags {
-      _id
-      name
-      colorCode
-    }
-    `
-      : ``
-  }
-  tagIds
   createdAt
   group {
     _id
@@ -48,7 +34,6 @@ const assets = `
   query assets(
     $type: String,
     $groupId: String,
-    $tag: String,
     $searchValue: String,
     $perPage: Int,
     $page: Int $ids: [String],
@@ -59,7 +44,6 @@ const assets = `
     assets(
       type: $type,
       groupId: $groupId,
-      tag: $tag,
       searchValue: $searchValue,
       perPage: $perPage,
       page: $page ids: $ids,
@@ -78,4 +62,13 @@ const assetsCount = `
   }
 `;
 
-export default { assets, assetsCount };
+const assetDetail = `
+  query assetDetail($_id: String) {
+    assetDetail(_id: $_id) {
+      ${assetFields}
+      customFieldsData
+    }
+  }
+`;
+
+export default { assets, assetsCount, assetDetail };

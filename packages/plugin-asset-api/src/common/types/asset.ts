@@ -12,7 +12,6 @@ export interface IAsset {
   code: string;
   customFieldsData?: ICustomField[];
   assetId?: string;
-  tagIds?: string[];
   attachment?: any;
   attachmentMore?: any[];
   status?: string;

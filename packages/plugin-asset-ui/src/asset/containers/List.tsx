@@ -48,7 +48,9 @@ class ListContainer extends React.Component<FinalProps> {
 
         const status = removeStatus.data.assetsRemove;
 
-        status === 'deleted' ? Alert.success('You successfully deleted a asset') : Alert.warning('Product status deleted');
+        status === 'deleted'
+          ? Alert.success('You successfully deleted a asset')
+          : Alert.warning('Product status deleted');
       })
       .catch(e => {
         Alert.error(e.message);
@@ -114,8 +116,7 @@ export default withProps<Props>(
       name: 'assets',
       options: ({ queryParams }) => ({
         variables: {
-          categoryId: queryParams?.categoryId,
-          tag: queryParams?.tag,
+          groupId: queryParams?.groupId,
           searchValue: queryParams?.searchValue,
           type: queryParams?.type,
           ...generatePaginationParams(queryParams || {})

@@ -7,7 +7,7 @@ import {
   putDeleteLog as commonPutDeleteLog
 } from '@erxes/api-utils/src/logUtils';
 import { IModels } from './connectionResolver';
-import messageBroker, { sendTagsMessage } from './messageBroker';
+import messageBroker from './messageBroker';
 import { IAssetDocument, IAssetGroupDocument } from './common/types/asset';
 
 export const MODULE_NAMES = {
@@ -21,28 +21,16 @@ export const LOG_ACTIONS = {
   DELETE: 'delete'
 };
 
-const gatherAssetFieldNames = async (models: IModels, subdomain: string, doc: IAssetDocument, prevList?: LogDesc[]): Promise<LogDesc[]> => {
+const gatherAssetFieldNames = async (
+  models: IModels,
+  subdomain: string,
+  doc: IAssetDocument,
+  prevList?: LogDesc[]
+): Promise<LogDesc[]> => {
   let options: LogDesc[] = [];
 
   if (prevList) {
     options = prevList;
-  }
-
-  if (doc.tagIds && doc.tagIds.length > 0) {
-    options = await gatherNames({
-      foreignKey: 'tagIds',
-      prevList: options,
-      nameFields: ['name'],
-      items: await sendTagsMessage({
-        subdomain,
-        action: 'find',
-        data: {
-          _id: { $in: doc.tagIds }
-        },
-        isRPC: true,
-        defaultValue: []
-      })
-    });
   }
 
   if (doc.groupId) {
@@ -59,7 +47,11 @@ const gatherAssetFieldNames = async (models: IModels, subdomain: string, doc: IA
   return options;
 };
 
-const gatherDescriptions = async (models: IModels, subdomain: string, params: any): Promise<IDescriptions> => {
+const gatherDescriptions = async (
+  models: IModels,
+  subdomain: string,
+  params: any
+): Promise<IDescriptions> => {
   const { action, type, object, updatedDocument } = params;
 
   let extraDesc: LogDesc[] = [];
@@ -109,7 +101,12 @@ export const putCreateLog = async (models: IModels, subdomain: string, logDoc, u
     action: LOG_ACTIONS.CREATE
   });
 
-  await commonPutCreateLog(subdomain, messageBroker(), { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` }, user);
+  await commonPutCreateLog(
+    subdomain,
+    messageBroker(),
+    { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` },
+    user
+  );
 };
 
 export const putUpdateLog = async (models: IModels, subdomain: string, logDoc, user) => {
@@ -118,7 +115,12 @@ export const putUpdateLog = async (models: IModels, subdomain: string, logDoc, u
     action: LOG_ACTIONS.UPDATE
   });
 
-  await commonPutUpdateLog(subdomain, messageBroker(), { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` }, user);
+  await commonPutUpdateLog(
+    subdomain,
+    messageBroker(),
+    { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` },
+    user
+  );
 };
 
 export const putDeleteLog = async (models: IModels, subdomain: string, logDoc, user) => {
@@ -127,5 +129,10 @@ export const putDeleteLog = async (models: IModels, subdomain: string, logDoc, u
     action: LOG_ACTIONS.DELETE
   });
 
-  await commonPutDeleteLog(subdomain, messageBroker(), { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` }, user);
+  await commonPutDeleteLog(
+    subdomain,
+    messageBroker(),
+    { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` },
+    user
+  );
 };

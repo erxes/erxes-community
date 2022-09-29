@@ -2,21 +2,11 @@ import { attachmentInput, attachmentType } from '@erxes/api-utils/src/commonType
 import { assetGroupParams } from '../../common/graphql/asset';
 import { assetParams } from '../../common/graphql/asset';
 
-export const types = (tagsAvailable, contactsAvailable) => `
+export const types = contactsAvailable => `
 
     ${attachmentType}
     ${attachmentInput}
     
-      ${
-        tagsAvailable
-          ? `
-      extend type Tag @key(fields: "_id") {
-        _id: String! @external
-      }
-    `
-          : ''
-      }
-
     ${
       contactsAvailable
         ? `
@@ -40,11 +30,6 @@ export const types = (tagsAvailable, contactsAvailable) => `
         assetCount: Int
     }
 
-    type ListAssetGroup {
-        list :[AssetGroup]
-        totalCount: Int
-    }
-
     type Asset @key(fields: "_id") @cacheControl(maxAge: 3) {
     _id: String!
     name: String
@@ -56,8 +41,6 @@ export const types = (tagsAvailable, contactsAvailable) => `
     groupId: String
     customFieldsData: JSON
     createdAt: Date
-    ${tagsAvailable ? `getTags: [Tag]` : ''}
-    tagIds: [String]
     attachment: Attachment
     attachmentMore: [Attachment]
     vendorId: String
@@ -76,7 +59,6 @@ export const queries = `
       type: String,
       groupId: String,
       searchValue: String,
-      tag: String,
       page: Int,
       perPage: Int ids: [String],
       excludeIds: Boolean,
@@ -84,8 +66,10 @@ export const queries = `
       boardId: String
     ): [Asset]
     assetsTotalCount(type: String): Int
-    assetGroup(parentId: String, searchValue: String, status: String): ListAssetGroup
+    assetDetail(_id: String): Asset
+    assetGroups(parentId: String, searchValue: String, status: String): [AssetGroup]
     assetGroupDetail(_id: String): AssetGroup
+    assetGroupsTotalCount: Int
 
 `;
 

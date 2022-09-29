@@ -7,15 +7,6 @@ export const initBroker = async cl => {
   client = cl;
 };
 
-export const sendTagsMessage = (args: ISendMessageArgs): Promise<any> => {
-  return sendMessage({
-    client,
-    serviceDiscovery,
-    serviceName: 'tags',
-    ...args
-  });
-};
-
 export const sendContactsMessage = (args: ISendMessageArgs): Promise<any> => {
   return sendMessage({
     client,

@@ -1,13 +1,11 @@
 const assetGroup = `
-  query assetGroup($status: String) {
-    assetGroup(status: $status) {
-      list {
-
-        _id
-        name
-        order
-        code
-        parentId
+  query assetGroups($status: String) {
+    assetGroups(status: $status) {
+      _id
+      name
+      order
+      code
+      parentId
       description
       status
       attachment {
@@ -16,11 +14,8 @@ const assetGroup = `
         type
         size
       }
-      
       isRoot
       assetCount
-    }
-    totalCount
     }
   }
 `;
@@ -35,4 +30,10 @@ const assetGroupDetail = `
   }
 `;
 
-export default { assetGroup, assetGroupDetail };
+const assetGroupsTotalCount = `
+  query assetGroupsTotalCount {
+    assetGroupsTotalCount
+  }
+`;
+
+export default { assetGroup, assetGroupDetail, assetGroupsTotalCount };

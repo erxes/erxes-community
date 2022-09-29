@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModalTrigger, Icon, FormControl, TextInfo, Tags } from '@erxes/ui/src';
+import { ModalTrigger, Icon, FormControl, TextInfo } from '@erxes/ui/src';
 import { IAsset } from '../../common/types';
 import AssetForm from '../containers/Form';
 type Props = {
@@ -16,8 +16,6 @@ class Row extends React.Component<Props> {
 
   render() {
     const { asset, history, toggleBulk, isChecked } = this.props;
-
-    const tags = asset.getTags || [];
 
     const onChange = e => {
       if (toggleBulk) {
@@ -40,7 +38,7 @@ class Row extends React.Component<Props> {
     return (
       <tr onClick={onTrClick}>
         <td onClick={onClick}>
-          <FormControl checked={isChecked} componentClass='checkbox' onChange={onChange} />
+          <FormControl checked={isChecked} componentClass="checkbox" onChange={onChange} />
         </td>
         <td>{code}</td>
         <td>{name}</td>
@@ -53,11 +51,13 @@ class Row extends React.Component<Props> {
         <td>{minimiumCount ? minimiumCount : 0}</td>
         <td>{(unitPrice || 0).toLocaleString()}</td>
         <td>{sku}</td>
-        <td>
-          <Tags tags={tags} limit={2} />
-        </td>
         <td onClick={onClick}>
-          <ModalTrigger title='Edit basic info' trigger={<Icon icon='edit' />} size='lg' content={content} />
+          <ModalTrigger
+            title="Edit basic info"
+            trigger={<Icon icon="edit" />}
+            size="lg"
+            content={content}
+          />
         </td>
       </tr>
     );
