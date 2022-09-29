@@ -1,9 +1,10 @@
-import { IProductCategoryDocument } from '../../../models/definitions/products';
-import { PRODUCT_STATUSES } from '../../../models/definitions/constants';
+import { escapeRegExp, paginate } from '@erxes/api-utils/src/core';
 import { IContext } from '../../types';
 import { IModels } from '../../../connectionResolver';
-import { escapeRegExp, paginate } from '@erxes/api-utils/src/core';
+import { IProductCategoryDocument } from '../../../models/definitions/products';
+import { PRODUCT_STATUSES } from '../../../models/definitions/constants';
 import { sendInventoriesMessage } from '../../../messageBroker';
+import { sendRequest } from '@erxes/api-utils/src/requests';
 
 interface IProductParams {
   type?: string;
@@ -81,18 +82,6 @@ const productQueries = {
       searchValue
     });
 
-    const inventoryResponse = await sendInventoriesMessage({
-      subdomain,
-      action: 'remainders',
-      data: {
-        productCategoryId: categoryId,
-        departmentId: config.departmentId,
-        branchId: config.branchId
-      },
-      isRPC: true,
-      defaultValue: {}
-    });
-
     const paginatedProducts = await paginate(
       models.Products.find(filter)
         .sort('code')
@@ -100,13 +89,75 @@ const productQueries = {
       paginationArgs
     );
 
-    paginatedProducts.map((item: any) => {
-      for (const inventory of inventoryResponse) {
-        if (item._id === inventory.productId) item.count = inventory.count;
+    if (config.checkRemainder) {
+      const productIds = paginatedProducts.map(p => p._id);
+
+      const inventoryResponse = await sendInventoriesMessage({
+        subdomain,
+        action: 'remainders',
+        data: {
+          productIds,
+          departmentId: config.departmentId,
+          branchId: config.branchId
+        },
+        isRPC: true,
+        defaultValue: []
+      });
+
+      const remainderByProductId = {};
+      for (const rem of inventoryResponse) {
+        remainderByProductId[rem.productId] = rem;
       }
 
-      return item;
-    });
+      paginatedProducts.map((item: any) => {
+        item.remainder = remainderByProductId[item._id]
+          ? remainderByProductId[item._id].count
+          : undefined;
+        return item;
+      });
+    }
+
+    if (config.erkhetConfig.getRemainder) {
+      const configs = config.erkhetConfig;
+      if (
+        configs &&
+        configs.getRemainderApiUrl &&
+        configs.apiKey &&
+        configs.apiSecret &&
+        configs.account &&
+        configs.location
+      ) {
+        const response = await sendRequest({
+          url: configs.getRemainderApiUrl,
+          method: 'GET',
+          params: {
+            kind: 'remainder',
+            api_key: configs.apiKey,
+            api_secret: configs.apiSecret,
+            check_relate: paginatedProducts.length < 4 ? '1' : '',
+            accounts: configs.account,
+            locations: configs.location,
+            inventories: paginatedProducts.map(p => p.code).join(',')
+          }
+        });
+
+        const jsonRes = JSON.parse(response);
+
+        let responseByCode = jsonRes;
+
+        responseByCode =
+          (jsonRes[configs.account] &&
+            jsonRes[configs.account][configs.location]) ||
+          {};
+
+        paginatedProducts.map((item: any) => {
+          item.remainder = responseByCode[item.code]
+            ? responseByCode[item.code]
+            : undefined;
+          return item;
+        });
+      }
+    }
 
     return paginatedProducts;
   },

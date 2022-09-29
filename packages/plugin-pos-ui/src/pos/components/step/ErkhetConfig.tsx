@@ -1,4 +1,5 @@
 import React from 'react';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import {
   __,
   ControlLabel,
@@ -12,25 +13,32 @@ import { IPos } from '../../../types';
 import Select from 'react-select-plus';
 
 type Props = {
-  onChange: (name: 'erkhetConfig', value: any) => void;
+  onChange: (name: 'erkhetConfig' | 'checkRemainder', value: any) => void;
   pos?: IPos;
+  checkRemainder: boolean;
 };
 
-class ErkhetConfig extends React.Component<Props, { config: any }> {
+class ErkhetConfig extends React.Component<
+  Props,
+  { config: any; checkRemainder: boolean }
+> {
   constructor(props: Props) {
     super(props);
 
+    const { pos, checkRemainder } = props;
     const config =
-      props.pos && props.pos.erkhetConfig
-        ? props.pos.erkhetConfig
+      pos && pos.erkhetConfig
+        ? pos.erkhetConfig
         : {
             isSyncErkhet: false,
             userEmail: '',
-            defaultPay: ''
+            defaultPay: '',
+            getRemainder: false
           };
 
     this.state = {
-      config
+      config,
+      checkRemainder
     };
   }
 
@@ -49,6 +57,34 @@ class ErkhetConfig extends React.Component<Props, { config: any }> {
 
   onChangeSwitch = e => {
     this.onChangeConfig('isSyncErkhet', e.target.checked);
+  };
+
+  onChangeSwitchCheckErkhet = e => {
+    let val = e.target.checked;
+    if (!this.state.config.isSyncErkhet) {
+      val = false;
+    }
+
+    if (val && this.state.checkRemainder) {
+      this.props.onChange('checkRemainder', false);
+      this.setState({ checkRemainder: false });
+    }
+
+    this.onChangeConfig('getRemainder', val);
+  };
+
+  onChangeSwitchCheckInv = e => {
+    let val = e.target.checked;
+    if (!isEnabled('inventories')) {
+      val = false;
+    }
+
+    if (val && this.state.config.getRemainder) {
+      this.onChangeConfig('getRemainder', false);
+    }
+
+    this.props.onChange('checkRemainder', val);
+    this.setState({ checkRemainder: val });
   };
 
   onChangeSelect = value => {
@@ -104,9 +140,14 @@ class ErkhetConfig extends React.Component<Props, { config: any }> {
             />
           </FormGroup>
         </BlockRow>
+        <BlockRow>
+          {this.renderInput('account', 'Account', '')}
+          {this.renderInput('location', 'Location', '')}
+        </BlockRow>
       </Block>
     );
   }
+
   render() {
     return (
       <FlexItem>
@@ -132,6 +173,35 @@ class ErkhetConfig extends React.Component<Props, { config: any }> {
 
             {this.renderOther()}
 
+            <Block>
+              <h4>{__('Remainder')}</h4>
+              <BlockRow>
+                <FormGroup>
+                  <ControlLabel>Check erkhet</ControlLabel>
+                  <Toggle
+                    id={'getRemainder'}
+                    checked={this.state.config.getRemainder || false}
+                    onChange={this.onChangeSwitchCheckErkhet}
+                    icons={{
+                      checked: <span>Yes</span>,
+                      unchecked: <span>No</span>
+                    }}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <ControlLabel>Check inventories</ControlLabel>
+                  <Toggle
+                    id={'checkRemainder'}
+                    checked={this.state.checkRemainder}
+                    onChange={this.onChangeSwitchCheckInv}
+                    icons={{
+                      checked: <span>Yes</span>,
+                      unchecked: <span>No</span>
+                    }}
+                  />
+                </FormGroup>
+              </BlockRow>
+            </Block>
             <Block />
           </LeftItem>
         </FlexColumn>
