@@ -39,7 +39,9 @@ export const assetSchema = schemaWrapper(
     _id: field({ pkey: true }),
     name: field({ type: String, label: 'Name' }),
     code: field({ type: String, unique: true, label: 'Code' }),
+    order: field({ type: String, label: 'Order' }),
     groupId: field({ type: String, label: 'Group' }),
+    parentId: field({ type: String, optional: true, label: 'Parent' }),
     type: field({
       type: String,
       enum: ASSET_TYPES.ALL,

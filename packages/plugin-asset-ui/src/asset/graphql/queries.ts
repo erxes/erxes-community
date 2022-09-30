@@ -3,13 +3,20 @@ const assetFields = `
   name
   type
   code
+  order
   groupId
+  parentId
   vendorId
   description
   unitPrice
   sku
   createdAt
   group {
+    _id
+    code
+    name
+  }
+  parent {
     _id
     code
     name
@@ -28,6 +35,7 @@ const assetFields = `
   }
   supply
   assetCount
+  isRoot
   minimiumCount
 `;
 const assets = `

@@ -4,11 +4,16 @@ import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { queries as groupQueries } from '../group/graphql';
-import { IAsset, IAssetGroupQeuryResponse, IAssetGroupTypes } from '../../common/types';
+import {
+  IAsset,
+  IAssetGroupQeuryResponse,
+  IAssetGroupTypes,
+  IAssetQueryResponse
+} from '../../common/types';
 import Form from '../components/Form';
-import { ButtonMutate } from '@erxes/ui/src';
+import { ButtonMutate, Spinner } from '@erxes/ui/src';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import { mutations } from '../graphql';
+import { mutations, queries } from '../graphql';
 
 type Props = {
   asset: IAsset;
@@ -17,6 +22,7 @@ type Props = {
 
 type FinalProps = {
   assetGroups: IAssetGroupQeuryResponse;
+  assets: IAssetQueryResponse;
 } & Props;
 
 class FormContainer extends React.Component<FinalProps> {
@@ -47,7 +53,7 @@ class FormContainer extends React.Component<FinalProps> {
         callback={callback}
         refetchQueries={getRefetchQueries()}
         isSubmitted={isSubmitted}
-        type='submit'
+        type="submit"
         uppercase={false}
         successMessage={`You successfully ${object ? 'updated' : 'added'} a ${name}`}
       />
@@ -55,11 +61,16 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { assetGroups } = this.props;
+    const { assetGroups, assets } = this.props;
+
+    if (assetGroups.loading || assets.loading) {
+      return <Spinner />;
+    }
 
     const updatedProps = {
       ...this.props,
-      groups: assetGroups.assetGroup.list,
+      groups: assetGroups.assetGroups,
+      assets: assets.assets,
       renderButton: this.renderButton
     };
 
@@ -75,6 +86,9 @@ export default withProps<Props>(
   compose(
     graphql(gql(groupQueries.assetGroup), {
       name: 'assetGroups'
+    }),
+    graphql(gql(queries.assets), {
+      name: 'assets'
     })
   )(FormContainer)
 );

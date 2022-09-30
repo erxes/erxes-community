@@ -26,8 +26,12 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
     public static async createAsset(doc: IAsset) {
-      console.log('hell yeah');
+      console.log(doc);
       await checkCodeDuplication(models, doc.code);
+
+      const parentAsset = await models.Asset.findOne({ _id: doc.parentId }).lean();
+
+      doc.order = await this.generateOrder(parentAsset, doc);
 
       if (doc.groupCode) {
         const group = await models.AssetGroup.getAssetGroup({
@@ -197,6 +201,11 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       });
 
       return asset;
+    }
+    public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
+      const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
+
+      return order;
     }
   }
   assetSchema.loadClass(Asset);

@@ -9,7 +9,7 @@ import {
 } from '@erxes/ui/src';
 import React from 'react';
 import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
-import { CommonFormGroupTypes, IAssetGroupTypes } from './types';
+import { CommonFormGroupTypes, IAsset, IAssetGroupTypes } from './types';
 
 export const DefaultWrapper = ({
   title,
@@ -92,6 +92,35 @@ export const generateGroupOptions = (
     }
   }
 
+  return result;
+};
+
+export const generateParentOptions = (
+  assets: IAsset[],
+  currentAssetId?: string,
+  drawCode?: boolean
+) => {
+  const result: React.ReactNode[] = [];
+  for (const asset of assets) {
+    const order = asset.order;
+
+    const foundedString = order.match(/[/]/gi);
+
+    let space = '';
+
+    if (foundedString) {
+      space = '\u00A0 '.repeat(foundedString.length);
+    }
+    if (currentAssetId !== asset._id) {
+      result.push(
+        <option key={asset._id} value={asset._id}>
+          {space}
+          {drawCode ? `${asset.code} - ` : ''}
+          {asset.name}
+        </option>
+      );
+    }
+  }
   return result;
 };
 

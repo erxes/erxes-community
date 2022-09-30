@@ -1,7 +1,16 @@
 import React from 'react';
-import { FormControl, FormGroup, ControlLabel, Form as CommonForm, Uploader, ModalTrigger, Button, extractAttachment } from '@erxes/ui/src';
+import {
+  FormControl,
+  FormGroup,
+  ControlLabel,
+  Form as CommonForm,
+  Uploader,
+  ModalTrigger,
+  Button,
+  extractAttachment
+} from '@erxes/ui/src';
 import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
-import { generateGroupOptions } from '../../common/utils';
+import { generateGroupOptions, generateParentOptions } from '../../common/utils';
 import { IAsset, IAssetGroupTypes } from '../../common/types';
 import { ASSET_SUPPLY, TYPES } from '../../common/constant';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
@@ -12,6 +21,7 @@ import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectC
 
 type Props = {
   asset?: IAsset;
+  assets: IAsset[];
   groups: IAssetGroupTypes[];
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
@@ -29,7 +39,15 @@ class Form extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const asset = props.asset || ({} as IAsset);
-    const { attachment, attachmentMore, supply, assetCount, minimiumCount, vendorId, description } = asset;
+    const {
+      attachment,
+      attachmentMore,
+      supply,
+      assetCount,
+      minimiumCount,
+      vendorId,
+      description
+    } = asset;
 
     this.state = {
       disabled: supply === 'limited' ? false : true,
@@ -55,7 +73,14 @@ class Form extends React.Component<Props, State> {
   }) => {
     const { asset } = this.props;
     const finalValues = values;
-    const { attachment, attachmentMore, assetCount, minimiumCount, vendorId, description } = this.state;
+    const {
+      attachment,
+      attachmentMore,
+      assetCount,
+      minimiumCount,
+      vendorId,
+      description
+    } = this.state;
 
     if (asset) {
       finalValues._id = asset._id;
@@ -77,7 +102,7 @@ class Form extends React.Component<Props, State> {
   renderFormTrigger(trigger: React.ReactNode) {
     const content = props => <GroupForm {...props} groups={this.props.groups} />;
 
-    return <ModalTrigger title='Add Asset Group' trigger={trigger} content={content} />;
+    return <ModalTrigger title="Add Asset Group" trigger={trigger} content={content} />;
   }
   onChangeDescription = e => {
     this.setState({ description: e.editor.getData() });
@@ -115,7 +140,7 @@ class Form extends React.Component<Props, State> {
     this.setState({ attachmentMore: files ? files : undefined });
   };
   renderContent(formProps: IFormProps) {
-    const { asset, groups, closeModal, renderButton } = this.props;
+    const { asset, groups, assets, closeModal, renderButton } = this.props;
 
     const { description, disabled, assetCount, minimiumCount, vendorId } = this.state;
 
@@ -125,13 +150,22 @@ class Form extends React.Component<Props, State> {
 
     const attachments = (object.attachment && extractAttachment([object.attachment])) || [];
 
-    const attachmentsMore = (object.attachmentMore && extractAttachment(object.attachmentMore)) || [];
+    const attachmentsMore =
+      (object.attachmentMore && extractAttachment(object.attachmentMore)) || [];
 
-    const trigger = (
-      <Button btnStyle='primary' uppercase={false} icon='plus-circle'>
+    const addGroupTrigger = (
+      <Button btnStyle="primary" uppercase={false} icon="plus-circle">
         Add group
       </Button>
     );
+
+    const addParentTrigger = (
+      <Button btnStyle="primary" icon="plus-circle">
+        Add Parent
+      </Button>
+    );
+
+    console.log(generateParentOptions(assets));
 
     return (
       <>
@@ -139,12 +173,24 @@ class Form extends React.Component<Props, State> {
           <FormColumn>
             <FormGroup>
               <ControlLabel required={true}>Name</ControlLabel>
-              <FormControl {...formProps} name='name' defaultValue={object.name} autoFocus={true} required={true} />
+              <FormControl
+                {...formProps}
+                name="name"
+                defaultValue={object.name}
+                autoFocus={true}
+                required={true}
+              />
             </FormGroup>
 
             <FormGroup>
               <ControlLabel required={true}>Type</ControlLabel>
-              <FormControl {...formProps} name='type' componentClass='select' defaultValue={object.type} required={true}>
+              <FormControl
+                {...formProps}
+                name="type"
+                componentClass="select"
+                defaultValue={object.type}
+                required={true}
+              >
                 {Object.keys(TYPES).map((typeName, index) => (
                   <option key={index} value={TYPES[typeName]}>
                     {typeName}
@@ -156,20 +202,44 @@ class Form extends React.Component<Props, State> {
             <FormGroup>
               <ControlLabel required={true}>Code</ControlLabel>
               <p>
-                Depending on your business type, you may type in a barcode or any other UPC (Universal Asset Code). If you don't use UPC, type in any
-                numeric value to differentiate your assets.
+                Depending on your business type, you may type in a barcode or any other UPC
+                (Universal Asset Code). If you don't use UPC, type in any numeric value to
+                differentiate your assets.
               </p>
-              <FormControl {...formProps} name='code' defaultValue={object.code} required={true} />
+              <FormControl {...formProps} name="code" defaultValue={object.code} required={true} />
             </FormGroup>
 
             <FormGroup>
               <ControlLabel required={true}>Group</ControlLabel>
               <Row>
-                <FormControl {...formProps} name='groupId' componentClass='select' defaultValue={object.groupId} required={true}>
+                <FormControl
+                  {...formProps}
+                  name="groupId"
+                  componentClass="select"
+                  defaultValue={object.groupId}
+                  required={true}
+                >
                   {generateGroupOptions(groups)}
                 </FormControl>
 
-                {this.renderFormTrigger(trigger)}
+                {this.renderFormTrigger(addGroupTrigger)}
+              </Row>
+            </FormGroup>
+
+            <FormGroup>
+              <ControlLabel required={true}>Parent</ControlLabel>
+              <Row>
+                <FormControl
+                  {...formProps}
+                  name="parentId"
+                  componentClass="select"
+                  defaultValue={object.parentId}
+                  // required={true}
+                >
+                  {generateParentOptions(assets)}
+                </FormControl>
+
+                {this.renderFormTrigger(addParentTrigger)}
               </Row>
             </FormGroup>
 
@@ -184,7 +254,17 @@ class Form extends React.Component<Props, State> {
                 toolbar={[
                   {
                     name: 'basicstyles',
-                    items: ['Bold', 'Italic', 'NumberedList', 'BulletedList', 'Link', 'Unlink', '-', 'Image', 'EmojiPanel']
+                    items: [
+                      'Bold',
+                      'Italic',
+                      'NumberedList',
+                      'BulletedList',
+                      'Link',
+                      'Unlink',
+                      '-',
+                      'Image',
+                      'EmojiPanel'
+                    ]
                   }
                 ]}
               />
@@ -193,10 +273,17 @@ class Form extends React.Component<Props, State> {
             <FormGroup>
               <ControlLabel required={true}>Unit price</ControlLabel>
               <p>
-                Please ensure you have set the default currency in the <a href='/settings/general'> {'General Settings'}</a> of the System
-                Configuration.
+                Please ensure you have set the default currency in the{' '}
+                <a href="/settings/general"> {'General Settings'}</a> of the System Configuration.
               </p>
-              <FormControl {...formProps} type='number' name='unitPrice' defaultValue={object.unitPrice} required={true} min={0} />
+              <FormControl
+                {...formProps}
+                type="number"
+                name="unitPrice"
+                defaultValue={object.unitPrice}
+                required={true}
+                min={0}
+              />
             </FormGroup>
           </FormColumn>
           <FormColumn>
@@ -205,8 +292,8 @@ class Form extends React.Component<Props, State> {
 
               <FormControl
                 {...formProps}
-                name='supply'
-                componentClass='select'
+                name="supply"
+                componentClass="select"
                 onChange={this.onSupplyChange}
                 defaultValue={object.supply}
                 options={ASSET_SUPPLY}
@@ -220,11 +307,11 @@ class Form extends React.Component<Props, State> {
 
                   <FormControl
                     {...formProps}
-                    name='assetCount'
+                    name="assetCount"
                     value={assetCount}
                     disabled={disabled}
                     onChange={this.onComboEvent.bind(this, 'assetCount')}
-                    type='number'
+                    type="number"
                   />
                 </FormGroup>
               </FormColumn>
@@ -234,11 +321,11 @@ class Form extends React.Component<Props, State> {
 
                   <FormControl
                     {...formProps}
-                    name='minimiumCount'
+                    name="minimiumCount"
                     value={minimiumCount}
                     disabled={disabled}
                     onChange={this.onComboEvent.bind(this, 'minimiumCount')}
-                    type='number'
+                    type="number"
                   />
                 </FormGroup>
               </FormColumn>
@@ -247,20 +334,30 @@ class Form extends React.Component<Props, State> {
             <FormGroup>
               <ControlLabel>Featured image</ControlLabel>
 
-              <Uploader defaultFileList={attachments} onChange={this.onChangeAttachment} multiple={false} single={true} />
+              <Uploader
+                defaultFileList={attachments}
+                onChange={this.onChangeAttachment}
+                multiple={false}
+                single={true}
+              />
             </FormGroup>
 
             <FormGroup>
               <ControlLabel>Secondary Images</ControlLabel>
 
-              <Uploader defaultFileList={attachmentsMore} onChange={this.onChangeAttachmentMore} multiple={true} single={false} />
+              <Uploader
+                defaultFileList={attachmentsMore}
+                onChange={this.onChangeAttachmentMore}
+                multiple={true}
+                single={false}
+              />
             </FormGroup>
 
             <FormGroup>
               <ControlLabel>Vendor</ControlLabel>
               <SelectCompanies
-                label='Choose an vendor'
-                name='vendorId'
+                label="Choose an vendor"
+                name="vendorId"
                 customOption={{ value: '', label: 'No vendor chosen' }}
                 initialValue={vendorId}
                 onSelect={this.onComboEvent.bind(this, 'vendorId')}
@@ -271,7 +368,7 @@ class Form extends React.Component<Props, State> {
         </FormWrapper>
 
         <ModalFooter>
-          <Button btnStyle='simple' onClick={closeModal} icon='times-circle' uppercase={false}>
+          <Button btnStyle="simple" onClick={closeModal} icon="times-circle" uppercase={false}>
             Close
           </Button>
 

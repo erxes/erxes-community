@@ -65,8 +65,10 @@ export interface IAsset {
   name: string;
   type: string;
   groupId: string;
+  parentId: string;
   description: string;
   sku: string;
+  order: string;
   code: string;
   unitPrice: number;
   customFieldsData?: any;

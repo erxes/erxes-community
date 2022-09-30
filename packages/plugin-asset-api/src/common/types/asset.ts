@@ -3,12 +3,14 @@ import { Document } from 'mongoose';
 
 export interface IAsset {
   name: string;
+  parentId?: string;
   groupId?: string;
   groupCode?: string;
   type?: string;
   description?: string;
   sku?: string;
   unitPrice?: number;
+  order: string;
   code: string;
   customFieldsData?: ICustomField[];
   assetId?: string;

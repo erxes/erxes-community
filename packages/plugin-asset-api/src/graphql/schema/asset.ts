@@ -34,11 +34,13 @@ export const types = contactsAvailable => `
     _id: String!
     name: String
     code: String
+    order: String
     type: String
     description: String
     sku: String
     unitPrice: Float
     groupId: String
+    parentId: String
     customFieldsData: JSON
     createdAt: Date
     attachment: Attachment
@@ -49,6 +51,8 @@ export const types = contactsAvailable => `
     minimiumCount: Int
 
     group: AssetGroup
+    parent:Asset
+    isRoot: Boolean
     ${contactsAvailable ? 'vendor: Company' : ''}
     }
 
