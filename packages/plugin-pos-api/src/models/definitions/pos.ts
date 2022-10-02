@@ -24,6 +24,7 @@ export interface IPosOrder {
   customerId: string;
   cardAmount: number;
   cashAmount: number;
+  receivableAmount: number;
   mobileAmount: number;
   totalAmount: number;
   finalAmount: number;
@@ -73,6 +74,7 @@ export interface IPos {
   deliveryConfig?: any;
   cardsConfig?: any;
   checkRemainder?: boolean;
+  permissionConfig?: any;
 }
 export interface IPosDocument extends IPos, Document {
   _id: string;
@@ -140,6 +142,7 @@ export const posOrderSchema = schemaHooksWrapper(
     customerId: field({ type: String, label: 'Customer' }),
     cardAmount: field({ type: Number }),
     cashAmount: field({ type: Number }),
+    receivableAmount: field({ type: Number }),
     mobileAmount: field({ type: Number }),
     totalAmount: field({ type: Number }),
     finalAmount: field({ type: Number }),
@@ -235,7 +238,12 @@ export const posSchema = schemaHooksWrapper(
     }),
     deliveryConfig: field({ type: Object, label: 'Delivery Config' }),
     cardsConfig: field({ type: Object, label: 'Cards Config' }),
-    checkRemainder: field({ type: Boolean, optional: true })
+    checkRemainder: field({ type: Boolean, optional: true }),
+    permissionConfig: field({
+      type: Object,
+      optional: true,
+      label: 'Permission'
+    })
   }),
   'erxes_pos'
 );

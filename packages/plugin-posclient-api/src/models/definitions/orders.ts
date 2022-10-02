@@ -24,6 +24,7 @@ export interface IOrder {
   customerId?: string;
   cardAmount?: number;
   cashAmount?: number;
+  receivableAmount?: number;
   mobileAmount?: number;
   totalAmount: number;
   finalAmount?: number;
@@ -91,6 +92,10 @@ export const orderSchema = schemaHooksWrapper(
       label: 'Card amount'
     }),
     cashAmount: getNumberFieldDefinition({
+      ...commonAttributes,
+      label: 'Cash amount'
+    }),
+    receivableAmount: getNumberFieldDefinition({
       ...commonAttributes,
       label: 'Cash amount'
     }),

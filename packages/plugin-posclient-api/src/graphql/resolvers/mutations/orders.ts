@@ -37,6 +37,7 @@ interface ISettlePaymentParams extends IPaymentBase {
 
 export interface IPayment extends IPaymentBase {
   cashAmount?: number;
+  receivableAmount?: number;
   mobileAmount?: number;
   cardAmount?: number;
 }
@@ -175,7 +176,7 @@ const orderMutations = {
   async orderItemChangeStatus(
     _root,
     { _id, status }: { _id: string; status: string },
-    { models, subdomain }: IContext
+    { models }: IContext
   ) {
     const oldOrderItem = await models.OrderItems.getOrderItem(_id);
 
@@ -282,12 +283,14 @@ const orderMutations = {
 
   async ordersAddPayment(
     _root,
-    { _id, cashAmount = 0, cardAmount = 0, cardInfo },
+    { _id, cashAmount = 0, receivableAmount = 0, cardAmount = 0, cardInfo },
     { models }: IContext
   ) {
     const order = await models.Orders.getOrder(_id);
 
-    const amount = Number((cashAmount + cardAmount).toFixed(2));
+    const amount = Number(
+      (cashAmount + receivableAmount + cardAmount).toFixed(2)
+    );
 
     checkOrderStatus(order);
     checkOrderAmount(order, amount);
@@ -297,6 +300,9 @@ const orderMutations = {
         cashAmount: cashAmount
           ? (order.cashAmount || 0) + Number(cashAmount.toFixed(2))
           : order.cashAmount || 0,
+        receivableAmount: receivableAmount
+          ? (order.receivableAmount || 0) + Number(receivableAmount.toFixed(2))
+          : order.receivableAmount || 0,
         cardAmount: cardAmount
           ? (order.cardAmount || 0) + Number(cardAmount.toFixed(2))
           : order.cardAmount || 0
@@ -363,32 +369,38 @@ const orderMutations = {
     }).lean();
 
     await validateOrderPayment(order, { billType });
+    const now = new Date();
 
     const ebarimtConfig: any = config.ebarimtConfig;
 
-    const data = await prepareEbarimtData(
-      models,
-      order,
-      ebarimtConfig,
-      items,
-      billType,
-      registerNumber
-    );
-
-    ebarimtConfig.districtName = getDistrictName(
-      (config.ebarimtConfig && config.ebarimtConfig.districtCode) || ''
-    );
-
     try {
-      const response = await models.PutResponses.putData({
-        ...data,
-        config: ebarimtConfig,
-        models
-      });
+      let response;
 
-      if (response && response.success === 'true') {
-        const now = new Date();
+      if (billType !== BILL_TYPES.INNER) {
+        const data = await prepareEbarimtData(
+          models,
+          order,
+          ebarimtConfig,
+          items,
+          billType,
+          registerNumber
+        );
 
+        ebarimtConfig.districtName = getDistrictName(
+          (config.ebarimtConfig && config.ebarimtConfig.districtCode) || ''
+        );
+
+        response = await models.PutResponses.putData({
+          ...data,
+          config: ebarimtConfig,
+          models
+        });
+      }
+
+      if (
+        billType === BILL_TYPES.INNER ||
+        (response && response.success === 'true')
+      ) {
         await models.Orders.updateOne(
           { _id },
           {
