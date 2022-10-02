@@ -141,7 +141,6 @@ export const initBroker = async cl => {
 
     // ====== if (action === 'makePayment')
     if (response && response._id) {
-      console.log(response, 'bbbbbbbbbbbbbbbbbbbbb');
       await sendEbarimtMessage({
         subdomain,
         action: 'putresponses.createOrUpdate',
