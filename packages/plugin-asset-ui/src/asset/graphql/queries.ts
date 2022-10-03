@@ -35,12 +35,14 @@ const assetFields = `
   }
   supply
   assetCount
+  chidlAssetCount
   isRoot
   minimiumCount
 `;
 const assets = `
   query assets(
     $type: String,
+    $parentId: String,
     $groupId: String,
     $searchValue: String,
     $perPage: Int,
@@ -52,6 +54,7 @@ const assets = `
     assets(
       type: $type,
       groupId: $groupId,
+      parentId: $parentId,
       searchValue: $searchValue,
       perPage: $perPage,
       page: $page ids: $ids,

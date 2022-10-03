@@ -149,3 +149,7 @@ export const asssetTypeChoises = __ => {
 
   return options;
 };
+
+export const getRefetchQueries = () => {
+  return ['assetDetail', 'assets', 'assetsTotalCount', 'assetGroups'];
+};

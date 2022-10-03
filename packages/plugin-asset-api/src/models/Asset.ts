@@ -26,7 +26,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
     public static async createAsset(doc: IAsset) {
-      console.log(doc);
       await checkCodeDuplication(models, doc.code);
 
       const parentAsset = await models.Asset.findOne({ _id: doc.parentId }).lean();
@@ -89,15 +88,16 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return models.Asset.findOne({ _id });
     }
     public static async removeAssets(_ids: string[]) {
-      const dealAssetIds = await sendCardsMessage({
-        subdomain,
-        action: 'findDealAssetIds',
-        data: {
-          _ids
-        },
-        isRPC: true,
-        defaultValue: []
-      });
+      // const dealAssetIds = await sendCardsMessage({
+      //   subdomain,
+      //   action: 'findDealAssetIds',
+      //   data: {
+      //     _ids
+      //   },
+      //   isRPC: true,
+      //   defaultValue: []
+      // });
+      const dealAssetIds: string[] = [];
 
       const usedIds: string[] = [];
       const unUsedIds: string[] = [];
@@ -121,7 +121,14 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         response = 'updated';
       }
 
-      await models.Asset.deleteMany({ _id: { $in: unUsedIds } });
+      const assets = await models.Asset.find({ _id: { $in: unUsedIds } });
+      const orders = assets.map(asset => new RegExp(asset.order));
+
+      const child_assets = await models.Asset.find({ order: { $in: orders } });
+
+      const child_assets_ids = child_assets.map(asset => asset._id);
+
+      await models.Asset.deleteMany({ _id: { $in: child_assets_ids } });
 
       return response;
     }

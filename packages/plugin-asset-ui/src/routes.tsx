@@ -6,6 +6,11 @@ import queryString from 'query-string';
 const AssetList = asyncComponent(() =>
   import(/* webpackChunkName: "List - Assets" */ './asset/containers/List')
 );
+
+const AssetMovements = asyncComponent(() =>
+  import(/* webpackChunkName: "List - Assets" */ './movements/containers/List')
+);
+
 const AssetDetails = asyncComponent(() =>
   import(/* webpackChunkName: "List - Assets" */ './asset/detail/containers/Details')
 );
@@ -22,6 +27,10 @@ const details = ({ history, location, match }) => {
   );
 };
 
+const movements = props => {
+  return <AssetMovements {...props} />;
+};
+
 const routes = () => {
   return (
     <React.Fragment>
@@ -32,6 +41,7 @@ const routes = () => {
         key="/settings/asset-movements/details/:id"
         component={details}
       />
+      <Route path="/asset-movements" exact={true} component={movements} />
     </React.Fragment>
   );
 };

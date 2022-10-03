@@ -14,6 +14,7 @@ import Form from '../components/Form';
 import { ButtonMutate, Spinner } from '@erxes/ui/src';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { mutations, queries } from '../graphql';
+import { getRefetchQueries } from '../../common/utils';
 
 type Props = {
   asset: IAsset;
@@ -77,10 +78,6 @@ class FormContainer extends React.Component<FinalProps> {
     return <Form {...updatedProps} />;
   }
 }
-
-const getRefetchQueries = () => {
-  return ['assetDetail', 'assets', 'assetsTotalCount', 'assetGroups'];
-};
 
 export default withProps<Props>(
   compose(

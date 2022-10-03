@@ -7,7 +7,9 @@ import {
   Uploader,
   ModalTrigger,
   Button,
-  extractAttachment
+  extractAttachment,
+  Tabs,
+  TabTitle
 } from '@erxes/ui/src';
 import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
 import { generateGroupOptions, generateParentOptions } from '../../common/utils';
@@ -18,6 +20,7 @@ import EditorCK from '@erxes/ui/src/components/EditorCK';
 import GroupForm from '../group/containers/Form';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
+import { TabContainer, TabContent, TriggerTabs } from '../../style';
 
 type Props = {
   asset?: IAsset;
@@ -33,7 +36,10 @@ type State = {
   attachment?: IAttachment;
   attachmentMore?: IAttachment[];
   vendorId: string;
+  parentId: string;
+  groupId: string;
   description: string;
+  currentTab: string;
 };
 class Form extends React.Component<Props, State> {
   constructor(props) {
@@ -46,6 +52,8 @@ class Form extends React.Component<Props, State> {
       assetCount,
       minimiumCount,
       vendorId,
+      parentId,
+      groupId,
       description
     } = asset;
 
@@ -56,7 +64,10 @@ class Form extends React.Component<Props, State> {
       attachment: attachment ? attachment : undefined,
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
-      description: description ? description : ''
+      groupId: groupId ? groupId : '',
+      parentId: parentId ? parentId : '',
+      description: description ? description : '',
+      currentTab: parentId ? 'Parent' : 'Group'
     };
 
     this.renderContent = this.renderContent.bind(this);
@@ -139,6 +150,18 @@ class Form extends React.Component<Props, State> {
   onChangeAttachmentMore = (files: IAttachment[]) => {
     this.setState({ attachmentMore: files ? files : undefined });
   };
+
+  onChangeCurrentTab = selecteTab => {
+    switch (selecteTab) {
+      case 'Parent':
+        this.setState({ groupId: '', currentTab: selecteTab });
+        break;
+      case 'Group':
+        this.setState({ parentId: '', currentTab: selecteTab });
+        break;
+    }
+  };
+
   renderContent(formProps: IFormProps) {
     const { asset, groups, assets, closeModal, renderButton } = this.props;
 
@@ -159,13 +182,45 @@ class Form extends React.Component<Props, State> {
       </Button>
     );
 
-    const addParentTrigger = (
-      <Button btnStyle="primary" icon="plus-circle">
-        Add Parent
-      </Button>
-    );
+    const currentTabItem = () => {
+      const { currentTab } = this.state;
 
-    console.log(generateParentOptions(assets));
+      if (currentTab === 'Parent') {
+        return (
+          <FormGroup>
+            <ControlLabel required={true}>Parent</ControlLabel>
+            <FormControl
+              {...formProps}
+              name="parentId"
+              componentClass="select"
+              defaultValue={object.parentId}
+            >
+              <option />
+              {generateParentOptions(assets)}
+            </FormControl>
+          </FormGroup>
+        );
+      }
+
+      return (
+        <FormGroup>
+          <ControlLabel required={true}>Group</ControlLabel>
+          <Row>
+            <FormControl
+              {...formProps}
+              name="groupId"
+              componentClass="select"
+              defaultValue={object.groupId}
+            >
+              <option />
+              {generateGroupOptions(groups)}
+            </FormControl>
+
+            {this.renderFormTrigger(addGroupTrigger)}
+          </Row>
+        </FormGroup>
+      );
+    };
 
     return (
       <>
@@ -209,39 +264,22 @@ class Form extends React.Component<Props, State> {
               <FormControl {...formProps} name="code" defaultValue={object.code} required={true} />
             </FormGroup>
 
-            <FormGroup>
-              <ControlLabel required={true}>Group</ControlLabel>
-              <Row>
-                <FormControl
-                  {...formProps}
-                  name="groupId"
-                  componentClass="select"
-                  defaultValue={object.groupId}
-                  required={true}
-                >
-                  {generateGroupOptions(groups)}
-                </FormControl>
-
-                {this.renderFormTrigger(addGroupTrigger)}
-              </Row>
-            </FormGroup>
-
-            <FormGroup>
-              <ControlLabel required={true}>Parent</ControlLabel>
-              <Row>
-                <FormControl
-                  {...formProps}
-                  name="parentId"
-                  componentClass="select"
-                  defaultValue={object.parentId}
-                  // required={true}
-                >
-                  {generateParentOptions(assets)}
-                </FormControl>
-
-                {this.renderFormTrigger(addParentTrigger)}
-              </Row>
-            </FormGroup>
+            <TabContainer>
+              <TriggerTabs>
+                <Tabs full>
+                  {['Group', 'Parent'].map(item => (
+                    <TabTitle
+                      className={this.state.currentTab === item ? 'active' : ''}
+                      key={item}
+                      onClick={this.onChangeCurrentTab.bind(this, item)}
+                    >
+                      {item}
+                    </TabTitle>
+                  ))}
+                </Tabs>
+              </TriggerTabs>
+              <TabContent>{currentTabItem()}</TabContent>
+            </TabContainer>
 
             <FormGroup>
               <ControlLabel>Description</ControlLabel>

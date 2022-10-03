@@ -10,6 +10,7 @@ const assetQueries = {
     {
       type,
       groupId,
+      parentId,
       searchValue,
       ids,
       excludeIds,
@@ -21,6 +22,7 @@ const assetQueries = {
       excludeIds: boolean;
       type: string;
       groupId: string;
+      parentId: string;
       searchValue: string;
       page: number;
       perPage: number;
@@ -54,6 +56,10 @@ const assetQueries = {
       });
 
       filter.groupId = { $nin: notActiveGroups.map(e => e._id) };
+    }
+
+    if (parentId) {
+      filter.parentId = parentId;
     }
 
     if (ids && ids.length > 0) {

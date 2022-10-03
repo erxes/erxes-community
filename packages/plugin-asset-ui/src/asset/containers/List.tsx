@@ -6,15 +6,19 @@ import { queries as groupQueries } from '../group/graphql';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { mutations, queries } from '../graphql';
-import { Alert, Bulk, Spinner } from '@erxes/ui/src';
+import { Alert, Bulk, confirm, Spinner } from '@erxes/ui/src';
 import {
   AssetRemoveMutationResponse,
+  IAssetDetailQueryResponse,
   IAssetGroupDetailQueryResponse,
   IAssetQueryResponse,
   IAssetTotalCountQueryResponse,
   MergeMutationResponse
 } from '../../common/types';
 import { generatePaginationParams } from '@erxes/ui/src/utils/router';
+
+import { getRefetchQueries } from '../../common/utils';
+
 type Props = {
   queryParams: any;
   history: any;
@@ -24,6 +28,7 @@ type FinalProps = {
   assets: IAssetQueryResponse;
   assetsCount: IAssetTotalCountQueryResponse;
   assetGroupDetailQuery: IAssetGroupDetailQueryResponse;
+  assetDetailQuery: IAssetDetailQueryResponse;
 } & Props &
   AssetRemoveMutationResponse &
   MergeMutationResponse;
@@ -50,7 +55,7 @@ class ListContainer extends React.Component<FinalProps> {
 
         status === 'deleted'
           ? Alert.success('You successfully deleted a asset')
-          : Alert.warning('Product status deleted');
+          : Alert.warning('Asset status deleted');
       })
       .catch(e => {
         Alert.error(e.message);
@@ -72,7 +77,7 @@ class ListContainer extends React.Component<FinalProps> {
         callback();
         this.setState({ mergeAssetLoading: false });
         Alert.success('You successfully merged a asset');
-        history.push(`/settings/asset-service/details/${result.data.assetsMerge._id}`);
+        history.push(`/settings/asset-movements/details/${result.data.assetsMerge._id}`);
       })
       .catch(e => {
         Alert.error(e.message);
@@ -81,7 +86,13 @@ class ListContainer extends React.Component<FinalProps> {
   };
 
   assetList(props) {
-    const { assets, assetsCount, queryParams, assetGroupDetailQuery } = this.props;
+    const {
+      assets,
+      assetsCount,
+      queryParams,
+      assetGroupDetailQuery,
+      assetDetailQuery
+    } = this.props;
     if (assets.loading) {
       return <Spinner />;
     }
@@ -95,6 +106,7 @@ class ListContainer extends React.Component<FinalProps> {
       loading: assets.loading,
       queryParams,
       currentGroup: assetGroupDetailQuery.assetGroupDetail || {},
+      currentParent: assetDetailQuery.assetDetail || {},
       searchValue: queryParams.searchValue || ''
     };
 
@@ -117,6 +129,7 @@ export default withProps<Props>(
       options: ({ queryParams }) => ({
         variables: {
           groupId: queryParams?.groupId,
+          parentId: queryParams?.parentId,
           searchValue: queryParams?.searchValue,
           type: queryParams?.type,
           ...generatePaginationParams(queryParams || {})
@@ -126,6 +139,14 @@ export default withProps<Props>(
     }),
     graphql(gql(queries.assetsCount), {
       name: 'assetsCount'
+    }),
+    graphql<Props>(gql(queries.assetDetail), {
+      name: 'assetDetailQuery',
+      options: ({ queryParams }) => ({
+        variables: {
+          _id: queryParams?.parentId
+        }
+      })
     }),
     graphql<Props>(gql(groupQueries.assetGroupDetail), {
       name: 'assetGroupDetailQuery',
@@ -139,7 +160,10 @@ export default withProps<Props>(
       name: 'assetsMerge'
     }),
     graphql(gql(mutations.assetsRemove), {
-      name: 'assetsRemove'
+      name: 'assetsRemove',
+      options: () => ({
+        refetchQueries: getRefetchQueries()
+      })
     })
   )(ListContainer)
 );

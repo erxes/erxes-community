@@ -17,6 +17,12 @@ module.exports = {
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
       scope: 'asset'
+    },
+    {
+      text: 'Asset & Movements',
+      url: '/asset-movements',
+      icon: 'icon-piggybank',
+      location: 'mainNavigation'
     }
   ]
 };

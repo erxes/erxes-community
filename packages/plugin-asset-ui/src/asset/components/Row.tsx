@@ -1,7 +1,8 @@
 import React from 'react';
-import { ModalTrigger, Icon, FormControl, TextInfo } from '@erxes/ui/src';
+import { ModalTrigger, Icon, FormControl, TextInfo, Button, Tip, router } from '@erxes/ui/src';
 import { IAsset } from '../../common/types';
 import AssetForm from '../containers/Form';
+import { MoreContainer, Badge, ContainerBox } from '../../style';
 type Props = {
   asset: IAsset;
   history: any;
@@ -31,9 +32,25 @@ class Row extends React.Component<Props> {
       history.push(`/settings/asset-movements/details/${asset._id}`);
     };
 
+    const handleParent = () => {
+      router.setParams(history, { parentId: this.props.asset._id });
+    };
+
     const content = props => <AssetForm {...props} asset={asset} />;
 
-    const { code, name, type, group, supply, assetCount, minimiumCount, unitPrice, sku } = asset;
+    const {
+      code,
+      name,
+      type,
+      group,
+      parent,
+      supply,
+      assetCount,
+      chidlAssetCount,
+      minimiumCount,
+      unitPrice,
+      sku
+    } = asset;
 
     return (
       <tr onClick={onTrClick}>
@@ -46,18 +63,31 @@ class Row extends React.Component<Props> {
           <TextInfo>{type}</TextInfo>
         </td>
         <td>{group ? group.name : ''}</td>
+        <td>{parent ? parent.name : ''}</td>
         <td>{supply || ''}</td>
         <td>{assetCount ? assetCount : 0}</td>
         <td>{minimiumCount ? minimiumCount : 0}</td>
         <td>{(unitPrice || 0).toLocaleString()}</td>
         <td>{sku}</td>
         <td onClick={onClick}>
-          <ModalTrigger
-            title="Edit basic info"
-            trigger={<Icon icon="edit" />}
-            size="lg"
-            content={content}
-          />
+          <ContainerBox row gap={10} justifyEnd>
+            {chidlAssetCount > 0 && (
+              <MoreContainer>
+                <Button btnStyle="link" onClick={handleParent}>
+                  <Tip text="See Child Assets">
+                    <Icon icon="list-2" />
+                  </Tip>
+                </Button>
+                <Badge>{chidlAssetCount}</Badge>
+              </MoreContainer>
+            )}
+            <ModalTrigger
+              title="Edit basic info"
+              trigger={<Icon icon="edit" />}
+              size="lg"
+              content={content}
+            />
+          </ContainerBox>
         </td>
       </tr>
     );

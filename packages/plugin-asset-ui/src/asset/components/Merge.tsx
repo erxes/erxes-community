@@ -37,8 +37,8 @@ class AssetsMerge extends React.Component<Props, State> {
     const { objects } = this.props;
     const selectedValues = { ...this.state.selectedValues };
 
-    if (selectedValues.category) {
-      selectedValues.categoryId = selectedValues.category._id;
+    if (selectedValues.group) {
+      selectedValues.groupId = selectedValues.group._id;
     }
 
     if (selectedValues.vendor) {
@@ -110,8 +110,8 @@ class AssetsMerge extends React.Component<Props, State> {
 
   renderValue(field: string, value: any) {
     switch (field) {
-      case 'category':
-        return this.renderCategoryInfo(value);
+      case 'group':
+        return this.renderGroupInfo(value);
 
       case 'vendor':
         return this.renderVendorInfo(value);
@@ -121,7 +121,7 @@ class AssetsMerge extends React.Component<Props, State> {
     }
   }
 
-  renderCategoryInfo(value) {
+  renderGroupInfo(value) {
     return (
       <Info>
         <InfoTitle>{__('Name')}: </InfoTitle>
@@ -134,7 +134,9 @@ class AssetsMerge extends React.Component<Props, State> {
     return (
       <Info>
         <InfoTitle>{__('Info')}: </InfoTitle>
-        <InfoDetail>{value.primaryName || value.primaryEmail || value.primaryPhone || value.code}</InfoDetail>
+        <InfoDetail>
+          {value.primaryName || value.primaryEmail || value.primaryPhone || value.code}
+        </InfoDetail>
       </Info>
     );
   }
@@ -148,18 +150,23 @@ class AssetsMerge extends React.Component<Props, State> {
     return (
       <form onSubmit={this.save}>
         <Columns>
-          <Column className='multiple'>{this.renderAsset(asset1, 'plus-1')}</Column>
+          <Column className="multiple">{this.renderAsset(asset1, 'plus-1')}</Column>
 
-          <Column className='multiple'>{this.renderAsset(asset2, 'plus-1')}</Column>
+          <Column className="multiple">{this.renderAsset(asset2, 'plus-1')}</Column>
 
           <Column>{this.renderAsset(selectedValues, 'times')}</Column>
         </Columns>
 
         <ModalFooter>
-          <Button btnStyle='simple' onClick={closeModal} icon='times-circle'>
+          <Button btnStyle="simple" onClick={closeModal} icon="times-circle">
             Cancel
           </Button>
-          <Button type='submit' btnStyle='success' icon={mergeAssetLoading ? undefined : 'check-circle'} disabled={mergeAssetLoading}>
+          <Button
+            type="submit"
+            btnStyle="success"
+            icon={mergeAssetLoading ? undefined : 'check-circle'}
+            disabled={mergeAssetLoading}
+          >
             {mergeAssetLoading && <SmallLoader />}
             Save
           </Button>

@@ -53,6 +53,7 @@ export const types = contactsAvailable => `
     group: AssetGroup
     parent:Asset
     isRoot: Boolean
+    chidlAssetCount:Int
     ${contactsAvailable ? 'vendor: Company' : ''}
     }
 
@@ -62,6 +63,7 @@ export const queries = `
     assets(
       type: String,
       groupId: String,
+      parentId: String,
       searchValue: String,
       page: Int,
       perPage: Int ids: [String],

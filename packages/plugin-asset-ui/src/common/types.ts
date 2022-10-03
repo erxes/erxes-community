@@ -81,6 +81,8 @@ export interface IAsset {
   assetCount: number;
   minimiumCount: number;
   group: IAssetGroup;
+  parent: IAsset;
+  chidlAssetCount: number;
   vendor?: ICompany;
 }
 

@@ -7,7 +7,9 @@ import {
   Table,
   __,
   confirm,
-  Alert
+  Alert,
+  Tip,
+  Icon
 } from '@erxes/ui/src';
 import React from 'react';
 import { IAsset, IAssetGroup } from '../../common/types';
@@ -16,10 +18,11 @@ import Form from '../containers/Form';
 import Row from './Row';
 import SideBar from './SideBar';
 import { Link } from 'react-router-dom';
-import { isEnabled } from '@erxes/ui/src/utils/core';
+import * as _loadash from 'lodash';
 import MergeAsset from './Merge';
 import { breadcrumb } from '../../common/constant';
 import { Title } from '@erxes/ui/src/styles/main';
+import { ContainerBox } from '../../style';
 
 type Props = {
   assets: IAsset[];
@@ -35,6 +38,7 @@ type Props = {
   loading: boolean;
   searchValue: string;
   currentGroup: IAssetGroup;
+  currentParent: IAsset;
   mergeAssets: () => void;
   mergeAssetLoading;
 };
@@ -110,6 +114,7 @@ class List extends React.Component<Props, State> {
             <th>{__('Name')}</th>
             <th>{__('Type')}</th>
             <th>{__('Group')}</th>
+            <th>{__('Parent')}</th>
             <th>{__('Supply')}</th>
             <th>{__('Asset count')}</th>
             <th>{__('Minimium count')}</th>
@@ -167,7 +172,15 @@ class List extends React.Component<Props, State> {
   };
 
   render() {
-    const { bulk, emptyBulk, queryParams, assetsCount, currentGroup, history } = this.props;
+    const {
+      bulk,
+      emptyBulk,
+      queryParams,
+      assetsCount,
+      currentGroup,
+      currentParent,
+      history
+    } = this.props;
 
     let rightActionBar = (
       <BarItems>
@@ -189,7 +202,7 @@ class List extends React.Component<Props, State> {
     );
 
     if (bulk.length > 0) {
-      const onClick = () =>
+      const onClick = () => {
         confirm()
           .then(() => {
             this.removeAssets(bulk);
@@ -197,6 +210,7 @@ class List extends React.Component<Props, State> {
           .catch(error => {
             Alert.error(error.message);
           });
+      };
 
       const mergeButton = (
         <Button btnStyle="primary" size="small" icon="merge">
@@ -222,7 +236,25 @@ class List extends React.Component<Props, State> {
       );
     }
 
-    const leftActionBar = <Title>{currentGroup.name || 'All Assets'}</Title>;
+    const handleClearParams = type => {
+      router.setParams(history, { [`${type}Id`]: null });
+    };
+
+    const clearButton = type => (
+      <Button btnStyle="link" onClick={() => handleClearParams(type)}>
+        <Tip text={`Clear ${type}`}>
+          <Icon icon="cancel-1" />
+        </Tip>
+      </Button>
+    );
+
+    const leftActionBar = (
+      <ContainerBox row>
+        <Title>{currentGroup.name || currentParent.name || 'All Assets'}</Title>
+        {!_loadash.isEmpty(currentGroup) && clearButton('group')}
+        {!_loadash.isEmpty(currentParent) && clearButton('parent')}
+      </ContainerBox>
+    );
 
     const updatedProps = {
       title: 'List Assets',

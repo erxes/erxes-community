@@ -8,7 +8,6 @@ interface IAssetsEdit extends IAsset {
 
 const assetMutations = {
   async assetsAdd(_root, doc: IAsset, { user, docModifier, models, subdomain }: IContext) {
-    console.log('shit hell dfucad');
     const asset = await models.Asset.createAsset(docModifier(doc));
 
     await putCreateLog(
