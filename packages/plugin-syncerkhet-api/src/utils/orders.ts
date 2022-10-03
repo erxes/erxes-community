@@ -110,9 +110,16 @@ export const getPostData = async (subdomain, pos, order) => {
         .toISOString()
         .slice(0, 10),
       orderId: order._id,
-      hasVat: pos.ebarimtConfig && pos.ebarimtConfig.hasVat ? true : false,
-      hasCitytax:
-        pos.ebarimtConfig && pos.ebarimtConfig.hasCitytax ? true : false,
+      hasVat: order.taxInfo
+        ? order.taxInfo.hasVat
+        : pos.ebarimtConfig && pos.ebarimtConfig.hasVat
+        ? true
+        : false,
+      hasCitytax: order.taxInfo
+        ? order.taxInfo.hasCitytax
+        : pos.ebarimtConfig && pos.ebarimtConfig.hasCitytax
+        ? true
+        : false,
       billType: order.billType,
       customerCode: (
         (await sendContactsMessage({
@@ -141,22 +148,6 @@ export const getPostData = async (subdomain, pos, order) => {
     apiSecret: erkhetConfig.apiSecret,
     orderInfos: JSON.stringify(orderInfos)
   };
-};
-
-export const orderToErkhet = async (subdomain, pos, orderId) => {
-  const postData = await getPostData(subdomain, pos, orderId);
-
-  if (!postData) {
-    return;
-  }
-
-  sendCommonMessage('rpc_queue:erxes-automation-erkhet', {
-    action: 'get-response-send-order-info',
-    isJson: true,
-    isEbarimt: false,
-    payload: JSON.stringify(postData),
-    thirdService: true
-  });
 };
 
 export const orderDeleteToErkhet = async (subdomain, pos, order) => {

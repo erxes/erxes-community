@@ -19,28 +19,29 @@ export interface IPosOrderItemDocument extends IPosOrderItem, Document {
 export interface IPosOrder {
   createdAt: Date;
   status: string;
-  paidDate: Date;
+  paidDate?: Date;
   number: string;
-  customerId: string;
-  cardAmount: number;
-  cashAmount: number;
-  receivableAmount: number;
-  mobileAmount: number;
-  totalAmount: number;
-  finalAmount: number;
-  shouldPrintEbarimt: Boolean;
-  printedEbarimt: Boolean;
-  billType: string;
-  billId: string;
-  oldBillId: string;
+  customerId?: string;
+  cardAmount?: number;
+  cashAmount?: number;
+  receivableAmount?: number;
+  mobileAmount?: number;
+  totalAmount?: number;
+  finalAmount?: number;
+  shouldPrintEbarimt?: Boolean;
+  printedEbarimt?: Boolean;
+  billType?: string;
+  billId?: string;
+  oldBillId?: string;
   type: string;
-  userId: string;
-  items: IPosOrderItem[];
+  userId?: string;
+  items?: IPosOrderItem[];
   branchId: string;
   departmentId: string;
   posToken: string;
-  syncedErkhet: Boolean;
-  deliveryInfo: Object;
+  syncedErkhet?: Boolean;
+  deliveryInfo?: any;
+  taxInfo?: any;
 }
 export interface IPosOrderDocument extends IPosOrder, Document {
   _id: string;
@@ -181,7 +182,8 @@ export const posOrderSchema = schemaHooksWrapper(
       type: Object,
       optional: true,
       label: 'Delivery Info, address, map, etc'
-    })
+    }),
+    taxInfo: field({ type: Object, optional: true })
   }),
   'erxes_posOrders'
 );

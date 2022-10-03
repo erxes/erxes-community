@@ -1,5 +1,11 @@
 import * as Random from 'meteor-random';
 import {
+  BILL_TYPES,
+  ORDER_ITEM_STATUSES,
+  ORDER_STATUSES
+} from '../../../models/definitions/constants';
+import { checkLoyalties } from '../../utils/loyalties';
+import {
   checkOrderAmount,
   checkOrderStatus,
   checkUnpaidInvoices,
@@ -9,22 +15,17 @@ import {
   getTotalAmount,
   prepareEbarimtData,
   prepareOrderDoc,
+  reverseItemStatus,
   updateOrderItems,
   validateOrder,
-  validateOrderPayment,
-  reverseItemStatus
+  validateOrderPayment
 } from '../../utils/orderUtils';
 import { debugError } from '@erxes/api-utils/src/debuggers';
 import { graphqlPubsub } from '../../../configs';
+import { IConfig } from '../../../models/definitions/configs';
 import { IContext } from '../../types';
 import { IOrderInput } from '../../types';
-import {
-  BILL_TYPES,
-  ORDER_STATUSES,
-  ORDER_ITEM_STATUSES
-} from '../../../models/definitions/constants';
 import { sendPosMessage } from '../../../messageBroker';
-import { checkLoyalties } from '../../utils/loyalties';
 
 interface IPaymentBase {
   billType: string;
@@ -52,6 +53,14 @@ interface IOrderEditParams extends IOrderInput {
   billType: string;
   registerNumber: string;
 }
+
+const getTaxInfo = (config: IConfig) => {
+  return {
+    hasVat: (config.ebarimtConfig && config.ebarimtConfig.hasVat) || false,
+    hasCitytax:
+      (config.ebarimtConfig && config.ebarimtConfig?.hasCitytax) || false
+  };
+};
 
 const orderMutations = {
   async ordersAdd(
@@ -82,7 +91,8 @@ const orderMutations = {
         ...orderDoc,
         totalAmount: preparedDoc.totalAmount,
         posToken: config.token,
-        departmentId: config.departmentId
+        departmentId: config.departmentId,
+        taxInfo: getTaxInfo(config)
       });
 
       for (const item of preparedDoc.items) {
@@ -140,7 +150,8 @@ const orderMutations = {
       registerNumber: doc.registerNumber || '',
       slotCode: doc.slotCode,
       posToken: config.token,
-      departmentId: config.departmentId
+      departmentId: config.departmentId,
+      taxInfo: getTaxInfo(config)
     });
 
     return updatedOrder;
