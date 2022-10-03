@@ -83,6 +83,7 @@ const orderQueries = {
       { page, perPage }
     );
   },
+
   async fullOrderItems(
     _root,
     {
@@ -118,6 +119,7 @@ const orderQueries = {
       { page, perPage }
     );
   },
+
   async orderDetail(
     _root,
     { _id, customerId }: { _id: string; customerId?: string },

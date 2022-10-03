@@ -108,7 +108,7 @@ export const getBranchesUtil = async (
 };
 
 export const confirmLoyalties = async (subdomain: string, order: IPosOrder) => {
-  const confirmItems = order.items.filter(i => i.bonusCount) || [];
+  const confirmItems = (order.items || []).filter(i => i.bonusCount) || [];
 
   if (!confirmItems.length) {
     return;
