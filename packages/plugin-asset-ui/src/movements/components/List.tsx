@@ -1,7 +1,10 @@
 import React from 'react';
 import { DefaultWrapper } from '../../common/utils';
-import { BarItems, FormControl, Button, router, __ } from '@erxes/ui/src';
+import { BarItems, FormControl, Button, router, __, ModalTrigger } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
+import { ContainerBox } from '../../style';
+import { Title } from '@erxes/ui-settings/src/styles';
+import Form from '../containers/Form';
 
 type Props = {} & IRouterProps;
 type State = {
@@ -17,8 +20,22 @@ class List extends React.Component<Props, State> {
       searchValue: ''
     };
   }
-
-  renderRightActionBar = (<Button btnStyle="success" icon="plus-circle"></Button>);
+  renderRightActionBarButton = (
+    <Button btnStyle="success" icon="plus-circle">
+      Movement
+    </Button>
+  );
+  renderRightActionBarContent = () => {
+    return <Form />;
+  };
+  renderRightActionBar = (
+    <ModalTrigger
+      title="Movement"
+      content={this.renderRightActionBarContent}
+      trigger={this.renderRightActionBarButton}
+      size="xl"
+    />
+  );
 
   search = e => {
     if (this.timer) {
@@ -58,9 +75,16 @@ class List extends React.Component<Props, State> {
       </BarItems>
     );
 
+    const leftActionBar = (
+      <ContainerBox row>
+        <Title>{'All Movements'}</Title>
+      </ContainerBox>
+    );
+
     const updatedProps = {
       title: 'Asset Movements',
       rightActionBar,
+      leftActionBar,
       content: <div>List</div>,
       sidebar: <div>Sidebar</div>
     };

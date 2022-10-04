@@ -22,6 +22,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
 import xss from 'xss';
 import { AssetContent } from '../../../style';
+import moment from 'moment';
 
 type Props = {
   asset: IAsset;
@@ -116,7 +117,8 @@ class BasicInfo extends React.Component<Props> {
       sku,
       attachment,
       vendor,
-      description
+      description,
+      createdAt
     } = asset;
 
     return (
@@ -144,6 +146,7 @@ class BasicInfo extends React.Component<Props> {
           {this.renderView('Supply', supply)}
           {this.renderView('Asset count', assetCount)}
           {this.renderView('Minimium asset count', minimiumCount)}
+          {this.renderView('Create At', moment(createdAt).format('YYYY-MM-DD HH:mm'))}
           <SidebarFlexRow>{__(`Description`)}</SidebarFlexRow>
         </SidebarList>
         <AssetContent

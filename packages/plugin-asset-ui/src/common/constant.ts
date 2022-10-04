@@ -52,5 +52,5 @@ export const ASSET_GROUP_STATUS_FILTER = {
 
 export const breadcrumb = [
   { title: __('Settings'), link: '/settings' },
-  { title: __('Product & Service') }
+  { title: __('Asset & Movement') }
 ];

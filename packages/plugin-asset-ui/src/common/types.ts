@@ -34,7 +34,7 @@ export type IAssetGroupsTotalCountResponse = {
 export type IAssetQueryResponse = {
   assets: IAsset[];
   loading: boolean;
-  refetch: () => void;
+  refetch: (variables?: any) => void;
 };
 
 export type IAssetTotalCountQueryResponse = {
