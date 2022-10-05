@@ -84,7 +84,7 @@ class JobForm extends React.Component<Props, State> {
 
     let content = (
       <div onClick={onClick}>
-        {__('Choose Product & Service')} <Icon icon="plus-circle" />
+        {__('Choose Product')} <Icon icon="plus-circle" />
       </div>
     );
 
@@ -147,7 +147,7 @@ class JobForm extends React.Component<Props, State> {
         <FormGroup>
           <ControlLabel>Income Product</ControlLabel>
           <ModalTrigger
-            title="Choose product & service"
+            title="Choose product"
             trigger={this.renderProductServiceTrigger(product)}
             size="lg"
             content={content}

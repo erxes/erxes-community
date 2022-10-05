@@ -1,4 +1,5 @@
 import { paginate } from '@erxes/api-utils/src/core';
+import { sendProductsMessage } from '../../../messageBroker';
 // import {
 //   checkPermission,
 //   requireLogin
@@ -13,12 +14,25 @@ interface IParam {
   excludeIds: boolean;
 }
 
-const generateFilter = (params: IParam, commonQuerySelector) => {
+const generateFilter = async (
+  subdomain: string,
+  params: IParam,
+  commonQuerySelector
+) => {
   const { categoryId, searchValue, ids, excludeIds } = params;
   const selector: any = { ...commonQuerySelector };
 
   if (categoryId) {
-    selector.categoryId = categoryId;
+    const products = await sendProductsMessage({
+      subdomain,
+      action: 'find',
+      data: { query: {}, categoryId, fields: { _id: 1 }, limit: 10000 },
+      isRPC: true,
+      defaultValue: []
+    });
+
+    const productIds = products.map(p => p._id);
+    selector.productId = { $in: productIds };
   }
 
   if (searchValue) {
@@ -33,15 +47,19 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
 };
 
 const flowQueries = {
-  flows(
+  async flows(
     _root,
     params: IParam & {
       page: number;
       perPage: number;
     },
-    { models, commonQuerySelector }: IContext
+    { models, commonQuerySelector, subdomain }: IContext
   ) {
-    const selector = generateFilter(params, commonQuerySelector);
+    const selector = await generateFilter(
+      subdomain,
+      params,
+      commonQuerySelector
+    );
 
     return paginate(
       models.Flows.find(selector)
@@ -63,12 +81,16 @@ const flowQueries = {
       .lean();
   },
 
-  flowTotalCount(
+  async flowTotalCount(
     _root,
     params: IParam,
-    { commonQuerySelector, models }: IContext
+    { commonQuerySelector, models, subdomain }: IContext
   ) {
-    const selector = generateFilter(params, commonQuerySelector);
+    const selector = await generateFilter(
+      subdomain,
+      params,
+      commonQuerySelector
+    );
 
     return models.Flows.find(selector).count();
   },

@@ -16,7 +16,7 @@ import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 type Props = {
   closeModal: () => void;
   activeFlowJob: IJob;
-  jobRefers: IJobRefer[];
+  jobRefer: IJobRefer;
   flowJobs: IJob[];
   lastFlowJob?: IJob;
   flowProduct?: IProduct;
@@ -40,10 +40,8 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { jobRefers, activeFlowJob } = props;
+    const { jobRefer, activeFlowJob } = props;
     const { config, description } = activeFlowJob;
-
-    const jobRefer = jobRefers.length && jobRefers[0];
 
     const {
       jobReferId,

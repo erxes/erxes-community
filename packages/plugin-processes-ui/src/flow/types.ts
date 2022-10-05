@@ -1,4 +1,5 @@
 import { QueryResponse } from '@erxes/ui/src/types';
+import { IJobRefer } from '../job/types';
 import {
   IProduct,
   IProductCategory as IProductCategoryC
@@ -50,34 +51,6 @@ export interface IFlowDocument extends IFlow, Document {
   createdBy?: string;
   updatedAt?: Date;
   updatedBy?: string;
-}
-
-export interface IJobCategory {
-  _id: string;
-  name: string;
-  code: string;
-  description?: string;
-  parentId?: string;
-  attachment?: any;
-  status?: string;
-  order: string;
-  createdAt: Date;
-  isRoot: boolean;
-  productCount: number;
-}
-
-export interface IJobRefer {
-  _id: string;
-  createdAt: Date;
-  code: string;
-  name: string;
-  type: string;
-  status?: string;
-  categoryId?: string;
-  duration: number;
-  durationType: string;
-  needProducts?: any[];
-  resultProducts?: any[];
 }
 
 // FLOW

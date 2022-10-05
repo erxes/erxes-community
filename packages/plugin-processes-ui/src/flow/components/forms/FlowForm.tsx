@@ -73,7 +73,7 @@ type State = {
   editNoteForm?: boolean;
   showTemplateForm: boolean;
   flowJobs: IJob[];
-  activeFlowJob: IJob;
+  activeFlowJob?: IJob;
   selectedContentId?: string;
   isZoomable: boolean;
   zoomStep: number;
@@ -342,13 +342,6 @@ class FlowForm extends React.Component<Props, State> {
     }
   };
 
-  onAddActionConfig = config => {
-    const { activeFlowJob } = this.state;
-
-    activeFlowJob.config = config;
-    this.setState({ activeFlowJob });
-  };
-
   onChange = e => {
     const value = e.target.value;
 
@@ -503,6 +496,7 @@ class FlowForm extends React.Component<Props, State> {
   toggleDrawer = (type: string) => {
     this.setState({
       showDrawer: !this.state.showDrawer,
+      activeFlowJob: undefined,
       currentTab: type
     });
   };
@@ -652,7 +646,7 @@ class FlowForm extends React.Component<Props, State> {
         </ToggleWrapper>
 
         <ToggleWrapper>
-          <span>{__('Flow status: ')}</span>
+          <span>{__('Validation status: ')}</span>
           {this.state.flowStatus === true &&
             this.renderLabelInfo('success', 'True')}
           {this.state.flowStatus === false &&
@@ -711,7 +705,7 @@ class FlowForm extends React.Component<Props, State> {
   onSave = () => {
     const { activeFlowJob } = this.state;
 
-    this.addFlowJob(activeFlowJob);
+    this.addFlowJob(activeFlowJob as IJob);
 
     this.onBackFlowJob();
   };
