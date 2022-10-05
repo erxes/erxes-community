@@ -111,6 +111,14 @@ const orderMutations = {
         });
       }
 
+      await graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          _id: order._id,
+          status: order.status,
+          customerId: order.customerId
+        }
+      });
+
       return order;
     } catch (e) {
       debugError(
@@ -120,6 +128,7 @@ const orderMutations = {
       return e;
     }
   },
+
   async ordersEdit(
     _root,
     doc: IOrderEditParams,
@@ -154,6 +163,15 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
+    if (order.status !== updatedOrder.status) {
+      await graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          _id: updatedOrder._id,
+          status: updatedOrder.status,
+          customerId: updatedOrder.customerId
+        }
+      });
+    }
     return updatedOrder;
   },
 
@@ -184,6 +202,7 @@ const orderMutations = {
       } catch (e) {}
     }
   },
+
   async orderItemChangeStatus(
     _root,
     { _id, status }: { _id: string; status: string },
