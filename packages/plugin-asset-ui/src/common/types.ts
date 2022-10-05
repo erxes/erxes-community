@@ -126,3 +126,10 @@ export type MergeMutationVariables = {
 export type MergeMutationResponse = {
   assetsMerge: (params: { variables: MergeMutationVariables }) => Promise<any>;
 };
+
+export type SelectedVariables = {
+  id: string;
+  departmentIds: string[];
+  branchIds: string[];
+  userType: string;
+};

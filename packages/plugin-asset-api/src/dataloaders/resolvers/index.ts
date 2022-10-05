@@ -2,8 +2,16 @@ import customScalars from '@erxes/api-utils/src/customScalars';
 import Asset from './asset';
 import AssetGroup from './assetGroup';
 
-import { AssetGroup as assetGroupMutations, Asset as assetMutations } from './mutations';
-import { AssetGroup as assetGroupQueries, Asset as assetQueries } from './queries';
+import {
+  AssetGroup as assetGroupMutations,
+  Asset as assetMutations,
+  Movement as movementMutations
+} from './mutations';
+import {
+  AssetGroup as assetGroupQueries,
+  Asset as assetQueries,
+  Movement as movementQueries
+} from './queries';
 
 const resolvers: any = async serviceDiscovery => ({
   ...customScalars,
@@ -11,11 +19,13 @@ const resolvers: any = async serviceDiscovery => ({
   AssetGroup,
   Mutation: {
     ...assetGroupMutations,
-    ...assetMutations
+    ...assetMutations,
+    ...movementMutations
   },
   Query: {
     ...assetGroupQueries,
-    ...assetQueries
+    ...assetQueries,
+    ...movementQueries
   }
 });
 

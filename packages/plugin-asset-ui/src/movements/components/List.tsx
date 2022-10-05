@@ -25,8 +25,8 @@ class List extends React.Component<Props, State> {
       Movement
     </Button>
   );
-  renderRightActionBarContent = () => {
-    return <Form />;
+  renderRightActionBarContent = props => {
+    return <Form {...props} />;
   };
   renderRightActionBar = (
     <ModalTrigger

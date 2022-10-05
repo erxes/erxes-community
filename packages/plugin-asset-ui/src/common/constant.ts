@@ -54,3 +54,21 @@ export const breadcrumb = [
   { title: __('Settings'), link: '/settings' },
   { title: __('Asset & Movement') }
 ];
+
+export const USER_TYPES = [
+  {
+    label: 'Team Member',
+    key: 'TeamMember',
+    name: 'teamMember'
+  },
+  {
+    label: 'Customer',
+    key: 'Customer',
+    name: 'customer'
+  },
+  {
+    label: 'Company',
+    key: 'Company',
+    name: 'compnay'
+  }
+];

@@ -44,3 +44,16 @@ export interface IAssetGroupDocument extends IAssetGroup, Document {
   _id: string;
   createdAt: Date;
 }
+export interface IMovement {
+  userType: string;
+  branches: string[];
+  customer: string[];
+  departments: string[];
+  teamMember: string[];
+  company: string[];
+}
+
+export interface IMovementDocument extends IMovement, Document {
+  _id: string;
+  createdAt: Date;
+}

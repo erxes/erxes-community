@@ -13,6 +13,8 @@ interface ContainerBoxType {
   spaceAround?: boolean;
   horizontal?: boolean;
   vertical?: boolean;
+  marginX?: number;
+  marginY?: number;
 }
 
 export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
@@ -26,6 +28,8 @@ export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
         : `${horizontal ? '10px' : '0px'} ${vertical ? '10px' : '0px'}`};
     justify-content: ${({ spaceBetween }) => (spaceBetween ? 'space-between' : '')};
     justify-content: ${({ justifyEnd }) => (justifyEnd ? 'end' : '')};
+    margin:${({ marginX, marginY }) =>
+      `${marginX ? `${marginX}px` : '0px'} margin${marginY ? `${marginY}px` : '0px'}`};
 `;
 
 export const InfoDetail = styled.p`

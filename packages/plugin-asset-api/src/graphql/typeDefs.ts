@@ -5,6 +5,11 @@ import {
   queries as assetQueries,
   mutations as assetMutations
 } from './schema/asset';
+import {
+  types as movementTypes,
+  queries as movementQueries,
+  mutations as movementMutations
+} from './schema/movement';
 
 const typeDefs = async serviceDiscovery => {
   const contactsAvailable = await serviceDiscovery.isEnabled('contacts');
@@ -25,13 +30,16 @@ const typeDefs = async serviceDiscovery => {
     ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
     ${assetTypes(contactsAvailable)}
+    ${movementTypes}
     
     extend type Query {
       ${assetQueries}
+      ${movementQueries}
     }
     
     extend type Mutation {
       ${assetMutations}
+      ${movementMutations}
     }
   `;
 };

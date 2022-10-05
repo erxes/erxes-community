@@ -1,19 +1,42 @@
-import { Button, Chooser, ModalTrigger } from '@erxes/ui/src';
+import {
+  Button,
+  Chooser,
+  ModalTrigger,
+  EmptyState,
+  CollapseContent,
+  __,
+  Icon,
+  BarItems,
+  FormControl,
+  SelectTeamMembers,
+  Form as CommonForm
+} from '@erxes/ui/src';
+
 import React from 'react';
-import { IAsset } from '../../common/types';
+import { IAsset, SelectedVariables } from '../../common/types';
 import AssetForm from '../../asset/containers/Form';
 import { Title } from '@erxes/ui-settings/src/styles';
 import { ContainerBox } from '../../style';
-
+import AssetChooser from './Chooser';
+import { USER_TYPES } from '../../common/constant';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
+import _loadash from 'lodash';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
+import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
+import { ModalFooter } from '@erxes/ui/src/styles/main';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 type Props = {
   assets: IAsset[];
   refetch: (variables: any) => void;
+  closeModal: () => void;
+  renderButton: (props: IButtonMutateProps) => JSX.Element;
+  movements?: any[];
 };
 
 type State = {
   selectedAssets: IAsset[];
-  perpage: number;
-  searchValue: string;
+  variables: SelectedVariables[];
 };
 
 class Form extends React.Component<Props, State> {
@@ -21,59 +44,35 @@ class Form extends React.Component<Props, State> {
     super(props);
 
     this.assetChooser = this.assetChooser.bind(this);
-    this.assetAddForm = this.assetAddForm.bind(this);
+    this.renderContent = this.renderContent.bind(this);
 
     this.state = {
       selectedAssets: [],
-      searchValue: '',
-      perpage: 0
+      variables: []
     };
   }
 
-  search(value: string, reload?: boolean) {
-    if (!reload) {
-      this.setState({ perpage: 0 });
-    }
+  generateDoc(values) {}
 
-    this.setState({ perpage: this.state.perpage + 5 }, () =>
-      this.props.refetch({
-        searchValue: value,
-        perPage: this.state.perpage
-      })
-    );
-  }
+  assetChooser(props) {
+    const handleSelect = datas => {
+      this.setState({ selectedAssets: datas });
 
-  assetAddForm(props) {
+      const variables = datas.map(d => ({
+        id: d._id,
+        userType: ''
+      }));
+
+      this.setState({ variables });
+    };
+
     const updatedProps = {
       ...props,
-      assets: this.props.assets
+      handleSelect,
+      datas: this.props.assets
     };
 
-    return <AssetForm {...updatedProps} />;
-  }
-
-  handleSelect(datas) {
-    this.setState({ selectedAssets: datas });
-  }
-
-  assetChooser({ closeModal }) {
-    const { assets } = this.props;
-
-    return (
-      <Chooser
-        title="Asset Chooser"
-        datas={assets}
-        data={{}}
-        search={this.search}
-        clearState={() => this.search('', true)}
-        renderForm={this.assetAddForm}
-        onSelect={this.handleSelect}
-        closeModal={() => closeModal()}
-        renderName={asset => asset.name}
-        perPage={5}
-        limit={5}
-      />
-    );
+    return <AssetChooser {...updatedProps} />;
   }
 
   assetChooserTrigger = (<Button>Select Assets</Button>);
@@ -89,19 +88,150 @@ class Form extends React.Component<Props, State> {
     );
   }
 
-  renderContent() {
+  renderChooser() {
     return <>{this.assetChooserContent()}</>;
   }
 
-  render() {
+  renderRow(p, asset: IAsset, selection?: any) {
+    let Selection;
+    let name = `selected${p}Ids`;
+    let label = p;
+
+    if (p === 'Branches') {
+      Selection = SelectBranches;
+    }
+    if (p === 'Departments') {
+      Selection = SelectDepartments;
+    }
+    if (p === 'TeamMember') {
+      Selection = SelectTeamMembers;
+      label = `${label.substring(0, 4)} ${label.substring(4, label.length)}`;
+    }
+    if (p === 'Company') {
+      Selection = SelectCompanies;
+    }
+    if (p === 'Customer') {
+      Selection = SelectCustomers;
+    }
+
+    const handleChange = selected => {
+      let { variables } = this.state;
+      const field = p.charAt(0).toLowerCase() + p.slice(1);
+
+      if (variables.some(selectedAsset => selectedAsset?.id === asset._id)) {
+        variables = variables.map(selectedAsset =>
+          selectedAsset.id === asset._id ? { ...selectedAsset, [field]: selected } : selectedAsset
+        );
+      }
+
+      this.setState({ variables });
+    };
+
+    return (
+      <BarItems key={p}>
+        <div>{__(`Current ${label}:`)}</div>
+        <Icon icon="arrow-down" />
+        {selection}
+        {p !== 'User Type' && (
+          <Selection label={`Choose ${label}`} name={name} onSelect={handleChange} />
+        )}
+      </BarItems>
+    );
+  }
+
+  renderBox(formProps: IFormProps, asset: IAsset) {
+    const { variables } = this.state;
+
+    const current = variables.find(variable => variable.id === asset._id);
+
+    const selectionUserType = () => {
+      const handleSelect = e => {
+        let { variables } = this.state;
+        const { value } = e.currentTarget as HTMLInputElement;
+
+        variables = variables.map(selectedAsset =>
+          selectedAsset.id === asset._id ? { ...selectedAsset, userType: value } : selectedAsset
+        );
+
+        this.setState({ variables });
+      };
+
+      return (
+        <div style={{ width: '200px' }}>
+          <FormControl componentClass="select" onChange={handleSelect} required {...formProps}>
+            {USER_TYPES.map(type => (
+              <option key={type.key} value={type.key}>
+                {type.label}
+              </option>
+            ))}
+          </FormControl>
+        </div>
+      );
+    };
+
     return (
       <>
-        <ContainerBox row spaceBetween>
-          <Title>Movements</Title>
-          {this.renderContent()}
-        </ContainerBox>
+        {this.renderRow('Branches', asset)}
+        {this.renderRow('Departments', asset)}
+        {this.renderRow('User Type', asset, selectionUserType())}
+        {current?.userType &&
+          current?.userType.length > 0 &&
+          this.renderRow(current.userType, asset)}
+        <BarItems></BarItems>
       </>
     );
+  }
+
+  renderSelectedAssetsContent(formProps: IFormProps) {
+    const { selectedAssets } = this.state;
+    return (
+      <div>
+        {selectedAssets.map(asset => {
+          return (
+            <CollapseContent key={asset._id} title={asset.name}>
+              {this.renderBox(formProps, asset)}
+            </CollapseContent>
+          );
+        })}
+      </div>
+    );
+  }
+
+  renderContent(formProps: IFormProps) {
+    const { selectedAssets } = this.state;
+    const { closeModal, renderButton, movements } = this.props;
+    const { values, isSubmitted } = formProps;
+
+    return (
+      <ContainerBox column gap={40}>
+        <ContainerBox row spaceBetween>
+          <Title>Movements</Title>
+          {this.renderChooser()}
+        </ContainerBox>
+        {selectedAssets.length > 0 ? (
+          this.renderSelectedAssetsContent(formProps)
+        ) : (
+          <EmptyState text="No Selected Assets" image="/images/actions/5.svg" />
+        )}
+
+        <ModalFooter>
+          <Button btnStyle="simple" onClick={() => closeModal()}>
+            Cancel
+          </Button>
+          {renderButton({
+            name: 'asset and movements',
+            values: this.generateDoc(values),
+            isSubmitted,
+            callback: closeModal,
+            object: movements
+          })}
+        </ModalFooter>
+      </ContainerBox>
+    );
+  }
+
+  render() {
+    return <CommonForm renderContent={this.renderContent} />;
   }
 }
 
