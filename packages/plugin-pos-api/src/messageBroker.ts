@@ -259,7 +259,7 @@ export const initBroker = async cl => {
         action: 'deals.find',
         data: {
           stageId: { $in: currentDealsConfigs.map(c => c.stageId) },
-          _ids: dealIds
+          _id: { $in: dealIds }
         },
         isRPC: true
       });
