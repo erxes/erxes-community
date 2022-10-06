@@ -229,6 +229,94 @@ export const initBroker = async cl => {
     }
     // end sync cards config then <
 
+    // sync deal config
+    const { dealsConfig } = pos;
+
+    const currentDealsConfigs: any = Object.values(dealsConfig || {}) || [];
+
+    if (newOrder.customerId && currentCardsConfig) {
+      const conformities = await sendCoreMessage({
+        subdomain,
+        action: 'conformities.findConformities',
+        data: {
+          mainType: 'deal',
+          relType: 'customer',
+          relTypeId: newOrder.customerId
+        },
+        isRPC: true
+      });
+
+      if (!conformities) {
+        throw new Error('Conformities not found.');
+      }
+
+      const dealIds = conformities.map(c => c.mainTypeId);
+
+      const foundDeals = await sendCardsMessage({
+        subdomain,
+        action: 'deals.find',
+        data: {
+          stageId: { $in: currentDealsConfigs.map(c => c.stageId) },
+          _ids: dealIds
+        },
+        isRPC: true
+      });
+
+      if (foundDeals) {
+        await sendCardsMessage({
+          subdomain,
+          action: 'deals.updateMany',
+          data: {
+            selector: {
+              _id: { $in: foundDeals.map(f => f._id) }
+            },
+            modifier: {
+              name: `Cards: ${newOrder.number}`,
+              startDate: newOrder.createdAt,
+              description: newOrder.deliveryInfo
+                ? newOrder.deliveryInfo.address
+                : '',
+              productsData: newOrder.items.map(i => ({
+                productId: i.productId,
+                uom: 'PC',
+                currency: 'MNT',
+                quantity: i.count,
+                unitPrice: i.unitPrice,
+                amount: i.count * i.unitPrice,
+                tickUsed: true
+              }))
+            }
+          },
+          isRPC: true
+        });
+      } else {
+        for (const dealConfigs of currentDealsConfigs) {
+          await sendCardsMessage({
+            subdomain,
+            action: 'deals.create',
+            data: {
+              name: `Cards: ${newOrder.number}`,
+              startDate: newOrder.createdAt,
+              description: newOrder.deliveryInfo
+                ? newOrder.deliveryInfo.address
+                : '',
+              stageId: dealConfigs.stageId,
+              productsData: newOrder.items.map(i => ({
+                productId: i.productId,
+                uom: 'PC',
+                currency: 'MNT',
+                quantity: i.count,
+                unitPrice: i.unitPrice,
+                amount: i.count * i.unitPrice,
+                tickUsed: true
+              }))
+            },
+            isRPC: true,
+            defaultValue: {}
+          });
+        }
+      }
+    }
     // return info saved
     sendPosclientMessage({
       subdomain,

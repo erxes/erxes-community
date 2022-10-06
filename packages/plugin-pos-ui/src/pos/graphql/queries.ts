@@ -29,6 +29,7 @@ export const posCommonFields = `
   ebarimtConfig
   erkhetConfig
   cardsConfig
+  dealsConfig
   catProdMappings {
     _id
     categoryId

@@ -25,6 +25,7 @@ import GeneralStep from './step/GeneralStep';
 import { IProductCategory } from '@erxes/ui-products/src/types';
 import { Link } from 'react-router-dom';
 import React from 'react';
+import DealsConfig from './step/DealsConfig';
 
 type Props = {
   pos?: IPos;
@@ -53,6 +54,7 @@ type State = {
   erkhetConfig: any;
   deliveryConfig: any;
   cardsConfig: any;
+  dealsConfig: any;
 };
 
 class Pos extends React.Component<Props, State> {
@@ -86,6 +88,7 @@ class Pos extends React.Component<Props, State> {
       erkhetConfig: pos.erkhetConfig,
       deliveryConfig: pos.deliveryConfig,
       cardsConfig: pos.cardsConfig,
+      dealsConfig: pos.dealsConfig,
       slots: props.slots || []
     };
   }
@@ -101,7 +104,8 @@ class Pos extends React.Component<Props, State> {
       ebarimtConfig,
       erkhetConfig,
       deliveryConfig,
-      cardsConfig
+      cardsConfig,
+      dealsConfig
     } = this.state;
 
     if (!pos.name) {
@@ -154,7 +158,8 @@ class Pos extends React.Component<Props, State> {
       initialCategoryIds: pos.initialCategoryIds || [],
       kioskExcludeProductIds: pos.kioskExcludeProductIds || [],
       deliveryConfig,
-      cardsConfig
+      cardsConfig,
+      dealsConfig
     };
 
     if (pos.isOnline) {
@@ -332,6 +337,14 @@ class Pos extends React.Component<Props, State> {
                 noButton={true}
               >
                 <CardsConfig onChange={this.onChange} pos={pos} />
+              </Step>
+              <Step
+                img="/images/icons/erxes-07.svg"
+                title={'Sync Deals'}
+                onClick={this.onStepClick}
+                noButton={true}
+              >
+                <DealsConfig onChange={this.onChange} pos={pos} />
               </Step>
             </Steps>
             <ControlWrapper>
