@@ -1,12 +1,17 @@
 import React from 'react';
 import { DefaultWrapper } from '../../common/utils';
-import { BarItems, FormControl, Button, router, __, ModalTrigger } from '@erxes/ui/src';
+import { BarItems, FormControl, Button, router, __, ModalTrigger, Table } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { ContainerBox } from '../../style';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Form from '../containers/Form';
-
-type Props = {} & IRouterProps;
+import { IMovementType } from '../../common/types';
+import Row from './Row';
+type Props = {
+  movements: IMovementType[];
+  loading: boolean;
+  refetch: () => void;
+} & IRouterProps;
 type State = {
   searchValue: string;
 };
@@ -60,6 +65,30 @@ class List extends React.Component<Props, State> {
     e.target.value = tmpValue;
   }
 
+  renderRow() {
+    const { movements } = this.props;
+    return movements.map(movement => <Row key={movement._id} movement={movement} />);
+  }
+
+  renderList() {
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>{__('Asset Name')}</th>
+            <th>{__('Branch')}</th>
+            <th>{__('Department')}</th>
+            <th>{__('Team Member')}</th>
+            <th>{__('Company')}</th>
+            <th>{__('Customer')}</th>
+            <th>{__('Created At')}</th>
+          </tr>
+        </thead>
+        <tbody>{this.renderRow()}</tbody>
+      </Table>
+    );
+  }
+
   render() {
     let rightActionBar = (
       <BarItems>
@@ -85,7 +114,7 @@ class List extends React.Component<Props, State> {
       title: 'Asset Movements',
       rightActionBar,
       leftActionBar,
-      content: <div>List</div>,
+      content: this.renderList(),
       sidebar: <div>Sidebar</div>
     };
 

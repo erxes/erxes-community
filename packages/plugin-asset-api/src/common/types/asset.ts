@@ -45,12 +45,14 @@ export interface IAssetGroupDocument extends IAssetGroup, Document {
   createdAt: Date;
 }
 export interface IMovement {
+  assetID: string;
+  assetName: string;
   userType: string;
-  branches: string[];
-  customer: string[];
-  departments: string[];
-  teamMember: string[];
-  company: string[];
+  branchId: string;
+  customerId: string;
+  departmentId: string;
+  teamMemberId: string;
+  companyId: string;
 }
 
 export interface IMovementDocument extends IMovement, Document {

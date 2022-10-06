@@ -62,7 +62,7 @@ class AssetChooser extends React.Component<Props, State> {
         closeModal={() => closeModal()}
         renderName={asset => asset.name}
         perPage={5}
-        limit={5}
+        limit={1}
       />
     );
   }

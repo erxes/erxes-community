@@ -55,20 +55,22 @@ export const breadcrumb = [
   { title: __('Asset & Movement') }
 ];
 
+export const MOVEMENT_TYPES = [];
+
 export const USER_TYPES = [
   {
     label: 'Team Member',
     key: 'TeamMember',
-    name: 'teamMember'
+    name: 'teamMemberId'
   },
   {
     label: 'Customer',
     key: 'Customer',
-    name: 'customer'
+    name: 'customerId'
   },
   {
     label: 'Company',
     key: 'Company',
-    name: 'compnay'
+    name: 'compnayId'
   }
 ];

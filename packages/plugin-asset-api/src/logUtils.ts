@@ -12,7 +12,8 @@ import { IAssetDocument, IAssetGroupDocument } from './common/types/asset';
 
 export const MODULE_NAMES = {
   ASSET: 'asset',
-  ASSET_GROUP: 'assetGroup'
+  ASSET_GROUP: 'assetGroup',
+  MOVEMENT: 'movement'
 };
 
 export const LOG_ACTIONS = {

@@ -3,17 +3,29 @@ import { IModels } from '../connectionResolver';
 import assetGroup from './assetGroup';
 import company from './company';
 import asset from './asset';
+import branch from './branch';
+import customer from './customer';
+import teamMember from './teanMember';
+import department from './department';
 
 export interface IDataLoaders {
   asset: DataLoader<string, any>;
   assetGroup: DataLoader<string, any>;
   company: DataLoader<string, any>;
+  branch: DataLoader<string, any>;
+  customer: DataLoader<string, any>;
+  teamMember: DataLoader<string, any>;
+  department: DataLoader<string, any>;
 }
 
 export function generateAllDataLoaders(models: IModels, subdomain: string): IDataLoaders {
   return {
     assetGroup: assetGroup(models),
     asset: asset(models),
-    company: company(subdomain)
+    company: company(subdomain),
+    branch: branch(models, subdomain),
+    customer: customer(models, subdomain),
+    teamMember: teamMember(models, subdomain),
+    department: department(models, subdomain)
   };
 }

@@ -13,7 +13,7 @@ import {
 } from '@erxes/ui/src';
 
 import React from 'react';
-import { IAsset, SelectedVariables } from '../../common/types';
+import { IAsset, IMovementType, SelectedVariables } from '../../common/types';
 import AssetForm from '../../asset/containers/Form';
 import { Title } from '@erxes/ui-settings/src/styles';
 import { ContainerBox } from '../../style';
@@ -28,15 +28,14 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 type Props = {
   assets: IAsset[];
+  detail: IMovementType;
   refetch: (variables: any) => void;
   closeModal: () => void;
-  renderButton: (props: IButtonMutateProps) => JSX.Element;
-  movements?: any[];
+  renderButton?: (props: IButtonMutateProps) => JSX.Element;
 };
 
 type State = {
-  selectedAssets: IAsset[];
-  variables: SelectedVariables[];
+  variables: SelectedVariables;
 };
 
 class Form extends React.Component<Props, State> {
@@ -47,23 +46,21 @@ class Form extends React.Component<Props, State> {
     this.renderContent = this.renderContent.bind(this);
 
     this.state = {
-      selectedAssets: [],
-      variables: []
+      variables: props.detail || {}
     };
   }
 
-  generateDoc(values) {}
+  generateDoc(values) {
+    const { variables } = this.state;
+    return { ...variables };
+  }
 
   assetChooser(props) {
     const handleSelect = datas => {
-      this.setState({ selectedAssets: datas });
-
-      const variables = datas.map(d => ({
-        id: d._id,
-        userType: ''
-      }));
-
-      this.setState({ variables });
+      const data = datas[0];
+      this.setState({
+        variables: { assetId: data._id, assetName: data.name, userType: '' }
+      });
     };
 
     const updatedProps = {
@@ -92,39 +89,38 @@ class Form extends React.Component<Props, State> {
     return <>{this.assetChooserContent()}</>;
   }
 
-  renderRow(p, asset: IAsset, selection?: any) {
+  renderRow(p, selection?: any) {
+    let { variables } = this.state;
+
     let Selection;
     let name = `selected${p}Ids`;
     let label = p;
+    let field;
 
     if (p === 'Branches') {
       Selection = SelectBranches;
+      field = 'branchId';
     }
     if (p === 'Departments') {
       Selection = SelectDepartments;
+      field = 'departmentId';
     }
     if (p === 'TeamMember') {
       Selection = SelectTeamMembers;
       label = `${label.substring(0, 4)} ${label.substring(4, label.length)}`;
+      field = 'teamMemberId';
     }
     if (p === 'Company') {
       Selection = SelectCompanies;
+      field = 'companyId';
     }
     if (p === 'Customer') {
       Selection = SelectCustomers;
+      field = 'customerId';
     }
 
     const handleChange = selected => {
-      let { variables } = this.state;
-      const field = p.charAt(0).toLowerCase() + p.slice(1);
-
-      if (variables.some(selectedAsset => selectedAsset?.id === asset._id)) {
-        variables = variables.map(selectedAsset =>
-          selectedAsset.id === asset._id ? { ...selectedAsset, [field]: selected } : selectedAsset
-        );
-      }
-
-      this.setState({ variables });
+      this.setState(prev => ({ variables: { ...prev.variables, [field]: selected } }));
     };
 
     return (
@@ -133,32 +129,36 @@ class Form extends React.Component<Props, State> {
         <Icon icon="arrow-down" />
         {selection}
         {p !== 'User Type' && (
-          <Selection label={`Choose ${label}`} name={name} onSelect={handleChange} />
+          <Selection
+            label={`Choose ${label}`}
+            name={name}
+            onSelect={handleChange}
+            multi={false}
+            initialValue={variables[field]}
+          />
         )}
       </BarItems>
     );
   }
 
-  renderBox(formProps: IFormProps, asset: IAsset) {
+  renderBox(formProps: IFormProps) {
     const { variables } = this.state;
-
-    const current = variables.find(variable => variable.id === asset._id);
-
     const selectionUserType = () => {
       const handleSelect = e => {
-        let { variables } = this.state;
         const { value } = e.currentTarget as HTMLInputElement;
 
-        variables = variables.map(selectedAsset =>
-          selectedAsset.id === asset._id ? { ...selectedAsset, userType: value } : selectedAsset
-        );
-
-        this.setState({ variables });
+        this.setState(prev => ({ variables: { ...prev.variables, userType: value } }));
       };
 
       return (
         <div style={{ width: '200px' }}>
-          <FormControl componentClass="select" onChange={handleSelect} required {...formProps}>
+          <FormControl
+            componentClass="select"
+            defaultValue={variables?.assetId}
+            onChange={handleSelect}
+            required
+            {...formProps}
+          >
             {USER_TYPES.map(type => (
               <option key={type.key} value={type.key}>
                 {type.label}
@@ -171,35 +171,32 @@ class Form extends React.Component<Props, State> {
 
     return (
       <>
-        {this.renderRow('Branches', asset)}
-        {this.renderRow('Departments', asset)}
-        {this.renderRow('User Type', asset, selectionUserType())}
-        {current?.userType &&
-          current?.userType.length > 0 &&
-          this.renderRow(current.userType, asset)}
+        {this.renderRow('Branches')}
+        {this.renderRow('Departments')}
+        {this.renderRow('User Type', selectionUserType())}
+        {variables?.userType &&
+          variables?.userType.length > 0 &&
+          this.renderRow(variables.userType)}
         <BarItems></BarItems>
       </>
     );
   }
 
   renderSelectedAssetsContent(formProps: IFormProps) {
-    const { selectedAssets } = this.state;
+    const { variables } = this.state;
     return (
-      <div>
-        {selectedAssets.map(asset => {
-          return (
-            <CollapseContent key={asset._id} title={asset.name}>
-              {this.renderBox(formProps, asset)}
-            </CollapseContent>
-          );
-        })}
-      </div>
+      <CollapseContent
+        key={variables.assetId}
+        title={variables.assetName ? variables.assetName : ''}
+      >
+        {this.renderBox(formProps)}
+      </CollapseContent>
     );
   }
 
   renderContent(formProps: IFormProps) {
-    const { selectedAssets } = this.state;
-    const { closeModal, renderButton, movements } = this.props;
+    const { variables } = this.state;
+    const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
 
     return (
@@ -208,23 +205,23 @@ class Form extends React.Component<Props, State> {
           <Title>Movements</Title>
           {this.renderChooser()}
         </ContainerBox>
-        {selectedAssets.length > 0 ? (
+        {!_loadash.isEmpty(variables) ? (
           this.renderSelectedAssetsContent(formProps)
         ) : (
-          <EmptyState text="No Selected Assets" image="/images/actions/5.svg" />
+          <EmptyState text="No Selected Asset" image="/images/actions/5.svg" />
         )}
 
         <ModalFooter>
           <Button btnStyle="simple" onClick={() => closeModal()}>
             Cancel
           </Button>
-          {renderButton({
-            name: 'asset and movements',
-            values: this.generateDoc(values),
-            isSubmitted,
-            callback: closeModal,
-            object: movements
-          })}
+          {renderButton &&
+            renderButton({
+              name: 'asset and movements',
+              values: this.generateDoc(values),
+              isSubmitted,
+              callback: closeModal
+            })}
         </ModalFooter>
       </ContainerBox>
     );

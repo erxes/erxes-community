@@ -33,6 +33,14 @@ export const sendCardsMessage = (args: ISendMessageArgs): Promise<any> => {
     ...args
   });
 };
+export const sendCoreMessage = (args: ISendMessageArgs): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'core',
+    ...args
+  });
+};
 
 export default function() {
   return client;

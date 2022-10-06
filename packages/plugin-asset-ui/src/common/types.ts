@@ -37,6 +37,12 @@ export type IAssetQueryResponse = {
   refetch: (variables?: any) => void;
 };
 
+export type IMovementDetailQueryResponse = {
+  assetMovement: IMovementType;
+  loading: boolean;
+  refetch: () => void;
+};
+
 export type IAssetTotalCountQueryResponse = {
   assetsCount: number;
   loading: boolean;
@@ -128,8 +134,33 @@ export type MergeMutationResponse = {
 };
 
 export type SelectedVariables = {
-  id: string;
-  departmentIds: string[];
-  branchIds: string[];
+  assetId?: string;
+  assetName?: string;
+  departmentIds?: string[];
+  branchIds?: string[];
+  userType?: string;
+};
+
+export type IMovementType = {
+  _id: string;
+  assetId: string;
+  assetName: string;
   userType: string;
+  branchId?: string;
+  departmentId?: string;
+  teamMemberId?: string;
+  customerId?: string;
+  companyId?: string;
+  branch?: any;
+  department?: any;
+  company?: any;
+  customer?: any;
+  teamMember?: any;
+  createdAt?: string;
+};
+
+export type MovementQueryResponse = {
+  assetMovements: IMovementType[];
+  loading: boolean;
+  refetch: () => void;
 };
