@@ -140,12 +140,14 @@ export const initBroker = async cl => {
     }
 
     // ====== if (action === 'makePayment')
-    const putResponse = await sendEbarimtMessage({
-      subdomain,
-      action: 'putresponses.createOrUpdate',
-      data: { _id: response._id, doc: { ...response, posToken } },
-      isRPC: true
-    });
+    if (response && response._id) {
+      await sendEbarimtMessage({
+        subdomain,
+        action: 'putresponses.createOrUpdate',
+        data: { _id: response._id, doc: { ...response, posToken } },
+        isRPC: true
+      });
+    }
 
     await models.PosOrders.updateOne(
       { _id: order._id },
@@ -324,7 +326,7 @@ export const initBroker = async cl => {
       data: {
         status: 'ok',
         posToken,
-        responseId: response._id,
+        responseId: response && response._id,
         orderId: order._id
       },
       pos
@@ -353,8 +355,7 @@ export const initBroker = async cl => {
       action: 'toOrder',
       data: {
         pos,
-        order: newOrder,
-        putRes: putResponse
+        order: newOrder
       }
     });
 

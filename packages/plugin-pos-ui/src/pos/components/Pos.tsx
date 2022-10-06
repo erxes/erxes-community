@@ -26,6 +26,7 @@ import { IProductCategory } from '@erxes/ui-products/src/types';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import DealsConfig from './step/DealsConfig';
+import PermissionStep from './step/Permission';
 
 type Props = {
   pos?: IPos;
@@ -55,6 +56,7 @@ type State = {
   deliveryConfig: any;
   cardsConfig: any;
   dealsConfig: any;
+  checkRemainder: boolean;
 };
 
 class Pos extends React.Component<Props, State> {
@@ -89,7 +91,8 @@ class Pos extends React.Component<Props, State> {
       deliveryConfig: pos.deliveryConfig,
       cardsConfig: pos.cardsConfig,
       dealsConfig: pos.dealsConfig,
-      slots: props.slots || []
+      slots: props.slots || [],
+      checkRemainder: pos.checkRemainder || false
     };
   }
 
@@ -101,6 +104,7 @@ class Pos extends React.Component<Props, State> {
       slots,
       groups,
       uiOptions,
+      checkRemainder,
       ebarimtConfig,
       erkhetConfig,
       deliveryConfig,
@@ -159,7 +163,9 @@ class Pos extends React.Component<Props, State> {
       kioskExcludeProductIds: pos.kioskExcludeProductIds || [],
       deliveryConfig,
       cardsConfig,
-      dealsConfig
+      dealsConfig,
+      checkRemainder,
+      permissionConfig: pos.permissionConfig || {}
     };
 
     if (pos.isOnline) {
@@ -256,7 +262,7 @@ class Pos extends React.Component<Props, State> {
   };
 
   render() {
-    const { pos, slots, groups, uiOptions } = this.state;
+    const { pos, slots, groups, uiOptions, checkRemainder } = this.state;
     const { productCategories, envs } = this.props;
     const breadcrumb = [{ title: 'POS List', link: `/pos` }, { title: 'POS' }];
 
@@ -278,6 +284,17 @@ class Pos extends React.Component<Props, State> {
                   onChange={this.onChange}
                   pos={pos}
                   posSlots={slots}
+                  envs={envs}
+                />
+              </Step>
+              <Step
+                img="/images/icons/erxes-02.svg"
+                title={`Permission`}
+                onClick={this.onStepClick}
+              >
+                <PermissionStep
+                  onChange={this.onChange}
+                  pos={pos}
                   envs={envs}
                 />
               </Step>
@@ -316,11 +333,15 @@ class Pos extends React.Component<Props, State> {
               </Step>
               <Step
                 img="/images/icons/erxes-07.svg"
-                title={'erkhet Config'}
+                title={'finance Config'}
                 onClick={this.onStepClick}
                 noButton={true}
               >
-                <ErkhetConfig onChange={this.onChange} pos={pos} />
+                <ErkhetConfig
+                  onChange={this.onChange}
+                  pos={pos}
+                  checkRemainder={checkRemainder}
+                />
               </Step>
               <Step
                 img="/images/icons/erxes-09.svg"
