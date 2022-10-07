@@ -36,7 +36,7 @@ const posCommonFields = `
   kioskExcludeProductIds: [String]
   deliveryConfig: JSON
   cardsConfig: JSON
-  dealsConfig: JSON
+  dealsIntegrationConfig: JSON
   checkRemainder: Boolean
   permissionConfig: JSON
 `;

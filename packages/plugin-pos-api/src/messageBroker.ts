@@ -232,9 +232,10 @@ export const initBroker = async cl => {
     // end sync cards config then <
 
     // sync deal config
-    const { dealsConfig } = pos;
+    const { dealsIntegrationConfig } = pos;
 
-    const currentDealsConfigs: any = Object.values(dealsConfig || {}) || [];
+    const currentDealsConfigs: any =
+      Object.values(dealsIntegrationConfig || {}) || [];
 
     if (newOrder.customerId && currentCardsConfig) {
       const conformities = await sendCoreMessage({
@@ -250,7 +251,7 @@ export const initBroker = async cl => {
       });
 
       if (conformities.length) {
-        const dealIds = conformities.map(c => c.mainTypeId);
+        const dealIds = conformities.map(c => c.relTypeId);
 
         const foundDeals = await sendCardsMessage({
           subdomain,

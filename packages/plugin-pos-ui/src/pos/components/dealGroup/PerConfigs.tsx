@@ -15,7 +15,7 @@ type Props = {
   configsMap: IConfigsMap;
   config: any;
   currentConfigKey: string;
-  save: (name: 'dealsConfig', value: any) => void;
+  save: (name: 'dealsIntegrationConfig', value: any) => void;
   delete: (currentConfigKey: string) => void;
 };
 
@@ -53,9 +53,9 @@ class PerConfigs extends React.Component<Props, State> {
     console.log(currentConfigKey);
     const key = Math.floor(Math.random() * 1000000 + 1);
 
-    delete configsMap.dealsConfig[currentConfigKey];
-    configsMap.dealsConfig[key] = config;
-    this.props.save('dealsConfig', configsMap);
+    delete configsMap.dealsIntegrationConfig[currentConfigKey];
+    configsMap.dealsIntegrationConfig[key] = config;
+    this.props.save('dealsIntegrationConfig', configsMap);
     Alert.success('You successfully updated stage in deals settings.');
   };
 

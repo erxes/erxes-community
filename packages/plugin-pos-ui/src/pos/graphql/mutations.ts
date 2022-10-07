@@ -20,7 +20,7 @@ const commonFields = `
   $ebarimtConfig: JSON
   $erkhetConfig: JSON
   $cardsConfig: JSON
-  $dealsConfig: JSON
+  $dealsIntegrationConfig: JSON
   $catProdMappings: [CatProdInput]
   $initialCategoryIds: [String]
   $kioskExcludeProductIds: [String]
@@ -53,7 +53,7 @@ const commonVariables = `
   kioskExcludeProductIds: $kioskExcludeProductIds
   deliveryConfig: $deliveryConfig
   cardsConfig: $cardsConfig
-  dealsConfig: $dealsConfig
+  dealsIntegrationConfig: $dealsIntegrationConfig
   checkRemainder: $checkRemainder
   permissionConfig: $permissionConfig
 `;
