@@ -19,14 +19,15 @@ interface IFullOrderParams extends ISearchParams {
   statuses: string[];
 }
 
+export const getPureDate = (date: Date, multiplier = 1) => {
+  const ndate = new Date(date);
+  const diffTimeZone =
+    multiplier * Number(process.env.TIMEZONE || 0) * 1000 * 60 * 60;
+  return new Date(ndate.getTime() - diffTimeZone);
+};
+
 const generateFilter = (config: IConfig, params: IFullOrderParams) => {
-  const {
-    searchValue,
-    statuses,
-    sortField,
-    sortDirection,
-    customerId
-  } = params;
+  const { searchValue, statuses, customerId, startDate, endDate } = params;
   const filter: any = {
     $or: [
       { posToken: config.token },
@@ -35,17 +36,24 @@ const generateFilter = (config: IConfig, params: IFullOrderParams) => {
   };
 
   if (searchValue) {
-    filter.number = { $regex: new RegExp(escapeRegExp(searchValue), 'i') };
+    filter.$or = [
+      { number: { $regex: new RegExp(escapeRegExp(searchValue), 'i') } },
+      { origin: { $regex: new RegExp(escapeRegExp(searchValue), 'i') } }
+    ];
   }
   if (customerId) {
     filter.customerId = customerId;
   }
-  const sort: { [key: string]: any } = {};
 
-  if (sortField) {
-    sort[sortField] = sortDirection;
-  } else {
-    sort.createdAt = 1;
+  const dateQry: any = {};
+  if (startDate) {
+    dateQry.$gte = getPureDate(startDate);
+  }
+  if (endDate) {
+    dateQry.$lte = getPureDate(endDate);
+  }
+  if (Object.keys(dateQry).length) {
+    filter.modifiedAt = dateQry;
   }
 
   return { ...filter, status: { $in: statuses } };
