@@ -28,7 +28,7 @@ const addEditParams = `
   billType: String,
   registerNumber: String,
   slotCode: String,
-  fromKiosk: boolean
+  fromKiosk: Boolean
 `;
 
 export const types = `
