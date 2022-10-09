@@ -26,8 +26,9 @@ const addEditParams = `
   customerId: String,
   deliveryInfo: JSON,
   billType: String,
-  registerNumber: String
-  slotCode: String
+  registerNumber: String,
+  slotCode: String,
+  fromKiosk: boolean
 `;
 
 export const types = `
@@ -111,6 +112,7 @@ export const types = `
     qpayInvoices: [QPayInvoice]
 
     slotCode: String
+    fromKiosk: Boolean
   }
 
   input OrderItemInput {

@@ -49,6 +49,7 @@ export interface IOrder {
   //posSlot
   slotCode?: string;
   taxInfo?: any;
+  fromKiosk?: boolean;
 }
 
 const commonAttributes = { positive: true, default: 0 };
@@ -201,7 +202,8 @@ export const orderSchema = schemaHooksWrapper(
       optional: true,
       label: 'Slot code'
     }),
-    taxInfo: field({ type: Object, optional: true })
+    taxInfo: field({ type: Object, optional: true }),
+    fromKiosk: field({ type: Boolean, optional: true })
   }),
   'erxes_orders'
 );

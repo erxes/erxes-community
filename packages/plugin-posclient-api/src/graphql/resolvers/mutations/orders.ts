@@ -111,14 +111,16 @@ const orderMutations = {
         });
       }
 
-      await graphqlPubsub.publish('ordersOrdered', {
-        ordersOrdered: {
-          ...order,
-          _id: order._id,
-          status: order.status,
-          customerId: order.customerId
-        }
-      });
+      if (!order.fromKiosk) {
+        await graphqlPubsub.publish('ordersOrdered', {
+          ordersOrdered: {
+            ...order,
+            _id: order._id,
+            status: order.status,
+            customerId: order.customerId
+          }
+        });
+      }
 
       return order;
     } catch (e) {
@@ -164,14 +166,16 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
-    await graphqlPubsub.publish('ordersOrdered', {
-      ordersOrdered: {
-        ...updatedOrder,
-        _id: updatedOrder._id,
-        status: updatedOrder.status,
-        customerId: updatedOrder.customerId
-      }
-    });
+    if (!order.fromKiosk) {
+      await graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          ...updatedOrder,
+          _id: updatedOrder._id,
+          status: updatedOrder.status,
+          customerId: updatedOrder.customerId
+        }
+      });
+    }
 
     return updatedOrder;
   },
