@@ -372,7 +372,7 @@ export const prepareOrderDoc = async (
 };
 
 export const checkOrderStatus = (order: IOrderDocument) => {
-  if (order.status === ORDER_STATUSES.PAID || order.paidDate) {
+  if (order.paidDate) {
     throw new Error('Order is already paid');
   }
 };
@@ -502,7 +502,6 @@ export const commonCheckPayment = async (
           $set: {
             ...doc,
             paidDate: now,
-            status: ORDER_STATUSES.PAID,
             modifiedAt: now
           }
         }

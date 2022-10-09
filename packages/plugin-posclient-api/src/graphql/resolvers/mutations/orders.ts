@@ -278,7 +278,6 @@ const orderMutations = {
             $set: {
               ...doc,
               paidDate: now,
-              status: ORDER_STATUSES.PAID,
               modifiedAt: now
             }
           }
@@ -445,7 +444,6 @@ const orderMutations = {
               billType,
               registerNumber,
               paidDate: now,
-              status: ORDER_STATUSES.PAID,
               modifiedAt: now
             }
           }
