@@ -451,7 +451,7 @@ const up = async ({ uis, fromInstaller }) => {
 
   if (dashboard) {
     dockerComposeConfig.services.dashboard = {
-      image: `erxes/dashboard:${image_tag}`,
+      image: `erxes/dashboard:${dashboard.image_tag || image_tag}`,
       ports: ['4300:80'],
       environment: {
         PORT: '80',
@@ -721,7 +721,9 @@ const update = async ({ serviceNames, noimage, uis }) => {
     if (!noimage) {
       log(`Updating image ${name}......`);
 
-      if (['crons', 'dashboard', 'gateway', 'client-portal'].includes(name)) {
+      if (
+        ['crons', 'dashboard-api', 'gateway', 'client-portal'].includes(name)
+      ) {
         await execCommand(
           `docker service update erxes_${name} --image erxes/${name}:${image_tag}`
         );
