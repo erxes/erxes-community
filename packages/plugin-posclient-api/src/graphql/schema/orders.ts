@@ -127,6 +127,18 @@ export const types = `
   }
 `;
 
+export const ordersQueryParams = `
+  searchValue: String,
+  statuses: [String],
+  customerId: String,
+  startDate: Date,
+  endDate: Date,
+  page: Int,
+  perPage: Int,
+  sortField: String,
+  sortDirection: Int
+`;
+
 export const mutations = `
   ordersAdd(${addEditParams}, origin: String): Order
   ordersEdit(_id: String!, ${addEditParams}): Order
@@ -140,7 +152,8 @@ export const mutations = `
 
 export const queries = `
   orders(searchValue: String, page: Int, perPage: Int): [Order]
-  fullOrders(searchValue: String, statuses: [String], customerId: String, page: Int, perPage: Int, sortField: String, sortDirection: Int): [Order]
+  fullOrders(${ordersQueryParams}): [Order]
+  ordersTotalCount(${ordersQueryParams}): Int
   orderDetail(_id: String, customerId: String): Order
   ordersCheckCompany(registerNumber: String!): JSON
   ordersDeliveryInfo(orderId: String!): JSON

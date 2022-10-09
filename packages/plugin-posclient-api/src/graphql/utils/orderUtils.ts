@@ -512,6 +512,7 @@ export const commonCheckPayment = async (
     order = await models.Orders.getOrder(orderId);
     graphqlPubsub.publish('ordersOrdered', {
       ordersOrdered: {
+        ...order,
         _id: orderId,
         status: order.status,
         customerId: order.customerId

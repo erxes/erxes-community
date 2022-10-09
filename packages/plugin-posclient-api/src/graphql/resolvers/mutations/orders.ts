@@ -113,6 +113,7 @@ const orderMutations = {
 
       await graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...order,
           _id: order._id,
           status: order.status,
           customerId: order.customerId
@@ -163,15 +164,15 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
-    if (order.status !== updatedOrder.status) {
-      await graphqlPubsub.publish('ordersOrdered', {
-        ordersOrdered: {
-          _id: updatedOrder._id,
-          status: updatedOrder.status,
-          customerId: updatedOrder.customerId
-        }
-      });
-    }
+    await graphqlPubsub.publish('ordersOrdered', {
+      ordersOrdered: {
+        ...updatedOrder,
+        _id: updatedOrder._id,
+        status: updatedOrder.status,
+        customerId: updatedOrder.customerId
+      }
+    });
+
     return updatedOrder;
   },
 
@@ -186,6 +187,7 @@ const orderMutations = {
 
     await graphqlPubsub.publish('ordersOrdered', {
       ordersOrdered: {
+        ...order,
         _id,
         status: order.status,
         customerId: order.customerId
@@ -282,6 +284,7 @@ const orderMutations = {
       order = await models.Orders.getOrder(_id);
       graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...order,
           _id,
           status: order.status,
           customerId: order.customerId
@@ -449,6 +452,7 @@ const orderMutations = {
 
       graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...order,
           _id,
           status: order.status,
           customerId: order.customerId
