@@ -111,7 +111,7 @@ const orderMutations = {
         });
       }
 
-      if (!order.fromKiosk) {
+      if (order.origin !== 'kiosk') {
         await graphqlPubsub.publish('ordersOrdered', {
           ordersOrdered: {
             ...order,
@@ -166,7 +166,7 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
-    if (!order.fromKiosk) {
+    if (order.origin !== 'kiosk') {
       await graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
           ...updatedOrder,

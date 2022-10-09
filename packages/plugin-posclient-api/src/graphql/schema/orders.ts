@@ -28,7 +28,7 @@ const addEditParams = `
   billType: String,
   registerNumber: String,
   slotCode: String,
-  fromKiosk: Boolean
+  origin: String
 `;
 
 export const types = `
@@ -112,7 +112,6 @@ export const types = `
     qpayInvoices: [QPayInvoice]
 
     slotCode: String
-    fromKiosk: Boolean
   }
 
   input OrderItemInput {
@@ -142,7 +141,7 @@ export const ordersQueryParams = `
 `;
 
 export const mutations = `
-  ordersAdd(${addEditParams}, origin: String): Order
+  ordersAdd(${addEditParams}): Order
   ordersEdit(_id: String!, ${addEditParams}): Order
   ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse
   orderChangeStatus(_id: String!, status: String): Order
