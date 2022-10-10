@@ -1,20 +1,19 @@
-import { requireLogin } from '@erxes/api-utils/src/permissions';
+import {
+  checkPermission,
+  requireLogin
+} from '@erxes/api-utils/src/permissions';
 
 import { IContext } from '../../connectionResolver';
-import { IPaymentConfig } from '../../models/definitions/payment';
+import { IInvoice } from '../../models/definitions/invoices';
+import { IPaymentConfig } from '../../models/definitions/paymentConfigs';
 
 const paymentConfigMutations = {
-  /**
-   * Creates a new template
-   */
   async paymentConfigsAdd(_root, doc: IPaymentConfig, { models }: IContext) {
     const paymentConfig = await models.PaymentConfigs.createPaymentConfig(doc);
 
     return paymentConfig;
   },
-  /**
-   * remove a template
-   */
+
   async paymentConfigRemove(
     _root,
     { id }: { id: string },
@@ -25,26 +24,21 @@ const paymentConfigMutations = {
     return 'success';
   },
 
-  /**
-   * remove a template
-   */
   async paymentConfigsEdit(
     _root,
     {
       id,
       name,
       status,
-      type,
+      kind,
       config
-    }: { id: string; name: string; status: string; type: string; config: any },
+    }: { id: string; name: string; status: string; kind: string; config: any },
     { models }: IContext
   ) {
-    console.log('paymentConfigsEdit: ', id, name, status, type, config);
-
     return await models.PaymentConfigs.updatePaymentConfig(id, {
       name,
       status,
-      type,
+      kind,
       config
     });
   },
@@ -52,48 +46,44 @@ const paymentConfigMutations = {
   /**
    *  create an invoice
    */
-  async createInvoice(_root, params, { models }: IContext) {
-    const {
-      paymentId,
-      amount,
-      description,
-      phone,
-      customerId,
-      companyId,
-      contentType,
-      contentTypeId
-    } = params;
-    const paymentConfig = await models.PaymentConfigs.findOne({
-      _id: paymentId
-    });
-
-    if (!paymentConfig) {
-      throw new Error(`Not found payment config`);
+  async invoiceCreate(_root, params: IInvoice, { models }: IContext) {
+    try {
+      return models.Invoices.createInvoice(params);
+    } catch (e) {
+      throw new Error(e.message);
     }
+  },
 
-    const { config, type } = paymentConfig;
+  /**
+   * cancel an invoice
+   */
 
-    const data = {
-      config,
-      amount,
-      invoice_description: description,
-      phone,
-      customerId,
-      companyId,
-      contentType,
-      contentTypeId
-    };
-
-    const response =
-      type.toLowerCase() === 'qpay'
-        ? await models.QpayInvoices.createInvoice(data)
-        : await models.SocialPayInvoices.createInvoice(data);
-
-    return response;
+  async invoiceCancel(_root, { _id }: { _id: string }, { models }: IContext) {
+    try {
+      return models.Invoices.cancelInvoice(_id);
+    } catch (e) {
+      throw new Error(e.message);
+    }
   }
 };
 
 requireLogin(paymentConfigMutations, 'paymentConfigsAdd');
+requireLogin(paymentConfigMutations, 'paymentConfigsEdit');
 requireLogin(paymentConfigMutations, 'paymentConfigRemove');
+
+checkPermission(paymentConfigMutations, 'paymentConfigsAdd', 'addPayment', []);
+checkPermission(
+  paymentConfigMutations,
+  'paymentConfigsEdit',
+  'editPayment',
+  []
+);
+checkPermission(
+  paymentConfigMutations,
+  'paymentConfigRemove',
+  'removePayment',
+  []
+);
+checkPermission(paymentConfigMutations, 'paymentConfigsAdd', 'addPayment', []);
 
 export default paymentConfigMutations;

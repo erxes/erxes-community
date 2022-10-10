@@ -1,21 +1,18 @@
-import * as mongoose from 'mongoose';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
-import { IPaymentConfigModel, loadPaymentConfigClass } from './models/Payment';
-import { IPaymentConfigDocument } from './models/definitions/payment';
-import { IQpayInvoiceDocument } from './models/definitions/qpay';
+import * as mongoose from 'mongoose';
 
-import { IQpayInvoiceModel, loadQpayInvoiceClass } from './models/Qpay';
+import { IInvoiceDocument } from './models/definitions/invoices';
+import { IPaymentConfigDocument } from './models/definitions/paymentConfigs';
+import { IInvoiceModel, loadInvoiceClass } from './models/Invoices';
 import {
-  ISocialPayInvoiceModel,
-  loadSocialPayInvoiceClass
-} from './models/SocialPay';
-import { ISocialPayInvoiceDocument } from './models/definitions/socialPay';
+  IPaymentConfigModel,
+  loadPaymentConfigClass
+} from './models/PaymentConfigs';
 
 export interface IModels {
   PaymentConfigs: IPaymentConfigModel;
-  QpayInvoices: IQpayInvoiceModel;
-  SocialPayInvoices: ISocialPayInvoiceModel;
+  Invoices: IInvoiceModel;
 }
 
 export interface IContext extends IMainContext {
@@ -29,19 +26,14 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
 
   models.PaymentConfigs = db.model<IPaymentConfigDocument, IPaymentConfigModel>(
-    'payment_config',
+    'payment_configs',
     loadPaymentConfigClass(models)
   );
 
-  models.QpayInvoices = db.model<IQpayInvoiceDocument, IQpayInvoiceModel>(
-    'qpay_invoice',
-    loadQpayInvoiceClass(models)
+  models.Invoices = db.model<IInvoiceDocument, IInvoiceModel>(
+    'invoices',
+    loadInvoiceClass(models)
   );
-
-  models.SocialPayInvoices = db.model<
-    ISocialPayInvoiceDocument,
-    ISocialPayInvoiceModel
-  >('socialpay_invoice', loadSocialPayInvoiceClass(models));
 
   return models;
 };

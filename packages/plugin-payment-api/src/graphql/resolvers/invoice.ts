@@ -1,60 +1,52 @@
+import { serviceDiscovery } from './../../configs';
 import { IContext } from '../../connectionResolver';
-import { sendContactsMessage } from '../../messageBroker';
+import { IInvoice } from '../../models/definitions/invoices';
+import { sendPluginsMessage } from '../../messageBroker';
+import { PLUGIN_RESOLVERS_META } from '../../constants';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
-    return models.QpayInvoices.findOne({ _id });
+    return models.Invoices.findOne({ _id });
   },
 
-  async type(invoice: any, {}, { models }: IContext) {
-    const checkQpay = await models.QpayInvoices.findOne({ _id: invoice._id });
-
-    return checkQpay ? 'qpay' : 'socialPay';
+  async customer(invoice: IInvoice) {
+    return (
+      invoice.customerId && { __typename: 'Customer', _id: invoice.customerId }
+    );
   },
 
-  async comment(invoice: any, {}, { models }: IContext) {
-    const checkSpay = await models.SocialPayInvoices.findOne({
-      _id: invoice._id
-    });
-
-    return checkSpay
-      ? checkSpay.phone
-        ? `${checkSpay.phone} mobile invoice`
-        : 'socialPay invoice'
-      : 'qpay invoice';
+  async company(invoice: IInvoice) {
+    return (
+      invoice.companyId && { __typename: 'Company', _id: invoice.companyId }
+    );
   },
 
-  async paymentId(invoice: any, {}, { models }: IContext) {
-    const checkQpay = await models.QpayInvoices.findOne({
-      _id: invoice._id
-    });
-
-    return checkQpay ? checkQpay.qpayPaymentId : '';
+  async paymentConfig(invoice: IInvoice, {}, { models }: IContext) {
+    return (
+      invoice.paymentConfigId &&
+      models.PaymentConfigs.findOne({ _id: invoice.paymentConfigId })
+    );
   },
 
-  async customer(invoice: any, {}, { subdomain }: IContext) {
-    console.log('invoice.customerId:', invoice.customerId);
+  async pluginData(invoice: IInvoice, {}, { subdomain }: IContext) {
+    const pluginName = invoice.contentType.split(':')[0];
 
-    const customer = await sendContactsMessage({
+    if (!(await serviceDiscovery.isEnabled(pluginName))) {
+      return null;
+    }
+
+    const data: any = {};
+
+    const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
+
+    data[meta.queryKey] = invoice.contentTypeId;
+
+    return sendPluginsMessage(pluginName, {
       subdomain,
-      action: 'customers.findOne',
-      data: { _id: invoice.customerId },
-      isRPC: true
+      action: meta.action,
+      data,
+      isRPC: true,
+      defaultValue: null
     });
-
-    return customer;
-  },
-
-  async company(invoice: any, {}, { subdomain }: IContext) {
-    console.log('invoice.customerId:', invoice.companyId);
-
-    const company = await sendContactsMessage({
-      subdomain,
-      action: 'companies.findOne',
-      data: { _id: invoice.companyId },
-      isRPC: true
-    });
-
-    return company;
   }
 };

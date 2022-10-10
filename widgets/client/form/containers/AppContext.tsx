@@ -4,13 +4,13 @@ import { checkRules } from "../../utils";
 import { connection } from "../connection";
 import { ICurrentStatus, IForm, IFormDoc, ISaveFormResponse } from "../types";
 import {
-  cancelOrder,
   increaseViewCount,
   postMessage,
   saveLead,
   sendEmail,
+  getPaymentLink
 } from "./utils";
-import * as QRCode from "qrcode";
+
 interface IState {
   isPopupVisible: boolean;
   isFormVisible: boolean;
@@ -19,9 +19,7 @@ interface IState {
   isSubmitting?: boolean;
   extraContent?: string;
   callSubmit: boolean;
-  invoiceResponse?: string;
-  invoiceType?: string;
-  lastMessageId?: string;
+  paymentsUrl?: string;
 }
 
 interface IStore extends IState {
@@ -39,7 +37,6 @@ interface IStore extends IState {
   getIntegration: () => IIntegration;
   getForm: () => IForm;
   getIntegrationConfigs: () => IIntegrationLeadData;
-  cancelOrder: (customerId: string, messageId: string) => void;
   onChangeCurrentStatus: (status: string) => void;
 }
 
@@ -58,8 +55,6 @@ export class AppProvider extends React.Component<{}, IState> {
       currentStatus: { status: "INITIAL" },
       extraContent: "",
       callSubmit: false,
-      invoiceResponse: "",
-      invoiceType: "",
     };
   }
 
@@ -83,7 +78,7 @@ export class AppProvider extends React.Component<{}, IState> {
       return this.setState({
         isPopupVisible: false,
         isFormVisible: false,
-        isCalloutVisible: false,
+        isCalloutVisible: false
       });
     }
 
@@ -113,7 +108,7 @@ export class AppProvider extends React.Component<{}, IState> {
   showForm = () => {
     this.setState({
       isCalloutVisible: false,
-      isFormVisible: true,
+      isFormVisible: true
     });
   };
 
@@ -128,7 +123,7 @@ export class AppProvider extends React.Component<{}, IState> {
 
     this.setState({
       isCalloutVisible: false,
-      isFormVisible: !isVisible,
+      isFormVisible: !isVisible
     });
   };
 
@@ -162,7 +157,7 @@ export class AppProvider extends React.Component<{}, IState> {
       isPopupVisible: false,
       isCalloutVisible: false,
       isFormVisible: false,
-      currentStatus: { status: "INITIAL" },
+      currentStatus: { status: "INITIAL" }
     });
 
     // Increasing view count
@@ -172,7 +167,7 @@ export class AppProvider extends React.Component<{}, IState> {
   /*
    * Save user submissions
    */
-  save = (doc: IFormDoc) => {
+  save = (doc: IFormDoc, requiredPaymentAmount?: number) => {
     this.setState({ isSubmitting: true });
 
     saveLead({
@@ -182,8 +177,7 @@ export class AppProvider extends React.Component<{}, IState> {
       formId: this.getForm()._id,
       userId: connection.setting.user_id,
       saveCallback: async (response: ISaveFormResponse) => {
-        const { errors, invoiceType } = response;
-        let { invoiceResponse } = response;
+        const { errors } = response;
 
         let status = "ERROR";
 
@@ -191,40 +185,34 @@ export class AppProvider extends React.Component<{}, IState> {
           case "ok":
             status = "SUCCESS";
             break;
-          case "pending":
-            status = "PENDING";
-            break;
           default:
             status = "ERROR";
             break;
         }
 
+        if (status !== "ERROR" && requiredPaymentAmount && requiredPaymentAmount > 0) {
+          status = 'PAYMENT_PENDING';
+
+          getPaymentLink(requiredPaymentAmount, response.conversationId).then((response: any) => {
+            const paymentsUrl = response.data.getPaymentOptions;
+            this.setState({ paymentsUrl });
+          });
+        }
+
         postMessage({
           message: "submitResponse",
-          status,
+          status
         });
-
-        if (invoiceType === "socialPay") {
-          if (
-            invoiceResponse &&
-            invoiceResponse.includes("socialpay-payment")
-          ) {
-            invoiceResponse = await QRCode.toDataURL(invoiceResponse);
-          }
-        }
 
         this.setState({
           callSubmit: false,
           isSubmitting: false,
-          invoiceResponse,
-          invoiceType,
-          lastMessageId: response.messageId,
           currentStatus: {
             status,
-            errors,
-          },
+            errors
+          }
         });
-      },
+      }
     });
   };
 
@@ -254,7 +242,7 @@ export class AppProvider extends React.Component<{}, IState> {
 
     postMessage({
       message: "changeContainerStyle",
-      style: `height: ${elementsHeight}px;`,
+      style: `height: ${elementsHeight}px;`
     });
   };
 
@@ -268,16 +256,6 @@ export class AppProvider extends React.Component<{}, IState> {
 
   getIntegrationConfigs = () => {
     return this.getIntegration().leadData;
-  };
-
-  cancelOrder = (customerId: string, messageId: string) => {
-    cancelOrder({
-      customerId,
-      messageId,
-      cancelCallback: (response: string) => {
-        this.setState({ currentStatus: { status: response } });
-      },
-    });
   };
 
   onChangeCurrentStatus = (status: string) => {
@@ -303,7 +281,6 @@ export class AppProvider extends React.Component<{}, IState> {
           getIntegration: this.getIntegration,
           getForm: this.getForm,
           getIntegrationConfigs: this.getIntegrationConfigs,
-          cancelOrder: this.cancelOrder,
           onChangeCurrentStatus: this.onChangeCurrentStatus,
         }}
       >

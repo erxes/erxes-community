@@ -1,10 +1,14 @@
-import typeDefs from './graphql/typeDefs';
-import resolvers from './graphql/resolvers';
-
-import { initBroker } from './messageBroker';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import * as express from 'express';
+import * as path from 'path';
+import * as permissions from './permissions';
 import { generateModels } from './connectionResolver';
-import { callBackQpay, callBackSocialPay, paymentCallback } from './utils';
+import { GET_CALLBACK_TYPES, POST_CALLBACK_TYPES } from './constants';
+import controllers from './controllers';
+import resolvers from './graphql/resolvers';
+import typeDefs from './graphql/typeDefs';
+import { initBroker } from './messageBroker';
+import { getHandler, postHandler } from './utils';
 
 export let mainDb;
 export let debug;
@@ -13,6 +17,7 @@ export let serviceDiscovery;
 
 export default {
   name: 'payment',
+  permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
 
@@ -23,14 +28,20 @@ export default {
   },
 
   hasSubscriptions: true,
+  meta: {
+    permissions
+  },
 
-  getHandlers: [
-    { path: `/pl:payment/callBackQpay`, method: callBackQpay },
-    { path: `/callBackQpay`, method: callBackQpay },
-    { path: `/pl:payment/callBackSocialPay`, method: callBackSocialPay },
-    { path: `/callBackSocialPay`, method: callBackSocialPay },
-    { path: `/callback`, method: paymentCallback }
-  ],
+  getHandlers: GET_CALLBACK_TYPES.ALL.map(type => ({
+    path: `/callback/${type}`,
+    method: getHandler
+  })),
+
+  postHandlers: POST_CALLBACK_TYPES.ALL.map(type => ({
+    path: `/callback/${type}`,
+    method: postHandler
+  })),
+
   apolloServerContext: async (context, req) => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
@@ -40,6 +51,7 @@ export default {
 
     return context;
   },
+
   onServerInit: async options => {
     mainDb = options.db;
 
@@ -48,5 +60,18 @@ export default {
     graphqlPubsub = options.pubsubClient;
 
     debug = options.debug;
+
+    const { app } = options;
+
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'pug');
+
+    // serve static files
+    app.use('/static', express.static(path.join(__dirname, '/public')));
+
+    // generated scripts
+    app.use('/build', express.static(path.join(__dirname, '../static')));
+
+    app.use(controllers);
   }
 };

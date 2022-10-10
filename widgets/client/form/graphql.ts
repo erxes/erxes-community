@@ -62,6 +62,7 @@ export const formConnectMutation = `
         name
         leadData
         languageCode
+        paymentConfigIds
       }
     }
   }
@@ -71,15 +72,13 @@ export const saveFormMutation = `
   mutation widgetsSaveLead($integrationId: String!, $formId: String!, $submissions: [FieldValueInput], $browserInfo: JSON!, $cachedCustomerId: String, $userId: String) {
     widgetsSaveLead(integrationId: $integrationId, formId: $formId, submissions: $submissions, browserInfo: $browserInfo, cachedCustomerId: $cachedCustomerId, userId: $userId) {
       status
-      messageId
+      conversationId
       customerId
       errors {
         fieldId
         code
         text
       }
-      invoiceResponse
-      invoiceType
     }
   }
 `;
@@ -96,14 +95,28 @@ export const increaseViewCountMutation = `
   }
 `;
 
-export const cancelOrderMutation = `
-  mutation widgetsCancelOrder($customerId: String!, $messageId: String!) {
-    widgetsCancelOrder(customerId: $customerId, messageId: $messageId)
-  }
-`;
-
-export const formInvoiceUpdated = `
-  subscription formInvoiceUpdated($messageId: String) {
-    formInvoiceUpdated(messageId: $messageId) 
-  }
-`;
+export const getPaymentOptions = `
+query getPaymentOptions(
+  $amount: Float
+  $companyId: String
+  $contentType: String
+  $contentTypeId: String
+  $customerId: String
+  $description: String
+  $paymentConfigIds: [String]
+  $redirectUri: String
+  $phone: String
+) {
+  getPaymentOptions(
+    amount: $amount
+    companyId: $companyId
+    contentType: $contentType
+    contentTypeId: $contentTypeId
+    customerId: $customerId
+    description: $description
+    paymentConfigIds: $paymentConfigIds
+    redirectUri: $redirectUri
+    phone: $phone
+  )
+}
+`

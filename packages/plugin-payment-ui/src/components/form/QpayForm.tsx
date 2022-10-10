@@ -1,15 +1,16 @@
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-
 import Button from '@erxes/ui/src/components/Button';
-import ControlLabel from '@erxes/ui/src/components/form/Label';
-import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
+import Form from '@erxes/ui/src/components/form/Form';
 import FormGroup from '@erxes/ui/src/components/form/Group';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
-import React from 'react';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils';
-import { SettingsContent } from './styles';
+import React from 'react';
 import { IPaymentConfigDocument, IQpayConfig } from 'types';
+
+import { PAYMENT_KINDS } from '../constants';
+import { SettingsContent } from './styles';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -22,8 +23,6 @@ type State = {
   qpayMerchantUser: string;
   qpayMerchantPassword: string;
   qpayInvoiceCode: string;
-  qpayUrl: string;
-  callbackUrl: string;
 };
 
 class QpayConfigForm extends React.Component<Props, State> {
@@ -32,22 +31,15 @@ class QpayConfigForm extends React.Component<Props, State> {
 
     const { paymentConfig } = this.props;
     const { name, config } = paymentConfig || ({} as IPaymentConfigDocument);
-    console.log(name, config);
-    const {
-      qpayMerchantUser,
-      qpayMerchantPassword,
-      qpayInvoiceCode,
-      qpayUrl,
-      callbackUrl
-    } = config || ({} as IQpayConfig);
+
+    const { qpayMerchantUser, qpayMerchantPassword, qpayInvoiceCode } =
+      config || ({} as IQpayConfig);
 
     this.state = {
       paymentConfigName: name || '',
       qpayMerchantUser: qpayMerchantUser || '',
       qpayMerchantPassword: qpayMerchantPassword || '',
-      qpayInvoiceCode: qpayInvoiceCode || '',
-      qpayUrl: qpayUrl || '',
-      callbackUrl: callbackUrl || ''
+      qpayInvoiceCode: qpayInvoiceCode || ''
     };
   }
 
@@ -56,20 +48,16 @@ class QpayConfigForm extends React.Component<Props, State> {
     qpayMerchantUser: string;
     qpayMerchantPassword: string;
     qpayInvoiceCode: string;
-    qpayUrl: string;
-    callbackUrl: string;
   }) => {
     const { paymentConfig } = this.props;
     const generatedValues = {
       name: values.paymentConfigName,
-      type: 'qpay',
+      kind: PAYMENT_KINDS.QPAY,
       status: 'active',
       config: {
         qpayMerchantUser: values.qpayMerchantUser,
         qpayMerchantPassword: values.qpayMerchantPassword,
-        qpayInvoiceCode: values.qpayInvoiceCode,
-        qpayUrl: values.qpayUrl,
-        callbackUrl: values.callbackUrl
+        qpayInvoiceCode: values.qpayInvoiceCode
       }
     };
 
@@ -83,11 +71,7 @@ class QpayConfigForm extends React.Component<Props, State> {
   };
 
   renderItem = (key: string, title: string, description?: string) => {
-    const value = this.state[key]
-      ? this.state[key]
-      : key === 'qpayUrl'
-      ? 'https://merchant.qpay.mn'
-      : '';
+    const value = this.state[key] || '';
     return (
       <FormGroup>
         <ControlLabel>{title}</ControlLabel>
@@ -108,18 +92,14 @@ class QpayConfigForm extends React.Component<Props, State> {
       paymentConfigName,
       qpayMerchantUser,
       qpayMerchantPassword,
-      qpayInvoiceCode,
-      qpayUrl,
-      callbackUrl
+      qpayInvoiceCode
     } = this.state;
 
     const values = {
       paymentConfigName,
       qpayMerchantUser,
       qpayMerchantPassword,
-      qpayInvoiceCode,
-      qpayUrl,
-      callbackUrl
+      qpayInvoiceCode
     };
 
     return (
@@ -129,8 +109,6 @@ class QpayConfigForm extends React.Component<Props, State> {
           {this.renderItem('qpayMerchantUser', 'Username')}
           {this.renderItem('qpayMerchantPassword', 'Password')}
           {this.renderItem('qpayInvoiceCode', 'Invoice code')}
-          {this.renderItem('qpayUrl', 'Qpay url')}
-          {this.renderItem('callbackUrl', 'Call back url with /payments')}
         </SettingsContent>
 
         <ModalFooter>
@@ -143,7 +121,7 @@ class QpayConfigForm extends React.Component<Props, State> {
             Cancel
           </Button>
           {renderButton({
-            name: 'integration',
+            passedName: 'payment',
             values: this.generateDoc(values),
             isSubmitted,
             callback: closeModal

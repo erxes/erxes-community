@@ -1,6 +1,11 @@
+import { ICompany } from '@erxes/ui-contacts/src/companies/types';
+import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
+
+import { Counts, QueryResponse } from '@erxes/ui/src/types';
+
 export interface IPaymentConfig {
   name: string;
-  type: string;
+  kind: string;
   status: string;
   config: any;
 }
@@ -9,26 +14,57 @@ export interface IQpayConfig {
   qpayMerchantUser: string;
   qpayMerchantPassword: string;
   qpayInvoiceCode: string;
-  qpayUrl: string;
-  callbackUrl: string;
 }
 
 export interface ISocialPayConfig {
   inStoreSPTerminal: string;
   inStoreSPKey: string;
-  inStoreSPUrl: string;
-  pushNotification: string;
 }
 
 export interface IPaymentConfigDocument extends IPaymentConfig, Document {
   _id: string;
 }
 
-export interface IPaymentTypeCount {
+export type ByKindTotalCount = {
   qpay: number;
   socialPay: number;
+};
+
+export type InvoicesCount = {
   total: number;
+  byKind: Counts;
+  byStatus: Counts;
+};
+
+export interface IInvoice {
+  _id: string;
+  amount: number;
+  contentType: string;
+  contentTypeId: string;
+  createdAt: Date;
+  customerId: string;
+  description: string;
+  email: string;
+  paymentConfig: IPaymentConfig;
+  phone: string;
+  resolvedAt: Date;
+  status: string;
+  company?: ICompany;
+  customer?: ICustomer;
+  pluginData?: any;
 }
+
+export type InvoicesQueryResponse = {
+  invoices: (params: {
+    variables: { page: number; perPage: number };
+  }) => IInvoice[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type InvoicesTotalCountQueryResponse = {
+  invoicesTotalCount: InvoicesCount;
+} & QueryResponse;
 
 export type PaymentConfigsRemoveMutationResponse = {
   paymentConfigsRemove: (params: { variables: { id: string } }) => Promise<any>;
@@ -47,7 +83,7 @@ export type PaymentConfigsQueryResponse = {
 };
 
 export type PaymentConfigsCountByTypeQueryResponse = {
-  paymentConfigsCountByType: IPaymentTypeCount;
+  paymentsTotalCount: any;
   loading: boolean;
   refetch: () => void;
 };

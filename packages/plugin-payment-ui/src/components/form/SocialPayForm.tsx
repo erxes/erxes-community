@@ -1,16 +1,16 @@
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-
 import Button from '@erxes/ui/src/components/Button';
-import ControlLabel from '@erxes/ui/src/components/form/Label';
-import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
+import Form from '@erxes/ui/src/components/form/Form';
 import FormGroup from '@erxes/ui/src/components/form/Group';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import { __, getEnv } from '@erxes/ui/src/utils';
 import React from 'react';
+import { IPaymentConfigDocument, ISocialPayConfig } from 'types';
 
-import { __ } from '@erxes/ui/src/utils';
+import { PAYMENT_KINDS } from '../constants';
 import { SettingsContent } from './styles';
-import { ISocialPayConfig, IPaymentConfigDocument } from 'types';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -22,8 +22,6 @@ type State = {
   paymentConfigName: string;
   inStoreSPTerminal: string;
   inStoreSPKey: string;
-  inStoreSPUrl: string;
-  pushNotification: string;
 };
 
 class SocialPayConfigForm extends React.Component<Props, State> {
@@ -32,15 +30,13 @@ class SocialPayConfigForm extends React.Component<Props, State> {
 
     const { paymentConfig } = this.props;
     const { name, config } = paymentConfig || ({} as IPaymentConfigDocument);
-    const { inStoreSPTerminal, inStoreSPKey, inStoreSPUrl, pushNotification } =
+    const { inStoreSPTerminal, inStoreSPKey } =
       config || ({} as ISocialPayConfig);
 
     this.state = {
       paymentConfigName: name || '',
       inStoreSPTerminal: inStoreSPTerminal || '',
-      inStoreSPKey: inStoreSPKey || '',
-      inStoreSPUrl: inStoreSPUrl || '',
-      pushNotification: pushNotification || ''
+      inStoreSPKey: inStoreSPKey || ''
     };
   }
 
@@ -48,19 +44,15 @@ class SocialPayConfigForm extends React.Component<Props, State> {
     paymentConfigName: string;
     inStoreSPTerminal: string;
     inStoreSPKey: string;
-    inStoreSPUrl: string;
-    pushNotification: string;
   }) => {
     const { paymentConfig } = this.props;
     const generatedValues = {
       name: values.paymentConfigName,
-      type: 'socialPay',
+      kind: PAYMENT_KINDS.SOCIALPAY,
       status: 'active',
       config: {
         inStoreSPTerminal: values.inStoreSPTerminal,
-        inStoreSPKey: values.inStoreSPKey,
-        inStoreSPUrl: values.inStoreSPUrl,
-        pushNotification: values.pushNotification
+        inStoreSPKey: values.inStoreSPKey
       }
     };
 
@@ -74,19 +66,20 @@ class SocialPayConfigForm extends React.Component<Props, State> {
   };
 
   renderItem = (key: string, title: string, description?: string) => {
-    const value = this.state[key]
-      ? this.state[key]
-      : key === 'inStoreSPUrl'
-      ? 'https://instore.golomtbank.com/'
-      : '';
+    const value =
+      key === 'pushNotification'
+        ? `${getEnv().REACT_APP_API_URL}/pl:payment/callback/socialPay`
+        : this.state[key];
 
     return (
       <FormGroup>
         <ControlLabel>{title}</ControlLabel>
+        {description && <p>{description}</p>}
         <FormControl
           defaultValue={value}
           onChange={this.onChangeConfig.bind(this, key)}
           value={value}
+          disabled={key === 'pushNotification'}
         />
       </FormGroup>
     );
@@ -95,20 +88,12 @@ class SocialPayConfigForm extends React.Component<Props, State> {
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal } = this.props;
     const { isSubmitted } = formProps;
-    const {
-      paymentConfigName,
-      inStoreSPTerminal,
-      inStoreSPKey,
-      inStoreSPUrl,
-      pushNotification
-    } = this.state;
+    const { paymentConfigName, inStoreSPTerminal, inStoreSPKey } = this.state;
 
     const values = {
       paymentConfigName,
       inStoreSPTerminal,
-      inStoreSPKey,
-      inStoreSPUrl,
-      pushNotification
+      inStoreSPKey
     };
 
     return (
@@ -117,10 +102,10 @@ class SocialPayConfigForm extends React.Component<Props, State> {
           {this.renderItem('paymentConfigName', 'Name')}
           {this.renderItem('inStoreSPTerminal', 'Terminal')}
           {this.renderItem('inStoreSPKey', 'Key')}
-          {this.renderItem('inStoreSPUrl', 'InStore SocialPay url')}
           {this.renderItem(
             'pushNotification',
-            'Push notification url with /pushNotif'
+            'Notification URL',
+            'Register following URL in Golomt Bank'
           )}
         </SettingsContent>
 

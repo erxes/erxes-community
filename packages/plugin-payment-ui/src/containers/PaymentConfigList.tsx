@@ -17,7 +17,7 @@ import {
 type Props = {
   queryParams: any;
   paymentConfigsCount: number;
-  type: string | null;
+  kind: string | null;
 };
 
 type FinalProps = {
@@ -26,7 +26,7 @@ type FinalProps = {
   PaymentConfigsRemoveMutationResponse;
 
 const IntegrationListContainer = (props: FinalProps) => {
-  const { paymentConfigsQuery, type, paymentConfigsRemove } = props;
+  const { paymentConfigsQuery, kind, paymentConfigsRemove } = props;
 
   if (paymentConfigsQuery.loading) {
     return <Spinner objective={true} />;
@@ -49,8 +49,8 @@ const IntegrationListContainer = (props: FinalProps) => {
     });
   };
 
-  const filteredConfigs = type
-    ? paymentConfigs.filter(pc => pc.type === type)
+  const filteredConfigs = kind
+    ? paymentConfigs.filter(pc => pc.kind === kind)
     : paymentConfigs;
 
   const updatedProps = {
@@ -68,11 +68,11 @@ const mutationOptions = () => ({
     {
       query: gql(queries.paymentConfigs),
       variables: {
-        paymentIds: []
+        paymentConfigIds: []
       }
     },
     {
-      query: gql(queries.paymentConfigsCountByType)
+      query: gql(queries.paymentsTotalCountQuery)
     }
   ]
 });
@@ -92,7 +92,7 @@ export default withProps<Props>(
         return {
           notifyOnNetworkStatusChange: true,
           variables: {
-            paymentIds: []
+            paymentConfigIds: []
           },
           fetchPolicy: 'network-only'
         };
