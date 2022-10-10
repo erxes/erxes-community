@@ -1,12 +1,13 @@
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { IFormProps } from '@erxes/ui/src/types';
+import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { ChildProps, graphql } from 'react-apollo';
 
 import SelectPayments from '../components/SelectPayments';
 import { queries } from '../graphql';
-import { PaymentsQueryResponse } from '../types';
+import { PaymentConfigsQueryResponse } from '../types';
 
 type Props = {
   onChange: (values: string[]) => void;
@@ -17,7 +18,7 @@ type Props = {
 };
 
 type FinalProps = {
-  paymentsQuery: PaymentsQueryResponse;
+  paymentsQuery: PaymentConfigsQueryResponse;
 } & Props;
 
 const SelectPaymentsContainer = (props: ChildProps<FinalProps>) => {
@@ -37,22 +38,11 @@ const SelectPaymentsContainer = (props: ChildProps<FinalProps>) => {
   return <SelectPayments {...updatedProps} />;
 };
 
-const getRefetchQueries = () => {
-  return [
-    {
-      query: queries.paymentsQuery,
-      variables: {
-        status: 'active'
-      }
-    }
-  ];
-};
-
 export default compose(
-  graphql<PaymentsQueryResponse>(queries.paymentsQuery, {
+  graphql<PaymentConfigsQueryResponse>(gql(queries.paymentConfigs), {
     name: 'paymentsQuery',
     options: () => ({
-      refetchQueries: getRefetchQueries
+      variables: { status: 'active' }
     })
   })
 )(SelectPaymentsContainer);

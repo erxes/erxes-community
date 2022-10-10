@@ -1,7 +1,6 @@
 import { IFormData } from '@erxes/ui-forms/src/forms/types';
 import SelectBrand from '@erxes/ui-inbox/src/settings/integrations/containers/SelectBrand';
 import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
-import SelectPayments from '@erxes/ui-settings/src/payment/containers/SelectPayments';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { LANGUAGES } from '@erxes/ui-settings/src/general/constants';
 import { Description } from '@erxes/ui-settings/src/styles';
@@ -16,7 +15,7 @@ import {
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
 import Toggle from '@erxes/ui/src/components/Toggle';
 import { IField } from '@erxes/ui/src/types';
-import { __ } from 'coreui/utils';
+import { __, loadDynamicComponent } from 'coreui/utils';
 import React from 'react';
 import Select from 'react-select-plus';
 
@@ -187,13 +186,18 @@ class OptionStep extends React.Component<Props, State> {
             onChange={channelOnChange}
           />
 
-          {renderPayments && (
-            <SelectPayments
-              defaultValue={this.props.paymentConfigIds}
-              isRequired={false}
-              onChange={paymentConfigOnChange}
-            />
-          )}
+          {renderPayments &&
+            // <SelectPayments
+            //   defaultValue={this.props.paymentConfigIds}
+            //   isRequired={false}
+            //   onChange={paymentConfigOnChange}
+            // />
+
+            loadDynamicComponent('selectPaymentsForm', {
+              defaultValue: this.props.paymentConfigIds,
+              isRequired: false,
+              onChange: paymentConfigOnChange
+            })}
 
           <FormGroup>
             <ControlLabel required={true}>Visibility</ControlLabel>

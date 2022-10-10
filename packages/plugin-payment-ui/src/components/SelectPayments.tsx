@@ -6,7 +6,7 @@ import React from 'react';
 import Select from 'react-select-plus';
 import styled from 'styled-components';
 
-import { IPaymentConfig } from '../types';
+import { IPaymentConfigDocument } from '../types';
 
 const LeftContent = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ const Row = styled.div`
 `;
 
 type Props = {
-  payments: IPaymentConfig[];
+  payments: IPaymentConfigDocument[];
   onChange?: (values: string[]) => any;
   defaultValue?: string[];
   isRequired?: boolean;
@@ -37,9 +37,9 @@ type Props = {
 };
 
 class SelectPayments extends React.Component<Props, {}> {
-  generateUserOptions(array: IPaymentConfig[] = []): IOption[] {
+  generateUserOptions(array: IPaymentConfigDocument[] = []): IOption[] {
     return array.map(item => {
-      const payment = item || ({} as IPaymentConfig);
+      const payment = item || ({} as IPaymentConfigDocument);
 
       return {
         value: payment._id,

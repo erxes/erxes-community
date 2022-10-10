@@ -3,13 +3,15 @@ module.exports = {
   port: 3012,
   scope: 'payment',
   exposes: {
-    './routes': './src/routes.tsx'
+    './routes': './src/routes.tsx',
+    './selectPaymentsForm': './src/containers/SelectPayments.tsx',
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
     scope: 'payment',
     module: './routes'
   },
+  selectPaymentsForm: './selectPaymentsForm',
   menus: [
     {
       text: 'Invoices',
