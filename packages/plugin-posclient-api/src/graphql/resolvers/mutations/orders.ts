@@ -111,16 +111,14 @@ const orderMutations = {
         });
       }
 
-      if (order.origin !== 'kiosk') {
-        await graphqlPubsub.publish('ordersOrdered', {
-          ordersOrdered: {
-            ...order,
-            _id: order._id,
-            status: order.status,
-            customerId: order.customerId
-          }
-        });
-      }
+      await graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          ...order,
+          _id: order._id,
+          status: order.status,
+          customerId: order.customerId
+        }
+      });
 
       return order;
     } catch (e) {
@@ -166,16 +164,14 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
-    if (order.origin !== 'kiosk') {
-      await graphqlPubsub.publish('ordersOrdered', {
-        ordersOrdered: {
-          ...updatedOrder,
-          _id: updatedOrder._id,
-          status: updatedOrder.status,
-          customerId: updatedOrder.customerId
-        }
-      });
-    }
+    await graphqlPubsub.publish('ordersOrdered', {
+      ordersOrdered: {
+        ...updatedOrder,
+        _id: updatedOrder._id,
+        status: updatedOrder.status,
+        customerId: updatedOrder.customerId
+      }
+    });
 
     return updatedOrder;
   },
@@ -187,7 +183,25 @@ const orderMutations = {
   ) {
     const oldOrder = await models.Orders.getOrder(_id);
 
-    const order = await models.Orders.updateOrder(_id, { ...oldOrder, status });
+    const order = await models.Orders.updateOrder(_id, {
+      ...oldOrder,
+      status,
+      modifiedAt: new Date()
+    });
+
+    if (status === ORDER_STATUSES.REDOING) {
+      await models.OrderItems.updateMany(
+        { orderId: order._id },
+        { $set: { status: ORDER_ITEM_STATUSES.CONFIRM } }
+      );
+    }
+
+    if (status === ORDER_STATUSES.DONE) {
+      await models.OrderItems.updateMany(
+        { orderId: order._id },
+        { $set: { status: ORDER_ITEM_STATUSES.DONE } }
+      );
+    }
 
     await graphqlPubsub.publish('ordersOrdered', {
       ordersOrdered: {
