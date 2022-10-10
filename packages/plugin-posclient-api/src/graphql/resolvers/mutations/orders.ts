@@ -111,13 +111,16 @@ const orderMutations = {
         });
       }
 
-      await graphqlPubsub.publish('ordersOrdered', {
-        ordersOrdered: {
-          _id: order._id,
-          status: order.status,
-          customerId: order.customerId
-        }
-      });
+      if (order.origin !== 'kiosk') {
+        await graphqlPubsub.publish('ordersOrdered', {
+          ordersOrdered: {
+            ...order,
+            _id: order._id,
+            status: order.status,
+            customerId: order.customerId
+          }
+        });
+      }
 
       return order;
     } catch (e) {
@@ -163,15 +166,17 @@ const orderMutations = {
       taxInfo: getTaxInfo(config)
     });
 
-    if (order.status !== updatedOrder.status) {
+    if (order.origin !== 'kiosk') {
       await graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...updatedOrder,
           _id: updatedOrder._id,
           status: updatedOrder.status,
           customerId: updatedOrder.customerId
         }
       });
     }
+
     return updatedOrder;
   },
 
@@ -186,6 +191,7 @@ const orderMutations = {
 
     await graphqlPubsub.publish('ordersOrdered', {
       ordersOrdered: {
+        ...order,
         _id,
         status: order.status,
         customerId: order.customerId
@@ -272,7 +278,6 @@ const orderMutations = {
             $set: {
               ...doc,
               paidDate: now,
-              status: ORDER_STATUSES.PAID,
               modifiedAt: now
             }
           }
@@ -282,6 +287,7 @@ const orderMutations = {
       order = await models.Orders.getOrder(_id);
       graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...order,
           _id,
           status: order.status,
           customerId: order.customerId
@@ -438,7 +444,6 @@ const orderMutations = {
               billType,
               registerNumber,
               paidDate: now,
-              status: ORDER_STATUSES.PAID,
               modifiedAt: now
             }
           }
@@ -449,6 +454,7 @@ const orderMutations = {
 
       graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...order,
           _id,
           status: order.status,
           customerId: order.customerId
