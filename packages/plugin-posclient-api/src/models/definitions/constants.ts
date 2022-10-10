@@ -122,10 +122,11 @@ export const ORDER_RETURN_TYPES = {
 export const ORDER_STATUSES = {
   NEW: 'new',
   DOING: 'doing',
+  REDOING: 'reDoing',
   DONE: 'done',
   COMPLETE: 'complete',
 
-  ALL: ['new', 'doing', 'done', 'complete'],
+  ALL: ['new', 'doing', 'done', 'complete', 'reDoing'],
   FULL: ['paid', 'done', 'complete']
 };
 
