@@ -64,6 +64,7 @@ export interface IConfig {
   token: string;
   uiOptions: IUIOptions;
   ebarimtConfig?: IEbarimtConfig;
+  erkhetConfig?: any;
   qpayConfig?: IQPayConfig;
   catProdMappings?: ICatProd[];
   initialCategoryIds?: string[];
@@ -75,6 +76,8 @@ export interface IConfig {
   branchId?: string;
   departmentId?: string;
   allowBranchIds?: string[];
+  checkRemainder?: boolean;
+  permissionConfig?: any;
 }
 
 export interface IConfigDocument extends Document, IConfig {
@@ -136,6 +139,7 @@ export const configSchema = new Schema({
   token: field({ type: String, label: 'Token generated at erxes-api' }),
   uiOptions: field({ type: Object, label: 'Logo & color configs' }),
   ebarimtConfig: field({ type: ebarimtConfigSchema }),
+  erkhetConfig: field({ type: Object }),
   qpayConfig: field({ type: qpayConfigSchema }),
   catProdMappings: field({
     type: [Object],
@@ -161,7 +165,9 @@ export const configSchema = new Schema({
     type: [String],
     optional: true,
     label: 'Allow branches'
-  })
+  }),
+  checkRemainder: field({ type: Boolean, optional: true }),
+  permissionConfig: field({ type: Object, optional: true })
 });
 
 export const productGroupSchema = new Schema({
