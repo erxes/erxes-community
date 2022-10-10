@@ -12,6 +12,7 @@ export default function generateDataLoaderDepartment(models: IModels, subdomain)
       isRPC: true,
       defaultValue: []
     });
+
     return result;
   });
 }

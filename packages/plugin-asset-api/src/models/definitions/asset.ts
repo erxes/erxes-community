@@ -1,12 +1,7 @@
 import { schemaWrapper, field } from './utils';
 import { Schema } from 'mongoose';
 import { attachmentSchema, customFieldSchema } from '@erxes/api-utils/src/types';
-import {
-  ASSET_GROUP_STATUSES,
-  ASSET_STATUSES,
-  ASSET_SUPPLY,
-  ASSET_TYPES
-} from '../../common/constant/asset';
+import { ASSET_GROUP_STATUSES, ASSET_STATUSES, ASSET_SUPPLY, ASSET_TYPES } from '../../common/constant/asset';
 
 export const assetGroupSchema = schemaWrapper(
   new Schema({
@@ -92,6 +87,7 @@ export const assetSchema = schemaWrapper(
       default: '0'
     }),
     vendorId: field({ type: String, optional: true, label: 'Vendor' }),
-    mergedIds: field({ type: [String], optional: true })
+    mergedIds: field({ type: [String], optional: true }),
+    currentMovement: field({ type: Object, label: 'Current Movement' })
   })
 );

@@ -29,6 +29,19 @@ export const types = contactsAvailable => `
         isRoot: Boolean
         assetCount: Int
     }
+    type CurrentMovement {
+      branchId: String
+      departmentId: String
+      teamMemberId: String
+      companyId: String
+      customerId: String
+
+      branch:JSON
+      department:JSON
+      teamMember:JSON
+      company:JSON
+      customer:JSON
+    }
 
     type Asset @key(fields: "_id") @cacheControl(maxAge: 3) {
     _id: String!
@@ -54,6 +67,7 @@ export const types = contactsAvailable => `
     parent:Asset
     isRoot: Boolean
     chidlAssetCount:Int
+    currentMovement:CurrentMovement
     ${contactsAvailable ? 'vendor: Company' : ''}
     }
 

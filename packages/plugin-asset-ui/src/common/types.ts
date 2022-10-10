@@ -138,10 +138,17 @@ export type SelectedVariables = {
   assetName?: string;
   departmentIds?: string[];
   branchIds?: string[];
-  userType?: string;
+  currentMovement?: object;
 };
 
 export type IMovementType = {
+  _id?: string;
+  assetIds?: string[];
+  assets?: IMovementItem[];
+  createdAt?: string;
+};
+
+export type IMovementItem = {
   _id: string;
   assetId: string;
   assetName: string;
@@ -159,8 +166,20 @@ export type IMovementType = {
   createdAt?: string;
 };
 
+export type MovementItemsQueryResponse = {
+  assetMovementAssets: IMovementItem[];
+} & QueryResponse;
+
+export type MovementItemsTotalCountQueryResponse = {
+  assetMovementItemsTotalCount: number;
+};
+
 export type MovementQueryResponse = {
   assetMovements: IMovementType[];
   loading: boolean;
   refetch: () => void;
 };
+
+export type MovementsTotalCountQueryResponse = {
+  assetMovementTotalCount: number;
+} & QueryResponse;

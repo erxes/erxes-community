@@ -1,16 +1,22 @@
 import React from 'react';
 import { DefaultWrapper } from '../../common/utils';
-import { BarItems, FormControl, Button, router, __, ModalTrigger, Table } from '@erxes/ui/src';
+import { BarItems, FormControl, Button, router, __, ModalTrigger, Table, Tip } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { ContainerBox } from '../../style';
 import { Title } from '@erxes/ui-settings/src/styles';
 import Form from '../containers/Form';
 import { IMovementType } from '../../common/types';
 import Row from './Row';
+import { menuMovements } from '../../common/constant';
+import { SideBar } from './Sidebar';
 type Props = {
   movements: IMovementType[];
+  totalCount: number;
   loading: boolean;
+  remove: () => void;
   refetch: () => void;
+  refetchTotalCount: () => void;
+  history: any;
 } & IRouterProps;
 type State = {
   searchValue: string;
@@ -31,7 +37,15 @@ class List extends React.Component<Props, State> {
     </Button>
   );
   renderRightActionBarContent = props => {
-    return <Form {...props} />;
+    const { refetch, refetchTotalCount } = this.props;
+
+    const updatedProps = {
+      ...props,
+      refetch,
+      refetchTotalCount
+    };
+
+    return <Form {...updatedProps} />;
   };
   renderRightActionBar = (
     <ModalTrigger
@@ -66,8 +80,8 @@ class List extends React.Component<Props, State> {
   }
 
   renderRow() {
-    const { movements } = this.props;
-    return movements.map(movement => <Row key={movement._id} movement={movement} />);
+    const { movements, history } = this.props;
+    return movements.map(movement => <Row key={movement._id} movement={movement} history={history} />);
   }
 
   renderList() {
@@ -75,13 +89,9 @@ class List extends React.Component<Props, State> {
       <Table>
         <thead>
           <tr>
-            <th>{__('Asset Name')}</th>
-            <th>{__('Branch')}</th>
-            <th>{__('Department')}</th>
-            <th>{__('Team Member')}</th>
-            <th>{__('Company')}</th>
-            <th>{__('Customer')}</th>
+            <th>{__('Id')}</th>
             <th>{__('Created At')}</th>
+            <th>{__('Action')}</th>
           </tr>
         </thead>
         <tbody>{this.renderRow()}</tbody>
@@ -90,6 +100,8 @@ class List extends React.Component<Props, State> {
   }
 
   render() {
+    const { totalCount, remove } = this.props;
+
     let rightActionBar = (
       <BarItems>
         <FormControl
@@ -101,6 +113,9 @@ class List extends React.Component<Props, State> {
           onFocus={this.moveCursorAtTheEnd}
         />
         {this.renderRightActionBar}
+        <Tip text="Remove last movement" placement="bottom">
+          <Button btnStyle="danger" icon="cancel-1" onClick={remove} />
+        </Tip>
       </BarItems>
     );
 
@@ -115,7 +130,9 @@ class List extends React.Component<Props, State> {
       rightActionBar,
       leftActionBar,
       content: this.renderList(),
-      sidebar: <div>Sidebar</div>
+      sidebar: <SideBar />,
+      subMenu: menuMovements,
+      totalCount
     };
 
     return <DefaultWrapper {...updatedProps} />;

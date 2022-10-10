@@ -1,12 +1,4 @@
-import {
-  ControlLabel,
-  DataWithLoader,
-  FormGroup,
-  Pagination,
-  Spinner,
-  Wrapper,
-  __
-} from '@erxes/ui/src';
+import { ControlLabel, DataWithLoader, FormGroup, Pagination, Spinner, Wrapper, __, router } from '@erxes/ui/src';
 import React from 'react';
 import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetGroupTypes } from './types';
@@ -20,7 +12,8 @@ export const DefaultWrapper = ({
   content,
   sidebar,
   isPaginationHide,
-  breadcrumb
+  breadcrumb,
+  subMenu
 }: {
   title: string;
   rightActionBar?: JSX.Element;
@@ -31,13 +24,14 @@ export const DefaultWrapper = ({
   sidebar?: JSX.Element;
   isPaginationHide?: boolean;
   breadcrumb?: any[];
+  subMenu?: { title: string; link: string }[];
 }) => {
   if (loading) {
     return <Spinner objective />;
   }
   return (
     <Wrapper
-      header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}
+      header={<Wrapper.Header title={title} submenu={subMenu} breadcrumb={breadcrumb} />}
       actionBar={<Wrapper.ActionBar left={leftActionBar} right={rightActionBar} />}
       content={
         <DataWithLoader
@@ -63,11 +57,7 @@ export const CommonFormGroup = ({ children, label, required }: CommonFormGroupTy
   );
 };
 
-export const generateGroupOptions = (
-  groups: IAssetGroupTypes[],
-  currentGroupId?: string,
-  drawCode?: boolean
-) => {
+export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?: string, drawCode?: boolean) => {
   const result: React.ReactNode[] = [];
 
   for (const group of groups) {
@@ -95,11 +85,7 @@ export const generateGroupOptions = (
   return result;
 };
 
-export const generateParentOptions = (
-  assets: IAsset[],
-  currentAssetId?: string,
-  drawCode?: boolean
-) => {
+export const generateParentOptions = (assets: IAsset[], currentAssetId?: string, drawCode?: boolean) => {
   const result: React.ReactNode[] = [];
   for (const asset of assets) {
     const order = asset.order;
@@ -153,3 +139,16 @@ export const asssetTypeChoises = __ => {
 export const getRefetchQueries = () => {
   return ['assetDetail', 'assets', 'assetsTotalCount', 'assetGroups'];
 };
+
+export const generateParams = ({ queryParams }) => ({
+  ...router.generatePaginationParams(queryParams || {}),
+  movementId: queryParams?.movementId,
+  from: queryParams.from,
+  to: queryParams.to,
+  branchId: queryParams?.branchId,
+  departmentId: queryParams?.departmentId,
+  teamMemberId: queryParams?.teamMemberId,
+  companyId: queryParams?.companyId,
+  customerId: queryParams?.customerId,
+  searchValue: queryParams?.searchValue
+});

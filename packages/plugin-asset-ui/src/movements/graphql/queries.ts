@@ -1,16 +1,19 @@
-const movements = `
-query AssetMovements {
-    assetMovements {
+const movementDetail = `
+query AssetMovement($_id: String) {
+  assetMovement(_id: $_id) {
+    _id
+    assetIds
+    createdAt
+    assets {
       _id
       assetId
       assetName
-      userType
       branchId
       companyId
+      createdAt
       customerId
       departmentId
       teamMemberId
-      createdAt
 
       branch
       department
@@ -19,28 +22,22 @@ query AssetMovements {
       teamMember
     }
   }
-`;
-
-const movementDetail = `
-query AssetMovement($_id: String) {
-  assetMovement(_id: $_id) {
-    _id
-    assetId
-    assetName
-    branch
-    branchId
-    company
-    companyId
-    createdAt
-    customer
-    customerId
-    department
-    departmentId
-    teamMember
-    teamMemberId
-    userType
-  }
 }
 `;
 
-export default { movements, movementDetail };
+const movements = `
+  query AssetMovements {
+  assetMovements {
+    _id
+    assetIds
+    createdAt
+  }
+}
+`;
+const movementsTotalCount = `
+  query AssetMovementTotalCount {
+    assetMovementTotalCount
+  }
+`;
+
+export default { movements, movementDetail, movementsTotalCount };

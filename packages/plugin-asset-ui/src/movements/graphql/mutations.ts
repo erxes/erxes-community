@@ -1,10 +1,14 @@
 import { movementParams, movementParamsDef } from '../../common/graphql/movement';
 
 const movementAdd = `
-    mutation AssetMovementAdd(${movementParamsDef}) {
-        assetMovementAdd(${movementParams})
-    }
+mutation AssetMovementAdd($movements: [IMovementAsset]) {
+  assetMovementAdd(movements: $movements)
+}
+
 `;
-const movementEdit = `
+const movementRemove = `
+mutation Mutation {
+  assetMovementRemove
+}
 `;
-export default { movementAdd, movementEdit };
+export default { movementAdd, movementRemove };

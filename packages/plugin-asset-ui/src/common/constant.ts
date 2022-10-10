@@ -50,10 +50,7 @@ export const ASSET_GROUP_STATUS_FILTER = {
   archived: 'Archived'
 };
 
-export const breadcrumb = [
-  { title: __('Settings'), link: '/settings' },
-  { title: __('Asset & Movement') }
-];
+export const breadcrumb = [{ title: __('Settings'), link: '/settings' }, { title: __('Asset & Movement') }];
 
 export const MOVEMENT_TYPES = [];
 
@@ -73,4 +70,9 @@ export const USER_TYPES = [
     key: 'Company',
     name: 'compnayId'
   }
+];
+
+export const menuMovements = [
+  { title: 'Movements', link: '/asset-movements' },
+  { title: 'Assets', link: '/asset-movement-items' }
 ];

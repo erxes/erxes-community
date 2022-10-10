@@ -39,6 +39,23 @@ const assetFields = `
   isRoot
   minimiumCount
 `;
+
+const assetCurrentField = `
+  currentMovement {
+    branchId
+    departmentId
+    teamMemberId
+    companyId
+    customerId
+
+    branch
+    department
+    teamMember
+    company
+    customer
+  }
+`;
+
 const assets = `
   query assets(
     $type: String,
@@ -63,6 +80,7 @@ const assets = `
       boardId: $boardId
     ) {
       ${assetFields}
+      ${assetCurrentField}
     }
   }
 `;

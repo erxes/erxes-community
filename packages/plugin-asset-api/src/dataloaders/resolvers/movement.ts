@@ -1,23 +1,22 @@
 import { IContext } from '../../connectionResolver';
-import { IMovementDocument } from '../../common/types/asset';
+import { IAssetDocument, IMovementAsset, IMovementDocument } from '../../common/types/asset';
+import { ASSET_STATUSES } from '../../common/constant/asset';
+
 export default {
   __resolveReference({ _id }, { models }: IContext) {
-    return models.Movement.findOne({ _id });
+    return models.Asset.findOne({ _id });
   },
 
-  async branch(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    return (movement.branchId && dataLoaders.branch.load(movement.branchId)) || null;
-  },
-  async customer(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    return (movement.customerId && dataLoaders.customer.load(movement.customerId)) || null;
-  },
-  async company(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    return (movement.companyId && dataLoaders.company.load(movement.companyId)) || null;
-  },
-  async teamMember(movement: IMovementDocument, {}, { dataLoaders }: IContext) {
-    return (movement.teamMemberId && dataLoaders.teamMember.load(movement.teamMemberId)) || null;
-  },
-  async department(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    return (movement.departmentId && dataLoaders.department.load(movement.departmentId)) || null;
+  async assets(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
+    const movementItems = await models.MovementAsset.find({ _id: { $in: movement.assetIds } }).lean();
+    movementItems.map(item => ({
+      ...item,
+      branch: (item.branchId && dataLoaders.branch.load(item.branchId)) || null,
+      teamMember: (item.teamMemberId && dataLoaders.teamMember.load(item.teamMemberId)) || null,
+      customer: (item.customer && dataLoaders.customer.load(item.customer)) || null,
+      company: (item.company && dataLoaders.company.load(item.company)) || null,
+      department: (item.departmentId && dataLoaders.department.load(item.departmentId)) || null
+    }));
+    return movementItems;
   }
 };

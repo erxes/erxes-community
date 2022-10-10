@@ -1,20 +1,27 @@
 import React from 'react';
-import { Chooser } from '@erxes/ui/src';
-import { IAsset } from '../../common/types';
+import { Chooser, Spinner } from '@erxes/ui/src';
+import { IAsset, IAssetQueryResponse } from '../../common/types';
 import AssetForm from '../../asset/containers/Form';
+import { withProps } from '@erxes/ui/src/utils/core';
+import * as compose from 'lodash.flowright';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import { queries } from '../../asset/graphql';
 type Props = {
-  datas: IAsset[];
-  refetch: (variables: any) => void;
   closeModal: () => void;
   handleSelect: (datas: IAsset[]) => void;
 };
+
+type FinalProps = {
+  assets: IAssetQueryResponse;
+} & Props;
 
 type State = {
   perpage: number;
   searchValue: string;
 };
 
-class AssetChooser extends React.Component<Props, State> {
+class AssetChooser extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
 
@@ -24,12 +31,14 @@ class AssetChooser extends React.Component<Props, State> {
       perpage: 0,
       searchValue: ''
     };
+
+    this.search = this.search.bind(this);
   }
 
   assetAddForm(props) {
     const updatedProps = {
       ...props,
-      assets: this.props.datas
+      assets: this.props.assets.assets
     };
 
     return <AssetForm {...updatedProps} />;
@@ -40,7 +49,7 @@ class AssetChooser extends React.Component<Props, State> {
       this.setState({ perpage: 0 });
     }
     this.setState({ perpage: this.state.perpage + 5 }, () =>
-      this.props.refetch({
+      this.props.assets.refetch({
         searchValue: value,
         perPage: this.state.perpage
       })
@@ -48,12 +57,16 @@ class AssetChooser extends React.Component<Props, State> {
   }
 
   render() {
-    const { closeModal, datas, handleSelect } = this.props;
+    const { closeModal, assets, handleSelect } = this.props;
+
+    if (assets.loading) {
+      return <Spinner />;
+    }
 
     return (
       <Chooser
         title="Asset Chooser"
-        datas={datas}
+        datas={assets.assets}
         data={{}}
         search={this.search}
         clearState={() => this.search('', true)}
@@ -67,4 +80,17 @@ class AssetChooser extends React.Component<Props, State> {
   }
 }
 
-export default AssetChooser;
+export default withProps(
+  compose(
+    graphql(gql(queries.assets), {
+      name: 'assets',
+      options: () => ({
+        variables: {
+          perPage: 20,
+          searchValue: ''
+        },
+        fetchPolicy: 'network-only'
+      })
+    })
+  )(AssetChooser)
+);

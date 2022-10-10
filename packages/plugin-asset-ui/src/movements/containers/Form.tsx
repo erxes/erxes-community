@@ -13,10 +13,11 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 type Props = {
   assetId?: string;
   closeModal: () => void;
+  refetch: () => void;
+  refetchTotalCount: () => void;
 };
 
 type FinalProps = {
-  assets: IAssetQueryResponse;
   movementDetail: IMovementDetailQueryResponse;
 } & Props;
 
@@ -26,22 +27,25 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { assets, movementDetail, closeModal } = this.props;
+    const { movementDetail, closeModal } = this.props;
 
-    if (assets.loading || movementDetail.loading) {
+    if (movementDetail && movementDetail.loading) {
       return <Spinner objective />;
     }
 
-    const refetch = variables => {
-      assets.refetch(variables);
-    };
-
     const renderButton = ({ name, values, isSubmitted, callback }: IButtonMutateProps) => {
+      const afterSavedDb = () => {
+        const { refetch, refetchTotalCount } = this.props;
+
+        refetch();
+        refetchTotalCount();
+        callback && callback();
+      };
       return (
         <ButtonMutate
           mutation={mutations.movementAdd}
           variables={values}
-          callback={callback}
+          callback={afterSavedDb}
           refetchQueries={getRefetchQueries()}
           isSubmitted={isSubmitted}
           type="submit"
@@ -52,12 +56,9 @@ class FormContainer extends React.Component<FinalProps> {
     };
 
     const updatedProps = {
-      assets: assets.assets,
-      loading: assets.loading,
-      detail: movementDetail.assetMovement,
-      refetch,
+      detail: movementDetail?.assetMovement.assets || [],
       closeModal,
-      renderButton: !movementDetail.assetMovement ? renderButton : undefined
+      renderButton: !movementDetail?.assetMovement ? renderButton : undefined
     };
 
     return <Form {...updatedProps} />;
@@ -66,9 +67,6 @@ class FormContainer extends React.Component<FinalProps> {
 
 export default withProps(
   compose(
-    graphql<Props>(gql(assetQueries.assets), {
-      name: 'assets'
-    }),
     graphql<Props>(gql(queries.movementDetail), {
       name: 'movementDetail',
       skip: ({ assetId }) => !assetId,

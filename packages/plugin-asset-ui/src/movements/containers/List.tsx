@@ -1,16 +1,21 @@
 import React from 'react';
 import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
-import { Bulk, Spinner } from '@erxes/ui/src';
+import { Alert, Bulk, Spinner } from '@erxes/ui/src';
 import List from '../components/List';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { queries } from '../graphql';
+import { mutations, queries } from '../graphql';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { MovementQueryResponse } from '../../common/types';
+import { MovementQueryResponse, MovementsTotalCountQueryResponse } from '../../common/types';
 
-type Props = {};
-type FinalProps = { movementsQuery: MovementQueryResponse } & IRouterProps & Props;
+type Props = { queryParams: any; history: string };
+type FinalProps = {
+  movementsQuery: MovementQueryResponse;
+  movementsTotalCountQuery: MovementsTotalCountQueryResponse;
+  movementRemove: any;
+} & IRouterProps &
+  Props;
 
 class ListContainer extends React.Component<FinalProps> {
   constructor(props) {
@@ -20,17 +25,29 @@ class ListContainer extends React.Component<FinalProps> {
   }
 
   renderList() {
-    const { movementsQuery } = this.props;
+    const { movementsQuery, movementsTotalCountQuery, history } = this.props;
 
     if (movementsQuery.loading) {
       return <Spinner />;
     }
 
+    const remove = () => {
+      this.props.movementRemove().then(() => {
+        movementsQuery.refetch();
+        movementsTotalCountQuery.refetch();
+        Alert.success('Removed movement');
+      });
+    };
+
     const updateProps = {
       ...this.props,
       movements: movementsQuery.assetMovements,
+      totalCount: movementsTotalCountQuery.assetMovementTotalCount,
       loading: movementsQuery.loading,
-      refetch: movementsQuery.refetch
+      refetch: movementsQuery.refetch,
+      refetchTotalCount: movementsTotalCountQuery.refetch,
+      history,
+      remove
     };
 
     return <List {...updateProps} />;
@@ -45,6 +62,12 @@ export default withProps(
   compose(
     graphql<Props>(gql(queries.movements), {
       name: 'movementsQuery'
+    }),
+    graphql<Props>(gql(queries.movementsTotalCount), {
+      name: 'movementsTotalCountQuery'
+    }),
+    graphql<Props>(gql(mutations.movementRemove), {
+      name: 'movementRemove'
     })
   )(ListContainer)
 );

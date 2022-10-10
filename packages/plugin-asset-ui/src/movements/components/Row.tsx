@@ -1,11 +1,12 @@
 import React from 'react';
 import { IMovementType } from '../../common/types';
 import moment from 'moment';
-import { Button, ModalTrigger } from '@erxes/ui/src';
+import { Button, ModalTrigger, router } from '@erxes/ui/src';
 import Form from '../containers/Form';
 
 type Props = {
   movement: IMovementType;
+  history: any;
 };
 
 class Row extends React.Component<Props> {
@@ -16,26 +17,20 @@ class Row extends React.Component<Props> {
   render() {
     const { movement } = this.props;
 
-    const {
-      assetName,
-      branch,
-      department,
-      teamMember,
-      company,
-      customer,
-      createdAt,
-      _id
-    } = movement;
+    const { createdAt, _id } = movement;
+
+    const handleItems = () => {
+      const { history } = this.props;
+      history.push(`/asset-movement-items?movementId=${_id}`);
+    };
 
     const renderRow = (
       <tr>
-        <td>{assetName}</td>
-        <td>{(branch && branch?.title) || '-'}</td>
-        <td>{(department && department.title) || '-'}</td>
-        <td>{(teamMember && teamMember.name) || '-'}</td>
-        <td>{(company && company.name) || '-'}</td>
-        <td>{(customer && customer.name) || '-'}</td>
+        <td>{_id}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
+        <td>
+          <Button btnStyle="link" icon="list-2" onClick={handleItems} />
+        </td>
       </tr>
     );
 
