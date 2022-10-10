@@ -36,6 +36,8 @@ const posCommonFields = `
   kioskExcludeProductIds: [String]
   deliveryConfig: JSON
   cardsConfig: JSON
+  checkRemainder: Boolean
+  permissionConfig: JSON
 `;
 
 const catProd = `
@@ -53,6 +55,7 @@ const posOrderFields = contactsEnabled => `
   customerId: String,
   cardAmount: Float,
   cashAmount: Float,
+  receivableAmount: Float,
   mobileAmount: Float,
   totalAmount: Float,
   finalAmount: Float,
@@ -214,7 +217,7 @@ const queryParams = `
   paidDate: String
   userId: String
   customerId: String
-  posToken: String
+  posId: String
 `;
 
 export const queries = `
@@ -228,7 +231,7 @@ export const queries = `
   posProducts(${queryParams} categoryId: String, searchValue: String): PosProducts
   posOrdersSummary(${queryParams}): JSON
   ecommerceGetBranches(posToken: String): [JSON]
-  posOrdersTotalCount(${queryParams}): JSON 
+  posOrdersTotalCount(${queryParams}): JSON
 `;
 
 export const mutations = `
@@ -240,5 +243,5 @@ export const mutations = `
   posSlotBulkUpdate(posId: String, slots: [SlotInput]): [PosSlot]
   posOrderSyncErkhet(_id: String!): PosOrder
   posOrderReturnBill(_id: String!): PosOrder
-  posOrderChangePayments(_id: String!, cashAmount: Float, cardAmount: Float, mobileAmount: Float): PosOrder
+  posOrderChangePayments(_id: String!, cashAmount: Float, receivableAmount: Float, cardAmount: Float, mobileAmount: Float): PosOrder
 `;
