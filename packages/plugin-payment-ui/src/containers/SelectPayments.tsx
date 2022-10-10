@@ -22,6 +22,7 @@ type FinalProps = {
 } & Props;
 
 const SelectPaymentsContainer = (props: ChildProps<FinalProps>) => {
+  console.log('paymentssssss');
   const { paymentsQuery } = props;
 
   const payments = paymentsQuery.paymentConfigs || [];

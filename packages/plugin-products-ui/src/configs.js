@@ -1,14 +1,17 @@
 module.exports = {
   name: "products",
   port: 3022,
+  scope: 'products',
   exposes: {
     "./routes": "./src/routes.tsx",
+    './selectCategoryForm': './src/containers/productCategory/SelectProductCategory.tsx',
   },
   routes: {
     url: "http://localhost:3022/remoteEntry.js",
     scope: "products",
     module: "./routes",
   },
+  selectCategoryForm: './selectCategoryForm',
   menus: [
     {
       text: "Product and services",

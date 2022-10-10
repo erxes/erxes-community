@@ -448,7 +448,7 @@ export default class Field extends React.Component<Props, State> {
         <option>-</option>
         {products.map(({ _id, name, unitPrice }) => (
           <option key={_id} value={_id}>
-            {`${name} - ${unitPrice.toLocaleString()}`}
+            {`${name} - ${unitPrice || ''} `}
           </option>
         ))}
       </select>

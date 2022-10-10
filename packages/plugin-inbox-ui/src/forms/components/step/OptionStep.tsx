@@ -187,12 +187,6 @@ class OptionStep extends React.Component<Props, State> {
           />
 
           {renderPayments &&
-            // <SelectPayments
-            //   defaultValue={this.props.paymentConfigIds}
-            //   isRequired={false}
-            //   onChange={paymentConfigOnChange}
-            // />
-
             loadDynamicComponent('selectPaymentsForm', {
               defaultValue: this.props.paymentConfigIds,
               isRequired: false,

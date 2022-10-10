@@ -39,8 +39,15 @@ export const loadDynamicComponent = (
   multi?: boolean,
   pluginName?: string
 ): any => {
+  console.log('componentName', componentName);
+
   const plugins: any[] = (window as any).plugins || [];
+
+  // console.log('plugins', plugins);
+
   const filteredPlugins = plugins.filter(plugin => plugin[componentName]);
+
+  // console.log('filteredPlugins', filteredPlugins);
 
   const renderDynamicComp = (plugin: any) => (
     <ErrorBoundary key={plugin.scope}>
@@ -65,8 +72,12 @@ export const loadDynamicComponent = (
       plugin => plugin.name === pluginName
     );
 
+    console.log('withPluginName', withPluginName);
+
     return renderDynamicComp(withPluginName[0]);
   }
+
+  console.log('filteredPlugins[0]', filteredPlugins[0]);
 
   return renderDynamicComp(filteredPlugins[0]);
 };

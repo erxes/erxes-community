@@ -39,11 +39,7 @@ export const formDetailQuery = `
           logicOperator
           logicValue
         }
-        products{
-          _id
-          name
-          unitPrice
-        }
+        products
       }
     }
   }

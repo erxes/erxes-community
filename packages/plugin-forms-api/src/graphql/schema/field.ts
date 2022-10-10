@@ -83,14 +83,8 @@ export const fieldsTypes = ({ products }) => `
     objectListConfigs: [ObjectListConfig]
     optionsValues: String
 
-    ${
-      products
-        ? `
-        products: [Product]
-      `
-        : `products: [JSON]`
-    }
-
+    products: [JSON]
+    
     ${fieldCommonFields}
     logics: [Logic]
   }

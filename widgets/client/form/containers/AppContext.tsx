@@ -194,8 +194,16 @@ export class AppProvider extends React.Component<{}, IState> {
           status = 'PAYMENT_PENDING';
 
           getPaymentLink(requiredPaymentAmount, response.conversationId).then((response: any) => {
-            const paymentsUrl = response.data.getPaymentOptions;
+            const paymentsUrl = response.data.getPaymentOptions || '';
             this.setState({ paymentsUrl });
+          }).catch((error: any) => {
+            if (error.message.includes('Received status code 400')) {
+              status = 'SUCCESS';
+              this.setState({ currentStatus: { status } });
+              return;
+            }
+            status = 'ERROR';
+            this.setState({ currentStatus: { status } });
           });
         }
 
