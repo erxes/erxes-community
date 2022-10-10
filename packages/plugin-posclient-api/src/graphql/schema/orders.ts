@@ -121,6 +121,7 @@ export const types = `
     unitPrice: Float!
     isPackage: Boolean
     isTake: Boolean
+    status: String
   }
 
   input OrderPaymentInput {

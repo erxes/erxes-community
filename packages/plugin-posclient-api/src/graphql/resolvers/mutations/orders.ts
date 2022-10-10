@@ -150,6 +150,20 @@ const orderMutations = {
 
     await updateOrderItems(doc._id, preparedDoc.items, models);
 
+    let status = order.status;
+
+    if (
+      [ORDER_STATUSES.COMPLETE, ORDER_STATUSES.DONE].includes(
+        order.status || ''
+      )
+    ) {
+      const newItems =
+        doc.items.filter(i => i.status === ORDER_ITEM_STATUSES.NEW) || [];
+      if (newItems.length) {
+        status = ORDER_STATUSES.REDOING;
+      }
+    }
+
     const updatedOrder = await models.Orders.updateOrder(doc._id, {
       deliveryInfo: doc.deliveryInfo,
       branchId: doc.branchId,
@@ -161,7 +175,8 @@ const orderMutations = {
       slotCode: doc.slotCode,
       posToken: config.token,
       departmentId: config.departmentId,
-      taxInfo: getTaxInfo(config)
+      taxInfo: getTaxInfo(config),
+      status
     });
 
     await graphqlPubsub.publish('ordersOrdered', {
