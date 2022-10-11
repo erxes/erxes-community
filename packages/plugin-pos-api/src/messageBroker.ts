@@ -234,10 +234,24 @@ export const initBroker = async cl => {
     // sync deal config
     const { dealsIntegrationConfig } = pos;
 
-    const currentDealsConfigs: any =
-      Object.values(dealsIntegrationConfig || {}) || [];
+    const currentDealsConfigs: any = dealsIntegrationConfig || {};
 
-    if (newOrder.customerId && currentCardsConfig) {
+    let checkDealsConfigs: any = [];
+    let createDealConfig: any = {};
+
+    if (currentDealsConfigs.forCreateDeal) {
+      createDealConfig = currentDealsConfigs.forCreateDeal;
+    }
+
+    if (currentDealsConfigs.forCheckDeals) {
+      checkDealsConfigs = currentDealsConfigs.forCheckDeals;
+    }
+
+    if (
+      newOrder.customerId &&
+      checkDealsConfigs.length &&
+      newOrder.mergedAmount
+    ) {
       const conformities = await sendCoreMessage({
         subdomain,
         action: 'conformities.savedConformities',
@@ -249,7 +263,7 @@ export const initBroker = async cl => {
         isRPC: true,
         defaultValue: []
       });
-
+      let foundDeal;
       if (conformities.length) {
         const dealIds = conformities.map(c => c.relTypeId);
 
@@ -257,19 +271,24 @@ export const initBroker = async cl => {
           subdomain,
           action: 'deals.find',
           data: {
-            stageId: { $in: currentDealsConfigs.map(c => c.stageId) },
-            _id: { $in: dealIds }
+            query: {
+              stageId: { $in: checkDealsConfigs.map(c => c.stageId) },
+              status: { $ne: 'archive' },
+              _id: { $in: dealIds }
+            },
+            sort: { modifiedAt: -1 }
           },
           isRPC: true
         });
 
         if (foundDeals) {
+          foundDeal = foundDeals[0];
           await sendCardsMessage({
             subdomain,
-            action: 'deals.updateMany',
+            action: 'deals.updateOne',
             data: {
               selector: {
-                _id: { $in: foundDeals.map(f => f._id) }
+                _id: foundDeal._id
               },
               modifier: {
                 name: `Cards: ${newOrder.number}`,
@@ -290,33 +309,33 @@ export const initBroker = async cl => {
             },
             isRPC: true
           });
-        } else {
-          for (const dealConfigs of currentDealsConfigs) {
-            await sendCardsMessage({
-              subdomain,
-              action: 'deals.create',
-              data: {
-                name: `Cards: ${newOrder.number}`,
-                startDate: newOrder.createdAt,
-                description: newOrder.deliveryInfo
-                  ? newOrder.deliveryInfo.address
-                  : '',
-                stageId: dealConfigs.stageId,
-                productsData: newOrder.items.map(i => ({
-                  productId: i.productId,
-                  uom: 'PC',
-                  currency: 'MNT',
-                  quantity: i.count,
-                  unitPrice: i.unitPrice,
-                  amount: i.count * i.unitPrice,
-                  tickUsed: true
-                }))
-              },
-              isRPC: true,
-              defaultValue: {}
-            });
-          }
         }
+      }
+
+      if (!foundDeal && createDealConfig) {
+        await sendCardsMessage({
+          subdomain,
+          action: 'deals.create',
+          data: {
+            name: `Cards: ${newOrder.number}`,
+            startDate: newOrder.createdAt,
+            description: newOrder.deliveryInfo
+              ? newOrder.deliveryInfo.address
+              : '',
+            stageId: createDealConfig.stageId,
+            productsData: newOrder.items.map(i => ({
+              productId: i.productId,
+              uom: 'PC',
+              currency: 'MNT',
+              quantity: i.count,
+              unitPrice: i.unitPrice,
+              amount: i.count * i.unitPrice,
+              tickUsed: true
+            }))
+          },
+          isRPC: true,
+          defaultValue: {}
+        });
       }
     }
     // return info saved

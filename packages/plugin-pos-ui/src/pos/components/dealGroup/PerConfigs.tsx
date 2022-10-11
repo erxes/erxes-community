@@ -50,11 +50,10 @@ class PerConfigs extends React.Component<Props, State> {
     e.preventDefault();
     const { configsMap, currentConfigKey } = this.props;
     const { config } = this.state;
-    console.log(currentConfigKey);
     const key = Math.floor(Math.random() * 1000000 + 1);
 
-    delete configsMap.dealsIntegrationConfig[currentConfigKey];
-    configsMap.dealsIntegrationConfig[key] = config;
+    delete configsMap.forCheckDeals[currentConfigKey];
+    configsMap.forCheckDeals[key] = config;
     this.props.save('dealsIntegrationConfig', configsMap);
     Alert.success('You successfully updated stage in deals settings.');
   };

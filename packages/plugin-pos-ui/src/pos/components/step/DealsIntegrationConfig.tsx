@@ -1,7 +1,15 @@
 import PerConfigs from '../dealGroup/PerConfigs';
 import React from 'react';
-import { __, Alert, Button } from '@erxes/ui/src';
-import { Block, FlexColumn, FlexItem, FlexRow } from '../../../styles';
+import {
+  AppearanceRow,
+  Block,
+  FlexColumn,
+  FlexItem,
+  FlexRow
+} from '../../../styles';
+import { Button, ControlLabel, FormGroup } from '@erxes/ui/src/components';
+import BoardSelectContainer from '@erxes/ui-cards/src/boards/containers/BoardSelect';
+import { Alert, __ } from '@erxes/ui/src/utils';
 import { IConfigsMap } from '../../../types';
 import { IPos } from '../../../types';
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
@@ -16,12 +24,24 @@ type State = {
 class DealsIntegrationConfig extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    const configsMap =
+    let configsMap =
       props.pos && props.pos.dealsIntegrationConfig
         ? props.pos.dealsIntegrationConfig
         : {
-            dealsIntegrationConfig: null
+            forCheckDeals: null,
+            forCreateDeal: {
+              boardId: '',
+              pipelineId: '',
+              stageId: ''
+            }
           };
+    if (!configsMap.forCheckDeals) {
+      configsMap.forCreateDeal = {
+        boardId: '',
+        pipelineId: '',
+        stageId: ''
+      };
+    }
     this.state = {
       configsMap: configsMap
     };
@@ -30,11 +50,11 @@ class DealsIntegrationConfig extends React.Component<Props, State> {
     e.preventDefault();
     const { configsMap } = this.state;
 
-    if (!configsMap?.dealsIntegrationConfig) {
-      configsMap.dealsIntegrationConfig = {};
+    if (!configsMap?.forCheckDeals) {
+      configsMap.forCheckDeals = {};
     }
 
-    configsMap.dealsIntegrationConfig.newDealsIntegrationConfig = {
+    configsMap.forCheckDeals.newDealsIntegrationConfig = {
       boardId: '',
       pipelineId: '',
       stageId: ''
@@ -43,8 +63,8 @@ class DealsIntegrationConfig extends React.Component<Props, State> {
   };
   delete = (currentConfigKey: string) => {
     const { configsMap } = this.state;
-    delete configsMap.dealsIntegrationConfig[currentConfigKey];
-    delete configsMap.dealsIntegrationConfig['newDealsConfig'];
+    delete configsMap.forCheckDeals[currentConfigKey];
+    delete configsMap.forCheckDeals['newDealsConfig'];
 
     this.setState({ configsMap });
 
@@ -65,9 +85,16 @@ class DealsIntegrationConfig extends React.Component<Props, State> {
       );
     });
   }
+
+  onChangeCreateConfig = (code: string, value) => {
+    const { configsMap } = this.state;
+    configsMap.forCreateDeal[code] = value;
+
+    this.setState({ configsMap });
+  };
   renderCollapse() {
     const { configsMap } = this.state;
-    const mapping = configsMap.dealsIntegrationConfig || {};
+    const mapping = configsMap.forCheckDeals || {};
     const actionButtons = (
       <Button
         btnStyle="primary"
@@ -78,13 +105,45 @@ class DealsIntegrationConfig extends React.Component<Props, State> {
         Add Stage
       </Button>
     );
+
+    const onChangeBoard = (boardId: string) => {
+      this.onChangeCreateConfig('boardId', boardId);
+    };
+
+    const onChangePipeline = (pipelineId: string) => {
+      this.onChangeCreateConfig('pipelineId', pipelineId);
+    };
+
+    const onChangeStage = (stageId: string) => {
+      this.onChangeCreateConfig('stageId', stageId);
+    };
+
     return (
       <FlexRow>
         <LeftItem>
-          {actionButtons}
-          <br />
-          <br />
-          {this.renderContent(mapping)}
+          <Block>
+            <h4>For creating new deal</h4>
+            <FormGroup>
+              <ControlLabel>Choose Stage</ControlLabel>
+              <BoardSelectContainer
+                type="deal"
+                autoSelectStage={false}
+                boardId={configsMap.forCreateDeal['boardId']}
+                pipelineId={configsMap.forCreateDeal['pipelineId']}
+                stageId={configsMap.forCreateDeal['stageId']}
+                onChangeBoard={onChangeBoard}
+                onChangePipeline={onChangePipeline}
+                onChangeStage={onChangeStage}
+              />
+            </FormGroup>
+          </Block>
+          <Block>
+            <h4>For checking deals</h4>
+            {actionButtons}
+            <br />
+            <br />
+            {this.renderContent(mapping)}
+          </Block>
         </LeftItem>
       </FlexRow>
     );
