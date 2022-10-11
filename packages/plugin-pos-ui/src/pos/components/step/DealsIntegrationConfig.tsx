@@ -7,20 +7,20 @@ import { IPos } from '../../../types';
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
 
 type Props = {
-  onChange: (name: 'dealsConfig', value: any) => void;
+  onChange: (name: 'dealsIntegrationConfig', value: any) => void;
   pos?: IPos;
 };
 type State = {
   configsMap: IConfigsMap;
 };
-class DealsConfig extends React.Component<Props, State> {
+class DealsIntegrationConfig extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const configsMap =
-      props.pos && props.pos.dealsConfig
-        ? props.pos.dealsConfig
+      props.pos && props.pos.dealsIntegrationConfig
+        ? props.pos.dealsIntegrationConfig
         : {
-            dealsConfig: null
+            dealsIntegrationConfig: null
           };
     this.state = {
       configsMap: configsMap
@@ -30,11 +30,11 @@ class DealsConfig extends React.Component<Props, State> {
     e.preventDefault();
     const { configsMap } = this.state;
 
-    if (!configsMap?.dealsConfig) {
-      configsMap.dealsConfig = {};
+    if (!configsMap?.dealsIntegrationConfig) {
+      configsMap.dealsIntegrationConfig = {};
     }
 
-    configsMap.dealsConfig.newDealsConfig = {
+    configsMap.dealsIntegrationConfig.newDealsIntegrationConfig = {
       boardId: '',
       pipelineId: '',
       stageId: ''
@@ -43,12 +43,12 @@ class DealsConfig extends React.Component<Props, State> {
   };
   delete = (currentConfigKey: string) => {
     const { configsMap } = this.state;
-    delete configsMap.dealsConfig[currentConfigKey];
-    delete configsMap.dealsConfig['newDealsConfig'];
+    delete configsMap.dealsIntegrationConfig[currentConfigKey];
+    delete configsMap.dealsIntegrationConfig['newDealsConfig'];
 
     this.setState({ configsMap });
 
-    this.props.onChange('dealsConfig', configsMap);
+    this.props.onChange('dealsIntegrationConfig', configsMap);
     Alert.success('You successfully deleted stage in deals settings.');
   };
   renderContent(configs) {
@@ -67,7 +67,7 @@ class DealsConfig extends React.Component<Props, State> {
   }
   renderCollapse() {
     const { configsMap } = this.state;
-    const mapping = configsMap.dealsConfig || {};
+    const mapping = configsMap.dealsIntegrationConfig || {};
     const actionButtons = (
       <Button
         btnStyle="primary"
@@ -101,4 +101,4 @@ class DealsConfig extends React.Component<Props, State> {
     );
   }
 }
-export default DealsConfig;
+export default DealsIntegrationConfig;

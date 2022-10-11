@@ -25,7 +25,7 @@ import GeneralStep from './step/GeneralStep';
 import { IProductCategory } from '@erxes/ui-products/src/types';
 import { Link } from 'react-router-dom';
 import React from 'react';
-import DealsConfig from './step/DealsConfig';
+import DealsIntegrationConfig from './step/DealsIntegrationConfig';
 import PermissionStep from './step/Permission';
 
 type Props = {
@@ -55,7 +55,7 @@ type State = {
   erkhetConfig: any;
   deliveryConfig: any;
   cardsConfig: any;
-  dealsConfig: any;
+  dealsIntegrationConfig: any;
   checkRemainder: boolean;
 };
 
@@ -90,7 +90,7 @@ class Pos extends React.Component<Props, State> {
       erkhetConfig: pos.erkhetConfig,
       deliveryConfig: pos.deliveryConfig,
       cardsConfig: pos.cardsConfig,
-      dealsConfig: pos.dealsConfig,
+      dealsIntegrationConfig: pos.dealsIntegrationConfig,
       slots: props.slots || [],
       checkRemainder: pos.checkRemainder || false
     };
@@ -109,7 +109,7 @@ class Pos extends React.Component<Props, State> {
       erkhetConfig,
       deliveryConfig,
       cardsConfig,
-      dealsConfig
+      dealsIntegrationConfig
     } = this.state;
 
     if (!pos.name) {
@@ -163,7 +163,7 @@ class Pos extends React.Component<Props, State> {
       kioskExcludeProductIds: pos.kioskExcludeProductIds || [],
       deliveryConfig,
       cardsConfig,
-      dealsConfig,
+      dealsIntegrationConfig,
       checkRemainder,
       permissionConfig: pos.permissionConfig || {}
     };
@@ -361,11 +361,11 @@ class Pos extends React.Component<Props, State> {
               </Step>
               <Step
                 img="/images/icons/erxes-07.svg"
-                title={'Sync Deals'}
+                title={'Deals Integration Config'}
                 onClick={this.onStepClick}
                 noButton={true}
               >
-                <DealsConfig onChange={this.onChange} pos={pos} />
+                <DealsIntegrationConfig onChange={this.onChange} pos={pos} />
               </Step>
             </Steps>
             <ControlWrapper>
