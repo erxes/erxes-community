@@ -77,7 +77,8 @@ export const callBackQpay = async (req, res) => {
     {
       $set: {
         paymentDate: new Date(),
-        qpayPaymentId: paymentId
+        qpayPaymentId: paymentId,
+        status: 'PAID'
       }
     }
   );
