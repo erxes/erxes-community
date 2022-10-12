@@ -8,8 +8,13 @@ const generateFilter = params => {
     filter.createdAt = { $gte: params.from };
   }
   if (params.to) {
-    filter.createdAt = { ...filter.createdAt, $lt: params.to };
+    filter.createdAt = { ...filter.createdAt, $lte: params.to };
   }
+  if (params.userId) {
+    filter.userId = params.userId;
+  }
+
+  return filter;
 };
 
 const movementQueries = {

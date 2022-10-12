@@ -10,13 +10,19 @@ export interface IMovementAssetModel extends Model<IMovementAssetDocument> {
 
 export const loadMovementAssetClass = (models: IModels) => {
   class MovementAsset {
-    public static async movementAssetsAdd(assets: any) {
+    public static async movementAssetsAdd(assets: any[]) {
+      for (const asset of assets) {
+        if (!asset.branchId || !asset.departmentId) {
+          throw new Error('You cannot move an asset without a branch or department');
+        }
+      }
+
       for (const asset of assets) {
         await models.Asset.findByIdAndUpdate(asset.assetId, {
           $set: { currentMovement: { ...asset, assetId: undefined, assetName: undefined } }
         });
       }
-      return models.MovementAsset.insertMany(assets, { ordered: false });
+      return models.MovementAsset.insertMany(assets);
     }
   }
 

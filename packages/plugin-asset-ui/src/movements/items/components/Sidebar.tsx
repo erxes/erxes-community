@@ -15,6 +15,7 @@ import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectC
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { ContainerBox } from '../../../style';
+import moment from 'moment';
 
 type Props = {
   history: any;
@@ -79,7 +80,7 @@ class Sidebar extends React.Component<Props, State> {
 
     const handleSelect = (value, name) => {
       if (['from', 'to'].includes(name)) {
-        value = new Date(value);
+        value = moment(value).format(`YYYY/MM/DD hh:mm`);
       }
 
       this.setState({ [name]: value });
@@ -90,7 +91,13 @@ class Sidebar extends React.Component<Props, State> {
       <CommonSideBar>
         <ContainerBox column gap={5}>
           <FormGroup label="Branch" field="branchId" clearable={!!branchId}>
-            <SelectBranches label="Choose Branch" name="branchId" multi={false} initialValue={branchId} onSelect={handleSelect} />
+            <SelectBranches
+              label="Choose Branch"
+              name="branchId"
+              multi={false}
+              initialValue={branchId}
+              onSelect={handleSelect}
+            />
           </FormGroup>
           <FormGroup label="Department" field="departmentId" clearable={!!departmentId}>
             <SelectDepartments
@@ -130,12 +137,22 @@ class Sidebar extends React.Component<Props, State> {
           </FormGroup>
           <FormGroup label="From" clearable={!!from} field="from">
             <DateContainer>
-              <DateControl name="from" placeholder="Choose start date" value={from} onChange={e => handleSelect(e, 'from')} />
+              <DateControl
+                name="from"
+                placeholder="Choose start date"
+                value={from}
+                onChange={e => handleSelect(e, 'from')}
+              />
             </DateContainer>
           </FormGroup>
           <FormGroup label="To" clearable={!!to} field="to">
             <DateContainer>
-              <DateControl name="to" placeholder="Choose end date" value={to} onChange={e => handleSelect(e, 'to')} />
+              <DateControl
+                name="to"
+                placeholder="Choose end date"
+                value={to}
+                onChange={e => handleSelect(e, 'to')}
+              />
             </DateContainer>
           </FormGroup>
         </ContainerBox>

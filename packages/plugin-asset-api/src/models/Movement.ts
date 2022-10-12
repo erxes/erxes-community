@@ -5,7 +5,7 @@ import { movementSchema } from './definitions/movements';
 
 export interface IMovementModel extends Model<IMovementDocument> {
   movements(params: any): Promise<IMovementDocument[]>;
-  movementAdd(movements: any): Promise<IMovementDocument>;
+  movementAdd(doc: any, userId: string): Promise<IMovementDocument>;
   movementRemove(): Promise<IMovementDocument>;
 }
 
@@ -15,12 +15,29 @@ export const loadMovementClass = (models: IModels) => {
       return models.Movement.find();
     }
 
-    public static async movementAdd(movements: any) {
-      const addedAssets = await models.MovementAsset.movementAssetsAdd(movements);
+    public static async movementAdd(doc: any, userId: string) {
+      if (!doc.movements) {
+        throw new Error('No assets in  movement ');
+      }
+
+      if (!doc.description) {
+        throw new Error('No description in movement ');
+      }
+
+      if (!doc.movedAt) {
+        throw new Error('No moved date in movement ');
+      }
+
+      const addedAssets = await models.MovementAsset.movementAssetsAdd(doc.movements);
 
       const movementAssetIds = addedAssets.map(asset => asset._id);
 
-      return models.Movement.create({ assetIds: movementAssetIds });
+      return models.Movement.create({
+        assetIds: movementAssetIds,
+        movedAt: doc.movedAt,
+        description: doc.description,
+        userId
+      });
     }
     public static async movementRemove() {
       try {
@@ -31,6 +48,14 @@ export const loadMovementClass = (models: IModels) => {
         if (!movement) {
           throw new Error('Movement not found');
         }
+
+        const items = await models.MovementAsset.find({ _id: { $in: movement.assetIds } });
+        const assetIds = items.map(item => item.assetId);
+
+        await models.Asset.updateMany(
+          { _id: { $in: assetIds } },
+          { $set: { currentMovement: undefined } }
+        );
 
         await models.MovementAsset.deleteMany({ _id: { $in: movement.assetIds } });
 

@@ -56,7 +56,7 @@ class FormContainer extends React.Component<FinalProps> {
     };
 
     const updatedProps = {
-      detail: movementDetail?.assetMovement.assets || [],
+      detail: movementDetail?.assetMovement || {},
       closeModal,
       renderButton: !movementDetail?.assetMovement ? renderButton : undefined
     };

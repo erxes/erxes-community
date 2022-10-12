@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { colors, dimensions } from '@erxes/ui/src/styles';
+import { Input } from '@erxes/ui/src/components/form/styles';
+import { highlight } from '@erxes/ui/src/utils/animations';
 
 interface ContainerBoxType {
   row?: boolean;
@@ -15,6 +17,7 @@ interface ContainerBoxType {
   vertical?: boolean;
   marginX?: number;
   marginY?: number;
+  rightBorder?: boolean;
 }
 
 export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
@@ -28,8 +31,10 @@ export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
         : `${horizontal ? '10px' : '0px'} ${vertical ? '10px' : '0px'}`};
     justify-content: ${({ spaceBetween }) => (spaceBetween ? 'space-between' : '')};
     justify-content: ${({ justifyEnd }) => (justifyEnd ? 'end' : '')};
+    justify-content: ${({ justifyCenter }) => (justifyCenter ? 'center  ' : '')};
     margin:${({ marginX, marginY }) =>
       `${marginX ? `${marginX}px` : '0px'} margin${marginY ? `${marginY}px` : '0px'}`};
+    border-right:${({ rightBorder }) => (rightBorder ? '1px solid ${colors.borderPrimary}' : '')};
 `;
 
 export const InfoDetail = styled.p`
@@ -113,4 +118,72 @@ export const Badge = styled.span`
   color: ${colors.colorWhite};
   position: absolute;
   right: 0;
+`;
+
+export const MovementItemContainer = styled.div`
+  position: relative;
+  ${Input} {
+    text-align: left;
+  }
+`;
+export const MovementTableWrapper = styled.div`
+  table {
+    border-collapse: separate;
+    border-spacing: 0 6px;
+
+    thead tr th {
+      position: inherit;
+    }
+
+    tr td {
+      background: ${colors.colorWhite};
+
+      &:first-child {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+      }
+    }
+
+    tr td,
+    tr th {
+      padding: 8px 12px;
+      border: none;
+    }
+  }
+
+  tr td:not(:first-child),
+  tr th:not(:first-child) {
+    text-align: center;
+
+    &.item {
+      text-align: left;
+    }
+  }
+
+  tr td:first-child {
+    text-align: left;
+  }
+
+  tbody tr {
+    margin-bottom: 5px;
+    border-radius: 6px;
+    box-shadow: 0 0 5px 0 rgba(221, 221, 221, 0.7);
+
+    &.active {
+      animation: ${highlight} 0.9s ease;
+    }
+  }
+`;
+
+export const RemoveRow = styled.div`
+  color: ${colors.colorCoreRed};
+
+  &:hover {
+    cursor: pointer;
+  }
 `;

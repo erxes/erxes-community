@@ -1,7 +1,18 @@
-import { ControlLabel, DataWithLoader, FormGroup, Pagination, Spinner, Wrapper, __, router } from '@erxes/ui/src';
+import { ContentColumn, ItemRow, ItemText } from '@erxes/ui-cards/src/deals/styles';
+import {
+  ControlLabel,
+  DataWithLoader,
+  FormGroup,
+  Pagination,
+  Spinner,
+  Wrapper,
+  __,
+  router
+} from '@erxes/ui/src';
 import React from 'react';
 import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetGroupTypes } from './types';
+import moment from 'moment';
 
 export const DefaultWrapper = ({
   title,
@@ -57,7 +68,20 @@ export const CommonFormGroup = ({ children, label, required }: CommonFormGroupTy
   );
 };
 
-export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?: string, drawCode?: boolean) => {
+export const CommonItemRow = ({ children, label }) => {
+  return (
+    <ItemRow>
+      <ItemText>{__(label)}</ItemText>
+      <ContentColumn flex="4">{children}</ContentColumn>
+    </ItemRow>
+  );
+};
+
+export const generateGroupOptions = (
+  groups: IAssetGroupTypes[],
+  currentGroupId?: string,
+  drawCode?: boolean
+) => {
   const result: React.ReactNode[] = [];
 
   for (const group of groups) {
@@ -85,7 +109,11 @@ export const generateGroupOptions = (groups: IAssetGroupTypes[], currentGroupId?
   return result;
 };
 
-export const generateParentOptions = (assets: IAsset[], currentAssetId?: string, drawCode?: boolean) => {
+export const generateParentOptions = (
+  assets: IAsset[],
+  currentAssetId?: string,
+  drawCode?: boolean
+) => {
   const result: React.ReactNode[] = [];
   for (const asset of assets) {
     const order = asset.order;
@@ -143,8 +171,9 @@ export const getRefetchQueries = () => {
 export const generateParams = ({ queryParams }) => ({
   ...router.generatePaginationParams(queryParams || {}),
   movementId: queryParams?.movementId,
-  from: queryParams.from,
-  to: queryParams.to,
+  from: queryParams.from ? moment(queryParams.from) : undefined,
+  to: queryParams.to ? moment(queryParams.to) : undefined,
+  userId: queryParams.userId,
   branchId: queryParams?.branchId,
   departmentId: queryParams?.departmentId,
   teamMemberId: queryParams?.teamMemberId,

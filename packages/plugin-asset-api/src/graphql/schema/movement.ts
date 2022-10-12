@@ -23,8 +23,13 @@ export const types = `
     type Movement {
         _id:String
         createdAt:String
+        userId:String
+        movedAt:String
         assetIds:[String]
-
+        description:String
+        
+        user:JSON
+        selectedItems:JSON
         assets:[MovementAsset]
     }
 
@@ -40,7 +45,7 @@ export const types = `
     }
 `;
 export const mutations = `
-    assetMovementAdd(movements:[IMovementAsset]):JSON
+    assetMovementAdd(movedAt:String,description:String,movements:[IMovementAsset]):JSON
     assetMovementRemove:JSON
 `;
 export const queries = `

@@ -55,6 +55,9 @@ export interface IAssetGroupDocument extends IAssetGroup, Document {
 
 export interface IMovement {
   assetIds: string[];
+  userId: string;
+  createdAt: Date;
+  movedAt: Date;
 }
 export interface IMovementAsset {
   assetId: string;

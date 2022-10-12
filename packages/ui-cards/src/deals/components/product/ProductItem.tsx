@@ -107,10 +107,8 @@ class ProductItem extends React.Component<Props, State> {
         productData.discount = (amount * productData.discountPercent) / 100;
       }
 
-      productData.tax =
-        ((amount - productData.discount || 0) * productData.taxPercent) / 100;
-      productData.amount =
-        amount - (productData.discount || 0) + (productData.tax || 0);
+      productData.tax = ((amount - productData.discount || 0) * productData.taxPercent) / 100;
+      productData.amount = amount - (productData.discount || 0) + (productData.tax || 0);
     } else {
       productData.tax = 0;
       productData.discount = 0;
@@ -142,8 +140,7 @@ class ProductItem extends React.Component<Props, State> {
           const product = value as IProduct;
 
           productData.unitPrice = product.unitPrice;
-          productData.currency =
-            productData.currency || this.props.currencies[0];
+          productData.currency = productData.currency || this.props.currencies[0];
         }
 
         productData[type] = value;
@@ -198,17 +195,9 @@ class ProductItem extends React.Component<Props, State> {
           confirmLoyalties(variables);
           if (discountValue?.type === 'bonus') {
             this.onChangeField('discountPercent', 100, productData._id);
-            this.onChangeField(
-              'maxQuantity',
-              discountValue?.potentialBonus || 0,
-              productData._id
-            );
+            this.onChangeField('maxQuantity', discountValue?.potentialBonus || 0, productData._id);
           } else {
-            this.onChangeField(
-              'discountPercent',
-              discountValue?.discount || 0,
-              productData._id
-            );
+            this.onChangeField('discountPercent', discountValue?.discount || 0, productData._id);
           }
         }
       }
@@ -243,11 +232,7 @@ class ProductItem extends React.Component<Props, State> {
         discountValue && (
           <VoucherContainer>
             {discountValue.potentialBonus > 0 ? (
-              <Discountcard
-                percentage={100}
-                name={discountValue?.bonusName}
-                type="bonus"
-              />
+              <Discountcard percentage={100} name={discountValue?.bonusName} type="bonus" />
             ) : discountValue.discount > 0 ? (
               <Discountcard
                 percentage={discountValue?.discount}
@@ -288,18 +273,10 @@ class ProductItem extends React.Component<Props, State> {
   }
 
   uomOnChange = (option: HTMLOptionElement) =>
-    this.onChangeField(
-      'uom',
-      option ? option.value : '',
-      this.props.productData._id
-    );
+    this.onChangeField('uom', option ? option.value : '', this.props.productData._id);
 
   currencyOnChange = (currency: HTMLOptionElement) =>
-    this.onChangeField(
-      'currency',
-      currency ? currency.value : '',
-      this.props.productData._id
-    );
+    this.onChangeField('currency', currency ? currency.value : '', this.props.productData._id);
 
   onChange = e =>
     this.onChangeField(
@@ -352,9 +329,7 @@ class ProductItem extends React.Component<Props, State> {
       .then(res => {
         const { checkDiscount } = res.data;
         if (checkDiscount !== null) {
-          const result: IDiscountValue = Object.values(
-            checkDiscount
-          )[0] as IDiscountValue;
+          const result: IDiscountValue = Object.values(checkDiscount)[0] as IDiscountValue;
           return this.setState({ discountValue: result });
         }
         this.setState({
@@ -381,10 +356,7 @@ class ProductItem extends React.Component<Props, State> {
       </div>
     );
 
-    if (
-      !productData.product ||
-      this.state.currentProduct === productData.product._id
-    ) {
+    if (!productData.product || this.state.currentProduct === productData.product._id) {
       return (
         <ProductItemContainer key={productData._id}>
           <Flex>
@@ -445,9 +417,7 @@ class ProductItem extends React.Component<Props, State> {
             <ContentColumn>
               <ItemRow>
                 <ItemText>{__('Choose Product')}:</ItemText>
-                <ContentColumn flex="3">
-                  {this.renderProductModal(productData)}
-                </ContentColumn>
+                <ContentColumn flex="3">{this.renderProductModal(productData)}</ContentColumn>
               </ItemRow>
               <ItemRow>
                 <ItemText>{__('Quantity')}:</ItemText>
@@ -456,11 +426,7 @@ class ProductItem extends React.Component<Props, State> {
                     defaultValue={productData.quantity || 0}
                     type="number"
                     min={1}
-                    max={
-                      productData?.maxQuantity > 0
-                        ? productData?.maxQuantity
-                        : undefined
-                    }
+                    max={productData?.maxQuantity > 0 ? productData?.maxQuantity : undefined}
                     placeholder="0"
                     name="quantity"
                     onChange={this.onChange}
@@ -483,9 +449,7 @@ class ProductItem extends React.Component<Props, State> {
                 <ItemText>{__('Amount')}:</ItemText>
                 <ContentColumn flex="3">
                   <Amount>
-                    {(
-                      productData.quantity * productData.unitPrice
-                    ).toLocaleString()}{' '}
+                    {(productData.quantity * productData.unitPrice).toLocaleString()}{' '}
                     <b>{productData.currency}</b>
                   </Amount>
                 </ContentColumn>
@@ -544,8 +508,7 @@ class ProductItem extends React.Component<Props, State> {
                     </ContentColumn>
                     <ContentColumn flex="2">
                       <Amount>
-                        {(productData.tax || 0).toLocaleString()}{' '}
-                        <b>{productData.currency}</b>
+                        {(productData.tax || 0).toLocaleString()} <b>{productData.currency}</b>
                       </Amount>
                     </ContentColumn>
                   </Flex>

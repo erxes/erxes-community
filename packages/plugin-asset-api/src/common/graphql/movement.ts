@@ -18,4 +18,5 @@ export const movementFilters = `
     from:String,
     to:String,
     searchValue:String,
+    userId:String,
 `;

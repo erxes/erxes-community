@@ -10,6 +10,7 @@ import { queries } from '../../asset/graphql';
 type Props = {
   closeModal: () => void;
   handleSelect: (datas: IAsset[]) => void;
+  selected: any;
 };
 
 type FinalProps = {
@@ -57,7 +58,7 @@ class AssetChooser extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { closeModal, assets, handleSelect } = this.props;
+    const { closeModal, assets, handleSelect, selected } = this.props;
 
     if (assets.loading) {
       return <Spinner />;
@@ -67,7 +68,7 @@ class AssetChooser extends React.Component<FinalProps, State> {
       <Chooser
         title="Asset Chooser"
         datas={assets.assets}
-        data={{}}
+        data={{ name: 'Asset', datas: selected }}
         search={this.search}
         clearState={() => this.search('', true)}
         renderForm={this.assetAddForm}

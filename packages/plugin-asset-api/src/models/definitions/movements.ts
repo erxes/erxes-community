@@ -20,6 +20,9 @@ export const movementSchema = schemaWrapper(
     _id: field({ pkey: true }),
     createdAt: field({ type: String, label: 'Created At', default: new Date() }),
     modifiedAt: field({ type: String, label: 'Modified At', defaul: new Date() }),
-    assetIds: field({ type: [String], label: 'Assets' })
+    assetIds: field({ type: [String], label: 'Assets' }),
+    movedAt: field({ type: String, label: 'Moved Date' }),
+    description: field({ type: String, label: 'Description' }),
+    userId: field({ type: String, label: 'User ID' })
   })
 );

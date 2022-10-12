@@ -17,6 +17,7 @@ type Props = {
   refetch: () => void;
   refetchTotalCount: () => void;
   history: any;
+  queryParams: any;
 } & IRouterProps;
 type State = {
   searchValue: string;
@@ -81,7 +82,9 @@ class List extends React.Component<Props, State> {
 
   renderRow() {
     const { movements, history } = this.props;
-    return movements.map(movement => <Row key={movement._id} movement={movement} history={history} />);
+    return movements.map(movement => (
+      <Row key={movement._id} movement={movement} history={history} />
+    ));
   }
 
   renderList() {
@@ -90,6 +93,8 @@ class List extends React.Component<Props, State> {
         <thead>
           <tr>
             <th>{__('Id')}</th>
+            <th>{__('User')}</th>
+            <th>{__('Moved At')}</th>
             <th>{__('Created At')}</th>
             <th>{__('Action')}</th>
           </tr>
@@ -100,7 +105,7 @@ class List extends React.Component<Props, State> {
   }
 
   render() {
-    const { totalCount, remove } = this.props;
+    const { totalCount, remove, history, queryParams } = this.props;
 
     let rightActionBar = (
       <BarItems>
@@ -130,7 +135,7 @@ class List extends React.Component<Props, State> {
       rightActionBar,
       leftActionBar,
       content: this.renderList(),
-      sidebar: <SideBar />,
+      sidebar: <SideBar history={history} queryParams={queryParams} />,
       subMenu: menuMovements,
       totalCount
     };

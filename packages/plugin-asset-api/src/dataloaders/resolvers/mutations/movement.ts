@@ -2,15 +2,15 @@ import { IContext } from '../../../connectionResolver';
 import { MODULE_NAMES, putCreateLog } from '../../../logUtils';
 
 const movementMutations = {
-  async assetMovementAdd(_root, { movements }, { user, docModifier, models, subdomain }: IContext) {
-    const movement = await models.Movement.movementAdd(docModifier(movements));
+  async assetMovementAdd(_root, doc, { user, docModifier, models, subdomain }: IContext) {
+    const movement = await models.Movement.movementAdd(docModifier(doc), user._id);
 
     await putCreateLog(
       models,
       subdomain,
       {
         type: MODULE_NAMES.MOVEMENT,
-        newData: { ...movements },
+        newData: { ...doc.movements },
         object: movement
       },
       user

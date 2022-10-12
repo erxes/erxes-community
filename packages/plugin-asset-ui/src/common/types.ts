@@ -134,7 +134,7 @@ export type MergeMutationResponse = {
 };
 
 export type SelectedVariables = {
-  assetId?: string;
+  assetId: string;
   assetName?: string;
   departmentIds?: string[];
   branchIds?: string[];
@@ -146,13 +146,15 @@ export type IMovementType = {
   assetIds?: string[];
   assets?: IMovementItem[];
   createdAt?: string;
+  movedAt?: string;
+  userId?: string;
+  user?: any;
 };
 
 export type IMovementItem = {
-  _id: string;
+  _id?: string;
   assetId: string;
-  assetName: string;
-  userType: string;
+  assetName?: string;
   branchId?: string;
   departmentId?: string;
   teamMemberId?: string;

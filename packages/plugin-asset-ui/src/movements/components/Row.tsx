@@ -3,6 +3,7 @@ import { IMovementType } from '../../common/types';
 import moment from 'moment';
 import { Button, ModalTrigger, router } from '@erxes/ui/src';
 import Form from '../containers/Form';
+import { Link } from 'react-router-dom';
 
 type Props = {
   movement: IMovementType;
@@ -17,7 +18,7 @@ class Row extends React.Component<Props> {
   render() {
     const { movement } = this.props;
 
-    const { createdAt, _id } = movement;
+    const { createdAt, _id, user, movedAt } = movement;
 
     const handleItems = () => {
       const { history } = this.props;
@@ -27,6 +28,10 @@ class Row extends React.Component<Props> {
     const renderRow = (
       <tr>
         <td>{_id}</td>
+        <td>
+          <Link to={`/settings/team/details/${user._id}`}>{user.email}</Link>
+        </td>
+        <td>{moment(movedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>
           <Button btnStyle="link" icon="list-2" onClick={handleItems} />
@@ -50,7 +55,7 @@ class Row extends React.Component<Props> {
         trigger={renderRow}
         autoOpenKey="showListFormModal"
         dialogClassName="transform"
-        size="lg"
+        size="xl"
       />
     );
   }

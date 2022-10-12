@@ -1,9 +1,15 @@
+import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
+
 const movementDetail = `
 query AssetMovement($_id: String) {
   assetMovement(_id: $_id) {
     _id
     assetIds
     createdAt
+    movedAt
+    userId
+    description
+    selectedItems
     assets {
       _id
       assetId
@@ -26,11 +32,14 @@ query AssetMovement($_id: String) {
 `;
 
 const movements = `
-  query AssetMovements {
-  assetMovements {
+  query AssetMovements ($userId:String,${dateFilterParams}) {
+  assetMovements (userId:$userId,${dateFilterParamsDef}) {
     _id
     assetIds
     createdAt
+    movedAt
+    userId
+    user
   }
 }
 `;

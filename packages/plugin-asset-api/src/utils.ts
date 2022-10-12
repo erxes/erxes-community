@@ -44,14 +44,12 @@ export const generateFilter = async (params, models) => {
     filter.createdAt = { $gte: params.from };
   }
   if (params.to) {
-    filter.createdAt = { ...filter.createdAt, $lt: params.to };
+    filter.createdAt = { ...filter.createdAt, $lte: params.to };
   }
 
   if (params.searchValue) {
     filter.assetName = new RegExp(`.*${params.searchValue}.*`, 'i');
   }
-
-  console.log(filter);
 
   return filter;
 };

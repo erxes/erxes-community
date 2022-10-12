@@ -8,6 +8,7 @@ import { mutations, queries } from '../graphql';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { MovementQueryResponse, MovementsTotalCountQueryResponse } from '../../common/types';
+import { generateParams } from '../../common/utils';
 
 type Props = { queryParams: any; history: string };
 type FinalProps = {
@@ -61,7 +62,10 @@ class ListContainer extends React.Component<FinalProps> {
 export default withProps(
   compose(
     graphql<Props>(gql(queries.movements), {
-      name: 'movementsQuery'
+      name: 'movementsQuery',
+      options: ({ queryParams }) => ({
+        variables: generateParams({ queryParams })
+      })
     }),
     graphql<Props>(gql(queries.movementsTotalCount), {
       name: 'movementsTotalCountQuery'

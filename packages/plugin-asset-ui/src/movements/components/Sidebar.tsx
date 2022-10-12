@@ -1,17 +1,28 @@
 import React from 'react';
-import { Sidebar as CommonSideBar, FormGroup as CommonFormGroup, ControlLabel, DateControl } from '@erxes/ui/src';
+import {
+  Sidebar as CommonSideBar,
+  FormGroup as CommonFormGroup,
+  ControlLabel,
+  DateControl,
+  Button,
+  Tip,
+  Icon,
+  router,
+  SelectTeamMembers
+} from '@erxes/ui/src';
 import { ContainerBox } from '../../style';
 import { DateContainer } from '@erxes/ui/src/styles/main';
+import moment from 'moment';
 
-type Props = {};
-
-type VariablesType = {
-  from?: string;
-  to?: string;
+type Props = {
+  history: any;
+  queryParams: any;
 };
 
 type State = {
-  variables: VariablesType;
+  from?: string;
+  to?: string;
+  userId?: string;
 };
 
 export class SideBar extends React.Component<Props, State> {
@@ -19,19 +30,54 @@ export class SideBar extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      variables: {}
+      ...props.queryParams
     };
+
+    this.handleValue = this.handleValue.bind(this);
   }
 
   handleDate(field, value) {
-    this.setState(prev => ({ variables: { ...prev.variables, [field]: value } }));
+    value = moment(value).format('YYYY/MM/DD hh:mm');
+    this.setState({ [field]: value });
+    router.setParams(this.props.history, { [field]: value });
   }
-  render() {
-    const { variables } = this.state;
 
-    const FormGroup = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  handleValue(value, name) {
+    this.setState({ [name]: value });
+    router.setParams(this.props.history, { userId: value });
+  }
+
+  render() {
+    const { from, to } = this.state;
+    const { queryParams, history } = this.props;
+
+    const clearParams = field => {
+      this.setState({ [field]: undefined });
+      router.removeParams(history, field);
+    };
+
+    const FormGroup = ({
+      label,
+      field,
+      clearable,
+      children
+    }: {
+      label: string;
+      clearable?: boolean;
+      field: string;
+      children: React.ReactNode;
+    }) => (
       <CommonFormGroup>
-        <ControlLabel>{label}</ControlLabel>
+        <ContainerBox row spaceBetween>
+          <ControlLabel>{label}</ControlLabel>
+          {clearable && (
+            <Button btnStyle="link" onClick={() => clearParams(field)}>
+              <Tip placement="bottom" text="Clear">
+                <Icon icon="cancel-1" />
+              </Tip>
+            </Button>
+          )}
+        </ContainerBox>
         {children}
       </CommonFormGroup>
     );
@@ -39,22 +85,31 @@ export class SideBar extends React.Component<Props, State> {
     return (
       <CommonSideBar>
         <ContainerBox column gap={5}>
-          <FormGroup label="From">
+          <FormGroup field="userId" label="Moved User" clearable={queryParams.userId}>
+            <SelectTeamMembers
+              label="Select Team Member"
+              name="userId"
+              multi={false}
+              onSelect={this.handleValue}
+              initialValue={queryParams.userId}
+            />
+          </FormGroup>
+          <FormGroup field="from" label="From" clearable={queryParams?.from}>
             <DateContainer>
               <DateControl
                 name="from"
                 placeholder="Choose start date"
-                value={variables.from}
+                value={from}
                 onChange={e => this.handleDate('from', e)}
               />
             </DateContainer>
           </FormGroup>
-          <FormGroup label="To">
+          <FormGroup field="to" label="To" clearable={queryParams?.to}>
             <DateContainer>
               <DateControl
                 name="to"
                 placeholder="Choose end date"
-                value={variables.to}
+                value={to}
                 onChange={e => this.handleDate('to', e)}
               />
             </DateContainer>
