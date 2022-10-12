@@ -7,7 +7,7 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
-import { IPaymentConfigDocument, IQpayConfig } from 'types';
+import { IPaymentDocument, IQpayConfig } from 'types';
 
 import { PAYMENT_KINDS } from '../constants';
 import { SettingsContent } from './styles';
@@ -15,11 +15,11 @@ import { SettingsContent } from './styles';
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
-  paymentConfig?: IPaymentConfigDocument;
+  payment?: IPaymentDocument;
 };
 
 type State = {
-  paymentConfigName: string;
+  paymentName: string;
   qpayMerchantUser: string;
   qpayMerchantPassword: string;
   qpayInvoiceCode: string;
@@ -29,14 +29,14 @@ class QpayConfigForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { paymentConfig } = this.props;
-    const { name, config } = paymentConfig || ({} as IPaymentConfigDocument);
+    const { payment } = this.props;
+    const { name, config } = payment || ({} as IPaymentDocument);
 
     const { qpayMerchantUser, qpayMerchantPassword, qpayInvoiceCode } =
       config || ({} as IQpayConfig);
 
     this.state = {
-      paymentConfigName: name || '',
+      paymentName: name || '',
       qpayMerchantUser: qpayMerchantUser || '',
       qpayMerchantPassword: qpayMerchantPassword || '',
       qpayInvoiceCode: qpayInvoiceCode || ''
@@ -44,14 +44,14 @@ class QpayConfigForm extends React.Component<Props, State> {
   }
 
   generateDoc = (values: {
-    paymentConfigName: string;
+    paymentName: string;
     qpayMerchantUser: string;
     qpayMerchantPassword: string;
     qpayInvoiceCode: string;
   }) => {
-    const { paymentConfig } = this.props;
+    const { payment } = this.props;
     const generatedValues = {
-      name: values.paymentConfigName,
+      name: values.paymentName,
       kind: PAYMENT_KINDS.QPAY,
       status: 'active',
       config: {
@@ -61,9 +61,7 @@ class QpayConfigForm extends React.Component<Props, State> {
       }
     };
 
-    return paymentConfig
-      ? { id: paymentConfig._id, ...generatedValues }
-      : generatedValues;
+    return payment ? { id: payment._id, ...generatedValues } : generatedValues;
   };
 
   onChangeConfig = (code: string, e) => {
@@ -89,14 +87,14 @@ class QpayConfigForm extends React.Component<Props, State> {
     const { isSubmitted } = formProps;
 
     const {
-      paymentConfigName,
+      paymentName,
       qpayMerchantUser,
       qpayMerchantPassword,
       qpayInvoiceCode
     } = this.state;
 
     const values = {
-      paymentConfigName,
+      paymentName,
       qpayMerchantUser,
       qpayMerchantPassword,
       qpayInvoiceCode
@@ -105,7 +103,7 @@ class QpayConfigForm extends React.Component<Props, State> {
     return (
       <>
         <SettingsContent title={__('General settings')}>
-          {this.renderItem('paymentConfigName', 'Name')}
+          {this.renderItem('paymentName', 'Name')}
           {this.renderItem('qpayMerchantUser', 'Username')}
           {this.renderItem('qpayMerchantPassword', 'Password')}
           {this.renderItem('qpayInvoiceCode', 'Invoice code')}

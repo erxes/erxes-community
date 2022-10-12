@@ -3,7 +3,7 @@ import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 
 import { Counts, QueryResponse } from '@erxes/ui/src/types';
 
-export interface IPaymentConfig {
+export interface IPayment {
   name: string;
   kind: string;
   status: string;
@@ -21,7 +21,7 @@ export interface ISocialPayConfig {
   inStoreSPKey: string;
 }
 
-export interface IPaymentConfigDocument extends IPaymentConfig, Document {
+export interface IPaymentDocument extends IPayment, Document {
   _id: string;
 }
 
@@ -45,13 +45,26 @@ export interface IInvoice {
   customerId: string;
   description: string;
   email: string;
-  paymentConfig: IPaymentConfig;
+  payment: IPayment;
   phone: string;
   resolvedAt: Date;
   status: string;
   company?: ICompany;
   customer?: ICustomer;
   pluginData?: any;
+}
+
+export interface IPaymentConfig {
+  _id: string;
+  paymentIds: string[];
+  contentType: string;
+  contentTypeId: string;
+}
+
+export interface ISetConfigParams {
+  contentType: string;
+  contentTypeId: string;
+  paymentIds: string[];
 }
 
 export type InvoicesQueryResponse = {
@@ -66,23 +79,35 @@ export type InvoicesTotalCountQueryResponse = {
   invoicesTotalCount: InvoicesCount;
 } & QueryResponse;
 
-export type PaymentConfigsRemoveMutationResponse = {
-  paymentConfigsRemove: (params: { variables: { id: string } }) => Promise<any>;
+export type PaymentRemoveMutationResponse = {
+  paymentsRemove: (params: { variables: { id: string } }) => Promise<any>;
 };
 
-export type PaymentConfigsEditMutationResponse = {
-  paymentConfigsEdit: (params: {
-    variables: { id: string; doc: IPaymentConfig };
+export type SetPaymentConfigMutationResponse = {
+  setPaymentConfig: (params: {
+    variables: { contentType; contentTypeId; paymentIds };
   }) => Promise<any>;
 };
 
-export type PaymentConfigsQueryResponse = {
-  paymentConfigs: IPaymentConfigDocument[];
+export type PaymentEditMutationResponse = {
+  paymentsEdit: (params: {
+    variables: { id: string; doc: IPayment };
+  }) => Promise<any>;
+};
+
+export type PaymentsQueryResponse = {
+  payments: IPaymentDocument[];
   loading: boolean;
   refetch: () => void;
 };
 
-export type PaymentConfigsCountByTypeQueryResponse = {
+export type PaymentConfigQueryResponse = {
+  getPaymentConfig: IPaymentConfig;
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type PaymentsCountByTypeQueryResponse = {
   paymentsTotalCount: any;
   loading: boolean;
   refetch: () => void;

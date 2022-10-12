@@ -21,10 +21,9 @@ export default {
     );
   },
 
-  async paymentConfig(invoice: IInvoice, {}, { models }: IContext) {
+  async payment(invoice: IInvoice, {}, { models }: IContext) {
     return (
-      invoice.paymentConfigId &&
-      models.PaymentConfigs.findOne({ _id: invoice.paymentConfigId })
+      invoice.paymentId && models.Payments.findOne({ _id: invoice.paymentId })
     );
   },
 

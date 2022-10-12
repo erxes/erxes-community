@@ -1,5 +1,5 @@
 import { PAYMENT_STATUS, PAYMENT_KINDS } from '../../constants';
-import { IPaymentConfigDocument } from '../../models/definitions/paymentConfigs';
+import { IPaymentDocument } from '../../models/definitions/payments';
 import { sendRequest } from '@erxes/api-utils/src';
 
 import { QPAY_ACTIONS, QPAY_ENDPOINT } from '../../constants';
@@ -18,19 +18,14 @@ export const qPayHandler = async (models: IModels, queryParams) => {
     _id: invoiceId
   });
 
-  const paymentConfig = await models.PaymentConfigs.getPaymentConfig(
-    invoice.paymentConfigId
-  );
+  const payment = await models.Payments.getPayment(invoice.paymentId);
 
-  if (paymentConfig.kind !== 'qpay') {
+  if (payment.kind !== 'qpay') {
     throw new Error('Payment config type is mismatched');
   }
 
   try {
-    const response = await getInvoice(
-      invoice.apiResponse.invoice_id,
-      paymentConfig
-    );
+    const response = await getInvoice(invoice.apiResponse.invoice_id, payment);
 
     if (response.invoice_status === 'CLOSED') {
       await models.Invoices.updateOne(
@@ -77,16 +72,16 @@ export const getToken = async config => {
 
 export const createInvoice = async (
   invoice: IInvoiceDocument,
-  paymentConfig: IPaymentConfigDocument
+  payment: IPaymentDocument
 ) => {
   const MAIN_API_DOMAIN =
     process.env.MAIN_API_DOMAIN || 'http://localhost:4000';
 
   try {
-    const token = await getToken(paymentConfig.config);
+    const token = await getToken(payment.config);
 
     const data: IQpayInvoice = {
-      invoice_code: paymentConfig.config.qpayInvoiceCode,
+      invoice_code: payment.config.qpayInvoiceCode,
       sender_invoice_no: invoice._id,
       invoice_receiver_code: 'terminal',
       invoice_description: invoice.description || 'test invoice',
@@ -116,10 +111,10 @@ export const createInvoice = async (
 
 export const getInvoice = async (
   invoiceId: string,
-  paymentConfig: IPaymentConfigDocument
+  payment: IPaymentDocument
 ) => {
   try {
-    const token = await getToken(paymentConfig.config);
+    const token = await getToken(payment.config);
     const requestOptions = {
       url: `${QPAY_ENDPOINT}${QPAY_ACTIONS.INVOICE}/${invoiceId}`,
       method: 'GET',
@@ -139,9 +134,9 @@ export const getInvoice = async (
 
 export const cancelInvoice = async (
   invoiceId: string,
-  paymentConfig: IPaymentConfigDocument
+  payment: IPaymentDocument
 ) => {
-  const token = await getToken(paymentConfig.config);
+  const token = await getToken(payment.config);
   const requestOptions = {
     url: `${QPAY_ENDPOINT}${QPAY_ACTIONS.INVOICE}/${invoiceId}`,
     method: 'DELETE',

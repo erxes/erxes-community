@@ -5,12 +5,9 @@ import { graphql } from 'react-apollo';
 
 import { withProps } from '@erxes/ui/src/utils';
 
-import PaymentConfigHome from '../components/PaymentConfigHome';
+import PaymentHome from '../components/PaymentHome';
 import { queries } from '../graphql';
-import {
-  ByKindTotalCount,
-  PaymentConfigsCountByTypeQueryResponse
-} from '../types';
+import { ByKindTotalCount, PaymentsCountByTypeQueryResponse } from '../types';
 
 type Props = {
   queryParams: any;
@@ -18,7 +15,7 @@ type Props = {
 };
 
 type FinalProps = {
-  paymentsTotalCountQuery: PaymentConfigsCountByTypeQueryResponse;
+  paymentsTotalCountQuery: PaymentsCountByTypeQueryResponse;
 } & Props;
 
 const Store = (props: FinalProps) => {
@@ -37,12 +34,12 @@ const Store = (props: FinalProps) => {
     totalCount
   };
 
-  return <PaymentConfigHome {...updatedProps} />;
+  return <PaymentHome {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, PaymentConfigsCountByTypeQueryResponse, {}>(
+    graphql<Props, PaymentsCountByTypeQueryResponse, {}>(
       gql(queries.paymentsTotalCountQuery),
       {
         name: 'paymentsTotalCountQuery'

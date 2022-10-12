@@ -4,15 +4,18 @@ import * as mongoose from 'mongoose';
 
 import { IInvoiceDocument } from './models/definitions/invoices';
 import { IPaymentConfigDocument } from './models/definitions/paymentConfigs';
+import { IPaymentDocument } from './models/definitions/payments';
 import { IInvoiceModel, loadInvoiceClass } from './models/Invoices';
 import {
   IPaymentConfigModel,
   loadPaymentConfigClass
 } from './models/PaymentConfigs';
+import { IPaymentModel, loadPaymentClass } from './models/Payments';
 
 export interface IModels {
-  PaymentConfigs: IPaymentConfigModel;
+  Payments: IPaymentModel;
   Invoices: IInvoiceModel;
+  PaymentConfigs: IPaymentConfigModel;
 }
 
 export interface IContext extends IMainContext {
@@ -25,14 +28,19 @@ export let models: IModels | null = null;
 export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
 
-  models.PaymentConfigs = db.model<IPaymentConfigDocument, IPaymentConfigModel>(
-    'payment_configs',
-    loadPaymentConfigClass(models)
+  models.Payments = db.model<IPaymentDocument, IPaymentModel>(
+    'payments',
+    loadPaymentClass(models)
   );
 
   models.Invoices = db.model<IInvoiceDocument, IInvoiceModel>(
     'invoices',
     loadInvoiceClass(models)
+  );
+
+  models.PaymentConfigs = db.model<IPaymentConfigDocument, IPaymentConfigModel>(
+    'payment_configs',
+    loadPaymentConfigClass(models)
   );
 
   return models;

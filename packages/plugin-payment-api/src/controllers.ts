@@ -32,17 +32,17 @@ router.get('/gateway', async (req, res) => {
 
   const filter: any = {};
 
-  if (data.paymentConfigIds) {
-    filter._id = { $in: data.paymentConfigIds };
+  if (data.paymentIds) {
+    filter._id = { $in: data.paymentIds };
   }
 
-  const paymentConfigs = await models.PaymentConfigs.find(filter).sort({
+  const payments = await models.Payments.find(filter).sort({
     type: 1
   });
 
   res.render('index', {
     title: 'Payment gateway',
-    payments: paymentConfigs,
+    payments,
     invoiceData: data
   });
 });
@@ -59,18 +59,18 @@ router.post('/gateway', async (req, res) => {
 
   const filter: any = {};
 
-  if (data.paymentConfigIds) {
-    filter._id = { $in: data.paymentConfigIds };
+  if (data.paymentIds) {
+    filter._id = { $in: data.paymentIds };
   }
 
-  const paymentConfigs = await models.PaymentConfigs.find(filter).sort({
+  const payments = await models.Payments.find(filter).sort({
     type: 1
   });
 
-  const paymentConfigId = req.body.paymentConfigId;
+  const paymentId = req.body.paymentId;
 
-  const payments = paymentConfigs.map(p => {
-    if (p._id === paymentConfigId) {
+  const paymentsModified = payments.map(p => {
+    if (p._id === paymentId) {
       return {
         ...(p.toJSON() as any),
         selected: true
@@ -84,7 +84,7 @@ router.post('/gateway', async (req, res) => {
 
   if (
     (invoice && invoice.status === 'paid') ||
-    (invoice && invoice.paymentConfigId === paymentConfigId)
+    (invoice && invoice.paymentId === paymentId)
   ) {
     return res.render('index', {
       title: 'Payment gateway',
@@ -94,20 +94,16 @@ router.post('/gateway', async (req, res) => {
     });
   }
 
-  if (
-    invoice &&
-    invoice.status !== 'paid' &&
-    invoice.paymentConfigId !== paymentConfigId
-  ) {
+  if (invoice && invoice.status !== 'paid' && invoice.paymentId !== paymentId) {
     models.Invoices.cancelInvoice(invoice._id);
   }
 
   try {
-    const selectedPayment = payments.find(p => p.selected);
+    const selectedPayment = paymentsModified.find(p => p.selected);
     invoice = await models.Invoices.createInvoice({
       ...data,
       token: params,
-      paymentConfigId,
+      paymentId,
       paymentKind: selectedPayment.kind
     });
 

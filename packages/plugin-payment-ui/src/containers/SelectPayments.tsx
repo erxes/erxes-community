@@ -1,49 +1,84 @@
 import Spinner from '@erxes/ui/src/components/Spinner';
-import { IFormProps } from '@erxes/ui/src/types';
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { ChildProps, graphql } from 'react-apollo';
 
 import SelectPayments from '../components/SelectPayments';
-import { queries } from '../graphql';
-import { PaymentConfigsQueryResponse } from '../types';
+import { mutations, queries } from '../graphql';
+import {
+  PaymentConfigQueryResponse,
+  PaymentsQueryResponse,
+  SetPaymentConfigMutationResponse
+} from '../types';
 
 type Props = {
-  onChange: (values: string[]) => void;
-  defaultValue: string[];
-  isRequired?: boolean;
-  formProps: IFormProps;
-  description?: string;
+  contentType: string;
+  contentTypeId: string;
 };
 
 type FinalProps = {
-  paymentsQuery: PaymentConfigsQueryResponse;
-} & Props;
+  paymentsQuery: PaymentsQueryResponse;
+  paymentConfigQuery: PaymentConfigQueryResponse;
+} & Props &
+  SetPaymentConfigMutationResponse;
 
 const SelectPaymentsContainer = (props: ChildProps<FinalProps>) => {
-  console.log('paymentssssss');
-  const { paymentsQuery } = props;
+  const [paymentIds, setPaymentIds] = React.useState<string[]>([]);
 
-  const payments = paymentsQuery.paymentConfigs || [];
+  const { paymentsQuery, paymentConfigQuery } = props;
 
-  if (paymentsQuery.loading) {
+  if (
+    paymentsQuery.loading ||
+    (paymentConfigQuery && paymentConfigQuery.loading)
+  ) {
     return <Spinner objective={true} />;
   }
 
+  const payments = paymentsQuery.payments || [];
+
+  const defaultValue = paymentConfigQuery
+    ? paymentConfigQuery.getPaymentConfig.paymentIds
+    : [];
+
+  const onChange = value => {
+    setPaymentIds(value.map(item => item.value));
+
+    console.log(paymentIds);
+  };
+
   const updatedProps = {
     ...props,
-    payments
+    defaultValue: paymentIds,
+    payments,
+    onChange
   };
 
   return <SelectPayments {...updatedProps} />;
 };
 
 export default compose(
-  graphql<PaymentConfigsQueryResponse>(gql(queries.paymentConfigs), {
+  graphql<PaymentsQueryResponse>(gql(queries.payments), {
     name: 'paymentsQuery',
     options: () => ({
       variables: { status: 'active' }
+    })
+  }),
+
+  graphql<Props, SetPaymentConfigMutationResponse>(
+    gql(mutations.setPaymentConfig),
+    {
+      name: 'setPaymentConfig'
+    }
+  ),
+  graphql<Props, PaymentConfigQueryResponse>(gql(queries.paymentConfigQuery), {
+    name: 'paymentConfigQuery',
+    skip: props => !props.contentType || !props.contentTypeId,
+    options: ({ contentType, contentTypeId }) => ({
+      variables: {
+        contentType,
+        contentTypeId
+      }
     })
   })
 )(SelectPaymentsContainer);

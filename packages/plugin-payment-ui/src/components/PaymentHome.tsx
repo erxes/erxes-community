@@ -9,13 +9,8 @@ import React from 'react';
 
 import { ByKindTotalCount } from '../types';
 import { PAYMENTCONFIGS } from './constants';
-import PaymentConfigRow from './PaymentConfigRow';
-import {
-  Content,
-  FullHeight,
-  PaymentConfigWrapper,
-  SearchInput
-} from './styles';
+import PaymentRow from './PaymentRow';
+import { Content, FullHeight, PaymentWrapper, SearchInput } from './styles';
 
 type Props = {
   queryParams: any;
@@ -24,7 +19,7 @@ type Props = {
 
 type State = {
   searchValue: string;
-  paymentConfigs: any;
+  payments: any;
 };
 
 class Home extends React.Component<Props, State> {
@@ -32,8 +27,8 @@ class Home extends React.Component<Props, State> {
     super(props);
     this.state = {
       searchValue: '',
-      paymentConfigs: PAYMENTCONFIGS.filter(
-        paymentConfig => paymentConfig.category.indexOf('Payment method') !== -1
+      payments: PAYMENTCONFIGS.filter(
+        payment => payment.category.indexOf('Payment method') !== -1
       )
     };
   }
@@ -47,12 +42,11 @@ class Home extends React.Component<Props, State> {
       prevState.searchValue !== searchValue
     ) {
       this.setState({
-        paymentConfigs: PAYMENTCONFIGS.filter(
-          paymentConfig =>
-            paymentConfig.name.toLowerCase().indexOf(searchValue) !== -1 &&
-            paymentConfig.category.indexOf(
-              queryParams.kind || 'Payment method'
-            ) !== -1
+        payments: PAYMENTCONFIGS.filter(
+          payment =>
+            payment.name.toLowerCase().indexOf(searchValue) !== -1 &&
+            payment.category.indexOf(queryParams.kind || 'Payment method') !==
+              -1
         )
       });
     }
@@ -62,18 +56,18 @@ class Home extends React.Component<Props, State> {
     this.setState({ searchValue: e.target.value.toLowerCase() });
   };
 
-  renderPaymentConfigs() {
-    const { paymentConfigs, searchValue } = this.state;
+  renderPayments() {
+    const { payments, searchValue } = this.state;
     const { totalCount, queryParams } = this.props;
     const datas = [] as any;
-    const rows = [...paymentConfigs];
+    const rows = [...payments];
 
     while (rows.length > 0) {
       datas.push(
-        <PaymentConfigRow
+        <PaymentRow
           key={rows.length}
-          paymentConfigs={rows.splice(0, 4)}
-          paymentConfigsCount={totalCount}
+          payments={rows.splice(0, 4)}
+          paymentsCount={totalCount}
           queryParams={queryParams}
         />
       );
@@ -139,9 +133,7 @@ class Home extends React.Component<Props, State> {
         mainHead={headerDescription}
         content={
           <Content>
-            <PaymentConfigWrapper>
-              {this.renderPaymentConfigs()}
-            </PaymentConfigWrapper>
+            <PaymentWrapper>{this.renderPayments()}</PaymentWrapper>
           </Content>
         }
         hasBorder={true}

@@ -37,7 +37,6 @@ type State = {
     lead: any;
     leadData: ILeadData;
     channelIds?: string[];
-    paymentConfigIds?: string[];
   };
 };
 
@@ -64,8 +63,7 @@ class CreateLeadContainer extends React.Component<Props, State> {
           brandId,
           name,
           languageCode,
-          channelIds,
-          paymentConfigIds
+          channelIds
         } = this.state.doc;
 
         addIntegrationMutation({
@@ -75,8 +73,7 @@ class CreateLeadContainer extends React.Component<Props, State> {
             brandId,
             name,
             languageCode,
-            channelIds,
-            paymentConfigIds
+            channelIds
           }
         })
           .then(

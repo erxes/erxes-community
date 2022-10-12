@@ -46,7 +46,7 @@ class Row extends React.Component<Props> {
     };
 
     const {
-      paymentConfig,
+      payment,
       amount,
       contentType,
       description,
@@ -80,8 +80,8 @@ class Row extends React.Component<Props> {
             onChange={onChange}
           />
         </td>
-        <td>{paymentConfig.name}</td>
-        <td>{paymentConfig.kind}</td>
+        <td>{payment.name}</td>
+        <td>{payment.kind}</td>
         <td>{amount.toFixed(2)}</td>
 
         <td>{`${contentType.split(':')[0]} - ${pluginData &&

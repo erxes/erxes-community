@@ -49,7 +49,6 @@ export const types = ({ products, tags, forms }) => `
 
     visibility: String
     departmentIds: [String]
-    paymentConfigIds: [String]
   }
 
   type BookingData {
@@ -240,7 +239,6 @@ export const mutations = `
     channelIds: [String]
     visibility: String,
     departmentIds: [String],
-    paymentConfigIds: [String],
     languageCode: String,
     formId: String!,
     leadData: IntegrationLeadData!): Integration
@@ -251,7 +249,6 @@ export const mutations = `
     brandId: String!,
     visibility: String,
     departmentIds: [String],
-    paymentConfigIds: [String],
     channelIds: [String]
     languageCode: String,
     formId: String!,

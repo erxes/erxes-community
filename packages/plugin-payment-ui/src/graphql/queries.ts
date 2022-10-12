@@ -1,6 +1,6 @@
-const paymentConfigs = `
-query paymentConfigs($status: String) {
-  paymentConfigs(status: $status) {
+const payments = `
+query payments($status: String) {
+  payments(status: $status) {
     _id
     name
     kind
@@ -20,8 +20,8 @@ query paymentsTotalCount($kind: String, $status: String) {
 `;
 
 const checkInvoice = `
-query checkInvoice($paymentConfigId: String!, $invoiceId: String!) {
-  checkInvoice(paymentConfigId: $paymentConfigId, invoiceId: $invoiceId)
+query checkInvoice($paymentId: String!, $invoiceId: String!) {
+  checkInvoice(paymentId: $paymentId, invoiceId: $invoiceId)
 }`;
 
 const invoicesResponse = `
@@ -33,7 +33,7 @@ const invoicesResponse = `
     customerId
     description
     email
-    paymentConfig {
+    payment {
       name
       kind
     }
@@ -73,9 +73,19 @@ query invoicesTotalCount($kind: String, $searchValue: String, $status: String) {
 }
 `;
 
+const paymentConfigQuery = `
+query getPaymentConfig ($contentType: String, $contentTypeId: String) {
+  getPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
+    _id
+    paymentIds
+  }
+}
+`;
+
 export default {
-  paymentConfigs,
+  payments,
   paymentsTotalCountQuery,
+  paymentConfigQuery,
   checkInvoice,
   invoices,
   invoicesTotalCount

@@ -4,9 +4,9 @@ import { Route } from 'react-router-dom';
 
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 
-const PaymentConfigStore = asyncComponent(() =>
+const PaymentStore = asyncComponent(() =>
   import(
-    /* webpackChunkName: "List - PaymentConfigStore" */ './containers/PaymentConfigStore'
+    /* webpackChunkName: "List - PaymentStore" */ './containers/PaymentStore'
   )
 );
 
@@ -16,10 +16,8 @@ const InvoiceList = asyncComponent(() =>
   )
 );
 
-const paymentConfigStore = ({ location }) => {
-  return (
-    <PaymentConfigStore queryParams={queryString.parse(location.search)} />
-  );
+const paymentStore = ({ location }) => {
+  return <PaymentStore queryParams={queryString.parse(location.search)} />;
 };
 
 const invoiceList = history => {
@@ -32,7 +30,7 @@ const invoiceList = history => {
 const routes = () => {
   return (
     <React.Fragment>
-      <Route path="/settings/payments/" component={paymentConfigStore} />
+      <Route path="/settings/payments/" component={paymentStore} />
       <Route exact={true} path="/payment/invoices/" component={invoiceList} />
     </React.Fragment>
   );

@@ -27,7 +27,6 @@ import FieldPreview from './FieldPreview';
 import LocationOptions from './LocationOptions';
 import ObjectListConfigs from './ObjectListConfigs';
 
-// import { __, loadDynamicComponent } from '@erxes/ui/src/utils';
 type Props = {
   onSubmit: (field: IField) => void;
   onDelete: (field: IField) => void;
@@ -66,8 +65,6 @@ class FieldForm extends React.Component<Props, State> {
     if (field.type.includes('companyLinks')) {
       group = 'company';
     }
-
-    console.log('field', field);
 
     this.state = {
       field,
@@ -399,8 +396,6 @@ class FieldForm extends React.Component<Props, State> {
         'isRequired',
         (e.currentTarget as HTMLInputElement).checked
       );
-
-    console.log('************ ', field);
 
     const onCategoryChange = e => {
       this.onFieldChange(

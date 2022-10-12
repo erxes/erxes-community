@@ -5,17 +5,14 @@ import Table from '@erxes/ui/src/components/table';
 import { Count } from '@erxes/ui/src/styles/main';
 import { __ } from '@erxes/ui/src/utils';
 
-import { IPaymentConfigDocument } from '../types';
-import PaymentConfigListItem from './PaymentConfigListItem';
+import { IPaymentDocument } from '../types';
+import PaymentListItem from './PaymentListItem';
 
 type Props = {
-  paymentConfigs: IPaymentConfigDocument[];
-  removePaymentConfig: (
-    paymentConfig: IPaymentConfigDocument,
-    callback?: any
-  ) => void;
+  payments: IPaymentDocument[];
+  removePayment: (payment: IPaymentDocument, callback?: any) => void;
   queryParams: any;
-  paymentConfigsCount: number;
+  paymentsCount: number;
 };
 
 class IntegrationList extends React.Component<Props> {
@@ -25,25 +22,25 @@ class IntegrationList extends React.Component<Props> {
 
   renderRows() {
     const {
-      paymentConfigs,
+      payments,
       queryParams: { _id },
-      removePaymentConfig
+      removePayment
     } = this.props;
 
-    return paymentConfigs.map(paymentConfig => (
-      <PaymentConfigListItem
-        key={paymentConfig._id}
+    return payments.map(payment => (
+      <PaymentListItem
+        key={payment._id}
         _id={_id}
-        paymentConfig={paymentConfig}
-        removePaymentConfig={removePaymentConfig}
+        payment={payment}
+        removePayment={removePayment}
       />
     ));
   }
 
   render() {
-    const { paymentConfigs, paymentConfigsCount } = this.props;
+    const { payments, paymentsCount } = this.props;
 
-    if (!paymentConfigs || paymentConfigs.length < 1) {
+    if (!payments || payments.length < 1) {
       return (
         <EmptyState
           text="Start adding payments now!"
@@ -55,7 +52,7 @@ class IntegrationList extends React.Component<Props> {
     return (
       <>
         <Count>
-          {paymentConfigsCount} config{paymentConfigsCount > 1 && 's'}
+          {paymentsCount} config{paymentsCount > 1 && 's'}
         </Count>
         <Table>
           <thead>

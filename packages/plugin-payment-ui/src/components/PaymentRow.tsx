@@ -2,15 +2,15 @@ import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import React from 'react';
 import Collapse from 'react-bootstrap/Collapse';
 
-import PaymentConfigList from '../containers/PaymentConfigList';
+import PaymentList from '../containers/PaymentList';
 import { ByKindTotalCount } from '../types';
-import PaymentConfigEntry from './PaymentConfigEntry';
-import { CollapsibleContent, PaymentConfigRow } from './styles';
+import PaymentEntry from './PaymentEntry';
+import { CollapsibleContent, PaymentRow } from './styles';
 
 type Props = {
-  paymentConfigs: any[];
+  payments: any[];
   queryParams: any;
-  paymentConfigsCount?: ByKindTotalCount;
+  paymentsCount?: ByKindTotalCount;
 };
 
 type State = {
@@ -79,30 +79,30 @@ class Row extends React.Component<Props, State> {
     return <Pagination count={totalCount} />;
   }
 
-  renderEntry(paymentConfig, paymentConfigsCount, queryParams) {
+  renderEntry(payment, paymentsCount, queryParams) {
     const commonProp = {
-      key: paymentConfig.name,
-      paymentConfig,
+      key: payment.name,
+      payment,
       toggleBox: this.toggleBox,
       getClassName: this.getClassName,
-      paymentConfigsCount,
+      paymentsCount,
       queryParams
     };
 
-    return <PaymentConfigEntry {...commonProp} />;
+    return <PaymentEntry {...commonProp} />;
   }
 
   renderList() {
-    const { queryParams, paymentConfigsCount } = this.props;
+    const { queryParams, paymentsCount } = this.props;
     const kind = this.state.kind || '';
-    const count = (paymentConfigsCount && paymentConfigsCount[kind]) || 0;
+    const count = (paymentsCount && paymentsCount[kind]) || 0;
 
     return (
       <>
-        <PaymentConfigList
+        <PaymentList
           kind={kind}
           queryParams={queryParams}
-          paymentConfigsCount={count}
+          paymentsCount={count}
         />
         {this.renderPagination(count)}
       </>
@@ -110,19 +110,17 @@ class Row extends React.Component<Props, State> {
   }
 
   render() {
-    const { paymentConfigs, paymentConfigsCount, queryParams } = this.props;
+    const { payments, paymentsCount, queryParams } = this.props;
 
-    const selected = paymentConfigs.find(
-      paymentConfig => paymentConfig.kind === this.state.kind
-    );
+    const selected = payments.find(payment => payment.kind === this.state.kind);
 
     return (
       <>
-        <PaymentConfigRow>
-          {paymentConfigs.map(paymentConfig =>
-            this.renderEntry(paymentConfig, paymentConfigsCount, queryParams)
+        <PaymentRow>
+          {payments.map(payment =>
+            this.renderEntry(payment, paymentsCount, queryParams)
           )}
-        </PaymentConfigRow>
+        </PaymentRow>
         <Collapse
           in={this.state.isContentVisible && selected ? true : false}
           unmountOnExit={true}

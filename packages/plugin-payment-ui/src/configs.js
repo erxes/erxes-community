@@ -4,14 +4,14 @@ module.exports = {
   scope: 'payment',
   exposes: {
     './routes': './src/routes.tsx',
-    './selectPaymentsForm': './src/containers/SelectPayments.tsx',
+    './SelectPayments': './src/containers/SelectPayments.tsx',
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
     scope: 'payment',
     module: './routes'
   },
-  selectPaymentsForm: './selectPaymentsForm',
+  extendFormOptions: './SelectPayments',
   menus: [
     {
       text: 'Invoices',
@@ -26,7 +26,7 @@ module.exports = {
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
       scope: 'payment',
-      permission: 'paymentConfigRemove'
+      permission: 'paymentRemove'
     }
   ]
 }

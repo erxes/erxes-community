@@ -6,39 +6,39 @@ import { graphql } from 'react-apollo';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { Alert, confirm, withProps } from '@erxes/ui/src/utils';
 
-import PaymentConfigList from '../components/PaymentConfigList';
+import PaymentList from '../components/PaymentList';
 import { mutations, queries } from '../graphql';
 import {
-  IPaymentConfigDocument,
-  PaymentConfigsQueryResponse,
-  PaymentConfigsRemoveMutationResponse
+  IPaymentDocument,
+  PaymentsQueryResponse,
+  PaymentRemoveMutationResponse
 } from '../types';
 
 type Props = {
   queryParams: any;
-  paymentConfigsCount: number;
+  paymentsCount: number;
   kind: string | null;
 };
 
 type FinalProps = {
-  paymentConfigsQuery: PaymentConfigsQueryResponse;
+  paymentsQuery: PaymentsQueryResponse;
 } & Props &
-  PaymentConfigsRemoveMutationResponse;
+  PaymentRemoveMutationResponse;
 
 const IntegrationListContainer = (props: FinalProps) => {
-  const { paymentConfigsQuery, kind, paymentConfigsRemove } = props;
+  const { paymentsQuery, kind, paymentsRemove } = props;
 
-  if (paymentConfigsQuery.loading) {
+  if (paymentsQuery.loading) {
     return <Spinner objective={true} />;
   }
 
-  const paymentConfigs = paymentConfigsQuery.paymentConfigs || [];
+  const payments = paymentsQuery.payments || [];
 
-  const removePaymentConfig = (paymentConfig: IPaymentConfigDocument) => {
+  const removePayment = (payment: IPaymentDocument) => {
     const message = 'Are you sure?';
 
     confirm(message).then(() => {
-      paymentConfigsRemove({ variables: { id: paymentConfig._id } })
+      paymentsRemove({ variables: { id: payment._id } })
         .then(() => {
           Alert.success('Your config not found');
         })
@@ -50,25 +50,25 @@ const IntegrationListContainer = (props: FinalProps) => {
   };
 
   const filteredConfigs = kind
-    ? paymentConfigs.filter(pc => pc.kind === kind)
-    : paymentConfigs;
+    ? payments.filter(pc => pc.kind === kind)
+    : payments;
 
   const updatedProps = {
     ...props,
-    paymentConfigs: filteredConfigs,
-    loading: paymentConfigsQuery.loading,
-    removePaymentConfig
+    payments: filteredConfigs,
+    loading: paymentsQuery.loading,
+    removePayment
   };
 
-  return <PaymentConfigList {...updatedProps} />;
+  return <PaymentList {...updatedProps} />;
 };
 
 const mutationOptions = () => ({
   refetchQueries: [
     {
-      query: gql(queries.paymentConfigs),
+      query: gql(queries.payments),
       variables: {
-        paymentConfigIds: []
+        paymentIds: []
       }
     },
     {
@@ -79,20 +79,20 @@ const mutationOptions = () => ({
 
 export default withProps<Props>(
   compose(
-    graphql<Props, PaymentConfigsRemoveMutationResponse>(
-      gql(mutations.paymentConfigRemove),
+    graphql<Props, PaymentRemoveMutationResponse>(
+      gql(mutations.paymentRemove),
       {
-        name: 'paymentConfigsRemove',
+        name: 'paymentsRemove',
         options: mutationOptions
       }
     ),
-    graphql<Props, PaymentConfigsQueryResponse>(gql(queries.paymentConfigs), {
-      name: 'paymentConfigsQuery',
+    graphql<Props, PaymentsQueryResponse>(gql(queries.payments), {
+      name: 'paymentsQuery',
       options: () => {
         return {
           notifyOnNetworkStatusChange: true,
           variables: {
-            paymentConfigIds: []
+            paymentIds: []
           },
           fetchPolicy: 'network-only'
         };

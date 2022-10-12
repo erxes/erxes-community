@@ -182,7 +182,6 @@ export interface IIntegration {
   bookingData?: IBookingData;
   departmentIds?: string[];
   visibility?: string;
-  paymentConfigIds?: string[];
 }
 
 export interface IIntegrationDocument extends IIntegration, Document {
@@ -507,8 +506,7 @@ export const integrationSchema = schemaHooksWrapper(
     messengerData: field({ type: messengerDataSchema }),
     uiOptions: field({ type: uiOptionsSchema }),
 
-    bookingData: field({ type: bookingSchema }),
-    paymentConfigIds: field({ type: [String], label: 'Payment configs' })
+    bookingData: field({ type: bookingSchema })
   }),
   'erxes_integrations'
 );

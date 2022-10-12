@@ -11,7 +11,7 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils';
 
 import { mutations } from '../graphql';
-import { IPaymentConfigDocument } from '../types';
+import { IPaymentDocument } from '../types';
 import QpayForm from './form/QpayForm';
 import SocialPayForm from './form/SocialPayForm';
 import { getRefetchQueries } from '../containers/utils';
@@ -19,8 +19,8 @@ import { PAYMENT_KINDS } from './constants';
 
 type Props = {
   _id?: string;
-  paymentConfig: IPaymentConfigDocument;
-  removePaymentConfig: (paymentConfig: IPaymentConfigDocument) => void;
+  payment: IPaymentDocument;
+  removePayment: (payment: IPaymentDocument) => void;
 };
 
 type State = {
@@ -37,13 +37,13 @@ class IntegrationListItem extends React.Component<Props, State> {
   }
 
   renderRemoveAction() {
-    const { paymentConfig, removePaymentConfig } = this.props;
+    const { payment, removePayment } = this.props;
 
-    if (!removePaymentConfig) {
+    if (!removePayment) {
       return null;
     }
 
-    const onClick = () => removePaymentConfig(paymentConfig);
+    const onClick = () => removePayment(payment);
 
     return (
       <Tip text={__('Delete')} placement="top">
@@ -53,8 +53,8 @@ class IntegrationListItem extends React.Component<Props, State> {
   }
 
   renderEditAction() {
-    const { paymentConfig } = this.props;
-    const { kind } = paymentConfig;
+    const { payment } = this.props;
+    const { kind } = payment;
 
     const renderButton = ({
       name,
@@ -64,7 +64,7 @@ class IntegrationListItem extends React.Component<Props, State> {
     }: IButtonMutateProps) => {
       return (
         <ButtonMutate
-          mutation={mutations.paymentConfigsEdit}
+          mutation={mutations.paymentsEdit}
           variables={values}
           callback={callback}
           refetchQueries={getRefetchQueries()}
@@ -88,18 +88,14 @@ class IntegrationListItem extends React.Component<Props, State> {
     switch (kind) {
       case PAYMENT_KINDS.QPAY:
         content = props => (
-          <QpayForm
-            {...props}
-            paymentConfig={paymentConfig}
-            renderButton={renderButton}
-          />
+          <QpayForm {...props} payment={payment} renderButton={renderButton} />
         );
         break;
       case PAYMENT_KINDS.SOCIALPAY:
         content = props => (
           <SocialPayForm
             {...props}
-            paymentConfig={paymentConfig}
+            payment={payment}
             renderButton={renderButton}
           />
         );
@@ -120,13 +116,13 @@ class IntegrationListItem extends React.Component<Props, State> {
   }
 
   render() {
-    const { paymentConfig } = this.props;
+    const { payment } = this.props;
     const labelStyle = 'success';
-    const status = paymentConfig.status;
+    const status = payment.status;
 
     return (
-      <tr key={paymentConfig._id}>
-        <td>{paymentConfig.name}</td>
+      <tr key={payment._id}>
+        <td>{payment.name}</td>
         <td>
           <Label lblStyle={labelStyle}>{status}</Label>
         </td>

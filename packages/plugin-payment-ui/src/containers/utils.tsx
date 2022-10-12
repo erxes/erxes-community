@@ -4,9 +4,9 @@ import { queries } from '../graphql';
 export const getRefetchQueries = () => {
   return [
     {
-      query: gql(queries.paymentConfigs),
+      query: gql(queries.payments),
       variables: {
-        paymentConfigIds: []
+        paymentIds: []
       }
     },
     {

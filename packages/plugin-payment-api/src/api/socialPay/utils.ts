@@ -8,7 +8,7 @@ import {
   SOCIALPAY_ENDPOINT
 } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
-import { IPaymentConfigDocument } from '../../models/definitions/paymentConfigs';
+import { IPaymentDocument } from '../../models/definitions/payments';
 import { ISocialPayInvoice } from '../types';
 
 export const socialPayHandler = async (models: IModels, data) => {
@@ -61,9 +61,9 @@ export const socialPayInvoiceCheck = async body => {
 
 export const createInvoice = async (
   invoice: IInvoiceDocument,
-  paymentConfig: IPaymentConfigDocument
+  payment: IPaymentDocument
 ) => {
-  const { inStoreSPTerminal, inStoreSPKey } = paymentConfig.config;
+  const { inStoreSPTerminal, inStoreSPKey } = payment.config;
 
   const amount = invoice.amount.toString();
   let url = `${SOCIALPAY_ENDPOINT}${SOCIALPAY_ACTIONS.INVOICE_QR}`;
@@ -111,9 +111,9 @@ export const createInvoice = async (
 
 export const cancelInvoice = async (
   invoice: IInvoiceDocument,
-  paymentConfig: IPaymentConfigDocument
+  payment: IPaymentDocument
 ) => {
-  const { inStoreSPTerminal, inStoreSPKey } = paymentConfig.config;
+  const { inStoreSPTerminal, inStoreSPKey } = payment.config;
 
   const amount = invoice.amount.toString();
 

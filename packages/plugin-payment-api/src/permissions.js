@@ -7,22 +7,22 @@ module.exports = {
         name: 'paymentsAll',
         description: 'All',
         use: [
-          'paymentConfigsAdd',
-          'paymentConfigsEdit',
-          'paymentConfigRemove',
+          'paymentAdd',
+          'paymentEdit',
+          'paymentRemove',
           'showPayments',
         ],
       },
       {
-        name: 'paymentConfigsAdd',
+        name: 'paymentAdd',
         description: 'Add payments',
       },
       {
-        name: 'paymentConfigsEdit',
+        name: 'paymentEdit',
         description: 'Edit payments',
       },
       {
-        name: 'paymentConfigRemove',
+        name: 'paymentRemove',
         description: 'Remove payments',
       },
       {

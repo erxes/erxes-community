@@ -7,7 +7,7 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import { __, getEnv } from '@erxes/ui/src/utils';
 import React from 'react';
-import { IPaymentConfigDocument, ISocialPayConfig } from 'types';
+import { IPaymentDocument, ISocialPayConfig } from 'types';
 
 import { PAYMENT_KINDS } from '../constants';
 import { SettingsContent } from './styles';
@@ -15,11 +15,11 @@ import { SettingsContent } from './styles';
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
-  paymentConfig?: IPaymentConfigDocument;
+  payment?: IPaymentDocument;
 };
 
 type State = {
-  paymentConfigName: string;
+  paymentName: string;
   inStoreSPTerminal: string;
   inStoreSPKey: string;
 };
@@ -28,26 +28,26 @@ class SocialPayConfigForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { paymentConfig } = this.props;
-    const { name, config } = paymentConfig || ({} as IPaymentConfigDocument);
+    const { payment } = this.props;
+    const { name, config } = payment || ({} as IPaymentDocument);
     const { inStoreSPTerminal, inStoreSPKey } =
       config || ({} as ISocialPayConfig);
 
     this.state = {
-      paymentConfigName: name || '',
+      paymentName: name || '',
       inStoreSPTerminal: inStoreSPTerminal || '',
       inStoreSPKey: inStoreSPKey || ''
     };
   }
 
   generateDoc = (values: {
-    paymentConfigName: string;
+    paymentName: string;
     inStoreSPTerminal: string;
     inStoreSPKey: string;
   }) => {
-    const { paymentConfig } = this.props;
+    const { payment } = this.props;
     const generatedValues = {
-      name: values.paymentConfigName,
+      name: values.paymentName,
       kind: PAYMENT_KINDS.SOCIALPAY,
       status: 'active',
       config: {
@@ -56,9 +56,7 @@ class SocialPayConfigForm extends React.Component<Props, State> {
       }
     };
 
-    return paymentConfig
-      ? { ...generatedValues, id: paymentConfig._id }
-      : generatedValues;
+    return payment ? { ...generatedValues, id: payment._id } : generatedValues;
   };
 
   onChangeConfig = (code: string, e) => {
@@ -88,10 +86,10 @@ class SocialPayConfigForm extends React.Component<Props, State> {
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal } = this.props;
     const { isSubmitted } = formProps;
-    const { paymentConfigName, inStoreSPTerminal, inStoreSPKey } = this.state;
+    const { paymentName, inStoreSPTerminal, inStoreSPKey } = this.state;
 
     const values = {
-      paymentConfigName,
+      paymentName,
       inStoreSPTerminal,
       inStoreSPKey
     };
@@ -99,7 +97,7 @@ class SocialPayConfigForm extends React.Component<Props, State> {
     return (
       <>
         <SettingsContent title={__('General settings')}>
-          {this.renderItem('paymentConfigName', 'Name')}
+          {this.renderItem('paymentName', 'Name')}
           {this.renderItem('inStoreSPTerminal', 'Terminal')}
           {this.renderItem('inStoreSPKey', 'Key')}
           {this.renderItem(

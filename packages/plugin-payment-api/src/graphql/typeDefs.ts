@@ -1,26 +1,60 @@
 import { gql } from 'apollo-server-express';
 
-import { types, queries, mutations } from './schema';
+import {
+  queries as invoiceQueries,
+  types as invoiceTypes
+} from './schema/invoices';
+
+import {
+  queries as paymentQueries,
+  types as paymentTypes,
+  mutations as paymentMutations
+} from './schema/payments';
+
+import {
+  queries as configsQueries,
+  mutations as configsMutations,
+  types as configsTypes
+} from './schema/paymentConfigs';
 
 const typeDefs = async serviceDiscovery => {
   const isContactsEnabled = await serviceDiscovery.isEnabled('contacts');
+  const cardsAvailable = await serviceDiscovery.isEnabled('cards');
 
   const isEnabled = {
-    contacts: isContactsEnabled
+    contacts: isContactsEnabled,
+    cards: cardsAvailable
   };
 
   return gql`
     scalar JSON
     scalar Date
 
-    ${types(isEnabled)}
-
-    extend type Query {
-      ${queries}
+    enum CacheControlScope {
+      PUBLIC
+      PRIVATE
     }
+    
+    directive @cacheControl(
+      maxAge: Int
+      scope: CacheControlScope
+      inheritMaxAge: Boolean
+    ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+    
+    ${invoiceTypes(isEnabled)}
+    ${paymentTypes}
+    ${configsTypes}
 
+    
+    extend type Query {
+      ${invoiceQueries}
+      ${paymentQueries}
+      ${configsQueries}
+    }
+    
     extend type Mutation {
-      ${mutations}
+      ${paymentMutations}
+      ${configsMutations}
     }
   `;
 };

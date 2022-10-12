@@ -3,7 +3,7 @@ import { Schema, Document } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 
 export interface IInvoice {
-  paymentConfigId: string;
+  paymentId: string;
   amount: number;
   phone: string;
   email: string;
@@ -27,7 +27,7 @@ export interface IInvoiceDocument extends IInvoice, Document {
 export const invoiceSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-    paymentConfigId: field({
+    paymentId: field({
       type: String,
       required: true,
       label: 'payment config id'

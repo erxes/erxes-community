@@ -15,7 +15,7 @@ import {
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
 import Toggle from '@erxes/ui/src/components/Toggle';
 import { IField } from '@erxes/ui/src/types';
-import { __, loadDynamicComponent } from 'coreui/utils';
+import { __ } from 'coreui/utils';
 import React from 'react';
 import Select from 'react-select-plus';
 
@@ -29,8 +29,7 @@ type Props = {
       | 'theme'
       | 'saveAsCustomer'
       | 'visibility'
-      | 'departmentIds'
-      | 'paymentConfigIds',
+      | 'departmentIds',
     value: any
   ) => void;
   type: string;
@@ -46,7 +45,6 @@ type Props = {
   channelIds?: string[];
   visibility?: string;
   departmentIds?: string[];
-  paymentConfigIds?: string[];
   onFieldEdit?: () => void;
 };
 
@@ -128,10 +126,6 @@ class OptionStep extends React.Component<Props, State> {
       this.onChangeFunction('channelIds', values);
     };
 
-    const paymentConfigOnChange = (values: string[]) => {
-      this.onChangeFunction('paymentConfigIds', values);
-    };
-
     const onChangeLanguage = e => this.onSelectChange(e, 'language');
 
     const onSwitchHandler = e => {
@@ -185,13 +179,6 @@ class OptionStep extends React.Component<Props, State> {
             description="Choose a channel, if you wish to see every new form in your Team Inbox."
             onChange={channelOnChange}
           />
-
-          {renderPayments &&
-            loadDynamicComponent('selectPaymentsForm', {
-              defaultValue: this.props.paymentConfigIds,
-              isRequired: false,
-              onChange: paymentConfigOnChange
-            })}
 
           <FormGroup>
             <ControlLabel required={true}>Visibility</ControlLabel>

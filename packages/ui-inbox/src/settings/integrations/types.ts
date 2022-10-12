@@ -318,7 +318,6 @@ export type IntegrationMutationVariables = {
   name: string;
   channelIds?: string[];
   visibility?: string;
-  paymentConfigIds?: string[];
   departmentIds?: string[];
   data?: any;
 };

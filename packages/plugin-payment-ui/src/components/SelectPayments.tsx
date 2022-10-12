@@ -6,7 +6,7 @@ import React from 'react';
 import Select from 'react-select-plus';
 import styled from 'styled-components';
 
-import { IPaymentConfigDocument } from '../types';
+import { IPaymentDocument } from '../types';
 
 const LeftContent = styled.div`
   display: flex;
@@ -29,17 +29,15 @@ const Row = styled.div`
 `;
 
 type Props = {
-  payments: IPaymentConfigDocument[];
-  onChange?: (values: string[]) => any;
+  payments: IPaymentDocument[];
   defaultValue?: string[];
-  isRequired?: boolean;
-  description?: string;
+  onChange: (value: string[]) => void;
 };
 
 class SelectPayments extends React.Component<Props, {}> {
-  generateUserOptions(array: IPaymentConfigDocument[] = []): IOption[] {
+  generateOptions(array: IPaymentDocument[] = []): IOption[] {
     return array.map(item => {
-      const payment = item || ({} as IPaymentConfigDocument);
+      const payment = item || ({} as IPaymentDocument);
 
       return {
         value: payment._id,
@@ -49,30 +47,25 @@ class SelectPayments extends React.Component<Props, {}> {
   }
 
   onChangePayment = values => {
-    if (this.props.onChange) {
-      this.props.onChange(values.map(item => item.value) || []);
-    }
+    const { onChange } = this.props;
+
+    onChange(values);
   };
 
   render() {
-    const {
-      payments,
-      defaultValue,
-      isRequired,
-      description = __('Select payments that you want to use ')
-    } = this.props;
+    const { payments, defaultValue } = this.props;
 
     return (
       <FormGroup>
-        <ControlLabel required={isRequired}>Payments</ControlLabel>
-        <p>{description}</p>
+        <ControlLabel>Payments</ControlLabel>
+        <p>{__('Select payments that you want to use ')}</p>
         <Row>
           <LeftContent>
             <Select
               placeholder={__('Select payments')}
               value={defaultValue}
               onChange={this.onChangePayment}
-              options={this.generateUserOptions(payments)}
+              options={this.generateOptions(payments)}
               multi={true}
             />
           </LeftContent>

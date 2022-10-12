@@ -58,7 +58,6 @@ export const formConnectMutation = `
         name
         leadData
         languageCode
-        paymentConfigIds
       }
     }
   }
@@ -99,7 +98,6 @@ query getPaymentOptions(
   $contentTypeId: String
   $customerId: String
   $description: String
-  $paymentConfigIds: [String]
   $redirectUri: String
   $phone: String
 ) {
@@ -110,7 +108,6 @@ query getPaymentOptions(
     contentTypeId: $contentTypeId
     customerId: $customerId
     description: $description
-    paymentConfigIds: $paymentConfigIds
     redirectUri: $redirectUri
     phone: $phone
   )

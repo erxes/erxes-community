@@ -9,7 +9,6 @@ const commonFormParamsDef = `
   $leadData: IntegrationLeadData!
   $visibility: String,
   $departmentIds: [String],
-  $paymentConfigIds: [String],
 `;
 
 const commonFormParams = `
@@ -21,7 +20,6 @@ const commonFormParams = `
   leadData: $leadData,
   visibility: $visibility,
   departmentIds: $departmentIds,
-  paymentConfigIds: $paymentConfigIds,
 `;
 
 const integrationRemove = `

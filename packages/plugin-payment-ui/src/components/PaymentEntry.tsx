@@ -11,18 +11,18 @@ import { ByKindTotalCount } from '../types';
 import { PAYMENT_KINDS, PAYMENTCONFIGS } from './constants';
 import QpayForm from './form/QpayForm';
 import SocialPayForm from './form/SocialPayForm';
-import { Box, PaymentConfigItem, Ribbon, Type } from './styles';
+import { Box, PaymentItem, Ribbon, Type } from './styles';
 
 type Props = {
-  paymentConfig: any;
+  payment: any;
   getClassName: (type: string) => string;
   toggleBox: (kind: string) => void;
   queryParams: any;
-  paymentConfigsCount?: ByKindTotalCount;
+  paymentsCount?: ByKindTotalCount;
 };
 
-function getCount(type: string, paymentConfigsCount?: ByKindTotalCount) {
-  const countByType = (paymentConfigsCount && paymentConfigsCount[type]) || 0;
+function getCount(type: string, paymentsCount?: ByKindTotalCount) {
+  const countByType = (paymentsCount && paymentsCount[type]) || 0;
 
   if (typeof countByType === 'undefined') {
     return null;
@@ -49,7 +49,7 @@ const renderButton = ({
 }: IButtonMutateProps) => {
   return (
     <ButtonMutate
-      mutation={mutations.paymentConfigsAdd}
+      mutation={mutations.paymentsAdd}
       variables={values}
       callback={callback}
       refetchQueries={getRefetchQueries()}
@@ -92,27 +92,15 @@ function renderCreate(kind: string) {
   return <ModalTrigger title={title} trigger={trigger} content={formContent} />;
 }
 
-function Entry({
-  paymentConfig,
-  getClassName,
-  toggleBox,
-  paymentConfigsCount
-}: Props) {
-  const {
-    kind,
-    isAvailable,
-    name,
-    description,
-    logo,
-    inMessenger
-  } = paymentConfig;
+function Entry({ payment, getClassName, toggleBox, paymentsCount }: Props) {
+  const { kind, isAvailable, name, description, logo, inMessenger } = payment;
 
   return (
-    <PaymentConfigItem key={name} className={getClassName(kind)}>
+    <PaymentItem key={name} className={getClassName(kind)}>
       <Box onClick={() => toggleBox(kind)} isInMessenger={inMessenger}>
         <img alt="logo" src={logo} />
         <h5>
-          {name} {getCount(kind, paymentConfigsCount)}
+          {name} {getCount(kind, paymentsCount)}
         </h5>
         <p>
           {__(description)}
@@ -125,7 +113,7 @@ function Entry({
         )}
       </Box>
       {renderCreate(kind)}
-    </PaymentConfigItem>
+    </PaymentItem>
   );
 }
 

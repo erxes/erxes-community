@@ -177,7 +177,6 @@ export interface IIntegration {
   facebookData: IIntegrationFacebookData;
   uiOptions: IIntegrationUiOptions;
   bookingData: IBookingData;
-  paymentConfigIds: string[];
 }
 export interface IRule {
   _id: string;

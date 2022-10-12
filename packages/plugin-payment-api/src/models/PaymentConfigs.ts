@@ -8,18 +8,26 @@ import {
 } from './definitions/paymentConfigs';
 
 export interface IPaymentConfigModel extends Model<IPaymentConfigDocument> {
-  createPaymentConfig(doc: IPaymentConfig): Promise<IPaymentConfigDocument>;
+  createOrUpdate(doc: IPaymentConfig): Promise<IPaymentConfigDocument>;
   removePaymentConfig(_id: string): void;
-  updatePaymentConfig(
-    _id: string,
-    doc: IPaymentConfig
-  ): Promise<IPaymentConfigDocument>;
-  getPaymentConfig(_id: string): Promise<IPaymentConfigDocument>;
+  getPaymentConfig(doc: any): Promise<IPaymentConfigDocument>;
 }
 
 export const loadPaymentConfigClass = (models: IModels) => {
   class PaymentConfig {
-    public static async createPaymentConfig(doc: IPaymentConfig) {
+    public static async createOrUpdate(doc: IPaymentConfig) {
+      const paymentConfig = await models.PaymentConfigs.findOne({
+        contentType: doc.contentType,
+        contentTypeId: doc.contentTypeId
+      });
+
+      if (paymentConfig) {
+        return models.PaymentConfigs.updateOne(
+          { _id: paymentConfig._id },
+          { $set: { paymentIds: doc.paymentIds } }
+        );
+      }
+
       return models.PaymentConfigs.create(doc);
     }
 
@@ -27,19 +35,11 @@ export const loadPaymentConfigClass = (models: IModels) => {
       return models.PaymentConfigs.deleteOne({ _id });
     }
 
-    public static async updatePaymentConfig(_id: string, doc: IPaymentConfig) {
-      await models.PaymentConfigs.updateOne({ _id }, { $set: { ...doc } });
-
-      const updated = await models.PaymentConfigs.findOne({ _id });
-
-      return updated;
-    }
-
-    public static async getPaymentConfig(_id: string) {
-      const paymentConfig = await models.PaymentConfigs.findOne({ _id });
+    public static async getPaymentConfig(doc: any) {
+      const paymentConfig = await models.PaymentConfigs.findOne(doc);
 
       if (!paymentConfig) {
-        throw new Error('Payment config not found');
+        throw new Error('Payment Config not found');
       }
 
       return paymentConfig;

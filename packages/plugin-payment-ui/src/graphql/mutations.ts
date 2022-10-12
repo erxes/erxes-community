@@ -1,29 +1,29 @@
 const commonParamDefs = `$name: String!, $kind: String!, $status: String, $config: JSON`;
 const commonParams = `name: $name, kind: $kind, status: $status, config: $config`;
 
-const createInvoiceParamDefs = `$paymentConfigId: String!, $amount: Float!, $description: String!, $phone: String, $customerId: String, $companyId: String`;
+const createInvoiceParamDefs = `$paymentId: String!, $amount: Float!, $description: String!, $phone: String, $customerId: String, $companyId: String`;
 
-const createInvoiceParams = `paymentConfigId: $paymentConfigId, amount: $amount, description: $description, phone: $phone, customerId: $customerId, companyId: $companyId`;
+const createInvoiceParams = `paymentId: $paymentId, amount: $amount, description: $description, phone: $phone, customerId: $customerId, companyId: $companyId`;
 
-const paymentConfigsAdd = `
-mutation paymentConfigsAdd(${commonParamDefs}) {
-  paymentConfigsAdd(${commonParams}) {
+const paymentsAdd = `
+mutation paymentsAdd(${commonParamDefs}) {
+  paymentsAdd(${commonParams}) {
     _id
   }
 }
 `;
 
-const paymentConfigsEdit = `
-mutation PaymentConfigsEdit($id: String!, ${commonParamDefs}) {
-  paymentConfigsEdit(id: $id, ${commonParams}) {
+const paymentsEdit = `
+mutation PaymentEdit($id: String!, ${commonParamDefs}) {
+  paymentsEdit(id: $id, ${commonParams}) {
     _id
   }
 }
 `;
 
-const paymentConfigRemove = `
-mutation paymentConfigRemove($id: String!) {
-  paymentConfigRemove(id: $id)
+const paymentRemove = `
+mutation paymentRemove($id: String!) {
+  paymentRemove(id: $id)
 }`;
 
 const createInvoice = `
@@ -32,9 +32,19 @@ mutation createInvoice(${createInvoiceParamDefs}) {
 }
 `;
 
+const setPaymentConfig = `
+mutation SetPaymentConfig($contentType: String!, $contentTypeId: String!) {
+  setPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
+    _id
+    paymentIds
+  }
+}
+`;
+
 export default {
-  paymentConfigsAdd,
-  paymentConfigsEdit,
-  paymentConfigRemove,
-  createInvoice
+  paymentsAdd,
+  paymentsEdit,
+  paymentRemove,
+  createInvoice,
+  setPaymentConfig
 };

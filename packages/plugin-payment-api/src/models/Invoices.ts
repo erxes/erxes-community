@@ -34,30 +34,28 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Amount is required');
       }
 
-      if (!doc.paymentConfigId) {
+      if (!doc.paymentId) {
         throw new Error('Payment config id is required');
       }
 
-      const paymentConfig = await models.PaymentConfigs.getPaymentConfig(
-        doc.paymentConfigId
-      );
+      const payment = await models.Payments.getPayment(doc.paymentId);
 
       const invoice = await models.Invoices.create(doc);
 
       try {
-        switch (paymentConfig.kind) {
+        switch (payment.kind) {
           case PAYMENT_KINDS.QPAY:
             // create qpay invoice
             invoice.apiResponse = await qpayUtils.createInvoice(
               invoice,
-              paymentConfig
+              payment
             );
             break;
           case PAYMENT_KINDS.SOCIAL_PAY:
             // create socialpay invoice
             invoice.apiResponse = await socialPayUtils.createInvoice(
               invoice,
-              paymentConfig
+              payment
             );
             break;
           default:
@@ -82,21 +80,16 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Already settled');
       }
 
-      const paymentConfig = await models.PaymentConfigs.getPaymentConfig(
-        invoice.paymentConfigId
-      );
+      const payment = await models.Payments.getPayment(invoice.paymentId);
 
-      switch (paymentConfig.kind) {
+      switch (payment.kind) {
         case PAYMENT_KINDS.QPAY:
           // cancel qpay invoice
-          qpayUtils.cancelInvoice(
-            invoice.apiResponse.invoice_id,
-            paymentConfig
-          );
+          qpayUtils.cancelInvoice(invoice.apiResponse.invoice_id, payment);
           break;
         case PAYMENT_KINDS.SOCIAL_PAY:
           // cancel socialpay invoice
-          socialPayUtils.cancelInvoice(invoice, paymentConfig);
+          socialPayUtils.cancelInvoice(invoice, payment);
           break;
         default:
           break;
