@@ -23,6 +23,10 @@ export const generateFilter = async (params, models) => {
     filter._id = { $in: movementItems?.assetIds };
   }
 
+  if (params.userId) {
+    filter.userId = params.userId;
+  }
+
   if (params.branchId) {
     filter.branchId = params.branchId;
   }
@@ -40,11 +44,21 @@ export const generateFilter = async (params, models) => {
     filter.customerId = params.customerId;
   }
 
-  if (params.from) {
-    filter.createdAt = { $gte: params.from };
+  if (params.createdAtFrom) {
+    filter.createdAt = { $gt: new Date(params.createdAtFrom) };
   }
-  if (params.to) {
-    filter.createdAt = { ...filter.createdAt, $lte: params.to };
+  if (params.createdAtTo) {
+    filter.createdAt = {
+      ...filter.createdAt,
+      $lt: new Date(params.createdAtTo)
+    };
+  }
+
+  if (params.movedAtFrom) {
+    filter.movedAt = { $gt: new Date(params.movedAtFrom) };
+  }
+  if (params.movedAtTo) {
+    filter.movedAt = { ...filter.movedAt, $lt: new Date(params.movedAtTo) };
   }
 
   if (params.searchValue) {

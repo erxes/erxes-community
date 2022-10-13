@@ -70,7 +70,10 @@ export default withProps(
       })
     }),
     graphql<Props>(gql(queries.movementsTotalCount), {
-      name: 'movementsTotalCountQuery'
+      name: 'movementsTotalCountQuery',
+      options: ({ queryParams }) => ({
+        variables: generateParams({ queryParams })
+      })
     }),
     graphql<Props>(gql(mutations.movementRemove), {
       name: 'movementRemove'

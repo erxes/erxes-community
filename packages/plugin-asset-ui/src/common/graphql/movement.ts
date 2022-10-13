@@ -39,10 +39,14 @@ export const movementFilterParamsDef = `
 `;
 
 export const dateFilterParams = `
-    $from :String,
-    $to :String
+    $movedAtFrom :String,
+    $movedAtTo :String,
+    $createdAtFrom :String,
+    $createdAtTo :String
 `;
 export const dateFilterParamsDef = `
-    from : $from,
-    to: $to
+    movedAtFrom : $movedAtFrom,
+    movedAtTo: $movedAtTo,
+    createdAtFrom : $createdAtFrom,
+    createdAtTo: $createdAtTo
 `;

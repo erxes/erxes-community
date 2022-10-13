@@ -29,8 +29,8 @@ query AssetMovementAssets ($movementId:String,${movementFilterParams},${dateFilt
 `;
 
 const itemsTotalCount = `
-  query AssetMovementItemsTotalCount {
-  assetMovementItemsTotalCount
+  query AssetMovementItemsTotalCount(${movementFilterParams},${dateFilterParams}) {
+  assetMovementItemsTotalCount(${movementFilterParamsDef},${dateFilterParamsDef})
 }
 `;
 

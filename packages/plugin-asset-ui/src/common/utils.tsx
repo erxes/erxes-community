@@ -50,7 +50,7 @@ export const DefaultWrapper = ({
           data={content}
           count={totalCount}
           emptyImage="/images/actions/5.svg"
-          emptyText={__('No data of risk assessment')}
+          emptyText={__('No data')}
         />
       }
       leftSidebar={sidebar}
@@ -171,8 +171,10 @@ export const getRefetchQueries = () => {
 export const generateParams = ({ queryParams }) => ({
   ...router.generatePaginationParams(queryParams || {}),
   movementId: queryParams?.movementId,
-  from: queryParams.from,
-  to: queryParams.to,
+  movedAtFrom: queryParams.movedAtFrom,
+  movedAtTo: queryParams.movedAtTo,
+  createdAtFrom: queryParams.createdAtFrom,
+  createdAtTo: queryParams.createdAtTo,
   userId: queryParams.userId,
   branchId: queryParams?.branchId,
   departmentId: queryParams?.departmentId,

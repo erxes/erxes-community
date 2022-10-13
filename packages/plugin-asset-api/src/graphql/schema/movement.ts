@@ -11,7 +11,7 @@ export const types = `
         customerId:String,
         teamMemberId:String,
         companyId:String,
-        createdAt:String
+        createdAt:Date
 
         customer:JSON
         company:JSON
@@ -22,9 +22,9 @@ export const types = `
 
     type Movement {
         _id:String
-        createdAt:String
+        createdAt:Date
         userId:String
-        movedAt:String
+        movedAt:Date
         assetIds:[String]
         description:String
         
@@ -50,9 +50,9 @@ export const mutations = `
 `;
 export const queries = `
     assetMovements(${movementFilters}):[Movement]
-    assetMovementTotalCount:Int
+    assetMovementTotalCount(${movementFilters}):Int
     assetMovement(_id:String):Movement
     assetMovementAssets(${movementFilters}):[MovementAsset]
-    assetMovementItemsTotalCount:Int
+    assetMovementItemsTotalCount(${movementFilters}):Int
     assetMovementAsset(_id:String):MovementAsset
 `;

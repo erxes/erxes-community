@@ -110,6 +110,7 @@ class MovementItems extends React.Component<Props> {
         </tr>
         {current === assetId && (
           <tr>
+            <td style={{width:40}}/>
             <td>
               <ContainerBox row gap={5} justifyCenter>
                 <strong>{__('Move to')}</strong>

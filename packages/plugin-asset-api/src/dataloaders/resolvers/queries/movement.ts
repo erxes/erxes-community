@@ -1,27 +1,10 @@
 import { paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-
-const generateFilter = params => {
-  let filter: any = {};
-
-  if (params.from) {
-    filter.createdAt = { $gte: new Date(params.from) };
-  }
-  if (params.to) {
-    filter.createdAt = { ...filter.createdAt, $lte: new Date(params.to) };
-  }
-  if (params.userId) {
-    filter.userId = params.userId;
-  }
-
-  console.log(filter);
-
-  return filter;
-};
+import { generateFilter } from '../../../utils';
 
 const movementQueries = {
-  assetMovements(_root, params, { models }: IContext) {
-    const filter = generateFilter(params);
+  async assetMovements(_root, params, { models }: IContext) {
+    const filter = await generateFilter(params, models);
 
     return paginate(models.Movement.find(filter), params);
   },
@@ -29,8 +12,9 @@ const movementQueries = {
     return await models.Movement.findOne({ _id });
   },
 
-  assetMovementTotalCount(_root, params, { models }: IContext) {
-    const filter = generateFilter(params);
+  async assetMovementTotalCount(_root, params, { models }: IContext) {
+    console.log({ params });
+    const filter = await generateFilter(params, models);
 
     return models.Movement.find(filter).countDocuments();
   }

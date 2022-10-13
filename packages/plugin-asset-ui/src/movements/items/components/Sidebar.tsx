@@ -28,8 +28,8 @@ type State = {
   teamMemberId?: string;
   companyId?: string;
   customerId?: string;
-  from?: string;
-  to?: string;
+  createdAtFrom?: string;
+  createdAtTo?: string;
 };
 
 class Sidebar extends React.Component<Props, State> {
@@ -44,7 +44,15 @@ class Sidebar extends React.Component<Props, State> {
   }
 
   render() {
-    const { branchId, departmentId, teamMemberId, companyId, customerId, from, to } = this.state;
+    const {
+      branchId,
+      departmentId,
+      teamMemberId,
+      companyId,
+      customerId,
+      createdAtFrom,
+      createdAtTo
+    } = this.state;
 
     const FormGroup = ({
       label,
@@ -79,7 +87,7 @@ class Sidebar extends React.Component<Props, State> {
     };
 
     const handleSelect = (value, name) => {
-      if (['from', 'to'].includes(name)) {
+      if (['createdAtFrom', 'createdAtTo'].includes(name)) {
         value = moment(value).format(`YYYY/MM/DD hh:mm`);
       }
 
@@ -135,23 +143,23 @@ class Sidebar extends React.Component<Props, State> {
               onSelect={handleSelect}
             />
           </FormGroup>
-          <FormGroup label="From" clearable={!!from} field="from">
+          <FormGroup label="From" clearable={!!createdAtFrom} field="createdAtFrom">
             <DateContainer>
               <DateControl
-                name="from"
+                name="createdAtFrom"
                 placeholder="Choose start date"
-                value={from}
-                onChange={e => handleSelect(e, 'from')}
+                value={createdAtFrom}
+                onChange={e => handleSelect(e, 'createdAtFrom')}
               />
             </DateContainer>
           </FormGroup>
-          <FormGroup label="To" clearable={!!to} field="to">
+          <FormGroup label="To" clearable={!!createdAtTo} field="createdAtTo">
             <DateContainer>
               <DateControl
-                name="to"
+                name="createdAtTo"
                 placeholder="Choose end date"
-                value={to}
-                onChange={e => handleSelect(e, 'to')}
+                value={createdAtTo}
+                onChange={e => handleSelect(e, 'createdAtTo')}
               />
             </DateContainer>
           </FormGroup>

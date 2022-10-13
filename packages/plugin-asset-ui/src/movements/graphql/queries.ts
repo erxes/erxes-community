@@ -44,8 +44,8 @@ const movements = `
 }
 `;
 const movementsTotalCount = `
-  query AssetMovementTotalCount {
-    assetMovementTotalCount
+  query AssetMovementTotalCount(${dateFilterParams}) {
+    assetMovementTotalCount(${dateFilterParamsDef})
   }
 `;
 
