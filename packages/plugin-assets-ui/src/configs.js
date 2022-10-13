@@ -1,13 +1,13 @@
 module.exports = {
-  name: 'asset',
+  name: 'assets',
   port: 3012,
-  scope: 'asset',
+  scope: 'assets',
   exposes: {
     './routes': './src/routes.tsx'
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
-    scope: 'asset',
+    scope: 'assets',
     module: './routes'
   },
   menus: [
@@ -16,7 +16,7 @@ module.exports = {
       to: '/settings/asset-movements/',
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
-      scope: 'asset'
+      scope: 'assets'
     },
     {
       text: 'Asset & Movements',
