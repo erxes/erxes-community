@@ -3,20 +3,23 @@ export const types = `
     _id: String!
     contentType: String!
     contentTypeId: String!
+    contentName: String
     paymentIds: [String]
+  }
+
+  type PaymentConfigList {
+    list: [PaymentConfig]
+    totalCount: Int
   }
 `;
 
 export const queries = `
     getPaymentConfig(contentType: String!, contentTypeId: String!): PaymentConfig
-`;
-
-const mutationParams = `
-    contentType: String!
-    contentTypeId: String!
+    getPaymentConfigs(contentType: String, page: Int, perPage: Int ): PaymentConfigList
 `;
 
 export const mutations = `
-    setPaymentConfig(${mutationParams}): PaymentConfig
-    removePaymentConfig(${mutationParams}): String
+    paymentConfigsAdd(contentType: String!, contentTypeId: String!, paymentIds: [String]): PaymentConfig
+    paymentConfigsEdit(_id: String!, paymentIds: [String]): PaymentConfig
+    paymentConfigsRemove(_id: String!): String
 `;

@@ -1,17 +1,15 @@
-import gql from 'graphql-tag';
+import Spinner from '@erxes/ui/src/components/Spinner';
+import { Alert, confirm, withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
-
-import Spinner from '@erxes/ui/src/components/Spinner';
-import { Alert, confirm, withProps } from '@erxes/ui/src/utils';
 
 import PaymentList from '../components/PaymentList';
 import { mutations, queries } from '../graphql';
 import {
   IPaymentDocument,
-  PaymentsQueryResponse,
-  PaymentRemoveMutationResponse
+  PaymentRemoveMutationResponse,
+  PaymentsQueryResponse
 } from '../types';
 
 type Props = {
@@ -66,27 +64,24 @@ const IntegrationListContainer = (props: FinalProps) => {
 const mutationOptions = () => ({
   refetchQueries: [
     {
-      query: gql(queries.payments),
+      query: queries.payments,
       variables: {
         paymentIds: []
       }
     },
     {
-      query: gql(queries.paymentsTotalCountQuery)
+      query: queries.paymentsTotalCountQuery
     }
   ]
 });
 
 export default withProps<Props>(
   compose(
-    graphql<Props, PaymentRemoveMutationResponse>(
-      gql(mutations.paymentRemove),
-      {
-        name: 'paymentsRemove',
-        options: mutationOptions
-      }
-    ),
-    graphql<Props, PaymentsQueryResponse>(gql(queries.payments), {
+    graphql<Props, PaymentRemoveMutationResponse>(mutations.paymentRemove, {
+      name: 'paymentsRemove',
+      options: mutationOptions
+    }),
+    graphql<Props, PaymentsQueryResponse>(queries.payments, {
       name: 'paymentsQuery',
       options: () => {
         return {

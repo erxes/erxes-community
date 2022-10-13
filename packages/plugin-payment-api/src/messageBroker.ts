@@ -30,6 +30,15 @@ export const sendPluginsMessage = async (
   });
 };
 
+export const sendFormsMessage = (args: ISendMessageArgs): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'forms',
+    ...args
+  });
+};
+
 export default function() {
   return client;
 }

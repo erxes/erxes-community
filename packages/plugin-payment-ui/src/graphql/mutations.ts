@@ -1,44 +1,70 @@
-const commonParamDefs = `$name: String!, $kind: String!, $status: String, $config: JSON`;
-const commonParams = `name: $name, kind: $kind, status: $status, config: $config`;
+import { gql } from '@apollo/client';
 
-const createInvoiceParamDefs = `$paymentId: String!, $amount: Float!, $description: String!, $phone: String, $customerId: String, $companyId: String`;
+import {
+  commonPaymentParamDefs,
+  commonPaymentParams,
+  createInvoiceParamDefs,
+  createInvoiceParams,
+  paymentConfigFields
+} from './common';
 
-const createInvoiceParams = `paymentId: $paymentId, amount: $amount, description: $description, phone: $phone, customerId: $customerId, companyId: $companyId`;
-
-const paymentsAdd = `
-mutation paymentsAdd(${commonParamDefs}) {
-  paymentsAdd(${commonParams}) {
+const paymentsAdd = gql`
+mutation paymentsAdd(${commonPaymentParamDefs}) {
+  paymentsAdd(${commonPaymentParams}) {
     _id
   }
 }
 `;
 
-const paymentsEdit = `
-mutation PaymentEdit($id: String!, ${commonParamDefs}) {
-  paymentsEdit(id: $id, ${commonParams}) {
+const paymentsEdit = gql`
+mutation PaymentEdit($id: String!, ${commonPaymentParamDefs}) {
+  paymentsEdit(id: $id, ${commonPaymentParams}) {
     _id
   }
 }
 `;
 
-const paymentRemove = `
-mutation paymentRemove($id: String!) {
-  paymentRemove(id: $id)
-}`;
+const paymentRemove = gql`
+  mutation paymentRemove($id: String!) {
+    paymentRemove(id: $id)
+  }
+`;
 
-const createInvoice = `
+const createInvoice = gql`
 mutation createInvoice(${createInvoiceParamDefs}) {
   createInvoice(${createInvoiceParams})
 }
 `;
 
-const setPaymentConfig = `
-mutation SetPaymentConfig($contentType: String!, $contentTypeId: String!) {
-  setPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
-    _id
-    paymentIds
+const setPaymentConfig = gql`
+  mutation SetPaymentConfig($contentType: String!, $contentTypeId: String!) {
+    setPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
+      _id
+      paymentIds
+    }
+  }
+`;
+
+const paymentConfigsAdd = gql`
+mutation PaymentConfigsAdd($contentType: String!, $contentTypeId: String!, $paymentIds: [String]) {
+  paymentConfigsAdd(contentType: $contentType, contentTypeId: $contentTypeId, paymentIds: $paymentIds) {
+    ${paymentConfigFields}
   }
 }
+`;
+
+const paymentConfigsEdit = gql`
+  mutation PaymentConfigsEdit($id: String!, $paymentIds: [String]) {
+    paymentConfigsEdit(_id: $id, paymentIds: $paymentIds) {
+      ${paymentConfigFields}
+    }
+  }
+`;
+
+const paymentConfigsRemove = gql`
+  mutation PaymentConfigsRemove($id: String!) {
+    paymentConfigsRemove(_id: $id)
+  }
 `;
 
 export default {
@@ -46,5 +72,9 @@ export default {
   paymentsEdit,
   paymentRemove,
   createInvoice,
-  setPaymentConfig
+  setPaymentConfig,
+
+  paymentConfigsAdd,
+  paymentConfigsEdit,
+  paymentConfigsRemove
 };

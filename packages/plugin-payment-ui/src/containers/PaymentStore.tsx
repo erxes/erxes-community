@@ -1,9 +1,7 @@
-import gql from 'graphql-tag';
+import { withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
-
-import { withProps } from '@erxes/ui/src/utils';
 
 import PaymentHome from '../components/PaymentHome';
 import { queries } from '../graphql';
@@ -40,7 +38,7 @@ const Store = (props: FinalProps) => {
 export default withProps<Props>(
   compose(
     graphql<Props, PaymentsCountByTypeQueryResponse, {}>(
-      gql(queries.paymentsTotalCountQuery),
+      queries.paymentsTotalCountQuery,
       {
         name: 'paymentsTotalCountQuery'
       }

@@ -71,6 +71,8 @@ class Row extends React.Component<Props> {
         labelStyle = 'error';
     }
 
+    console.log('payment', payment);
+
     return (
       <tr onClick={onTrClick}>
         <td onClick={onClick}>

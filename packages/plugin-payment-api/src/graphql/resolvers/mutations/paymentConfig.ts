@@ -2,22 +2,24 @@ import { IContext } from '../../../connectionResolver';
 import { IPaymentConfig } from '../../../models/definitions/paymentConfigs';
 
 const mutations = {
-  async setPaymentConfig(_root, args: IPaymentConfig, { models }: IContext) {
-    return models.PaymentConfigs.createOrUpdate(args);
+  async paymentConfigsAdd(_root, args: IPaymentConfig, { models }: IContext) {
+    return models.PaymentConfigs.createConfig(args);
   },
 
-  async removePaymentConfig(
+  async paymentConfigsEdit(
     _root,
-    args: { contentType: string; contentTypeId: string },
+    { _id, paymentIds }: { _id: string; paymentIds: string[] },
     { models }: IContext
   ) {
-    const { contentType, contentTypeId } = args;
-    const config = await models.PaymentConfigs.getPaymentConfig({
-      contentType,
-      contentTypeId
-    });
+    return models.PaymentConfigs.updateConfig(_id, paymentIds);
+  },
 
-    return models.PaymentConfigs.remove(config._id);
+  async removePaymentsConfig(
+    _root,
+    args: { _id: string },
+    { models }: IContext
+  ) {
+    return models.PaymentConfigs.removeConfig(args._id);
   }
 };
 

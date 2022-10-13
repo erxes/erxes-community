@@ -1,9 +1,9 @@
-import gql from 'graphql-tag';
-import * as compose from 'lodash.flowright';
 import Bulk from '@erxes/ui/src/components/Bulk';
 import { withProps } from '@erxes/ui/src/utils';
+import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
+
 import List from '../components/invoice/List';
 import { queries } from '../graphql';
 import {
@@ -68,7 +68,7 @@ class InvoiceListContainer extends React.Component<FinalProps> {
 export default withProps<Props>(
   compose(
     graphql<Props, InvoicesQueryResponse, { page: number; perPage: number }>(
-      gql(queries.invoices),
+      queries.invoices,
       {
         name: 'invoicesQuery',
         options: ({ queryParams }) => ({
@@ -86,7 +86,7 @@ export default withProps<Props>(
       }
     ),
     graphql<Props, InvoicesTotalCountQueryResponse>(
-      gql(queries.invoicesTotalCount),
+      queries.invoicesTotalCount,
       {
         name: 'invoicesTotalCountQuery',
         options: ({ queryParams }) => ({

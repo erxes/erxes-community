@@ -22,6 +22,11 @@ type State = {
   payments: any;
 };
 
+export const subMenu = [
+  { title: 'Payments', link: '/settings/payments' },
+  { title: 'Integration Configs', link: '/payment/configs' }
+];
+
 class Home extends React.Component<Props, State> {
   constructor(props) {
     super(props);
@@ -102,27 +107,10 @@ class Home extends React.Component<Props, State> {
 
   render() {
     const { queryParams } = this.props;
-    const breadcrumb = [
-      { title: __('Settings'), link: '/settings' },
-      { title: __('Payments') },
-      { title: `${this.props.queryParams.kind || __('All payments')}` }
-    ];
-
-    const headerDescription = (
-      <HeaderDescription
-        icon="/images/actions/33.svg"
-        title="Paymets"
-        description={`${__('Set up your payment method')}.${__(
-          'Now you can choose payment method'
-        )}`}
-      />
-    );
 
     return (
       <Wrapper
-        header={
-          <Wrapper.Header title={__('Payments')} breadcrumb={breadcrumb} />
-        }
+        header={<Wrapper.Header title={__('Payments')} submenu={subMenu} />}
         actionBar={
           <Wrapper.ActionBar
             left={<Title>{queryParams.kind || 'All Payments'}</Title>}
@@ -130,7 +118,6 @@ class Home extends React.Component<Props, State> {
             background="colorWhite"
           />
         }
-        mainHead={headerDescription}
         content={
           <Content>
             <PaymentWrapper>{this.renderPayments()}</PaymentWrapper>

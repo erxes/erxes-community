@@ -1,30 +1,35 @@
-const payments = `
-query payments($status: String) {
-  payments(status: $status) {
-    _id
-    name
-    kind
-    status
-    config
+import gql from 'graphql-tag';
+
+import { paymentConfigFields } from './common';
+
+const payments = gql`
+  query payments($status: String) {
+    payments(status: $status) {
+      _id
+      name
+      kind
+      status
+      config
+    }
   }
-}
 `;
 
-const paymentsTotalCountQuery = `
-query paymentsTotalCount($kind: String, $status: String) {
-  paymentsTotalCount(kind: $kind, status: $status) {
-    byKind
-    total
+const paymentsTotalCountQuery = gql`
+  query paymentsTotalCount($kind: String, $status: String) {
+    paymentsTotalCount(kind: $kind, status: $status) {
+      byKind
+      total
+    }
   }
-}
 `;
 
-const checkInvoice = `
-query checkInvoice($paymentId: String!, $invoiceId: String!) {
-  checkInvoice(paymentId: $paymentId, invoiceId: $invoiceId)
-}`;
+const checkInvoice = gql`
+  query checkInvoice($paymentId: String!, $invoiceId: String!) {
+    checkInvoice(paymentId: $paymentId, invoiceId: $invoiceId)
+  }
+`;
 
-const invoicesResponse = `
+const invoicesResponse = gql`
     _id
     amount
     contentType
@@ -55,7 +60,7 @@ const invoicesResponse = `
     pluginData
 `;
 
-const invoices = `
+const invoices = gql`
 query invoices($page: Int, $perPage: Int, $kind: String, $searchValue: String, $status: String) {
   invoices(page: $page, perPage: $perPage, kind: $kind, searchValue: $searchValue, status: $status) {
     ${invoicesResponse}
@@ -63,23 +68,45 @@ query invoices($page: Int, $perPage: Int, $kind: String, $searchValue: String, $
 }
 `;
 
-const invoicesTotalCount = `
-query invoicesTotalCount($kind: String, $searchValue: String, $status: String) {
-  invoicesTotalCount(kind: $kind, searchValue: $searchValue, status: $status) {
-    byKind
-    byStatus
-    total
+const invoicesTotalCount = gql`
+  query invoicesTotalCount(
+    $kind: String
+    $searchValue: String
+    $status: String
+  ) {
+    invoicesTotalCount(
+      kind: $kind
+      searchValue: $searchValue
+      status: $status
+    ) {
+      byKind
+      byStatus
+      total
+    }
   }
-}
 `;
 
-const paymentConfigQuery = `
-query getPaymentConfig ($contentType: String, $contentTypeId: String) {
-  getPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
-    _id
-    paymentIds
+const paymentConfigQuery = gql`
+  query GetPaymentConfig($contentType: String!, $contentTypeId: String!) {
+    getPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
+      ${paymentConfigFields}
+    }
   }
-}
+`;
+
+const paymentConfigsQuery = gql`
+  query GetPaymentConfigs($contentType: String, $page: Int, $perPage: Int) {
+    getPaymentConfigs(
+      contentType: $contentType
+      page: $page
+      perPage: $perPage
+    ) {
+      list {
+        ${paymentConfigFields}
+      }
+      totalCount
+    }
+  }
 `;
 
 export default {
@@ -88,5 +115,7 @@ export default {
   paymentConfigQuery,
   checkInvoice,
   invoices,
-  invoicesTotalCount
+  invoicesTotalCount,
+
+  paymentConfigsQuery
 };

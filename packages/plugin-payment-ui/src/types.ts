@@ -58,6 +58,7 @@ export interface IPaymentConfig {
   _id: string;
   paymentIds: string[];
   contentType: string;
+  contentName: string;
   contentTypeId: string;
 }
 
@@ -117,14 +118,31 @@ export type PaymentsCountByTypeQueryResponse = {
 
 export type IConfigsMap = { [key: string]: any };
 
-export type IConfig = {
-  _id: string;
-  code: string;
-  value: any;
-};
-
-export type ConfigsQueryResponse = {
-  configs: IConfig[];
+export type PaymentConfigsQueryResponse = {
+  getPaymentConfigs: {
+    list: IPaymentConfig[];
+    totalCount: number;
+  };
   loading: boolean;
   refetch: () => void;
+};
+
+export type PaymentConfigsEditMutationResponse = {
+  paymentConfigsEdit: (params: {
+    variables: { id: string; paymentIds: string[] };
+  }) => Promise<any>;
+};
+
+export type PaymentConfigsAddMutationResponse = {
+  paymentConfigsAdd: (params: {
+    variables: {
+      contentType: string;
+      contentTypeId: string;
+      paymentIds: string[];
+    };
+  }) => Promise<any>;
+};
+
+export type PaymentConfigsRemoveMutationResponse = {
+  paymentConfigsRemove: (params: { variables: { id: string } }) => Promise<any>;
 };
