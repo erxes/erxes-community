@@ -44,7 +44,7 @@ interface IProps {
   callSubmit: boolean;
   extraContent?: string;
   isSubmitting?: boolean;
-  paymentsUrl?: string;
+  invoiceLink?: string;
   onChangeCurrentStatus: (status: string) => void;
 }
 
@@ -74,7 +74,7 @@ const WithContext = () => (
       isSubmitting,
       getForm,
       onChangeCurrentStatus,
-      paymentsUrl,
+      invoiceLink,
     }) => {
       const integration = getIntegration();
       const form = getForm();
@@ -92,7 +92,7 @@ const WithContext = () => (
           extraContent={extraContent}
           callSubmit={callSubmit}
           onChangeCurrentStatus={onChangeCurrentStatus}
-          paymentsUrl={paymentsUrl}
+          invoiceLink={invoiceLink}
         />
       );
     }}

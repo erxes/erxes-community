@@ -20,7 +20,7 @@ type Props = {
   isSubmitting?: boolean;
   color?: string;
   extraContent?: string;
-  paymentsUrl?: string;
+  invoiceLink?: string;
 
   onSubmit: (doc: IFormDoc, requiredPaymentAmount?:number ) => void;
   onCreateNew: () => void;
@@ -443,7 +443,7 @@ class Form extends React.Component<Props, State> {
   }
 
   renderPayments() {
-    const paymentsUrl = this.props.paymentsUrl;
+    const invoiceLink = this.props.invoiceLink;
     const { currentStatus } = this.props;
 
     const PaymentIframe = ({
@@ -458,11 +458,11 @@ class Form extends React.Component<Props, State> {
       <iframe src={src} width={width} height={height} scrolling="yes"></iframe>
     );
 
-    if (!paymentsUrl || currentStatus.status !== "PAYMENT_PENDING") {
+    if (!invoiceLink || currentStatus.status !== "PAYMENT_PENDING") {
       return null;
     }
 
-    return <PaymentIframe src={paymentsUrl} width="100%" height="600px" />;
+    return <PaymentIframe src={invoiceLink} width="100%" height="600px" />;
   }
 
   renderForm() {
@@ -581,7 +581,7 @@ class Form extends React.Component<Props, State> {
       return this.renderSuccessForm(thankTitle, thankContent, successImage);
     }
 
-    if (this.props.paymentsUrl) {
+    if (this.props.invoiceLink) {
       return this.renderPayments();
     }
 

@@ -6,7 +6,7 @@ import { IBrowserInfo, IEmailParams } from '../../types';
 import { requestBrowserInfo } from '../../utils';
 import { connection } from '../connection';
 import {
-  getPaymentOptions,
+  generateInvoiceUrl,
   increaseViewCountMutation,
   saveFormMutation,
   sendEmailMutation,
@@ -182,11 +182,11 @@ export const saveLead = (params: {
     });
 };
 
-export const getPaymentLink = ( amount: number, conversationId: string ) => {
+export const generatePaymentLink = ( amount: number, conversationId: string ) => {
   const customerId = getLocalStorageItem("customerId");
 
-  return client.query({
-    query: gql(getPaymentOptions),
+  return client.mutate({
+    mutation: gql(generateInvoiceUrl),
     variables: {
       customerId,
       amount,

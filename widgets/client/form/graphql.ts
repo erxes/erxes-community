@@ -100,9 +100,9 @@ export const increaseViewCountMutation = `
   }
 `;
 
-export const getPaymentOptions = `
-query getPaymentOptions(
-  $amount: Float
+export const generateInvoiceUrl = `
+mutation generateInvoiceUrl(
+  $amount: Float!
   $companyId: String
   $contentType: String
   $contentTypeId: String
@@ -110,8 +110,9 @@ query getPaymentOptions(
   $description: String
   $redirectUri: String
   $phone: String
+  $paymentIds: [String]
 ) {
-  getPaymentOptions(
+  generateInvoiceUrl(
     amount: $amount
     companyId: $companyId
     contentType: $contentType
@@ -120,6 +121,7 @@ query getPaymentOptions(
     description: $description
     redirectUri: $redirectUri
     phone: $phone
+    paymentIds: $paymentIds
   )
 }
 `

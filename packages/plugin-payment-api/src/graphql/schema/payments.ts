@@ -31,8 +31,6 @@ export const queries = `
   payments(status: String): [Payment]
   paymentsCountByType: paymentsTotalCount
   paymentsTotalCount(kind: String, status: String): paymentsTotalCount
-  
-  getPaymentOptions(${paymentOptionsParams} ): String
 `;
 
 const params = `

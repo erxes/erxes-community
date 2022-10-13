@@ -2,7 +2,8 @@ import { gql } from 'apollo-server-express';
 
 import {
   queries as invoiceQueries,
-  types as invoiceTypes
+  types as invoiceTypes,
+  mutations as invoiceMutations
 } from './schema/invoices';
 
 import {
@@ -55,6 +56,7 @@ const typeDefs = async serviceDiscovery => {
     extend type Mutation {
       ${paymentMutations}
       ${configsMutations}
+      ${invoiceMutations}
     }
   `;
 };

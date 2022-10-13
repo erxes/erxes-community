@@ -50,6 +50,23 @@ ${
   }
 `;
 
+const mutationParams = `
+  amount: Float!
+  phone: String
+  email: String
+  description: String
+  customerId: String
+  companyId: String
+  contentType: String
+  contentTypeId: String
+  redirectUri: String
+  paymentIds: [String]
+`;
+
+export const mutations = `
+  generateInvoiceUrl(${mutationParams}): String
+`;
+
 export const queries = `
   checkInvoice(_id:String!, paymentId: String!): Invoice
   invoices(searchValue: String, kind: String, status: String, page: Int, perPage: Int): [Invoice]

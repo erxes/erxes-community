@@ -1,15 +1,10 @@
-import * as React from "react";
-import { IEmailParams, IIntegration, IIntegrationLeadData } from "../../types";
-import { checkRules } from "../../utils";
-import { connection } from "../connection";
-import { ICurrentStatus, IForm, IFormDoc, ISaveFormResponse } from "../types";
-import {
-  increaseViewCount,
-  postMessage,
-  saveLead,
-  sendEmail,
-  getPaymentLink
-} from "./utils";
+import * as React from 'react';
+
+import { IEmailParams, IIntegration, IIntegrationLeadData } from '../../types';
+import { checkRules } from '../../utils';
+import { connection } from '../connection';
+import { ICurrentStatus, IForm, IFormDoc, ISaveFormResponse } from '../types';
+import { generatePaymentLink, increaseViewCount, postMessage, saveLead, sendEmail } from './utils';
 
 interface IState {
   isPopupVisible: boolean;
@@ -19,7 +14,7 @@ interface IState {
   isSubmitting?: boolean;
   extraContent?: string;
   callSubmit: boolean;
-  paymentsUrl?: string;
+  invoiceLink?: string;
 }
 
 interface IStore extends IState {
@@ -52,8 +47,8 @@ export class AppProvider extends React.Component<{}, IState> {
       isPopupVisible: false,
       isFormVisible: false,
       isCalloutVisible: false,
-      currentStatus: { status: "INITIAL" },
-      extraContent: "",
+      currentStatus: { status: 'INITIAL' },
+      extraContent: '',
       callSubmit: false,
     };
   }
@@ -78,12 +73,12 @@ export class AppProvider extends React.Component<{}, IState> {
       return this.setState({
         isPopupVisible: false,
         isFormVisible: false,
-        isCalloutVisible: false
+        isCalloutVisible: false,
       });
     }
 
     // if there is popup handler then do not show it initially
-    if (loadType === "popup" && hasPopupHandlers) {
+    if (loadType === 'popup' && hasPopupHandlers) {
       return null;
     }
 
@@ -95,7 +90,7 @@ export class AppProvider extends React.Component<{}, IState> {
     }
 
     // If load type is shoutbox then hide form component initially
-    if (callout.skip && loadType !== "shoutbox") {
+    if (callout.skip && loadType !== 'shoutbox') {
       return this.setState({ isFormVisible: true });
     }
 
@@ -108,7 +103,7 @@ export class AppProvider extends React.Component<{}, IState> {
   showForm = () => {
     this.setState({
       isCalloutVisible: false,
-      isFormVisible: true
+      isFormVisible: true,
     });
   };
 
@@ -123,7 +118,7 @@ export class AppProvider extends React.Component<{}, IState> {
 
     this.setState({
       isCalloutVisible: false,
-      isFormVisible: !isVisible
+      isFormVisible: !isVisible,
     });
   };
 
@@ -157,7 +152,7 @@ export class AppProvider extends React.Component<{}, IState> {
       isPopupVisible: false,
       isCalloutVisible: false,
       isFormVisible: false,
-      currentStatus: { status: "INITIAL" }
+      currentStatus: { status: 'INITIAL' },
     });
 
     // Increasing view count
@@ -179,37 +174,45 @@ export class AppProvider extends React.Component<{}, IState> {
       saveCallback: async (response: ISaveFormResponse) => {
         const { errors } = response;
 
-        let status = "ERROR";
+        let status = 'ERROR';
 
         switch (response.status) {
-          case "ok":
-            status = "SUCCESS";
+          case 'ok':
+            status = 'SUCCESS';
             break;
           default:
-            status = "ERROR";
+            status = 'ERROR';
             break;
         }
 
-        if (status !== "ERROR" && requiredPaymentAmount && requiredPaymentAmount > 0) {
+        if (
+          status !== 'ERROR' &&
+          requiredPaymentAmount && requiredPaymentAmount > 0 &&
+          connection.enabledServices.payment
+        ) {
           status = 'PAYMENT_PENDING';
 
-          getPaymentLink(requiredPaymentAmount, response.conversationId).then((response: any) => {
-            const paymentsUrl = response.data.getPaymentOptions || '';
-            this.setState({ paymentsUrl });
-          }).catch((error: any) => {
-            if (error.message.includes('Received status code 400')) {
-              status = 'SUCCESS';
+          generatePaymentLink(requiredPaymentAmount, response.conversationId)
+            .then((response: any) => {
+              console.log('getPaymentLink response', response);
+              const invoiceLink = response.data.generateInvoiceUrl || '';
+
+              this.setState({ invoiceLink });
+            })
+            .catch((error: any) => {
+              if (error.message.includes('Received status code 400')) {
+                status = 'SUCCESS';
+                this.setState({ currentStatus: { status } });
+                return;
+              }
+              status = 'ERROR';
               this.setState({ currentStatus: { status } });
-              return;
-            }
-            status = 'ERROR';
-            this.setState({ currentStatus: { status } });
-          });
+            });
         }
 
         postMessage({
-          message: "submitResponse",
-          status
+          message: 'submitResponse',
+          status,
         });
 
         this.setState({
@@ -217,10 +220,10 @@ export class AppProvider extends React.Component<{}, IState> {
           isSubmitting: false,
           currentStatus: {
             status,
-            errors
-          }
+            errors,
+          },
         });
-      }
+      },
     });
   };
 
@@ -236,11 +239,11 @@ export class AppProvider extends React.Component<{}, IState> {
    * Redisplay form component after submission
    */
   createNew = () => {
-    this.setState({ currentStatus: { status: "INITIAL" } });
+    this.setState({ currentStatus: { status: 'INITIAL' } });
   };
 
   setHeight = () => {
-    const container = document.getElementById("erxes-container");
+    const container = document.getElementById('erxes-container');
 
     if (!container) {
       return;
@@ -249,8 +252,8 @@ export class AppProvider extends React.Component<{}, IState> {
     const elementsHeight = container.clientHeight;
 
     postMessage({
-      message: "changeContainerStyle",
-      style: `height: ${elementsHeight}px;`
+      message: 'changeContainerStyle',
+      style: `height: ${elementsHeight}px;`,
     });
   };
 

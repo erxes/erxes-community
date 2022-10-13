@@ -29,8 +29,7 @@ export const invoiceSchema = schemaHooksWrapper(
     _id: field({ pkey: true }),
     paymentId: field({
       type: String,
-      required: true,
-      label: 'payment config id'
+      label: 'payment id'
     }),
     amount: field({ type: Number, required: true, label: 'amount' }),
     phone: field({ type: String, optional: true, label: 'phone' }),
