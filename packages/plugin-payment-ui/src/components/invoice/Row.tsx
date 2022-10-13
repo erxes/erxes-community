@@ -71,8 +71,6 @@ class Row extends React.Component<Props> {
         labelStyle = 'error';
     }
 
-    console.log('payment', payment);
-
     return (
       <tr onClick={onTrClick}>
         <td onClick={onClick}>
@@ -82,8 +80,8 @@ class Row extends React.Component<Props> {
             onChange={onChange}
           />
         </td>
-        <td>{payment.name}</td>
-        <td>{payment.kind}</td>
+        <td>{payment ? payment.name : 'NA'}</td>
+        <td>{payment ? payment.kind : 'NA'}</td>
         <td>{amount.toFixed(2)}</td>
 
         <td>{`${contentType.split(':')[0]} - ${pluginData &&
