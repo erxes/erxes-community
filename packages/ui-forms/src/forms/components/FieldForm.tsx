@@ -476,11 +476,11 @@ class FieldForm extends React.Component<Props, State> {
           </FormGroup>
 
           {this.renderColumn()}
-          {field.type === 'productCategory' &&
-            loadDynamicComponent('selectCategoryForm', {
-              defaultValue: field.productCategoryId,
-              onChange: onCategoryChange
-            })}
+
+          {loadDynamicComponent('extendFormField', {
+            field,
+            onChange: this.onFieldChange
+          })}
           {this.renderHtml()}
           {this.renderCustomPropertyGroup()}
           {this.renderCustomProperty()}

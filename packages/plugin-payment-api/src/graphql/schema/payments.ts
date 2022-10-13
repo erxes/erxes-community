@@ -44,6 +44,6 @@ const params = `
 
 export const mutations = `
   paymentAdd(${params}): Payment
-  paymentEdit(id: String!,${params}): Payment
-  paymentRemove(id: String!): String
+  paymentEdit(_id: String!,${params}): Payment
+  paymentRemove(_id: String!): String
 `;

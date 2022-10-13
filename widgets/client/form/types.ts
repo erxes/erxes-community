@@ -123,3 +123,8 @@ export interface ILocationOption {
   lng: number;
   description?: string;
 }
+
+
+export type EnabledServices = {
+  [key: string]: boolean;
+}

@@ -30,11 +30,13 @@ export const sendPluginsMessage = async (
   });
 };
 
-export const sendFormsMessage = (args: ISendMessageArgs): Promise<any> => {
+export const sendInboxMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
   return sendMessage({
     client,
     serviceDiscovery,
-    serviceName: 'forms',
+    serviceName: 'inbox',
     ...args
   });
 };

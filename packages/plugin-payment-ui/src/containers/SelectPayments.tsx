@@ -4,54 +4,34 @@ import React from 'react';
 import { ChildProps, graphql } from 'react-apollo';
 
 import SelectPayments from '../components/SelectPayments';
-import { mutations, queries } from '../graphql';
-import {
-  PaymentConfigQueryResponse,
-  PaymentsQueryResponse,
-  SetPaymentConfigMutationResponse
-} from '../types';
+import { queries } from '../graphql';
+import { PaymentsQueryResponse } from '../types';
 
 type Props = {
-  contentType: string;
-  contentTypeId: string;
-  callback: () => void;
+  defaultValue: string[];
+  isRequired?: boolean;
+  description?: string;
+  onChange: (value: string[]) => void;
 };
 
 type FinalProps = {
   paymentsQuery: PaymentsQueryResponse;
-  paymentConfigQuery: PaymentConfigQueryResponse;
-} & Props &
-  SetPaymentConfigMutationResponse;
+} & Props;
 
 const SelectPaymentsContainer = (props: ChildProps<FinalProps>) => {
   const [paymentIds, setPaymentIds] = React.useState<string[]>([]);
 
-  const { paymentsQuery, paymentConfigQuery } = props;
+  const { paymentsQuery } = props;
 
-  if (
-    paymentsQuery.loading ||
-    (paymentConfigQuery && paymentConfigQuery.loading)
-  ) {
+  if (paymentsQuery.loading) {
     return <Spinner objective={true} />;
   }
 
   const payments = paymentsQuery.payments || [];
 
-  const defaultValue = paymentConfigQuery
-    ? paymentConfigQuery.getPaymentConfig.paymentIds
-    : [];
-
-  const onChange = value => {
-    setPaymentIds(value.map(item => item.value));
-
-    console.log(paymentIds);
-  };
-
   const updatedProps = {
     ...props,
-    defaultValue: paymentIds,
-    payments,
-    onChange
+    payments
   };
 
   return <SelectPayments {...updatedProps} />;
@@ -62,20 +42,6 @@ export default compose(
     name: 'paymentsQuery',
     options: () => ({
       variables: { status: 'active' }
-    })
-  }),
-
-  graphql<Props, SetPaymentConfigMutationResponse>(mutations.setPaymentConfig, {
-    name: 'setPaymentConfig'
-  }),
-  graphql<Props, PaymentConfigQueryResponse>(queries.paymentConfigQuery, {
-    name: 'paymentConfigQuery',
-    skip: props => !props.contentType || !props.contentTypeId,
-    options: ({ contentType, contentTypeId }) => ({
-      variables: {
-        contentType,
-        contentTypeId
-      }
     })
   })
 )(SelectPaymentsContainer);

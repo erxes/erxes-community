@@ -13,3 +13,7 @@ export const getRefetchQueries = () => {
     }
   ];
 };
+
+export const getGqlString = doc => {
+  return doc.loc && doc.loc.source.body;
+};

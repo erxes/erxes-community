@@ -14,7 +14,7 @@ const mutations = {
     return models.PaymentConfigs.updateConfig(_id, paymentIds);
   },
 
-  async removePaymentsConfig(
+  async paymentConfigsRemove(
     _root,
     args: { _id: string },
     { models }: IContext

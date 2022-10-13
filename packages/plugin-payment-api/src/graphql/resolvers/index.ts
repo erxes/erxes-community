@@ -1,6 +1,7 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
 
 import Invoice from './invoice';
+import PaymentConfig from './paymentConfig';
 import mutations from './mutations';
 import queries from './queries';
 
@@ -8,6 +9,7 @@ const resolvers: any = async () => ({
   ...customScalars,
 
   Invoice,
+  PaymentConfig,
   Mutation: {
     ...mutations
   },
@@ -15,5 +17,7 @@ const resolvers: any = async () => ({
     ...queries
   }
 });
+
+console.log('resolvers', resolvers);
 
 export default resolvers;

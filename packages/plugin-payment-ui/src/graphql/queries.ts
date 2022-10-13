@@ -29,7 +29,7 @@ const checkInvoice = gql`
   }
 `;
 
-const invoicesResponse = gql`
+const invoicesFields = `
     _id
     amount
     contentType
@@ -63,7 +63,7 @@ const invoicesResponse = gql`
 const invoices = gql`
 query invoices($page: Int, $perPage: Int, $kind: String, $searchValue: String, $status: String) {
   invoices(page: $page, perPage: $perPage, kind: $kind, searchValue: $searchValue, status: $status) {
-    ${invoicesResponse}
+    ${invoicesFields}
   }
 }
 `;
@@ -101,11 +101,20 @@ const paymentConfigsQuery = gql`
       page: $page
       perPage: $perPage
     ) {
-      list {
-        ${paymentConfigFields}
+      ${paymentConfigFields}
+
+      payments {
+        _id
+        name
+        kind
       }
-      totalCount
     }
+  }
+`;
+
+const paymentConfigsTotalCount = gql`
+  query paymentConfigsTotalCount {
+    paymentConfigsTotalCount
   }
 `;
 
@@ -117,5 +126,6 @@ export default {
   invoices,
   invoicesTotalCount,
 
-  paymentConfigsQuery
+  paymentConfigsQuery,
+  paymentConfigsTotalCount
 };

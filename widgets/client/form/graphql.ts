@@ -1,4 +1,4 @@
-export const formDetailQuery = `
+export const formDetailQuery = (isProductsEnabled: boolean) => `
   query formDetail($_id: String!) {
     formDetail(_id: $_id) {
       title
@@ -39,7 +39,17 @@ export const formDetailQuery = `
           logicOperator
           logicValue
         }
-        products
+        ${
+          isProductsEnabled
+            ? `
+            products {
+              _id
+              name
+              unitPrice
+            }
+          `
+            : ''
+        }
       }
     }
   }
@@ -111,5 +121,11 @@ query getPaymentOptions(
     redirectUri: $redirectUri
     phone: $phone
   )
+}
+`
+
+export const enabledServicesQuery = `
+query enabledServices {
+  enabledServices
 }
 `

@@ -24,7 +24,7 @@ type State = {
 
 export const subMenu = [
   { title: 'Payments', link: '/settings/payments' },
-  { title: 'Integration Configs', link: '/payment/configs' }
+  { title: 'Lead Integration Configs', link: '/payment/configs' }
 ];
 
 class Home extends React.Component<Props, State> {

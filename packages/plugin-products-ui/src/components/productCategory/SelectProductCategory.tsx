@@ -2,20 +2,24 @@ import { IProductCategory } from '@erxes/ui-products/src/types';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
+import { IField } from '@erxes/ui/src/types';
 import React from 'react';
 
 type Props = {
   productCategories?: IProductCategory[];
-  defaultValue?: string;
-  onChange: (value: string) => void;
+  field?: IField;
+  onChange: (name: string, value: string) => void;
 };
 
 class SelectCatgory extends React.Component<Props> {
   render() {
-    const { productCategories = [], defaultValue } = this.props;
+    const { productCategories = [], field } = this.props;
 
     const onCategoryChange = e => {
-      this.props.onChange((e.currentTarget as HTMLInputElement).value);
+      this.props.onChange(
+        'productCategoryId',
+        (e.currentTarget as HTMLInputElement).value
+      );
     };
 
     return (
@@ -25,7 +29,7 @@ class SelectCatgory extends React.Component<Props> {
           <FormControl
             id="productCategories"
             componentClass="select"
-            defaultValue={defaultValue || ''}
+            defaultValue={(field && field.productCategoryId) || ''}
             onChange={onCategoryChange}
           >
             <option>-</option>

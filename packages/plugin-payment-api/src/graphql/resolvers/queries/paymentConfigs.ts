@@ -10,7 +10,7 @@ const queries = {
     return models.PaymentConfigs.getConfig(args);
   },
 
-  getPaymentConfigs(
+  async getPaymentConfigs(
     _root,
     args: { contentType: string; page: number; perPage: number },
     { models }: IContext
@@ -22,13 +22,14 @@ const queries = {
       filter.contentType = contentType;
     }
 
-    return {
-      list: paginate(models.PaymentConfigs.find(filter).lean(), {
-        page: page || 1,
-        perPage: perPage || 20
-      }),
-      totalCount: models.PaymentConfigs.find(filter).count()
-    };
+    return paginate(models.PaymentConfigs.find(filter).lean(), {
+      page: page || 1,
+      perPage: perPage || 20
+    });
+  },
+
+  async paymentConfigsTotalCount(_root, _args, { models }: IContext) {
+    return models.PaymentConfigs.find().countDocuments();
   }
 };
 

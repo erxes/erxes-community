@@ -17,16 +17,16 @@ mutation paymentsAdd(${commonPaymentParamDefs}) {
 `;
 
 const paymentsEdit = gql`
-mutation PaymentEdit($id: String!, ${commonPaymentParamDefs}) {
-  paymentsEdit(id: $id, ${commonPaymentParams}) {
+mutation PaymentEdit($_id: String!, ${commonPaymentParamDefs}) {
+  paymentsEdit(_id: $_id, ${commonPaymentParams}) {
     _id
   }
 }
 `;
 
 const paymentRemove = gql`
-  mutation paymentRemove($id: String!) {
-    paymentRemove(id: $id)
+  mutation paymentRemove($_id: String!) {
+    paymentRemove(_id: $_id)
   }
 `;
 
@@ -54,16 +54,16 @@ mutation PaymentConfigsAdd($contentType: String!, $contentTypeId: String!, $paym
 `;
 
 const paymentConfigsEdit = gql`
-  mutation PaymentConfigsEdit($id: String!, $paymentIds: [String]) {
-    paymentConfigsEdit(_id: $id, paymentIds: $paymentIds) {
+  mutation PaymentConfigsEdit($_id: String!, $paymentIds: [String]) {
+    paymentConfigsEdit(_id: $_id, paymentIds: $paymentIds) {
       ${paymentConfigFields}
     }
   }
 `;
 
 const paymentConfigsRemove = gql`
-  mutation PaymentConfigsRemove($id: String!) {
-    paymentConfigsRemove(_id: $id)
+  mutation PaymentConfigsRemove($_id: String!) {
+    paymentConfigsRemove(_id: $_id)
   }
 `;
 

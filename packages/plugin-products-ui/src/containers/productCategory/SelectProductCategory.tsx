@@ -7,13 +7,20 @@ import { useQuery } from 'react-apollo';
 import { queries } from '../../graphql';
 
 import SelectCategory from '../../components/productCategory/SelectProductCategory';
+import { IField } from '@erxes/ui/src/types';
 
 type Props = {
-  defaultValue?: string;
-  onChange: (value: string) => void;
+  field?: IField;
+  onChange: (name: string, value: string) => void;
 };
 
 const SelectCategoryContainer = (props: Props) => {
+  console.log('SelectCategoryContainer', props);
+
+  if (props.field && props.field.type !== 'productCategory') {
+    return null;
+  }
+
   const { data, loading, error } = useQuery(gql(queries.productCategories));
 
   if (loading) {

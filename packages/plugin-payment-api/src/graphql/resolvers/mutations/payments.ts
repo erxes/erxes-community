@@ -20,15 +20,15 @@ const mutations = {
   async paymentEdit(
     _root,
     {
-      id,
+      _id,
       name,
       status,
       kind,
       config
-    }: { id: string; name: string; status: string; kind: string; config: any },
+    }: { _id: string; name: string; status: string; kind: string; config: any },
     { models }: IContext
   ) {
-    return await models.Payments.updatePayment(id, {
+    return await models.Payments.updatePayment(_id, {
       name,
       status,
       kind,

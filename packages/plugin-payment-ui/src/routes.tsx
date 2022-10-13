@@ -18,7 +18,7 @@ const InvoiceList = asyncComponent(() =>
 
 const PaymentConfigList = asyncComponent(() =>
   import(
-    /* webpackChunkName: "Navigation - Payment Config List" */ './containers/paymentConfig/IntegrationConfigs'
+    /* webpackChunkName: "Navigation - Payment Config List" */ './containers/paymentConfig/List'
   )
 );
 

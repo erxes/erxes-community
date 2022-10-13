@@ -30,6 +30,8 @@ const Row = styled.div`
 
 type Props = {
   payments: IPaymentDocument[];
+  isRequired?: boolean;
+  description?: string;
   defaultValue?: string[];
   onChange: (value: string[]) => void;
 };
@@ -49,7 +51,7 @@ class SelectPayments extends React.Component<Props, {}> {
   onChangePayment = values => {
     const { onChange } = this.props;
 
-    onChange(values);
+    onChange(values.map(item => item.value) || []);
   };
 
   render() {
@@ -57,8 +59,13 @@ class SelectPayments extends React.Component<Props, {}> {
 
     return (
       <FormGroup>
-        <ControlLabel>Payments</ControlLabel>
-        <p>{__('Select payments that you want to use ')}</p>
+        <ControlLabel required={this.props.isRequired}>Payments</ControlLabel>
+        <p>
+          {' '}
+          {this.props.description
+            ? this.props.description
+            : __('Select payments that you want to use ')}
+        </p>
         <Row>
           <LeftContent>
             <Select

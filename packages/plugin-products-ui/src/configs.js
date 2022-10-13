@@ -4,14 +4,16 @@ module.exports = {
   scope: 'products',
   exposes: {
     "./routes": "./src/routes.tsx",
-    './selectCategoryForm': './src/containers/productCategory/SelectProductCategory.tsx',
+    './extendFormField': './src/containers/productCategory/SelectProductCategory.tsx',
+    './extendFormFieldChoice': './src/components/product/FormFieldChoice.tsx',
   },
   routes: {
     url: "http://localhost:3022/remoteEntry.js",
     scope: "products",
     module: "./routes",
   },
-  selectCategoryForm: './selectCategoryForm',
+  extendFormField: './extendFormField',
+  extendFormFieldChoice: './extendFormFieldChoice',
   menus: [
     {
       text: "Product and services",
