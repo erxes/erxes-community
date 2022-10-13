@@ -1,10 +1,14 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 
 import { qPayHandler } from './api/qPay/utils';
+import * as qPayUtils from './api/qPay/utils';
 import { socialPayHandler } from './api/socialPay/utils';
+import * as socialPayUtils from './api/socialPay/utils';
 import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
 import { PAYMENT_KINDS } from './constants';
+import { IInvoiceDocument } from './models/definitions/invoices';
+import { IPaymentDocument } from './models/definitions/payments';
 import redisUtils from './redisUtils';
 
 export const getHandler = async (req, res) => {
@@ -94,4 +98,42 @@ export const makeInvoiceNo = length => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+};
+
+export const cancelPayment = (
+  invoice: IInvoiceDocument,
+  payment: IPaymentDocument
+) => {
+  switch (payment.kind) {
+    case PAYMENT_KINDS.QPAY:
+      // cancel qpay invoice
+      qPayUtils.cancelInvoice(invoice.apiResponse.invoice_id, payment);
+      break;
+    case PAYMENT_KINDS.SOCIAL_PAY:
+      // cancel socialpay invoice
+      socialPayUtils.cancelInvoice(invoice, payment);
+      break;
+    default:
+      break;
+  }
+};
+
+export const createNewInvoice = async (
+  invoice: IInvoiceDocument,
+  payment: IPaymentDocument
+) => {
+  try {
+    switch (payment.kind) {
+      case PAYMENT_KINDS.QPAY:
+        // create qpay invoice
+        return qPayUtils.createInvoice(invoice, payment);
+      case PAYMENT_KINDS.SOCIAL_PAY:
+        // create socialpay invoice
+        return socialPayUtils.createInvoice(invoice, payment);
+      default:
+        break;
+    }
+  } catch (e) {
+    throw new Error(e.message);
+  }
 };

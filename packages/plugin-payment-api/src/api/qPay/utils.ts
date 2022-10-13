@@ -86,7 +86,7 @@ export const createInvoice = async (
       invoice_receiver_code: 'terminal',
       invoice_description: invoice.description || 'test invoice',
       amount: invoice.amount,
-      callback_url: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENT_KINDS.QPAY}?invoiceId=${invoice._id}`
+      callback_url: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENT_KINDS.QPAY}?identifier=${invoice.identifier}`
     };
 
     const requestOptions = {

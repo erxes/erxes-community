@@ -18,7 +18,7 @@ export interface IInvoice {
   paymentKind: string;
 
   apiResponse?: any;
-  token: string;
+  identifier: string;
 }
 export interface IInvoiceDocument extends IInvoice, Document {
   _id: string;
@@ -27,6 +27,12 @@ export interface IInvoiceDocument extends IInvoice, Document {
 export const invoiceSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
+    identifier: field({
+      type: String,
+      unique: true,
+      index: true,
+      label: 'Identifier'
+    }),
     paymentId: field({
       type: String,
       label: 'payment id'
@@ -64,8 +70,7 @@ export const invoiceSchema = schemaHooksWrapper(
       type: Date,
       optional: true,
       label: 'Resolved Date for invoice'
-    }),
-    token: field({ type: String, label: 'token' })
+    })
   }),
   'erxes_invoices'
 );

@@ -33,7 +33,7 @@ export const socialPayHandler = async (models: IModels, data) => {
     }
 
     const invoiceObj = await models.Invoices.getInvoice({
-      _id: invoice
+      identifier: invoice
     });
 
     await models.Invoices.updateOne(
@@ -70,8 +70,11 @@ export const createInvoice = async (
 
   const data: ISocialPayInvoice = {
     amount,
-    checksum: hmac256(inStoreSPKey, inStoreSPTerminal + invoice._id + amount),
-    invoice: invoice._id,
+    checksum: hmac256(
+      inStoreSPKey,
+      inStoreSPTerminal + invoice.identifier + amount
+    ),
+    invoice: invoice.identifier,
     terminal: inStoreSPTerminal
   };
 
@@ -80,7 +83,7 @@ export const createInvoice = async (
     url = `${SOCIALPAY_ENDPOINT}${SOCIALPAY_ACTIONS.INVOICE_PHONE}`;
     data.checksum = hmac256(
       inStoreSPKey,
-      inStoreSPTerminal + invoice._id + amount + invoice.phone
+      inStoreSPTerminal + invoice.identifier + amount + invoice.phone
     );
   }
 
@@ -119,8 +122,11 @@ export const cancelInvoice = async (
 
   const data: ISocialPayInvoice = {
     amount,
-    checksum: hmac256(inStoreSPKey, inStoreSPTerminal + invoice._id + amount),
-    invoice: invoice._id,
+    checksum: hmac256(
+      inStoreSPKey,
+      inStoreSPTerminal + invoice.identifier + amount
+    ),
+    invoice: invoice.identifier,
     terminal: inStoreSPTerminal
   };
 

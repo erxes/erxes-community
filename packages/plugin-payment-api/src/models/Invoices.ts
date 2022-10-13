@@ -1,3 +1,4 @@
+import { getInvoice } from './../api/qPay/utils';
 import { Model } from 'mongoose';
 
 import { PAYMENT_KINDS } from '../constants';
@@ -10,10 +11,12 @@ import {
   invoiceSchema
 } from './definitions/invoices';
 import redisUtils from '../redisUtils';
+import { cancelPayment, createNewInvoice, makeInvoiceNo } from '../utils';
 
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(doc: any): IInvoiceDocument;
   createInvoice(doc: IInvoice): Promise<IInvoiceDocument>;
+  updateInvoice(_id: string, doc: any): Promise<IInvoiceDocument>;
   cancelInvoice(_id: string): Promise<String>;
 }
 
@@ -40,35 +43,73 @@ export const loadInvoiceClass = (models: IModels) => {
 
       const payment = await models.Payments.getPayment(doc.paymentId);
 
-      const invoice = await models.Invoices.create(doc);
+      const invoice = await models.Invoices.create({
+        ...doc,
+        identifier: doc.identifier || makeInvoiceNo(8)
+      });
 
       try {
-        switch (payment.kind) {
-          case PAYMENT_KINDS.QPAY:
-            // create qpay invoice
-            invoice.apiResponse = await qpayUtils.createInvoice(
-              invoice,
-              payment
-            );
-            break;
-          case PAYMENT_KINDS.SOCIAL_PAY:
-            // create socialpay invoice
-            invoice.apiResponse = await socialPayUtils.createInvoice(
-              invoice,
-              payment
-            );
-            break;
-          default:
-            break;
-        }
+        const apiResponse = createNewInvoice(invoice, payment);
+        invoice.apiResponse = apiResponse;
+        invoice.paymentId = payment._id;
+        invoice.paymentKind = payment.kind;
 
         await invoice.save();
 
         return invoice;
       } catch (e) {
-        // remove invoice if error
-        models.Invoices.deleteOne({ _id: invoice._id });
+        await models.Invoices.deleteOne({ _id: invoice._id });
+        throw new Error(e.message);
+      }
+    }
 
+    public static async updateInvoice(_id: string, doc: any) {
+      const invoice = await models.Invoices.getInvoice({ _id });
+
+      if (invoice.status !== 'pending') {
+        throw new Error('Already settled');
+      }
+
+      if (!invoice.paymentId) {
+        try {
+          const payment = await models.Payments.getPayment(doc.paymentId);
+          invoice.identifier = doc.identifier || makeInvoiceNo(8);
+
+          const apiResponse = await createNewInvoice(invoice, payment);
+          invoice.apiResponse = apiResponse;
+          invoice.paymentKind = payment.kind;
+          invoice.paymentId = payment._id;
+
+          await invoice.save();
+
+          return invoice;
+        } catch (e) {
+          throw new Error(e.message);
+        }
+      }
+
+      if (invoice.paymentId === doc.paymentId) {
+        await models.Invoices.updateOne({ _id }, { $set: doc });
+
+        return models.Invoices.getInvoice({ _id });
+      }
+
+      const prevPayment = await models.Payments.getPayment(invoice.paymentId);
+      const newPayment = await models.Payments.getPayment(doc.paymentId);
+
+      cancelPayment(invoice, prevPayment);
+
+      try {
+        const apiResponse = await createNewInvoice(invoice, newPayment);
+        invoice.apiResponse = apiResponse;
+        invoice.paymentKind = newPayment.kind;
+        invoice.paymentId = newPayment._id;
+
+        await invoice.save();
+
+        return invoice;
+      } catch (e) {
+        await models.Invoices.deleteOne({ _id: invoice._id });
         throw new Error(e.message);
       }
     }
@@ -82,18 +123,7 @@ export const loadInvoiceClass = (models: IModels) => {
 
       const payment = await models.Payments.getPayment(invoice.paymentId);
 
-      switch (payment.kind) {
-        case PAYMENT_KINDS.QPAY:
-          // cancel qpay invoice
-          qpayUtils.cancelInvoice(invoice.apiResponse.invoice_id, payment);
-          break;
-        case PAYMENT_KINDS.SOCIAL_PAY:
-          // cancel socialpay invoice
-          socialPayUtils.cancelInvoice(invoice, payment);
-          break;
-        default:
-          break;
-      }
+      cancelPayment(invoice, payment);
 
       await models.Invoices.deleteOne({ _id });
 

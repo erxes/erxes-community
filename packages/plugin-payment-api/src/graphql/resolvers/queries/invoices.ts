@@ -30,6 +30,8 @@ const generateFilterQuery = (params: IParam) => {
     query.description = regex;
   }
 
+  query.paymentId = { $exists: true };
+
   return query;
 };
 

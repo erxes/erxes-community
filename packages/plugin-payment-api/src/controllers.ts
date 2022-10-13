@@ -27,6 +27,8 @@ router.get('/gateway', async (req, res) => {
     Buffer.from(params as string, 'base64').toString('ascii')
   );
 
+  console.log('data', data);
+
   const subdomain = getSubdomain(req);
   const models = await generateModels(subdomain);
 
@@ -80,12 +82,9 @@ router.post('/gateway', async (req, res) => {
     return p.toJSON();
   });
 
-  let invoice = await models.Invoices.findOne({ token: params });
+  let invoice = await models.Invoices.findOne({ _id: data._id });
 
-  if (
-    (invoice && invoice.status === 'paid') ||
-    (invoice && invoice.paymentId === paymentId)
-  ) {
+  if (invoice && invoice.status === 'paid') {
     return res.render('index', {
       title: 'Payment gateway',
       payments: payments,
@@ -95,17 +94,20 @@ router.post('/gateway', async (req, res) => {
   }
 
   if (invoice && invoice.status !== 'paid' && invoice.paymentId !== paymentId) {
-    models.Invoices.cancelInvoice(invoice._id);
+    await models.Invoices.updateInvoice(invoice._id, { paymentId });
+
+    invoice = await models.Invoices.findOne({ _id: data._id });
+  }
+
+  if (!invoice) {
+    invoice = await models.Invoices.createInvoice({
+      ...data,
+      paymentId
+    });
   }
 
   try {
     const selectedPayment = paymentsModified.find(p => p.selected);
-    invoice = await models.Invoices.createInvoice({
-      ...data,
-      token: params,
-      paymentId,
-      paymentKind: selectedPayment.kind
-    });
 
     if (selectedPayment.kind === PAYMENT_KINDS.SOCIAL_PAY && !invoice.phone) {
       invoice.apiResponse.socialPayQrCode = await QRCode.toDataURL(
