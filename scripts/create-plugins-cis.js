@@ -47,6 +47,7 @@ var plugins = [
   { name: 'posclient', api: true },
   { name: 'webbuilder', ui: true, api: true },
   { name: 'payment', ui: true, api: true },
+  { name: 'imap', ui: true, api: true },
 ];
 
 const pluginsMap = {};
