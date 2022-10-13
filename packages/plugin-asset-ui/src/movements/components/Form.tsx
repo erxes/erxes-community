@@ -13,7 +13,8 @@ import {
   Table,
   FormGroup,
   ControlLabel,
-  DateControl
+  DateControl,
+  Bulk
 } from '@erxes/ui/src';
 
 import React from 'react';
@@ -27,15 +28,30 @@ import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import _loadash from 'lodash';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
-import { DateContainer, ModalFooter } from '@erxes/ui/src/styles/main';
+import {
+  DateContainer,
+  Flex,
+  FormColumn,
+  FormWrapper,
+  ModalFooter
+} from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import MovementItems from './MovementItem';
 import { ContentColumn, Divider, ItemRow } from '@erxes/ui-cards/src/deals/styles';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
+
 type Props = {
   detail: IMovementType;
   closeModal: () => void;
   renderButton?: (props: IButtonMutateProps) => JSX.Element;
+};
+
+type General = {
+  branchId?: string;
+  departmentId?: string;
+  customerId?: string;
+  companyId?: string;
+  teamMemberId?: string;
 };
 
 type State = {
@@ -44,6 +60,8 @@ type State = {
   description: string;
   movedAt: string;
   selectedItems: IAsset[];
+  general: General;
+  checkedItems: string[];
 };
 
 class Form extends React.Component<Props, State> {
@@ -53,13 +71,16 @@ class Form extends React.Component<Props, State> {
     this.assetChooser = this.assetChooser.bind(this);
     this.renderContent = this.renderContent.bind(this);
     this.changeCurrentItem = this.changeCurrentItem.bind(this);
+    this.renderList = this.renderList.bind(this);
 
     this.state = {
       variables: props.detail?.assets || [],
       selectedItems: props.detail?.selectedItems || [],
       description: props.detail?.description || '',
       movedAt: props.detail?.movedAt || '',
-      currentItems: []
+      currentItems: [],
+      general: {},
+      checkedItems: []
     };
   }
 
@@ -176,9 +197,8 @@ class Form extends React.Component<Props, State> {
     this.setState(prev => ({ currentItems: [...prev.currentItems, id] }));
   }
 
-  renderList(formProps: IFormProps) {
+  renderList(props) {
     const { variables, currentItems, selectedItems } = this.state;
-
     if (variables.length === 0) {
       return <EmptyState text="No Selected Asset" image="/images/actions/5.svg" />;
     }
@@ -193,11 +213,34 @@ class Form extends React.Component<Props, State> {
       this.setState({ variables: newVariables, selectedItems: newSelectedItems });
     };
 
+    const onChange = () => {
+      const { checkedItems } = this.state;
+      const newCheckedItems = variables.map(item => item.assetId);
+      this.setState({ checkedItems: checkedItems.length > 0 ? [] : newCheckedItems });
+      props.toggleAll(variables, 'variables');
+    };
+
+    const onChangeCheckedItems = (id: string, checked: boolean) => {
+      if (!checked) {
+        const newCheckedItems = this.state.checkedItems.filter(item => item !== id);
+        return this.setState({ checkedItems: newCheckedItems });
+      }
+      this.setState(prev => ({ checkedItems: [...prev.checkedItems, id] }));
+    };
+
     return (
       <MovementTableWrapper>
         <Table>
           <thead>
             <tr>
+              <th style={{ width: 40 }}>
+                <FormControl
+                  checked={props.isAllSelected}
+                  componentClass="checkbox"
+                  onChange={onChange}
+                  color="#3B85F4"
+                />
+              </th>
               <th>{__('Name')}</th>
               <th>{__('Branch')}</th>
               <th>{__('Departmnet')}</th>
@@ -214,12 +257,17 @@ class Form extends React.Component<Props, State> {
                 current={currentItems.includes(item.assetId) ? item.assetId : ''}
                 changeCurrent={this.changeCurrentItem}
                 removeRow={removeRow}
+                onsSelect={this.handleChangeRowItem}
+                selectedItems={selectedItems}
+                toggleBulk={props.toggleBulk}
+                isChecked={props.bulk.includes(item)}
+                onChangeBulkItems={onChangeCheckedItems}
               >
                 {this.renderRow('Branches', item)}
                 {this.renderRow('Departments', item)}
-                {this.renderRow('Team Member', item)}
                 {this.renderRow('Customer', item)}
                 {this.renderRow('Company', item)}
+                {this.renderRow('Team Member', item)}
               </MovementItems>
             ))}
           </tbody>
@@ -228,88 +276,99 @@ class Form extends React.Component<Props, State> {
     );
   }
 
+  handleGeneralDate = e => {
+    this.setState({ movedAt: e });
+  };
+
+  handleGeneralDescription = e => {
+    const { value } = e.currentTarget as HTMLInputElement;
+
+    this.setState({ description: value });
+  };
+  handleChangeRowItem = (prevId, newItem) => {
+    let { selectedItems, variables } = this.state;
+    selectedItems = selectedItems.map(item => (item._id === prevId ? newItem : item));
+    const currentMovement = newItem?.currentMovement;
+    variables = variables.map(item =>
+      item.assetId === prevId
+        ? { assetId: newItem._id, assetName: newItem.name, ...currentMovement }
+        : item
+    );
+    this.setState({ selectedItems, variables });
+  };
   renderGeneral() {
-    const { movedAt, description, variables } = this.state;
+    const { variables, general, checkedItems } = this.state;
 
     const handleGeneralOptions = (value, field) => {
-      const newVariables = variables.map(item => ({ ...item, [field]: value }));
-      this.setState({ variables: newVariables });
-    };
-
-    const handleGeneralDate = e => {
-      this.setState({ movedAt: e });
-    };
-
-    const handleGeneralDescription = e => {
-      const { value } = e.currentTarget as HTMLInputElement;
-
-      this.setState({ description: value });
+      const newVariables = variables.map(item =>
+        checkedItems.includes(item.assetId) ? { ...item, [field]: value } : item
+      );
+      this.setState({ variables: newVariables, general: { ...general, [field]: value } });
     };
 
     return (
-      <CollapseContent title="General Options">
-        <ContainerBox column>
-          <CommonFormGroup label="Date">
-            <DateContainer>
-              <DateControl placeholder="Select Date" onChange={handleGeneralDate} value={movedAt} />
-            </DateContainer>
-          </CommonFormGroup>
-        </ContainerBox>
-        <CommonFormGroup label="Description">
-          <FormControl
-            componentClass="textarea"
-            name="description"
-            onChange={handleGeneralDescription}
-            value={description}
-            required
-          />
-        </CommonFormGroup>
-        {variables.length > 0 && (
-          <BarItems>
-            <ContentColumn>
-              <CommonItemRow label="Branch">
-                <SelectBranches
-                  label="Choose Branch"
-                  name="branchId"
-                  onSelect={handleGeneralOptions}
-                  multi={false}
-                />
-              </CommonItemRow>
-              <CommonItemRow label="Department">
-                <SelectDepartments
-                  label="Choose Department"
-                  name="departmentId"
-                  onSelect={handleGeneralOptions}
-                  multi={false}
-                />
-              </CommonItemRow>
-              <CommonItemRow label="Customer">
-                <SelectCustomers
-                  label="Choose Customer"
-                  name="customerId"
-                  onSelect={handleGeneralOptions}
-                  multi={false}
-                />
-              </CommonItemRow>
-              <CommonItemRow label="Company">
-                <SelectCompanies
-                  label="Choose Company"
-                  name="companyId"
-                  onSelect={handleGeneralOptions}
-                  multi={false}
-                />
-              </CommonItemRow>
-              <CommonItemRow label="Team Member">
-                <SelectTeamMembers
-                  label="Choose Team Member"
-                  name="teamMemberId"
-                  onSelect={handleGeneralOptions}
-                  multi={false}
-                />
-              </CommonItemRow>
-            </ContentColumn>
-          </BarItems>
-        )}
+      <CollapseContent title="General Settings">
+        <BarItems>
+          <ContentColumn>
+            <FormWrapper>
+              <FormColumn>
+                <CommonItemRow label="Branch">
+                  <SelectBranches
+                    label="Choose Branch"
+                    name="branchId"
+                    onSelect={handleGeneralOptions}
+                    multi={false}
+                    initialValue={general?.branchId}
+                  />
+                </CommonItemRow>
+              </FormColumn>
+              <FormColumn>
+                <CommonItemRow label="Department">
+                  <SelectDepartments
+                    label="Choose Department"
+                    name="departmentId"
+                    onSelect={handleGeneralOptions}
+                    multi={false}
+                    initialValue={general?.departmentId}
+                  />
+                </CommonItemRow>
+              </FormColumn>
+            </FormWrapper>
+            <FormWrapper>
+              <FormColumn>
+                <CommonItemRow label="Customer">
+                  <SelectCustomers
+                    label="Choose Customer"
+                    name="customerId"
+                    onSelect={handleGeneralOptions}
+                    multi={false}
+                    initialValue={general?.customerId}
+                  />
+                </CommonItemRow>
+              </FormColumn>
+              <FormColumn>
+                <CommonItemRow label="Company">
+                  <SelectCompanies
+                    label="Choose Company"
+                    name="companyId"
+                    onSelect={handleGeneralOptions}
+                    multi={false}
+                    initialValue={general?.companyId}
+                  />
+                </CommonItemRow>
+              </FormColumn>
+            </FormWrapper>
+            <CommonItemRow label="Team Member">
+              <SelectTeamMembers
+                label="Choose Team Member"
+                name="teamMemberId"
+                onSelect={handleGeneralOptions}
+                multi={false}
+                initialValue={general?.teamMemberId}
+              />
+            </CommonItemRow>
+          </ContentColumn>
+        </BarItems>
       </CollapseContent>
     );
   }
@@ -317,13 +376,39 @@ class Form extends React.Component<Props, State> {
   renderContent(formProps: IFormProps) {
     const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
+    const { movedAt, description, variables } = this.state;
 
     return (
       <ContainerBox column gap={20}>
         <Title>Movements</Title>
-        {this.renderGeneral()}
+        <FormWrapper>
+          <FormColumn>
+            <CommonFormGroup label="Date">
+              <DateContainer>
+                <DateControl
+                  placeholder="Select Date"
+                  onChange={this.handleGeneralDate}
+                  value={movedAt}
+                />
+              </DateContainer>
+            </CommonFormGroup>
+          </FormColumn>
+          <FormColumn>
+            <CommonFormGroup label="Description">
+              <FormControl
+                type="text"
+                name="description"
+                onChange={this.handleGeneralDescription}
+                value={description}
+                required
+              />
+            </CommonFormGroup>
+          </FormColumn>
+        </FormWrapper>
+
+        {variables.length > 0 && this.renderGeneral()}
         <CollapseContent title="Asset List">
-          {this.renderList(formProps)}
+          <Bulk content={this.renderList} />
           <ContainerBox justifyCenter>
             {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
           </ContainerBox>

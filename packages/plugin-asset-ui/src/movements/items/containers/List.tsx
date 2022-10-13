@@ -5,7 +5,10 @@ import * as compose from 'lodash.flowright';
 import { withProps } from '@erxes/ui/src/utils/core';
 import MovementAsset from '../components/List';
 import { queries } from '../graphql';
-import { MovementItemsQueryResponse, MovementItemsTotalCountQueryResponse } from '../../../common/types';
+import {
+  MovementItemsQueryResponse,
+  MovementItemsTotalCountQueryResponse
+} from '../../../common/types';
 import { Spinner } from '@erxes/ui/src';
 import { generateParams } from '../../../common/utils';
 
@@ -26,8 +29,6 @@ class MovementAssetsContainer extends React.Component<FinalProps> {
     if (itemsQuery.loading) {
       return <Spinner />;
     }
-
-    console.log(generateParams({ queryParams }));
 
     const updatedProps = {
       items: itemsQuery.assetMovementAssets || [],

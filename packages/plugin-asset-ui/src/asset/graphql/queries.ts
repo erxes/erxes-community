@@ -66,7 +66,8 @@ const assets = `
     $page: Int $ids: [String],
     $excludeIds: Boolean,
     $pipelineId: String,
-    $boardId: String
+    $boardId: String,
+    $ignoreIds: [String]
   ) {
     assets(
       type: $type,
@@ -77,7 +78,8 @@ const assets = `
       page: $page ids: $ids,
       excludeIds: $excludeIds,
       pipelineId: $pipelineId,
-      boardId: $boardId
+      boardId: $boardId,
+      ignoreIds: $ignoreIds
     ) {
       ${assetFields}
       ${assetCurrentField}

@@ -16,6 +16,7 @@ const assetQueries = {
       excludeIds,
       pipelineId,
       boardId,
+      ignoreIds,
       ...pagintationArgs
     }: {
       ids: string[];
@@ -28,6 +29,7 @@ const assetQueries = {
       perPage: number;
       pipelineId: string;
       boardId: string;
+      ignoreIds: string[];
     },
     { commonQuerySelector, models, subdomain, user }: IContext
   ) {
@@ -37,6 +39,10 @@ const assetQueries = {
 
     if (type) {
       filter.type = type;
+    }
+
+    if (ignoreIds) {
+      filter._id = { $nin: ignoreIds };
     }
 
     if (groupId) {

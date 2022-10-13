@@ -1,8 +1,9 @@
 import { TypeBox } from '@erxes/ui-cards/src/deals/styles';
-import { FlexContent, Icon, Tip, __ } from '@erxes/ui/src';
+import { ModalTrigger, Icon, Tip, __, FormControl, colors } from '@erxes/ui/src';
 import React from 'react';
-import { IMovementItem } from '../../common/types';
+import { IAsset, IMovementItem } from '../../common/types';
 import { ContainerBox, RemoveRow } from '../../style';
+import Chooser from '../containers/Chooser';
 
 type Props = {
   item: IMovementItem;
@@ -10,6 +11,11 @@ type Props = {
   changeCurrent: (id: string) => void;
   removeRow: (id: string) => void;
   current: string;
+  onsSelect: (prevItemId: any, newItem: any) => void;
+  selectedItems?: IAsset[];
+  isChecked: boolean;
+  toggleBulk: (movement: IMovementItem, isChecked?: boolean) => void;
+  onChangeBulkItems: (ids: string, checked: boolean) => void;
 };
 
 class MovementItems extends React.Component<Props> {
@@ -18,10 +24,58 @@ class MovementItems extends React.Component<Props> {
   }
 
   render() {
-    const { item, children, changeCurrent, current, removeRow } = this.props;
+    const {
+      item,
+      children,
+      changeCurrent,
+      current,
+      removeRow,
+      onsSelect,
+      selectedItems,
+      isChecked,
+      toggleBulk,
+      onChangeBulkItems
+    } = this.props;
 
     const { assetId, assetName, branch, department, customer, company, teamMember } = item;
 
+    const trigger = (
+      <TypeBox color="#3B85F4">
+        <Icon icon="invoice" />
+      </TypeBox>
+    );
+
+    const renderChooser = props => {
+      const ignoreIds = selectedItems?.map(item => item._id);
+
+      const handleSelect = newItem => {
+        this.props.onsSelect(assetId, newItem[0]);
+      };
+
+      const updatedProps = {
+        ...props,
+        handleSelect,
+        ignoreIds,
+        limit: 1
+      };
+      return <Chooser {...updatedProps} />;
+    };
+
+    const renderContent = () => {
+      return (
+        <ModalTrigger title="Choose Assets" trigger={trigger} content={renderChooser} size="lg" />
+      );
+    };
+
+    const onChange = e => {
+      if (toggleBulk) {
+        toggleBulk(item, e.target.checked);
+        onChangeBulkItems(item.assetId, e.target.checked);
+      }
+    };
+    const onClick = e => {
+      e.stopPropagation();
+    };
     return (
       <>
         <tr
@@ -29,13 +83,17 @@ class MovementItems extends React.Component<Props> {
           className={current === assetId ? 'active' : ''}
           onClick={() => changeCurrent(assetId)}
         >
+          <td onClick={onClick}>
+            <FormControl
+              checked={isChecked}
+              componentClass="checkbox"
+              onChange={onChange}
+              color="#3B85F4"
+            />
+          </td>
           <td>
             <ContainerBox row>
-              <Tip text={__('Assets')}>
-                <TypeBox color="#3B85F4">
-                  <Icon icon="invoice" />
-                </TypeBox>
-              </Tip>
+              <Tip text={__('Assets')}>{renderContent()}</Tip>
               {__(assetName || '-')}
             </ContainerBox>
           </td>

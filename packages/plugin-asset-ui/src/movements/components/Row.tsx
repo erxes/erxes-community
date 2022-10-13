@@ -27,7 +27,7 @@ class Row extends React.Component<Props> {
 
     const renderRow = (
       <tr>
-        <td>{_id}</td>
+        <td>{_id || ''}</td>
         <td>
           <Link to={`/settings/team/details/${user._id}`}>{user.email}</Link>
         </td>

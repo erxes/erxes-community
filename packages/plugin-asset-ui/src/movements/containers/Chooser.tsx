@@ -11,6 +11,8 @@ type Props = {
   closeModal: () => void;
   handleSelect: (datas: IAsset[]) => void;
   selected: any;
+  ignoreIds?: string[];
+  limit?: number;
 };
 
 type FinalProps = {
@@ -58,7 +60,7 @@ class AssetChooser extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { closeModal, assets, handleSelect, selected } = this.props;
+    const { closeModal, assets, handleSelect, selected, limit } = this.props;
 
     if (assets.loading) {
       return <Spinner />;
@@ -76,6 +78,7 @@ class AssetChooser extends React.Component<FinalProps, State> {
         closeModal={() => closeModal()}
         renderName={asset => asset.name}
         perPage={5}
+        limit={limit}
       />
     );
   }
@@ -83,12 +86,13 @@ class AssetChooser extends React.Component<FinalProps, State> {
 
 export default withProps(
   compose(
-    graphql(gql(queries.assets), {
+    graphql<Props>(gql(queries.assets), {
       name: 'assets',
-      options: () => ({
+      options: ({ ignoreIds }) => ({
         variables: {
           perPage: 20,
-          searchValue: ''
+          searchValue: '',
+          ignoreIds
         },
         fetchPolicy: 'network-only'
       })

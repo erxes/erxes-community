@@ -83,7 +83,8 @@ export const queries = `
       perPage: Int ids: [String],
       excludeIds: Boolean,
       pipelineId: String,
-      boardId: String
+      boardId: String,
+      ignoreIds:[String]
     ): [Asset]
     assetsTotalCount(type: String): Int
     assetDetail(_id: String): Asset

@@ -8,11 +8,12 @@ export default function generateDataLoaderTeamMember(models: IModels, subdomain)
       subdomain,
       action: 'users.find',
       data: {
-        _id: { $in: ids }
+        query: { _id: { $in: ids } }
       },
       isRPC: true,
       defaultValue: []
     });
+
     return result;
   });
 }

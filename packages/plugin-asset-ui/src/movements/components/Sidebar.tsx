@@ -8,11 +8,13 @@ import {
   Tip,
   Icon,
   router,
-  SelectTeamMembers
+  SelectTeamMembers,
+  __
 } from '@erxes/ui/src';
 import { ContainerBox } from '../../style';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import moment from 'moment';
+import { Title } from '@erxes/ui-settings/src/styles';
 
 type Props = {
   history: any;
