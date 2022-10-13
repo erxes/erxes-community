@@ -1,7 +1,7 @@
 import React from 'react';
 import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
-import { Alert, Bulk, Spinner } from '@erxes/ui/src';
+import { Alert, Bulk, Spinner, confirm } from '@erxes/ui/src';
 import List from '../components/List';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { mutations, queries } from '../graphql';
@@ -33,10 +33,12 @@ class ListContainer extends React.Component<FinalProps> {
     }
 
     const remove = () => {
-      this.props.movementRemove().then(() => {
-        movementsQuery.refetch();
-        movementsTotalCountQuery.refetch();
-        Alert.success('Removed movement');
+      confirm('It will remove last asset movement.Are you sure.').then(() => {
+        this.props.movementRemove().then(() => {
+          movementsQuery.refetch();
+          movementsTotalCountQuery.refetch();
+          Alert.success('Removed movement');
+        });
       });
     };
 

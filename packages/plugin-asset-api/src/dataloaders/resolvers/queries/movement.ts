@@ -5,14 +5,16 @@ const generateFilter = params => {
   let filter: any = {};
 
   if (params.from) {
-    filter.createdAt = { $gte: params.from };
+    filter.createdAt = { $gte: new Date(params.from) };
   }
   if (params.to) {
-    filter.createdAt = { ...filter.createdAt, $lte: params.to };
+    filter.createdAt = { ...filter.createdAt, $lte: new Date(params.to) };
   }
   if (params.userId) {
     filter.userId = params.userId;
   }
+
+  console.log(filter);
 
   return filter;
 };

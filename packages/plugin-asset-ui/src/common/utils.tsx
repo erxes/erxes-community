@@ -171,8 +171,8 @@ export const getRefetchQueries = () => {
 export const generateParams = ({ queryParams }) => ({
   ...router.generatePaginationParams(queryParams || {}),
   movementId: queryParams?.movementId,
-  from: queryParams.from ? moment(queryParams.from) : undefined,
-  to: queryParams.to ? moment(queryParams.to) : undefined,
+  from: queryParams.from,
+  to: queryParams.to,
   userId: queryParams.userId,
   branchId: queryParams?.branchId,
   departmentId: queryParams?.departmentId,
