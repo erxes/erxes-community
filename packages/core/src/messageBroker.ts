@@ -22,6 +22,7 @@ import internalNotes from './internalNotes';
 import forms from './forms';
 import { generateModels } from './connectionResolver';
 import { USER_ROLES } from '@erxes/api-utils/src/constants';
+import segments from './segments';
 
 let client;
 
@@ -421,6 +422,8 @@ export const initBroker = async options => {
       data: await forms.fields({ subdomain })
     };
   });
+  
+  consumeRPCQueue(`core:segments.associationTypes`, segments.associationTypes);
 
   return client;
 };
