@@ -205,8 +205,6 @@ export class AppProvider extends React.Component<{}, IState> {
               response.conversationId
             );
 
-            console.log('invoiceLink', invoiceLink);
-
             if (invoiceLink) {
               this.setState({ invoiceLink });
             }

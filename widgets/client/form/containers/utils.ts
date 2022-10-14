@@ -191,8 +191,6 @@ export const generatePaymentLink = async (
   amount: number,
   conversationId: string
 ) => {
-  console.log(connection);
-
   try {
     const qryResponse: any = await client.query({
       query: gql(getPaymentMethods),

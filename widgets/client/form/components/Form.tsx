@@ -206,8 +206,13 @@ class Form extends React.Component<Props, State> {
     const { form } = this.props;
     const doc: any = {};
 
-    form.fields.forEach(field => {
+    for (const field of form.fields) {
       let isHidden = false;
+
+      if (field.type === "productCategory" && !connection.enabledServices.products) {
+        continue;
+      }
+
       if (
         field.logicAction &&
         field.logicAction === "show" &&
@@ -232,7 +237,7 @@ class Form extends React.Component<Props, State> {
         column: field.column,
         associatedFieldId: field.associatedFieldId || ""
       };
-    });
+    };
 
     return doc;
   }
@@ -317,6 +322,10 @@ class Form extends React.Component<Props, State> {
     const nonFieldError = errors.find(error => !error.fieldId);
 
     const renderedFields = fields.map(field => {
+      if (field.type === 'productCategory' && !connection.enabledServices.products) {
+        return null;
+      }
+
       const fieldError = errors.find(
         (error: IFieldError) => error.fieldId === field._id
       );
@@ -354,6 +363,8 @@ class Form extends React.Component<Props, State> {
       }
 
       this.showField(field._id);
+
+     
 
       return (
         <Field

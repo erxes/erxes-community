@@ -10,7 +10,6 @@ import { ICurrentStatus, IForm, IFormDoc } from "../types";
 import { AppConsumer } from "./AppContext";
 
 const Form = (props: ChildProps<IProps, QueryResponse>) => {
-  console.log('connection', connection);
   const data = props.data;
 
   if (!data || data.loading) {
