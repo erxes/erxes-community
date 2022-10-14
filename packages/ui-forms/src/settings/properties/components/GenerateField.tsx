@@ -583,7 +583,7 @@ export default class GenerateField extends React.Component<Props, State> {
 
       case 'product': {
         if (!isEnabled('product')) {
-          return <p>Products plugin is not enabled</p>;
+          return <p>Products service is not enabled</p>;
         }
         return this.renderProduct(attrs);
       }
@@ -602,7 +602,7 @@ export default class GenerateField extends React.Component<Props, State> {
 
       case 'selectProductCategory': {
         if (!isEnabled('products')) {
-          return <p>Products plugin is not enabled</p>;
+          return <p>Products service is not enabled</p>;
         }
         return this.renderSelectCategory(attrs);
       }

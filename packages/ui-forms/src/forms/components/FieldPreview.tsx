@@ -23,7 +23,7 @@ class FieldPreview extends React.Component<Props, {}> {
     };
 
     if (field.type === 'productCategory' && !isEnabled('products')) {
-      return <p>Products plugin is not enabled</p>;
+      return <p>Products service is not enabled</p>;
     }
 
     return (

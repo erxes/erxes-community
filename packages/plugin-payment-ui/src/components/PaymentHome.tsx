@@ -1,7 +1,6 @@
 import { Title } from '@erxes/ui-settings/src/styles';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import Icon from '@erxes/ui/src/components/Icon';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils';
@@ -105,6 +104,13 @@ class Home extends React.Component<Props, State> {
 
   render() {
     const { queryParams } = this.props;
+
+    if (isEnabled('products') && isEnabled('inbox')) {
+      subMenu.push({
+        title: 'Lead Integration Configs',
+        link: '/payment/configs'
+      });
+    }
 
     return (
       <Wrapper
