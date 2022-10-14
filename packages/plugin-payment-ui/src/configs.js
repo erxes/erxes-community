@@ -26,7 +26,8 @@ module.exports = {
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
       scope: 'payment',
-      permission: 'paymentRemove'
+      action: "paymentsAll",
+      permissions: ['showPayments']
     }
   ]
 }

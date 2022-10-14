@@ -92,23 +92,7 @@ const queries = {
   }
 };
 
-// requireLogin(queries, 'payments');
-// checkPermission(queries, 'payments', 'showPayments', []);
-
-export const paymentOptionQuery = {
-  getPaymentOptions(_root, params, _args) {
-    const MAIN_API_DOMAIN =
-      process.env.MAIN_API_DOMAIN || 'http://localhost:4000';
-
-    const base64 = Buffer.from(
-      JSON.stringify({
-        ...params,
-        date: Math.round(new Date().getTime() / 1000)
-      })
-    ).toString('base64');
-
-    return `${MAIN_API_DOMAIN}/pl:payment/gateway?params=${base64}`;
-  }
-};
+requireLogin(queries, 'payments');
+checkPermission(queries, 'payments', 'showPayments', []);
 
 export default queries;
