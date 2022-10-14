@@ -59,7 +59,6 @@ const ConfigForm = (props: Props) => {
   };
 
   const onChangePayments = (values: string[]) => {
-    console.log(values);
     setPaymentIdes(values);
   };
 

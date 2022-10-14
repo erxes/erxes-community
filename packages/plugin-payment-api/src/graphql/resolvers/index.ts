@@ -18,6 +18,4 @@ const resolvers: any = async () => ({
   }
 });
 
-console.log('resolvers', resolvers);
-
 export default resolvers;

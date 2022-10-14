@@ -9,8 +9,6 @@ export default {
   },
 
   async contentName(config: IPaymentConfig, {}, { subdomain }: IContext) {
-    console.log('config', config);
-
     if (config.contentType.includes('integrations')) {
       if (!(await serviceDiscovery.isEnabled('inbox'))) {
         return 'Inbox service is not enabled';

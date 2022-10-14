@@ -35,7 +35,6 @@ const generateFilterQuery = (params: IParam) => {
 const queries = {
   payments(_root, args, { models }: IContext) {
     const filter: any = {};
-    console.log('args', args);
 
     if (args.status) {
       filter.status = args.status;

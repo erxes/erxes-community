@@ -1,37 +1,20 @@
-import { LeadIntegrationsQueryResponse } from '@erxes/ui-leads/src/types';
-import { commonListComposer } from '@erxes/ui/src/utils';
-import { generatePaginationParams } from '@erxes/ui/src/utils/router';
-import React from 'react';
-import { graphql } from 'react-apollo';
-import { Alert, confirm } from '@erxes/ui/src/utils';
 import { router } from '@erxes/ui/src';
+import { Alert, confirm } from '@erxes/ui/src/utils';
+import React from 'react';
+import { useMutation, useQuery } from 'react-apollo';
+
 import List from '../../components/paymentConfig/List';
 import { mutations, queries } from '../../graphql';
 import {
-  PaymentConfigsAddMutationResponse,
   PaymentConfigsCountQueryResponse,
-  PaymentConfigsEditMutationResponse,
   PaymentConfigsQueryResponse,
   PaymentConfigsRemoveMutationResponse
 } from '../../types';
 
-import { useMutation, useQuery } from 'react-apollo';
-
-const commonOptions = ({ queryParams }: { queryParams?: any }) => ({
-  refetchQueries: [
-    {
-      query: queries.paymentConfigsQuery,
-      variables: {
-        contentType: queryParams.contentType,
-        ...generatePaginationParams(queryParams)
-      }
-    }
-  ]
-});
-
 type Props = {
   queryParams: any;
 };
+
 export default function ConfigListContainer(props: Props) {
   const { data, loading, refetch } = useQuery<PaymentConfigsQueryResponse>(
     queries.paymentConfigsQuery,
@@ -50,7 +33,9 @@ export default function ConfigListContainer(props: Props) {
     }
   );
 
-  const [removeMutation] = useMutation(mutations.paymentConfigsRemove);
+  const [removeMutation] = useMutation<PaymentConfigsRemoveMutationResponse>(
+    mutations.paymentConfigsRemove
+  );
 
   const remove = (_id: string) => {
     const message = 'Are you sure want to remove this config ?';
@@ -70,8 +55,6 @@ export default function ConfigListContainer(props: Props) {
     });
   };
 
-  console.log('dddddd ', data);
-
   const extendedProps = {
     ...props,
     loading,
@@ -84,56 +67,3 @@ export default function ConfigListContainer(props: Props) {
 
   return <List {...extendedProps} />;
 }
-
-// export default commonListComposer<Props>({
-//   label: 'paymentConfigs',
-//   text: 'Payment Config',
-//   stringEditMutation: getGqlString(mutations.paymentConfigsEdit),
-//   stringAddMutation: getGqlString(mutations.paymentConfigsAdd),
-
-//   confirmProps: {
-//     message:
-//       'This will permanently delete this config and configs in it. Are you absolutely sure?',
-//     options: { hasDeleteConfirm: true },
-//   },
-
-//   gqlListQuery: graphql<Props, PaymentConfigsQueryResponse>(
-//     queries.paymentConfigsQuery,
-//     {
-//       name: 'listQuery',
-//       options: () => ({
-//         notifyOnNetworkStatusChange: true,
-//       }),
-//     }
-//   ),
-
-//   gqlTotalCountQuery: graphql<{}, any>(queries.paymentConfigsTotalCount, {
-//     name: 'totalCountQuery',
-//   }),
-
-//   gqlAddMutation: graphql<{}, PaymentConfigsAddMutationResponse>(
-//     mutations.paymentConfigsAdd,
-//     {
-//       name: 'addMutation',
-//       options: commonOptions,
-//     }
-//   ),
-
-//   gqlEditMutation: graphql<{}, PaymentConfigsEditMutationResponse>(
-//     mutations.paymentConfigsEdit,
-//     {
-//       name: 'editMutation',
-//       options: commonOptions,
-//     }
-//   ),
-
-//   gqlRemoveMutation: graphql<Props, PaymentConfigsRemoveMutationResponse>(
-//     mutations.paymentConfigsRemove,
-//     {
-//       name: 'removeMutation',
-//       options: commonOptions,
-//     }
-//   ),
-
-//   ListComponent: ConfigListContainer,
-// });
