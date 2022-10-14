@@ -422,7 +422,7 @@ export const initBroker = async options => {
       data: await forms.fields({ subdomain })
     };
   });
-  
+
   consumeRPCQueue(`core:segments.associationTypes`, segments.associationTypes);
 
   return client;
