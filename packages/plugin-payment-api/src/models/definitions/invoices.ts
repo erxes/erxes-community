@@ -1,6 +1,7 @@
 import { PAYMENT_STATUS, PAYMENT_KINDS } from '../../constants';
 import { Schema, Document } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
+import { makeInvoiceNo } from '../../utils';
 
 export interface IInvoice {
   paymentId: string;
@@ -31,7 +32,8 @@ export const invoiceSchema = schemaHooksWrapper(
       type: String,
       unique: true,
       index: true,
-      label: 'Identifier'
+      label: 'Identifier',
+      default: makeInvoiceNo(32)
     }),
     paymentId: field({
       type: String,

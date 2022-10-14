@@ -131,3 +131,11 @@ query enabledServices {
   enabledServices
 }
 `
+
+export const getPaymentMethods = `
+query GetPaymentConfig($contentType: String!, $contentTypeId: String!) {
+  getPaymentConfig(contentType: $contentType, contentTypeId: $contentTypeId) {
+    paymentIds
+  }
+}
+`

@@ -4,7 +4,13 @@ import { IEmailParams, IIntegration, IIntegrationLeadData } from '../../types';
 import { checkRules } from '../../utils';
 import { connection } from '../connection';
 import { ICurrentStatus, IForm, IFormDoc, ISaveFormResponse } from '../types';
-import { generatePaymentLink, increaseViewCount, postMessage, saveLead, sendEmail } from './utils';
+import {
+  generatePaymentLink,
+  increaseViewCount,
+  postMessage,
+  saveLead,
+  sendEmail,
+} from './utils';
 
 interface IState {
   isPopupVisible: boolean;
@@ -187,27 +193,27 @@ export class AppProvider extends React.Component<{}, IState> {
 
         if (
           status !== 'ERROR' &&
-          requiredPaymentAmount && requiredPaymentAmount > 0 &&
+          requiredPaymentAmount &&
+          requiredPaymentAmount > 0 &&
           connection.enabledServices.payment
         ) {
           status = 'PAYMENT_PENDING';
 
-          generatePaymentLink(requiredPaymentAmount, response.conversationId)
-            .then((response: any) => {
-              console.log('getPaymentLink response', response);
-              const invoiceLink = response.data.generateInvoiceUrl || '';
+          try {
+            const invoiceLink = await generatePaymentLink(
+              requiredPaymentAmount,
+              response.conversationId
+            );
 
+            console.log('invoiceLink', invoiceLink);
+
+            if (invoiceLink) {
               this.setState({ invoiceLink });
-            })
-            .catch((error: any) => {
-              if (error.message.includes('Received status code 400')) {
-                status = 'SUCCESS';
-                this.setState({ currentStatus: { status } });
-                return;
-              }
-              status = 'ERROR';
-              this.setState({ currentStatus: { status } });
-            });
+            }
+          } catch (e) {
+            status = 'ERROR';
+            this.setState({ currentStatus: { status } });
+          }
         }
 
         postMessage({

@@ -1,17 +1,14 @@
-import { getInvoice } from './../api/qPay/utils';
 import { Model } from 'mongoose';
 
-import { PAYMENT_KINDS } from '../constants';
 import { IModels } from '../connectionResolver';
-import * as qpayUtils from '../api/qPay/utils';
-import * as socialPayUtils from '../api/socialPay/utils';
+import redisUtils from '../redisUtils';
+import { cancelPayment, createNewInvoice, makeInvoiceNo } from '../utils';
+import { getInvoice } from './../api/qPay/utils';
 import {
   IInvoice,
   IInvoiceDocument,
   invoiceSchema
 } from './definitions/invoices';
-import redisUtils from '../redisUtils';
-import { cancelPayment, createNewInvoice, makeInvoiceNo } from '../utils';
 
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(doc: any): IInvoiceDocument;
@@ -45,7 +42,7 @@ export const loadInvoiceClass = (models: IModels) => {
 
       const invoice = await models.Invoices.create({
         ...doc,
-        identifier: doc.identifier || makeInvoiceNo(8)
+        identifier: doc.identifier || makeInvoiceNo(32)
       });
 
       try {
@@ -73,7 +70,7 @@ export const loadInvoiceClass = (models: IModels) => {
       if (!invoice.paymentId) {
         try {
           const payment = await models.Payments.getPayment(doc.paymentId);
-          invoice.identifier = doc.identifier || makeInvoiceNo(8);
+          invoice.identifier = doc.identifier || makeInvoiceNo(32);
 
           const apiResponse = await createNewInvoice(invoice, payment);
           invoice.apiResponse = apiResponse;

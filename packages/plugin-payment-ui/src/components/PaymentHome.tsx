@@ -5,6 +5,7 @@ import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import Icon from '@erxes/ui/src/components/Icon';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import React from 'react';
 
 import { ByKindTotalCount } from '../types';
@@ -22,10 +23,7 @@ type State = {
   payments: any;
 };
 
-export const subMenu = [
-  { title: 'Payments', link: '/settings/payments' },
-  { title: 'Lead Integration Configs', link: '/payment/configs' }
-];
+export const subMenu = [{ title: 'Payments', link: '/settings/payments' }];
 
 class Home extends React.Component<Props, State> {
   constructor(props) {
