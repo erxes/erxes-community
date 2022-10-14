@@ -195,6 +195,7 @@ export class AppProvider extends React.Component<{}, IState> {
           status !== 'ERROR' &&
           requiredPaymentAmount &&
           requiredPaymentAmount > 0 &&
+          connection.enabledServices.products &&
           connection.enabledServices.payment
         ) {
           status = 'PAYMENT_PENDING';
