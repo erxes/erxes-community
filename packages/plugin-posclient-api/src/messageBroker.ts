@@ -123,6 +123,7 @@ export const initBroker = async cl => {
 
       await graphqlPubsub.publish('ordersOrdered', {
         ordersOrdered: {
+          ...(await models.Orders.findOne({ _id: order._id }).lean()),
           _id: order._id,
           status: order.status,
           customerId: order.customerId
@@ -175,7 +176,7 @@ const sendMessageWrapper = async (
       const timeout = (cb, interval) => () =>
         new Promise(resolve => setTimeout(() => cb(resolve), interval));
 
-      const onTimeout = timeout(resolve => resolve(false), 1500);
+      const onTimeout = timeout(resolve => resolve(false), 1000);
 
       let response = false;
       await Promise.race([longTask, onTimeout].map(f => f())).then(
@@ -210,6 +211,12 @@ export const sendPosMessage = async (args: ISendMessageArgs): Promise<any> => {
 
 export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessageWrapper('core', args);
+};
+
+export const sendInventoriesMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('inventories', args);
 };
 
 export const sendContactsMessage = async (
