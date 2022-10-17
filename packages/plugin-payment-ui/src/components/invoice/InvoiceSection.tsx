@@ -1,5 +1,7 @@
 import Box from '@erxes/ui/src/components/Box';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
+import Icon from '@erxes/ui/src/components/Icon';
+import Label from '@erxes/ui/src/components/Label';
 import Table from '@erxes/ui/src/components/table';
 import { SectionBodyItem } from '@erxes/ui/src/layout/styles';
 import { __ } from '@erxes/ui/src/utils/core';
@@ -9,13 +11,47 @@ import { IInvoice } from '../../types';
 
 export type Props = {
   invoices: IInvoice[];
+  onReload: () => void;
 };
 
-export default function Component({ invoices }: Props) {
+export default function Component(props: Props) {
+  const { invoices, onReload } = props;
+
+  const onRefresh = () => {
+    onReload();
+  };
+
+  const reload = (
+    <a href="#refresh" onClick={onRefresh} tabIndex={0}>
+      <Icon icon="refresh" size={8} />
+    </a>
+  );
+
   const renderBody = (invoices: IInvoice[]) => {
     if (!invoices || !invoices.length) {
       return <EmptyState icon="user-6" text="No data" />;
     }
+
+    const renderStatus = status => {
+      let labelStyle = 'error';
+
+      switch (status) {
+        case 'paid':
+          labelStyle = 'success';
+          break;
+        case 'pending':
+          labelStyle = 'warning';
+          break;
+        default:
+          labelStyle = 'error';
+      }
+
+      return (
+        <td>
+          <Label lblStyle={labelStyle}>{status}</Label>
+        </td>
+      );
+    };
 
     return (
       <div>
@@ -32,7 +68,7 @@ export default function Component({ invoices }: Props) {
               <tr key={index}>
                 <td>{invoice.payment.kind}</td>
                 <td>{invoice.amount.toFixed(2)}</td>
-                <td>{invoice.status}</td>
+                {renderStatus(invoice.status)}
               </tr>
             ))}
           </tbody>
@@ -44,7 +80,7 @@ export default function Component({ invoices }: Props) {
   return (
     <Box
       title={__('Invoices')}
-      //   extraButtons={extraButtons}
+      extraButtons={reload}
       isOpen={true}
       name="invoiceList"
     >

@@ -22,9 +22,19 @@ function InvoiceSecitonContainer(props: Props) {
     return <Spinner />;
   }
 
+  const onReload = () => {
+    invoicesQuery.refetch();
+  };
+
   const invoices = (invoicesQuery.data && invoicesQuery.data.invoices) || [];
 
-  return <InvoiceSection {...props} invoices={invoices} />;
+  const updatedProps = {
+    ...props,
+    invoices,
+    onReload
+  };
+
+  return <InvoiceSection {...updatedProps} />;
 }
 
 export default ({ id }: { id: string }) => {
