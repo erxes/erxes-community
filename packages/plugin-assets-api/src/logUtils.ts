@@ -4,11 +4,13 @@ import {
   LogDesc,
   putCreateLog as commonPutCreateLog,
   putUpdateLog as commonPutUpdateLog,
-  putDeleteLog as commonPutDeleteLog
+  putDeleteLog as commonPutDeleteLog,
+  getSchemaLabels
 } from '@erxes/api-utils/src/logUtils';
 import { IModels } from './connectionResolver';
 import messageBroker from './messageBroker';
 import { IAssetDocument, IAssetGroupDocument } from './common/types/asset';
+import { assetGroupSchema, assetSchema } from './models/definitions/asset';
 
 export const MODULE_NAMES = {
   ASSET: 'asset',
@@ -136,4 +138,14 @@ export const putDeleteLog = async (models: IModels, subdomain: string, logDoc, u
     { ...logDoc, description, extraDesc, type: `assets:${logDoc.type}` },
     user
   );
+};
+
+export default {
+  getSchemaLabels: ({ data: { type } }) => ({
+    status: 'success',
+    data: getSchemaLabels(type, [
+      { name: 'asset', schemas: [assetSchema] },
+      { name: 'assetGroup', schemas: [assetGroupSchema] }
+    ])
+  })
 };

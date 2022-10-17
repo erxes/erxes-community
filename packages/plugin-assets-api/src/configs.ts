@@ -5,6 +5,10 @@ import { initBroker } from './messageBroker';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { generateModels } from './connectionResolver';
 import { generateAllDataLoaders } from './dataloaders';
+import imports from './imports';
+import forms from './forms';
+import internalNotes from './internalNotes';
+import logUtils from './logUtils';
 
 export let mainDb;
 export let debug;
@@ -32,6 +36,14 @@ export default {
 
     return context;
   },
+
+  meta: {
+    logs: { consumers: logUtils },
+    internalNotes,
+    imports,
+    forms
+  },
+
   onServerInit: async options => {
     mainDb = options.db;
 
