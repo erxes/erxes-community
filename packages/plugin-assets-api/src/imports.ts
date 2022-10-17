@@ -25,7 +25,12 @@ export default {
 
     const { docs } = data;
 
-    console.log(docs);
+        try {
+          const objects = await models.Asset.insertMany(docs);
+          return { objects, updated: 0 };
+        } catch (e) {
+          return { error: e.message };
+        }
   },
   prepareImportDocs: async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
