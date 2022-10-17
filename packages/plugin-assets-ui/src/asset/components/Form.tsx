@@ -236,24 +236,34 @@ class Form extends React.Component<Props, State> {
                 required={true}
               />
             </FormGroup>
-
             <FormGroup>
-              <ControlLabel required={true}>Type</ControlLabel>
+              <ControlLabel>Vendor</ControlLabel>
+              <SelectCompanies
+                label="Choose an vendor"
+                name="vendorId"
+                customOption={{ value: '', label: 'No vendor chosen' }}
+                initialValue={vendorId}
+                onSelect={this.onComboEvent.bind(this, 'vendorId')}
+                multi={false}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel required={true}>Unit price</ControlLabel>
+              <p>
+                Please ensure you have set the default currency in the{' '}
+                <a href="/settings/general"> {'General Settings'}</a> of the System Configuration.
+              </p>
               <FormControl
                 {...formProps}
-                name="type"
-                componentClass="select"
-                defaultValue={object.type}
+                type="number"
+                name="unitPrice"
+                defaultValue={object.unitPrice}
                 required={true}
-              >
-                {Object.keys(TYPES).map((typeName, index) => (
-                  <option key={index} value={TYPES[typeName]}>
-                    {typeName}
-                  </option>
-                ))}
-              </FormControl>
+                min={0}
+              />
             </FormGroup>
-
+          </FormColumn>
+          <FormColumn>
             <FormGroup>
               <ControlLabel required={true}>Code</ControlLabel>
               <p>
@@ -263,24 +273,26 @@ class Form extends React.Component<Props, State> {
               </p>
               <FormControl {...formProps} name="code" defaultValue={object.code} required={true} />
             </FormGroup>
-
-            <TabContainer>
-              <TriggerTabs>
-                <Tabs full>
-                  {['Group', 'Parent'].map(item => (
-                    <TabTitle
-                      className={this.state.currentTab === item ? 'active' : ''}
-                      key={item}
-                      onClick={this.onChangeCurrentTab.bind(this, item)}
-                    >
-                      {item}
-                    </TabTitle>
-                  ))}
-                </Tabs>
-              </TriggerTabs>
-              <TabContent>{currentTabItem()}</TabContent>
-            </TabContainer>
-
+          </FormColumn>
+        </FormWrapper>
+        <TabContainer>
+          <TriggerTabs>
+            <Tabs full>
+              {['Group', 'Parent'].map(item => (
+                <TabTitle
+                  className={this.state.currentTab === item ? 'active' : ''}
+                  key={item}
+                  onClick={this.onChangeCurrentTab.bind(this, item)}
+                >
+                  {item}
+                </TabTitle>
+              ))}
+            </Tabs>
+          </TriggerTabs>
+          <TabContent>{currentTabItem()}</TabContent>
+        </TabContainer>
+        <FormWrapper>
+          <FormColumn>
             <FormGroup>
               <ControlLabel>Description</ControlLabel>
               <EditorCK
@@ -307,68 +319,8 @@ class Form extends React.Component<Props, State> {
                 ]}
               />
             </FormGroup>
-
-            <FormGroup>
-              <ControlLabel required={true}>Unit price</ControlLabel>
-              <p>
-                Please ensure you have set the default currency in the{' '}
-                <a href="/settings/general"> {'General Settings'}</a> of the System Configuration.
-              </p>
-              <FormControl
-                {...formProps}
-                type="number"
-                name="unitPrice"
-                defaultValue={object.unitPrice}
-                required={true}
-                min={0}
-              />
-            </FormGroup>
           </FormColumn>
           <FormColumn>
-            <FormGroup>
-              <ControlLabel>Asset supply</ControlLabel>
-
-              <FormControl
-                {...formProps}
-                name="supply"
-                componentClass="select"
-                onChange={this.onSupplyChange}
-                defaultValue={object.supply}
-                options={ASSET_SUPPLY}
-              />
-            </FormGroup>
-
-            <FormWrapper>
-              <FormColumn>
-                <FormGroup>
-                  <ControlLabel>Asset count</ControlLabel>
-
-                  <FormControl
-                    {...formProps}
-                    name="assetCount"
-                    value={assetCount}
-                    disabled={disabled}
-                    onChange={this.onComboEvent.bind(this, 'assetCount')}
-                    type="number"
-                  />
-                </FormGroup>
-              </FormColumn>
-              <FormColumn>
-                <FormGroup>
-                  <ControlLabel>Minimium count</ControlLabel>
-
-                  <FormControl
-                    {...formProps}
-                    name="minimiumCount"
-                    value={minimiumCount}
-                    disabled={disabled}
-                    onChange={this.onComboEvent.bind(this, 'minimiumCount')}
-                    type="number"
-                  />
-                </FormGroup>
-              </FormColumn>
-            </FormWrapper>
-
             <FormGroup>
               <ControlLabel>Featured image</ControlLabel>
 
@@ -379,7 +331,6 @@ class Form extends React.Component<Props, State> {
                 single={true}
               />
             </FormGroup>
-
             <FormGroup>
               <ControlLabel>Secondary Images</ControlLabel>
 
@@ -388,18 +339,6 @@ class Form extends React.Component<Props, State> {
                 onChange={this.onChangeAttachmentMore}
                 multiple={true}
                 single={false}
-              />
-            </FormGroup>
-
-            <FormGroup>
-              <ControlLabel>Vendor</ControlLabel>
-              <SelectCompanies
-                label="Choose an vendor"
-                name="vendorId"
-                customOption={{ value: '', label: 'No vendor chosen' }}
-                initialValue={vendorId}
-                onSelect={this.onComboEvent.bind(this, 'vendorId')}
-                multi={false}
               />
             </FormGroup>
           </FormColumn>
@@ -411,7 +350,7 @@ class Form extends React.Component<Props, State> {
           </Button>
 
           {renderButton({
-            name: 'asset and movements',
+            text: 'asset and movements',
             values: this.generateDoc(values),
             isSubmitted,
             callback: closeModal,

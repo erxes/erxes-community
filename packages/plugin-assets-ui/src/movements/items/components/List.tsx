@@ -65,6 +65,7 @@ class MovementAsset extends React.Component<Props, State> {
             <th>{__('Company')}</th>
             <th>{__('Customer')}</th>
             <th>{__('Created At')}</th>
+            <th>{__('Actions')}</th>
           </tr>
         </thead>
         <tbody>{this.renderRow()}</tbody>

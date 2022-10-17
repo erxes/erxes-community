@@ -9,6 +9,7 @@ export const types = `
         branchId:String,
         departmentId:String,
         customerId:String,
+        movementId:String,
         teamMemberId:String,
         companyId:String,
         createdAt:Date
@@ -46,7 +47,7 @@ export const types = `
 `;
 export const mutations = `
     assetMovementAdd(movedAt:String,description:String,movements:[IMovementAsset]):JSON
-    assetMovementRemove:JSON
+    assetMovementRemove(ids:[String]):JSON
 `;
 export const queries = `
     assetMovements(${movementFilters}):[Movement]

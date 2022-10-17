@@ -1,6 +1,16 @@
 import React from 'react';
 import { DefaultWrapper } from '../../common/utils';
-import { BarItems, FormControl, Button, router, __, ModalTrigger, Table, Tip } from '@erxes/ui/src';
+import {
+  BarItems,
+  FormControl,
+  Button,
+  router,
+  __,
+  ModalTrigger,
+  Table,
+  Tip,
+  Bulk
+} from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { ContainerBox } from '../../style';
 import { Title } from '@erxes/ui-settings/src/styles';
@@ -21,6 +31,7 @@ type Props = {
 } & IRouterProps;
 type State = {
   searchValue: string;
+  selectedRows: string[];
 };
 
 class List extends React.Component<Props, State> {
@@ -29,8 +40,11 @@ class List extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      searchValue: ''
+      searchValue: '',
+      selectedRows: []
     };
+
+    this.renderList = this.renderList.bind(this);
   }
   renderRightActionBarButton = (
     <Button btnStyle="success" icon="plus-circle">
@@ -50,7 +64,7 @@ class List extends React.Component<Props, State> {
   };
   renderRightActionBar = (
     <ModalTrigger
-      title="Movement"
+      title="Add Movement"
       content={this.renderRightActionBarContent}
       trigger={this.renderRightActionBarButton}
       size="xl"
@@ -80,18 +94,49 @@ class List extends React.Component<Props, State> {
     e.target.value = tmpValue;
   }
 
-  renderRow() {
+  renderRow(props) {
     const { movements, history } = this.props;
+
+    const handleSelecteRow = (movement: IMovementType, movementId: string, isChecked?: boolean) => {
+      const { selectedRows } = this.state;
+
+      props.toggleBulk(movement, isChecked);
+
+      if (!isChecked) {
+        const newSelectedRow = selectedRows.filter(item => item !== movementId);
+        return this.setState({ selectedRows: newSelectedRow });
+      }
+      this.setState({ selectedRows: [...selectedRows, movementId] });
+    };
+
     return movements.map(movement => (
-      <Row key={movement._id} movement={movement} history={history} />
+      <Row
+        key={movement._id}
+        movement={movement}
+        history={history}
+        toggleBulk={handleSelecteRow}
+        isChecked={props.bulk.includes(movement)}
+      />
     ));
   }
 
-  renderList() {
+  renderList(props) {
+    const { isAllSelected, toggleAll } = props;
+    const { movements } = this.props;
+
+    const onchange = () => {
+      toggleAll(movements, 'movements');
+      this.setState({
+        selectedRows: !isAllSelected ? movements.map(movement => movement._id || '') : []
+      });
+    };
     return (
       <Table>
         <thead>
           <tr>
+            <th style={{ width: 60 }}>
+              <FormControl checked={isAllSelected} componentClass="checkbox" onChange={onchange} />
+            </th>
             <th>{__('Id')}</th>
             <th>{__('User')}</th>
             <th>{__('Moved At')}</th>
@@ -99,7 +144,7 @@ class List extends React.Component<Props, State> {
             <th>{__('Action')}</th>
           </tr>
         </thead>
-        <tbody>{this.renderRow()}</tbody>
+        <tbody>{this.renderRow(props)}</tbody>
       </Table>
     );
   }
@@ -118,9 +163,11 @@ class List extends React.Component<Props, State> {
           onFocus={this.moveCursorAtTheEnd}
         />
         {this.renderRightActionBar}
-        <Tip text="Remove last movement" placement="bottom">
-          <Button btnStyle="danger" icon="cancel-1" onClick={remove} />
-        </Tip>
+        {this.state.selectedRows.length > 0 && (
+          <Tip text="Remove movement" placement="bottom">
+            <Button btnStyle="danger" icon="cancel-1" onClick={remove} />
+          </Tip>
+        )}
       </BarItems>
     );
 
@@ -134,7 +181,7 @@ class List extends React.Component<Props, State> {
       title: 'Asset Movements',
       rightActionBar,
       leftActionBar,
-      content: this.renderList(),
+      content: <Bulk content={this.renderList} />,
       sidebar: <SideBar history={history} queryParams={queryParams} />,
       subMenu: menuMovements,
       totalCount

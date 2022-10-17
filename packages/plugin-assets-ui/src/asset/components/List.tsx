@@ -112,14 +112,9 @@ class List extends React.Component<Props, State> {
             </th>
             <th>{__('Code')}</th>
             <th>{__('Name')}</th>
-            <th>{__('Type')}</th>
             <th>{__('Group')}</th>
             <th>{__('Parent')}</th>
-            <th>{__('Supply')}</th>
-            <th>{__('Asset count')}</th>
-            <th>{__('Minimium count')}</th>
             <th>{__('Unit Price')}</th>
-            <th>{__('SKU')}</th>
             <th>{__('Actions')}</th>
           </tr>
         </thead>

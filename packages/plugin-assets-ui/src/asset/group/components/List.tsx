@@ -16,7 +16,6 @@ import { ContainerBox } from '../../../style';
 import Form from '../containers/Form';
 import { Link } from 'react-router-dom';
 import AssetStatusFilter from './StatusFilter';
-import AssetTypeFilter from './FilterByType';
 import { isEnabled, router } from '@erxes/ui/src/utils/core';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 
@@ -194,7 +193,6 @@ class List extends React.Component<Props> {
         {this.renderAddForm()}
         {this.renderAssetGroups()}
         <AssetStatusFilter />
-        <AssetTypeFilter />
       </ContainerBox>
     );
   }

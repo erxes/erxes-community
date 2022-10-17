@@ -23,6 +23,10 @@ export const generateFilter = async (params, models) => {
     filter._id = { $in: movementItems?.assetIds };
   }
 
+  if (params.assetId) {
+    filter.assetId = params.assetId;
+  }
+
   if (params.userId) {
     filter.userId = params.userId;
   }

@@ -11,10 +11,11 @@ import { getRefetchQueries } from '../../common/utils';
 import { mutations, queries } from '../graphql';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 type Props = {
+  movementId?: string;
   assetId?: string;
   closeModal: () => void;
-  refetch: () => void;
-  refetchTotalCount: () => void;
+  refetch?: () => void;
+  refetchTotalCount?: () => void;
 };
 
 type FinalProps = {
@@ -27,18 +28,18 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { movementDetail, closeModal } = this.props;
+    const { movementDetail, closeModal, assetId, movementId } = this.props;
 
     if (movementDetail && movementDetail.loading) {
       return <Spinner objective />;
     }
 
-    const renderButton = ({ name, values, isSubmitted, callback }: IButtonMutateProps) => {
+    const renderButton = ({ text, values, isSubmitted, callback }: IButtonMutateProps) => {
       const afterSavedDb = () => {
         const { refetch, refetchTotalCount } = this.props;
 
-        refetch();
-        refetchTotalCount();
+        refetch && refetch();
+        refetchTotalCount && refetchTotalCount();
         callback && callback();
       };
       return (
@@ -50,7 +51,7 @@ class FormContainer extends React.Component<FinalProps> {
           isSubmitted={isSubmitted}
           type="submit"
           uppercase={false}
-          successMessage={`You successfully added a ${name}`}
+          successMessage={`You successfully added a ${text}`}
         />
       );
     };
@@ -58,7 +59,9 @@ class FormContainer extends React.Component<FinalProps> {
     const updatedProps = {
       detail: movementDetail?.assetMovement || {},
       closeModal,
-      renderButton: !movementDetail?.assetMovement ? renderButton : undefined
+      renderButton: !movementDetail?.assetMovement ? renderButton : undefined,
+      assetId,
+      movementId
     };
 
     return <Form {...updatedProps} />;
@@ -69,9 +72,9 @@ export default withProps(
   compose(
     graphql<Props>(gql(queries.movementDetail), {
       name: 'movementDetail',
-      skip: ({ assetId }) => !assetId,
-      options: ({ assetId }) => ({
-        variables: { _id: assetId }
+      skip: ({ movementId }) => !movementId,
+      options: ({ movementId }) => ({
+        variables: { _id: movementId }
       })
     })
   )(FormContainer)

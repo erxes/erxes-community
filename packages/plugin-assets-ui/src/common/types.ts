@@ -160,6 +160,7 @@ export type IMovementItem = {
   teamMemberId?: string;
   customerId?: string;
   companyId?: string;
+  movementId: string;
   branch?: any;
   department?: any;
   company?: any;

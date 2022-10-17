@@ -26,6 +26,7 @@ export const movementFilterParams = `
     $customerId:String,
     $teamMemberId:String,
     $companyId:String,
+    $assetId:String,
     $searchValue:String
 `;
 
@@ -35,6 +36,7 @@ export const movementFilterParamsDef = `
     customerId:$customerId
     teamMemberId:$teamMemberId
     companyId:$companyId
+    assetId:$assetId
     searchValue:$searchValue
 `;
 

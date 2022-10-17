@@ -31,7 +31,7 @@ class FormContainer extends React.Component<FinalProps> {
     super(props);
   }
 
-  renderButton({ name, values, isSubmitted, callback, object }: IButtonMutateProps) {
+  renderButton({ text, values, isSubmitted, callback, object }: IButtonMutateProps) {
     const { unitPrice, assetCount, minimiumCount } = values;
     const attachmentMoreArray: any[] = [];
     const attachment = values.attachment || undefined;
@@ -56,7 +56,7 @@ class FormContainer extends React.Component<FinalProps> {
         isSubmitted={isSubmitted}
         type="submit"
         uppercase={false}
-        successMessage={`You successfully ${object ? 'updated' : 'added'} a ${name}`}
+        successMessage={`You successfully ${object ? 'updated' : 'added'} a ${text}`}
       />
     );
   }

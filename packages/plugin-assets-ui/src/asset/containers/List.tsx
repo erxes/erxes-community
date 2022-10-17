@@ -53,7 +53,9 @@ class ListContainer extends React.Component<FinalProps> {
 
         const status = removeStatus.data.assetsRemove;
 
-        status === 'deleted' ? Alert.success('You successfully deleted a asset') : Alert.warning('Asset status deleted');
+        status === 'deleted'
+          ? Alert.success('You successfully deleted a asset')
+          : Alert.warning('Asset status deleted');
       })
       .catch(e => {
         Alert.error(e.message);
@@ -84,7 +86,13 @@ class ListContainer extends React.Component<FinalProps> {
   };
 
   assetList(props) {
-    const { assets, assetsCount, queryParams, assetGroupDetailQuery, assetDetailQuery } = this.props;
+    const {
+      assets,
+      assetsCount,
+      queryParams,
+      assetGroupDetailQuery,
+      assetDetailQuery
+    } = this.props;
     if (assets.loading) {
       return <Spinner />;
     }

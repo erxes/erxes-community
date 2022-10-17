@@ -110,7 +110,7 @@ class Form extends React.Component<Props> {
           </Button>
 
           {renderButton({
-            name: 'Asset Group',
+            text: 'Asset Group',
             values: this.generateDocs(values),
             isSubmitted,
             callback: closeModal,

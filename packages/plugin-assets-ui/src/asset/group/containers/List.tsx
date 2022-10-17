@@ -38,12 +38,17 @@ class ListContainer extends React.Component<FinalProps> {
       });
     };
 
+    const refetchGroup = () => {
+      assetGroups.refetch();
+      assetGroupsTotalCount.refetch();
+    };
+
     const updateProps = {
       assetGroups: assetGroups.assetGroups,
       totalCount: assetGroupsTotalCount.assetGroupsTotalCount,
       loading: assetGroups.loading,
       remove: removeAssetGroup,
-      refetchAssetGroups: assetGroups.refetch,
+      refetchAssetGroups: refetchGroup,
       queryParams,
       history
     };
@@ -53,7 +58,7 @@ class ListContainer extends React.Component<FinalProps> {
 }
 
 const getRefetchQueries = () => {
-  return ['assetGroup', 'assetGroupTotalCount', 'assets'];
+  return ['assetGroups', 'assetGroupTotalCount', 'assets'];
 };
 
 export default withProps<Props>(

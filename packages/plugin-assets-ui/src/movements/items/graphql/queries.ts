@@ -17,6 +17,7 @@ query AssetMovementAssets ($movementId:String,${movementFilterParams},${dateFilt
       customerId
       departmentId
       teamMemberId
+      movementId
       createdAt
 
       branch

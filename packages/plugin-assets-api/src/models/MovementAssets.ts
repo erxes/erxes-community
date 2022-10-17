@@ -12,16 +12,19 @@ export const loadMovementAssetClass = (models: IModels) => {
   class MovementAsset {
     public static async movementAssetsAdd(assets: any[]) {
       for (const asset of assets) {
-        if (!asset.branchId || !asset.departmentId) {
-          throw new Error('You cannot move an asset without a branch or department');
+        const newAsset = Object.assign(
+          {},
+          { ...asset },
+          { assetId: undefined, assetName: undefined }
+        );
+        if (Object.values(newAsset).every(item => !item)) {
+          throw new Error('You should provide at least one field');
         }
-      }
-
-      for (const asset of assets) {
         await models.Asset.findByIdAndUpdate(asset.assetId, {
-          $set: { currentMovement: { ...asset, assetId: undefined, assetName: undefined } }
+          $set: { currentMovement: { ...newAsset } }
         });
       }
+
       return models.MovementAsset.insertMany(assets);
     }
   }

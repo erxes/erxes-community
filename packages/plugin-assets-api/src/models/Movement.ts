@@ -32,12 +32,19 @@ export const loadMovementClass = (models: IModels) => {
 
       const movementAssetIds = addedAssets.map(asset => asset._id);
 
-      return models.Movement.create({
+      const movement = await models.Movement.create({
         assetIds: movementAssetIds,
         movedAt: doc.movedAt,
         description: doc.description,
         userId
       });
+
+      await models.MovementAsset.updateMany(
+        { _id: { $in: movementAssetIds } },
+        { $set: { movementId: movement._id } }
+      );
+
+      return movement;
     }
     public static async movementRemove() {
       try {

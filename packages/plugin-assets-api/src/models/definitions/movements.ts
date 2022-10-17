@@ -10,7 +10,8 @@ export const movementAssetsSchema = schemaWrapper(
     departmentId: field({ type: String, label: 'Department Id' }),
     teamMemberId: field({ type: String, label: 'Team Member Id' }),
     companyId: field({ type: String, label: 'Company Id' }),
-    customerId: field({ type: String, label: 'Customer Id' })
+    customerId: field({ type: String, label: 'Customer Id' }),
+    movementId: field({ type: String, label: 'Movement Id' })
   })
 );
 

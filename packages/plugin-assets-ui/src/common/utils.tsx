@@ -7,12 +7,14 @@ import {
   Spinner,
   Wrapper,
   __,
-  router
+  router,
+  SelectWithSearch
 } from '@erxes/ui/src';
 import React from 'react';
 import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetGroupTypes } from './types';
-import moment from 'moment';
+import { queries as assetQueries } from '../asset/graphql';
+import { IOption, IQueryParams } from '@erxes/ui/src/types';
 
 export const DefaultWrapper = ({
   title,
@@ -181,5 +183,50 @@ export const generateParams = ({ queryParams }) => ({
   teamMemberId: queryParams?.teamMemberId,
   companyId: queryParams?.companyId,
   customerId: queryParams?.customerId,
+  assetId: queryParams?.assetId,
   searchValue: queryParams?.searchValue
 });
+
+export const SelectWithAssets = ({
+  label,
+  name,
+  queryParams,
+  initialValue,
+  multi,
+  customOption,
+  onSelect
+}: {
+  queryParams?: IQueryParams;
+  label: string;
+  onSelect: (value: string[] | string, name: string) => void;
+  multi?: boolean;
+  customOption?: IOption;
+  initialValue?: string | string[];
+  name: string;
+}) => {
+  const defaultValue = queryParams ? queryParams[name] : initialValue;
+
+  const generateAssetOptions = (array: IAsset[] = []): IOption[] => {
+    return array.map(item => {
+      const asset = item || ({} as IAsset);
+      return {
+        value: asset._id,
+        label: item.name
+      };
+    });
+  };
+
+  return (
+    <SelectWithSearch
+      label={label}
+      queryName="assets"
+      name={name}
+      initialValue={defaultValue}
+      generateOptions={generateAssetOptions}
+      onSelect={onSelect}
+      customQuery={assetQueries.assets}
+      customOption={customOption}
+      multi={multi}
+    />
+  );
+};

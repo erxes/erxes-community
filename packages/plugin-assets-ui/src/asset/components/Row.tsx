@@ -38,19 +38,7 @@ class Row extends React.Component<Props> {
 
     const content = props => <AssetForm {...props} asset={asset} />;
 
-    const {
-      code,
-      name,
-      type,
-      group,
-      parent,
-      supply,
-      assetCount,
-      chidlAssetCount,
-      minimiumCount,
-      unitPrice,
-      sku
-    } = asset;
+    const { code, name, group, parent, chidlAssetCount, unitPrice } = asset;
 
     return (
       <tr onClick={onTrClick}>
@@ -59,16 +47,9 @@ class Row extends React.Component<Props> {
         </td>
         <td>{code}</td>
         <td>{name}</td>
-        <td>
-          <TextInfo>{type}</TextInfo>
-        </td>
         <td>{group ? group.name : ''}</td>
         <td>{parent ? parent.name : ''}</td>
-        <td>{supply || ''}</td>
-        <td>{assetCount ? assetCount : 0}</td>
-        <td>{minimiumCount ? minimiumCount : 0}</td>
         <td>{(unitPrice || 0).toLocaleString()}</td>
-        <td>{sku}</td>
         <td onClick={onClick}>
           <ContainerBox row gap={10} justifyEnd>
             {chidlAssetCount > 0 && (

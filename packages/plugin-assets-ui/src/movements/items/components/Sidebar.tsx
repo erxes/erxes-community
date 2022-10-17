@@ -7,7 +7,8 @@ import {
   Button,
   Tip,
   Icon,
-  DateControl
+  DateControl,
+  FormControl
 } from '@erxes/ui/src';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
@@ -16,6 +17,7 @@ import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectC
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { ContainerBox } from '../../../style';
 import moment from 'moment';
+import { SelectWithAssets } from '../../../common/utils';
 
 type Props = {
   history: any;
@@ -28,6 +30,7 @@ type State = {
   teamMemberId?: string;
   companyId?: string;
   customerId?: string;
+  assetId?: string;
   createdAtFrom?: string;
   createdAtTo?: string;
 };
@@ -50,6 +53,7 @@ class Sidebar extends React.Component<Props, State> {
       teamMemberId,
       companyId,
       customerId,
+      assetId,
       createdAtFrom,
       createdAtTo
     } = this.state;
@@ -140,6 +144,15 @@ class Sidebar extends React.Component<Props, State> {
               name="customerId"
               multi={false}
               initialValue={customerId}
+              onSelect={handleSelect}
+            />
+          </FormGroup>
+          <FormGroup label="Asset" field="assetId" clearable={!!assetId}>
+            <SelectWithAssets
+              label="Choose Asset"
+              name="assetId"
+              multi={false}
+              initialValue={assetId}
               onSelect={handleSelect}
             />
           </FormGroup>

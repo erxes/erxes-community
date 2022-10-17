@@ -42,6 +42,7 @@ import { CommonFormGroup, CommonItemRow } from '../../common/utils';
 
 type Props = {
   detail: IMovementType;
+  assetId?: string;
   closeModal: () => void;
   renderButton?: (props: IButtonMutateProps) => JSX.Element;
 };
@@ -71,18 +72,20 @@ class Form extends React.Component<Props, State> {
     this.assetChooser = this.assetChooser.bind(this);
     this.changeCurrentItem = this.changeCurrentItem.bind(this);
 
+    const { detail, assetId } = props;
+
     this.state = {
-      variables: props.detail?.assets || [],
-      selectedItems: props.detail?.selectedItems || [],
-      description: props.detail?.description || '',
-      movedAt: props.detail?.movedAt || '',
-      currentItems: [],
+      variables: detail?.assets || [],
+      selectedItems: detail?.selectedItems || [],
+      description: detail?.description || '',
+      movedAt: detail?.movedAt || '',
+      currentItems: [assetId],
       general: {},
       checkedItems: []
     };
   }
 
-  generateDoc(values) {
+  generateDoc() {
     const { variables, movedAt, description } = this.state;
     const items = variables.map(
       ({ assetId, assetName, branchId, departmentId, customerId, companyId, teamMemberId }) => ({
@@ -131,7 +134,7 @@ class Form extends React.Component<Props, State> {
     return <>{this.assetChooserContent(this.assetChooserTrigger)}</>;
   }
 
-  renderRow(label, asset,value) {
+  renderRow(label, asset, value) {
     let { variables } = this.state;
 
     let Selection;
@@ -176,7 +179,7 @@ class Form extends React.Component<Props, State> {
           <Selection
             label={`Choose ${label}`}
             onSelect={handleChange}
-            initialValue={value||''}
+            initialValue={value || ''}
             multi={false}
           />
         </MovementItemContainer>
@@ -194,7 +197,6 @@ class Form extends React.Component<Props, State> {
 
     this.setState(prev => ({ currentItems: [...prev.currentItems, id] }));
   }
-
 
   handleGeneralDate = e => {
     this.setState({ movedAt: e });
@@ -220,8 +222,7 @@ class Form extends React.Component<Props, State> {
     const { variables, general, checkedItems } = this.state;
 
     const handleGeneralOptions = (value, field) => {
-
-      this.setState({currentItems:[]})
+      this.setState({ currentItems: [] });
 
       const newVariables = variables.map(item =>
         checkedItems.includes(item.assetId) ? { ...item, [field]: value } : item
@@ -230,7 +231,12 @@ class Form extends React.Component<Props, State> {
     };
 
     return (
-      <CollapseContent title="General Settings">
+      <CollapseContent
+        title="General Location Configrations"
+        description={__(
+          'You should click checkbox before if you want change location in generally selected assets'
+        )}
+      >
         <BarItems>
           <ContentColumn>
             <FormWrapper>
@@ -296,10 +302,8 @@ class Form extends React.Component<Props, State> {
     );
   }
 
-  
-  render() {
-
-    const renderList = (props) => {
+  renderList = props => {
+    console.log(props.bulk);
     const { variables, currentItems, selectedItems } = this.state;
     if (variables.length === 0) {
       return <EmptyState text="No Selected Asset" image="/images/actions/5.svg" />;
@@ -362,27 +366,27 @@ class Form extends React.Component<Props, State> {
                 onsSelect={this.handleChangeRowItem}
                 selectedItems={selectedItems}
                 toggleBulk={props.toggleBulk}
-                isChecked={props.bulk.includes(item)}
+                isChecked={props.bulk.some(bulk => bulk.assetId === item.assetId)}
                 onChangeBulkItems={onChangeCheckedItems}
               >
-                {this.renderRow('Branches', item,item['branchId'])}
-                {this.renderRow('Departments', item,item['departmentId'])}
-                {this.renderRow('Customer', item,item['customerId'])}
-                {this.renderRow('Company', item,item['companyId'])}
-                {this.renderRow('Team Member', item,item['teamMemberId'])}
+                {this.renderRow('Branches', item, item['branchId'])}
+                {this.renderRow('Departments', item, item['departmentId'])}
+                {this.renderRow('Customer', item, item['customerId'])}
+                {this.renderRow('Company', item, item['companyId'])}
+                {this.renderRow('Team Member', item, item['teamMemberId'])}
               </MovementItems>
             ))}
           </tbody>
         </Table>
       </MovementTableWrapper>
     );
-  }
-
+  };
+  render() {
     const renderContent = (formProps: IFormProps) => {
-      const { closeModal, renderButton } = this.props;
+      const { closeModal, renderButton, assetId } = this.props;
       const { values, isSubmitted } = formProps;
       const { movedAt, description, variables } = this.state;
-  
+
       return (
         <ContainerBox column gap={20}>
           <Title>Movements</Title>
@@ -410,10 +414,10 @@ class Form extends React.Component<Props, State> {
               </CommonFormGroup>
             </FormColumn>
           </FormWrapper>
-  
+
           {variables.length > 0 && this.renderGeneral()}
-          <CollapseContent title="Asset List">
-            <Bulk content={renderList} />
+          <CollapseContent title="Asset List" open={!!assetId}>
+            <Bulk content={this.renderList} />
             <ContainerBox justifyCenter>
               {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
             </ContainerBox>
@@ -424,8 +428,8 @@ class Form extends React.Component<Props, State> {
                 Cancel
               </Button>
               {renderButton({
-                name: 'asset and movements',
-                values: this.generateDoc(values),
+                text: 'asset and movements',
+                values: this.generateDoc(),
                 isSubmitted,
                 callback: closeModal
               })}
@@ -433,7 +437,7 @@ class Form extends React.Component<Props, State> {
           )}
         </ContainerBox>
       );
-    }
+    };
 
     return <CommonForm renderContent={renderContent} />;
   }

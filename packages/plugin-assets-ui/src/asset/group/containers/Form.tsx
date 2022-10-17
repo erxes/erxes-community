@@ -24,7 +24,14 @@ class FormContainer extends React.Component<FinalProps> {
     super(props);
   }
 
-  renderButton = ({ name, values, isSubmitted, callback, confirmationUpdate, object }: IButtonMutateProps) => {
+  renderButton = ({
+    text,
+    values,
+    isSubmitted,
+    callback,
+    confirmationUpdate,
+    object
+  }: IButtonMutateProps) => {
     const afterMutate = () => {
       if (callback) {
         this.props.refetchAssetGroups();
@@ -47,9 +54,9 @@ class FormContainer extends React.Component<FinalProps> {
         variables={values}
         callback={afterMutate}
         isSubmitted={isSubmitted}
-        type='submit'
+        type="submit"
         confirmationUpdate={confirmationUpdate}
-        successMessage={`You successfully ${sucessAction} a ${name}`}
+        successMessage={`You successfully ${sucessAction} a ${text}`}
       />
     );
   };
