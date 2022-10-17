@@ -92,23 +92,26 @@ function ListContainer() {
   const submitItems = (data: any) => {
     let products: any = [];
 
-    console.log(data);
+    for (let item of data) {
+      if (item.count - item.preCount !== 0)
+        products.push({
+          productId: item.productId,
+          count: item.count - item.preCount,
+          uomId: item.uomId,
+          isDebit: true
+        });
+    }
 
-    data.map((item: any) => {
-      products.push({
-        productId: item.productId,
-        count: item.count,
-        preCount: item.preCount,
-        uomId: item.uomId,
-        isDebit: true
-      });
-    });
+    if (products.length === 0) {
+      Alert.error('No recent changes to submit!');
+      return;
+    }
 
     safeRemainderSubmit({
       variables: {
         branchId: safeRemainder.branchId,
         departmentId: safeRemainder.departmentId,
-        contentType: 'safe remainder',
+        contentType: 'Safe Remainder',
         contentId: 'safe_remainder_id',
         status: 'checked',
         products: products

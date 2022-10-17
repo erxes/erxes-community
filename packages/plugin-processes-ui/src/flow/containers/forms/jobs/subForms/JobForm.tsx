@@ -6,10 +6,11 @@ import { graphql } from 'react-apollo';
 import { IJob } from '../../../../types';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { IUser } from '@erxes/ui/src/auth/types';
-import { JobRefersAllQueryResponse } from '../../../../../job/types';
+import { JobRefersQueryResponse } from '../../../../../job/types';
 import { queries } from '../../../../../job/graphql';
 import { withProps } from '@erxes/ui/src/utils';
 import { withRouter } from 'react-router-dom';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   id: string;
@@ -18,20 +19,25 @@ type Props = {
   flowJobs: IJob[];
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   closeModal: () => void;
+  setUsedPopup: (check: boolean) => void;
 };
 
 type FinalProps = {
-  jobRefersAllQuery: JobRefersAllQueryResponse;
+  jobRefersQuery: JobRefersQueryResponse;
   currentUser: IUser;
 } & Props &
   IRouterProps;
 
 const JobFormContainer = (props: FinalProps) => {
-  const { currentUser, jobRefersAllQuery } = props;
+  const { currentUser, jobRefersQuery } = props;
 
   const [saveLoading] = useState(false);
 
-  const jobRefers = jobRefersAllQuery.jobRefersAll || [];
+  if (jobRefersQuery.loading) {
+    return <Spinner />;
+  }
+
+  const jobRefers = jobRefersQuery.jobRefers || [];
 
   const updatedProps = {
     ...props,
@@ -45,8 +51,13 @@ const JobFormContainer = (props: FinalProps) => {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, JobRefersAllQueryResponse>(gql(queries.jobRefersAll), {
-      name: 'jobRefersAllQuery'
+    graphql<Props, JobRefersQueryResponse>(gql(queries.jobRefers), {
+      name: 'jobRefersQuery',
+      options: ({ activeFlowJob }) => ({
+        variables: {
+          ids: [activeFlowJob.config.jobReferId]
+        }
+      })
     })
   )(withRouter<FinalProps>(JobFormContainer))
 );

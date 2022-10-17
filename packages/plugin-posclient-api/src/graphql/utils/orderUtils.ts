@@ -98,11 +98,14 @@ export const validateOrderPayment = (order: IOrder, doc: IPayment) => {
   const {
     cardAmount: paidCard = 0,
     cashAmount: paidCash = 0,
+    receivableAmount: paidReceivable = 0,
     mobileAmount: paidMobile = 0
   } = order;
   const { cashAmount = 0 } = doc;
 
-  const paidTotal = Number((paidCard + paidCash + paidMobile).toFixed(2));
+  const paidTotal = Number(
+    (paidCard + paidCash + paidReceivable + paidMobile).toFixed(2)
+  );
   // only remainder cash amount will come
   const total = Number(cashAmount.toFixed(2));
 
@@ -239,6 +242,7 @@ export const prepareEbarimtData = async (
   const orderInfo = {
     date: new Date().toISOString().slice(0, 10),
     orderId: order._id,
+    number: order.number,
     hasVat: config.hasVat || false,
     hasCitytax: config.hasCitytax || false,
     billType,
@@ -369,15 +373,20 @@ export const prepareOrderDoc = async (
 };
 
 export const checkOrderStatus = (order: IOrderDocument) => {
-  if (order.status === ORDER_STATUSES.PAID || order.paidDate) {
+  if (order.paidDate) {
     throw new Error('Order is already paid');
   }
 };
 
 export const checkOrderAmount = (order: IOrderDocument, amount: number) => {
-  const { cardAmount = 0, cashAmount = 0, mobileAmount = 0 } = order;
+  const {
+    cardAmount = 0,
+    cashAmount = 0,
+    receivableAmount = 0,
+    mobileAmount = 0
+  } = order;
 
-  const paidAmount = cardAmount + cashAmount + mobileAmount;
+  const paidAmount = cardAmount + cashAmount + receivableAmount + mobileAmount;
 
   if (paidAmount + amount > order.totalAmount) {
     throw new Error('Amount exceeds total amount');
@@ -449,6 +458,7 @@ export const commonCheckPayment = async (
     billType: order.billType || BILL_TYPES.CITIZEN,
     registerNumber: order.registerNumber || '',
     cashAmount: order.cashAmount || 0,
+    receivableAmount: order.receivableAmount || 0,
     mobileAmount: order.mobileAmount,
     cardAmount: order.cardAmount || 0
   };
@@ -493,7 +503,6 @@ export const commonCheckPayment = async (
           $set: {
             ...doc,
             paidDate: now,
-            status: ORDER_STATUSES.PAID,
             modifiedAt: now
           }
         }
@@ -503,6 +512,7 @@ export const commonCheckPayment = async (
     order = await models.Orders.getOrder(orderId);
     graphqlPubsub.publish('ordersOrdered', {
       ordersOrdered: {
+        ...order,
         _id: orderId,
         status: order.status,
         customerId: order.customerId
