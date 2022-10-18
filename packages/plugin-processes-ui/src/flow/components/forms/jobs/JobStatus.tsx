@@ -1,10 +1,7 @@
-import FormGroup from '@erxes/ui/src/components/form/Group';
-import Info from '@erxes/ui/src/components/Info';
 import Label from '@erxes/ui/src/components/Label';
 import React from 'react';
 import { __ } from '@erxes/ui/src/utils';
-import { ControlLabel } from '@erxes/ui/src/components/form';
-
+import { FLOWJOB_TYPES } from '../../../../flow/constants';
 import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { IJob } from '../../../types';
 import { IJobRefer } from '../../../../job/types';
@@ -19,18 +16,38 @@ type Props = {
   products: IProduct[];
 };
 
-class JobStatus extends React.Component<Props, {}> {
+type State = {
+  jobReferById: any;
+  productById: any;
+};
+
+class JobStatus extends React.Component<Props, State> {
   constructor(props) {
     super(props);
+
+    const { jobRefers, products } = this.props;
+
+    const jobReferById = {};
+    for (const jobRefer of jobRefers) {
+      jobReferById[jobRefer._id] = jobRefer;
+    }
+
+    const productById = {};
+    for (const product of products) {
+      productById[product._id] = product;
+    }
+
+    this.state = {
+      jobReferById,
+      productById
+    };
   }
 
   renderLabelInfo = (style, text) => {
     return <Label lblStyle={style}>{text}</Label>;
   };
 
-  renderProducts = (products, type, matchProducts?: any[], flowProduct?) => {
-    const space = '\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0';
-
+  renderProducts = (products, matchProducts?: any[], flowProduct?) => {
     return products.map(product => {
       const name = product.product ? product.product.name : '';
 
@@ -44,81 +61,79 @@ class JobStatus extends React.Component<Props, {}> {
       }
 
       return (
-        <>
-          <FormGroup>
-            <ControlLabel key={product.id}>
-              {space} - {matchResult === undefined && name}
-              {matchResult === true && name}
-              {matchResult === false && this.renderLabelInfo('danger', name)}
-            </ControlLabel>
-          </FormGroup>
-        </>
+        <li key={Math.random()}>
+          {matchResult === undefined && name}
+          {matchResult === true && name}
+          {matchResult === false && this.renderLabelInfo('danger', name)}
+        </li>
       );
     });
   };
 
-  renderFlowJobs = (
-    chosenFlowJobs: IJob[],
-    jobRefers,
-    type,
-    beforeFlowJobs: IJob[]
-  ) => {
-    let beforeResultProducts: any = [];
-    if ((beforeFlowJobs || []).length > 0) {
-      for (const before of beforeFlowJobs) {
-        const jobRefer =
-          (jobRefers || []).find(job => job._id === before.config.jobReferId) ||
-          {};
-        const resultProducts = jobRefer.resultProducts || [];
+  renderBlock(title, job: IJob, kind = 'result') {
+    const { jobReferById, productById } = this.state;
+    const jobConfig = job.config;
 
-        const productNames = resultProducts.map(e =>
-          e.product ? e.product.name : ''
-        );
+    if (!jobConfig.jobReferId && !jobConfig.productId) {
+      return (
+        <ul key={Math.random()}>
+          <b>{title}</b>
+          <p>Wrong configured</p>
+        </ul>
+      );
+    }
 
-        beforeResultProducts = beforeResultProducts.concat(productNames);
+    let products = [];
+
+    if (jobConfig.jobReferId) {
+      if ([FLOWJOB_TYPES.JOB, FLOWJOB_TYPES.ENDPOINT].includes(job.type)) {
+        const jobRefer = jobReferById[jobConfig.jobReferId] || {};
+        products =
+          kind === 'need' ? jobRefer.needProducts : jobRefer.resultProducts;
       }
     }
 
-    return chosenFlowJobs.map(flowJob => {
-      if (!flowJob.config.jobReferId) {
-        return [];
+    if (jobConfig.productId) {
+      if (kind === 'need') {
+        if ([FLOWJOB_TYPES.OUTLET, FLOWJOB_TYPES.MOVE].includes(job.type)) {
+          products =
+            (productById[jobConfig.productId] && [
+              { product: productById[jobConfig.productId] }
+            ]) ||
+            [];
+        }
+        if (job.type === FLOWJOB_TYPES.INCOME) {
+          products = [];
+        }
+      } else {
+        if ([FLOWJOB_TYPES.INCOME, FLOWJOB_TYPES.MOVE].includes(job.type)) {
+          products =
+            (productById[jobConfig.productId] && [
+              { product: productById[jobConfig.productId] }
+            ]) ||
+            [];
+          console.log(products);
+        }
+        if (job.type === FLOWJOB_TYPES.OUTLET) {
+          products = [];
+        }
       }
+    }
 
-      const jobRefer =
-        (jobRefers || []).find(job => job._id === flowJob.config.jobReferId) ||
-        {};
-      const needProducts = jobRefer.needProducts || [];
-      const resultProducts = jobRefer.resultProducts || [];
-
-      beforeResultProducts =
-        beforeResultProducts.length === 0 ? false : beforeResultProducts;
-
-      return (
-        <Info type="primary" title="">
-          <FormGroup>
-            <ControlLabel key={flowJob.id}>{flowJob.label}</ControlLabel>
-          </FormGroup>
-          {type === 'next' && this.renderProducts(needProducts, 'need')}
-          {type === 'prev' && this.renderProducts(resultProducts, 'result')}
-          {type === 'cur' &&
-            this.renderProducts(needProducts, 'need', beforeResultProducts)}
-        </Info>
-      );
-    });
-  };
-
-  renderList(title, products, type) {
     return (
-      <Info type="success" title={title}>
-        {this.renderProducts(products, type)}
-      </Info>
+      <ul key={Math.random()}>
+        <b>{title}</b>
+        {this.renderProducts(products)}
+      </ul>
     );
   }
 
   render() {
-    const { jobRefers } = this.props;
-
     const { activeFlowJob, flowJobs } = this.props;
+
+    if (!activeFlowJob) {
+      return <>Not found active job</>;
+    }
 
     const activeFlowJobId =
       activeFlowJob && activeFlowJob.id ? activeFlowJob.id : '';
@@ -126,33 +141,20 @@ class JobStatus extends React.Component<Props, {}> {
       (e.nextJobIds || []).includes(activeFlowJobId)
     );
 
-    const jobRefer = (jobRefers || []).length && jobRefers[0];
-
-    const needProducts = (jobRefer || {}).needProducts || [];
-    const resultProducts = (jobRefer || {}).resultProducts || [];
-
     return (
       <FormWrapper>
         <FormColumn>
-          <Info type="primary" title="Өмнөх жоб бүтээгдэхүүнүүд">
-            {this.renderFlowJobs(beforeFlowJobs, jobRefer, 'prev', [])}
-          </Info>
+          <Label lblColor="#673FBD">Өмнөх дамжлагаас бэлэн болох:</Label>
+          {(beforeFlowJobs || []).map(b => this.renderBlock(`${b.label}`, b))}
         </FormColumn>
 
         <FormColumn>
-          <Info type="success" title="Шаардлагатай бүтээгдэхүүнүүд">
-            {activeFlowJob &&
-              this.renderFlowJobs(
-                [activeFlowJob],
-                jobRefer,
-                'cur',
-                beforeFlowJobs
-              )}
-          </Info>
-        </FormColumn>
+          <Label lblColor="#3CCC38">Уг дамжлагад хэрэгцээт:</Label>
+          {this.renderBlock('', activeFlowJob, 'need')}
 
-        {this.renderList('In products', needProducts, 'need')}
-        {this.renderList('Out products', resultProducts, 'result')}
+          <Label lblColor="#F7CE53">Уг дамжлагаас гарц:</Label>
+          {this.renderBlock('', activeFlowJob)}
+        </FormColumn>
       </FormWrapper>
     );
   }

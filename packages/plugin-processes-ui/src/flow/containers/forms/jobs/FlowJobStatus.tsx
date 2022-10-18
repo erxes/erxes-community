@@ -53,7 +53,7 @@ const FlowJobStatusContainer = (props: FinalProps) => {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, JobRefersQueryResponse>(gql(queries.jobReferDetail), {
+    graphql<Props, JobRefersQueryResponse>(gql(queries.jobRefers), {
       name: 'jobRefersQuery',
       options: ({ flowJobs }) => ({
         variables: {

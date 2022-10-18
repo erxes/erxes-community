@@ -44,6 +44,15 @@ export const FLOWJOBS = [
   }
 ];
 
+export const FLOWJOB_TYPES = {
+  JOB: 'job',
+  ENDPOINT: 'endPoint',
+  INCOME: 'income',
+  OUTLET: 'outlet',
+  MOVE: 'move',
+  FLOW: 'flow'
+};
+
 export const statusFilters = [
   { key: 'active', value: 'Active' },
   { key: 'draft', value: 'Draft' }
