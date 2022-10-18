@@ -46,7 +46,8 @@ export const types = `
     }
 `;
 export const mutations = `
-    assetMovementAdd(movedAt:String,description:String,movements:[IMovementAsset]):JSON
+    assetMovementAdd(movedAt:String,description:String,items:[IMovementAsset]):JSON
+    assetMovementUpdate(_id: String,doc:JSON):JSON
     assetMovementRemove(ids:[String]):JSON
 `;
 export const queries = `

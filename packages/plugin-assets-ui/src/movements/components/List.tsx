@@ -23,7 +23,7 @@ type Props = {
   movements: IMovementType[];
   totalCount: number;
   loading: boolean;
-  remove: () => void;
+  remove: (ids: string[]) => void;
   refetch: () => void;
   refetchTotalCount: () => void;
   history: any;
@@ -151,6 +151,7 @@ class List extends React.Component<Props, State> {
 
   render() {
     const { totalCount, remove, history, queryParams } = this.props;
+    const { selectedRows } = this.state;
 
     let rightActionBar = (
       <BarItems>
@@ -163,9 +164,9 @@ class List extends React.Component<Props, State> {
           onFocus={this.moveCursorAtTheEnd}
         />
         {this.renderRightActionBar}
-        {this.state.selectedRows.length > 0 && (
+        {selectedRows.length > 0 && (
           <Tip text="Remove movement" placement="bottom">
-            <Button btnStyle="danger" icon="cancel-1" onClick={remove} />
+            <Button btnStyle="danger" icon="cancel-1" onClick={() => remove(selectedRows)} />
           </Tip>
         )}
       </BarItems>

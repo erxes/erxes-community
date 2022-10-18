@@ -1,14 +1,21 @@
 import { movementParams, movementParamsDef } from '../../common/graphql/movement';
 
 const movementAdd = `
-mutation AssetMovementAdd($movedAt:String,$description:String,$movements: [IMovementAsset]) {
-  assetMovementAdd(movedAt:$movedAt,description:$description,movements: $movements)
+mutation AssetMovementAdd($movedAt:String,$description:String,$items: [IMovementAsset]) {
+  assetMovementAdd(movedAt:$movedAt,description:$description,items: $items)
 }
 
 `;
 const movementRemove = `
-mutation Mutation {
-  assetMovementRemove
+mutation AssetMovementRemove($ids:[String]) {
+  assetMovementRemove(ids:$ids)
 }
 `;
-export default { movementAdd, movementRemove };
+
+const movementEdit = `
+mutation AssetMovementUpdate($_id: String, $doc: JSON) {
+  assetMovementUpdate(_id: $_id, doc: $doc)
+}
+`;
+
+export default { movementAdd, movementRemove, movementEdit };

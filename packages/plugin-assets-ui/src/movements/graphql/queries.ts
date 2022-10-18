@@ -1,3 +1,4 @@
+import { assetCurrentField, assetFields } from '../../common/graphql/asset';
 import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
 
 const movementDetail = `
@@ -9,7 +10,7 @@ query AssetMovement($_id: String) {
     movedAt
     userId
     description
-    selectedItems
+    selectedItems 
     assets {
       _id
       assetId

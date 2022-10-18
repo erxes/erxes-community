@@ -32,14 +32,16 @@ class ListContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
-    const remove = () => {
-      confirm('It will remove last asset movement.Are you sure.').then(() => {
-        this.props.movementRemove().then(() => {
-          movementsQuery.refetch();
-          movementsTotalCountQuery.refetch();
-          Alert.success('Removed movement');
-        });
-      });
+    const remove = (ids: string[]) => {
+      confirm()
+        .then(() => {
+          this.props.movementRemove({ variables: { ids } }).then(() => {
+            movementsQuery.refetch();
+            movementsTotalCountQuery.refetch();
+            Alert.success('Removed movement');
+          });
+        })
+        .catch(error => Alert.error(error.message));
     };
 
     const updateProps = {

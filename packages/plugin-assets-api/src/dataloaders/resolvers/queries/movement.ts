@@ -13,7 +13,6 @@ const movementQueries = {
   },
 
   async assetMovementTotalCount(_root, params, { models }: IContext) {
-    console.log({ params });
     const filter = await generateFilter(params, models);
 
     return models.Movement.find(filter).countDocuments();

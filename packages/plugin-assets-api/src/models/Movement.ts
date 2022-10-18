@@ -6,7 +6,8 @@ import { movementSchema } from './definitions/movements';
 export interface IMovementModel extends Model<IMovementDocument> {
   movements(params: any): Promise<IMovementDocument[]>;
   movementAdd(doc: any, userId: string): Promise<IMovementDocument>;
-  movementRemove(): Promise<IMovementDocument>;
+  movementRemove(ids: string[]): Promise<IMovementDocument>;
+  movementEdit(_id: String, doc: any): Promise<IMovementDocument>;
 }
 
 export const loadMovementClass = (models: IModels) => {
@@ -16,7 +17,7 @@ export const loadMovementClass = (models: IModels) => {
     }
 
     public static async movementAdd(doc: any, userId: string) {
-      if (!doc.movements) {
+      if (!doc.items) {
         throw new Error('No assets in  movement ');
       }
 
@@ -28,7 +29,7 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error('No moved date in movement ');
       }
 
-      const addedAssets = await models.MovementAsset.movementAssetsAdd(doc.movements);
+      const addedAssets = await models.MovementAsset.movementAssetsAdd(doc.items);
 
       const movementAssetIds = addedAssets.map(asset => asset._id);
 
@@ -46,27 +47,43 @@ export const loadMovementClass = (models: IModels) => {
 
       return movement;
     }
-    public static async movementRemove() {
+
+    public static async movementEdit(_id: string, doc: any) {
+      if (!_id) {
+        throw new Error('You must provide a id');
+      }
+      const movement = await models.Movement.findOne({ _id });
+
+      if (!movement) {
+        throw new Error('Movement not found');
+      }
+
+      await models.MovementAsset.movementItemsEdit(_id, doc.items);
+      await models.Movement.update(
+        { _id },
+        { $set: { movedAt: doc.movedAt, description: doc.description } }
+      );
+    }
+
+    public static async movementRemove(ids: string[]) {
+      if (!ids) {
+        throw new Error('You must specify a valid id');
+      }
       try {
-        const movement = await models.Movement.findOne()
-          .sort({ createdAt: 1 })
-          .limit(1);
+        const movements = await models.Movement.find({ _id: { $in: ids } });
 
-        if (!movement) {
-          throw new Error('Movement not found');
+        if (movements.length === 0) {
+          throw new Error('Something went wrong');
         }
+        const movementIds = movements.map(movement => movement._id);
+        const movementItemsIds = movements
+          .map(movement => movement.assetIds)
+          .reduce((pre, cur) => pre.concat(cur))
+          .map(id => id);
 
-        const items = await models.MovementAsset.find({ _id: { $in: movement.assetIds } });
-        const assetIds = items.map(item => item.assetId);
+        await models.MovementAsset.deleteMany({ _id: { $in: movementItemsIds } });
 
-        await models.Asset.updateMany(
-          { _id: { $in: assetIds } },
-          { $set: { currentMovement: undefined } }
-        );
-
-        await models.MovementAsset.deleteMany({ _id: { $in: movement.assetIds } });
-
-        await models.Movement.remove({ _id: movement._id });
+        await models.Movement.remove({ _id: { $in: movementIds } });
       } catch (error) {
         throw new Error(error.message);
       }

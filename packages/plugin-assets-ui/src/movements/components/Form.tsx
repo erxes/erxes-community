@@ -87,6 +87,7 @@ class Form extends React.Component<Props, State> {
 
   generateDoc() {
     const { variables, movedAt, description } = this.state;
+    const { detail } = this.props;
     const items = variables.map(
       ({ assetId, assetName, branchId, departmentId, customerId, companyId, teamMemberId }) => ({
         assetId,
@@ -98,7 +99,11 @@ class Form extends React.Component<Props, State> {
         teamMemberId
       })
     );
-    return { movements: items, description, movedAt };
+    const doc = { items, description, movedAt };
+    if (!_loadash.isEmpty(detail)) {
+      return { _id: detail._id, doc };
+    }
+    return { ...doc };
   }
 
   assetChooser(props) {
@@ -303,7 +308,6 @@ class Form extends React.Component<Props, State> {
   }
 
   renderList = props => {
-    console.log(props.bulk);
     const { variables, currentItems, selectedItems } = this.state;
     if (variables.length === 0) {
       return <EmptyState text="No Selected Asset" image="/images/actions/5.svg" />;
@@ -383,7 +387,7 @@ class Form extends React.Component<Props, State> {
   };
   render() {
     const renderContent = (formProps: IFormProps) => {
-      const { closeModal, renderButton, assetId } = this.props;
+      const { closeModal, renderButton, assetId, detail } = this.props;
       const { values, isSubmitted } = formProps;
       const { movedAt, description, variables } = this.state;
 
@@ -428,10 +432,11 @@ class Form extends React.Component<Props, State> {
                 Cancel
               </Button>
               {renderButton({
-                text: 'asset and movements',
+                text: 'Movement',
                 values: this.generateDoc(),
                 isSubmitted,
-                callback: closeModal
+                callback: closeModal,
+                object: !_loadash.isEmpty(detail)
               })}
             </ModalFooter>
           )}

@@ -16,8 +16,11 @@ const movementMutations = {
       user
     );
   },
-  async assetMovementRemove(_root, { _id }, { models }: IContext) {
-    return await models.Movement.movementRemove();
+  async assetMovementRemove(_root, { ids }, { models }: IContext) {
+    return await models.Movement.movementRemove(ids);
+  },
+  async assetMovementUpdate(_root, { _id, doc }, { models, docModifier }: IContext) {
+    return await models.Movement.movementEdit(_id, docModifier(doc));
   }
 };
 

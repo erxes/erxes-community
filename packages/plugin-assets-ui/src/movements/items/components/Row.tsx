@@ -26,7 +26,7 @@ class Row extends React.Component<Props> {
     const trigger = (
       <Button btnStyle="link">
         <Tip text="See detail of movement">
-          <Icon icon="list" />
+          <Icon icon="file-edit-alt" />
         </Tip>
       </Button>
     );

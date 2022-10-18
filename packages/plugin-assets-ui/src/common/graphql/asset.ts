@@ -34,3 +34,90 @@ export const assetParams = `
   minimiumCount: $minimiumCount,
   vendorId: $vendorId,
 `;
+
+const vendorField = `
+  vendor {
+    _id
+    avatar
+    businessType
+    code
+    createdAt
+    customFieldsData
+    description
+    emails
+    industry
+    isSubscribed
+    links
+    location
+    mergedIds
+    modifiedAt
+    names
+    ownerId
+    parentCompanyId
+    phones
+    plan
+    primaryEmail
+    primaryName
+    primaryPhone
+    score
+    size
+    tagIds
+    trackedData
+    website
+  }
+`;
+
+export const assetFields = `
+  _id
+  name
+  type
+  code
+  order
+  groupId
+  parentId
+  vendorId
+  ${vendorField}
+  description
+  unitPrice
+  createdAt
+  group {
+    _id
+    code
+    name
+  }
+  parent {
+    _id
+    code
+    name
+  }
+  attachment {
+    url
+    name
+    size
+    type
+  }
+  attachmentMore {
+    url
+    name
+    size
+    type
+  }
+  chidlAssetCount
+  isRoot
+`;
+
+export const assetCurrentField = `
+  currentMovement {
+    branchId
+    departmentId
+    teamMemberId
+    companyId
+    customerId
+
+    branch
+    department
+    teamMember
+    company
+    customer
+  }
+`;

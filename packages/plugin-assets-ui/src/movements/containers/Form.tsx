@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { queries as assetQueries } from '../../asset/graphql';
 import { IAsset, IAssetQueryResponse, IMovementDetailQueryResponse } from '../../common/types';
-import { Spinner, ButtonMutate } from '@erxes/ui/src';
+import { Spinner, ButtonMutate, Alert, confirm } from '@erxes/ui/src';
 import { getRefetchQueries } from '../../common/utils';
 import { mutations, queries } from '../graphql';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
@@ -34,17 +34,24 @@ class FormContainer extends React.Component<FinalProps> {
       return <Spinner objective />;
     }
 
-    const renderButton = ({ text, values, isSubmitted, callback }: IButtonMutateProps) => {
+    const renderButton = ({ text, values, isSubmitted, callback, object }: IButtonMutateProps) => {
       const afterSavedDb = () => {
         const { refetch, refetchTotalCount } = this.props;
 
         refetch && refetch();
         refetchTotalCount && refetchTotalCount();
+        movementDetail.refetch();
         callback && callback();
       };
+
+      let mutation = mutations.movementAdd;
+      if (object) {
+        mutation = mutations.movementEdit;
+      }
+
       return (
         <ButtonMutate
-          mutation={mutations.movementAdd}
+          mutation={mutation}
           variables={values}
           callback={afterSavedDb}
           refetchQueries={getRefetchQueries()}
@@ -59,7 +66,7 @@ class FormContainer extends React.Component<FinalProps> {
     const updatedProps = {
       detail: movementDetail?.assetMovement || {},
       closeModal,
-      renderButton: !movementDetail?.assetMovement ? renderButton : undefined,
+      renderButton: renderButton,
       assetId,
       movementId
     };
