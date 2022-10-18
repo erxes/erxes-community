@@ -4,15 +4,17 @@ module.exports = {
   scope: 'payment',
   exposes: {
     './routes': './src/routes.tsx',
-    './SelectPayments': './src/containers/SelectPayments.tsx',
-    "./invoiceSection": "./src/containers/InvoiceSection.tsx",
+    './selectPayments': './src/containers/SelectPayments.tsx',
+    './invoiceSection': './src/containers/InvoiceSection.tsx',
+    './invoiceForm': './src/containers/invoice/InvoiceForm.tsx',
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
     scope: 'payment',
     module: './routes'
   },
-  extendFormOptions: './SelectPayments',
+  extendFormOptions: './selectPayments',
+  extendEditorToolbar: './invoiceForm',
   menus: [
     {
       text: 'Invoices',

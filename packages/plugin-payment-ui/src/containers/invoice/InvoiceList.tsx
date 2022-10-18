@@ -4,12 +4,12 @@ import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
 
-import List from '../components/invoice/List';
-import { queries } from '../graphql';
+import List from '../../components/invoice/List';
+import { queries } from '../../graphql';
 import {
   InvoicesQueryResponse,
   InvoicesTotalCountQueryResponse
-} from '../types';
+} from '../../types';
 
 type Props = {
   queryParams: any;

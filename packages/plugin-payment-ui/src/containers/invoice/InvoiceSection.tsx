@@ -2,15 +2,15 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import React from 'react';
 import { useQuery } from 'react-apollo';
 
-import InvoiceSection from '../components/invoice/InvoiceSection';
-import { queries } from '../graphql';
-import { InvoicesQueryResponse } from '../types';
+import InvoiceSection from '../../components/invoice/InvoiceSection';
+import { queries } from '../../graphql';
+import { InvoicesQueryResponse } from '../../types';
 
 type Props = {
   dealId: string;
 };
 
-function InvoiceSecitonContainer(props: Props) {
+function InvoiceSectionContainer(props: Props) {
   const { dealId } = props;
 
   const invoicesQuery = useQuery<InvoicesQueryResponse>(queries.invoices, {
@@ -38,5 +38,5 @@ function InvoiceSecitonContainer(props: Props) {
 }
 
 export default ({ id }: { id: string }) => {
-  return <InvoiceSecitonContainer dealId={id} />;
+  return <InvoiceSectionContainer dealId={id} />;
 };

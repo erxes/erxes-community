@@ -34,7 +34,7 @@ import { SmallLoader } from '@erxes/ui/src/components/ButtonMutate';
 import Tip from '@erxes/ui/src/components/Tip';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { deleteHandler } from '@erxes/ui/src/utils/uploadHandler';
-import { isEnabled } from '@erxes/ui/src/utils/core';
+import { isEnabled, loadDynamicComponent } from '@erxes/ui/src/utils/core';
 
 const Editor = asyncComponent(
   () => import(/* webpackChunkName: "Editor-in-Inbox" */ './Editor'),
@@ -391,6 +391,14 @@ class RespondBox extends React.Component<Props, State> {
     return null;
   }
 
+  renderControls = () => {
+    return loadDynamicComponent(
+      'extendEditorToolbar',
+      { id: this.props.conversation._id },
+      true
+    );
+  };
+
   renderFacebookTagMessage() {
     const selectTag = value => {
       this.setState({ facebookMessageTag: value });
@@ -448,6 +456,7 @@ class RespondBox extends React.Component<Props, State> {
         responseTemplate={responseTemplate}
         responseTemplates={responseTemplates}
         handleFileInput={this.handleFileInput}
+        controls={this.renderControls()}
       />
     );
   }

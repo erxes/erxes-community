@@ -128,38 +128,38 @@ export class ErxesEditor extends React.Component<ErxesEditorProps> {
     const { editorState } = this.props;
     const currentContent = editorState.getCurrentContent();
 
-    return currentContent.getPlainText('').length
-  }
+    return currentContent.getPlainText('').length;
+  };
 
-  handlePastedText = (pastedText) => {
+  handlePastedText = pastedText => {
     const { integrationKind } = this.props;
 
-    if (integrationKind !== "telnyx"){
+    if (integrationKind !== 'telnyx') {
       return 'un-handled';
     }
 
     const contentLength = this.getContentLength();
 
-  	if (contentLength + pastedText.length > 160) {
-    	return 'handled';
+    if (contentLength + pastedText.length > 160) {
+      return 'handled';
     }
 
-    return 'un-handled'
-  }
+    return 'un-handled';
+  };
 
   renderChar = () => {
     const { editorState, integrationKind } = this.props;
 
-    if (integrationKind !== "telnyx") {
+    if (integrationKind !== 'telnyx') {
       return;
     }
 
     const currentContent = editorState.getCurrentContent();
-    const currentContentLength = currentContent.getPlainText('').length
+    const currentContentLength = currentContent.getPlainText('').length;
     const characterCount = 160 - currentContentLength;
 
-    return <Char count={characterCount}>{characterCount}</Char>
-  }
+    return <Char count={characterCount}>{characterCount}</Char>;
+  };
 
   render() {
     const {
@@ -229,26 +229,32 @@ export class ErxesEditor extends React.Component<ErxesEditorProps> {
           <Toolbar>
             {externalProps => (
               <>
-              { integrationKind !== 'telnyx' &&
+                {integrationKind !== 'telnyx' && (
                   <>
-                  <BoldButton {...externalProps} />
-                  <ItalicButton {...externalProps} />
-                  <UnderlineButton {...externalProps} />
-                  <Separator {...externalProps} />
-                  <HeadlinesButton {...externalProps} />
-                  <UnorderedListButton {...externalProps} />
-                  <OrderedListButton {...externalProps} />
-                  <BlockquoteButton {...externalProps} />
-                  <CodeBlockButton {...externalProps} />
-                  <LinkButton {...externalProps} />
+                    <BoldButton {...externalProps} />
+                    <ItalicButton {...externalProps} />
+                    <UnderlineButton {...externalProps} />
+                    <Separator {...externalProps} />
+                    <HeadlinesButton {...externalProps} />
+                    <UnorderedListButton {...externalProps} />
+                    <OrderedListButton {...externalProps} />
+                    <BlockquoteButton {...externalProps} />
+                    <CodeBlockButton {...externalProps} />
+                    <LinkButton {...externalProps} />
                   </>
-             }
+                )}
+                {/* <button>sda</button> */}
                 <EmojiSelect />
                 {controls ? controls : null}
+                {/* <a
+                  href="#refresh"
+                >
+                  <Icon icon="invoice" size={8} />
+                </a> */}
               </>
             )}
           </Toolbar>
-          {this.renderChar()} 
+          {this.renderChar()}
         </RichEditorControlsRoot>
         {this.props.pluginContent}
       </RichEditorRoot>
