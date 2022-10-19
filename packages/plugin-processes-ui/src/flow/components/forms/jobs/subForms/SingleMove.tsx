@@ -15,7 +15,7 @@ import Common from '../Common';
 type Props = {
   closeModal: () => void;
   activeFlowJob: IJob;
-  products: IProduct[];
+  product?: IProduct;
   flowJobs: IJob[];
   lastFlowJob?: IJob;
   flowProduct?: IProduct;
@@ -28,10 +28,6 @@ type State = {
   product?: IProduct;
   description: string;
   name: string;
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
   currentTab: string;
   categoryId: string;
 };
@@ -45,23 +41,14 @@ class JobForm extends React.Component<Props, State> {
 
     const product = products.length && products[0];
 
-    const {
-      productId,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = config;
+    const { productId } = config;
 
     this.state = {
       productId: productId || '',
       product,
       description: description || '',
-      name: products.length ? products[0].name : '' || '',
-      inBranchId: inBranchId || '',
-      inDepartmentId: inDepartmentId || '',
-      outBranchId: outBranchId || '',
-      outDepartmentId: outDepartmentId || '',
+      name:
+        (product && `${product.code} - ${product.name}`) || 'Unknown product',
       currentTab: 'inputs',
 
       categoryId: ''
@@ -72,7 +59,8 @@ class JobForm extends React.Component<Props, State> {
     if (nextProps.activeFlowJob !== this.props.activeFlowJob) {
       this.setState({
         productId: nextProps.activeFlowJob.productId,
-        description: nextProps.activeFlowJob.description
+        description: nextProps.activeFlowJob.description,
+        product: nextProps.product
       });
     }
   }
@@ -166,28 +154,14 @@ class JobForm extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      productId,
-      product,
-      description,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = this.state;
+    const { productId, product, description } = this.state;
 
     return (
       <Common
         {...this.props}
-        name={(product && product.name) || 'Unknown'}
+        name={(product && `${product.code} - ${product.name}`) || 'Unknown'}
         description={description}
-        config={{
-          productId,
-          inBranchId,
-          inDepartmentId,
-          outBranchId,
-          outDepartmentId
-        }}
+        config={{ productId }}
         {...this.props}
       >
         {this.renderContent()}

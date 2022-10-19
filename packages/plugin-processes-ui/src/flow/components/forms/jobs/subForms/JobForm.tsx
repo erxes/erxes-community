@@ -4,12 +4,8 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import JobReferChooser from '../../../../../job/containers/refer/Chooser';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import React from 'react';
-import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { __ } from '@erxes/ui/src/utils';
 import { ControlLabel } from '@erxes/ui/src/components/form';
-import { DrawerDetail } from '../../../../styles';
-import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { IJob } from '../../../../types';
 import { IJobRefer } from '../../../../../job/types';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
@@ -28,10 +24,6 @@ type State = {
   jobReferId: string;
   jobRefer?: IJobRefer;
   description: string;
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
   currentTab: string;
   categoryId: string;
 };
@@ -43,26 +35,26 @@ class JobForm extends React.Component<Props, State> {
     const { jobRefer, activeFlowJob } = props;
     const { config, description } = activeFlowJob;
 
-    const {
-      jobReferId,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = config;
+    const { jobReferId } = config;
 
     this.state = {
       jobReferId: jobReferId || '',
       jobRefer,
       description: description || '',
-      inBranchId: inBranchId || '',
-      inDepartmentId: inDepartmentId || '',
-      outBranchId: outBranchId || '',
-      outDepartmentId: outDepartmentId || '',
       currentTab: 'inputs',
 
       categoryId: ''
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.activeFlowJob !== this.props.activeFlowJob) {
+      this.setState({
+        description: nextProps.activeFlowJob.description,
+        jobReferId: nextProps.activeFlowJob.jobReferId,
+        jobRefer: nextProps.jobRefer
+      });
+    }
   }
 
   onSelect = (name, value) => {
@@ -92,14 +84,7 @@ class JobForm extends React.Component<Props, State> {
   }
 
   renderContent() {
-    const {
-      jobRefer,
-      description,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = this.state;
+    const { jobRefer, description } = this.state;
 
     const onChangeValue = (type, e) => {
       this.setState({ [type]: e.target.value } as any);
@@ -140,7 +125,7 @@ class JobForm extends React.Component<Props, State> {
     };
 
     return (
-      <DrawerDetail>
+      <>
         <FormGroup>
           <ControlLabel>Jobs</ControlLabel>
           <ModalTrigger
@@ -158,96 +143,19 @@ class JobForm extends React.Component<Props, State> {
             onChange={onChangeValue.bind(this, 'description')}
           />
         </FormGroup>
-        <>
-          <FormWrapper>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel>inBranch</ControlLabel>
-                <SelectBranches
-                  label="Choose branch"
-                  name="selectedBranchIds"
-                  initialValue={inBranchId}
-                  onSelect={branchId => this.onSelect('inBranchId', branchId)}
-                  multi={false}
-                  customOption={{ value: 'all', label: 'All branches' }}
-                />
-              </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel>inDepartment</ControlLabel>
-                <SelectDepartments
-                  label="Choose department"
-                  name="selectedDepartmentIds"
-                  initialValue={inDepartmentId}
-                  onSelect={departmentId =>
-                    this.onSelect('inDepartmentId', departmentId)
-                  }
-                  multi={false}
-                  customOption={{ value: 'all', label: 'All departments' }}
-                />
-              </FormGroup>
-            </FormColumn>
-          </FormWrapper>
-
-          <FormWrapper>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel>outBranch</ControlLabel>
-                <SelectBranches
-                  label="Choose branch"
-                  name="selectedBranchIds"
-                  initialValue={outBranchId}
-                  onSelect={branchId => this.onSelect('outBranchId', branchId)}
-                  multi={false}
-                  customOption={{ value: 'all', label: 'All branches' }}
-                />
-              </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel>outDepartment</ControlLabel>
-                <SelectDepartments
-                  label="Choose department"
-                  name="selectedDepartmentIds"
-                  initialValue={outDepartmentId}
-                  onSelect={departmentId =>
-                    this.onSelect('outDepartmentId', departmentId)
-                  }
-                  multi={false}
-                  customOption={{ value: 'all', label: 'All departments' }}
-                />
-              </FormGroup>
-            </FormColumn>
-          </FormWrapper>
-        </>
-      </DrawerDetail>
+      </>
     );
   }
 
   render() {
-    const {
-      jobReferId,
-      jobRefer,
-      description,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = this.state;
+    const { jobReferId, jobRefer, description } = this.state;
 
     return (
       <Common
         {...this.props}
         name={(jobRefer && jobRefer.name) || 'Unknown'}
         description={description}
-        config={{
-          jobReferId,
-          inBranchId,
-          inDepartmentId,
-          outBranchId,
-          outDepartmentId
-        }}
+        config={{ jobReferId }}
       >
         {this.renderContent()}
       </Common>

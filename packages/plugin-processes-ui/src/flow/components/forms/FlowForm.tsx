@@ -609,6 +609,7 @@ class FlowForm extends React.Component<Props, State> {
     jquery(`#canvas #${idElm} .job-label`).html(item.label || 'Unknown');
     jquery(`#canvas #${idElm} .job-description`).html(item.description || '');
 
+    jquery('#canvas').off('dblclick', `#${idElm}`);
     jquery('#canvas').on('dblclick', `#${idElm}`, event => {
       event.preventDefault();
 

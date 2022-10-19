@@ -64,7 +64,14 @@ class JobDetailForm extends React.Component<Props, State> {
 
     const Content = ActionForms[type];
 
-    return <Content onSave={this.onSave} {...this.props} type={type} />;
+    return (
+      <Content
+        {...this.props}
+        onSave={this.onSave}
+        activeFlowJob={activeFlowJob}
+        type={type}
+      />
+    );
   }
 
   render() {

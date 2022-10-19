@@ -28,10 +28,6 @@ type State = {
   jobReferId: string;
   jobRefer?: IJobRefer;
   description: string;
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
   currentTab: string;
   categoryId: string;
 };
@@ -43,22 +39,12 @@ class JobForm extends React.Component<Props, State> {
     const { jobRefer, activeFlowJob } = props;
     const { config, description } = activeFlowJob;
 
-    const {
-      jobReferId,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = config;
+    const { jobReferId } = config;
 
     this.state = {
       jobReferId: jobReferId || '',
       jobRefer,
       description: description || '',
-      inBranchId: inBranchId || '',
-      inDepartmentId: inDepartmentId || '',
-      outBranchId: outBranchId || '',
-      outDepartmentId: outDepartmentId || '',
       currentTab: 'inputs',
 
       categoryId: ''
@@ -68,8 +54,9 @@ class JobForm extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps) {
     if (nextProps.activeFlowJob !== this.props.activeFlowJob) {
       this.setState({
+        description: nextProps.activeFlowJob.description,
         jobReferId: nextProps.activeFlowJob.jobReferId,
-        description: nextProps.activeFlowJob.description
+        jobRefer: nextProps.jobRefer
       });
     }
   }
@@ -161,28 +148,14 @@ class JobForm extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      jobReferId,
-      jobRefer,
-      description,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = this.state;
+    const { jobReferId, jobRefer, description } = this.state;
 
     return (
       <Common
         {...this.props}
         name={(jobRefer && jobRefer.name) || 'Unknown'}
         description={description}
-        config={{
-          jobReferId,
-          inBranchId,
-          inDepartmentId,
-          outBranchId,
-          outDepartmentId
-        }}
+        config={{ jobReferId }}
       >
         {this.renderContent()}
       </Common>

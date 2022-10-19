@@ -14,6 +14,8 @@ interface IConfig {
 
   quantity?: number;
 
+  durationType: string;
+  duration: number;
   inBranchId?: string;
   inDepartmentId?: string;
   outBranchId?: string;
