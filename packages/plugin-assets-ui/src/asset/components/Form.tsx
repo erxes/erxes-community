@@ -205,6 +205,7 @@ class Form extends React.Component<Props, State> {
               multi={false}
               initialValue={object.parentId}
               onSelect={handleSelect}
+              skip={asset?._id}
             />
           </FormGroup>
         );
@@ -221,6 +222,7 @@ class Form extends React.Component<Props, State> {
                 multi={false}
                 initialValue={object.categoryId}
                 onSelect={handleSelect}
+                skip={object.categoryId}
               />
             </FormColumn>
             {this.renderFormTrigger(addCategoryTrigger)}

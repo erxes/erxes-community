@@ -197,7 +197,8 @@ export const SelectWithAssets = ({
   initialValue,
   multi,
   customOption,
-  onSelect
+  onSelect,
+  skip
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -206,17 +207,24 @@ export const SelectWithAssets = ({
   customOption?: IOption;
   initialValue?: string | string[];
   name: string;
+  skip?: string;
 }) => {
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
   const generateAssetOptions = (array: IAsset[] = []): IOption[] => {
-    return array.map(item => {
+    let list = array.map(item => {
       const asset = item || ({} as IAsset);
       return {
         value: asset._id,
         label: item.name
       };
     });
+
+    if (skip) {
+      list = list.filter(item => item.value !== skip);
+    }
+
+    return list;
   };
 
   return (
@@ -241,6 +249,7 @@ export const SelectWithAssetCategory = ({
   initialValue,
   multi,
   customOption,
+  skip,
   onSelect
 }: {
   queryParams?: IQueryParams;
@@ -250,17 +259,22 @@ export const SelectWithAssetCategory = ({
   customOption?: IOption;
   initialValue?: string | string[];
   name: string;
+  skip?: string;
 }) => {
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
   const generateAssetCategoryOptions = (array: IAsset[] = []): IOption[] => {
-    return array.map(item => {
+    let list = array.map(item => {
       const asset = item || ({} as IAsset);
       return {
         value: asset._id,
         label: item.name
       };
     });
+    if (skip) {
+      list = list.filter(item => item.value !== skip);
+    }
+    return list;
   };
 
   return (
