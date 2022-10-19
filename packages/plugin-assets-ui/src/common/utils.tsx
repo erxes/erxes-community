@@ -14,6 +14,7 @@ import React from 'react';
 import { ASSET_CATEGORY_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetCategoryTypes } from './types';
 import { queries as assetQueries } from '../asset/graphql';
+import { queries as assetCategoryQueries } from '../asset/category/graphql';
 import { IOption, IQueryParams } from '@erxes/ui/src/types';
 
 export const DefaultWrapper = ({
@@ -227,6 +228,50 @@ export const SelectWithAssets = ({
       generateOptions={generateAssetOptions}
       onSelect={onSelect}
       customQuery={assetQueries.assets}
+      customOption={customOption}
+      multi={multi}
+    />
+  );
+};
+
+export const SelectWithAssetCategory = ({
+  label,
+  name,
+  queryParams,
+  initialValue,
+  multi,
+  customOption,
+  onSelect
+}: {
+  queryParams?: IQueryParams;
+  label: string;
+  onSelect: (value: string[] | string, name: string) => void;
+  multi?: boolean;
+  customOption?: IOption;
+  initialValue?: string | string[];
+  name: string;
+}) => {
+  const defaultValue = queryParams ? queryParams[name] : initialValue;
+
+  const generateAssetCategoryOptions = (array: IAsset[] = []): IOption[] => {
+    return array.map(item => {
+      const asset = item || ({} as IAsset);
+      return {
+        value: asset._id,
+        label: item.name
+      };
+    });
+  };
+
+  return (
+    <SelectWithSearch
+      label={label}
+      queryName="assetCategories"
+      name={name}
+      initialValue={defaultValue}
+      generateOptions={generateAssetCategoryOptions}
+      onSelect={onSelect}
+      customQuery={assetCategoryQueries.assetCategory}
       customOption={customOption}
       multi={multi}
     />

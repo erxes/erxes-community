@@ -17,7 +17,7 @@ export const types = contactsAvailable => `
         : ''
     }
 
-    type AssetCategory @key(fields: "_id") @cacheControl(maxAge: 3) {
+    type AssetCategories @key(fields: "_id") @cacheControl(maxAge: 3) {
         _id: String!
         name: String
         description: String
@@ -63,7 +63,7 @@ export const types = contactsAvailable => `
     assetCount: Int
     minimiumCount: Int
 
-    category: AssetCategory
+    category: AssetCategories
     parent:Asset
     isRoot: Boolean
     chidlAssetCount:Int
@@ -88,8 +88,8 @@ export const queries = `
     ): [Asset]
     assetsTotalCount(type: String): Int
     assetDetail(_id: String): Asset
-    assetCategories(parentId: String, searchValue: String, status: String): [AssetCategory]
-    assetCategoryDetail(_id: String): AssetCategory
+    assetCategories(parentId: String, searchValue: String, status: String): [AssetCategories]
+    assetCategoryDetail(_id: String): AssetCategories
     assetCategoriesTotalCount: Int
 
 `;
@@ -99,7 +99,7 @@ export const mutations = `
     assetsEdit(_id: String!, ${assetParams}): Asset
     assetsRemove(assetIds: [String!]): String
     assetsMerge(assetIds: [String], assetFields: JSON): Asset
-    assetCategoryAdd(${assetCategoryParams}): AssetCategory
-    assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategory
+    assetCategoryAdd(${assetCategoryParams}): AssetCategories
+    assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategories
     assetCategoryRemove(_id: String!): JSON
 `;

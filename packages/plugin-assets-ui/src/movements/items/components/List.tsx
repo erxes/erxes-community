@@ -16,7 +16,7 @@ type State = {
   searchValue: string;
 };
 
-class MovementAsset extends React.Component<Props, State> {
+class MovementItem extends React.Component<Props, State> {
   private timer?: NodeJS.Timer;
   constructor(props) {
     super(props);
@@ -102,4 +102,4 @@ class MovementAsset extends React.Component<Props, State> {
   }
 }
 
-export default MovementAsset;
+export default MovementItem;

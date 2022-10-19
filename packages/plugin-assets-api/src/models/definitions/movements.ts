@@ -1,7 +1,7 @@
 import { field, schemaWrapper } from './utils';
 import { Schema } from 'mongoose';
 
-export const movementAssetsSchema = schemaWrapper(
+export const movementItemsSchema = schemaWrapper(
   new Schema({
     assetId: field({ type: String, label: 'Asset Id' }),
     assetName: field({ type: String, label: 'Asset Name' }),

@@ -12,7 +12,11 @@ import {
   TabTitle
 } from '@erxes/ui/src';
 import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
-import { generateCategoryOptions, generateParentOptions } from '../../common/utils';
+import {
+  generateCategoryOptions,
+  generateParentOptions,
+  SelectWithAssetCategory
+} from '../../common/utils';
 import { IAsset, IAssetCategoryTypes } from '../../common/types';
 import { ASSET_SUPPLY, TYPES } from '../../common/constant';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
@@ -21,6 +25,8 @@ import CategoryForm from '../category/containers/Form';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import { TabContainer, TabContent, TriggerTabs } from '../../style';
+import { isEnabled } from '@erxes/ui/src/utils/core';
+import { SelectWithAssets } from '../../common/utils';
 
 type Props = {
   asset?: IAsset;
@@ -185,19 +191,21 @@ class Form extends React.Component<Props, State> {
     const currentTabItem = () => {
       const { currentTab } = this.state;
 
+      const handleSelect = (value, name) => {
+        this.setState({ [name]: value } as Pick<State, keyof State>);
+      };
+
       if (currentTab === 'Parent') {
         return (
           <FormGroup>
             <ControlLabel required={true}>Parent</ControlLabel>
-            <FormControl
-              {...formProps}
+            <SelectWithAssets
+              label="Choose Asset"
               name="parentId"
-              componentClass="select"
-              defaultValue={object.parentId}
-            >
-              <option />
-              {generateParentOptions(assets)}
-            </FormControl>
+              multi={false}
+              initialValue={object.parentId}
+              onSelect={handleSelect}
+            />
           </FormGroup>
         );
       }
@@ -205,19 +213,18 @@ class Form extends React.Component<Props, State> {
       return (
         <FormGroup>
           <ControlLabel required={true}>Category</ControlLabel>
-          <Row>
-            <FormControl
-              {...formProps}
-              name="categoryId"
-              componentClass="select"
-              defaultValue={object.categoryId}
-            >
-              <option />
-              {generateCategoryOptions(categories)}
-            </FormControl>
-
+          <FormWrapper>
+            <FormColumn>
+              <SelectWithAssetCategory
+                label="Choose Asset Category"
+                name="categoryId"
+                multi={false}
+                initialValue={object.categoryId}
+                onSelect={handleSelect}
+              />
+            </FormColumn>
             {this.renderFormTrigger(addCategoryTrigger)}
-          </Row>
+          </FormWrapper>
         </FormGroup>
       );
     };
@@ -236,17 +243,19 @@ class Form extends React.Component<Props, State> {
                 required={true}
               />
             </FormGroup>
-            <FormGroup>
-              <ControlLabel>Vendor</ControlLabel>
-              <SelectCompanies
-                label="Choose an vendor"
-                name="vendorId"
-                customOption={{ value: '', label: 'No vendor chosen' }}
-                initialValue={vendorId}
-                onSelect={this.onComboEvent.bind(this, 'vendorId')}
-                multi={false}
-              />
-            </FormGroup>
+            {isEnabled('contacts') && (
+              <FormGroup>
+                <ControlLabel>Vendor</ControlLabel>
+                <SelectCompanies
+                  label="Choose an vendor"
+                  name="vendorId"
+                  customOption={{ value: '', label: 'No vendor chosen' }}
+                  initialValue={vendorId}
+                  onSelect={this.onComboEvent.bind(this, 'vendorId')}
+                  multi={false}
+                />
+              </FormGroup>
+            )}
             <FormGroup>
               <ControlLabel required={true}>Unit price</ControlLabel>
               <p>

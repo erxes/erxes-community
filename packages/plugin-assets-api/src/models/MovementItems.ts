@@ -1,17 +1,17 @@
 import { Model } from 'mongoose';
 
-import { IMovementAsset, IMovementAssetDocument } from '../common/types/asset';
+import { IMovementItem, IMovementItemDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
-import { movementAssetsSchema } from './definitions/movements';
+import { movementItemsSchema } from './definitions/movements';
 
-export interface IMovementAssetModel extends Model<IMovementAssetDocument> {
-  movementAssetsAdd(assets: any): Promise<IMovementAssetDocument[]>;
-  movementItemsEdit(movementId: string, items: any[]): Promise<IMovementAssetDocument[]>;
+export interface IMovementItemModel extends Model<IMovementItemDocument> {
+  movementItemsAdd(assets: any): Promise<IMovementItemDocument[]>;
+  movementItemsEdit(movementId: string, items: any[]): Promise<IMovementItemDocument[]>;
 }
 
-export const loadMovementAssetClass = (models: IModels) => {
-  class MovementAsset {
-    public static async movementAssetsAdd(assets: any[]) {
+export const loadMovementItemClass = (models: IModels) => {
+  class MovementItem {
+    public static async movementItemsAdd(assets: any[]) {
       for (const asset of assets) {
         const newAsset = Object.assign(
           {},
@@ -26,7 +26,7 @@ export const loadMovementAssetClass = (models: IModels) => {
         });
       }
 
-      return models.MovementAsset.insertMany(assets);
+      return models.MovementItems.insertMany(assets);
     }
     public static async movementItemsEdit(movementId: string, items: any[]) {
       const movementItemIds: string[] = [];
@@ -39,7 +39,7 @@ export const loadMovementAssetClass = (models: IModels) => {
         if (Object.values(newItem).every(item => !item)) {
           throw new Error('You should provide at least one field');
         }
-        const movementItems = await models.MovementAsset.findOneAndUpdate(
+        const movementItems = await models.MovementItems.findOneAndUpdate(
           { assetId: item.assetId },
           { ...item, movementId },
           {
@@ -59,6 +59,6 @@ export const loadMovementAssetClass = (models: IModels) => {
     }
   }
 
-  movementAssetsSchema.loadClass(MovementAsset);
-  return movementAssetsSchema;
+  movementItemsSchema.loadClass(MovementItem);
+  return movementItemsSchema;
 };

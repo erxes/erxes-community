@@ -59,7 +59,7 @@ export interface IMovement {
   createdAt: Date;
   movedAt: Date;
 }
-export interface IMovementAsset {
+export interface IMovementItem {
   assetId: string;
   assetName: string;
   userType: string;
@@ -75,7 +75,7 @@ export interface IMovementDocument extends IMovement, Document {
   createdAt: Date;
 }
 
-export interface IMovementAssetDocument extends IMovementAsset, Document {
+export interface IMovementItemDocument extends IMovementItem, Document {
   _id: string;
   createdAt: Date;
 }

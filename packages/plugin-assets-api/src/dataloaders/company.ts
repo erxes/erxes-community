@@ -1,10 +1,10 @@
 import * as DataLoader from 'dataloader';
 import * as _ from 'underscore';
-import { sendCardsMessage } from '../messageBroker';
+import { sendContactsMessage } from '../messageBroker';
 
 export default function generateDataLoaderCompany(subdomain) {
   return new DataLoader<string, any>(async (ids: readonly string[]) => {
-    const result = await sendCardsMessage({
+    const result = await sendContactsMessage({
       subdomain,
       action: 'companies.findActiveCompanies',
       data: {

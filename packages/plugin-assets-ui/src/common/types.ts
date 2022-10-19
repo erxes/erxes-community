@@ -44,7 +44,7 @@ export type IMovementDetailQueryResponse = {
 };
 
 export type IAssetTotalCountQueryResponse = {
-  assetsCount: number;
+  assetsTotalCount: number;
   loading: boolean;
   refetch: () => void;
 };
@@ -171,7 +171,7 @@ export type IMovementItem = {
 };
 
 export type MovementItemsQueryResponse = {
-  assetMovementAssets: IMovementItem[];
+  assetMovementItems: IMovementItem[];
 } & QueryResponse;
 
 export type MovementItemsTotalCountQueryResponse = {

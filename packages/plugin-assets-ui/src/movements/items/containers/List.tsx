@@ -3,7 +3,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import { withProps } from '@erxes/ui/src/utils/core';
-import MovementAsset from '../components/List';
+import MovementItem from '../components/List';
 import { queries } from '../graphql';
 import {
   MovementItemsQueryResponse,
@@ -18,7 +18,7 @@ type FinalProps = {
   itemsQuery: MovementItemsQueryResponse;
   itemsTotalCount: MovementItemsTotalCountQueryResponse;
 } & Props;
-class MovementAssetsContainer extends React.Component<FinalProps> {
+class MovementItemsContainer extends React.Component<FinalProps> {
   constructor(props) {
     super(props);
   }
@@ -31,13 +31,13 @@ class MovementAssetsContainer extends React.Component<FinalProps> {
     }
 
     const updatedProps = {
-      items: itemsQuery.assetMovementAssets || [],
+      items: itemsQuery.assetMovementItems || [],
       totalCount: itemsTotalCount.assetMovementItemsTotalCount,
       history,
       queryParams
     };
 
-    return <MovementAsset {...updatedProps} />;
+    return <MovementItem {...updatedProps} />;
   }
 }
 
@@ -55,5 +55,5 @@ export default withProps(
         variables: generateParams({ queryParams })
       })
     })
-  )(MovementAssetsContainer)
+  )(MovementItemsContainer)
 );

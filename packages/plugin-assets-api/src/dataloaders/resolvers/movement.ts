@@ -1,5 +1,5 @@
 import { IContext } from '../../connectionResolver';
-import { IAssetDocument, IMovementAsset, IMovementDocument } from '../../common/types/asset';
+import { IAssetDocument, IMovementItem, IMovementDocument } from '../../common/types/asset';
 import { ASSET_STATUSES } from '../../common/constant/asset';
 
 export default {
@@ -8,7 +8,7 @@ export default {
   },
 
   async assets(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    const movementItems = await models.MovementAsset.find({
+    const movementItems = await models.MovementItems.find({
       _id: { $in: movement.assetIds }
     }).lean();
     movementItems.map(item => ({
@@ -27,7 +27,7 @@ export default {
   },
 
   async selectedItems(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
-    const movementItems = await models.MovementAsset.find({
+    const movementItems = await models.MovementItems.find({
       _id: { $in: movement.assetIds }
     }).lean();
     const assetIds = movementItems.map(item => item.assetId);

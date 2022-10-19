@@ -1,6 +1,6 @@
 import AssetCategories from './categories';
 import Asset from './asset';
 import Movement from './movement';
-import MovementAsset from './movementAssets';
+import MovementItem from './movementItems';
 
-export { AssetCategories, Asset, Movement, MovementAsset };
+export { AssetCategories, Asset, Movement, MovementItem };

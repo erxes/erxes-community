@@ -6,8 +6,8 @@ import {
 } from '../../../common/graphql/movement';
 
 const items = `
-query AssetMovementAssets ($movementId:String,${movementFilterParams},${dateFilterParams}) {
-  assetMovementAssets(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef}) {
+query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilterParams}) {
+  assetMovementItems(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef}) {
       _id
       assetId
       assetName

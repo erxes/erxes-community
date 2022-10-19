@@ -1,7 +1,7 @@
 import { movementFilters, movementParams } from '../../common/graphql/movement';
 
 export const types = `
-    type MovementAsset{
+    type MovementItem{
         _id:String,
         assetName:String,
         assetId:String,
@@ -32,10 +32,10 @@ export const types = `
         
         user:JSON
         selectedItems:JSON
-        assets:[MovementAsset]
+        assets:[MovementItem]
     }
 
-    input IMovementAsset {
+    input IMovementItem {
         assetId:String,
         assetName:String,
         userType:String,
@@ -47,7 +47,7 @@ export const types = `
     }
 `;
 export const mutations = `
-    assetMovementAdd(movedAt:String,description:String,items:[IMovementAsset]):JSON
+    assetMovementAdd(movedAt:String,description:String,items:[IMovementItem]):JSON
     assetMovementUpdate(_id: String,doc:JSON):JSON
     assetMovementRemove(ids:[String]):JSON
 `;
@@ -55,7 +55,7 @@ export const queries = `
     assetMovements(${movementFilters}):[Movement]
     assetMovementTotalCount(${movementFilters}):Int
     assetMovement(_id:String):Movement
-    assetMovementAssets(${movementFilters}):[MovementAsset]
+    assetMovementItems(${movementFilters}):[MovementItem]
     assetMovementItemsTotalCount(${movementFilters}):Int
-    assetMovementAsset(_id:String):MovementAsset
+    assetMovementItem(_id:String):MovementItem
 `;

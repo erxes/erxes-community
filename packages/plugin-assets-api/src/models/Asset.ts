@@ -214,14 +214,11 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         throw new Error('The "/" character is not allowed in the code');
       }
 
-      const parent = await models.Asset.findOne({
-        code
-      });
-
-      if (parent) {
+      if (await models.Asset.findOne({ code })) {
         throw new Error('Code must be unique');
       }
     }
+
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
       const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
 

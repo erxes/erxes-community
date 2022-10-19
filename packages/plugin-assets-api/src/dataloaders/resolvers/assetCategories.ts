@@ -4,6 +4,7 @@ import { ASSET_STATUSES } from '../../common/constant/asset';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
+    console.log('shit');
     return models.AssetCategories.findOne({ _id });
   },
 
@@ -12,7 +13,6 @@ export default {
   },
 
   async assetCount(category: IAssetCategoriesDocument, {}, { models }: IContext) {
-    console.log('dasda');
     const asset_category_ids = await models.AssetCategories.find(
       { order: { $regex: new RegExp(category.order) } },
       { _id: 1 }

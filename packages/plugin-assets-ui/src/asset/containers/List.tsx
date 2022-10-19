@@ -93,14 +93,14 @@ class ListContainer extends React.Component<FinalProps> {
       assetCategoryDetailQuery,
       assetDetailQuery
     } = this.props;
-    if (assets.loading) {
+    if (assets.loading || assetsCount.loading) {
       return <Spinner />;
     }
 
     const updatedProps = {
       ...this.props,
       assets: assets?.assets,
-      assetsCount: assetsCount.assetsCount,
+      assetsCount: assetsCount.assetsTotalCount,
       remove: this.remove,
       mergeAssets: this.mergeAssets,
       loading: assets.loading,

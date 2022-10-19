@@ -29,19 +29,19 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error('No moved date in movement ');
       }
 
-      const addedAssets = await models.MovementAsset.movementAssetsAdd(doc.items);
+      const addedAssets = await models.MovementItems.movementItemsAdd(doc.items);
 
-      const movementAssetIds = addedAssets.map(asset => asset._id);
+      const movementItemIds = addedAssets.map(asset => asset._id);
 
       const movement = await models.Movement.create({
-        assetIds: movementAssetIds,
+        assetIds: movementItemIds,
         movedAt: doc.movedAt,
         description: doc.description,
         userId
       });
 
-      await models.MovementAsset.updateMany(
-        { _id: { $in: movementAssetIds } },
+      await models.MovementItems.updateMany(
+        { _id: { $in: movementItemIds } },
         { $set: { movementId: movement._id } }
       );
 
@@ -58,7 +58,7 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error('Movement not found');
       }
 
-      await models.MovementAsset.movementItemsEdit(_id, doc.items);
+      await models.MovementItems.movementItemsEdit(_id, doc.items);
       await models.Movement.update(
         { _id },
         { $set: { movedAt: doc.movedAt, description: doc.description, modifiedAt: new Date() } }
@@ -81,7 +81,7 @@ export const loadMovementClass = (models: IModels) => {
           .reduce((pre, cur) => pre.concat(cur))
           .map(id => id);
 
-        await models.MovementAsset.deleteMany({ _id: { $in: movementItemsIds } });
+        await models.MovementItems.deleteMany({ _id: { $in: movementItemsIds } });
 
         await models.Movement.remove({ _id: { $in: movementIds } });
       } catch (error) {
