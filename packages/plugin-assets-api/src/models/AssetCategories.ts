@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
-import { assetCategoriesSchema } from './definitions/asset';
+import { assetCategoriesSchema } from './definitions/assets';
 
-import { IAssetCategories, IAssetCategoriesDocument } from '../common/types/asset';
 import { ASSET_STATUSES } from '../common/constant/asset';
+import { IAssetCategories, IAssetCategoriesDocument } from '../common/types/asset';
 export interface IAssetCategoriesModel extends Model<IAssetCategoriesDocument> {
   assetCategoryAdd(doc: IAssetCategories): Promise<IAssetCategoriesDocument>;
   getAssetCategory(selector: any): Promise<IAssetCategoriesDocument>;
@@ -81,7 +81,7 @@ export const loadAssetCategoriesClass = (models: IModels) => {
     public static async assetCategoryRemove(_id: string) {
       await models.AssetCategories.getAssetCategory({ _id });
 
-      let count = await models.Asset.countDocuments({
+      let count = await models.Assets.countDocuments({
         categoryId: _id,
         status: { $ne: ASSET_STATUSES.DELETED }
       });

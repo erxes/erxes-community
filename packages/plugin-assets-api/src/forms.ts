@@ -1,13 +1,13 @@
 import { generateFieldsFromSchema } from '@erxes/api-utils/src';
+import { ASSET_INFO, EXTEND_FIELDS } from './common/constant/asset';
 import { generateModels } from './connectionResolver';
-import { EXTEND_FIELDS, ASSET_INFO } from './common/constant/asset';
 
 export default {
   types: [{ description: 'Assets', type: 'asset' }],
   fields: async ({ subdomain }) => {
     const models = await generateModels(subdomain);
 
-    const schema = models.Asset.schema as any;
+    const schema = models.Assets.schema as any;
 
     let fields: Array<{
       _id: number;

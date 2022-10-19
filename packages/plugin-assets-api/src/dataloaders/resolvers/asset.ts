@@ -1,10 +1,10 @@
-import { IContext } from '../../connectionResolver';
-import { IAssetDocument } from '../../common/types/asset';
 import { ASSET_STATUSES } from '../../common/constant/asset';
+import { IAssetDocument } from '../../common/types/asset';
+import { IContext } from '../../connectionResolver';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
-    return models.Asset.findOne({ _id });
+    return models.Assets.findOne({ _id });
   },
 
   category(asset: IAssetDocument, _, { dataLoaders }: IContext) {
@@ -20,12 +20,12 @@ export default {
   },
 
   async childAssetCount(asset: IAssetDocument, {}, { models }: IContext) {
-    const asset_ids = await models.Asset.find(
+    const asset_ids = await models.Assets.find(
       { order: { $regex: new RegExp(asset.order) } },
       { _id: 1 }
     );
 
-    return models.Asset.countDocuments({
+    return models.Assets.countDocuments({
       parentId: { $in: asset_ids },
       status: { $ne: ASSET_STATUSES.DELETED }
     });

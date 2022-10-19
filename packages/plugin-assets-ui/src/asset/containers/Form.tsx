@@ -42,10 +42,6 @@ class FormContainer extends React.Component<FinalProps> {
     values.attachment = attachment ? { ...attachment, __typename: undefined } : null;
     values.attachmentMore = attachmentMoreArray;
 
-    const afterSavedDb = () => {
-      callback && callback();
-    };
-
     return (
       <ButtonMutate
         mutation={object ? mutations.assetEdit : mutations.assetAdd}

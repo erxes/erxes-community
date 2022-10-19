@@ -6,7 +6,7 @@ export default {
 
     const { contentTypeId, notifDoc } = data;
 
-    const product = await models.Asset.getAssets({ _id: contentTypeId });
+    const product = await models.Assets.getAssets({ _id: contentTypeId });
 
     notifDoc.content = product.name;
 

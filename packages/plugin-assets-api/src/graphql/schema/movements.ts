@@ -1,6 +1,6 @@
-import { movementFilters, movementParams } from '../../common/graphql/movement';
+import { movementFilters } from '../../common/graphql/movement';
 
-export const types = `
+export const types = contactsAvailable => `
     type MovementItem{
         _id:String,
         assetName:String,
@@ -14,11 +14,17 @@ export const types = `
         companyId:String,
         createdAt:Date
 
-        customer:JSON
-        company:JSON
-        branch:JSON
-        teamMember:JSON
-        department:JSON
+        ${
+          contactsAvailable
+            ? `
+            customer:JSON
+            company:JSON
+            branch:JSON
+            teamMember:JSON
+            department:JSON
+            `
+            : ``
+        }
     }
 
     type Movement {

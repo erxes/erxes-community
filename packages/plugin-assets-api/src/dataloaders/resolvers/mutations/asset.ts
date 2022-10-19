@@ -8,7 +8,7 @@ interface IAssetsEdit extends IAsset {
 
 const assetMutations = {
   async assetsAdd(_root, doc: IAsset, { user, docModifier, models, subdomain }: IContext) {
-    const asset = await models.Asset.createAsset(docModifier(doc));
+    const asset = await models.Assets.createAsset(docModifier(doc));
 
     await putCreateLog(
       models,
@@ -34,8 +34,8 @@ const assetMutations = {
    * @param {Object} param2.doc Asset info
    */
   async assetsEdit(_root, { _id, ...doc }: IAssetsEdit, { user, models, subdomain }: IContext) {
-    const asset = await models.Asset.getAssets({ _id });
-    const updated = await models.Asset.updateAsset(_id, doc);
+    const asset = await models.Assets.getAssets({ _id });
+    const updated = await models.Assets.updateAsset(_id, doc);
 
     await putUpdateLog(
       models,
@@ -56,11 +56,11 @@ const assetMutations = {
     { assetIds }: { assetIds: string[] },
     { user, models, subdomain }: IContext
   ) {
-    const assets: IAssetDocument[] = await models.Asset.find({
+    const assets: IAssetDocument[] = await models.Assets.find({
       _id: { $in: assetIds }
     }).lean();
 
-    const response = await models.Asset.removeAssets(assetIds);
+    const response = await models.Assets.removeAssets(assetIds);
 
     for (const asset of assets) {
       await putDeleteLog(models, subdomain, { type: MODULE_NAMES.ASSET, object: asset }, user);
@@ -73,7 +73,7 @@ const assetMutations = {
     { assetIds, assetFields }: { assetIds: string[]; assetFields: IAsset },
     { models }: IContext
   ) {
-    return models.Asset.mergeAssets(assetIds, { ...assetFields });
+    return models.Assets.mergeAssets(assetIds, { ...assetFields });
   }
 };
 

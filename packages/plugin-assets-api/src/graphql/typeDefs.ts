@@ -1,15 +1,15 @@
 import { gql } from 'apollo-server-express';
 
 import {
-  types as assetTypes,
+  mutations as assetMutations,
   queries as assetQueries,
-  mutations as assetMutations
-} from './schema/asset';
+  types as assetTypes
+} from './schema/assets';
 import {
-  types as movementTypes,
+  mutations as movementMutations,
   queries as movementQueries,
-  mutations as movementMutations
-} from './schema/movement';
+  types as movementTypes
+} from './schema/movements';
 
 const typeDefs = async serviceDiscovery => {
   const contactsAvailable = await serviceDiscovery.isEnabled('contacts');
@@ -30,7 +30,7 @@ const typeDefs = async serviceDiscovery => {
     ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
     ${assetTypes(contactsAvailable)}
-    ${movementTypes}
+    ${movementTypes(contactsAvailable)}
     
     extend type Query {
       ${assetQueries}

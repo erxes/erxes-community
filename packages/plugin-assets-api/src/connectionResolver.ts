@@ -1,21 +1,21 @@
-import * as mongoose from 'mongoose';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
+import * as mongoose from 'mongoose';
 import {
-  IAssetDocument,
   IAssetCategoriesDocument,
-  IMovementItemDocument,
-  IMovementDocument
+  IAssetDocument,
+  IMovementDocument,
+  IMovementItemDocument
 } from './common/types/asset';
 import { IAssetCategoriesModel, loadAssetCategoriesClass } from './models/AssetCategories';
-import { IAssetModel, loadAssetClass } from './models/Asset';
-import { IMovementModel, loadMovementClass } from './models/Movement';
+import { IAssetModel, loadAssetClass } from './models/Assets';
 import { IMovementItemModel, loadMovementItemClass } from './models/MovementItems';
+import { IMovementModel, loadMovementClass } from './models/Movements';
 
 export interface IModels {
-  Asset: IAssetModel;
+  Assets: IAssetModel;
   AssetCategories: IAssetCategoriesModel;
-  Movement: IMovementModel;
+  Movements: IMovementModel;
   MovementItems: IMovementItemModel;
 }
 
@@ -29,13 +29,16 @@ export let models: IModels | null = null;
 export const loadClasses = (db: mongoose.Connection, subdomain: string): IModels => {
   models = {} as IModels;
 
-  models.Asset = db.model<IAssetDocument, IAssetModel>('asset', loadAssetClass(models, subdomain));
+  models.Assets = db.model<IAssetDocument, IAssetModel>(
+    'assets',
+    loadAssetClass(models, subdomain)
+  );
   models.AssetCategories = db.model<IAssetCategoriesDocument, IAssetCategoriesModel>(
     'asset_categories',
     loadAssetCategoriesClass(models)
   );
-  models.Movement = db.model<IMovementDocument, IMovementModel>(
-    'asset_movement',
+  models.Movements = db.model<IMovementDocument, IMovementModel>(
+    'asset_movements',
     loadMovementClass(models)
   );
   models.MovementItems = db.model<IMovementItemDocument, IMovementItemModel>(

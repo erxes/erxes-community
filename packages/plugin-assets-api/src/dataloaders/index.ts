@@ -1,12 +1,12 @@
 import * as DataLoader from 'dataloader';
 import { IModels } from '../connectionResolver';
-import assetCategories from './assetCategories';
-import company from './company';
 import asset from './asset';
+import assetCategories from './assetCategory';
 import branch from './branch';
+import company from './company';
 import customer from './customer';
-import teamMember from './teanMember';
 import department from './department';
+import teamMember from './teanMember';
 
 export interface IDataLoaders {
   asset: DataLoader<string, any>;

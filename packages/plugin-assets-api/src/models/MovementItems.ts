@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 
-import { IMovementItem, IMovementItemDocument } from '../common/types/asset';
+import { IMovementItemDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
 import { movementItemsSchema } from './definitions/movements';
 
@@ -21,7 +21,7 @@ export const loadMovementItemClass = (models: IModels) => {
         if (Object.values(newAsset).every(item => !item)) {
           throw new Error('You should provide at least one field');
         }
-        await models.Asset.findByIdAndUpdate(asset.assetId, {
+        await models.Assets.findByIdAndUpdate(asset.assetId, {
           $set: { currentMovement: { ...newAsset } }
         });
       }
@@ -51,11 +51,11 @@ export const loadMovementItemClass = (models: IModels) => {
 
         movementItemIds.push(movementItems._id);
 
-        await models.Asset.findByIdAndUpdate(item.assetId, {
+        await models.Assets.findByIdAndUpdate(item.assetId, {
           $set: { currentMovement: { ...newItem } }
         });
       }
-      await models.Movement.update({ _id: movementId }, { $set: { assetIds: movementItemIds } });
+      await models.Movements.update({ _id: movementId }, { $set: { assetIds: movementItemIds } });
     }
   }
 

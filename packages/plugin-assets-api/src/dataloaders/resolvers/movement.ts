@@ -1,10 +1,9 @@
+import { IMovementDocument } from '../../common/types/asset';
 import { IContext } from '../../connectionResolver';
-import { IAssetDocument, IMovementItem, IMovementDocument } from '../../common/types/asset';
-import { ASSET_STATUSES } from '../../common/constant/asset';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
-    return models.Asset.findOne({ _id });
+    return models.Assets.findOne({ _id });
   },
 
   async assets(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
@@ -31,6 +30,6 @@ export default {
       _id: { $in: movement.assetIds }
     }).lean();
     const assetIds = movementItems.map(item => item.assetId);
-    return models.Asset.find({ _id: { $in: assetIds } });
+    return models.Assets.find({ _id: { $in: assetIds } });
   }
 };

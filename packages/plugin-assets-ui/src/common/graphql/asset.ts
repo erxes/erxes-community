@@ -1,3 +1,4 @@
+import { isEnabled } from '@erxes/ui/src/utils/core';
 export const assetParamsDef = `
   $name: String,
   $type: String,
@@ -11,8 +12,6 @@ export const assetParamsDef = `
   $attachment: AttachmentInput,
   $attachmentMore: [AttachmentInput],
   $supply: String,
-  $assetCount: Int,
-  $minimiumCount: Int,
   $vendorId: String,
 `;
 export const assetParams = `
@@ -28,8 +27,6 @@ export const assetParams = `
   attachment: $attachment,
   attachmentMore: $attachmentMore,
   supply: $supply,
-  assetCount: $assetCount,
-  minimiumCount: $minimiumCount,
   vendorId: $vendorId,
 `;
 
@@ -74,7 +71,7 @@ export const assetFields = `
   categoryId
   parentId
   vendorId
-  ${vendorField}
+  ${isEnabled('contacts') ? vendorField : ``}
   description
   unitPrice
   createdAt

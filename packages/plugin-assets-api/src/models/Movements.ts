@@ -13,7 +13,7 @@ export interface IMovementModel extends Model<IMovementDocument> {
 export const loadMovementClass = (models: IModels) => {
   class Movement {
     public static async movements(params) {
-      return models.Movement.find();
+      return models.Movements.find();
     }
 
     public static async movementAdd(doc: any, userId: string) {
@@ -33,7 +33,7 @@ export const loadMovementClass = (models: IModels) => {
 
       const movementItemIds = addedAssets.map(asset => asset._id);
 
-      const movement = await models.Movement.create({
+      const movement = await models.Movements.create({
         assetIds: movementItemIds,
         movedAt: doc.movedAt,
         description: doc.description,
@@ -52,14 +52,14 @@ export const loadMovementClass = (models: IModels) => {
       if (!_id) {
         throw new Error('You must provide a id');
       }
-      const movement = await models.Movement.findOne({ _id });
+      const movement = await models.Movements.findOne({ _id });
 
       if (!movement) {
         throw new Error('Movement not found');
       }
 
       await models.MovementItems.movementItemsEdit(_id, doc.items);
-      await models.Movement.update(
+      await models.Movements.update(
         { _id },
         { $set: { movedAt: doc.movedAt, description: doc.description, modifiedAt: new Date() } }
       );
@@ -70,7 +70,7 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error('You must specify a valid id');
       }
       try {
-        const movements = await models.Movement.find({ _id: { $in: ids } });
+        const movements = await models.Movements.find({ _id: { $in: ids } });
 
         if (movements.length === 0) {
           throw new Error('Something went wrong');
@@ -83,7 +83,7 @@ export const loadMovementClass = (models: IModels) => {
 
         await models.MovementItems.deleteMany({ _id: { $in: movementItemsIds } });
 
-        await models.Movement.remove({ _id: { $in: movementIds } });
+        await models.Movements.remove({ _id: { $in: movementIds } });
       } catch (error) {
         throw new Error(error.message);
       }

@@ -1,3 +1,4 @@
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import {
   dateFilterParams,
   dateFilterParamsDef,
@@ -20,11 +21,18 @@ query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilte
       movementId
       createdAt
 
-      branch
-      department
-      company
-      customer
-      teamMember
+      ${
+        isEnabled('contacts')
+          ? `
+        branch
+        department
+        company
+        customer
+        teamMember
+        
+        `
+          : ``
+      }
     }
   }
 `;

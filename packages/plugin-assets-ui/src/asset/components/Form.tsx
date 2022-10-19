@@ -1,26 +1,25 @@
-import React from 'react';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import {
+  Button,
+  ControlLabel,
+  extractAttachment,
+  Form as CommonForm,
   FormControl,
   FormGroup,
-  ControlLabel,
-  Form as CommonForm,
-  Uploader,
   ModalTrigger,
-  Button,
-  extractAttachment,
   Tabs,
-  TabTitle
+  TabTitle,
+  Uploader
 } from '@erxes/ui/src';
-import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
-import { SelectWithAssetCategory } from '../../common/utils';
-import { IAsset, IAssetCategoryTypes } from '../../common/types';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
-import CategoryForm from '../category/containers/Form';
+import { FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
-import { TabContainer, TabContent, TriggerTabs } from '../../style';
 import { isEnabled } from '@erxes/ui/src/utils/core';
-import { SelectWithAssets } from '../../common/utils';
+import React from 'react';
+import { IAsset, IAssetCategoryTypes } from '../../common/types';
+import { SelectWithAssetCategory, SelectWithAssets } from '../../common/utils';
+import { TabContainer, TabContent, TriggerTabs } from '../../style';
+import CategoryForm from '../category/containers/Form';
 
 type Props = {
   asset?: IAsset;

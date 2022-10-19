@@ -26,7 +26,7 @@ export default {
     const { docs } = data;
 
     try {
-      const objects = await models.Asset.insertMany(docs);
+      const objects = await models.Assets.insertMany(docs);
       return { objects, updated: 0 };
     } catch (e) {
       return { error: e.message };
@@ -68,7 +68,7 @@ export default {
             break;
           case 'parentName':
             {
-              const parent = await models.Asset.findOne({
+              const parent = await models.Assets.findOne({
                 name: { $regex: new RegExp(`^${value}$`, 'i') }
               });
 

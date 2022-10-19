@@ -102,7 +102,7 @@ const assetQueries = {
         ...pagintationArgs
       },
       await paginate(
-        models.Asset.find(filter)
+        models.Assets.find(filter)
           .sort({ order: 1 })
           .lean(),
         pagintationArgs
@@ -120,10 +120,10 @@ const assetQueries = {
       filter.type = type;
     }
 
-    return models.Asset.find(filter).countDocuments();
+    return models.Assets.find(filter).countDocuments();
   },
   assetDetail(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.Asset.findOne({ _id }).lean();
+    return models.Assets.findOne({ _id }).lean();
   }
 };
 

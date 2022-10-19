@@ -2,7 +2,7 @@ export const generateFilter = async (params, models) => {
   let filter: any = {};
 
   if (params.movementId) {
-    const movementItems = await models.Movement.findOne({ _id: params.movementId }).lean();
+    const movementItems = await models.Movements.findOne({ _id: params.movementId }).lean();
 
     filter._id = { $in: movementItems?.assetIds };
   }

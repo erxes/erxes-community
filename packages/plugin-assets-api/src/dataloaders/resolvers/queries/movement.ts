@@ -6,16 +6,16 @@ const movementQueries = {
   async assetMovements(_root, params, { models }: IContext) {
     const filter = await generateFilter(params, models);
 
-    return paginate(models.Movement.find(filter), params);
+    return paginate(models.Movements.find(filter), params);
   },
   async assetMovement(_root, { _id }, { models }: IContext) {
-    return await models.Movement.findOne({ _id });
+    return await models.Movements.findOne({ _id });
   },
 
   async assetMovementTotalCount(_root, params, { models }: IContext) {
     const filter = await generateFilter(params, models);
 
-    return models.Movement.find(filter).countDocuments();
+    return models.Movements.find(filter).countDocuments();
   }
 };
 

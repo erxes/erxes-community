@@ -1,10 +1,10 @@
+import { ICustomField } from '@erxes/api-utils/src/types';
 import { Model } from 'mongoose';
+import { ASSET_STATUSES } from '../common/constant/asset';
 import { IAsset, IAssetDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
-import { assetSchema } from './definitions/asset';
 import { sendCardsMessage, sendContactsMessage, sendFormsMessage } from '../messageBroker';
-import { ASSET_STATUSES } from '../common/constant/asset';
-import { ICustomField } from '@erxes/api-utils/src/types';
+import { assetSchema } from './definitions/assets';
 export interface IAssetModel extends Model<IAssetDocument> {
   getAssets(selector: any): Promise<IAssetDocument>;
   createAsset(doc: IAsset): Promise<IAssetDocument>;
@@ -16,7 +16,7 @@ export interface IAssetModel extends Model<IAssetDocument> {
 export const loadAssetClass = (models: IModels, subdomain: string) => {
   class Asset {
     public static async getAssets(selector: any) {
-      const asset = await models.Asset.findOne(selector);
+      const asset = await models.Assets.findOne(selector);
 
       if (!asset) {
         throw new Error('Asset not found');
@@ -27,7 +27,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
     public static async createAsset(doc: IAsset) {
       this.checkCodeDuplication(doc.code);
 
-      const parentAsset = await models.Asset.findOne({ _id: doc.parentId }).lean();
+      const parentAsset = await models.Assets.findOne({ _id: doc.parentId }).lean();
 
       doc.order = await this.generateOrder(parentAsset, doc);
 
@@ -63,10 +63,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         isRPC: true
       });
 
-      return models.Asset.create(doc);
+      return models.Assets.create(doc);
     }
     public static async updateAsset(_id: string, doc: IAsset) {
-      const asset = await models.Asset.getAssets({ _id });
+      const asset = await models.Assets.getAssets({ _id });
 
       if (asset.code !== doc.code) {
         this.checkCodeDuplication(doc.code);
@@ -82,20 +82,11 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         });
       }
 
-      await models.Asset.updateOne({ _id }, { $set: doc });
+      await models.Assets.updateOne({ _id }, { $set: doc });
 
-      return models.Asset.findOne({ _id });
+      return models.Assets.findOne({ _id });
     }
     public static async removeAssets(_ids: string[]) {
-      // const dealAssetIds = await sendCardsMessage({
-      //   subdomain,
-      //   action: 'findDealAssetIds',
-      //   data: {
-      //     _ids
-      //   },
-      //   isRPC: true,
-      //   defaultValue: []
-      // });
       const dealAssetIds: string[] = [];
 
       const usedIds: string[] = [];
@@ -111,7 +102,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       if (usedIds.length > 0) {
-        await models.Asset.updateMany(
+        await models.Assets.updateMany(
           { _id: { $in: usedIds } },
           {
             $set: { status: ASSET_STATUSES.DELETED }
@@ -120,14 +111,14 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         response = 'updated';
       }
 
-      const assets = await models.Asset.find({ _id: { $in: unUsedIds } });
+      const assets = await models.Assets.find({ _id: { $in: unUsedIds } });
       const orders = assets.map(asset => new RegExp(asset.order));
 
-      const child_assets = await models.Asset.find({ order: { $in: orders } });
+      const child_assets = await models.Assets.find({ order: { $in: orders } });
 
       const child_assets_ids = child_assets.map(asset => asset._id);
 
-      await models.Asset.deleteMany({ _id: { $in: child_assets_ids } });
+      await models.Assets.deleteMany({ _id: { $in: child_assets_ids } });
 
       return response;
     }
@@ -150,12 +141,12 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const usedIds: string[] = [];
 
       for (const assetId of assetIds) {
-        const assetObj = await models.Asset.getAssets({ _id: assetId });
+        const assetObj = await models.Assets.getAssets({ _id: assetId });
 
         // merge custom fields data
         customFieldsData = [...customFieldsData, ...(assetObj.customFieldsData || [])];
 
-        await models.Asset.findByIdAndUpdate(assetId, {
+        await models.Assets.findByIdAndUpdate(assetId, {
           $set: {
             status: ASSET_STATUSES.DELETED,
             code: Math.random()
@@ -166,7 +157,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       // Creating asset with properties
-      const asset = await models.Asset.createAsset({
+      const asset = await models.Assets.createAsset({
         ...assetFields,
         customFieldsData,
         mergedIds: assetIds,
@@ -214,7 +205,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         throw new Error('The "/" character is not allowed in the code');
       }
 
-      if (await models.Asset.findOne({ code })) {
+      if (await models.Assets.findOne({ code })) {
         throw new Error('Code must be unique');
       }
     }

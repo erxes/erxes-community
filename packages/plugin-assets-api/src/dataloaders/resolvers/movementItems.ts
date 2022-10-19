@@ -1,8 +1,8 @@
-import { IContext } from '../../connectionResolver';
 import { IMovementItemDocument } from '../../common/types/asset';
+import { IContext } from '../../connectionResolver';
 export default {
   __resolveReference({ _id }, { models }: IContext) {
-    return models.Movement.findOne({ _id });
+    return models.Movements.findOne({ _id });
   },
 
   async branch(movement: IMovementItemDocument, {}, { models, dataLoaders }: IContext) {

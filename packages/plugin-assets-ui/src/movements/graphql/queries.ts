@@ -1,3 +1,4 @@
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
 
 const movementDetail = `
@@ -21,15 +22,23 @@ query AssetMovement($_id: String) {
       departmentId
       teamMemberId
 
-      branch
-      department
-      company
-      customer
-      teamMember
+      ${
+        isEnabled('contacts')
+          ? `
+        branch
+        department
+        company
+        customer
+        teamMember
+        `
+          : ''
+      }
     }
   }
 }
 `;
+
+isEnabled;
 
 const movements = `
   query AssetMovements ($userId:String,${dateFilterParams}) {

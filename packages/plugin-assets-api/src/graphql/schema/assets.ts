@@ -1,6 +1,5 @@
 import { attachmentInput, attachmentType } from '@erxes/api-utils/src/commonTypeDefs';
-import { assetCategoryParams } from '../../common/graphql/asset';
-import { assetParams } from '../../common/graphql/asset';
+import { assetCategoryParams, assetParams } from '../../common/graphql/asset';
 
 export const types = contactsAvailable => `
 
@@ -17,7 +16,7 @@ export const types = contactsAvailable => `
         : ''
     }
 
-    type AssetCategories @key(fields: "_id") @cacheControl(maxAge: 3) {
+    type AssetCategory @key(fields: "_id") @cacheControl(maxAge: 3) {
         _id: String!
         name: String
         description: String
@@ -61,7 +60,7 @@ export const types = contactsAvailable => `
     supply: String
     assetCount: Int
 
-    category: AssetCategories
+    category: AssetCategory
     parent:Asset
     isRoot: Boolean
     childAssetCount:Int
@@ -86,8 +85,8 @@ export const queries = `
     ): [Asset]
     assetsTotalCount(type: String): Int
     assetDetail(_id: String): Asset
-    assetCategories(parentId: String, searchValue: String, status: String): [AssetCategories]
-    assetCategoryDetail(_id: String): AssetCategories
+    assetCategories(parentId: String, searchValue: String, status: String): [AssetCategory]
+    assetCategoryDetail(_id: String): AssetCategory
     assetCategoriesTotalCount: Int
 
 `;
@@ -97,7 +96,7 @@ export const mutations = `
     assetsEdit(_id: String!, ${assetParams}): Asset
     assetsRemove(assetIds: [String!]): String
     assetsMerge(assetIds: [String], assetFields: JSON): Asset
-    assetCategoryAdd(${assetCategoryParams}): AssetCategories
-    assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategories
+    assetCategoryAdd(${assetCategoryParams}): AssetCategory
+    assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategory
     assetCategoryRemove(_id: String!): JSON
 `;

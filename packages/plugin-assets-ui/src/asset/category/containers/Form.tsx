@@ -3,10 +3,9 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
+import { IAssetCategoryTypes } from '../../../common/types';
 import Form from '../components/Form';
 import { mutations } from '../graphql';
-import __ from 'lodash';
-import { IAssetCategoryTypes } from '../../../common/types';
 
 type Props = {
   closeModal: () => void;
@@ -30,13 +29,6 @@ class FormContainer extends React.Component<FinalProps> {
     confirmationUpdate,
     object
   }: IButtonMutateProps) => {
-    const afterMutate = () => {
-      if (callback) {
-        this.props.refetchAssetCategories();
-        callback();
-      }
-    };
-
     let mutation = mutations.assetCategoryAdd;
 
     let sucessAction = 'added';
@@ -50,7 +42,8 @@ class FormContainer extends React.Component<FinalProps> {
       <ButtonMutate
         mutation={mutation}
         variables={values}
-        callback={afterMutate}
+        callback={callback}
+        refetchQueries={['assetCategories', 'assetCategoriesTotalCount']}
         isSubmitted={isSubmitted}
         type="submit"
         confirmationUpdate={confirmationUpdate}

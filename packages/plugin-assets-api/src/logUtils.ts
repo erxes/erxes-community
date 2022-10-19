@@ -1,16 +1,16 @@
 import {
   gatherNames,
+  getSchemaLabels,
   IDescriptions,
   LogDesc,
   putCreateLog as commonPutCreateLog,
-  putUpdateLog as commonPutUpdateLog,
   putDeleteLog as commonPutDeleteLog,
-  getSchemaLabels
+  putUpdateLog as commonPutUpdateLog
 } from '@erxes/api-utils/src/logUtils';
+import { IAssetDocument } from './common/types/asset';
 import { IModels } from './connectionResolver';
 import messageBroker from './messageBroker';
-import { IAssetDocument, IAssetCategoriesDocument } from './common/types/asset';
-import { assetCategoriesSchema, assetSchema } from './models/definitions/asset';
+import { assetCategoriesSchema, assetSchema } from './models/definitions/assets';
 
 export const MODULE_NAMES = {
   ASSET: 'asset',
