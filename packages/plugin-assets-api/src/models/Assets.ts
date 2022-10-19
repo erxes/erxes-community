@@ -25,7 +25,13 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
     public static async createAsset(doc: IAsset) {
-      this.checkCodeDuplication(doc.code);
+      if (doc.code.includes('/')) {
+        throw new Error('The "/" character is not allowed in the code');
+      }
+
+      if (await models.Assets.findOne({ code: doc.code })) {
+        throw new Error('Code must be unique');
+      }
 
       const parentAsset = await models.Assets.findOne({ _id: doc.parentId }).lean();
 
@@ -69,7 +75,13 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const asset = await models.Assets.getAssets({ _id });
 
       if (asset.code !== doc.code) {
-        this.checkCodeDuplication(doc.code);
+        if (doc.code.includes('/')) {
+          throw new Error('The "/" character is not allowed in the code');
+        }
+
+        if (await models.Assets.findOne({ code: doc.code })) {
+          throw new Error('Code must be unique');
+        }
       }
 
       if (doc.customFieldsData) {
@@ -200,15 +212,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
 
-    static async checkCodeDuplication(code: string) {
-      if (code.includes('/')) {
-        throw new Error('The "/" character is not allowed in the code');
-      }
-
-      if (await models.Assets.findOne({ code })) {
-        throw new Error('Code must be unique');
-      }
-    }
+    static async checkCodeDuplication(code: string) {}
 
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
       const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
