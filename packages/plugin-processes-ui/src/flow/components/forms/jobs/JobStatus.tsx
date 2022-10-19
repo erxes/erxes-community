@@ -6,6 +6,7 @@ import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { IJob } from '../../../types';
 import { IJobRefer } from '../../../../job/types';
 import { IProduct } from '../../../../types';
+import { DisabledSpan } from '../../../styles';
 
 type Props = {
   closeModal: () => void;
@@ -43,36 +44,67 @@ class JobStatus extends React.Component<Props, State> {
     };
   }
 
-  renderLabelInfo = (style, text) => {
-    return <Label lblStyle={style}>{text}</Label>;
-  };
-
-  renderProducts = (products, matchProducts?: any[], flowProduct?) => {
+  renderProducts = (products, matchProducts: any[]) => {
+    const matchProductIds = matchProducts.length
+      ? matchProducts.map(p => p.product._id)
+      : [];
     return products.map(product => {
-      const name = product.product ? product.product.name : '';
-
-      let matchResult: any[] | boolean | undefined =
-        matchProducts && matchProducts.length > 0
-          ? matchProducts.includes(name)
-          : matchProducts;
-
-      if (flowProduct) {
-        matchResult = flowProduct && flowProduct.name === name ? true : false;
+      if (!product.product) {
+        return <li>Unknown product</li>;
       }
 
-      return (
-        <li key={Math.random()}>
-          {matchResult === undefined && name}
-          {matchResult === true && name}
-          {matchResult === false && this.renderLabelInfo('danger', name)}
-        </li>
-      );
+      const productId = product.product._id;
+      const name = `${product.product.code} - ${product.product.name}` || '';
+
+      if (matchProducts.length && !matchProductIds.includes(productId)) {
+        return (
+          <DisabledSpan>
+            <li>{name}</li>
+          </DisabledSpan>
+        );
+      }
+
+      return <li>{name}</li>;
     });
   };
 
-  renderBlock(title, job: IJob, kind = 'result') {
+  renderBlock(
+    title,
+    job: IJob,
+    match?: { jobs: IJob[]; type: string },
+    kind = 'result'
+  ) {
     const { jobReferById, productById } = this.state;
     const jobConfig = job.config;
+    let matchProducts: any[] = [];
+    if (match) {
+      for (const matchJob of match.jobs) {
+        const matchConfig = matchJob.config;
+        if (matchConfig.jobReferId) {
+          const matchJobRefer = jobReferById[matchConfig.jobReferId] || {};
+          matchProducts = matchProducts.concat(
+            match.type === 'need'
+              ? matchJobRefer.needProducts
+              : matchJobRefer.resultProducts
+          );
+        }
+        if (matchConfig.productId) {
+          const matchProduct = productById[matchConfig.productId];
+          if (
+            (match.type === 'need' &&
+              [FLOWJOB_TYPES.OUTLET, FLOWJOB_TYPES.MOVE].includes(
+                matchJob.type
+              )) ||
+            (match.type === 'result' &&
+              [FLOWJOB_TYPES.INCOME, FLOWJOB_TYPES.MOVE].includes(
+                matchJob.type
+              ))
+          ) {
+            matchProducts.push({ product: matchProduct });
+          }
+        }
+      }
+    }
 
     if (!jobConfig.jobReferId && !jobConfig.productId) {
       return (
@@ -112,7 +144,6 @@ class JobStatus extends React.Component<Props, State> {
               { product: productById[jobConfig.productId] }
             ]) ||
             [];
-          console.log(products);
         }
         if (job.type === FLOWJOB_TYPES.OUTLET) {
           products = [];
@@ -123,7 +154,7 @@ class JobStatus extends React.Component<Props, State> {
     return (
       <ul key={Math.random()}>
         <b>{title}</b>
-        {this.renderProducts(products)}
+        {this.renderProducts(products, matchProducts)}
       </ul>
     );
   }
@@ -145,12 +176,22 @@ class JobStatus extends React.Component<Props, State> {
       <FormWrapper>
         <FormColumn>
           <Label lblColor="#673FBD">Өмнөх дамжлагаас бэлэн болох:</Label>
-          {(beforeFlowJobs || []).map(b => this.renderBlock(`${b.label}`, b))}
+          {(beforeFlowJobs || []).map(b =>
+            this.renderBlock(`${b.label}`, b, {
+              jobs: [activeFlowJob],
+              type: 'need'
+            })
+          )}
         </FormColumn>
 
         <FormColumn>
           <Label lblColor="#3CCC38">Уг дамжлагад хэрэгцээт:</Label>
-          {this.renderBlock('', activeFlowJob, 'need')}
+          {this.renderBlock(
+            '',
+            activeFlowJob,
+            { jobs: beforeFlowJobs, type: 'result' },
+            'need'
+          )}
 
           <Label lblColor="#F7CE53">Уг дамжлагаас гарц:</Label>
           {this.renderBlock('', activeFlowJob)}
