@@ -13,7 +13,7 @@ module.exports = {
   menus: [
     {
       text: 'Assets',
-      to: '/settings/asset-movements/',
+      to: '/settings/assets/',
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
       scope: 'assets'

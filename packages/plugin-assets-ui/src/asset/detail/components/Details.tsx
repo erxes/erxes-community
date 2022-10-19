@@ -21,13 +21,17 @@ class CompanyDetails extends React.Component<Props> {
 
     const breadcrumb = [
       { title: __('Settings'), link: '/settings' },
-      { title: __('Asset & Movements'), link: '/settings/asset-movements' },
+      { title: __('Assets'), link: '/settings/assets' },
       { title }
     ];
 
     const content = (
       <>
-        <ActivityInputs contentTypeId={asset._id} contentType="assets:asset" showEmail={false} />
+        <ActivityInputs
+          contentTypeId={asset._id}
+          contentType="assets:asset"
+          showEmail={false}
+        />
         {isEnabled('logs') && (
           <ActivityLogs
             target={asset.name || ''}
