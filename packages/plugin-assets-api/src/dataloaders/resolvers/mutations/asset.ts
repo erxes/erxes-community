@@ -17,7 +17,7 @@ const assetMutations = {
         type: MODULE_NAMES.ASSET,
         newData: {
           ...doc,
-          groupId: asset.groupId,
+          categoryId: asset.categoryId,
           customFieldsData: asset.customFieldsData
         },
         object: asset
@@ -51,7 +51,11 @@ const assetMutations = {
 
     return updated;
   },
-  async assetsRemove(_root, { assetIds }: { assetIds: string[] }, { user, models, subdomain }: IContext) {
+  async assetsRemove(
+    _root,
+    { assetIds }: { assetIds: string[] },
+    { user, models, subdomain }: IContext
+  ) {
     const assets: IAssetDocument[] = await models.Asset.find({
       _id: { $in: assetIds }
     }).lean();
@@ -64,7 +68,11 @@ const assetMutations = {
 
     return response;
   },
-  async assetsMerge(_root, { assetIds, assetFields }: { assetIds: string[]; assetFields: IAsset }, { models }: IContext) {
+  async assetsMerge(
+    _root,
+    { assetIds, assetFields }: { assetIds: string[]; assetFields: IAsset },
+    { models }: IContext
+  ) {
     return models.Asset.mergeAssets(assetIds, { ...assetFields });
   }
 };

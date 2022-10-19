@@ -141,6 +141,7 @@ class List extends React.Component<Props, State> {
             <th>{__('User')}</th>
             <th>{__('Moved At')}</th>
             <th>{__('Created At')}</th>
+            <th>{__('Modified At')}</th>
             <th>{__('Action')}</th>
           </tr>
         </thead>

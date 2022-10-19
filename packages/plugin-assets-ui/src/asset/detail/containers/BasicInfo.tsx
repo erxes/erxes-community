@@ -46,7 +46,7 @@ const BasicInfoContainer = (props: FinalProps) => {
 };
 
 const generateOptions = () => ({
-  refetchQueries: ['assets', 'assetGroup', 'assetsTotalCount']
+  refetchQueries: ['assets', 'assetCategories', 'assetsTotalCount']
 });
 
 export default withProps<Props>(

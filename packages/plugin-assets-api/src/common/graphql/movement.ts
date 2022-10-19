@@ -18,6 +18,8 @@ export const movementFilters = `
     assetId:String,
     movedAtFrom:String,
     movedAtTo:String,
+    modifiedAtFrom:String,
+    modifiedAtTo:String,
     createdAtFrom:String,
     createdAtTo:String,
     searchValue:String,

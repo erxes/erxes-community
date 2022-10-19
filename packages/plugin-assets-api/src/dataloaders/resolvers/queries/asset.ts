@@ -9,7 +9,7 @@ const assetQueries = {
     _root,
     {
       type,
-      groupId,
+      categoryId,
       parentId,
       searchValue,
       ids,
@@ -22,7 +22,7 @@ const assetQueries = {
       ids: string[];
       excludeIds: boolean;
       type: string;
-      groupId: string;
+      categoryId: string;
       parentId: string;
       searchValue: string;
       page: number;
@@ -45,23 +45,23 @@ const assetQueries = {
       filter._id = { $nin: ignoreIds };
     }
 
-    if (groupId) {
-      const group = await models.AssetGroup.getAssetGroup({
-        _id: groupId,
+    if (categoryId) {
+      const category = await models.AssetCategories.getAssetCategory({
+        _id: categoryId,
         status: { $in: [null, 'active'] }
       });
 
-      const asset_group_ids = await models.AssetGroup.find(
-        { order: { $regex: new RegExp(group.order) } },
+      const asset_category_ids = await models.AssetCategories.find(
+        { order: { $regex: new RegExp(category.order) } },
         { _id: 1 }
       );
-      filter.groupId = { $in: asset_group_ids };
+      filter.categoryId = { $in: asset_category_ids };
     } else {
-      const notActiveGroups = await models.AssetGroup.find({
+      const notActiveCategories = await models.AssetCategories.find({
         status: { $nin: [null, 'active'] }
       });
 
-      filter.groupId = { $nin: notActiveGroups.map(e => e._id) };
+      filter.categoryId = { $nin: notActiveCategories.map(e => e._id) };
     }
 
     if (parentId) {
@@ -93,7 +93,7 @@ const assetQueries = {
       'assets',
       {
         type,
-        groupId,
+        categoryId,
         searchValue,
         ids,
         excludeIds,
@@ -103,7 +103,7 @@ const assetQueries = {
       },
       await paginate(
         models.Asset.find(filter)
-          .sort('code')
+          .sort({ order: 1 })
           .lean(),
         pagintationArgs
       ),

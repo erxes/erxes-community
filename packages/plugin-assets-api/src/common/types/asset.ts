@@ -4,8 +4,8 @@ import { Document } from 'mongoose';
 export interface IAsset {
   name: string;
   parentId?: string;
-  groupId?: string;
-  groupCode?: string;
+  categoryId?: string;
+  categoryCode?: string;
   type?: string;
   description?: string;
   sku?: string;
@@ -39,7 +39,7 @@ export interface IAssetDocument extends IAsset, Document {
   createdAt: Date;
 }
 
-export interface IAssetGroup {
+export interface IAssetCategories {
   name: string;
   code: string;
   order: string;
@@ -48,7 +48,7 @@ export interface IAssetGroup {
   attachment?: any;
   status?: string;
 }
-export interface IAssetGroupDocument extends IAssetGroup, Document {
+export interface IAssetCategoriesDocument extends IAssetCategories, Document {
   _id: string;
   createdAt: Date;
 }

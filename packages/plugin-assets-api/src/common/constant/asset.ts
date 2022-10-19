@@ -28,7 +28,7 @@ export const ASSET_INFO = {
   code: 'Code',
   name: 'Name',
   type: 'Type',
-  group: 'Group',
+  category: 'Category',
   parent: 'Parent',
   vendor: 'Vendor',
   description: 'Description',
@@ -39,7 +39,7 @@ export const ASSET_INFO = {
     { field: 'code', label: 'Code' },
     { field: 'name', label: 'Name' },
     { field: 'type', label: 'Type' },
-    { field: 'group', label: 'Group' },
+    { field: 'category', label: 'Category' },
     { field: 'parent', label: 'Parent' },
     { field: 'vendor', label: 'Vendor' },
     { field: 'description', label: 'Description' },
@@ -51,8 +51,8 @@ export const ASSET_INFO = {
 export const EXTEND_FIELDS = [
   {
     _id: Math.random(),
-    name: 'groupName',
-    label: 'Group Name',
+    name: 'categoryName',
+    label: 'Category Name',
     type: 'string'
   },
   {

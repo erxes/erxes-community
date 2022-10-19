@@ -2,7 +2,7 @@ import React from 'react';
 import * as compose from 'lodash.flowright';
 import { withProps } from '@erxes/ui/src/utils/core';
 import List from '../components/List';
-import { queries as groupQueries } from '../group/graphql';
+import { queries as categoryQueries } from '../category/graphql';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { mutations, queries } from '../graphql';
@@ -10,7 +10,7 @@ import { Alert, Bulk, confirm, Spinner } from '@erxes/ui/src';
 import {
   AssetRemoveMutationResponse,
   IAssetDetailQueryResponse,
-  IAssetGroupDetailQueryResponse,
+  IAssetCategoryDetailQueryResponse,
   IAssetQueryResponse,
   IAssetTotalCountQueryResponse,
   MergeMutationResponse
@@ -27,7 +27,7 @@ type Props = {
 type FinalProps = {
   assets: IAssetQueryResponse;
   assetsCount: IAssetTotalCountQueryResponse;
-  assetGroupDetailQuery: IAssetGroupDetailQueryResponse;
+  assetCategoryDetailQuery: IAssetCategoryDetailQueryResponse;
   assetDetailQuery: IAssetDetailQueryResponse;
 } & Props &
   AssetRemoveMutationResponse &
@@ -90,7 +90,7 @@ class ListContainer extends React.Component<FinalProps> {
       assets,
       assetsCount,
       queryParams,
-      assetGroupDetailQuery,
+      assetCategoryDetailQuery,
       assetDetailQuery
     } = this.props;
     if (assets.loading) {
@@ -105,7 +105,7 @@ class ListContainer extends React.Component<FinalProps> {
       mergeAssets: this.mergeAssets,
       loading: assets.loading,
       queryParams,
-      currentGroup: assetGroupDetailQuery.assetGroupDetail || {},
+      currentCategory: assetCategoryDetailQuery.assetCategoryDetail || {},
       currentParent: assetDetailQuery.assetDetail || {},
       searchValue: queryParams.searchValue || ''
     };
@@ -128,7 +128,7 @@ export default withProps<Props>(
       name: 'assets',
       options: ({ queryParams }) => ({
         variables: {
-          groupId: queryParams?.groupId,
+          categoryId: queryParams?.categoryId,
           parentId: queryParams?.parentId,
           searchValue: queryParams?.searchValue,
           type: queryParams?.type,
@@ -148,11 +148,11 @@ export default withProps<Props>(
         }
       })
     }),
-    graphql<Props>(gql(groupQueries.assetGroupDetail), {
-      name: 'assetGroupDetailQuery',
+    graphql<Props>(gql(categoryQueries.assetCategoryDetail), {
+      name: 'assetCategoryDetailQuery',
       options: ({ queryParams }) => ({
         variables: {
-          _id: queryParams?.groupId
+          _id: queryParams?.categoryId
         }
       })
     }),

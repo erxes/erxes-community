@@ -11,7 +11,7 @@ import {
   SelectTeamMembers,
   __
 } from '@erxes/ui/src';
-import { ContainerBox } from '../../style';
+import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../style';
 import { DateContainer, FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import moment from 'moment';
 import { Title } from '@erxes/ui-settings/src/styles';
@@ -24,6 +24,8 @@ type Props = {
 type State = {
   movedAtFrom?: string;
   movedAtTo?: string;
+  modifiedAtFrom?: string;
+  modifiedAtTo?: string;
   createdAtFrom?: string;
   createdAtTo?: string;
   userId?: string;
@@ -52,10 +54,23 @@ export class SideBar extends React.Component<Props, State> {
   }
 
   render() {
-    const { createdAtFrom, createdAtTo, movedAtFrom, movedAtTo } = this.state;
+    const {
+      createdAtFrom,
+      createdAtTo,
+      movedAtFrom,
+      movedAtTo,
+      modifiedAtFrom,
+      modifiedAtTo
+    } = this.state;
     const { queryParams, history } = this.props;
 
     const clearParams = field => {
+      if (Array.isArray(field)) {
+        field.forEach(name => {
+          this.setState({ [name]: undefined });
+          return router.removeParams(history, name);
+        });
+      }
       this.setState({ [field]: undefined });
       router.removeParams(history, field);
     };
@@ -68,7 +83,7 @@ export class SideBar extends React.Component<Props, State> {
     }: {
       label: string;
       clearable?: boolean;
-      field: string;
+      field: string | string[];
       children: React.ReactNode;
     }) => (
       <CommonFormGroup>
@@ -99,49 +114,82 @@ export class SideBar extends React.Component<Props, State> {
             />
           </FormGroup>
           <FormGroup
-            field="createdAtFrom"
-            label="Created At From"
-            clearable={queryParams?.createdAtFrom}
+            label="Created Date Range"
+            field={['createdAtFrom', 'createdAtTo']}
+            clearable={queryParams?.createdAtFrom || queryParams?.createdAtTo}
           >
-            <DateContainer>
-              <DateControl
-                name="createdAtFrom"
-                placeholder="Choose start date"
-                value={createdAtFrom}
-                onChange={e => this.handleDate('createdAtFrom', e)}
-              />
-            </DateContainer>
+            <CustomRangeContainer>
+              <DateContainer>
+                <DateControl
+                  name="createdAtFrom"
+                  placeholder="Choose start date"
+                  value={createdAtFrom}
+                  onChange={e => this.handleDate('createdAtFrom', e)}
+                />
+              </DateContainer>
+              <EndDateContainer>
+                <DateContainer>
+                  <DateControl
+                    name="createdAtTo"
+                    placeholder="Choose end date"
+                    value={createdAtTo}
+                    onChange={e => this.handleDate('createdAtTo', e)}
+                  />
+                </DateContainer>
+              </EndDateContainer>
+            </CustomRangeContainer>
           </FormGroup>
-          <FormGroup field="createdAtTo" label="Created At To" clearable={queryParams?.createdAtTo}>
-            <DateContainer>
-              <DateControl
-                name="createdAtTo"
-                placeholder="Choose end date"
-                value={createdAtTo}
-                onChange={e => this.handleDate('createdAtTo', e)}
-              />
-            </DateContainer>
+          <FormGroup
+            label="Moved Date Range"
+            field={['movedAtFrom', 'movedAtTo']}
+            clearable={queryParams?.movedAtFrom || queryParams?.movedAtTo}
+          >
+            <CustomRangeContainer>
+              <DateContainer>
+                <DateControl
+                  name="movedAtFrom"
+                  placeholder="Choose start date"
+                  value={movedAtFrom}
+                  onChange={e => this.handleDate('movedAtFrom', e)}
+                />
+              </DateContainer>
+              <EndDateContainer>
+                <DateContainer>
+                  <DateControl
+                    name="movedAtTo"
+                    placeholder="Choose end date"
+                    value={movedAtTo}
+                    onChange={e => this.handleDate('movedAtTo', e)}
+                  />
+                </DateContainer>
+              </EndDateContainer>
+            </CustomRangeContainer>
           </FormGroup>
-
-          <FormGroup field="movedAtFrom" label="Moved At From" clearable={queryParams?.movedAtFrom}>
-            <DateContainer>
-              <DateControl
-                name="movedAtFrom"
-                placeholder="Choose start date"
-                value={movedAtFrom}
-                onChange={e => this.handleDate('movedAtFrom', e)}
-              />
-            </DateContainer>
-          </FormGroup>
-          <FormGroup label="Moved At To" field="movedAtTo" clearable={queryParams?.movedAtTo}>
-            <DateContainer>
-              <DateControl
-                name="movedAtTo"
-                placeholder="Choose end date"
-                value={movedAtTo}
-                onChange={e => this.handleDate('movedAtTo', e)}
-              />
-            </DateContainer>
+          <FormGroup
+            label="Modified Date Range"
+            field={['modifiedAtFrom', 'modifiedAtTo']}
+            clearable={queryParams?.modifiedAtFrom || queryParams?.modifiedAtTo}
+          >
+            <CustomRangeContainer>
+              <DateContainer>
+                <DateControl
+                  name="modifiedAtFrom"
+                  placeholder="Choose start date"
+                  value={modifiedAtFrom}
+                  onChange={e => this.handleDate('modifiedAtFrom', e)}
+                />
+              </DateContainer>
+              <EndDateContainer>
+                <DateContainer>
+                  <DateControl
+                    name="modifiedAtTo"
+                    placeholder="Choose end date"
+                    value={modifiedAtTo}
+                    onChange={e => this.handleDate('modifiedAtTo', e)}
+                  />
+                </DateContainer>
+              </EndDateContainer>
+            </CustomRangeContainer>
           </FormGroup>
         </ContainerBox>
       </CommonSideBar>

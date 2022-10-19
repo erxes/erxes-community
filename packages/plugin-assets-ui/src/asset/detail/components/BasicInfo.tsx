@@ -109,7 +109,7 @@ class BasicInfo extends React.Component<Props> {
       code,
       name,
       type,
-      group,
+      category,
       supply,
       assetCount,
       minimiumCount,
@@ -139,7 +139,7 @@ class BasicInfo extends React.Component<Props> {
         <SidebarList className="no-link">
           {this.renderView('Code', code)}
           {this.renderView('Type', type)}
-          {this.renderView('Group', group ? group.name : '')}
+          {this.renderView('Category', category ? category.name : '')}
           {this.renderView('Unit price', (unitPrice || 0).toLocaleString())}
           {this.renderView('Sku', sku)}
           {this.renderVendor(vendor)}

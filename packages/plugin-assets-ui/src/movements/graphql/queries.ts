@@ -38,6 +38,7 @@ const movements = `
     _id
     assetIds
     createdAt
+    modifiedAt
     movedAt
     userId
     user

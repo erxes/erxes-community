@@ -12,12 +12,12 @@ import {
   TabTitle
 } from '@erxes/ui/src';
 import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
-import { generateGroupOptions, generateParentOptions } from '../../common/utils';
-import { IAsset, IAssetGroupTypes } from '../../common/types';
+import { generateCategoryOptions, generateParentOptions } from '../../common/utils';
+import { IAsset, IAssetCategoryTypes } from '../../common/types';
 import { ASSET_SUPPLY, TYPES } from '../../common/constant';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
-import GroupForm from '../group/containers/Form';
+import CategoryForm from '../category/containers/Form';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import { TabContainer, TabContent, TriggerTabs } from '../../style';
@@ -25,7 +25,7 @@ import { TabContainer, TabContent, TriggerTabs } from '../../style';
 type Props = {
   asset?: IAsset;
   assets: IAsset[];
-  groups: IAssetGroupTypes[];
+  categories: IAssetCategoryTypes[];
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
 };
@@ -37,7 +37,7 @@ type State = {
   attachmentMore?: IAttachment[];
   vendorId: string;
   parentId: string;
-  groupId: string;
+  categoryId: string;
   description: string;
   currentTab: string;
 };
@@ -53,7 +53,7 @@ class Form extends React.Component<Props, State> {
       minimiumCount,
       vendorId,
       parentId,
-      groupId,
+      categoryId,
       description
     } = asset;
 
@@ -64,10 +64,10 @@ class Form extends React.Component<Props, State> {
       attachment: attachment ? attachment : undefined,
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
-      groupId: groupId ? groupId : '',
+      categoryId: categoryId ? categoryId : '',
       parentId: parentId ? parentId : '',
       description: description ? description : '',
-      currentTab: parentId ? 'Parent' : 'Group'
+      currentTab: parentId ? 'Parent' : 'Category'
     };
 
     this.renderContent = this.renderContent.bind(this);
@@ -111,9 +111,9 @@ class Form extends React.Component<Props, State> {
   };
 
   renderFormTrigger(trigger: React.ReactNode) {
-    const content = props => <GroupForm {...props} groups={this.props.groups} />;
+    const content = props => <CategoryForm {...props} categories={this.props.categories} />;
 
-    return <ModalTrigger title="Add Asset Group" trigger={trigger} content={content} />;
+    return <ModalTrigger title="Add Asset Category" trigger={trigger} content={content} />;
   }
   onChangeDescription = e => {
     this.setState({ description: e.editor.getData() });
@@ -154,16 +154,16 @@ class Form extends React.Component<Props, State> {
   onChangeCurrentTab = selecteTab => {
     switch (selecteTab) {
       case 'Parent':
-        this.setState({ groupId: '', currentTab: selecteTab });
+        this.setState({ categoryId: '', currentTab: selecteTab });
         break;
-      case 'Group':
+      case 'Category':
         this.setState({ parentId: '', currentTab: selecteTab });
         break;
     }
   };
 
   renderContent(formProps: IFormProps) {
-    const { asset, groups, assets, closeModal, renderButton } = this.props;
+    const { asset, categories, assets, closeModal, renderButton } = this.props;
 
     const { description, disabled, assetCount, minimiumCount, vendorId } = this.state;
 
@@ -176,9 +176,9 @@ class Form extends React.Component<Props, State> {
     const attachmentsMore =
       (object.attachmentMore && extractAttachment(object.attachmentMore)) || [];
 
-    const addGroupTrigger = (
+    const addCategoryTrigger = (
       <Button btnStyle="primary" uppercase={false} icon="plus-circle">
-        Add group
+        Add category
       </Button>
     );
 
@@ -204,19 +204,19 @@ class Form extends React.Component<Props, State> {
 
       return (
         <FormGroup>
-          <ControlLabel required={true}>Group</ControlLabel>
+          <ControlLabel required={true}>Category</ControlLabel>
           <Row>
             <FormControl
               {...formProps}
-              name="groupId"
+              name="categoryId"
               componentClass="select"
-              defaultValue={object.groupId}
+              defaultValue={object.categoryId}
             >
               <option />
-              {generateGroupOptions(groups)}
+              {generateCategoryOptions(categories)}
             </FormControl>
 
-            {this.renderFormTrigger(addGroupTrigger)}
+            {this.renderFormTrigger(addCategoryTrigger)}
           </Row>
         </FormGroup>
       );
@@ -278,7 +278,7 @@ class Form extends React.Component<Props, State> {
         <TabContainer>
           <TriggerTabs>
             <Tabs full>
-              {['Group', 'Parent'].map(item => (
+              {['Category', 'Parent'].map(item => (
                 <TabTitle
                   className={this.state.currentTab === item ? 'active' : ''}
                   key={item}

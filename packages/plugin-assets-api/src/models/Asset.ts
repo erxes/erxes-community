@@ -2,7 +2,6 @@ import { Model } from 'mongoose';
 import { IAsset, IAssetDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
 import { assetSchema } from './definitions/asset';
-import { checkCodeDuplication } from '../utils';
 import { sendCardsMessage, sendContactsMessage, sendFormsMessage } from '../messageBroker';
 import { ASSET_STATUSES } from '../common/constant/asset';
 import { ICustomField } from '@erxes/api-utils/src/types';
@@ -26,17 +25,17 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
     public static async createAsset(doc: IAsset) {
-      await checkCodeDuplication(models, doc.code);
+      this.checkCodeDuplication(doc.code);
 
       const parentAsset = await models.Asset.findOne({ _id: doc.parentId }).lean();
 
       doc.order = await this.generateOrder(parentAsset, doc);
 
-      if (doc.groupCode) {
-        const group = await models.AssetGroup.getAssetGroup({
-          code: doc.groupCode
+      if (doc.categoryCode) {
+        const category = await models.AssetCategories.getAssetCategory({
+          code: doc.categoryCode
         });
-        doc.groupId = group._id;
+        doc.categoryId = category._id;
       }
 
       if (doc.vendorCode) {
@@ -70,7 +69,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const asset = await models.Asset.getAssets({ _id });
 
       if (asset.code !== doc.code) {
-        await checkCodeDuplication(models, doc.code);
+        this.checkCodeDuplication(doc.code);
       }
 
       if (doc.customFieldsData) {
@@ -134,7 +133,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
     }
 
     public static async mergeAssets(assetIds: string[], assetFields: IAsset) {
-      const fields = ['name', 'code', 'unitPrice', 'groupId', 'type'];
+      const fields = ['name', 'code', 'unitPrice', 'categoryId', 'type'];
 
       for (const field of fields) {
         if (!assetFields[field]) {
@@ -146,7 +145,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const name: string = assetFields.name || '';
       const type: string = assetFields.type || '';
       const description: string = assetFields.description || '';
-      const groupId: string = assetFields.groupId || '';
+      const categoryId: string = assetFields.categoryId || '';
       const vendorId: string = assetFields.vendorId || '';
       const usedIds: string[] = [];
 
@@ -174,7 +173,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         name,
         type,
         description,
-        groupId,
+        categoryId,
         vendorId
       });
 
@@ -208,6 +207,20 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       });
 
       return asset;
+    }
+
+    static async checkCodeDuplication(code: string) {
+      if (code.includes('/')) {
+        throw new Error('The "/" character is not allowed in the code');
+      }
+
+      const parent = await models.Asset.findOne({
+        code
+      });
+
+      if (parent) {
+        throw new Error('Code must be unique');
+      }
     }
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
       const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;

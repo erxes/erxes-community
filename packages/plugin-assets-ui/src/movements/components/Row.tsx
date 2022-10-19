@@ -20,7 +20,7 @@ class Row extends React.Component<Props> {
   render() {
     const { movement, isChecked, toggleBulk } = this.props;
 
-    const { createdAt, _id, user, movedAt } = movement;
+    const { createdAt, _id, user, movedAt, modifiedAt } = movement;
 
     const handleItems = () => {
       const { history } = this.props;
@@ -48,6 +48,7 @@ class Row extends React.Component<Props> {
         </td>
         <td>{moment(movedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
+        <td>{moment(modifiedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>
           <Button btnStyle="link" icon="list-2" onClick={handleItems} />
         </td>

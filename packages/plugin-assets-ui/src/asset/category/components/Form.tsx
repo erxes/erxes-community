@@ -4,23 +4,23 @@ import { FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main'
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import { extractAttachment } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import { ASSET_GROUP_STATUSES } from '../../../common/constant';
-import { IAssetGroup, IAssetGroupTypes } from '../../../common/types';
-import { CommonFormGroup, generateGroupOptions } from '../../../common/utils';
+import { ASSET_CATEGORY_STATUSES } from '../../../common/constant';
+import { IAssetCategory, IAssetCategoryTypes } from '../../../common/types';
+import { CommonFormGroup, generateCategoryOptions } from '../../../common/utils';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
-  group: IAssetGroupTypes;
-  groups: IAssetGroupTypes[];
+  category: IAssetCategoryTypes;
+  categories: IAssetCategoryTypes[];
 };
 
 class Form extends React.Component<Props> {
   constructor(props) {
     super(props);
 
-    const group = props.group || ({} as IAssetGroup);
-    const attachment = group.attachment || undefined;
+    const category = props.category || ({} as IAssetCategory);
+    const attachment = category.attachment || undefined;
     this.state = {
       attachment
     };
@@ -29,12 +29,12 @@ class Form extends React.Component<Props> {
   }
 
   generateDocs(values) {
-    const { group } = this.props;
+    const { category } = this.props;
 
     const finalValues = values;
 
-    if (group) {
-      finalValues._id = group._id;
+    if (category) {
+      finalValues._id = category._id;
     }
 
     return { ...finalValues };
@@ -44,10 +44,10 @@ class Form extends React.Component<Props> {
     this.setState({ attachment: files ? files[0] : undefined });
   };
   renderForm(formProps: IFormProps) {
-    const { renderButton, closeModal, group, groups } = this.props;
+    const { renderButton, closeModal, category, categories } = this.props;
     const { isSubmitted, values } = formProps;
 
-    const object = group || ({} as IAssetGroup);
+    const object = category || ({} as IAssetCategory);
 
     const attachments = (object.attachment && extractAttachment([object.attachment])) || [];
 
@@ -75,7 +75,7 @@ class Form extends React.Component<Props> {
                 name="status"
                 {...formProps}
                 componentClass="select"
-                options={ASSET_GROUP_STATUSES}
+                options={ASSET_CATEGORY_STATUSES}
                 defaultValue={object.status}
               />
             </CommonFormGroup>
@@ -92,7 +92,7 @@ class Form extends React.Component<Props> {
           </FormColumn>
         </FormWrapper>
 
-        <CommonFormGroup label="Parent Group">
+        <CommonFormGroup label="Parent Category">
           <FormControl
             name="parentId"
             {...formProps}
@@ -100,7 +100,7 @@ class Form extends React.Component<Props> {
             defaultValue={object.parentId}
           >
             <option value="" />
-            {generateGroupOptions(groups, object._id)}
+            {generateCategoryOptions(categories, object._id)}
           </FormControl>
         </CommonFormGroup>
 
@@ -110,11 +110,11 @@ class Form extends React.Component<Props> {
           </Button>
 
           {renderButton({
-            text: 'Asset Group',
+            text: 'Asset Category',
             values: this.generateDocs(values),
             isSubmitted,
             callback: closeModal,
-            object: group
+            object: category
           })}
         </ModalFooter>
       </>

@@ -1,4 +1,4 @@
-export const assetGroupParamsDef = `
+export const assetCategoryParamsDef = `
   $name: String!,
   $code: String!,
   $parentId: String,
@@ -7,7 +7,7 @@ export const assetGroupParamsDef = `
   $status: String,
 `;
 
-export const assetGroupParams = `
+export const assetCategoryParams = `
   name: $name,
   code: $code,
   parentId: $parentId,

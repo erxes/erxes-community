@@ -1,7 +1,7 @@
 import { IContext } from '../../../connectionResolver';
 
-const assetGroupQueries = {
-  assetGroups(
+const assetCategoriesQueries = {
+  assetCategories(
     _root,
     { parentId, searchValue, status }: { parentId: string; searchValue: string; status: string },
     { commonQuerySelector, models }: IContext
@@ -22,16 +22,16 @@ const assetGroupQueries = {
       filter.name = new RegExp(`.*${searchValue}.*`, 'i');
     }
 
-    return models.AssetGroup.find(filter)
+    return models.AssetCategories.find(filter)
       .sort({ order: 1 })
       .lean();
   },
-  assetGroupDetail(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.AssetGroup.findOne({ _id }).lean();
+  assetCategoryDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+    return models.AssetCategories.findOne({ _id }).lean();
   },
-  assetGroupsTotalCount(_root, _params, { models }: IContext) {
-    return models.AssetGroup.find().countDocuments();
+  assetCategoriesTotalCount(_root, _params, { models }: IContext) {
+    return models.AssetCategories.find().countDocuments();
   }
 };
 
-export default assetGroupQueries;
+export default assetCategoriesQueries;

@@ -12,7 +12,7 @@ export default {
     let fields: Array<{
       _id: number;
       name: string;
-      group?: string;
+      category?: string;
       label?: string;
       type?: string;
       validation?: string;
@@ -37,11 +37,11 @@ export default {
     return fields;
   },
 
-  systemFields: ({ data: { groupId } }) =>
+  systemFields: ({ data: { categoryId } }) =>
     ASSET_INFO.ALL.map(e => ({
       text: e.label,
       type: e.field,
-      groupId,
+      categoryId,
       contentType: `assets:asset`,
       canHide: false,
       isDefinedByErxes: true

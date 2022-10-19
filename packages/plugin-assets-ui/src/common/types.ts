@@ -8,7 +8,7 @@ export type CommonFormGroupTypes = {
   required?: boolean;
 };
 
-export type IAssetGroupTypes = {
+export type IAssetCategoryTypes = {
   _id: string;
   name: string;
   order: string;
@@ -21,14 +21,14 @@ export type IAssetGroupTypes = {
   assetCount: number;
 };
 
-export type IAssetGroupQeuryResponse = {
-  assetGroups: IAssetGroupTypes[];
+export type IAssetCategoryQeuryResponse = {
+  assetCategories: IAssetCategoryTypes[];
   loading: boolean;
   refetch: () => void;
 };
 
-export type IAssetGroupsTotalCountResponse = {
-  assetGroupsTotalCount: number;
+export type IAssetCategoriesTotalCountResponse = {
+  assetCategoriesTotalCount: number;
 } & QueryResponse;
 
 export type IAssetQueryResponse = {
@@ -52,7 +52,7 @@ export type IAssetDetailQueryResponse = {
   assetDetail: IAsset;
   loading: boolean;
 };
-export interface IAssetGroup {
+export interface IAssetCategory {
   _id: string;
   name: string;
   order: string;
@@ -70,7 +70,7 @@ export interface IAsset {
   _id: string;
   name: string;
   type: string;
-  groupId: string;
+  categoryId: string;
   parentId: string;
   description: string;
   sku: string;
@@ -86,7 +86,7 @@ export interface IAsset {
   supply: string;
   assetCount: number;
   minimiumCount: number;
-  group: IAssetGroup;
+  category: IAssetCategory;
   parent: IAsset;
   chidlAssetCount: number;
   vendor?: ICompany;
@@ -102,8 +102,8 @@ export interface IAssetDoc {
   customFieldsData?: any;
 }
 
-export type IAssetGroupDetailQueryResponse = {
-  assetGroupDetail: IAssetGroup;
+export type IAssetCategoryDetailQueryResponse = {
+  assetCategoryDetail: IAssetCategory;
   loading: boolean;
 };
 
@@ -146,6 +146,7 @@ export type IMovementType = {
   assetIds?: string[];
   assets?: IMovementItem[];
   createdAt?: string;
+  modifiedAt?: string;
   movedAt?: string;
   userId?: string;
   user?: any;

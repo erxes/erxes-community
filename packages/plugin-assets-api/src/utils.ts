@@ -1,19 +1,3 @@
-import { IModels } from './connectionResolver';
-
-export async function checkCodeDuplication(models: IModels, code: string) {
-  if (code.includes('/')) {
-    throw new Error('The "/" character is not allowed in the code');
-  }
-
-  const group = await models.AssetGroup.findOne({
-    code
-  });
-
-  if (group) {
-    throw new Error('Code must be unique');
-  }
-}
-
 export const generateFilter = async (params, models) => {
   let filter: any = {};
 
@@ -63,6 +47,13 @@ export const generateFilter = async (params, models) => {
   }
   if (params.movedAtTo) {
     filter.movedAt = { ...filter.movedAt, $lt: new Date(params.movedAtTo) };
+  }
+
+  if (params.modifiedAtFrom) {
+    filter.modifiedAt = { $gt: new Date(params.modifiedAtFrom) };
+  }
+  if (params.modifiedAtTo) {
+    filter.modifiedAt = { ...filter.modifiedAt, $lt: new Date(params.modifiedAtTo) };
   }
 
   if (params.searchValue) {

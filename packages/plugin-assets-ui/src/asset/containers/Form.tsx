@@ -3,11 +3,11 @@ import React from 'react';
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { queries as groupQueries } from '../group/graphql';
+import { queries as categoryQueries } from '../category/graphql';
 import {
   IAsset,
-  IAssetGroupQeuryResponse,
-  IAssetGroupTypes,
+  IAssetCategoryQeuryResponse,
+  IAssetCategoryTypes,
   IAssetQueryResponse
 } from '../../common/types';
 import Form from '../components/Form';
@@ -22,7 +22,7 @@ type Props = {
 };
 
 type FinalProps = {
-  assetGroups: IAssetGroupQeuryResponse;
+  assetCategories: IAssetCategoryQeuryResponse;
   assets: IAssetQueryResponse;
 } & Props;
 
@@ -47,6 +47,10 @@ class FormContainer extends React.Component<FinalProps> {
     values.attachment = attachment ? { ...attachment, __typename: undefined } : null;
     values.attachmentMore = attachmentMoreArray;
 
+    const afterSavedDb = () => {
+      callback && callback();
+    };
+
     return (
       <ButtonMutate
         mutation={object ? mutations.assetEdit : mutations.assetAdd}
@@ -62,15 +66,15 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { assetGroups, assets } = this.props;
+    const { assetCategories, assets } = this.props;
 
-    if (assetGroups.loading || assets.loading) {
+    if (assetCategories.loading || assets.loading) {
       return <Spinner />;
     }
 
     const updatedProps = {
       ...this.props,
-      groups: assetGroups.assetGroups,
+      categories: assetCategories.assetCategories,
       assets: assets.assets,
       renderButton: this.renderButton
     };
@@ -81,8 +85,8 @@ class FormContainer extends React.Component<FinalProps> {
 
 export default withProps<Props>(
   compose(
-    graphql(gql(groupQueries.assetGroup), {
-      name: 'assetGroups'
+    graphql(gql(categoryQueries.assetCategory), {
+      name: 'assetCategories'
     }),
     graphql(gql(queries.assets), {
       name: 'assets'

@@ -37,8 +37,8 @@ class AssetsMerge extends React.Component<Props, State> {
     const { objects } = this.props;
     const selectedValues = { ...this.state.selectedValues };
 
-    if (selectedValues.group) {
-      selectedValues.groupId = selectedValues.group._id;
+    if (selectedValues.category) {
+      selectedValues.categoryId = selectedValues.category._id;
     }
 
     if (selectedValues.vendor) {
@@ -110,8 +110,8 @@ class AssetsMerge extends React.Component<Props, State> {
 
   renderValue(field: string, value: any) {
     switch (field) {
-      case 'group':
-        return this.renderGroupInfo(value);
+      case 'category':
+        return this.renderCategoryInfo(value);
 
       case 'vendor':
         return this.renderVendorInfo(value);
@@ -121,7 +121,7 @@ class AssetsMerge extends React.Component<Props, State> {
     }
   }
 
-  renderGroupInfo(value) {
+  renderCategoryInfo(value) {
     return (
       <Info>
         <InfoTitle>{__('Name')}: </InfoTitle>

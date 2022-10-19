@@ -8,7 +8,7 @@ import {
   ASSET_TYPES
 } from '../../common/constant/asset';
 
-export const assetGroupSchema = schemaWrapper(
+export const assetCategoriesSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
     name: field({ type: String, label: 'Name' }),
@@ -48,7 +48,7 @@ export const assetSchema = schemaWrapper(
     name: field({ type: String, label: 'Name' }),
     code: field({ type: String, unique: true, label: 'Code' }),
     order: field({ type: String, label: 'Order' }),
-    groupId: field({ type: String, optional: true, label: 'Group' }),
+    categoryId: field({ type: String, optional: true, label: 'Category' }),
     parentId: field({ type: String, optional: true, label: 'Parent' }),
     type: field({
       type: String,

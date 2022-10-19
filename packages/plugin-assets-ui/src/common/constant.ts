@@ -1,6 +1,6 @@
 import { __ } from '@erxes/ui/src';
 
-export const ASSET_GROUP_STATUSES = [
+export const ASSET_CATEGORY_STATUSES = [
   { label: 'Active', value: 'active' },
   { label: 'Disabled', value: 'disabled' },
   { label: 'Archived', value: 'archived' }
@@ -21,7 +21,7 @@ export const ASSET_SUPPLY = [
 export const ASSET_INFO = {
   name: 'Name',
   type: 'Type',
-  group: 'group',
+  category: 'category',
   code: 'Code',
   description: 'Description',
   sku: 'Sku',
@@ -31,7 +31,7 @@ export const ASSET_INFO = {
   ALL: [
     { field: 'name', label: 'Name' },
     { field: 'type', label: 'Type' },
-    { field: 'group', label: 'Group' },
+    { field: 'category', label: 'Category' },
     { field: 'code', label: 'Code' },
     { field: 'description', label: 'Description' },
     { field: 'sku', label: 'Sku' },
@@ -45,12 +45,15 @@ export const ASSET_TYPE_CHOISES = {
   service: 'Service'
 };
 
-export const ASSET_GROUP_STATUS_FILTER = {
+export const ASSET_CATEGORY_STATUS_FILTER = {
   disabled: 'Disabled',
   archived: 'Archived'
 };
 
-export const breadcrumb = [{ title: __('Settings'), link: '/settings' }, { title: __('Asset & Movement') }];
+export const breadcrumb = [
+  { title: __('Settings'), link: '/settings' },
+  { title: __('Asset & Movement') }
+];
 
 export const MOVEMENT_TYPES = [];
 

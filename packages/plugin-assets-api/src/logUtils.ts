@@ -9,12 +9,12 @@ import {
 } from '@erxes/api-utils/src/logUtils';
 import { IModels } from './connectionResolver';
 import messageBroker from './messageBroker';
-import { IAssetDocument, IAssetGroupDocument } from './common/types/asset';
-import { assetGroupSchema, assetSchema } from './models/definitions/asset';
+import { IAssetDocument, IAssetCategoriesDocument } from './common/types/asset';
+import { assetCategoriesSchema, assetSchema } from './models/definitions/asset';
 
 export const MODULE_NAMES = {
   ASSET: 'asset',
-  ASSET_GROUP: 'assetGroup',
+  ASSET_CATEGORIES: 'assetCategories',
   MOVEMENT: 'movement'
 };
 
@@ -36,13 +36,13 @@ const gatherAssetFieldNames = async (
     options = prevList;
   }
 
-  if (doc.groupId) {
+  if (doc.categoryId) {
     options = await gatherNames({
-      foreignKey: 'groupId',
+      foreignKey: 'categoryId',
       prevList: options,
       nameFields: ['name'],
-      items: await models.AssetGroup.find({
-        _id: { $in: [doc.groupId] }
+      items: await models.AssetCategories.find({
+        _id: { $in: [doc.categoryId] }
       }).lean()
     });
   }
@@ -69,7 +69,7 @@ const gatherDescriptions = async (
       }
 
       break;
-    case MODULE_NAMES.ASSET_GROUP:
+    case MODULE_NAMES.ASSET_CATEGORIES:
       const parentIds: string[] = [];
 
       if (object.parentId) {
@@ -84,7 +84,7 @@ const gatherDescriptions = async (
         extraDesc = await gatherNames({
           foreignKey: 'parentId',
           nameFields: ['name'],
-          items: await models.AssetGroup.find({
+          items: await models.AssetCategories.find({
             _id: { $in: parentIds }
           }).lean()
         });
@@ -145,7 +145,7 @@ export default {
     status: 'success',
     data: getSchemaLabels(type, [
       { name: 'asset', schemas: [assetSchema] },
-      { name: 'assetGroup', schemas: [assetGroupSchema] }
+      { name: 'assetCategories', schemas: [assetCategoriesSchema] }
     ])
   })
 };

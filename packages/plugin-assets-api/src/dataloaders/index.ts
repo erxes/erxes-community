@@ -1,6 +1,6 @@
 import * as DataLoader from 'dataloader';
 import { IModels } from '../connectionResolver';
-import assetGroup from './assetGroup';
+import assetCategories from './assetCategories';
 import company from './company';
 import asset from './asset';
 import branch from './branch';
@@ -10,7 +10,7 @@ import department from './department';
 
 export interface IDataLoaders {
   asset: DataLoader<string, any>;
-  assetGroup: DataLoader<string, any>;
+  assetCategories: DataLoader<string, any>;
   company: DataLoader<string, any>;
   branch: DataLoader<string, any>;
   customer: DataLoader<string, any>;
@@ -20,7 +20,7 @@ export interface IDataLoaders {
 
 export function generateAllDataLoaders(models: IModels, subdomain: string): IDataLoaders {
   return {
-    assetGroup: assetGroup(models),
+    assetCategories: assetCategories(models),
     asset: asset(models),
     company: company(subdomain),
     branch: branch(models, subdomain),

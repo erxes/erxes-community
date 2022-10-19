@@ -1,5 +1,5 @@
 import { attachmentInput, attachmentType } from '@erxes/api-utils/src/commonTypeDefs';
-import { assetGroupParams } from '../../common/graphql/asset';
+import { assetCategoryParams } from '../../common/graphql/asset';
 import { assetParams } from '../../common/graphql/asset';
 
 export const types = contactsAvailable => `
@@ -17,7 +17,7 @@ export const types = contactsAvailable => `
         : ''
     }
 
-    type AssetGroup @key(fields: "_id") @cacheControl(maxAge: 3) {
+    type AssetCategory @key(fields: "_id") @cacheControl(maxAge: 3) {
         _id: String!
         name: String
         description: String
@@ -52,7 +52,7 @@ export const types = contactsAvailable => `
     description: String
     sku: String
     unitPrice: Float
-    groupId: String
+    categoryId: String
     parentId: String
     customFieldsData: JSON
     createdAt: Date
@@ -63,7 +63,7 @@ export const types = contactsAvailable => `
     assetCount: Int
     minimiumCount: Int
 
-    group: AssetGroup
+    category: AssetCategory
     parent:Asset
     isRoot: Boolean
     chidlAssetCount:Int
@@ -76,7 +76,7 @@ export const types = contactsAvailable => `
 export const queries = `
     assets(
       type: String,
-      groupId: String,
+      categoryId: String,
       parentId: String,
       searchValue: String,
       page: Int,
@@ -88,9 +88,9 @@ export const queries = `
     ): [Asset]
     assetsTotalCount(type: String): Int
     assetDetail(_id: String): Asset
-    assetGroups(parentId: String, searchValue: String, status: String): [AssetGroup]
-    assetGroupDetail(_id: String): AssetGroup
-    assetGroupsTotalCount: Int
+    assetCategories(parentId: String, searchValue: String, status: String): [AssetCategory]
+    assetCategoryDetail(_id: String): AssetCategory
+    assetCategoriesTotalCount: Int
 
 `;
 
@@ -99,7 +99,7 @@ export const mutations = `
     assetsEdit(_id: String!, ${assetParams}): Asset
     assetsRemove(assetIds: [String!]): String
     assetsMerge(assetIds: [String], assetFields: JSON): Asset
-    assetGroupAdd(${assetGroupParams}): AssetGroup
-    assetGroupEdit(_id: String!, ${assetGroupParams}): AssetGroup
-    assetGroupRemove(_id: String!): JSON
+    assetCategoryAdd(${assetCategoryParams}): AssetCategory
+    assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategory
+    assetCategoryRemove(_id: String!): JSON
 `;

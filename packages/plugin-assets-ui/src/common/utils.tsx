@@ -11,8 +11,8 @@ import {
   SelectWithSearch
 } from '@erxes/ui/src';
 import React from 'react';
-import { ASSET_GROUP_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
-import { CommonFormGroupTypes, IAsset, IAssetGroupTypes } from './types';
+import { ASSET_CATEGORY_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
+import { CommonFormGroupTypes, IAsset, IAssetCategoryTypes } from './types';
 import { queries as assetQueries } from '../asset/graphql';
 import { IOption, IQueryParams } from '@erxes/ui/src/types';
 
@@ -79,15 +79,15 @@ export const CommonItemRow = ({ children, label }) => {
   );
 };
 
-export const generateGroupOptions = (
-  groups: IAssetGroupTypes[],
-  currentGroupId?: string,
+export const generateCategoryOptions = (
+  categories: IAssetCategoryTypes[],
+  currentCategoryId?: string,
   drawCode?: boolean
 ) => {
   const result: React.ReactNode[] = [];
 
-  for (const group of groups) {
-    const order = group.order;
+  for (const category of categories) {
+    const order = category.order;
 
     const foundedString = order.match(/[/]/gi);
 
@@ -97,12 +97,12 @@ export const generateGroupOptions = (
       space = '\u00A0 '.repeat(foundedString.length);
     }
 
-    if (currentGroupId !== group._id) {
+    if (currentCategoryId !== category._id) {
       result.push(
-        <option key={group._id} value={group._id}>
+        <option key={category._id} value={category._id}>
           {space}
-          {drawCode ? `${group.code} - ` : ''}
-          {group.name}
+          {drawCode ? `${category.code} - ` : ''}
+          {category.name}
         </option>
       );
     }
@@ -143,10 +143,10 @@ export const generateParentOptions = (
 export const assetStatusChoises = __ => {
   const options: Array<{ value: string; label: string }> = [];
 
-  for (const key of Object.keys(ASSET_GROUP_STATUS_FILTER)) {
+  for (const key of Object.keys(ASSET_CATEGORY_STATUS_FILTER)) {
     options.push({
       value: key,
-      label: __(ASSET_GROUP_STATUS_FILTER[key])
+      label: __(ASSET_CATEGORY_STATUS_FILTER[key])
     });
   }
 
@@ -167,7 +167,7 @@ export const asssetTypeChoises = __ => {
 };
 
 export const getRefetchQueries = () => {
-  return ['assetDetail', 'assets', 'assetsTotalCount', 'assetGroups'];
+  return ['assetDetail', 'assets', 'assetsTotalCount', 'assetCategories'];
 };
 
 export const generateParams = ({ queryParams }) => ({
@@ -175,6 +175,8 @@ export const generateParams = ({ queryParams }) => ({
   movementId: queryParams?.movementId,
   movedAtFrom: queryParams.movedAtFrom,
   movedAtTo: queryParams.movedAtTo,
+  modifiedAtFrom: queryParams.modifiedAtFrom,
+  modifiedAtTo: queryParams.modifiedAtTo,
   createdAtFrom: queryParams.createdAtFrom,
   createdAtTo: queryParams.createdAtTo,
   userId: queryParams.userId,

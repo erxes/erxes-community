@@ -1,5 +1,5 @@
-import AssetGroup from './group';
+import AssetCategories from './category';
 import Asset from './asset';
 import Movement from './movement';
 
-export { AssetGroup, Asset, Movement };
+export { AssetCategories, Asset, Movement };

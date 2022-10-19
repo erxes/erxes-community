@@ -1,7 +1,7 @@
 import { Box, Button, ControlLabel, Icon, Sidebar as CommonSideBar, Tip, __ } from '@erxes/ui/src';
 import React from 'react';
 import { ContainerBox } from '../../style';
-import GroupListContainer from '../group/containers/List';
+import CategoryListContainer from '../category/containers/List';
 
 type Props = {
   queryParams: any;
@@ -17,7 +17,7 @@ class SideBar extends React.Component<Props> {
     return (
       <CommonSideBar>
         <ContainerBox column gap={5}>
-          <GroupListContainer {...this.props} />
+          <CategoryListContainer {...this.props} />
         </ContainerBox>
       </CommonSideBar>
     );

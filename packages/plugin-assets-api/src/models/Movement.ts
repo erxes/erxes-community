@@ -61,7 +61,7 @@ export const loadMovementClass = (models: IModels) => {
       await models.MovementAsset.movementItemsEdit(_id, doc.items);
       await models.Movement.update(
         { _id },
-        { $set: { movedAt: doc.movedAt, description: doc.description } }
+        { $set: { movedAt: doc.movedAt, description: doc.description, modifiedAt: new Date() } }
       );
     }
 

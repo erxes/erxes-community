@@ -15,7 +15,7 @@ import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import { DateContainer } from '@erxes/ui/src/styles/main';
-import { ContainerBox } from '../../../style';
+import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../../style';
 import moment from 'moment';
 import { SelectWithAssets } from '../../../common/utils';
 
@@ -65,11 +65,17 @@ class Sidebar extends React.Component<Props, State> {
       children
     }: {
       label: string;
-      field: string;
+      field: string | string[];
       clearable?: boolean;
       children: React.ReactNode;
     }) => {
-      const clearParams = () => {
+      const clearParams = field => {
+        if (Array.isArray(field)) {
+          field.forEach(name => {
+            this.setState({ [name]: undefined });
+            return router.removeParams(this.props.history, name);
+          });
+        }
         this.setState({ [field]: undefined });
         router.removeParams(this.props.history, field);
       };
@@ -78,7 +84,7 @@ class Sidebar extends React.Component<Props, State> {
           <ContainerBox row spaceBetween>
             <ControlLabel>{label}</ControlLabel>
             {clearable && (
-              <Button btnStyle="link" onClick={clearParams}>
+              <Button btnStyle="link" onClick={() => clearParams(field)}>
                 <Tip placement="bottom" text="Clear">
                   <Icon icon="cancel-1" />
                 </Tip>
@@ -156,25 +162,31 @@ class Sidebar extends React.Component<Props, State> {
               onSelect={handleSelect}
             />
           </FormGroup>
-          <FormGroup label="From" clearable={!!createdAtFrom} field="createdAtFrom">
-            <DateContainer>
-              <DateControl
-                name="createdAtFrom"
-                placeholder="Choose start date"
-                value={createdAtFrom}
-                onChange={e => handleSelect(e, 'createdAtFrom')}
-              />
-            </DateContainer>
-          </FormGroup>
-          <FormGroup label="To" clearable={!!createdAtTo} field="createdAtTo">
-            <DateContainer>
-              <DateControl
-                name="createdAtTo"
-                placeholder="Choose end date"
-                value={createdAtTo}
-                onChange={e => handleSelect(e, 'createdAtTo')}
-              />
-            </DateContainer>
+          <FormGroup
+            label="Created Date Range"
+            clearable={!!createdAtFrom || !!createdAtTo}
+            field={['createdAtFrom', 'createdAtTo']}
+          >
+            <CustomRangeContainer>
+              <DateContainer>
+                <DateControl
+                  name="createdAtFrom"
+                  placeholder="Choose start date"
+                  value={createdAtFrom}
+                  onChange={e => handleSelect(e, 'createdAtFrom')}
+                />
+              </DateContainer>
+              <EndDateContainer>
+                <DateContainer>
+                  <DateControl
+                    name="createdAtTo"
+                    placeholder="Choose end date"
+                    value={createdAtTo}
+                    onChange={e => handleSelect(e, 'createdAtTo')}
+                  />
+                </DateContainer>
+              </EndDateContainer>
+            </CustomRangeContainer>
           </FormGroup>
         </ContainerBox>
       </CommonSideBar>

@@ -7,8 +7,8 @@ export default {
     return models.Asset.findOne({ _id });
   },
 
-  group(asset: IAssetDocument, _, { dataLoaders }: IContext) {
-    return (asset.groupId && dataLoaders.assetGroup.load(asset.groupId)) || null;
+  category(asset: IAssetDocument, _, { dataLoaders }: IContext) {
+    return (asset.categoryId && dataLoaders.assetCategories.load(asset.categoryId)) || null;
   },
 
   parent(asset: IAssetDocument, _, { dataLoaders }: IContext) {
@@ -20,7 +20,10 @@ export default {
   },
 
   async chidlAssetCount(asset: IAssetDocument, {}, { models }: IContext) {
-    const asset_ids = await models.Asset.find({ order: { $regex: new RegExp(asset.order) } }, { _id: 1 });
+    const asset_ids = await models.Asset.find(
+      { order: { $regex: new RegExp(asset.order) } },
+      { _id: 1 }
+    );
 
     return models.Asset.countDocuments({
       parentId: { $in: asset_ids },
@@ -29,13 +32,26 @@ export default {
   },
 
   async currentMovement(asset: IAssetDocument, {}, { models, dataLoaders }: IContext) {
-    const branch = (asset.currentMovement?.branchId && dataLoaders.branch.load(asset.currentMovement?.branchId)) || null;
+    const branch =
+      (asset.currentMovement?.branchId &&
+        dataLoaders.branch.load(asset.currentMovement?.branchId)) ||
+      null;
     const department =
-      (asset.currentMovement?.departmentId && dataLoaders.department.load(asset.currentMovement?.departmentId)) || null;
+      (asset.currentMovement?.departmentId &&
+        dataLoaders.department.load(asset.currentMovement?.departmentId)) ||
+      null;
     const teamMember =
-      (asset.currentMovement?.teamMemberId && dataLoaders.teamMember.load(asset.currentMovement?.teamMemberId)) || null;
-    const customer = (asset.currentMovement?.customerId && dataLoaders.customer.load(asset.currentMovement?.customerId)) || null;
-    const company = (asset.currentMovement?.companyId && dataLoaders.company.load(asset.currentMovement?.companyId)) || null;
+      (asset.currentMovement?.teamMemberId &&
+        dataLoaders.teamMember.load(asset.currentMovement?.teamMemberId)) ||
+      null;
+    const customer =
+      (asset.currentMovement?.customerId &&
+        dataLoaders.customer.load(asset.currentMovement?.customerId)) ||
+      null;
+    const company =
+      (asset.currentMovement?.companyId &&
+        dataLoaders.company.load(asset.currentMovement?.companyId)) ||
+      null;
     return { ...asset.currentMovement, branch, department, teamMember, customer, company };
   },
 

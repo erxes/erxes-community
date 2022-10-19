@@ -108,13 +108,16 @@ class Form extends React.Component<Props, State> {
 
   assetChooser(props) {
     const handleSelect = datas => {
-      this.setState({ selectedItems: datas });
+      const { variables } = this.state;
 
-      const newVariables = datas.map(data => ({
-        ...data?.currentMovement,
-        assetId: data._id,
-        assetName: data.name
-      }));
+      this.setState({ selectedItems: datas });
+      const newVariables = datas.map(data => {
+        const item = variables.find(item => item.assetId === data._id);
+        if (item) {
+          return item;
+        }
+        return { ...data?.currentMovement, assetId: data._id, assetName: data.name };
+      });
       this.setState({ variables: newVariables });
     };
 
@@ -239,7 +242,7 @@ class Form extends React.Component<Props, State> {
       <CollapseContent
         title="General Location Configrations"
         description={__(
-          'You should click checkbox before if you want change location in generally selected assets'
+          'If you want to change the location generally of your selected assets, you should click checkboxes below.'
         )}
       >
         <BarItems>

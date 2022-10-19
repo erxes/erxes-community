@@ -1,7 +1,7 @@
 export const assetParamsDef = `
   $name: String,
   $type: String,
-  $groupId: String,
+  $categoryId: String,
   $parentId: String,
   $description: String,
   $sku: String,
@@ -19,7 +19,7 @@ export const assetParamsDef = `
 export const assetParams = `
   name: $name,
   type: $type,
-  groupId: $groupId,
+  categoryId: $categoryId,
   parentId: $parentId,
   description: $description,
   sku: $sku,
@@ -73,14 +73,14 @@ export const assetFields = `
   type
   code
   order
-  groupId
+  categoryId
   parentId
   vendorId
   ${vendorField}
   description
   unitPrice
   createdAt
-  group {
+  category {
     _id
     code
     name

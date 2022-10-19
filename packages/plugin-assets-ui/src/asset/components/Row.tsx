@@ -38,7 +38,7 @@ class Row extends React.Component<Props> {
 
     const content = props => <AssetForm {...props} asset={asset} />;
 
-    const { code, name, group, parent, chidlAssetCount, unitPrice } = asset;
+    const { code, name, category, parent, chidlAssetCount, unitPrice } = asset;
 
     return (
       <tr onClick={onTrClick}>
@@ -47,7 +47,7 @@ class Row extends React.Component<Props> {
         </td>
         <td>{code}</td>
         <td>{name}</td>
-        <td>{group ? group.name : ''}</td>
+        <td>{category ? category.name : ''}</td>
         <td>{parent ? parent.name : ''}</td>
         <td>{(unitPrice || 0).toLocaleString()}</td>
         <td onClick={onClick}>

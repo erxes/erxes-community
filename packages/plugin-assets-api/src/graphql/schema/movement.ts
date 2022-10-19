@@ -24,6 +24,7 @@ export const types = `
     type Movement {
         _id:String
         createdAt:Date
+        modifiedAt:Date
         userId:String
         movedAt:Date
         assetIds:[String]

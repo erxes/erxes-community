@@ -3,18 +3,18 @@ import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
 import {
   IAssetDocument,
-  IAssetGroupDocument,
+  IAssetCategoriesDocument,
   IMovementAssetDocument,
   IMovementDocument
 } from './common/types/asset';
-import { IAssetGroupModel, loadAssetGroupClass } from './models/AssetGroup';
+import { IAssetCategoriesModel, loadAssetCategoriesClass } from './models/AssetCategories';
 import { IAssetModel, loadAssetClass } from './models/Asset';
 import { IMovementModel, loadMovementClass } from './models/Movement';
 import { IMovementAssetModel, loadMovementAssetClass } from './models/MovementAssets';
 
 export interface IModels {
   Asset: IAssetModel;
-  AssetGroup: IAssetGroupModel;
+  AssetCategories: IAssetCategoriesModel;
   Movement: IMovementModel;
   MovementAsset: IMovementAssetModel;
 }
@@ -30,9 +30,9 @@ export const loadClasses = (db: mongoose.Connection, subdomain: string): IModels
   models = {} as IModels;
 
   models.Asset = db.model<IAssetDocument, IAssetModel>('asset', loadAssetClass(models, subdomain));
-  models.AssetGroup = db.model<IAssetGroupDocument, IAssetGroupModel>(
-    'asset_group',
-    loadAssetGroupClass(models)
+  models.AssetCategories = db.model<IAssetCategoriesDocument, IAssetCategoriesModel>(
+    'asset_categories',
+    loadAssetCategoriesClass(models)
   );
   models.Movement = db.model<IMovementDocument, IMovementModel>(
     'asset_movement',

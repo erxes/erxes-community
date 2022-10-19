@@ -11,7 +11,7 @@ import {
   __
 } from '@erxes/ui/src';
 import React from 'react';
-import { IAssetGroup, IAssetGroupTypes } from '../../../common/types';
+import { IAssetCategory, IAssetCategoryTypes } from '../../../common/types';
 import { ContainerBox } from '../../../style';
 import Form from '../containers/Form';
 import { Link } from 'react-router-dom';
@@ -22,11 +22,11 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 const { Section } = Wrapper.Sidebar;
 
 type Props = {
-  assetGroups: IAssetGroupTypes[];
+  assetCategories: IAssetCategoryTypes[];
   totalCount: number;
   loading: boolean;
   remove: (_id) => any;
-  refetchAssetGroups: () => void;
+  refetchAssetCategories: () => void;
   queryParams: any;
   history: any;
 };
@@ -34,17 +34,17 @@ type Props = {
 class List extends React.Component<Props> {
   addFormTrigger = (
     <Button btnStyle="success" icon="plus-circle" block>
-      Add Group
+      Add Category
     </Button>
   );
 
   renderFormContent = props => {
-    const { refetchAssetGroups, assetGroups } = this.props;
+    const { refetchAssetCategories, assetCategories } = this.props;
 
     const updatedProps = {
       ...props,
-      refetchAssetGroups,
-      groups: assetGroups
+      refetchAssetCategories,
+      categories: assetCategories
     };
 
     return <Form {...updatedProps} />;
@@ -53,14 +53,14 @@ class List extends React.Component<Props> {
   renderAddForm() {
     return (
       <ModalTrigger
-        title="Add Asset Group"
+        title="Add Asset Category"
         trigger={this.addFormTrigger}
         content={this.renderFormContent}
       />
     );
   }
 
-  renderEditAction(group) {
+  renderEditAction(category) {
     const trigger = (
       <Button btnStyle="link">
         <Tip text="Edit">
@@ -70,19 +70,21 @@ class List extends React.Component<Props> {
     );
 
     const content = props => {
-      const { refetchAssetGroups, assetGroups } = this.props;
+      const { refetchAssetCategories, assetCategories } = this.props;
 
       const updatedProps = {
         ...props,
-        refetchAssetGroups,
-        group,
-        groups: assetGroups
+        refetchAssetCategories,
+        category,
+        categories: assetCategories
       };
 
       return <Form {...updatedProps} />;
     };
 
-    return <ModalTrigger isAnimate title="Edit Asset Group" content={content} trigger={trigger} />;
+    return (
+      <ModalTrigger isAnimate title="Edit Asset Category" content={content} trigger={trigger} />
+    );
   }
 
   renderRemoveAction(_id) {
@@ -98,13 +100,13 @@ class List extends React.Component<Props> {
   }
   isActive = (id: string) => {
     const { queryParams } = this.props;
-    const currentGroup = queryParams.groupId || '';
+    const currentCategory = queryParams.categoryId || '';
 
-    return currentGroup === id;
+    return currentCategory === id;
   };
 
   renderContent() {
-    const { assetGroups, loading } = this.props;
+    const { assetCategories, loading } = this.props;
 
     if (loading) {
       return <Spinner objective />;
@@ -112,8 +114,8 @@ class List extends React.Component<Props> {
 
     const result: React.ReactNode[] = [];
 
-    for (const group of assetGroups) {
-      const order = group.order;
+    for (const category of assetCategories) {
+      const order = category.order;
 
       const m = order.match(/[/]/gi);
 
@@ -122,23 +124,23 @@ class List extends React.Component<Props> {
       if (m) {
         space = '\u00a0\u00a0'.repeat(m.length);
       }
-      const name = group.isRoot ? (
-        `${group.name} (${group.assetCount})`
+      const name = category.isRoot ? (
+        `${category.name} (${category.assetCount})`
       ) : (
         <span>
-          {group.name} ({group.assetCount})
+          {category.name} ({category.assetCount})
         </span>
       );
 
       result.push(
-        <SidebarListItem key={group._id} isActive={this.isActive(group._id)}>
-          <Link to={`?groupId=${group._id}`}>
+        <SidebarListItem key={category._id} isActive={this.isActive(category._id)}>
+          <Link to={`?categoryId=${category._id}`}>
             {space}
             {name}
           </Link>
           <ActionButtons>
-            {this.renderEditAction(group)}
-            {this.renderRemoveAction(group._id)}
+            {this.renderEditAction(category)}
+            {this.renderRemoveAction(category._id)}
           </ActionButtons>
         </SidebarListItem>
       );
@@ -146,7 +148,7 @@ class List extends React.Component<Props> {
     return result;
   }
 
-  renderGroupList() {
+  renderCategoryList() {
     const { totalCount, loading } = this.props;
 
     return (
@@ -155,7 +157,7 @@ class List extends React.Component<Props> {
           data={this.renderContent()}
           loading={loading}
           count={totalCount}
-          emptyText="There is no asset group"
+          emptyText="There is no asset category"
           emptyIcon="folder-2"
           size="small"
         />
@@ -163,14 +165,14 @@ class List extends React.Component<Props> {
     );
   }
 
-  clearGroupFilter = () => {
-    router.setParams(this.props.history, { groupId: null });
+  clearCategoryFilter = () => {
+    router.setParams(this.props.history, { categoryId: null });
   };
 
-  clearSelectedGroupButton = (
+  clearSelectedCategoryButton = (
     <Button btnStyle="link">
-      {router.getParam(this.props.history, 'groupId') && (
-        <a href="#cancel" tabIndex={0} onClick={this.clearGroupFilter}>
+      {router.getParam(this.props.history, 'categoryId') && (
+        <a href="#cancel" tabIndex={0} onClick={this.clearCategoryFilter}>
           <Tip text={__('Clear filter')} placement="bottom">
             <Icon icon="cancel-1" />
           </Tip>
@@ -179,10 +181,14 @@ class List extends React.Component<Props> {
     </Button>
   );
 
-  renderAssetGroups() {
+  renderAssetCategories() {
     return (
-      <Box title="Asset Group" extraButtons={this.clearSelectedGroupButton} name="assetGroup">
-        {this.renderGroupList()}
+      <Box
+        title="Asset Category"
+        extraButtons={this.clearSelectedCategoryButton}
+        name="assetCategory"
+      >
+        {this.renderCategoryList()}
       </Box>
     );
   }
@@ -191,7 +197,7 @@ class List extends React.Component<Props> {
     return (
       <ContainerBox gap={15} column>
         {this.renderAddForm()}
-        {this.renderAssetGroups()}
+        {this.renderAssetCategories()}
         <AssetStatusFilter />
       </ContainerBox>
     );

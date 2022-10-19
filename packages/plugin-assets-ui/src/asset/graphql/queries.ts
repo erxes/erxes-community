@@ -4,7 +4,7 @@ const assets = `
   query assets(
     $type: String,
     $parentId: String,
-    $groupId: String,
+    $categoryId: String,
     $searchValue: String,
     $perPage: Int,
     $page: Int $ids: [String],
@@ -15,7 +15,7 @@ const assets = `
   ) {
     assets(
       type: $type,
-      groupId: $groupId,
+      categoryId: $categoryId,
       parentId: $parentId,
       searchValue: $searchValue,
       perPage: $perPage,

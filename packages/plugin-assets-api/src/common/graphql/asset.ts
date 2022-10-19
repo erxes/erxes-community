@@ -1,4 +1,4 @@
-export const assetGroupParams = `
+export const assetCategoryParams = `
   name: String!,
   code: String!,
   description: String,
@@ -9,7 +9,7 @@ export const assetGroupParams = `
 
 export const assetParams = `
   name: String,
-  groupId: String,
+  categoryId: String,
   parentId: String,
   type: String,
   description: String,

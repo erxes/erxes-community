@@ -25,12 +25,12 @@ export default {
 
     const { docs } = data;
 
-        try {
-          const objects = await models.Asset.insertMany(docs);
-          return { objects, updated: 0 };
-        } catch (e) {
-          return { error: e.message };
-        }
+    try {
+      const objects = await models.Asset.insertMany(docs);
+      return { objects, updated: 0 };
+    } catch (e) {
+      return { error: e.message };
+    }
   },
   prepareImportDocs: async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
@@ -57,12 +57,12 @@ export default {
               });
             }
             break;
-          case 'groupName':
+          case 'categoryName':
             {
-              const group = await models.AssetGroup.findOne({
+              const category = await models.AssetCategories.findOne({
                 name: { $regex: new RegExp(`^${value}$`, 'i') }
               });
-              doc.groupId = group ? group._id : '';
+              doc.categoryId = category ? category._id : '';
             }
 
             break;

@@ -12,7 +12,7 @@ import {
   Icon
 } from '@erxes/ui/src';
 import React from 'react';
-import { IAsset, IAssetGroup } from '../../common/types';
+import { IAsset, IAssetCategory } from '../../common/types';
 import { DefaultWrapper } from '../../common/utils';
 import Form from '../containers/Form';
 import Row from './Row';
@@ -37,7 +37,7 @@ type Props = {
   toggleAll: (targets: IAsset[], containerId: string) => void;
   loading: boolean;
   searchValue: string;
-  currentGroup: IAssetGroup;
+  currentCategory: IAssetCategory;
   currentParent: IAsset;
   mergeAssets: () => void;
   mergeAssetLoading;
@@ -112,7 +112,7 @@ class List extends React.Component<Props, State> {
             </th>
             <th>{__('Code')}</th>
             <th>{__('Name')}</th>
-            <th>{__('Group')}</th>
+            <th>{__('Category')}</th>
             <th>{__('Parent')}</th>
             <th>{__('Unit Price')}</th>
             <th>{__('Actions')}</th>
@@ -172,7 +172,7 @@ class List extends React.Component<Props, State> {
       emptyBulk,
       queryParams,
       assetsCount,
-      currentGroup,
+      currentCategory,
       currentParent,
       history
     } = this.props;
@@ -245,8 +245,8 @@ class List extends React.Component<Props, State> {
 
     const leftActionBar = (
       <ContainerBox row>
-        <Title>{currentGroup.name || currentParent.name || 'All Assets'}</Title>
-        {!_loadash.isEmpty(currentGroup) && clearButton('group')}
+        <Title>{currentCategory.name || currentParent.name || 'All Assets'}</Title>
+        {!_loadash.isEmpty(currentCategory) && clearButton('category')}
         {!_loadash.isEmpty(currentParent) && clearButton('parent')}
       </ContainerBox>
     );

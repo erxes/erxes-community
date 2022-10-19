@@ -8,13 +8,13 @@ import { mutations, queries } from '../graphql';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import __ from 'lodash';
-import { IAssetGroupTypes } from '../../../common/types';
+import { IAssetCategoryTypes } from '../../../common/types';
 
 type Props = {
   closeModal: () => void;
-  refetchAssetGroups: () => void;
-  group: IAssetGroupTypes;
-  groups: IAssetGroupTypes[];
+  refetchAssetCategories: () => void;
+  category: IAssetCategoryTypes;
+  categories: IAssetCategoryTypes[];
 };
 
 type FinalProps = {} & Props;
@@ -34,17 +34,17 @@ class FormContainer extends React.Component<FinalProps> {
   }: IButtonMutateProps) => {
     const afterMutate = () => {
       if (callback) {
-        this.props.refetchAssetGroups();
+        this.props.refetchAssetCategories();
         callback();
       }
     };
 
-    let mutation = mutations.assetGroupAdd;
+    let mutation = mutations.assetCategoryAdd;
 
     let sucessAction = 'added';
 
     if (object) {
-      mutation = mutations.assetGroupEdit;
+      mutation = mutations.assetCategoryEdit;
       sucessAction = 'updated';
     }
 
@@ -62,13 +62,13 @@ class FormContainer extends React.Component<FinalProps> {
   };
 
   render() {
-    const { closeModal, group, groups } = this.props;
+    const { closeModal, category, categories } = this.props;
 
     const updatedProps = {
       renderButton: this.renderButton,
       closeModal,
-      group,
-      groups
+      category,
+      categories
     };
 
     return <Form {...updatedProps} />;
