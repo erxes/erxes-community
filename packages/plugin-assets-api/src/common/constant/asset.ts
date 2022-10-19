@@ -1,4 +1,4 @@
-export const ASSET_GROUP_STATUSES = {
+export const ASSET_CATEGORY_STATUSES = {
   ACTIVE: 'active',
   DISABLED: 'disabled',
   ARCHIVED: 'archived',

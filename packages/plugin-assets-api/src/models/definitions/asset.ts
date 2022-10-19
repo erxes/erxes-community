@@ -2,7 +2,7 @@ import { schemaWrapper, field } from './utils';
 import { Schema } from 'mongoose';
 import { attachmentSchema, customFieldSchema } from '@erxes/api-utils/src/types';
 import {
-  ASSET_GROUP_STATUSES,
+  ASSET_CATEGORY_STATUSES,
   ASSET_STATUSES,
   ASSET_SUPPLY,
   ASSET_TYPES
@@ -19,7 +19,7 @@ export const assetCategoriesSchema = schemaWrapper(
     attachment: field({ type: attachmentSchema }),
     status: field({
       type: String,
-      enum: ASSET_GROUP_STATUSES.ALL,
+      enum: ASSET_CATEGORY_STATUSES.ALL,
       optional: true,
       label: 'Status',
       default: 'active',

@@ -40,7 +40,6 @@ class FormContainer extends React.Component<FinalProps> {
 
         refetch && refetch();
         refetchTotalCount && refetchTotalCount();
-        movementDetail.refetch();
         callback && callback();
       };
 
