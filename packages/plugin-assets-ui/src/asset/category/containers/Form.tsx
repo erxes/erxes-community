@@ -4,9 +4,7 @@ import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import Form from '../components/Form';
-import { mutations, queries } from '../graphql';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { mutations } from '../graphql';
 import __ from 'lodash';
 import { IAssetCategoryTypes } from '../../../common/types';
 

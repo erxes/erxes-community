@@ -3,7 +3,7 @@ import { generateModels } from './connectionResolver';
 import { EXTEND_FIELDS, ASSET_INFO } from './common/constant/asset';
 
 export default {
-  types: [{ description: 'Assets & Movements', type: 'asset' }],
+  types: [{ description: 'Assets', type: 'asset' }],
   fields: async ({ subdomain }) => {
     const models = await generateModels(subdomain);
 

@@ -1,20 +1,15 @@
-import { withProps } from '@erxes/ui/src/utils/core';
-import React from 'react';
-import * as compose from 'lodash.flowright';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
-import { queries as categoryQueries } from '../category/graphql';
-import {
-  IAsset,
-  IAssetCategoryQeuryResponse,
-  IAssetCategoryTypes,
-  IAssetQueryResponse
-} from '../../common/types';
-import Form from '../components/Form';
 import { ButtonMutate, Spinner } from '@erxes/ui/src';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import { mutations, queries } from '../graphql';
+import { withProps } from '@erxes/ui/src/utils/core';
+import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { graphql } from 'react-apollo';
+import { IAsset, IAssetCategoryQeuryResponse, IAssetQueryResponse } from '../../common/types';
 import { getRefetchQueries } from '../../common/utils';
+import { queries as categoryQueries } from '../category/graphql';
+import Form from '../components/Form';
+import { mutations, queries } from '../graphql';
 
 type Props = {
   asset: IAsset;

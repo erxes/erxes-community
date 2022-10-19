@@ -12,14 +12,8 @@ import {
   TabTitle
 } from '@erxes/ui/src';
 import { FormWrapper, FormColumn, ModalFooter } from '@erxes/ui/src/styles/main';
-import {
-  generateCategoryOptions,
-  generateParentOptions,
-  SelectWithAssetCategory
-} from '../../common/utils';
+import { SelectWithAssetCategory } from '../../common/utils';
 import { IAsset, IAssetCategoryTypes } from '../../common/types';
-import { ASSET_SUPPLY, TYPES } from '../../common/constant';
-import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
 import CategoryForm from '../category/containers/Form';
 import { IAttachment, IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -169,9 +163,9 @@ class Form extends React.Component<Props, State> {
   };
 
   renderContent(formProps: IFormProps) {
-    const { asset, categories, assets, closeModal, renderButton } = this.props;
+    const { asset, closeModal, renderButton } = this.props;
 
-    const { description, disabled, assetCount, minimiumCount, vendorId } = this.state;
+    const { description, vendorId } = this.state;
 
     const { values, isSubmitted } = formProps;
 

@@ -2,7 +2,7 @@ import { generateModels } from './connectionResolver';
 
 export const EXPORT_TYPES = [
   {
-    text: 'Assets & Movements',
+    text: 'Assets',
     contentType: 'asset',
     icon: 'piggy-bank'
   }
@@ -10,7 +10,7 @@ export const EXPORT_TYPES = [
 
 export const IMPORT_TYPES = [
   {
-    text: ' Assets & Movements',
+    text: ' Assets',
     contentType: 'asset',
     icon: 'piggybank'
   }

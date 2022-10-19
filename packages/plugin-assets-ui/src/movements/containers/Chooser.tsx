@@ -1,12 +1,12 @@
-import React from 'react';
 import { Chooser, Spinner } from '@erxes/ui/src';
-import { IAsset, IAssetQueryResponse } from '../../common/types';
-import AssetForm from '../../asset/containers/Form';
 import { withProps } from '@erxes/ui/src/utils/core';
-import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { graphql } from 'react-apollo';
+import AssetForm from '../../asset/containers/Form';
 import { queries } from '../../asset/graphql';
+import { IAsset, IAssetQueryResponse } from '../../common/types';
 type Props = {
   closeModal: () => void;
   handleSelect: (datas: IAsset[]) => void;

@@ -1,14 +1,14 @@
-import React from 'react';
-import { withProps } from '@erxes/ui/src/utils/core';
-import * as compose from 'lodash.flowright';
-import { Alert, Bulk, Spinner, confirm } from '@erxes/ui/src';
-import List from '../components/List';
+import { Alert, Bulk, confirm, Spinner } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { mutations, queries } from '../graphql';
-import { graphql } from 'react-apollo';
+import { withProps } from '@erxes/ui/src/utils/core';
 import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { graphql } from 'react-apollo';
 import { MovementQueryResponse, MovementsTotalCountQueryResponse } from '../../common/types';
 import { generateParams } from '../../common/utils';
+import List from '../components/List';
+import { mutations, queries } from '../graphql';
 
 type Props = { queryParams: any; history: string };
 type FinalProps = {

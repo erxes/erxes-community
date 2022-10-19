@@ -1,10 +1,10 @@
-import gql from 'graphql-tag';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
+import gql from 'graphql-tag';
+import React from 'react';
+import { IAsset } from '../../../common/types';
+import { queries } from '../../graphql';
 import BasicInfo from '../containers/BasicInfo';
 import CustomFieldsSection from '../containers/CustomFieldSection';
-import { IAsset } from '../../../common/types';
-import React from 'react';
-import { queries } from '../../graphql';
 
 type Props = {
   asset: IAsset;

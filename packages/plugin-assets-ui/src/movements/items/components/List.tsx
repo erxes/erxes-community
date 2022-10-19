@@ -1,9 +1,9 @@
+import { BarItems, FormControl, router, Table, __ } from '@erxes/ui/src';
 import React from 'react';
 import { menuMovements } from '../../../common/constant';
-import { DefaultWrapper } from '../../../common/utils';
-import { Table, __, BarItems, FormControl, router } from '@erxes/ui/src';
-import Row from './Row';
 import { IMovementItem } from '../../../common/types';
+import { DefaultWrapper } from '../../../common/utils';
+import Row from './Row';
 import SideBar from './Sidebar';
 type Props = {
   items: IMovementItem[];

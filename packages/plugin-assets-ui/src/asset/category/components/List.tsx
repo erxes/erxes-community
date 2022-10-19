@@ -11,15 +11,12 @@ import {
   __
 } from '@erxes/ui/src';
 import React from 'react';
-import { IAssetCategory, IAssetCategoryTypes } from '../../../common/types';
+import { IAssetCategoryTypes } from '../../../common/types';
 import { ContainerBox } from '../../../style';
 import Form from '../containers/Form';
 import { Link } from 'react-router-dom';
 import AssetStatusFilter from './StatusFilter';
-import { isEnabled, router } from '@erxes/ui/src/utils/core';
-import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-
-const { Section } = Wrapper.Sidebar;
+import { router } from '@erxes/ui/src/utils/core';
 
 type Props = {
   assetCategories: IAssetCategoryTypes[];

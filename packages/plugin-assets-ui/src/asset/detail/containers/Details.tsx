@@ -1,18 +1,18 @@
-import gql from 'graphql-tag';
-import * as compose from 'lodash.flowright';
 import { IUser } from '@erxes/ui/src/auth/types';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { withProps } from '@erxes/ui/src/utils';
-import {
-  IAssetDetailQueryResponse,
-  //   AssetsConfigsQueryResponse,
-  IAsset
-} from '../../../common/types';
+import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import AssetDetails from '../components/Details';
+import {
+  //   AssetsConfigsQueryResponse,
+  IAsset,
+  IAssetDetailQueryResponse
+} from '../../../common/types';
 import { queries } from '../../graphql';
+import AssetDetails from '../components/Details';
 
 type Props = {
   id: string;

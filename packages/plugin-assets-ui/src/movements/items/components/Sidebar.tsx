@@ -1,23 +1,22 @@
-import React from 'react';
-import {
-  Sidebar as CommonSideBar,
-  FormGroup as CommonFormGroup,
-  ControlLabel,
-  router,
-  Button,
-  Tip,
-  Icon,
-  DateControl,
-  FormControl
-} from '@erxes/ui/src';
-import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
+import {
+  Button,
+  ControlLabel,
+  DateControl,
+  FormGroup as CommonFormGroup,
+  Icon,
+  router,
+  Sidebar as CommonSideBar,
+  Tip
+} from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
-import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../../style';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import moment from 'moment';
+import React from 'react';
 import { SelectWithAssets } from '../../../common/utils';
+import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../../style';
 
 type Props = {
   history: any;

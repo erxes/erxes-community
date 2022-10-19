@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModalTrigger, Icon, FormControl, TextInfo, Button, Tip, router } from '@erxes/ui/src';
+import { ModalTrigger, Icon, FormControl, Button, Tip, router } from '@erxes/ui/src';
 import { IAsset } from '../../common/types';
 import AssetForm from '../containers/Form';
 import { MoreContainer, Badge, ContainerBox } from '../../style';

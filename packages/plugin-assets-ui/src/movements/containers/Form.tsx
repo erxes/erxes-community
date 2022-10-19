@@ -1,15 +1,14 @@
+import { ButtonMutate, Spinner } from '@erxes/ui/src';
+import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { withProps } from '@erxes/ui/src/utils/core';
+import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
-import Form from '../components/Form';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-import { queries as assetQueries } from '../../asset/graphql';
-import { IAsset, IAssetQueryResponse, IMovementDetailQueryResponse } from '../../common/types';
-import { Spinner, ButtonMutate, Alert, confirm } from '@erxes/ui/src';
+import { IMovementDetailQueryResponse } from '../../common/types';
 import { getRefetchQueries } from '../../common/utils';
+import Form from '../components/Form';
 import { mutations, queries } from '../graphql';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
 type Props = {
   movementId?: string;
   assetId?: string;

@@ -5,7 +5,7 @@ import Icon from '@erxes/ui/src/components/Icon';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import { InfoWrapper } from '@erxes/ui/src/styles/main';
 import { IAttachment } from '@erxes/ui/src/types';
-import { __, Alert, confirm } from '@erxes/ui/src/utils';
+import { Alert, confirm, __ } from '@erxes/ui/src/utils';
 
 import { Action, Name } from '@erxes/ui-contacts/src/customers/styles';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
@@ -15,14 +15,14 @@ import {
   SidebarFlexRow,
   SidebarList
 } from '@erxes/ui/src/layout/styles';
-import AssetForm from '../../containers/Form';
-import { IAsset } from '../../../common/types';
+import moment from 'moment';
 import React from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
 import xss from 'xss';
+import { IAsset } from '../../../common/types';
 import { AssetContent } from '../../../style';
-import moment from 'moment';
+import AssetForm from '../../containers/Form';
 
 type Props = {
   asset: IAsset;

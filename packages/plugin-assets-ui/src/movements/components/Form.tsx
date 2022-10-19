@@ -1,44 +1,33 @@
 import {
-  Button,
-  Chooser,
-  ModalTrigger,
-  EmptyState,
-  CollapseContent,
-  __,
-  Icon,
   BarItems,
-  FormControl,
-  SelectTeamMembers,
-  Form as CommonForm,
-  Table,
-  FormGroup,
-  ControlLabel,
+  Bulk,
+  Button,
+  CollapseContent,
   DateControl,
-  Bulk
+  EmptyState,
+  Form as CommonForm,
+  FormControl,
+  ModalTrigger,
+  SelectTeamMembers,
+  Table,
+  __
 } from '@erxes/ui/src';
 
-import React from 'react';
-import { IAsset, IMovementType, IMovementItem } from '../../common/types';
-import AssetForm from '../../asset/containers/Form';
-import { Title } from '@erxes/ui-settings/src/styles';
-import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
-import AssetChooser from '../containers/Chooser';
-import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
-import _loadash from 'lodash';
+import { ContentColumn } from '@erxes/ui-cards/src/deals/styles';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
-import {
-  DateContainer,
-  Flex,
-  FormColumn,
-  FormWrapper,
-  ModalFooter
-} from '@erxes/ui/src/styles/main';
+import { Title } from '@erxes/ui-settings/src/styles';
+import { DateContainer, FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import MovementItems from './MovementItem';
-import { ContentColumn, Divider, ItemRow } from '@erxes/ui-cards/src/deals/styles';
+import _loadash from 'lodash';
+import React from 'react';
+import { IAsset, IMovementItem, IMovementType } from '../../common/types';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
+import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
+import AssetChooser from '../containers/Chooser';
+import MovementItems from './MovementItem';
 
 type Props = {
   detail: IMovementType;

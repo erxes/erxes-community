@@ -1,21 +1,21 @@
-import React from 'react';
-import * as compose from 'lodash.flowright';
+import { Alert, Bulk, Spinner } from '@erxes/ui/src';
 import { withProps } from '@erxes/ui/src/utils/core';
-import List from '../components/List';
-import { queries as categoryQueries } from '../category/graphql';
-import { graphql } from 'react-apollo';
+import { generatePaginationParams } from '@erxes/ui/src/utils/router';
 import gql from 'graphql-tag';
-import { mutations, queries } from '../graphql';
-import { Alert, Bulk, confirm, Spinner } from '@erxes/ui/src';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { graphql } from 'react-apollo';
 import {
   AssetRemoveMutationResponse,
-  IAssetDetailQueryResponse,
   IAssetCategoryDetailQueryResponse,
+  IAssetDetailQueryResponse,
   IAssetQueryResponse,
   IAssetTotalCountQueryResponse,
   MergeMutationResponse
 } from '../../common/types';
-import { generatePaginationParams } from '@erxes/ui/src/utils/router';
+import { queries as categoryQueries } from '../category/graphql';
+import List from '../components/List';
+import { mutations, queries } from '../graphql';
 
 import { getRefetchQueries } from '../../common/utils';
 

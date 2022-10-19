@@ -1,4 +1,3 @@
-import { assetCurrentField, assetFields } from '../../common/graphql/asset';
 import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
 
 const movementDetail = `

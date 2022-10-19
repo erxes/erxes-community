@@ -1,20 +1,18 @@
-import React from 'react';
 import {
-  Sidebar as CommonSideBar,
-  FormGroup as CommonFormGroup,
+  Button,
   ControlLabel,
   DateControl,
-  Button,
-  Tip,
+  FormGroup as CommonFormGroup,
   Icon,
   router,
   SelectTeamMembers,
-  __
+  Sidebar as CommonSideBar,
+  Tip
 } from '@erxes/ui/src';
-import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../style';
-import { DateContainer, FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
+import { DateContainer } from '@erxes/ui/src/styles/main';
 import moment from 'moment';
-import { Title } from '@erxes/ui-settings/src/styles';
+import React from 'react';
+import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../style';
 
 type Props = {
   history: any;

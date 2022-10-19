@@ -1,5 +1,3 @@
-import { movementParams, movementParamsDef } from '../../common/graphql/movement';
-
 const movementAdd = `
 mutation AssetMovementAdd($movedAt:String,$description:String,$items: [IMovementItem]) {
   assetMovementAdd(movedAt:$movedAt,description:$description,items: $items)

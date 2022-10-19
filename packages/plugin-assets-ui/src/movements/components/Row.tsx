@@ -1,9 +1,9 @@
-import React from 'react';
-import { IMovementType } from '../../common/types';
+import { Button, FormControl, ModalTrigger } from '@erxes/ui/src';
 import moment from 'moment';
-import { Button, ModalTrigger, FormControl } from '@erxes/ui/src';
-import Form from '../containers/Form';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { IMovementType } from '../../common/types';
+import Form from '../containers/Form';
 
 type Props = {
   movement: IMovementType;

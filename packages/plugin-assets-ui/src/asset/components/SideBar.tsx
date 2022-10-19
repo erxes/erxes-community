@@ -1,4 +1,4 @@
-import { Box, Button, ControlLabel, Icon, Sidebar as CommonSideBar, Tip, __ } from '@erxes/ui/src';
+import { Sidebar as CommonSideBar } from '@erxes/ui/src';
 import React from 'react';
 import { ContainerBox } from '../../style';
 import CategoryListContainer from '../category/containers/List';

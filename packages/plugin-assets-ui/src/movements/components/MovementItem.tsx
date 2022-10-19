@@ -1,5 +1,5 @@
 import { TypeBox } from '@erxes/ui-cards/src/deals/styles';
-import { ModalTrigger, Icon, Tip, __, FormControl, colors } from '@erxes/ui/src';
+import { FormControl, Icon, ModalTrigger, Tip, __ } from '@erxes/ui/src';
 import React from 'react';
 import { IAsset, IMovementItem } from '../../common/types';
 import { ContainerBox, RemoveRow } from '../../style';
@@ -110,7 +110,7 @@ class MovementItems extends React.Component<Props> {
         </tr>
         {current === assetId && (
           <tr>
-            <td style={{width:40}}/>
+            <td style={{ width: 40 }} />
             <td>
               <ContainerBox row gap={5} justifyCenter>
                 <strong>{__('Move to')}</strong>

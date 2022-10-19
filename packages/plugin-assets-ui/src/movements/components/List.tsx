@@ -1,23 +1,23 @@
-import React from 'react';
-import { DefaultWrapper } from '../../common/utils';
+import { Title } from '@erxes/ui-settings/src/styles';
 import {
   BarItems,
-  FormControl,
+  Bulk,
   Button,
-  router,
-  __,
+  FormControl,
   ModalTrigger,
+  router,
   Table,
   Tip,
-  Bulk
+  __
 } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { ContainerBox } from '../../style';
-import { Title } from '@erxes/ui-settings/src/styles';
-import Form from '../containers/Form';
-import { IMovementType } from '../../common/types';
-import Row from './Row';
+import React from 'react';
 import { menuMovements } from '../../common/constant';
+import { IMovementType } from '../../common/types';
+import { DefaultWrapper } from '../../common/utils';
+import { ContainerBox } from '../../style';
+import Form from '../containers/Form';
+import Row from './Row';
 import { SideBar } from './Sidebar';
 type Props = {
   movements: IMovementType[];

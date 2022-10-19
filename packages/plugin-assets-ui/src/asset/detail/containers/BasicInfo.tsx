@@ -1,14 +1,14 @@
+import { IUser } from '@erxes/ui/src/auth/types';
+import { IRouterProps } from '@erxes/ui/src/types';
+import { Alert, withProps } from '@erxes/ui/src/utils';
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
-import { Alert, withProps } from '@erxes/ui/src/utils';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { withRouter } from 'react-router-dom';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { IRouterProps } from '@erxes/ui/src/types';
-import BasicInfo from '../components/BasicInfo';
-import { IAsset, AssetRemoveMutationResponse } from '../../../common/types';
+import { AssetRemoveMutationResponse, IAsset } from '../../../common/types';
 import { mutations } from '../../graphql';
+import BasicInfo from '../components/BasicInfo';
 
 type Props = {
   asset: IAsset;
