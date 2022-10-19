@@ -40,6 +40,7 @@ import {
   sourceEndpoint,
   targetEndpoint
 } from '../../utils';
+import { FLOWJOB_TYPES, FLOWJOBS } from '../../constants';
 import { FormControl } from '@erxes/ui/src/components/form';
 import { IFlowDocument, IJob } from '../../../flow/types';
 import { IJobRefer } from '../../../job/types';
@@ -47,7 +48,6 @@ import { IProduct } from '@erxes/ui-products/src/types';
 import { jsPlumb } from 'jsplumb';
 import { Link } from 'react-router-dom';
 import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
-import { FLOWJOBS } from '../../constants';
 
 const plumb: any = jsPlumb;
 let instance;
@@ -732,7 +732,12 @@ class FlowForm extends React.Component<Props, State> {
       );
     }
 
-    return <FlowJobsForm onClickFlowJob={this.onClickFlowJob} />;
+    return (
+      <FlowJobsForm
+        onClickFlowJob={this.onClickFlowJob}
+        flowJobsOfEnd={flowJobs.find(fj => fj.type === FLOWJOB_TYPES.ENDPOINT)}
+      />
+    );
   }
 
   renderZoomFlowJobs() {

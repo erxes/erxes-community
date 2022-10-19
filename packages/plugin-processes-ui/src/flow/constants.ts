@@ -1,15 +1,15 @@
 export const FLOWJOBS = [
   {
-    type: 'job',
-    icon: 'puzzle',
-    label: 'Job',
+    type: 'endPoint',
+    icon: 'flower',
+    label: 'End Point Job',
     description: '',
     isAvailable: true
   },
   {
-    type: 'endPoint',
-    icon: 'flower',
-    label: 'End Point Job',
+    type: 'job',
+    icon: 'puzzle',
+    label: 'Job',
     description: '',
     isAvailable: true
   },
@@ -45,8 +45,8 @@ export const FLOWJOBS = [
 ];
 
 export const FLOWJOB_TYPES = {
-  JOB: 'job',
   ENDPOINT: 'endPoint',
+  JOB: 'job',
   INCOME: 'income',
   OUTLET: 'outlet',
   MOVE: 'move',
