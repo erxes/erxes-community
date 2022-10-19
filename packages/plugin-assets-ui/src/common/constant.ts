@@ -24,7 +24,6 @@ export const ASSET_INFO = {
   category: 'category',
   code: 'Code',
   description: 'Description',
-  sku: 'Sku',
   unitPrice: 'UnitPrice',
   vendor: 'Vendor',
 
@@ -34,7 +33,6 @@ export const ASSET_INFO = {
     { field: 'category', label: 'Category' },
     { field: 'code', label: 'Code' },
     { field: 'description', label: 'Description' },
-    { field: 'sku', label: 'Sku' },
     { field: 'unitPrice', label: 'UnitPrice' },
     { field: 'vendor', label: 'Vendor' }
   ]

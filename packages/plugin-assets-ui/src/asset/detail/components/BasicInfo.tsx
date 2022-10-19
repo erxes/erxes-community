@@ -111,10 +111,8 @@ class BasicInfo extends React.Component<Props> {
       type,
       category,
       supply,
-      assetCount,
       minimiumCount,
       unitPrice,
-      sku,
       attachment,
       vendor,
       description,
@@ -141,10 +139,8 @@ class BasicInfo extends React.Component<Props> {
           {this.renderView('Type', type)}
           {this.renderView('Category', category ? category.name : '')}
           {this.renderView('Unit price', (unitPrice || 0).toLocaleString())}
-          {this.renderView('Sku', sku)}
           {this.renderVendor(vendor)}
           {this.renderView('Supply', supply)}
-          {this.renderView('Asset count', assetCount)}
           {this.renderView('Minimium asset count', minimiumCount)}
           {this.renderView('Create At', moment(createdAt).format('YYYY-MM-DD HH:mm'))}
           <SidebarFlexRow>{__(`Description`)}</SidebarFlexRow>

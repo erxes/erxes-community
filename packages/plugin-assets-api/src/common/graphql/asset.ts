@@ -13,7 +13,6 @@ export const assetParams = `
   parentId: String,
   type: String,
   description: String,
-  sku: String,
   unitPrice: Float,
   code: String,
   order: String,
@@ -22,6 +21,5 @@ export const assetParams = `
   attachmentMore: [AttachmentInput],
   supply: String,
   assetCount: Int,
-  minimiumCount: Int,
   vendorId: String,
 `;

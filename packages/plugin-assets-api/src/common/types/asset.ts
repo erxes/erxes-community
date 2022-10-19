@@ -8,7 +8,6 @@ export interface IAsset {
   categoryCode?: string;
   type?: string;
   description?: string;
-  sku?: string;
   unitPrice?: number;
   order: string;
   code: string;
@@ -19,7 +18,6 @@ export interface IAsset {
   status?: string;
   supply?: string;
   assetCount?: number;
-  minimiumCount?: number;
   vendorId?: string;
   vendorCode?: string;
 

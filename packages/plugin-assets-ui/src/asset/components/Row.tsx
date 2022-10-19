@@ -38,7 +38,7 @@ class Row extends React.Component<Props> {
 
     const content = props => <AssetForm {...props} asset={asset} />;
 
-    const { code, name, category, parent, chidlAssetCount, unitPrice } = asset;
+    const { code, name, category, parent, childAssetCount, unitPrice } = asset;
 
     return (
       <tr onClick={onTrClick}>
@@ -52,14 +52,14 @@ class Row extends React.Component<Props> {
         <td>{(unitPrice || 0).toLocaleString()}</td>
         <td onClick={onClick}>
           <ContainerBox row gap={10} justifyEnd>
-            {chidlAssetCount > 0 && (
+            {childAssetCount > 0 && (
               <MoreContainer>
                 <Button btnStyle="link" onClick={handleParent}>
                   <Tip text="See Child Assets">
                     <Icon icon="list-2" />
                   </Tip>
                 </Button>
-                <Badge>{chidlAssetCount}</Badge>
+                <Badge>{childAssetCount}</Badge>
               </MoreContainer>
             )}
             <ModalTrigger

@@ -32,7 +32,6 @@ export const ASSET_INFO = {
   parent: 'Parent',
   vendor: 'Vendor',
   description: 'Description',
-  sku: 'Sku',
   productCount: 'Product count',
 
   ALL: [
@@ -43,7 +42,6 @@ export const ASSET_INFO = {
     { field: 'parent', label: 'Parent' },
     { field: 'vendor', label: 'Vendor' },
     { field: 'description', label: 'Description' },
-    { field: 'sku', label: 'Sku' },
     { field: 'productCount', label: 'Product count' }
   ]
 };

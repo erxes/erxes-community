@@ -4,7 +4,6 @@ export const assetParamsDef = `
   $categoryId: String,
   $parentId: String,
   $description: String,
-  $sku: String,
   $unitPrice: Float,
   $code: String,
   $order: String,
@@ -22,7 +21,6 @@ export const assetParams = `
   categoryId: $categoryId,
   parentId: $parentId,
   description: $description,
-  sku: $sku,
   unitPrice: $unitPrice,
   code: $code,
   order: $order,
@@ -102,7 +100,7 @@ export const assetFields = `
     size
     type
   }
-  chidlAssetCount
+  childAssetCount
   isRoot
 `;
 

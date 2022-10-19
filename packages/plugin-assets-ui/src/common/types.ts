@@ -73,7 +73,6 @@ export interface IAsset {
   categoryId: string;
   parentId: string;
   description: string;
-  sku: string;
   order: string;
   code: string;
   unitPrice: number;
@@ -88,7 +87,7 @@ export interface IAsset {
   minimiumCount: number;
   category: IAssetCategory;
   parent: IAsset;
-  chidlAssetCount: number;
+  childAssetCount: number;
   vendor?: ICompany;
 }
 
@@ -97,7 +96,6 @@ export interface IAssetDoc {
   type: string;
   name?: string;
   description?: string;
-  sku?: string;
   createdAt?: Date;
   customFieldsData?: any;
 }
@@ -112,7 +110,6 @@ export type MutationVariables = {
   type: string;
   name?: string;
   description?: string;
-  sku?: string;
   createdAt?: Date;
 };
 

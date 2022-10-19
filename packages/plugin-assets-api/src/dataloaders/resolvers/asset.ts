@@ -19,7 +19,7 @@ export default {
     return asset.parentId ? false : true;
   },
 
-  async chidlAssetCount(asset: IAssetDocument, {}, { models }: IContext) {
+  async childAssetCount(asset: IAssetDocument, {}, { models }: IContext) {
     const asset_ids = await models.Asset.find(
       { order: { $regex: new RegExp(asset.order) } },
       { _id: 1 }

@@ -57,7 +57,6 @@ export const assetSchema = schemaWrapper(
       label: 'Type'
     }),
     description: field({ type: String, optional: true, label: 'Description' }),
-    sku: field({ type: String, optional: true, label: 'Stock keeping unit' }),
     unitPrice: field({ type: Number, optional: true, label: 'Unit price' }),
     customFieldsData: field({
       type: [customFieldSchema],
@@ -88,16 +87,6 @@ export const assetSchema = schemaWrapper(
       default: 'unlimited',
       esType: 'keyword',
       index: true
-    }),
-    assetCount: field({
-      type: String,
-      label: 'Asset Count',
-      default: '0'
-    }),
-    minimiumCount: field({
-      type: String,
-      label: 'Minimium Count',
-      default: '0'
     }),
     vendorId: field({ type: String, optional: true, label: 'Vendor' }),
     mergedIds: field({ type: [String], optional: true }),

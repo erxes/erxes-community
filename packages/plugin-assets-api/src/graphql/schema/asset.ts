@@ -50,7 +50,6 @@ export const types = contactsAvailable => `
     order: String
     type: String
     description: String
-    sku: String
     unitPrice: Float
     categoryId: String
     parentId: String
@@ -61,12 +60,11 @@ export const types = contactsAvailable => `
     vendorId: String
     supply: String
     assetCount: Int
-    minimiumCount: Int
 
     category: AssetCategories
     parent:Asset
     isRoot: Boolean
-    chidlAssetCount:Int
+    childAssetCount:Int
     currentMovement:CurrentMovement
     ${contactsAvailable ? 'vendor: Company' : ''}
     }
