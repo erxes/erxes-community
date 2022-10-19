@@ -311,21 +311,11 @@ export const recursiveCatchBeforeJobs = async (
   intervalId,
   subdomain: string
 ) => {
-  console.log('Starting recursive ...');
-
-  console.log('level:', level);
   leftJobs =
     getLeftJobs(
       leftJobs,
       recursiveJobs.map(before => before.id)
     ) || [];
-
-  console.log(
-    'left jobs: ',
-    level,
-    leftJobs.map(e => e.label),
-    leftJobs.length
-  );
 
   const totalBeforeJobsRecursive: any[] = [];
 
@@ -351,22 +341,12 @@ export const recursiveCatchBeforeJobs = async (
 
     const beforeJobsRecursive = getBeforeJobs(leftJobs, recursiveJob.id);
 
-    console.log(
-      'beforeJobsRecursive: ',
-      level,
-      beforeJobsRecursive.map(e => e.label),
-      beforeJobsRecursive.length
-    );
-
     if (beforeJobsRecursive.length > 0) {
       totalBeforeJobsRecursive.push(beforeJobsRecursive);
     }
   }
 
   if (totalBeforeJobsRecursive.length === 0) {
-    console.log('Finished before jobs .');
-    console.log('Finished before jobs ..');
-    console.log('Finished before jobs ...');
   } else {
     let levelCounter = 1;
 
@@ -380,13 +360,6 @@ export const recursiveCatchBeforeJobs = async (
         checkJobFrequentlyIds.length === 0 ||
         JSON.stringify(checkTempIds) !== JSON.stringify(checkJobFrequentlyIds)
       ) {
-        console.log(
-          'Compare1 ... checkTempIds: ',
-          checkTempIds,
-          'checkJobFrequentlyIds: ',
-          checkJobFrequentlyIds
-        );
-
         checkJobFrequentlyIds = checkTempIds;
         recursiveJobs = beforeJobsRecursive;
         leftJobs = recursiveCatchBeforeJobs(
