@@ -55,7 +55,7 @@ class Row extends React.Component<Props> {
         <td>{(branch && branch?.title) || '-'}</td>
         <td>{(department && department.title) || '-'}</td>
         <td>{(teamMember && teamMember.name) || '-'}</td>
-        <td>{(company && company.name) || '-'}</td>
+        <td>{(company && company.primaryName) || '-'}</td>
         <td>{(customer && customer.primaryEmail) || '-'}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{this.renderForm(assetId, movementId)}</td>
