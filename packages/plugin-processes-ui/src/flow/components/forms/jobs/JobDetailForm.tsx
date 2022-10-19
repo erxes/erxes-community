@@ -62,7 +62,7 @@ class JobDetailForm extends React.Component<Props, State> {
       );
     }
 
-    const Content = ActionForms[type] || ActionForms.default;
+    const Content = ActionForms[type];
 
     return <Content onSave={this.onSave} {...this.props} type={type} />;
   }

@@ -12,7 +12,6 @@ import { DrawerDetail } from '../../../../styles';
 import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { IJob } from '../../../../types';
 import { IJobRefer } from '../../../../../job/types';
-import { IProduct } from '@erxes/ui-products/src/types';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Icon from '@erxes/ui/src/components/Icon';
 
@@ -21,8 +20,6 @@ type Props = {
   activeFlowJob: IJob;
   jobRefer: IJobRefer;
   flowJobs: IJob[];
-  lastFlowJob?: IJob;
-  flowProduct?: IProduct;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   setUsedPopup: (check: boolean) => void;
 };

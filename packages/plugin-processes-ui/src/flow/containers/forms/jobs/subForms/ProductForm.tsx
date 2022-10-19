@@ -13,6 +13,7 @@ import { withRouter } from 'react-router-dom';
 import { ProductsQueryResponse } from '@erxes/ui-products/src/types';
 import queries from '@erxes/ui-products/src/graphql/queries';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import { FLOWJOB_TYPES } from '../../../../constants';
 
 type Props = {
   id: string;
@@ -49,11 +50,11 @@ const EndPointFormContainer = (props: FinalProps) => {
     products
   };
 
-  if (type === 'move') {
+  if (type === FLOWJOB_TYPES.MOVE) {
     return <SingleMove {...updatedProps} />;
   }
 
-  if (type === 'outlet') {
+  if (type === FLOWJOB_TYPES.OUTLET) {
     return <SingleOutlet {...updatedProps} />;
   }
 

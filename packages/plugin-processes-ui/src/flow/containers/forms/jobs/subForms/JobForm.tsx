@@ -1,7 +1,9 @@
 import * as compose from 'lodash.flowright';
+import EndPointForm from '../../../../components/forms/jobs/subForms/EndPointForm';
 import gql from 'graphql-tag';
 import JobForm from '../../../../components/forms/jobs/subForms/JobForm';
 import React, { useState } from 'react';
+import Spinner from '@erxes/ui/src/components/Spinner';
 import { graphql } from 'react-apollo';
 import { IJob } from '../../../../types';
 import { IRouterProps } from '@erxes/ui/src/types';
@@ -10,7 +12,7 @@ import { JobReferDetailQueryResponse } from '../../../../../job/types';
 import { queries } from '../../../../../job/graphql';
 import { withProps } from '@erxes/ui/src/utils';
 import { withRouter } from 'react-router-dom';
-import Spinner from '@erxes/ui/src/components/Spinner';
+import { FLOWJOB_TYPES } from '../../../../constants';
 
 type Props = {
   id: string;
@@ -18,6 +20,7 @@ type Props = {
   activeFlowJob: IJob;
   currentTab: string;
   flowJobs: IJob[];
+  type: string;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   closeModal: () => void;
   setUsedPopup: (check: boolean) => void;
@@ -46,6 +49,10 @@ const JobFormContainer = (props: FinalProps) => {
     saveLoading,
     jobRefer
   };
+
+  if (props.type === FLOWJOB_TYPES.ENDPOINT) {
+    return <EndPointForm {...updatedProps} />;
+  }
 
   return <JobForm {...updatedProps} />;
 };
