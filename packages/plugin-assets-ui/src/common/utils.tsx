@@ -4,18 +4,18 @@ import {
   DataWithLoader,
   FormGroup,
   Pagination,
+  router,
+  SelectWithSearch,
   Spinner,
   Wrapper,
-  __,
-  router,
-  SelectWithSearch
+  __
 } from '@erxes/ui/src';
+import { IOption, IQueryParams } from '@erxes/ui/src/types';
 import React from 'react';
+import { queries as assetCategoryQueries } from '../asset/category/graphql';
+import { queries as assetQueries } from '../asset/graphql';
 import { ASSET_CATEGORY_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetCategoryTypes } from './types';
-import { queries as assetQueries } from '../asset/graphql';
-import { queries as assetCategoryQueries } from '../asset/category/graphql';
-import { IOption, IQueryParams } from '@erxes/ui/src/types';
 
 export const DefaultWrapper = ({
   title,
@@ -168,7 +168,14 @@ export const asssetTypeChoises = __ => {
 };
 
 export const getRefetchQueries = () => {
-  return ['assetDetail', 'assets', 'assetsTotalCount', 'assetCategories'];
+  return [
+    'assetDetail',
+    'assets',
+    'assetsTotalCount',
+    'assetCategories',
+    'assetMovementItems',
+    'assetMovementItemsTotalCount'
+  ];
 };
 
 export const generateParams = ({ queryParams }) => ({

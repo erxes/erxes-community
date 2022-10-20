@@ -4,7 +4,6 @@ import {
   Button,
   CollapseContent,
   DateControl,
-  EmptyState,
   Form as CommonForm,
   FormControl,
   ModalTrigger,
@@ -13,20 +12,23 @@ import {
   __
 } from '@erxes/ui/src';
 
-import { ContentColumn } from '@erxes/ui-cards/src/deals/styles';
+import { ContentColumn, ItemRow, ItemText } from '@erxes/ui-cards/src/deals/styles';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import { Title } from '@erxes/ui-settings/src/styles';
+import client from '@erxes/ui/src/apolloClient';
 import { DateContainer, FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import gql from 'graphql-tag';
 import _loadash from 'lodash';
 import React from 'react';
 import { IAsset, IMovementItem, IMovementType } from '../../common/types';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
 import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
 import AssetChooser from '../containers/Chooser';
+import { queries } from '../graphql';
 import MovementItems from './MovementItem';
 
 type Props = {
@@ -97,17 +99,18 @@ class Form extends React.Component<Props, State> {
 
   assetChooser(props) {
     const handleSelect = datas => {
-      const { variables } = this.state;
-
-      this.setState({ selectedItems: datas });
-      const newVariables = datas.map(data => {
-        const item = variables.find(item => item.assetId === data._id);
-        if (item) {
-          return item;
-        }
-        return { ...data?.currentMovement, assetId: data._id, assetName: data.name };
-      });
-      this.setState({ variables: newVariables });
+      const selectedItemsIds = datas.map(data => data._id);
+      client
+        .query({
+          query: gql(queries.itemsCurrentLocation),
+          fetchPolicy: 'network-only',
+          variables: { assetIds: selectedItemsIds }
+        })
+        .then(res => {
+          const { currentLocationAssetMovementItems } = res.data;
+          this.setState({ selectedItems: datas });
+          this.setState({ variables: currentLocationAssetMovementItems });
+        });
     };
 
     const updatedProps = {
@@ -172,14 +175,20 @@ class Form extends React.Component<Props, State> {
 
     return (
       <td key={label} className="item">
-        <MovementItemContainer>
-          <Selection
-            label={`Choose ${label}`}
-            onSelect={handleChange}
-            initialValue={value || ''}
-            multi={false}
-          />
-        </MovementItemContainer>
+        <ItemRow>
+          <ItemText>{label}</ItemText>
+          <ContentColumn flex="3">
+            <MovementItemContainer>
+              <Selection
+                label={`Choose ${label}`}
+                onSelect={handleChange}
+                initialValue={value || ''}
+                multi={false}
+                customOption={{ value: '', label: 'No option' }}
+              />
+            </MovementItemContainer>
+          </ContentColumn>
+        </ItemRow>
       </td>
     );
   }
@@ -204,7 +213,7 @@ class Form extends React.Component<Props, State> {
 
     this.setState({ description: value });
   };
-  handleChangeRowItem = (prevId, newItem) => {
+  handleChangeRowItemValue = (prevId, newItem) => {
     let { selectedItems, variables } = this.state;
     selectedItems = selectedItems.map(item => (item._id === prevId ? newItem : item));
     const currentMovement = newItem?.currentMovement;
@@ -215,6 +224,13 @@ class Form extends React.Component<Props, State> {
     );
     this.setState({ selectedItems, variables });
   };
+
+  handleChangeRowItem = (prevItemId, newItem) => {
+    const { variables } = this.state;
+    const newVariables = variables.map(item => (item.assetId === prevItemId ? newItem : item));
+    this.setState({ variables: newVariables });
+  };
+
   renderGeneral() {
     const { variables, general, checkedItems } = this.state;
 
@@ -245,6 +261,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.branchId}
+                    customOption={{ value: '', label: 'No option' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -256,6 +273,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.departmentId}
+                    customOption={{ value: '', label: 'No option' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -269,6 +287,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.customerId}
+                    customOption={{ value: '', label: 'No option' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -280,6 +299,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.companyId}
+                    customOption={{ value: '', label: 'No option' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -291,6 +311,7 @@ class Form extends React.Component<Props, State> {
                 onSelect={handleGeneralOptions}
                 multi={false}
                 initialValue={general?.teamMemberId}
+                customOption={{ value: '', label: 'No option' }}
               />
             </CommonItemRow>
           </ContentColumn>
@@ -301,9 +322,6 @@ class Form extends React.Component<Props, State> {
 
   renderList = props => {
     const { variables, currentItems, selectedItems } = this.state;
-    if (variables.length === 0) {
-      return <EmptyState text="No Selected Asset" image="/images/actions/5.svg" />;
-    }
 
     const removeRow = id => {
       const newVariables = variables.filter(item => item.assetId !== id);
@@ -359,11 +377,12 @@ class Form extends React.Component<Props, State> {
                 current={currentItems.includes(item.assetId) ? item.assetId : ''}
                 changeCurrent={this.changeCurrentItem}
                 removeRow={removeRow}
-                onsSelect={this.handleChangeRowItem}
+                onsSelect={this.handleChangeRowItemValue}
                 selectedItems={selectedItems}
                 toggleBulk={props.toggleBulk}
                 isChecked={props.bulk.some(bulk => bulk.assetId === item.assetId)}
                 onChangeBulkItems={onChangeCheckedItems}
+                handleChangeRowItem={this.handleChangeRowItem}
               >
                 {this.renderRow('Branches', item, item['branchId'])}
                 {this.renderRow('Departments', item, item['departmentId'])}
@@ -412,12 +431,11 @@ class Form extends React.Component<Props, State> {
           </FormWrapper>
 
           {variables.length > 0 && this.renderGeneral()}
-          <CollapseContent title="Asset List" open={!!assetId}>
-            <Bulk content={this.renderList} />
-            <ContainerBox justifyCenter>
-              {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
-            </ContainerBox>
-          </CollapseContent>
+
+          <Bulk content={this.renderList} />
+          <ContainerBox justifyCenter>
+            {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
+          </ContainerBox>
           {renderButton && (
             <ModalFooter>
               <Button btnStyle="simple" onClick={() => closeModal()}>

@@ -3,9 +3,9 @@ import { withRouter } from 'react-router-dom';
 
 import Box from '@erxes/ui/src/components/Box';
 import Icon from '@erxes/ui/src/components/Icon';
-import { IRouterProps } from '@erxes/ui/src/types';
-import { __, router } from '@erxes/ui/src/utils';
 import { FieldStyle, SidebarList } from '@erxes/ui/src/layout/styles';
+import { IRouterProps } from '@erxes/ui/src/types';
+import { router, __ } from '@erxes/ui/src/utils';
 import { assetStatusChoises } from '../../../common/utils';
 
 interface IProps extends IRouterProps {
@@ -34,7 +34,11 @@ class AssetStatusFilter extends React.Component<IProps> {
     };
 
     return (
-      <Box extraButtons={extraButtons} title={__('Filter asset by status')} name="showFilterByType">
+      <Box
+        extraButtons={extraButtons}
+        title={__('Filter category by status')}
+        name="showFilterByType"
+      >
         <SidebarList>
           {assetStatusChoises(__).map(({ value, label }: { value: string; label: string }) => {
             return (

@@ -1,6 +1,14 @@
 import { isEnabled } from '@erxes/ui/src/utils/core';
 import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
 
+const fieldAviableEnabledContacts = `
+branch
+department
+company
+customer
+teamMember
+`;
+
 const movementDetail = `
 query AssetMovement($_id: String) {
   assetMovement(_id: $_id) {
@@ -22,23 +30,11 @@ query AssetMovement($_id: String) {
       departmentId
       teamMemberId
 
-      ${
-        isEnabled('contacts')
-          ? `
-        branch
-        department
-        company
-        customer
-        teamMember
-        `
-          : ''
-      }
+      ${isEnabled('contacts') ? `${fieldAviableEnabledContacts}` : ''}
     }
   }
 }
 `;
-
-isEnabled;
 
 const movements = `
   query AssetMovements ($userId:String,${dateFilterParams}) {
@@ -59,4 +55,62 @@ const movementsTotalCount = `
   }
 `;
 
-export default { movements, movementDetail, movementsTotalCount };
+const itemsCurrentLocation = `
+query CurrentLocationAssetMovementItems($assetIds: [String]) {
+  currentLocationAssetMovementItems(assetIds: $assetIds) {
+    assetId
+    assetName
+    branchId
+    companyId
+    createdAt
+    customerId
+    departmentId
+    movementId
+    teamMemberId
+    ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
+    sourceLocations {
+      branchId
+      companyId
+      customerId
+      departmentId
+      teamMemberId
+
+      ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
+    }
+  }
+}
+`;
+
+const itemCurrentLocation = `
+query CurrentLocationAssetMovementItem($assetId: String) {
+  currentLocationAssetMovementItem(assetId: $assetId) {
+    assetId
+    assetName
+    branchId
+    companyId
+    createdAt
+    customerId
+    departmentId
+    movementId
+    teamMemberId
+    ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
+    sourceLocations {
+      branchId
+      companyId
+      customerId
+      departmentId
+      teamMemberId
+
+      ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
+    }
+  }
+}
+`;
+
+export default {
+  movements,
+  movementDetail,
+  movementsTotalCount,
+  itemsCurrentLocation,
+  itemCurrentLocation
+};

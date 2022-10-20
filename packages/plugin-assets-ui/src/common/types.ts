@@ -165,6 +165,19 @@ export type IMovementItem = {
   customer?: any;
   teamMember?: any;
   createdAt?: string;
+  sourceLocations: {
+    branchId?: string;
+    departmentId?: string;
+    teamMemberId?: string;
+    customerId?: string;
+    companyId?: string;
+    movementId: string;
+    branch?: any;
+    department?: any;
+    company?: any;
+    customer?: any;
+    teamMember?: any;
+  };
 };
 
 export type MovementItemsQueryResponse = {

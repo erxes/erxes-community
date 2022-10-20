@@ -1,11 +1,32 @@
 import { movementFilters } from '../../common/graphql/movement';
 
 export const types = contactsAvailable => `
+
+    type SourceLocationItem {
+        branchId:String,
+        departmentId:String,
+        customerId:String,
+        movementId:String,
+        teamMemberId:String,
+        companyId:String,
+        ${
+          contactsAvailable
+            ? `
+              customer:JSON
+              company:JSON
+              branch:JSON
+              teamMember:JSON
+              department:JSON
+              `
+            : ``
+        }
+    }
+
     type MovementItem{
         _id:String,
         assetName:String,
         assetId:String,
-        userType:String,
+        sourceLocations:SourceLocationItem,
         branchId:String,
         departmentId:String,
         customerId:String,
@@ -64,4 +85,6 @@ export const queries = `
     assetMovementItems(${movementFilters}):[MovementItem]
     assetMovementItemsTotalCount(${movementFilters}):Int
     assetMovementItem(_id:String):MovementItem
+    currentLocationAssetMovementItems(assetIds:[String]):[MovementItem]
+    currentLocationAssetMovementItem(assetId:String):MovementItem
 `;

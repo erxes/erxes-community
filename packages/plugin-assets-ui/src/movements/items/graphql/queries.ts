@@ -6,33 +6,36 @@ import {
   movementFilterParamsDef
 } from '../../../common/graphql/movement';
 
+const itemsType = `
+    _id
+    assetId
+    assetName
+    branchId
+    companyId
+    customerId
+    departmentId
+    teamMemberId
+    movementId
+    createdAt
+    ${
+      isEnabled('contacts')
+        ? `
+      branch
+      department
+      company
+      customer
+      teamMember
+
+      `
+        : ``
+    }
+`;
+
 const items = `
 query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilterParams}) {
   assetMovementItems(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef}) {
-      _id
-      assetId
-      assetName
-      userType
-      branchId
-      companyId
-      customerId
-      departmentId
-      teamMemberId
-      movementId
-      createdAt
-
-      ${
-        isEnabled('contacts')
-          ? `
-        branch
-        department
-        company
-        customer
-        teamMember
-        
-        `
-          : ``
-      }
+    ${itemsType}
+    sourceLocations 
     }
   }
 `;

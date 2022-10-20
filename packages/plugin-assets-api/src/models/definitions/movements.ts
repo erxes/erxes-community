@@ -1,5 +1,18 @@
-import { field, schemaWrapper } from './utils';
 import { Schema } from 'mongoose';
+import { field, schemaWrapper } from './utils';
+
+export const sourceLocationsShema = new Schema(
+  {
+    assetId: field({ type: String, label: 'Asset Id' }),
+    assetName: field({ type: String, label: 'Asset Name' }),
+    branchId: field({ type: String, label: 'Branch Id' }),
+    departmentId: field({ type: String, label: 'Department Id' }),
+    customerId: field({ type: String, label: 'Customer Id' }),
+    teamMemberId: field({ type: String, label: 'Team Member Id' }),
+    companyId: field({ type: String, label: 'Company Id' })
+  },
+  { _id: false }
+);
 
 export const movementItemsSchema = schemaWrapper(
   new Schema({
@@ -11,7 +24,8 @@ export const movementItemsSchema = schemaWrapper(
     teamMemberId: field({ type: String, label: 'Team Member Id' }),
     companyId: field({ type: String, label: 'Company Id' }),
     customerId: field({ type: String, label: 'Customer Id' }),
-    movementId: field({ type: String, label: 'Movement Id' })
+    movementId: field({ type: String, label: 'Movement Id' }),
+    sourceLocations: field({ type: sourceLocationsShema, label: 'Source Locations' })
   })
 );
 

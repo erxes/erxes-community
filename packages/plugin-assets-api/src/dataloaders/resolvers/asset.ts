@@ -31,30 +31,6 @@ export default {
     });
   },
 
-  async currentMovement(asset: IAssetDocument, {}, { models, dataLoaders }: IContext) {
-    const branch =
-      (asset.currentMovement?.branchId &&
-        dataLoaders.branch.load(asset.currentMovement?.branchId)) ||
-      null;
-    const department =
-      (asset.currentMovement?.departmentId &&
-        dataLoaders.department.load(asset.currentMovement?.departmentId)) ||
-      null;
-    const teamMember =
-      (asset.currentMovement?.teamMemberId &&
-        dataLoaders.teamMember.load(asset.currentMovement?.teamMemberId)) ||
-      null;
-    const customer =
-      (asset.currentMovement?.customerId &&
-        dataLoaders.customer.load(asset.currentMovement?.customerId)) ||
-      null;
-    const company =
-      (asset.currentMovement?.companyId &&
-        dataLoaders.company.load(asset.currentMovement?.companyId)) ||
-      null;
-    return { ...asset.currentMovement, branch, department, teamMember, customer, company };
-  },
-
   vendor(asset: IAssetDocument, _, { dataLoaders }: IContext) {
     return (asset.vendorId && dataLoaders.company.load(asset.vendorId)) || null;
   }

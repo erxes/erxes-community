@@ -22,14 +22,6 @@ export interface IAsset {
   vendorCode?: string;
 
   mergedIds?: string[];
-
-  currentMovement?: {
-    branchId: string;
-    departmentId: string;
-    teamMemberId: string;
-    customerId: string;
-    companyId: string;
-  };
 }
 
 export interface IAssetDocument extends IAsset, Document {
@@ -60,12 +52,18 @@ export interface IMovement {
 export interface IMovementItem {
   assetId: string;
   assetName: string;
-  userType: string;
   branchId: string;
   customerId: string;
   departmentId: string;
   teamMemberId: string;
   companyId: string;
+  sourceLocations: {
+    branchId: string;
+    departmentId: string;
+    customerId: string;
+    companyId: string;
+    teamMemberId: string;
+  };
 }
 
 export interface IMovementDocument extends IMovement, Document {

@@ -21,11 +21,11 @@ export const loadMovementItemClass = (models: IModels) => {
         if (Object.values(newAsset).every(item => !item)) {
           throw new Error('You should provide at least one field');
         }
-        await models.Assets.findByIdAndUpdate(asset.assetId, {
-          $set: { currentMovement: { ...newAsset } }
-        });
+        const sourceLocations = await models.MovementItems.findOne({ assetId: asset.assetId })
+          .sort({ createdAt: -1 })
+          .limit(1);
+        asset.sourceLocations = sourceLocations || {};
       }
-
       return models.MovementItems.insertMany(assets);
     }
     public static async movementItemsEdit(movementId: string, items: any[]) {

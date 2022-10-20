@@ -48,6 +48,9 @@ export class SideBar extends React.Component<Props, State> {
 
   handleValue(value, name) {
     this.setState({ [name]: value });
+    if (value === '') {
+      return router.removeParams(this.props.history, 'userId');
+    }
     router.setParams(this.props.history, { userId: value });
   }
 
@@ -109,6 +112,7 @@ export class SideBar extends React.Component<Props, State> {
               multi={false}
               onSelect={this.handleValue}
               initialValue={queryParams.userId}
+              customOption={{ value: '', label: 'No option' }}
             />
           </FormGroup>
           <FormGroup

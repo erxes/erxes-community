@@ -1,12 +1,12 @@
-import { schemaWrapper, field } from './utils';
-import { Schema } from 'mongoose';
 import { attachmentSchema, customFieldSchema } from '@erxes/api-utils/src/types';
+import { Schema } from 'mongoose';
 import {
   ASSET_CATEGORY_STATUSES,
   ASSET_STATUSES,
   ASSET_SUPPLY,
   ASSET_TYPES
 } from '../../common/constant/asset';
+import { field, schemaWrapper } from './utils';
 
 export const assetCategoriesSchema = schemaWrapper(
   new Schema({
@@ -33,14 +33,6 @@ export const assetCategoriesSchema = schemaWrapper(
     })
   })
 );
-
-export const assetMovementCurrentSchema = new Schema({
-  branchId: field({ type: String, label: 'Branch Id' }),
-  departmentId: field({ type: String, label: 'Department Id' }),
-  customerId: field({ type: String, label: 'Customer Id' }),
-  teamMemberId: field({ type: String, label: 'Team Member Id' }),
-  companyId: field({ type: String, label: 'Company Id' })
-});
 
 export const assetSchema = schemaWrapper(
   new Schema({
@@ -89,7 +81,6 @@ export const assetSchema = schemaWrapper(
       index: true
     }),
     vendorId: field({ type: String, optional: true, label: 'Vendor' }),
-    mergedIds: field({ type: [String], optional: true }),
-    currentMovement: field({ type: assetMovementCurrentSchema, label: 'Current Movement' })
+    mergedIds: field({ type: [String], optional: true })
   })
 );

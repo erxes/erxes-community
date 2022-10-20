@@ -1,7 +1,7 @@
-import React from 'react';
+import { Button, Icon, ModalTrigger, Tip } from '@erxes/ui/src';
 import moment from 'moment';
+import React from 'react';
 import { IMovementItem } from '../../../common/types';
-import { Icon, ModalTrigger, Tip, Button } from '@erxes/ui/src';
 import Form from '../../containers/Form';
 
 type Props = {
@@ -54,7 +54,7 @@ class Row extends React.Component<Props> {
         <td>{assetName}</td>
         <td>{(branch && branch?.title) || '-'}</td>
         <td>{(department && department.title) || '-'}</td>
-        <td>{(teamMember && teamMember.name) || '-'}</td>
+        <td>{(teamMember && teamMember?.details?.fullName) || '-'}</td>
         <td>{(company && company.primaryName) || '-'}</td>
         <td>{(customer && customer.primaryEmail) || '-'}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>

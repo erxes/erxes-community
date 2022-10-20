@@ -89,7 +89,9 @@ class Form extends React.Component<Props, State> {
       assetCount,
       minimiumCount,
       vendorId,
-      description
+      description,
+      parentId,
+      categoryId
     } = this.state;
 
     if (asset) {
@@ -105,7 +107,9 @@ class Form extends React.Component<Props, State> {
       assetCount,
       minimiumCount,
       vendorId,
-      description
+      description,
+      parentId,
+      categoryId
     };
   };
 

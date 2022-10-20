@@ -16,6 +16,7 @@ export const movementFilters = `
     companyId:String,
     teamMemberId:String,
     assetId:String,
+    assetIds:[String]
     movedAtFrom:String,
     movedAtTo:String,
     modifiedAtFrom:String,

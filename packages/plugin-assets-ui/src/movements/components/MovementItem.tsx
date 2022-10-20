@@ -1,9 +1,25 @@
-import { TypeBox } from '@erxes/ui-cards/src/deals/styles';
+import {
+  ContentColumn,
+  ItemRow as CommonItemRow,
+  ItemText,
+  TypeBox
+} from '@erxes/ui-cards/src/deals/styles';
 import { FormControl, Icon, ModalTrigger, Tip, __ } from '@erxes/ui/src';
+import client from '@erxes/ui/src/apolloClient';
+import { Flex } from '@erxes/ui/src/styles/main';
+import gql from 'graphql-tag';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { IAsset, IMovementItem } from '../../common/types';
-import { ContainerBox, RemoveRow } from '../../style';
+import { SelectWithAssets } from '../../common/utils';
+import {
+  ContainerBox,
+  MovementItemConfigContainer,
+  MovementItemInfoContainer,
+  RemoveRow
+} from '../../style';
 import Chooser from '../containers/Chooser';
+import { queries } from '../graphql';
 
 type Props = {
   item: IMovementItem;
@@ -16,6 +32,7 @@ type Props = {
   isChecked: boolean;
   toggleBulk: (movement: IMovementItem, isChecked?: boolean) => void;
   onChangeBulkItems: (ids: string, checked: boolean) => void;
+  handleChangeRowItem: (prevItemId, newItem) => void;
 };
 
 class MovementItems extends React.Component<Props> {
@@ -37,7 +54,16 @@ class MovementItems extends React.Component<Props> {
       onChangeBulkItems
     } = this.props;
 
-    const { assetId, assetName, branch, department, customer, company, teamMember } = item;
+    const {
+      assetId,
+      assetName,
+      branch,
+      department,
+      customer,
+      company,
+      teamMember,
+      sourceLocations
+    } = item;
 
     const trigger = (
       <TypeBox color="#3B85F4">
@@ -76,6 +102,29 @@ class MovementItems extends React.Component<Props> {
     const onClick = e => {
       e.stopPropagation();
     };
+
+    const ItemRow = ({ label, children }: { label: string; children: React.ReactNode }) => {
+      return (
+        <CommonItemRow>
+          <ItemText>{__(label)}</ItemText>
+          <ContentColumn flex="3">{children}</ContentColumn>
+        </CommonItemRow>
+      );
+    };
+
+    const changeRowItem = assetId => {
+      client
+        .query({
+          query: gql(queries.itemCurrentLocation),
+          fetchPolicy: 'network-only',
+          variables: { assetId }
+        })
+        .then(res => {
+          const { currentLocationAssetMovementItem } = res.data;
+          this.props.handleChangeRowItem(item.assetId, currentLocationAssetMovementItem);
+        });
+    };
+
     return (
       <>
         <tr
@@ -111,13 +160,58 @@ class MovementItems extends React.Component<Props> {
         {current === assetId && (
           <tr>
             <td style={{ width: 40 }} />
-            <td>
-              <ContainerBox row gap={5} justifyCenter>
-                <strong>{__('Move to')}</strong>
-                <Icon icon="rightarrow" />
-              </ContainerBox>
+            <td colSpan={7}>
+              <Flex>
+                <MovementItemInfoContainer>
+                  <ItemRow label="Choose Asset:">
+                    <SelectWithAssets
+                      label="Choose Asset"
+                      name="assetId"
+                      onSelect={changeRowItem}
+                      skip={item.assetId}
+                      customOption={{ value: '', label: 'Choose Asset' }}
+                    />
+                  </ItemRow>
+                  <ItemRow label="Asset:">{`${__(assetName || '')}`}</ItemRow>
+                  <ItemRow label="Branch:">{`${__(sourceLocations.branch?.title || '')} / ${__(
+                    branch?.title || ''
+                  )}`}</ItemRow>
+                  <ItemRow label="Department:">{`${__(sourceLocations.department?.title)} / ${__(
+                    department?.title || ''
+                  )}`}</ItemRow>
+                  <ItemRow label="Customer:">
+                    <Link to={`/settings/customer/details/${sourceLocations?.customer?._id || ''}`}>
+                      {__(sourceLocations.customer?.primaryEmail || '')}
+                    </Link>
+                    &nbsp; / &nbsp;
+                    <Link to={`/settings/customer/details/${customer?._id || ''}`}>
+                      {__(customer?.primaryEmaill || '')}
+                    </Link>
+                  </ItemRow>
+                  <ItemRow label="Company:">
+                    <Link to={`/settings/company/details/${sourceLocations.company?._id || ''}`}>
+                      {__(sourceLocations.company?.primaryEmail || '')}
+                    </Link>
+                    /
+                    <Link to={`/settings/company/details/${company?._id}`}>
+                      {__(company?.primaryEmail || '')}
+                    </Link>
+                  </ItemRow>
+                  <ItemRow label="Team Member:">
+                    <Link to={`/settings/team/details/${sourceLocations.teamMember?._id}`}>
+                      {__(sourceLocations.teamMember?.email || '')}
+                    </Link>
+                    &nbsp; / &nbsp;
+                    <Link to={`/settings/team/details/${teamMember?._id}`}>
+                      {__(teamMember?.email || '')}
+                    </Link>
+                  </ItemRow>
+                </MovementItemInfoContainer>
+                <MovementItemConfigContainer>
+                  <ContainerBox column>{children}</ContainerBox>
+                </MovementItemConfigContainer>
+              </Flex>
             </td>
-            {children}
           </tr>
         )}
       </>

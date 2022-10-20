@@ -1,8 +1,8 @@
+import { Input } from '@erxes/ui/src/components/form/styles';
+import { colors, dimensions } from '@erxes/ui/src/styles';
+import { highlight } from '@erxes/ui/src/utils/animations';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
-import { colors, dimensions } from '@erxes/ui/src/styles';
-import { Input } from '@erxes/ui/src/components/form/styles';
-import { highlight } from '@erxes/ui/src/utils/animations';
 
 interface ContainerBoxType {
   row?: boolean;
@@ -139,6 +139,7 @@ export const MovementTableWrapper = styled.div`
       background: ${colors.colorWhite};
 
       &:first-child {
+        padding: 8px 12px;
         border-top-left-radius: 6px;
         border-bottom-left-radius: 6px;
       }
@@ -214,5 +215,26 @@ export const CustomRangeContainer = styled.div`
 export const EndDateContainer = styled.div`
   .rdtPicker {
     left: -98px !important;
+  }
+`;
+
+export const MovementItemInfoContainer = styled.div`
+  flex: 1;
+  border-right: 1px solid ${colors.borderPrimary};
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  margin-right: 20px;
+  padding-right: 20px;
+  margin-top: -16px;
+  margin-bottom: -16px;
+  padding-top: 16px;
+`;
+
+export const MovementItemConfigContainer = styledTS<{ flex?: string }>(styled.div)`
+  flex: ${props => (props.flex ? props.flex : '1')};
+  margin-right: 10px;
+
+  &:last-of-type {
+    margin-right: 0;
   }
 `;

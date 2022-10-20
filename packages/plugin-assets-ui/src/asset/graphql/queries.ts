@@ -1,4 +1,4 @@
-import { assetFields, assetCurrentField } from '../../common/graphql/asset';
+import { assetFields } from '../../common/graphql/asset';
 
 const assets = `
   query assets(
@@ -26,7 +26,6 @@ const assets = `
       ignoreIds: $ignoreIds
     ) {
       ${assetFields}
-      ${assetCurrentField}
     }
   }
 `;
