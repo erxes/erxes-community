@@ -4,16 +4,16 @@ module.exports = {
   port: 3015,
   exposes: {
     './routes': './src/routes.tsx',
-    './inboxIntegrationSettings': './src/components/IntegrationSettings.tsx',
-    './inboxIntegrationForm': './src/components/IntegrationForm.tsx',
-    './inboxConversationDetail': './src/components/ConversationDetail.tsx'
+    './inboxIntegrationTwitterSettings': './src/components/Twitter.tsx',
+    './inboxIntegrationForm': './src/components/Twitter.tsx',
+    './inboxConversationDetail': './src/components/Twitter.tsx'
   },
   routes: {
-    url: 'http://localhost:3014/remoteEntry.js',
+    url: 'http://localhost:3015/remoteEntry.js',
     scope: 'twitter',
     module: './routes'
   },
-  inboxIntegrationSettings: './inboxIntegrationSettings',
+  inboxIntegrationTwitterSettings: './inboxIntegrationTwitterSettings',
   inboxIntegrationForm: './inboxIntegrationForm',
   inboxConversationDetail: './inboxConversationDetail',
   inboxIntegration: {

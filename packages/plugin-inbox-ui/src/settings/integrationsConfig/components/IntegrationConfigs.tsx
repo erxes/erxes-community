@@ -56,6 +56,12 @@ class IntegrationConfigs extends React.Component<Props, State> {
     defaultValue?: string,
     label?: string
   ) => {
+    console.log('key', key);
+    console.log('type', type);
+    console.log('description', description);
+    console.log('defaultValue', defaultValue);
+    console.log('label', label);
+
     const { configsMap } = this.state;
 
     return (
@@ -96,7 +102,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
             'pages_messaging,pages_manage_ads,pages_manage_engagement,pages_manage_metadata,pages_read_user_content'
           )}
         </CollapseContent>
-
         <CollapseContent title="Twitter">
           <Info>
             <a
@@ -113,7 +118,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('TWITTER_ACCESS_TOKEN_SECRET')}
           {this.renderItem('TWITTER_WEBHOOK_ENV')}
         </CollapseContent>
-
         <CollapseContent title="Nylas">
           <Info>
             <a
@@ -134,7 +138,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('MICROSOFT_CLIENT_ID')}
           {this.renderItem('MICROSOFT_CLIENT_SECRET')}
         </CollapseContent>
-
         <CollapseContent title="Video call">
           <Info>
             <a
@@ -163,7 +166,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('VIDEO_CALL_TIME_DELAY_BETWEEN_REQUESTS', 'number')}
           {this.renderItem('VIDEO_CALL_MESSAGE_FOR_TIME_DELAY')}
         </CollapseContent>
-
         <CollapseContent title="Sunshine Conversations API">
           <Info>
             <a
@@ -183,7 +185,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
             'https://yourdomain/smooch/webhook'
           )}
         </CollapseContent>
-
         <CollapseContent title="WhatsApp Chat-API">
           <Info>
             <a
@@ -197,13 +198,19 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('CHAT_API_UID')}
           {this.renderItem('CHAT_API_WEBHOOK_CALLBACK_URL')}
         </CollapseContent>
-
         <CollapseContent title="Telnyx SMS">
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
+        {/* {loadDynamicComponent(
+          'inboxIntegrationSettings',
+          {
+            renderItem: this.renderItem
+          },
+          true
+        )} */}
 
         {loadDynamicComponent(
-          'inboxIntegrationSettings',
+          'inboxIntegrationTwitterSettings',
           {
             renderItem: this.renderItem
           },
