@@ -112,8 +112,8 @@ class MovementItems extends React.Component<Props> {
       );
     };
 
-    const changeRowItem = async assetId => {
-      const dasczx = await client
+    const changeRowItem = assetId => {
+      client
         .query({
           query: gql(queries.itemCurrentLocation),
           fetchPolicy: 'network-only',
@@ -121,17 +121,7 @@ class MovementItems extends React.Component<Props> {
         })
         .then(res => {
           const { currentLocationAssetMovementItem } = res.data;
-          return currentLocationAssetMovementItem;
-        });
-      const dasd = await client
-        .query({
-          query: gql(assetQueries.assetDetail),
-          fetchPolicy: 'network-only',
-          variables: { assetId }
-        })
-        .then(res => {
-          const { currentLocationAssetMovementItem } = res.data;
-          return currentLocationAssetMovementItem;
+          this.props.handleChangeRowItem(item._id, currentLocationAssetMovementItem)
         });
     };
 
