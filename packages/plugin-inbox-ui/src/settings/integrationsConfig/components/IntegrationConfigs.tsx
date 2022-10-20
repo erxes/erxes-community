@@ -56,12 +56,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
     defaultValue?: string,
     label?: string
   ) => {
-    console.log('key', key);
-    console.log('type', type);
-    console.log('description', description);
-    console.log('defaultValue', defaultValue);
-    console.log('label', label);
-
     const { configsMap } = this.state;
 
     return (
@@ -101,22 +95,6 @@ class IntegrationConfigs extends React.Component<Props, State> {
             '',
             'pages_messaging,pages_manage_ads,pages_manage_engagement,pages_manage_metadata,pages_read_user_content'
           )}
-        </CollapseContent>
-        <CollapseContent title="Twitter">
-          <Info>
-            <a
-              target="_blank"
-              href="https://erxes.org/administrator/system-config#twitter"
-              rel="noopener noreferrer"
-            >
-              {__('Learn how to set Twitter Integration Variables')}
-            </a>
-          </Info>
-          {this.renderItem('TWITTER_CONSUMER_KEY')}
-          {this.renderItem('TWITTER_CONSUMER_SECRET')}
-          {this.renderItem('TWITTER_ACCESS_TOKEN')}
-          {this.renderItem('TWITTER_ACCESS_TOKEN_SECRET')}
-          {this.renderItem('TWITTER_WEBHOOK_ENV')}
         </CollapseContent>
         <CollapseContent title="Nylas">
           <Info>
@@ -201,6 +179,22 @@ class IntegrationConfigs extends React.Component<Props, State> {
         <CollapseContent title="Telnyx SMS">
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
+        <CollapseContent title="Twitter">
+          <Info>
+            <a
+              target="_blank"
+              href="https://erxes.org/administrator/system-config#twitter"
+              rel="noopener noreferrer"
+            >
+              {__('Learn how to set Twitter Integration Variables')}
+            </a>
+          </Info>
+          {this.renderItem('TWITTER_CONSUMER_KEY')}
+          {this.renderItem('TWITTER_CONSUMER_SECRET')}
+          {this.renderItem('TWITTER_ACCESS_TOKEN')}
+          {this.renderItem('TWITTER_ACCESS_TOKEN_SECRET')}
+          {this.renderItem('TWITTER_WEBHOOK_ENV')}
+        </CollapseContent>
         {/* {loadDynamicComponent(
           'inboxIntegrationSettings',
           {
@@ -210,7 +204,7 @@ class IntegrationConfigs extends React.Component<Props, State> {
         )} */}
 
         {loadDynamicComponent(
-          'inboxIntegrationTwitterSettings',
+          'inboxIntegrationSettings',
           {
             renderItem: this.renderItem
           },
