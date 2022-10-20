@@ -180,7 +180,7 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
 
-        {/* <CollapseContent title="Twitter">
+        <CollapseContent title="Twitter">
           <Info>
             <a
               target="_blank"
@@ -195,14 +195,14 @@ class IntegrationConfigs extends React.Component<Props, State> {
           {this.renderItem('TWITTER_ACCESS_TOKEN')}
           {this.renderItem('TWITTER_ACCESS_TOKEN_SECRET')}
           {this.renderItem('TWITTER_WEBHOOK_ENV')}
-        </CollapseContent> */}
-        {loadDynamicComponent(
+        </CollapseContent>
+        {/* {loadDynamicComponent(
           'inboxIntegrationSettings',
           {
             renderItem: this.renderItem
           },
           true
-        )}
+        )} */}
 
         {loadDynamicComponent(
           'inboxIntegrationSettings',
