@@ -5,7 +5,7 @@ import Icon from '@erxes/ui/src/components/Icon';
 import JobReferChooser from '../../../../../job/containers/refer/Chooser';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import React from 'react';
-import { __ } from '@erxes/ui/src/utils';
+import { Alert, __ } from '@erxes/ui/src/utils';
 import { ControlLabel } from '@erxes/ui/src/components/form';
 import { IJob } from '../../../../types';
 import { IJobRefer } from '../../../../../job/types';
@@ -21,6 +21,7 @@ type Props = {
   flowProduct?: IProduct;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   setUsedPopup: (check: boolean) => void;
+  setMainState: (param: any) => void;
 };
 
 type State = {
@@ -74,7 +75,7 @@ class JobForm extends React.Component<Props, State> {
     if (job) {
       content = (
         <div onClick={onClick}>
-          {job.name} <Icon icon="pen-1" />
+          {job.code} - {job.name} <Icon icon="pen-1" />
         </div>
       );
     }
@@ -89,15 +90,25 @@ class JobForm extends React.Component<Props, State> {
       this.setState({ [type]: e.target.value } as any);
     };
 
-    const onChangeJob = prs => {
-      let pr: any;
-      if (!prs.length) {
+    const onChangeJob = jobRefers => {
+      let selected: any;
+      if (!jobRefers.length) {
         this.setState({ jobReferId: '', jobRefer: undefined });
         return;
       }
 
-      pr = prs[0];
-      this.setState({ jobReferId: pr._id, jobRefer: pr });
+      selected = jobRefers[0];
+      this.setState({ jobReferId: selected._id, jobRefer: selected }, () => {
+        if (!selected.resultProducts.length) {
+          return Alert.error('This endPoint job has not result products');
+        }
+
+        const endProduct = selected.resultProducts[0].product || {};
+        this.props.setMainState({
+          product: endProduct,
+          productId: endProduct._id
+        });
+      });
     };
 
     const content = props => {

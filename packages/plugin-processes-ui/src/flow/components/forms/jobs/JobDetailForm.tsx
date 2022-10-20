@@ -12,6 +12,7 @@ type Props = {
   addFlowJob: (job: IJob, jobId?: string, config?: any) => void;
   closeModal: () => void;
   setUsedPopup: (check: boolean) => void;
+  setMainState: (param: any) => void;
 };
 
 type State = {

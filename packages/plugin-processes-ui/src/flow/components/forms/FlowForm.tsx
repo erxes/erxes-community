@@ -5,9 +5,7 @@ import Icon from '@erxes/ui/src/components/Icon';
 import JobDetailForm from './jobs/JobDetailForm';
 import jquery from 'jquery';
 import Label from '@erxes/ui/src/components/Label';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import PageContent from '@erxes/ui/src/layout/components/PageContent';
-import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
 import React from 'react';
 import RTG from 'react-transition-group';
 import Toggle from '@erxes/ui/src/components/Toggle';
@@ -47,7 +45,6 @@ import { IJobRefer } from '../../../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
 import { jsPlumb } from 'jsplumb';
 import { Link } from 'react-router-dom';
-import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 
 const plumb: any = jsPlumb;
 let instance;
@@ -65,21 +62,15 @@ type State = {
   name: string;
   currentTab: string;
   showDrawer: boolean;
-  showTrigger: boolean;
   showFlowJob: boolean;
   isActive: boolean;
-  showNoteForm: boolean;
-  editNoteForm?: boolean;
-  showTemplateForm: boolean;
   flowJobs: IJob[];
   activeFlowJob?: IJob;
-  selectedContentId?: string;
   isZoomable: boolean;
   zoomStep: number;
   zoom: number;
   percentage: number;
   flowJobEdited: boolean;
-  categoryId: string;
   productId?: string;
   product?: IProduct;
   lastFlowJob?: IJob;
@@ -105,9 +96,6 @@ class FlowForm extends React.Component<Props, State> {
       flowJobs,
       currentTab: 'flowJobs',
       isActive: lenFlow.length ? flow.status === 'active' : false,
-      showNoteForm: false,
-      showTemplateForm: false,
-      showTrigger: false,
       showDrawer: false,
       showFlowJob: false,
       isZoomable: false,
@@ -116,7 +104,6 @@ class FlowForm extends React.Component<Props, State> {
       percentage: 100,
       activeFlowJob: {} as IJob,
       flowJobEdited: false,
-      categoryId: '',
       productId: flow.productId || '',
       product: flow.product,
       lastFlowJob: undefined,
@@ -186,6 +173,10 @@ class FlowForm extends React.Component<Props, State> {
 
   setUsedPopup = check => {
     this.usedPopup = check;
+  };
+
+  setMainState = param => {
+    this.setState({ ...param });
   };
 
   componentDidMount() {
@@ -315,17 +306,6 @@ class FlowForm extends React.Component<Props, State> {
     return save(generateValues());
   };
 
-  handleNoteModal = (item?) => {
-    this.setState({
-      showNoteForm: !this.state.showNoteForm,
-      editNoteForm: item ? true : false
-    });
-  };
-
-  handleTemplateModal = () => {
-    this.setState({ showTemplateForm: !this.state.showTemplateForm });
-  };
-
   onToggle = e => {
     const isActive = e.target.checked;
 
@@ -336,12 +316,6 @@ class FlowForm extends React.Component<Props, State> {
     if (Object.keys(flow).length) {
       save({ _id: flow._id, status: isActive ? 'active' : 'draft' });
     }
-  };
-
-  onChange = e => {
-    const value = e.target.value;
-
-    this.setState({ categoryId: value });
   };
 
   doZoom = (step: number, inRange: boolean) => {
@@ -423,60 +397,6 @@ class FlowForm extends React.Component<Props, State> {
         'disconnect'
       )
     });
-  };
-
-  onChangeCategory = (categoryId: string) => {
-    this.setState({ categoryId });
-  };
-
-  renderProductServiceTrigger(product?: IProduct) {
-    let content = (
-      <div>
-        {__('Choose Product & service ')} <Icon icon="plus-circle" />
-      </div>
-    );
-
-    // if product selected
-    if (product) {
-      content = (
-        <div>
-          {product.name} <Icon icon="pen-1" />
-        </div>
-      );
-    }
-
-    return <ProductButton>{content}</ProductButton>;
-  }
-
-  renderProductModal = (currentProduct?: IProduct) => {
-    const productOnChange = (products: IProduct[]) => {
-      const product = products[0];
-      const productId = product ? product._id : '';
-      this.setState({ productId, product, name: product.name });
-    };
-
-    const content = props => (
-      <ProductChooser
-        {...props}
-        onSelect={productOnChange}
-        onChangeCategory={this.onChangeCategory}
-        categoryId={this.state.categoryId}
-        data={{
-          name: 'Product',
-          products: currentProduct ? [currentProduct] : []
-        }}
-        limit={1}
-      />
-    );
-
-    return (
-      <ModalTrigger
-        title="Choose product & service"
-        trigger={this.renderProductServiceTrigger(currentProduct)}
-        size="lg"
-        content={content}
-      />
-    );
   };
 
   handleClickOutside = event => {
@@ -633,21 +553,24 @@ class FlowForm extends React.Component<Props, State> {
   };
 
   rendeRightActionBar() {
-    const { isActive } = this.state;
+    const { isActive, flowStatus, product } = this.state;
 
     return (
       <BarItems>
         <ToggleWrapper>
           <span>{__('Product: ')}</span>
-          {this.renderProductModal(this.state.product)}
+          {(product &&
+            this.renderLabelInfo(
+              `default`,
+              `${product.code} - ${product.name}`
+            )) ||
+            this.renderLabelInfo(`simple`, 'Not found yet')}
         </ToggleWrapper>
 
         <ToggleWrapper>
           <span>{__('Validation status: ')}</span>
-          {this.state.flowStatus === true &&
-            this.renderLabelInfo('success', 'True')}
-          {this.state.flowStatus === false &&
-            this.renderLabelInfo('danger', 'False')}
+          {flowStatus === true && this.renderLabelInfo('success', 'True')}
+          {flowStatus === false && this.renderLabelInfo('danger', 'False')}
         </ToggleWrapper>
         <ToggleWrapper>
           <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>
@@ -684,7 +607,6 @@ class FlowForm extends React.Component<Props, State> {
             name="name"
             value={name}
             onChange={this.onNameChange}
-            disabled={true}
             required={true}
             autoFocus={true}
           />
@@ -724,6 +646,7 @@ class FlowForm extends React.Component<Props, State> {
             closeModal={this.onBackFlowJob}
             flowJobs={flowJobs}
             setUsedPopup={this.setUsedPopup}
+            setMainState={this.setMainState}
           />
         </>
       );

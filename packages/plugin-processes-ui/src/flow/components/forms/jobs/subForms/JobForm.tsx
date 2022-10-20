@@ -75,7 +75,7 @@ class JobForm extends React.Component<Props, State> {
     if (job) {
       content = (
         <div onClick={onClick}>
-          {job.name} <Icon icon="pen-1" />
+          {job.code} - {job.name} <Icon icon="pen-1" />
         </div>
       );
     }
