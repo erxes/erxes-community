@@ -1,6 +1,6 @@
 import { queries as productQueries } from '@erxes/ui-products/src/graphql';
 
-const flowFields = `
+export const flowFields = `
   _id
   createdAt
   createdBy
@@ -11,7 +11,7 @@ const flowFields = `
   productId
   product
   status
-  flowJobStatus
+  flowValidation
 `;
 
 const flows = `

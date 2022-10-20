@@ -5,15 +5,20 @@ import { IJobRefer } from './jobs';
 export interface IJob {
   id: string;
   nextJobIds: string[];
-  jobReferId: string;
+  type: string;
+  config: any;
+  // jobReferId?: string;
+  // productId?: string;
+  // durationType: string;
+  // duration: number;
+  // quantity: number;
+  // inBranchId: string;
+  // inDepartmentId: string;
+  // outBranchId: string;
+  // outDepartmentId: string;
   style: object;
   label: string;
   description: string;
-  quantity: number;
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
 }
 
 export interface IJobDocument extends IJob {
@@ -25,7 +30,7 @@ export interface IFlow {
   categoryId?: string;
   productId?: string;
   status: string;
-  flowJobStatus: boolean;
+  flowValidation: string;
   jobs?: IJobDocument[];
 }
 
@@ -68,7 +73,7 @@ export const flowSchema = schemaHooksWrapper(
       index: true
     }),
     status: field({ type: String, label: 'Status' }),
-    flowJobStatus: field({ type: Boolean, label: 'FlowJob status' }),
+    flowValidation: field({ type: String, label: 'FlowJob status' }),
     createdAt: { type: Date, default: new Date(), label: 'Created date' },
     createdBy: { type: String },
     updatedAt: { type: Date, default: new Date(), label: 'Updated date' },

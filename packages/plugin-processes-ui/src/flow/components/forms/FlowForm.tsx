@@ -74,7 +74,7 @@ type State = {
   productId?: string;
   product?: IProduct;
   lastFlowJob?: IJob;
-  flowStatus: boolean;
+  flowValidation: string;
 };
 
 class FlowForm extends React.Component<Props, State> {
@@ -107,7 +107,7 @@ class FlowForm extends React.Component<Props, State> {
       productId: flow.productId || '',
       product: flow.product,
       lastFlowJob: undefined,
-      flowStatus: false
+      flowValidation: flow.flowValidation || ''
     };
   }
 
@@ -178,6 +178,14 @@ class FlowForm extends React.Component<Props, State> {
   setMainState = param => {
     this.setState({ ...param });
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.flow !== this.props.flow) {
+      this.setState({
+        flowValidation: nextProps.flow.flowValidation
+      });
+    }
+  }
 
   componentDidMount() {
     this.connectInstance();
@@ -275,7 +283,7 @@ class FlowForm extends React.Component<Props, State> {
   };
 
   handleSubmit = () => {
-    const { name, isActive, flowJobs, productId, flowStatus } = this.state;
+    const { name, isActive, flowJobs, productId, flowValidation } = this.state;
     const { flow, save } = this.props;
 
     if (!name || name === 'Your flow title') {
@@ -288,7 +296,7 @@ class FlowForm extends React.Component<Props, State> {
         name,
         status: isActive ? 'active' : 'draft',
         productId,
-        flowJobStatus: flowStatus,
+        flowValidation: flowValidation,
         jobs: flowJobs.map(a => ({
           id: a.id,
           type: a.type,
@@ -553,7 +561,7 @@ class FlowForm extends React.Component<Props, State> {
   };
 
   rendeRightActionBar() {
-    const { isActive, flowStatus, product } = this.state;
+    const { isActive, flowValidation, product } = this.state;
 
     return (
       <BarItems>
@@ -569,8 +577,8 @@ class FlowForm extends React.Component<Props, State> {
 
         <ToggleWrapper>
           <span>{__('Validation status: ')}</span>
-          {flowStatus === true && this.renderLabelInfo('success', 'True')}
-          {flowStatus === false && this.renderLabelInfo('danger', 'False')}
+          {flowValidation === '' && this.renderLabelInfo('success', 'True')}
+          {flowValidation && this.renderLabelInfo('danger', flowValidation)}
         </ToggleWrapper>
         <ToggleWrapper>
           <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>

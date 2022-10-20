@@ -1,7 +1,8 @@
 import { Model } from 'mongoose';
 import * as _ from 'underscore';
 import { IModels } from '../connectionResolver';
-import { IFlow, IFlowDocument, flowSchema } from './definitions/flows';
+import { IFlow, IFlowDocument, flowSchema, IJob } from './definitions/flows';
+import { FLOWJOB_TYPES } from '../../../plugin-processes-ui/src/flow/constants';
 
 export interface IFlowModel extends Model<IFlowDocument> {
   getFlow(_id: string): Promise<IFlowDocument>;
@@ -9,6 +10,7 @@ export interface IFlowModel extends Model<IFlowDocument> {
   updateFlow(_id: string, doc: IFlow): Promise<IFlowDocument>;
   removeFlow(_id: string): void;
   removeFlows(flowIds: string[]): void;
+  checkValidation(jobs?: IJob[]): Promise<Boolean>;
 }
 
 export const loadFlowClass = (models: IModels) => {
@@ -24,6 +26,34 @@ export const loadFlowClass = (models: IModels) => {
       }
 
       return flow;
+    }
+
+    public static async checkValidation(jobs?: IJob[]) {
+      if (!jobs || !jobs.length) {
+        return 'Has not jobs';
+      }
+
+      const endJobs = jobs.filter(j => j.type === FLOWJOB_TYPES.ENDPOINT);
+      if (!endJobs || !endJobs.length) {
+        return 'Has not endPoint job';
+      }
+
+      if (endJobs.length > 1) {
+        return 'Many endPoint jobs';
+      }
+
+      const latestJobs = jobs.filter(
+        j => !j.nextJobIds || !j.nextJobIds.length
+      );
+      if (!latestJobs || !latestJobs.length) {
+        return 'Has not endPoint job';
+      }
+
+      if (latestJobs.length > 1) {
+        return 'Many endPoint jobs';
+      }
+
+      return '';
     }
 
     /**
@@ -42,7 +72,12 @@ export const loadFlowClass = (models: IModels) => {
      * Update Flow
      */
     public static async updateFlow(_id: string, doc: IFlow) {
-      await models.Flows.updateOne({ _id }, { $set: { ...doc } });
+      const flowValidation = await models.Flows.checkValidation(doc.jobs);
+
+      await models.Flows.updateOne(
+        { _id },
+        { $set: { ...doc, flowValidation } }
+      );
 
       const updated = await models.Flows.getFlow(_id);
 

@@ -12,7 +12,7 @@ export const types = `
     product: JSON,
     status: String,
     jobs: JSON,
-    flowJobStatus: Boolean
+    flowValidation: String
   }
 
   input JobInput {
@@ -46,7 +46,7 @@ const flowParams = `
   categoryId: String,
   productId: String,
   status: String,
-  flowJobStatus: Boolean,
+  flowValidation: String,
   jobs: [JobInput],
 `;
 

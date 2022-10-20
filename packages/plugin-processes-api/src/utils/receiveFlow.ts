@@ -27,9 +27,9 @@ export const rf = async (models: IModels, subdomain: string, params) => {
   for (const intervalData of intervals) {
     const { productId, count, label } = intervalData;
     intervalId = label;
-    const flowJobStatus = true;
+    const flowValidation = '';
     const status = 'active';
-    const filter = { productId, flowJobStatus, status };
+    const filter = { productId, flowValidation, status };
     const flow = (await models.Flows.findOne(filter)) || ({} as IFlowDocument);
     const jobRefers = await models.JobRefers.find({
       status: { $in: ['active', null] }
@@ -51,7 +51,7 @@ export const rf = async (models: IModels, subdomain: string, params) => {
 
       if (Object.keys(lastJob || {}).length > 0 && flowStatus) {
         const lastJobRefer = getJobRefers(
-          [lastJob?.jobReferId || ''],
+          [lastJob?.config.jobReferId || ''],
           jobRefers
         );
 

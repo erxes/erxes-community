@@ -43,7 +43,7 @@ export interface IFlow {
   productId?: string;
   product?: IProduct;
   status: string;
-  flowJobStatus?: boolean;
+  flowValidation?: string;
   jobs?: IJob[];
 }
 

@@ -34,7 +34,7 @@ class Row extends React.Component<Props> {
       history.push(`/processes/flows/details/${flow._id}`);
     };
 
-    const { name, status, jobs, flowJobStatus } = flow;
+    const { name, status, jobs, flowValidation } = flow;
 
     return (
       <tr onClick={onTrClick}>
@@ -48,8 +48,8 @@ class Row extends React.Component<Props> {
         <td>{name}</td>
         <td>{status}</td>
         <td>
-          {flowJobStatus === true && renderLabelInfo('success', 'True')}
-          {flowJobStatus === false && renderLabelInfo('danger', 'False')}
+          {flowValidation === '' && renderLabelInfo('success', 'True')}
+          {flowValidation && renderLabelInfo('danger', flowValidation)}
         </td>
         <td>{(jobs && jobs.length) || 0}</td>
       </tr>

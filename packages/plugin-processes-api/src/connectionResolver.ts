@@ -19,8 +19,8 @@ import { IOverallWorkDocument } from './models/definitions/overallWorks';
 import { IOverallWorkModel, loadOverallWorkClass } from './models/OverallWorks';
 import { IPerformDocument } from './models/definitions/performs';
 import { IPerformModel, loadPerformClass } from './models/Performs';
-import { IProcessDocument } from './models/definitions/processes';
-import { IProcessModel, loadProcessClass } from './models/Processes';
+// import { IProcessDocument } from './models/definitions/processes';
+// import { IProcessModel, loadProcessClass } from './models/Processes';
 import { IWorkDocument } from './models/definitions/works';
 import { IWorkModel, loadWorkClass } from './models/Works';
 
@@ -29,7 +29,7 @@ export interface IModels {
   JobRefers: IJobReferModel;
   FlowCategories: IFlowCategoryModel;
   Flows: IFlowModel;
-  Processes: IProcessModel;
+  // Processes: IProcessModel;
   Works: IWorkModel;
   OverallWorks: IOverallWorkModel;
   Performs: IPerformModel;
@@ -60,10 +60,10 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     'flows',
     loadFlowClass(models)
   );
-  models.Processes = db.model<IProcessDocument, IProcessModel>(
-    'processes',
-    loadProcessClass(models)
-  );
+  // models.Processes = db.model<IProcessDocument, IProcessModel>(
+  //   'processes',
+  //   loadProcessClass(models)
+  // );
   models.Works = db.model<IWorkDocument, IWorkModel>(
     'works',
     loadWorkClass(models)

@@ -93,7 +93,12 @@ class JobForm extends React.Component<Props, State> {
     const onChangeJob = jobRefers => {
       let selected: any;
       if (!jobRefers.length) {
-        this.setState({ jobReferId: '', jobRefer: undefined });
+        this.setState({ jobReferId: '', jobRefer: undefined }, () => {
+          this.props.setMainState({
+            product: undefined,
+            productId: ''
+          });
+        });
         return;
       }
 
