@@ -50,7 +50,7 @@ export const ASSET_CATEGORY_STATUS_FILTER = {
 
 export const breadcrumb = [
   { title: __('Settings'), link: '/settings' },
-  { title: __('Asset & Movement') }
+  { title: __('Assets') }
 ];
 
 export const MOVEMENT_TYPES = [];

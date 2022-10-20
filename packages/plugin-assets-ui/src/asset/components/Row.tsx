@@ -1,5 +1,12 @@
 import React from 'react';
-import { ModalTrigger, Icon, FormControl, Button, Tip, router } from '@erxes/ui/src';
+import {
+  ModalTrigger,
+  Icon,
+  FormControl,
+  Button,
+  Tip,
+  router
+} from '@erxes/ui/src';
 import { IAsset } from '../../common/types';
 import AssetForm from '../containers/Form';
 import { MoreContainer, Badge, ContainerBox } from '../../style';
@@ -29,7 +36,7 @@ class Row extends React.Component<Props> {
     };
 
     const onTrClick = () => {
-      history.push(`/settings/asset-movements/details/${asset._id}`);
+      history.push(`/settings/assets/details/${asset._id}`);
     };
 
     const handleParent = () => {
@@ -43,7 +50,11 @@ class Row extends React.Component<Props> {
     return (
       <tr onClick={onTrClick}>
         <td onClick={onClick}>
-          <FormControl checked={isChecked} componentClass="checkbox" onChange={onChange} />
+          <FormControl
+            checked={isChecked}
+            componentClass="checkbox"
+            onChange={onChange}
+          />
         </td>
         <td>{code}</td>
         <td>{name}</td>

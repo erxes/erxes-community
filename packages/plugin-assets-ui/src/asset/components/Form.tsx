@@ -242,7 +242,6 @@ class Form extends React.Component<Props, State> {
                 required={true}
               />
             </FormGroup>
-            {isEnabled('contacts') && (
               <FormGroup>
                 <ControlLabel>Vendor</ControlLabel>
                 <SelectCompanies
@@ -254,7 +253,6 @@ class Form extends React.Component<Props, State> {
                   multi={false}
                 />
               </FormGroup>
-            )}
             <FormGroup>
               <ControlLabel required={true}>Unit price</ControlLabel>
               <p>
