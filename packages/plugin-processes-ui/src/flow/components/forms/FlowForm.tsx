@@ -64,7 +64,6 @@ type Props = {
 type State = {
   name: string;
   currentTab: string;
-  activeId: string;
   showDrawer: boolean;
   showTrigger: boolean;
   showFlowJob: boolean;
@@ -104,7 +103,6 @@ class FlowForm extends React.Component<Props, State> {
     this.state = {
       name: lenFlow.length ? flow.name : 'Your flow title',
       flowJobs,
-      activeId: '',
       currentTab: 'flowJobs',
       isActive: lenFlow.length ? flow.status === 'active' : false,
       showNoteForm: false,
@@ -260,8 +258,6 @@ class FlowForm extends React.Component<Props, State> {
       event.preventDefault();
 
       jquery(`div#${event.currentTarget.id}`).toggleClass('show-flowJob-menu');
-
-      this.setState({ activeId: event.currentTarget.id });
     });
 
     // delete control ===================

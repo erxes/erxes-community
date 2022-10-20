@@ -50,8 +50,10 @@ class CommonForm extends React.Component<Props, State> {
 
     this.state = {
       durationType:
-        config.durationType || jobRefer?.durationType || DURATION_TYPES.minut,
-      duration: config.duration || jobRefer?.duration || 1,
+        config.durationType ||
+        (jobRefer || {}).durationType ||
+        DURATION_TYPES.minut,
+      duration: config.duration || (jobRefer || {}).duration || 1,
       inBranchId: config.inBranchId || '',
       inDepartmentId: config.inDepartmentId || '',
       outBranchId: config.outBranchId || '',
@@ -65,8 +67,12 @@ class CommonForm extends React.Component<Props, State> {
       this.timer = setTimeout(() => {
         this.setState(
           {
-            durationType: config.durationType,
-            duration: config.duration,
+            durationType:
+              config.durationType ||
+              (nextProps.jobRefer || {}).durationType ||
+              DURATION_TYPES.minut,
+            duration:
+              config.duration || (nextProps.jobRefer || {}).duration || 1,
             inBranchId: config.inBranchId,
             inDepartmentId: config.inDepartmentId,
             outBranchId: config.outBranchId,
@@ -74,7 +80,6 @@ class CommonForm extends React.Component<Props, State> {
           },
           () => {
             if (this.timer) {
-              clearTimeout(this.timer);
               this.timer = undefined;
             }
           }

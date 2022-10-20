@@ -27,12 +27,12 @@ export const DURATION_TYPES = {
 
 export const JOB_TYPES = {
   JOB: 'job',
-  ENDPOINT: 'endPoint',
+  ENDPOINT: 'end',
   INCOME: 'income',
   OUTLET: 'outlet',
   MOVE: 'move',
   FLOW: 'flow',
-  ALL: ['job', 'endPoint', 'income', 'outlet', 'move', 'flow']
+  ALL: ['job', 'end', 'income', 'outlet', 'move', 'flow']
 };
 
 export const JOB_STATUSES = {

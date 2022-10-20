@@ -7,7 +7,6 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import React from 'react';
 import { __ } from '@erxes/ui/src/utils';
 import { ControlLabel } from '@erxes/ui/src/components/form';
-import { DrawerDetail } from '../../../../styles';
 import { IJob } from '../../../../types';
 import { IJobRefer } from '../../../../../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
@@ -125,7 +124,7 @@ class JobForm extends React.Component<Props, State> {
     };
 
     return (
-      <DrawerDetail>
+      <>
         <FormGroup>
           <ControlLabel>Jobs</ControlLabel>
           <ModalTrigger
@@ -143,7 +142,7 @@ class JobForm extends React.Component<Props, State> {
             onChange={onChangeValue.bind(this, 'description')}
           />
         </FormGroup>
-      </DrawerDetail>
+      </>
     );
   }
 
@@ -155,6 +154,7 @@ class JobForm extends React.Component<Props, State> {
         {...this.props}
         name={(jobRefer && jobRefer.name) || 'Unknown'}
         description={description}
+        jobRefer={jobRefer}
         config={{ jobReferId }}
       >
         {this.renderContent()}

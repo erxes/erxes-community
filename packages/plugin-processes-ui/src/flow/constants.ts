@@ -1,6 +1,6 @@
 export const FLOWJOBS = [
   {
-    type: 'endPoint',
+    type: 'end',
     icon: 'flower',
     label: 'End Point Job',
     description: '',
@@ -45,7 +45,7 @@ export const FLOWJOBS = [
 ];
 
 export const FLOWJOB_TYPES = {
-  ENDPOINT: 'endPoint',
+  ENDPOINT: 'end',
   JOB: 'job',
   INCOME: 'income',
   OUTLET: 'outlet',

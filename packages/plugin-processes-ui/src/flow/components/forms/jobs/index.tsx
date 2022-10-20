@@ -4,7 +4,7 @@ import ProductForm from '../../../containers/forms/jobs/subForms/ProductForm';
 
 export const ActionForms = {
   job: JobForm,
-  endPoint: JobForm,
+  end: JobForm,
   move: ProductForm,
   income: ProductForm,
   outlet: ProductForm
