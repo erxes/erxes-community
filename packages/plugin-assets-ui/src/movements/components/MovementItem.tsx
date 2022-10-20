@@ -10,7 +10,8 @@ import { Flex } from '@erxes/ui/src/styles/main';
 import gql from 'graphql-tag';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { IAsset, IMovementItem } from '../../common/types';
+import { queries as assetQueries } from '../../asset/graphql';
+import { IMovementItem } from '../../common/types';
 import { SelectWithAssets } from '../../common/utils';
 import {
   ContainerBox,
@@ -28,7 +29,7 @@ type Props = {
   removeRow: (id: string) => void;
   current: string;
   onsSelect: (prevItemId: any, newItem: any) => void;
-  selectedItems?: IAsset[];
+  selectedItems?: string[];
   isChecked: boolean;
   toggleBulk: (movement: IMovementItem, isChecked?: boolean) => void;
   onChangeBulkItems: (ids: string, checked: boolean) => void;
@@ -72,16 +73,15 @@ class MovementItems extends React.Component<Props> {
     );
 
     const renderChooser = props => {
-      const ignoreIds = selectedItems?.map(item => item._id);
-
       const handleSelect = newItem => {
-        this.props.onsSelect(assetId, newItem[0]);
+        // this.props.onsSelect(assetId, newItem[0]);
+        console.log(item);
       };
 
       const updatedProps = {
         ...props,
         handleSelect,
-        ignoreIds,
+        ignoreIds: selectedItems,
         limit: 1
       };
       return <Chooser {...updatedProps} />;
@@ -112,8 +112,8 @@ class MovementItems extends React.Component<Props> {
       );
     };
 
-    const changeRowItem = assetId => {
-      client
+    const changeRowItem = async assetId => {
+      const dasczx = await client
         .query({
           query: gql(queries.itemCurrentLocation),
           fetchPolicy: 'network-only',
@@ -121,7 +121,17 @@ class MovementItems extends React.Component<Props> {
         })
         .then(res => {
           const { currentLocationAssetMovementItem } = res.data;
-          this.props.handleChangeRowItem(item.assetId, currentLocationAssetMovementItem);
+          return currentLocationAssetMovementItem;
+        });
+      const dasd = await client
+        .query({
+          query: gql(assetQueries.assetDetail),
+          fetchPolicy: 'network-only',
+          variables: { assetId }
+        })
+        .then(res => {
+          const { currentLocationAssetMovementItem } = res.data;
+          return currentLocationAssetMovementItem;
         });
     };
 
@@ -168,7 +178,7 @@ class MovementItems extends React.Component<Props> {
                       label="Choose Asset"
                       name="assetId"
                       onSelect={changeRowItem}
-                      skip={item.assetId}
+                      skip={selectedItems}
                       customOption={{ value: '', label: 'Choose Asset' }}
                     />
                   </ItemRow>

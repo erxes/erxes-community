@@ -15,7 +15,6 @@ import {
 import { ContentColumn, ItemRow, ItemText } from '@erxes/ui-cards/src/deals/styles';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
-import { Title } from '@erxes/ui-settings/src/styles';
 import client from '@erxes/ui/src/apolloClient';
 import { DateContainer, FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
@@ -24,7 +23,7 @@ import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import gql from 'graphql-tag';
 import _loadash from 'lodash';
 import React from 'react';
-import { IAsset, IMovementItem, IMovementType } from '../../common/types';
+import { IMovementItem, IMovementType } from '../../common/types';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
 import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
 import AssetChooser from '../containers/Chooser';
@@ -51,7 +50,7 @@ type State = {
   currentItems: string[];
   description: string;
   movedAt: string;
-  selectedItems: IAsset[];
+  selectedItemIds: string[];
   general: General;
   checkedItems: string[];
 };
@@ -67,7 +66,7 @@ class Form extends React.Component<Props, State> {
 
     this.state = {
       variables: detail?.assets || [],
-      selectedItems: detail?.selectedItems || [],
+      selectedItemIds: detail?.assetIds || [],
       description: detail?.description || '',
       movedAt: detail?.movedAt || '',
       currentItems: [assetId],
@@ -99,16 +98,16 @@ class Form extends React.Component<Props, State> {
 
   assetChooser(props) {
     const handleSelect = datas => {
-      const selectedItemsIds = datas.map(data => data._id);
+      const selectedItemIds = datas.map(data => data._id);
       client
         .query({
           query: gql(queries.itemsCurrentLocation),
           fetchPolicy: 'network-only',
-          variables: { assetIds: selectedItemsIds }
+          variables: { assetIds: selectedItemIds }
         })
         .then(res => {
           const { currentLocationAssetMovementItems } = res.data;
-          this.setState({ selectedItems: datas });
+          this.setState({ selectedItemIds });
           this.setState({ variables: currentLocationAssetMovementItems });
         });
     };
@@ -116,7 +115,7 @@ class Form extends React.Component<Props, State> {
     const updatedProps = {
       ...props,
       handleSelect,
-      selected: this.state.selectedItems
+      selectedAssetIds: this.state.selectedItemIds
     };
 
     return <AssetChooser {...updatedProps} />;
@@ -213,17 +212,17 @@ class Form extends React.Component<Props, State> {
 
     this.setState({ description: value });
   };
-  handleChangeRowItemValue = (prevId, newItem) => {
-    let { selectedItems, variables } = this.state;
-    selectedItems = selectedItems.map(item => (item._id === prevId ? newItem : item));
-    const currentMovement = newItem?.currentMovement;
-    variables = variables.map(item =>
-      item.assetId === prevId
-        ? { assetId: newItem._id, assetName: newItem.name, ...currentMovement }
-        : item
-    );
-    this.setState({ selectedItems, variables });
-  };
+  // handleChangeRowItemValue = (prevId, newItem) => {
+  //   let { selectedItems, variables } = this.state;
+  //   selectedItems = selectedItems.map(item => (item._id === prevId ? newItem : item));
+  //   const currentMovement = newItem?.currentMovement;
+  //   variables = variables.map(item =>
+  //     item.assetId === prevId
+  //       ? { assetId: newItem._id, assetName: newItem.name, ...currentMovement }
+  //       : item
+  //   );
+  //   this.setState({ selectedItems, variables });
+  // };
 
   handleChangeRowItem = (prevItemId, newItem) => {
     const { variables } = this.state;
@@ -321,16 +320,16 @@ class Form extends React.Component<Props, State> {
   }
 
   renderList = props => {
-    const { variables, currentItems, selectedItems } = this.state;
+    const { variables, currentItems, selectedItemIds } = this.state;
 
     const removeRow = id => {
       const newVariables = variables.filter(item => item.assetId !== id);
-      const newSelectedItems = selectedItems.filter(item => item._id !== id);
+      const newSelectedItems = selectedItemIds.filter(itemId => itemId !== id);
       if (currentItems.includes(id)) {
         const newCurrentItems = currentItems.filter(item => item !== id);
         this.setState({ currentItems: newCurrentItems });
       }
-      this.setState({ variables: newVariables, selectedItems: newSelectedItems });
+      this.setState({ variables: newVariables, selectedItemIds: newSelectedItems });
     };
 
     const onChange = () => {
@@ -377,8 +376,8 @@ class Form extends React.Component<Props, State> {
                 current={currentItems.includes(item.assetId) ? item.assetId : ''}
                 changeCurrent={this.changeCurrentItem}
                 removeRow={removeRow}
-                onsSelect={this.handleChangeRowItemValue}
-                selectedItems={selectedItems}
+                onsSelect={() => console.log('das')}
+                selectedItems={selectedItemIds}
                 toggleBulk={props.toggleBulk}
                 isChecked={props.bulk.some(bulk => bulk.assetId === item.assetId)}
                 onChangeBulkItems={onChangeCheckedItems}
@@ -404,7 +403,6 @@ class Form extends React.Component<Props, State> {
 
       return (
         <ContainerBox column gap={20}>
-          <Title>Movements</Title>
           <FormWrapper>
             <FormColumn>
               <CommonFormGroup label="Date">

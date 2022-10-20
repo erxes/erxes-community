@@ -10,7 +10,7 @@ import { IAsset, IAssetQueryResponse } from '../../common/types';
 type Props = {
   closeModal: () => void;
   handleSelect: (datas: IAsset[]) => void;
-  selected: any;
+  selectedAssetIds: string[];
   ignoreIds?: string[];
   limit?: number;
 };
@@ -60,11 +60,15 @@ class AssetChooser extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { closeModal, assets, handleSelect, selected, limit } = this.props;
+    const { closeModal, assets, handleSelect, limit, selectedAssetIds } = this.props;
 
     if (assets.loading) {
       return <Spinner />;
     }
+
+    const selected = assets.assets.filter(
+      asset => selectedAssetIds && selectedAssetIds.includes(asset._id)
+    );
 
     return (
       <Chooser

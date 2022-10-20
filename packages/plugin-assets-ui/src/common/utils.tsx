@@ -214,7 +214,7 @@ export const SelectWithAssets = ({
   customOption?: IOption;
   initialValue?: string | string[];
   name: string;
-  skip?: string;
+  skip?: string[];
 }) => {
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
@@ -228,7 +228,7 @@ export const SelectWithAssets = ({
     });
 
     if (skip) {
-      list = list.filter(item => item.value !== skip);
+      list = list.filter(item => !skip.includes(item.value));
     }
 
     return list;
