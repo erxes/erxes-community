@@ -5,26 +5,22 @@ export default {
     return models.Movements.findOne({ _id });
   },
 
-  async branch(movement: IMovementItemDocument, {}, { models, dataLoaders }: IContext) {
+  async branch(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.branchId && dataLoaders.branch.load(movement.branchId)) || null;
   },
-  async customer(movement: IMovementItemDocument, {}, { models, dataLoaders }: IContext) {
+  async customer(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.customerId && dataLoaders.customer.load(movement.customerId)) || null;
   },
-  async company(movement: IMovementItemDocument, {}, { models, dataLoaders }: IContext) {
+  async company(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.companyId && dataLoaders.company.load(movement.companyId)) || null;
   },
   async teamMember(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.teamMemberId && dataLoaders.teamMember.load(movement.teamMemberId)) || null;
   },
-  async department(movement: IMovementItemDocument, {}, { models, dataLoaders }: IContext) {
+  async department(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.departmentId && dataLoaders.department.load(movement.departmentId)) || null;
   },
-  async sourceLocations(
-    { sourceLocations }: IMovementItemDocument,
-    {},
-    { models, dataLoaders }: IContext
-  ) {
+  async sourceLocations({ sourceLocations }: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return {
       branchId: (sourceLocations.branchId && sourceLocations.branchId) || null,
       departmentId: (sourceLocations.departmentId && sourceLocations.departmentId) || null,

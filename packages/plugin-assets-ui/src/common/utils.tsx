@@ -175,7 +175,8 @@ export const getRefetchQueries = () => {
     'assetCategories',
     'assetMovementItems',
     'assetMovementItemsTotalCount',
-    'movementDetail'
+    'movementDetail',
+    'movementsQuery'
   ];
 };
 

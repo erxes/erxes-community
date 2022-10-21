@@ -2,11 +2,11 @@ import { isEnabled } from '@erxes/ui/src/utils/core';
 import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
 
 const fieldAviableEnabledContacts = `
-branch
-department
-company
-customer
-teamMember
+    branch
+    department
+    company
+    customer
+    teamMember
 `;
 const commonItemFields = `
     branchId
@@ -78,36 +78,9 @@ query CurrentAssetMovementItems($assetIds: [String]) {
 }
 `;
 
-const itemCurrentLocation = `
-query CurrentLocationAssetMovementItem($assetId: String) {
-  currentLocationAssetMovementItem(assetId: $assetId) {
-    assetId
-    assetName
-    branchId
-    companyId
-    createdAt
-    customerId
-    departmentId
-    movementId
-    teamMemberId
-    ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
-    sourceLocations {
-      branchId
-      companyId
-      customerId
-      departmentId
-      teamMemberId
-
-      ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
-    }
-  }
-}
-`;
-
 export default {
   movements,
   movementDetail,
   movementsTotalCount,
-  itemsCurrentLocation,
-  itemCurrentLocation
+  itemsCurrentLocation
 };

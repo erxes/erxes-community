@@ -37,7 +37,9 @@ export const loadMovementClass = (models: IModels) => {
         itemIds: movementItemIds,
         movedAt: doc.movedAt,
         description: doc.description,
-        userId
+        userId,
+        createdAt: new Date(),
+        modifiedAt: new Date()
       });
 
       await models.MovementItems.updateMany(
@@ -63,6 +65,7 @@ export const loadMovementClass = (models: IModels) => {
         { _id },
         { $set: { movedAt: doc.movedAt, description: doc.description, modifiedAt: new Date() } }
       );
+      return 'updated';
     }
 
     public static async movementRemove(ids: string[]) {
@@ -88,7 +91,7 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error(error.message);
       }
 
-      return { status: 'removed' };
+      return 'removed';
     }
   }
 

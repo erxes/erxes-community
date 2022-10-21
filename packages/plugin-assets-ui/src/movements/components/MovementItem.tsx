@@ -128,61 +128,65 @@ class MovementItems extends React.Component<Props> {
           <tr>
             <td style={{ width: 40 }} />
             <td colSpan={7}>
-              <Flex>
-                <MovementItemInfoContainer>
-                  <ItemRow label="Choose Asset:">
-                    <SelectWithAssets
-                      label="Choose Asset"
-                      name="assetId"
-                      onSelect={changeRowItem}
-                      skip={selectedItems}
-                      initialValue={assetId}
-                      customOption={{ value: '', label: 'Choose Asset' }}
-                    />
-                  </ItemRow>
-                  <ItemRow label="Asset:">{`${__(assetName || '')}`}</ItemRow>
-                  <ItemRow label="Branch:">
-                    {__(sourceLocations?.branch?.title || '')}
-                    {sourceLocations?.branch?.title && <TextInfo>/</TextInfo>}
-                    {__(branch?.title || '')}
-                  </ItemRow>
-                  <ItemRow label="Department:">
-                    {__(sourceLocations?.department?.title)}
-                    {sourceLocations?.department?.title && <TextInfo>/</TextInfo>}
-                    {__(department?.title)}
-                  </ItemRow>
-                  <ItemRow label="Customer:">
-                    <Link to={`/settings/customer/details/${sourceLocations?.customer?._id || ''}`}>
-                      {__(sourceLocations?.customer?.primaryEmail || '')}
-                    </Link>
-                    {sourceLocations?.customer?.primaryEmail && <TextInfo>/</TextInfo>}
-                    <Link to={`/settings/customer/details/${customer?._id || ''}`}>
-                      {__(customer?.primaryEmaill || '')}
-                    </Link>
-                  </ItemRow>
-                  <ItemRow label="Company:">
-                    <Link to={`/settings/company/details/${sourceLocations?.company?._id || ''}`}>
-                      {__(sourceLocations?.company?.primaryEmail || '')}
-                    </Link>
-                    {sourceLocations?.company?.primaryEmail && <TextInfo>/</TextInfo>}
-                    <Link to={`/settings/company/details/${company?._id}`}>
-                      {__(company?.primaryEmail || '')}
-                    </Link>
-                  </ItemRow>
-                  <ItemRow label="Team Member:">
-                    <Link to={`/settings/team/details/${sourceLocations?.teamMember?._id}`}>
-                      {__(sourceLocations?.teamMember?.email || '')}
-                    </Link>
-                    {sourceLocations?.teamMember?.email && <TextInfo>/</TextInfo>}
-                    <Link to={`/settings/team/details/${teamMember?._id}`}>
-                      {__(teamMember?.email || '')}
-                    </Link>
-                  </ItemRow>
-                </MovementItemInfoContainer>
-                <MovementItemConfigContainer>
-                  <ContainerBox column>{children}</ContainerBox>
-                </MovementItemConfigContainer>
-              </Flex>
+              <>
+                <Flex>
+                  <MovementItemInfoContainer>
+                    <ItemRow label="Choose Asset:">
+                      <SelectWithAssets
+                        label="Choose Asset"
+                        name="assetId"
+                        onSelect={changeRowItem}
+                        skip={selectedItems}
+                        initialValue={assetId}
+                        customOption={{ value: '', label: 'Choose Asset' }}
+                      />
+                    </ItemRow>
+                    <ItemRow label="Asset:">{`${__(assetName || '')}`}</ItemRow>
+                    <ItemRow label="Branch:">
+                      {__(sourceLocations?.branch?.title || '')}
+                      {sourceLocations?.branch?.title && <TextInfo>/</TextInfo>}
+                      {__(branch?.title || '')}
+                    </ItemRow>
+                    <ItemRow label="Department:">
+                      {__(sourceLocations?.department?.title)}
+                      {sourceLocations?.department?.title && <TextInfo>/</TextInfo>}
+                      {__(department?.title)}
+                    </ItemRow>
+                    <ItemRow label="Customer:">
+                      <Link
+                        to={`/settings/customer/details/${sourceLocations?.customer?._id || ''}`}
+                      >
+                        {__(sourceLocations?.customer?.primaryEmail || '')}
+                      </Link>
+                      {sourceLocations?.customer?.primaryEmail && <TextInfo>/</TextInfo>}
+                      <Link to={`/settings/customer/details/${customer?._id || ''}`}>
+                        {__(customer?.primaryEmaill || '')}
+                      </Link>
+                    </ItemRow>
+                    <ItemRow label="Company:">
+                      <Link to={`/settings/company/details/${sourceLocations?.company?._id || ''}`}>
+                        {__(sourceLocations?.company?.primaryEmail || '')}
+                      </Link>
+                      {sourceLocations?.company?.primaryEmail && <TextInfo>/</TextInfo>}
+                      <Link to={`/settings/company/details/${company?._id}`}>
+                        {__(company?.primaryEmail || '')}
+                      </Link>
+                    </ItemRow>
+                    <ItemRow label="Team Member:">
+                      <Link to={`/settings/team/details/${sourceLocations?.teamMember?._id}`}>
+                        {__(sourceLocations?.teamMember?.email || '')}
+                      </Link>
+                      {sourceLocations?.teamMember?.email && <TextInfo>/</TextInfo>}
+                      <Link to={`/settings/team/details/${teamMember?._id}`}>
+                        {__(teamMember?.email || '')}
+                      </Link>
+                    </ItemRow>
+                  </MovementItemInfoContainer>
+                  <MovementItemConfigContainer>
+                    <ContainerBox column>{children}</ContainerBox>
+                  </MovementItemConfigContainer>
+                </Flex>
+              </>
             </td>
           </tr>
         )}

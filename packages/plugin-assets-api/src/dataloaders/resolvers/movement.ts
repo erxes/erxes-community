@@ -6,15 +6,15 @@ export default {
     return models.Assets.findOne({ _id });
   },
 
-  async user(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
+  async user(movement: IMovementDocument, {}, { dataLoaders }: IContext) {
     return (movement.userId && dataLoaders.teamMember.load(movement.userId)) || null;
   },
 
-  async items(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
+  async items(movement: IMovementDocument, {}, { models }: IContext) {
     return await models.MovementItems.find({ _id: { $in: movement.itemIds } });
   },
 
-  async selectedAssetIds(movement: IMovementDocument, {}, { models, dataLoaders }: IContext) {
+  async selectedAssetIds(movement: IMovementDocument, {}, { models }: IContext) {
     const movementItems = await models.MovementItems.find({
       _id: { $in: movement.itemIds }
     }).lean();

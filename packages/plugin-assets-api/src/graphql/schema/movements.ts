@@ -74,9 +74,9 @@ export const types = contactsAvailable => `
     }
 `;
 export const mutations = `
-    assetMovementAdd(movedAt:String,description:String,items:[IMovementItem]):JSON
-    assetMovementUpdate(_id: String,doc:JSON):JSON
-    assetMovementRemove(ids:[String]):JSON
+    assetMovementAdd(movedAt:String,description:String,items:[IMovementItem]):String
+    assetMovementUpdate(_id: String,doc:JSON):String
+    assetMovementRemove(ids:[String]):String
 `;
 export const queries = `
     assetMovements(${movementFilters}):[Movement]
@@ -86,5 +86,4 @@ export const queries = `
     assetMovementItemsTotalCount(${movementFilters}):Int
     assetMovementItem(assetId:String):MovementItem
     currentAssetMovementItems(assetIds:[String]):[MovementItem]
-    currentLocationAssetMovementItem(assetId:String):MovementItem
 `;
