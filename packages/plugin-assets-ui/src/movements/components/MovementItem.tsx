@@ -1,10 +1,9 @@
 import {
   ContentColumn,
   ItemRow as CommonItemRow,
-  ItemText,
-  TypeBox
+  ItemText
 } from '@erxes/ui-cards/src/deals/styles';
-import { FormControl, Icon, ModalTrigger, TextInfo, Tip, __ } from '@erxes/ui/src';
+import { FormControl, Icon, __ } from '@erxes/ui/src';
 import client from '@erxes/ui/src/apolloClient';
 import { Flex } from '@erxes/ui/src/styles/main';
 import gql from 'graphql-tag';
@@ -18,7 +17,6 @@ import {
   MovementItemInfoContainer,
   RemoveRow
 } from '../../style';
-import Chooser from '../containers/Chooser';
 import { queries as itemQueries } from '../items/graphql';
 
 type Props = {
@@ -46,7 +44,6 @@ class MovementItems extends React.Component<Props> {
       changeCurrent,
       current,
       removeRow,
-      selectedItems,
       isChecked,
       toggleBulk,
       onChangeBulkItems
@@ -73,7 +70,13 @@ class MovementItems extends React.Component<Props> {
       e.stopPropagation();
     };
 
-    const ItemRow = ({ label, children }: { label: string; children: React.ReactNode }) => {
+    const ItemRow = ({
+      label,
+      children
+    }: {
+      label: string;
+      children: React.ReactNode;
+    }) => {
       return (
         <CommonItemRow>
           <ItemText>{__(label)}</ItemText>
@@ -136,49 +139,37 @@ class MovementItems extends React.Component<Props> {
                         label="Choose Asset"
                         name="assetId"
                         onSelect={changeRowItem}
-                        skip={selectedItems}
                         initialValue={assetId}
                         customOption={{ value: '', label: 'Choose Asset' }}
                       />
                     </ItemRow>
-                    <ItemRow label="Asset:">{`${__(assetName || '')}`}</ItemRow>
                     <ItemRow label="Branch:">
                       {__(sourceLocations?.branch?.title || '')}
-                      {sourceLocations?.branch?.title && <TextInfo>/</TextInfo>}
-                      {__(branch?.title || '')}
                     </ItemRow>
                     <ItemRow label="Department:">
-                      {__(sourceLocations?.department?.title)}
-                      {sourceLocations?.department?.title && <TextInfo>/</TextInfo>}
-                      {__(department?.title)}
+                      {__(sourceLocations?.department?.title || '')}
                     </ItemRow>
                     <ItemRow label="Customer:">
                       <Link
-                        to={`/settings/customer/details/${sourceLocations?.customer?._id || ''}`}
+                        to={`/settings/customer/details/${sourceLocations
+                          ?.customer?._id || ''}`}
                       >
                         {__(sourceLocations?.customer?.primaryEmail || '')}
                       </Link>
-                      {sourceLocations?.customer?.primaryEmail && <TextInfo>/</TextInfo>}
-                      <Link to={`/settings/customer/details/${customer?._id || ''}`}>
-                        {__(customer?.primaryEmaill || '')}
-                      </Link>
                     </ItemRow>
                     <ItemRow label="Company:">
-                      <Link to={`/settings/company/details/${sourceLocations?.company?._id || ''}`}>
+                      <Link
+                        to={`/settings/company/details/${sourceLocations
+                          ?.company?._id || ''}`}
+                      >
                         {__(sourceLocations?.company?.primaryEmail || '')}
-                      </Link>
-                      {sourceLocations?.company?.primaryEmail && <TextInfo>/</TextInfo>}
-                      <Link to={`/settings/company/details/${company?._id}`}>
-                        {__(company?.primaryEmail || '')}
                       </Link>
                     </ItemRow>
                     <ItemRow label="Team Member:">
-                      <Link to={`/settings/team/details/${sourceLocations?.teamMember?._id}`}>
+                      <Link
+                        to={`/settings/team/details/${sourceLocations?.teamMember?._id}`}
+                      >
                         {__(sourceLocations?.teamMember?.email || '')}
-                      </Link>
-                      {sourceLocations?.teamMember?.email && <TextInfo>/</TextInfo>}
-                      <Link to={`/settings/team/details/${teamMember?._id}`}>
-                        {__(teamMember?.email || '')}
                       </Link>
                     </ItemRow>
                   </MovementItemInfoContainer>

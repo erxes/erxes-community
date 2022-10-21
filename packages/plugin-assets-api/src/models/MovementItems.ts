@@ -6,44 +6,58 @@ import { movementItemsSchema } from './definitions/movements';
 
 export interface IMovementItemModel extends Model<IMovementItemDocument> {
   movementItemsAdd(assets: any): Promise<IMovementItemDocument[]>;
-  movementItemsEdit(movementId: string, items: any[]): Promise<IMovementItemDocument[]>;
-  movementItemsCurrentLocations(assetIds: string[]): Promise<IMovementItemDocument[]>;
+  movementItemsEdit(
+    movementId: string,
+    items: any[]
+  ): Promise<IMovementItemDocument[]>;
+  movementItemsCurrentLocations(
+    assetIds: string[]
+  ): Promise<IMovementItemDocument[]>;
 }
+
+const checkValidation = doc => {
+  console.log(doc);
+  const checker = [
+    doc.customerId,
+    doc.companyId,
+    doc.branchId,
+    doc.departmentId,
+    doc.userId
+  ];
+  console.log(checker);
+  console.log(checker.find(i => i));
+  return checker.find(i => i);
+};
 
 export const loadMovementItemClass = (models: IModels) => {
   class MovementItem {
     public static async movementItemsAdd(assets: any[]) {
       for (const asset of assets) {
-        const newAsset = Object.assign(
-          {},
-          { ...asset },
-          { assetId: undefined, assetName: undefined }
-        );
-        if (Object.values(newAsset).every(item => !item)) {
+        if (!checkValidation(asset)) {
           throw new Error('You should provide at least one field');
         }
-        const sourceLocations = await models.MovementItems.findOne({ assetId: asset.assetId })
+
+        const sourceLocations = await models.MovementItems.findOne({
+          assetId: asset.assetId
+        })
           .sort({ createdAt: -1 })
           .limit(1);
         asset.sourceLocations = sourceLocations || {};
         asset.createdAt = new Date();
       }
+
       return models.MovementItems.insertMany(assets);
     }
 
     public static async movementItemsEdit(movementId: string, items: any[]) {
       const movementItemIds: string[] = [];
       for (const item of items) {
-        const newItem = Object.assign(
-          {},
-          { ...item },
-          { assetId: undefined, assetName: undefined }
-        );
-        if (Object.values(newItem).every(item => !item)) {
+        if (!checkValidation(item)) {
           throw new Error('You should provide at least one field');
         }
+
         const movementItems = await models.MovementItems.findOneAndUpdate(
-          { assetId: item.assetId },
+          { movementId, assetId: item.assetId },
           { ...item, movementId },
           {
             upsert: true,
@@ -54,7 +68,10 @@ export const loadMovementItemClass = (models: IModels) => {
 
         movementItemIds.push(movementItems._id);
       }
-      await models.Movements.update({ _id: movementId }, { $set: { itemIds: movementItemIds } });
+      await models.Movements.update(
+        { _id: movementId },
+        { $set: { itemIds: movementItemIds } }
+      );
     }
 
     public static async movementItemsCurrentLocations(assetIds: string[]) {

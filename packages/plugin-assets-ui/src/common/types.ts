@@ -114,7 +114,9 @@ export type MutationVariables = {
 };
 
 export type AssetRemoveMutationResponse = {
-  assetsRemove: (mutation: { variables: { assetIds: string[] } }) => Promise<any>;
+  assetsRemove: (mutation: {
+    variables: { assetIds: string[] };
+  }) => Promise<any>;
 };
 
 export type AssetEditMutationResponse = {
@@ -141,6 +143,7 @@ export type SelectedVariables = {
 export type IMovementType = {
   _id?: string;
   assetIds?: string[];
+  description?: string;
   assets?: IMovementItem[];
   createdAt?: string;
   modifiedAt?: string;

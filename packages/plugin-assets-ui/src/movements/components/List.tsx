@@ -97,7 +97,11 @@ class List extends React.Component<Props, State> {
   renderRow(props) {
     const { movements, history } = this.props;
 
-    const handleSelecteRow = (movement: IMovementType, movementId: string, isChecked?: boolean) => {
+    const handleSelecteRow = (
+      movement: IMovementType,
+      movementId: string,
+      isChecked?: boolean
+    ) => {
       const { selectedRows } = this.state;
 
       props.toggleBulk(movement, isChecked);
@@ -127,7 +131,9 @@ class List extends React.Component<Props, State> {
     const onchange = () => {
       toggleAll(movements, 'movements');
       this.setState({
-        selectedRows: !isAllSelected ? movements.map(movement => movement._id || '') : []
+        selectedRows: !isAllSelected
+          ? movements.map(movement => movement._id || '')
+          : []
       });
     };
     return (
@@ -135,11 +141,15 @@ class List extends React.Component<Props, State> {
         <thead>
           <tr>
             <th style={{ width: 60 }}>
-              <FormControl checked={isAllSelected} componentClass="checkbox" onChange={onchange} />
+              <FormControl
+                checked={isAllSelected}
+                componentClass="checkbox"
+                onChange={onchange}
+              />
             </th>
-            <th>{__('Id')}</th>
             <th>{__('User')}</th>
             <th>{__('Moved At')}</th>
+            <th>{__('Description')}</th>
             <th>{__('Created At')}</th>
             <th>{__('Modified At')}</th>
             <th>{__('Action')}</th>
@@ -167,7 +177,11 @@ class List extends React.Component<Props, State> {
         {this.renderRightActionBar}
         {selectedRows.length > 0 && (
           <Tip text="Remove movement" placement="bottom">
-            <Button btnStyle="danger" icon="cancel-1" onClick={() => remove(selectedRows)} />
+            <Button
+              btnStyle="danger"
+              icon="cancel-1"
+              onClick={() => remove(selectedRows)}
+            />
           </Tip>
         )}
       </BarItems>

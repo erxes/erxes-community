@@ -12,11 +12,20 @@ import {
   __
 } from '@erxes/ui/src';
 
-import { ContentColumn, ItemRow, ItemText } from '@erxes/ui-cards/src/deals/styles';
+import {
+  ContentColumn,
+  ItemRow,
+  ItemText
+} from '@erxes/ui-cards/src/deals/styles';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import client from '@erxes/ui/src/apolloClient';
-import { DateContainer, FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
+import {
+  DateContainer,
+  FormColumn,
+  FormWrapper,
+  ModalFooter
+} from '@erxes/ui/src/styles/main';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -25,7 +34,11 @@ import _loadash from 'lodash';
 import React from 'react';
 import { IMovementItem, IMovementType } from '../../common/types';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
-import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
+import {
+  ContainerBox,
+  MovementItemContainer,
+  MovementTableWrapper
+} from '../../style';
 import AssetChooser from '../containers/Chooser';
 import { queries } from '../graphql';
 import MovementItems from './MovementItem';
@@ -79,7 +92,15 @@ class Form extends React.Component<Props, State> {
     const { variables, movedAt, description } = this.state;
     const { detail } = this.props;
     const items = variables.map(
-      ({ assetId, assetName, branchId, departmentId, customerId, companyId, teamMemberId }) => ({
+      ({
+        assetId,
+        assetName,
+        branchId,
+        departmentId,
+        customerId,
+        companyId,
+        teamMemberId
+      }) => ({
         assetId,
         assetName,
         branchId,
@@ -141,7 +162,12 @@ class Form extends React.Component<Props, State> {
 
   assetChooserContent(trigger) {
     return (
-      <ModalTrigger title="Select Assets" content={this.assetChooser} trigger={trigger} size="lg" />
+      <ModalTrigger
+        title="Select Assets"
+        content={this.assetChooser}
+        trigger={trigger}
+        size="lg"
+      />
     );
   }
 
@@ -233,8 +259,12 @@ class Form extends React.Component<Props, State> {
 
   handleChangeRowItem = (prevItemId, newItem) => {
     const { variables } = this.state;
-    const newVariables = variables.map(item => (item.assetId === prevItemId ? newItem : item));
-    const removedSeletedItemIds = this.state.selectedItemIds.filter(item => item !== prevItemId);
+    const newVariables = variables.map(item =>
+      item.assetId === prevItemId ? newItem : item
+    );
+    const removedSeletedItemIds = this.state.selectedItemIds.filter(
+      item => item !== prevItemId
+    );
     this.setState({
       variables: newVariables,
       selectedItemIds: [...removedSeletedItemIds, newItem.assetId]
@@ -345,19 +375,26 @@ class Form extends React.Component<Props, State> {
         const newCurrentItems = currentItems.filter(item => item !== id);
         this.setState({ currentItems: newCurrentItems });
       }
-      this.setState({ variables: newVariables, selectedItemIds: newSelectedItems });
+      this.setState({
+        variables: newVariables,
+        selectedItemIds: newSelectedItems
+      });
     };
 
     const onChange = () => {
       const { checkedItems } = this.state;
       const newCheckedItems = variables.map(item => item.assetId);
-      this.setState({ checkedItems: checkedItems.length > 0 ? [] : newCheckedItems });
+      this.setState({
+        checkedItems: checkedItems.length > 0 ? [] : newCheckedItems
+      });
       props.toggleAll(variables, 'variables');
     };
 
     const onChangeCheckedItems = (id: string, checked: boolean) => {
       if (!checked) {
-        const newCheckedItems = this.state.checkedItems.filter(item => item !== id);
+        const newCheckedItems = this.state.checkedItems.filter(
+          item => item !== id
+        );
         return this.setState({ checkedItems: newCheckedItems });
       }
       this.setState(prev => ({ checkedItems: [...prev.checkedItems, id] }));
@@ -389,12 +426,16 @@ class Form extends React.Component<Props, State> {
               <MovementItems
                 key={item.assetId}
                 item={item}
-                current={currentItems.includes(item.assetId) ? item.assetId : ''}
+                current={
+                  currentItems.includes(item.assetId) ? item.assetId : ''
+                }
                 changeCurrent={this.changeCurrentItem}
                 removeRow={removeRow}
                 selectedItems={selectedItemIds}
                 toggleBulk={props.toggleBulk}
-                isChecked={props.bulk.some(bulk => bulk.assetId === item.assetId)}
+                isChecked={props.bulk.some(
+                  bulk => bulk.assetId === item.assetId
+                )}
                 onChangeBulkItems={onChangeCheckedItems}
                 handleChangeRowItem={this.handleChangeRowItem}
               >
@@ -412,8 +453,8 @@ class Form extends React.Component<Props, State> {
   };
   render() {
     const renderContent = (formProps: IFormProps) => {
-      const { closeModal, renderButton, assetId, detail } = this.props;
-      const { values, isSubmitted } = formProps;
+      const { closeModal, renderButton, detail } = this.props;
+      const { isSubmitted } = formProps;
       const { movedAt, description, variables } = this.state;
 
       return (
@@ -447,7 +488,9 @@ class Form extends React.Component<Props, State> {
 
           <Bulk content={this.renderList} />
           <ContainerBox justifyCenter>
-            {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
+            {this.assetChooserContent(
+              <Button icon="plus-circle">{__('Add Asset')}</Button>
+            )}
           </ContainerBox>
           {renderButton && (
             <ModalFooter>

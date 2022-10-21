@@ -1,5 +1,8 @@
 import { isEnabled } from '@erxes/ui/src/utils/core';
-import { dateFilterParams, dateFilterParamsDef } from '../../common/graphql/movement';
+import {
+  dateFilterParams,
+  dateFilterParamsDef
+} from '../../common/graphql/movement';
 
 const fieldAviableEnabledContacts = `
     branch
@@ -48,6 +51,7 @@ const movements = `
   assetMovements (userId:$userId,searchValue:$searchValue,${dateFilterParamsDef}) {
     _id
     itemIds
+    description
     createdAt
     modifiedAt
     movedAt

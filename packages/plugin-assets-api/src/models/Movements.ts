@@ -29,7 +29,9 @@ export const loadMovementClass = (models: IModels) => {
         throw new Error('No moved date in movement ');
       }
 
-      const addedAssets = await models.MovementItems.movementItemsAdd(doc.items);
+      const addedAssets = await models.MovementItems.movementItemsAdd(
+        doc.items
+      );
 
       const movementItemIds = addedAssets.map(asset => asset._id);
 
@@ -63,7 +65,13 @@ export const loadMovementClass = (models: IModels) => {
       await models.MovementItems.movementItemsEdit(_id, doc.items);
       await models.Movements.update(
         { _id },
-        { $set: { movedAt: doc.movedAt, description: doc.description, modifiedAt: new Date() } }
+        {
+          $set: {
+            movedAt: doc.movedAt,
+            description: doc.description,
+            modifiedAt: new Date()
+          }
+        }
       );
       return 'updated';
     }
@@ -78,15 +86,10 @@ export const loadMovementClass = (models: IModels) => {
         if (movements.length === 0) {
           throw new Error('Something went wrong');
         }
-        const movementIds = movements.map(movement => movement._id);
-        const movementItemsIds = movements
-          .map(movement => movement.itemIds)
-          .reduce((pre, cur) => pre.concat(cur))
-          .map(id => id);
 
-        await models.MovementItems.deleteMany({ _id: { $in: movementItemsIds } });
+        await models.MovementItems.deleteMany({ movementId: { $in: ids } });
 
-        await models.Movements.remove({ _id: { $in: movementIds } });
+        await models.Movements.remove({ _id: { $in: ids } });
       } catch (error) {
         throw new Error(error.message);
       }

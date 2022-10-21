@@ -9,7 +9,11 @@ type Props = {
   movement: IMovementType;
   history: any;
   isChecked: boolean;
-  toggleBulk?: (movement: IMovementType, movementId: string, isChecked?: boolean) => void;
+  toggleBulk?: (
+    movement: IMovementType,
+    movementId: string,
+    isChecked?: boolean
+  ) => void;
 };
 
 class Row extends React.Component<Props> {
@@ -20,7 +24,7 @@ class Row extends React.Component<Props> {
   render() {
     const { movement, isChecked, toggleBulk } = this.props;
 
-    const { createdAt, _id, user, movedAt, modifiedAt } = movement;
+    const { createdAt, _id, user, movedAt, modifiedAt, description } = movement;
 
     const handleItems = () => {
       const { history } = this.props;
@@ -40,13 +44,17 @@ class Row extends React.Component<Props> {
     const renderRow = (
       <tr>
         <td onClick={onClick}>
-          <FormControl checked={isChecked} componentClass="checkbox" onChange={onChange} />
+          <FormControl
+            checked={isChecked}
+            componentClass="checkbox"
+            onChange={onChange}
+          />
         </td>
-        <td>{_id || ''}</td>
         <td>
           <Link to={`/settings/team/details/${user._id}`}>{user.email}</Link>
         </td>
         <td>{moment(movedAt || '').format('YYYY-MM-DD HH:mm')}</td>
+        <td>{description}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{moment(modifiedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>
