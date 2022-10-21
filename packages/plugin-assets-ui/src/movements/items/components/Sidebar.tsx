@@ -114,7 +114,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={branchId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Branch' }}
             />
           </FormGroup>
           <FormGroup label="Department" field="departmentId" clearable={!!departmentId}>
@@ -124,7 +124,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={departmentId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Department' }}
             />
           </FormGroup>
           <FormGroup label="Team Member" field="teamMemberId" clearable={!!teamMemberId}>
@@ -134,7 +134,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={teamMemberId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Team Member' }}
             />
           </FormGroup>
           <FormGroup label="Company" field="companyId" clearable={!!companyId}>
@@ -144,7 +144,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={companyId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Company' }}
             />
           </FormGroup>
           <FormGroup label="Customer" field="customerId" clearable={!!customerId}>
@@ -154,7 +154,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={customerId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Customer' }}
             />
           </FormGroup>
           <FormGroup label="Asset" field="assetId" clearable={!!assetId}>
@@ -164,7 +164,7 @@ class Sidebar extends React.Component<Props, State> {
               multi={false}
               initialValue={assetId}
               onSelect={handleSelect}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Asset' }}
             />
           </FormGroup>
           <FormGroup

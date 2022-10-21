@@ -107,12 +107,12 @@ export class SideBar extends React.Component<Props, State> {
         <ContainerBox column gap={5}>
           <FormGroup field="userId" label="Moved User" clearable={queryParams.userId}>
             <SelectTeamMembers
-              label="Select Team Member"
+              label="Choose Moved User"
               name="userId"
               multi={false}
               onSelect={this.handleValue}
               initialValue={queryParams.userId}
-              customOption={{ value: '', label: 'No option' }}
+              customOption={{ value: '', label: 'Choose Moved User' }}
             />
           </FormGroup>
           <FormGroup

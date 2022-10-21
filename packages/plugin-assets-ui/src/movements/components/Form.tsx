@@ -201,7 +201,7 @@ class Form extends React.Component<Props, State> {
                 onSelect={handleChange}
                 initialValue={value || ''}
                 multi={false}
-                customOption={{ value: '', label: 'No option' }}
+                customOption={{ value: '', label: `Choose ${label}` }}
               />
             </MovementItemContainer>
           </ContentColumn>
@@ -276,7 +276,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.branchId}
-                    customOption={{ value: '', label: 'No option' }}
+                    customOption={{ value: '', label: 'Choose Branch' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -288,7 +288,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.departmentId}
-                    customOption={{ value: '', label: 'No option' }}
+                    customOption={{ value: '', label: 'Choose Department' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -302,7 +302,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.customerId}
-                    customOption={{ value: '', label: 'No option' }}
+                    customOption={{ value: '', label: 'Choose Customer' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -314,7 +314,7 @@ class Form extends React.Component<Props, State> {
                     onSelect={handleGeneralOptions}
                     multi={false}
                     initialValue={general?.companyId}
-                    customOption={{ value: '', label: 'No option' }}
+                    customOption={{ value: '', label: 'Choose Company' }}
                   />
                 </CommonItemRow>
               </FormColumn>
@@ -326,7 +326,7 @@ class Form extends React.Component<Props, State> {
                 onSelect={handleGeneralOptions}
                 multi={false}
                 initialValue={general?.teamMemberId}
-                customOption={{ value: '', label: 'No option' }}
+                customOption={{ value: '', label: 'Choose Team Member' }}
               />
             </CommonItemRow>
           </ContentColumn>
