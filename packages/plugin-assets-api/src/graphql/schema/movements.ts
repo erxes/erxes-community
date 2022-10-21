@@ -54,12 +54,12 @@ export const types = contactsAvailable => `
         modifiedAt:Date
         userId:String
         movedAt:Date
-        assetIds:[String]
+        itemIds:[String]
         description:String
         
         user:JSON
-        selectedItems:JSON
-        assets:[MovementItem]
+        selectedAssetIds:JSON
+        items:[MovementItem]
     }
 
     input IMovementItem {
@@ -84,7 +84,7 @@ export const queries = `
     assetMovement(_id:String):Movement
     assetMovementItems(${movementFilters}):[MovementItem]
     assetMovementItemsTotalCount(${movementFilters}):Int
-    assetMovementItem(_id:String):MovementItem
-    currentLocationAssetMovementItems(assetIds:[String]):[MovementItem]
+    assetMovementItem(assetId:String):MovementItem
+    currentAssetMovementItems(assetIds:[String]):[MovementItem]
     currentLocationAssetMovementItem(assetId:String):MovementItem
 `;

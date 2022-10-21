@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-  ModalTrigger,
-  Icon,
-  FormControl,
-  Button,
-  Tip,
-  router
-} from '@erxes/ui/src';
+import { ModalTrigger, Icon, FormControl, Button, Tip, router } from '@erxes/ui/src';
 import { IAsset } from '../../common/types';
 import AssetForm from '../containers/Form';
 import { MoreContainer, Badge, ContainerBox } from '../../style';
 type Props = {
   asset: IAsset;
   history: any;
+  queryParams: any;
   isChecked: boolean;
   toggleBulk: (asset: IAsset, isChecked?: boolean) => void;
 };
@@ -23,7 +17,7 @@ class Row extends React.Component<Props> {
   }
 
   render() {
-    const { asset, history, toggleBulk, isChecked } = this.props;
+    const { asset, history, queryParams, toggleBulk, isChecked } = this.props;
 
     const onChange = e => {
       if (toggleBulk) {
@@ -40,6 +34,9 @@ class Row extends React.Component<Props> {
     };
 
     const handleParent = () => {
+      if (queryParams.categoryId) {
+        router.removeParams(history, 'categoryId');
+      }
       router.setParams(history, { parentId: this.props.asset._id });
     };
 
@@ -50,11 +47,7 @@ class Row extends React.Component<Props> {
     return (
       <tr onClick={onTrClick}>
         <td onClick={onClick}>
-          <FormControl
-            checked={isChecked}
-            componentClass="checkbox"
-            onChange={onChange}
-          />
+          <FormControl checked={isChecked} componentClass="checkbox" onChange={onChange} />
         </td>
         <td>{code}</td>
         <td>{name}</td>

@@ -44,7 +44,7 @@ export interface IAssetCategoriesDocument extends IAssetCategories, Document {
 }
 
 export interface IMovement {
-  assetIds: string[];
+  itemIds: string[];
   userId: string;
   createdAt: Date;
   movedAt: Date;

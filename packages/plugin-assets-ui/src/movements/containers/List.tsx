@@ -78,7 +78,10 @@ export default withProps(
       })
     }),
     graphql<Props>(gql(mutations.movementRemove), {
-      name: 'movementRemove'
+      name: 'movementRemove',
+      options: () => ({
+        refetchQueries: ['itemsQuery', 'itemsTotalCount']
+      })
     })
   )(ListContainer)
 );

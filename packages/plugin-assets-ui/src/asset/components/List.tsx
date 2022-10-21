@@ -87,6 +87,7 @@ class List extends React.Component<Props, State> {
         key={asset._id}
         asset={asset}
         toggleBulk={toggleBulk}
+        queryParams={this.props.queryParams}
         isChecked={bulk.includes(asset)}
       />
     ));

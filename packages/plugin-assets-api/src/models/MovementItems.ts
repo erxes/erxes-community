@@ -7,6 +7,7 @@ import { movementItemsSchema } from './definitions/movements';
 export interface IMovementItemModel extends Model<IMovementItemDocument> {
   movementItemsAdd(assets: any): Promise<IMovementItemDocument[]>;
   movementItemsEdit(movementId: string, items: any[]): Promise<IMovementItemDocument[]>;
+  movementItemsCurrentLocations(assetIds: string[]): Promise<IMovementItemDocument[]>;
 }
 
 export const loadMovementItemClass = (models: IModels) => {
@@ -25,9 +26,11 @@ export const loadMovementItemClass = (models: IModels) => {
           .sort({ createdAt: -1 })
           .limit(1);
         asset.sourceLocations = sourceLocations || {};
+        asset.createdAt = new Date();
       }
       return models.MovementItems.insertMany(assets);
     }
+
     public static async movementItemsEdit(movementId: string, items: any[]) {
       const movementItemIds: string[] = [];
       for (const item of items) {
@@ -50,12 +53,21 @@ export const loadMovementItemClass = (models: IModels) => {
         );
 
         movementItemIds.push(movementItems._id);
-
-        await models.Assets.findByIdAndUpdate(item.assetId, {
-          $set: { currentMovement: { ...newItem } }
-        });
       }
-      await models.Movements.update({ _id: movementId }, { $set: { assetIds: movementItemIds } });
+      await models.Movements.update({ _id: movementId }, { $set: { itemIds: movementItemIds } });
+    }
+
+    public static async movementItemsCurrentLocations(assetIds: string[]) {
+      const items: any[] = [];
+      for (const assetId of assetIds) {
+        const asset = await models.MovementItems.findOne({ assetId })
+          .sort({ createdAt: -1 })
+          .limit(1);
+        if (asset) {
+          items.push(asset);
+        }
+      }
+      return items;
     }
   }
 

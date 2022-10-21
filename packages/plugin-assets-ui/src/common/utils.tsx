@@ -174,7 +174,8 @@ export const getRefetchQueries = () => {
     'assetsTotalCount',
     'assetCategories',
     'assetMovementItems',
-    'assetMovementItemsTotalCount'
+    'assetMovementItemsTotalCount',
+    'movementDetail'
   ];
 };
 
@@ -219,14 +220,25 @@ export const SelectWithAssets = ({
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
   const generateAssetOptions = (array: IAsset[] = []): IOption[] => {
-    let list = array.map(item => {
-      const asset = item || ({} as IAsset);
-      return {
-        value: asset._id,
-        label: item.name
-      };
-    });
+    let list: any[] = [];
 
+    for (const item of array) {
+      const asset = item || ({} as IAsset);
+      const order = asset.order;
+
+      const foundedString = order.match(/[/]/gi);
+
+      let space = '';
+
+      if (foundedString) {
+        space = '\u00A0 '.repeat(foundedString.length);
+      }
+
+      list.push({
+        label: `${space} ${asset.name}`,
+        value: asset._id
+      });
+    }
     if (skip) {
       list = list.filter(item => !skip.includes(item.value));
     }
@@ -271,13 +283,22 @@ export const SelectWithAssetCategory = ({
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
   const generateAssetCategoryOptions = (array: IAsset[] = []): IOption[] => {
-    let list = array.map(item => {
+    let list: any[] = [];
+    for (const item of array) {
       const asset = item || ({} as IAsset);
-      return {
-        value: asset._id,
-        label: item.name
-      };
-    });
+      const order = asset.order;
+
+      const foundedString = order.match(/[/]/gi);
+
+      let space = '';
+
+      if (foundedString) {
+        space = '\u00A0 '.repeat(foundedString.length);
+      }
+
+      list.push({ label: `${space} ${asset.name}`, value: asset._id });
+    }
+
     if (skip) {
       list = list.filter(item => item.value !== skip);
     }

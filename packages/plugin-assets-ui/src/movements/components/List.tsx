@@ -40,7 +40,7 @@ class List extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      searchValue: '',
+      searchValue: props.queryParams.searchValue || '',
       selectedRows: []
     };
 
@@ -48,7 +48,7 @@ class List extends React.Component<Props, State> {
   }
   renderRightActionBarButton = (
     <Button btnStyle="success" icon="plus-circle">
-      Movement
+      Add Movement
     </Button>
   );
   renderRightActionBarContent = props => {

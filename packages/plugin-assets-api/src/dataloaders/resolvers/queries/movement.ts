@@ -4,7 +4,7 @@ import { generateFilter } from '../../../utils';
 
 const movementQueries = {
   async assetMovements(_root, params, { models }: IContext) {
-    const filter = await generateFilter(params, models);
+    const filter = await generateFilter(params, 'movement');
 
     return paginate(models.Movements.find(filter), params);
   },
@@ -13,7 +13,7 @@ const movementQueries = {
   },
 
   async assetMovementTotalCount(_root, params, { models }: IContext) {
-    const filter = await generateFilter(params, models);
+    const filter = await generateFilter(params, 'movement');
 
     return models.Movements.find(filter).countDocuments();
   }

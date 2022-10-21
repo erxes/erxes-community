@@ -13,25 +13,37 @@ class Row extends React.Component<Props> {
     super(props);
   }
 
-  renderForm(assetId: string, movementId: string) {
+  renderForm({
+    assetId,
+    movementId,
+    trigger,
+    modaltText,
+    item
+  }: {
+    assetId?: string;
+    movementId?: string;
+    modaltText: string;
+    item?: IMovementItem;
+    trigger: React.ReactNode;
+  }) {
     const content = props => {
       const updatedProps = {
         ...props,
         assetId,
-        movementId
+        movementId,
+        item
       };
       return <Form {...updatedProps} />;
     };
 
-    const trigger = (
-      <Button btnStyle="link">
-        <Tip text="See detail of movement">
-          <Icon icon="file-edit-alt" />
-        </Tip>
-      </Button>
+    return (
+      <ModalTrigger
+        content={content}
+        title={`${modaltText} Movement`}
+        trigger={trigger}
+        size="xl"
+      />
     );
-
-    return <ModalTrigger content={content} title="Detail Movement" trigger={trigger} size="xl" />;
   }
 
   render() {
@@ -49,6 +61,22 @@ class Row extends React.Component<Props> {
       createdAt
     } = item;
 
+    const editTrigger = (
+      <Button btnStyle="link" style={{ padding: 0 }}>
+        <Tip text="See detail of movement" placement="bottom">
+          <Icon icon="file-edit-alt" />
+        </Tip>
+      </Button>
+    );
+
+    const addTrigger = (
+      <Button btnStyle="link" style={{ padding: 0 }}>
+        <Tip text="add to new movement" placement="bottom">
+          <Icon icon="file-plus-alt" />
+        </Tip>
+      </Button>
+    );
+
     return (
       <tr>
         <td>{assetName}</td>
@@ -58,7 +86,10 @@ class Row extends React.Component<Props> {
         <td>{(company && company.primaryName) || '-'}</td>
         <td>{(customer && customer.primaryEmail) || '-'}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
-        <td>{this.renderForm(assetId, movementId)}</td>
+        <td style={{ width: 60 }}>
+          {this.renderForm({ modaltText: 'Detail', assetId, movementId, trigger: editTrigger })}
+          {this.renderForm({ modaltText: 'Add', trigger: addTrigger, item })}
+        </td>
       </tr>
     );
   }

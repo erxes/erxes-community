@@ -8,39 +8,46 @@ company
 customer
 teamMember
 `;
+const commonItemFields = `
+    branchId
+    companyId
+    customerId
+    departmentId
+    teamMemberId
+`;
 
 const movementDetail = `
 query AssetMovement($_id: String) {
   assetMovement(_id: $_id) {
     _id
-    assetIds
+    itemIds
     createdAt
     movedAt
     userId
     description
-    selectedItems 
-    assets {
-      _id
-      assetId
-      assetName
-      branchId
-      companyId
-      createdAt
-      customerId
-      departmentId
-      teamMemberId
+    selectedAssetIds
+    items {
+        _id,
+        assetName,
+        assetId,
+        ${commonItemFields}
+        createdAt
+        sourceLocations {
+                ${commonItemFields}
+                ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
+        },
 
-      ${isEnabled('contacts') ? `${fieldAviableEnabledContacts}` : ''}
+        ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
     }
   }
 }
 `;
 
 const movements = `
-  query AssetMovements ($userId:String,${dateFilterParams}) {
-  assetMovements (userId:$userId,${dateFilterParamsDef}) {
+  query AssetMovements ($userId:String,$searchValue:String,${dateFilterParams}) {
+  assetMovements (userId:$userId,searchValue:$searchValue,${dateFilterParamsDef}) {
     _id
-    assetIds
+    itemIds
     createdAt
     modifiedAt
     movedAt
@@ -56,24 +63,14 @@ const movementsTotalCount = `
 `;
 
 const itemsCurrentLocation = `
-query CurrentLocationAssetMovementItems($assetIds: [String]) {
-  currentLocationAssetMovementItems(assetIds: $assetIds) {
+query CurrentAssetMovementItems($assetIds: [String]) {
+  currentAssetMovementItems(assetIds: $assetIds) {
     assetId
     assetName
-    branchId
-    companyId
-    createdAt
-    customerId
-    departmentId
-    movementId
-    teamMemberId
+    ${commonItemFields}
     ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
     sourceLocations {
-      branchId
-      companyId
-      customerId
-      departmentId
-      teamMemberId
+      ${commonItemFields}
 
       ${isEnabled('contacts') ? fieldAviableEnabledContacts : ``}
     }

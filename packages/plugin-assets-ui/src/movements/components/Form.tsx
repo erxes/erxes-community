@@ -65,8 +65,8 @@ class Form extends React.Component<Props, State> {
     const { detail, assetId } = props;
 
     this.state = {
-      variables: detail?.assets || [],
-      selectedItemIds: detail?.assetIds || [],
+      variables: detail?.items || [],
+      selectedItemIds: detail?.selectedAssetIds || [],
       description: detail?.description || '',
       movedAt: detail?.movedAt || '',
       currentItems: [assetId],
@@ -106,9 +106,25 @@ class Form extends React.Component<Props, State> {
           variables: { assetIds: selectedItemIds }
         })
         .then(res => {
-          const { currentLocationAssetMovementItems } = res.data;
+          const { currentAssetMovementItems } = res.data;
           this.setState({ selectedItemIds });
-          this.setState({ variables: currentLocationAssetMovementItems });
+
+          const selectedItems = datas.map(data => ({
+            assetId: data._id,
+            assetName: data.name
+          }));
+
+          const newVariables = selectedItems.map(selectedItem => {
+            const newItem = currentAssetMovementItems.find(
+              item => item.assetId === selectedItem.assetId
+            );
+            if (newItem) {
+              return newItem;
+            }
+            return selectedItem;
+          });
+
+          this.setState({ variables: newVariables });
         });
     };
 
@@ -167,7 +183,9 @@ class Form extends React.Component<Props, State> {
 
     const handleChange = selected => {
       variables = variables.map(item =>
-        item.assetId === asset.assetId ? { ...item, [field]: selected } : item
+        item.assetId === asset.assetId
+          ? { ...item, [field]: selected === '' ? null : selected }
+          : item
       );
       this.setState({ variables });
     };
@@ -212,22 +230,15 @@ class Form extends React.Component<Props, State> {
 
     this.setState({ description: value });
   };
-  // handleChangeRowItemValue = (prevId, newItem) => {
-  //   let { selectedItems, variables } = this.state;
-  //   selectedItems = selectedItems.map(item => (item._id === prevId ? newItem : item));
-  //   const currentMovement = newItem?.currentMovement;
-  //   variables = variables.map(item =>
-  //     item.assetId === prevId
-  //       ? { assetId: newItem._id, assetName: newItem.name, ...currentMovement }
-  //       : item
-  //   );
-  //   this.setState({ selectedItems, variables });
-  // };
 
   handleChangeRowItem = (prevItemId, newItem) => {
     const { variables } = this.state;
     const newVariables = variables.map(item => (item.assetId === prevItemId ? newItem : item));
-    this.setState({ variables: newVariables });
+    const removedSeletedItemIds = this.state.selectedItemIds.filter(item => item !== prevItemId);
+    this.setState({
+      variables: newVariables,
+      selectedItemIds: [...removedSeletedItemIds, newItem.assetId]
+    });
   };
 
   renderGeneral() {
@@ -237,9 +248,14 @@ class Form extends React.Component<Props, State> {
       this.setState({ currentItems: [] });
 
       const newVariables = variables.map(item =>
-        checkedItems.includes(item.assetId) ? { ...item, [field]: value } : item
+        checkedItems.includes(item.assetId)
+          ? { ...item, [field]: value === '' ? null : value }
+          : item
       );
-      this.setState({ variables: newVariables, general: { ...general, [field]: value } });
+      this.setState({
+        variables: newVariables,
+        general: { ...general, [field]: value === '' ? null : value }
+      });
     };
 
     return (
@@ -376,7 +392,6 @@ class Form extends React.Component<Props, State> {
                 current={currentItems.includes(item.assetId) ? item.assetId : ''}
                 changeCurrent={this.changeCurrentItem}
                 removeRow={removeRow}
-                onsSelect={() => console.log('das')}
                 selectedItems={selectedItemIds}
                 toggleBulk={props.toggleBulk}
                 isChecked={props.bulk.some(bulk => bulk.assetId === item.assetId)}

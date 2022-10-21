@@ -4,13 +4,12 @@ import {
   ItemText,
   TypeBox
 } from '@erxes/ui-cards/src/deals/styles';
-import { FormControl, Icon, ModalTrigger, Tip, __ } from '@erxes/ui/src';
+import { FormControl, Icon, ModalTrigger, TextInfo, Tip, __ } from '@erxes/ui/src';
 import client from '@erxes/ui/src/apolloClient';
 import { Flex } from '@erxes/ui/src/styles/main';
 import gql from 'graphql-tag';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { queries as assetQueries } from '../../asset/graphql';
 import { IMovementItem } from '../../common/types';
 import { SelectWithAssets } from '../../common/utils';
 import {
@@ -20,7 +19,7 @@ import {
   RemoveRow
 } from '../../style';
 import Chooser from '../containers/Chooser';
-import { queries } from '../graphql';
+import { queries as itemQueries } from '../items/graphql';
 
 type Props = {
   item: IMovementItem;
@@ -28,7 +27,6 @@ type Props = {
   changeCurrent: (id: string) => void;
   removeRow: (id: string) => void;
   current: string;
-  onsSelect: (prevItemId: any, newItem: any) => void;
   selectedItems?: string[];
   isChecked: boolean;
   toggleBulk: (movement: IMovementItem, isChecked?: boolean) => void;
@@ -48,7 +46,6 @@ class MovementItems extends React.Component<Props> {
       changeCurrent,
       current,
       removeRow,
-      onsSelect,
       selectedItems,
       isChecked,
       toggleBulk,
@@ -65,33 +62,6 @@ class MovementItems extends React.Component<Props> {
       teamMember,
       sourceLocations
     } = item;
-
-    const trigger = (
-      <TypeBox color="#3B85F4">
-        <Icon icon="invoice" />
-      </TypeBox>
-    );
-
-    const renderChooser = props => {
-      const handleSelect = newItem => {
-        // this.props.onsSelect(assetId, newItem[0]);
-        console.log(item);
-      };
-
-      const updatedProps = {
-        ...props,
-        handleSelect,
-        ignoreIds: selectedItems,
-        limit: 1
-      };
-      return <Chooser {...updatedProps} />;
-    };
-
-    const renderContent = () => {
-      return (
-        <ModalTrigger title="Choose Assets" trigger={trigger} content={renderChooser} size="lg" />
-      );
-    };
 
     const onChange = e => {
       if (toggleBulk) {
@@ -115,13 +85,13 @@ class MovementItems extends React.Component<Props> {
     const changeRowItem = assetId => {
       client
         .query({
-          query: gql(queries.itemCurrentLocation),
+          query: gql(itemQueries.item),
           fetchPolicy: 'network-only',
           variables: { assetId }
         })
         .then(res => {
-          const { currentLocationAssetMovementItem } = res.data;
-          this.props.handleChangeRowItem(item._id, currentLocationAssetMovementItem)
+          let { assetMovementItem } = res.data;
+          this.props.handleChangeRowItem(item.assetId, assetMovementItem);
         });
     };
 
@@ -141,10 +111,7 @@ class MovementItems extends React.Component<Props> {
             />
           </td>
           <td>
-            <ContainerBox row>
-              <Tip text={__('Assets')}>{renderContent()}</Tip>
-              {__(assetName || '-')}
-            </ContainerBox>
+            <ContainerBox row>{__(assetName || '-')}</ContainerBox>
           </td>
           <td>{__(branch?.title || '-')}</td>
           <td>{__(department?.title || '-')}</td>
@@ -169,39 +136,44 @@ class MovementItems extends React.Component<Props> {
                       name="assetId"
                       onSelect={changeRowItem}
                       skip={selectedItems}
+                      initialValue={assetId}
                       customOption={{ value: '', label: 'Choose Asset' }}
                     />
                   </ItemRow>
                   <ItemRow label="Asset:">{`${__(assetName || '')}`}</ItemRow>
-                  <ItemRow label="Branch:">{`${__(sourceLocations.branch?.title || '')} / ${__(
-                    branch?.title || ''
-                  )}`}</ItemRow>
-                  <ItemRow label="Department:">{`${__(sourceLocations.department?.title)} / ${__(
-                    department?.title || ''
-                  )}`}</ItemRow>
+                  <ItemRow label="Branch:">
+                    {__(sourceLocations?.branch?.title || '')}
+                    {sourceLocations?.branch?.title && <TextInfo>/</TextInfo>}
+                    {__(branch?.title || '')}
+                  </ItemRow>
+                  <ItemRow label="Department:">
+                    {__(sourceLocations?.department?.title)}
+                    {sourceLocations?.department?.title && <TextInfo>/</TextInfo>}
+                    {__(department?.title)}
+                  </ItemRow>
                   <ItemRow label="Customer:">
                     <Link to={`/settings/customer/details/${sourceLocations?.customer?._id || ''}`}>
-                      {__(sourceLocations.customer?.primaryEmail || '')}
+                      {__(sourceLocations?.customer?.primaryEmail || '')}
                     </Link>
-                    &nbsp; / &nbsp;
+                    {sourceLocations?.customer?.primaryEmail && <TextInfo>/</TextInfo>}
                     <Link to={`/settings/customer/details/${customer?._id || ''}`}>
                       {__(customer?.primaryEmaill || '')}
                     </Link>
                   </ItemRow>
                   <ItemRow label="Company:">
-                    <Link to={`/settings/company/details/${sourceLocations.company?._id || ''}`}>
-                      {__(sourceLocations.company?.primaryEmail || '')}
+                    <Link to={`/settings/company/details/${sourceLocations?.company?._id || ''}`}>
+                      {__(sourceLocations?.company?.primaryEmail || '')}
                     </Link>
-                    /
+                    {sourceLocations?.company?.primaryEmail && <TextInfo>/</TextInfo>}
                     <Link to={`/settings/company/details/${company?._id}`}>
                       {__(company?.primaryEmail || '')}
                     </Link>
                   </ItemRow>
                   <ItemRow label="Team Member:">
-                    <Link to={`/settings/team/details/${sourceLocations.teamMember?._id}`}>
-                      {__(sourceLocations.teamMember?.email || '')}
+                    <Link to={`/settings/team/details/${sourceLocations?.teamMember?._id}`}>
+                      {__(sourceLocations?.teamMember?.email || '')}
                     </Link>
-                    &nbsp; / &nbsp;
+                    {sourceLocations?.teamMember?.email && <TextInfo>/</TextInfo>}
                     <Link to={`/settings/team/details/${teamMember?._id}`}>
                       {__(teamMember?.email || '')}
                     </Link>

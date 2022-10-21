@@ -66,9 +66,7 @@ class AssetChooser extends React.Component<FinalProps, State> {
       return <Spinner />;
     }
 
-    const selected = assets.assets.filter(
-      asset => selectedAssetIds && selectedAssetIds.includes(asset._id)
-    );
+    const selected = assets.assets.filter(asset => selectedAssetIds.includes(asset._id));
 
     return (
       <Chooser

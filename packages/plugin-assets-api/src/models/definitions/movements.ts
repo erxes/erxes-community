@@ -18,14 +18,14 @@ export const movementItemsSchema = schemaWrapper(
   new Schema({
     assetId: field({ type: String, label: 'Asset Id' }),
     assetName: field({ type: String, label: 'Asset Name' }),
-    createdAt: field({ type: Date, label: 'Created At', default: new Date() }),
-    branchId: field({ type: String, label: 'Branch Id' }),
-    departmentId: field({ type: String, label: 'Department Id' }),
-    teamMemberId: field({ type: String, label: 'Team Member Id' }),
-    companyId: field({ type: String, label: 'Company Id' }),
-    customerId: field({ type: String, label: 'Customer Id' }),
-    movementId: field({ type: String, label: 'Movement Id' }),
-    sourceLocations: field({ type: sourceLocationsShema, label: 'Source Locations' })
+    createdAt: field({ type: Date, label: 'Created At' }),
+    branchId: field({ type: String, optional: true, label: 'Branch Id' }),
+    departmentId: field({ type: String, optional: true, label: 'Department Id' }),
+    teamMemberId: field({ type: String, optional: true, label: 'Team Member Id' }),
+    companyId: field({ type: String, optional: true, label: 'Company Id' }),
+    customerId: field({ type: String, optional: true, label: 'Customer Id' }),
+    movementId: field({ type: String, optional: true, label: 'Movement Id' }),
+    sourceLocations: field({ type: sourceLocationsShema, label: 'Source Locations', default: {} })
   })
 );
 
@@ -33,8 +33,8 @@ export const movementSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
     createdAt: field({ type: Date, label: 'Created At', default: new Date() }),
-    modifiedAt: field({ type: Date, label: 'Created At', default: new Date() }),
-    assetIds: field({ type: [String], label: 'Assets' }),
+    modifiedAt: field({ type: Date, label: 'Modified At', default: new Date() }),
+    itemIds: field({ type: [String], label: 'Assets' }),
     movedAt: field({ type: Date, label: 'Moved Date' }),
     description: field({ type: String, label: 'Description' }),
     userId: field({ type: String, label: 'User ID' })

@@ -202,7 +202,7 @@ class Form extends React.Component<Props, State> {
               multi={false}
               initialValue={object.parentId}
               onSelect={handleSelect}
-              skip={asset?._id}
+              customOption={{ value: '', label: 'Choose Asset' }}
             />
           </FormGroup>
         );
@@ -219,7 +219,7 @@ class Form extends React.Component<Props, State> {
                 multi={false}
                 initialValue={object.categoryId}
                 onSelect={handleSelect}
-                skip={object.categoryId}
+                customOption={{ value: '', label: 'Choose Asset Category' }}
               />
             </FormColumn>
             {this.renderFormTrigger(addCategoryTrigger)}
@@ -242,17 +242,17 @@ class Form extends React.Component<Props, State> {
                 required={true}
               />
             </FormGroup>
-              <FormGroup>
-                <ControlLabel>Vendor</ControlLabel>
-                <SelectCompanies
-                  label="Choose an vendor"
-                  name="vendorId"
-                  customOption={{ value: '', label: 'No vendor chosen' }}
-                  initialValue={vendorId}
-                  onSelect={this.onComboEvent.bind(this, 'vendorId')}
-                  multi={false}
-                />
-              </FormGroup>
+            <FormGroup>
+              <ControlLabel>Vendor</ControlLabel>
+              <SelectCompanies
+                label="Choose an vendor"
+                name="vendorId"
+                customOption={{ value: '', label: 'No vendor chosen' }}
+                initialValue={vendorId}
+                onSelect={this.onComboEvent.bind(this, 'vendorId')}
+                multi={false}
+              />
+            </FormGroup>
             <FormGroup>
               <ControlLabel required={true}>Unit price</ControlLabel>
               <p>

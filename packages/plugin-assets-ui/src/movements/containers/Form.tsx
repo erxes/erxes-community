@@ -5,13 +5,14 @@ import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import { IMovementDetailQueryResponse } from '../../common/types';
+import { IMovementDetailQueryResponse, IMovementItem } from '../../common/types';
 import { getRefetchQueries } from '../../common/utils';
 import Form from '../components/Form';
 import { mutations, queries } from '../graphql';
 type Props = {
   movementId?: string;
   assetId?: string;
+  item?: IMovementItem;
   closeModal: () => void;
   refetch?: () => void;
   refetchTotalCount?: () => void;
@@ -27,7 +28,7 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { movementDetail, closeModal, assetId, movementId } = this.props;
+    const { movementDetail, closeModal, assetId, movementId, item } = this.props;
 
     if (movementDetail && movementDetail.loading) {
       return <Spinner objective />;
@@ -39,6 +40,7 @@ class FormContainer extends React.Component<FinalProps> {
 
         refetch && refetch();
         refetchTotalCount && refetchTotalCount();
+        movementDetail && movementDetail.refetch();
         callback && callback();
       };
 
@@ -61,8 +63,13 @@ class FormContainer extends React.Component<FinalProps> {
       );
     };
 
+    const forceNewItem = {
+      items: [item],
+      selectedItemIds: [item?._id]
+    };
+
     const updatedProps = {
-      detail: movementDetail?.assetMovement || {},
+      detail: item ? forceNewItem : movementDetail?.assetMovement || {},
       closeModal,
       renderButton: renderButton,
       assetId,
@@ -79,7 +86,8 @@ export default withProps(
       name: 'movementDetail',
       skip: ({ movementId }) => !movementId,
       options: ({ movementId }) => ({
-        variables: { _id: movementId }
+        variables: { _id: movementId },
+        fetchPolicy: 'network-only'
       })
     })
   )(FormContainer)

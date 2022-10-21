@@ -1,10 +1,9 @@
-export const generateFilter = async (params, models) => {
+import { Types } from 'mongoose';
+export const generateFilter = async (params, type) => {
   let filter: any = {};
 
   if (params.movementId) {
-    const movementItems = await models.Movements.findOne({ _id: params.movementId }).lean();
-
-    filter._id = { $in: movementItems?.assetIds };
+    filter.movementId = params.movementId;
   }
 
   if (params.assetId) {
@@ -57,7 +56,12 @@ export const generateFilter = async (params, models) => {
   }
 
   if (params.searchValue) {
-    filter.assetName = new RegExp(`.*${params.searchValue}.*`, 'i');
+    if (type === 'movement') {
+      filter._id = new RegExp(`.*${params.searchValue}.*`, 'i');
+    }
+    if (type === 'movementItems') {
+      filter.assetName = new RegExp(`.*${params.searchValue}.*`, 'i');
+    }
   }
 
   return filter;

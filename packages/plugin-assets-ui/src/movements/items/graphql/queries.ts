@@ -35,9 +35,55 @@ const items = `
 query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilterParams}) {
   assetMovementItems(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef}) {
     ${itemsType}
-    sourceLocations 
+    sourceLocations {
+      branchId
+      departmentId
+      customerId
+      companyId
+      teamMemberId
+          ${
+            isEnabled('contacts')
+              ? `
+              branch
+              department
+              company
+              customer
+              teamMember`
+              : ``
+          }
+    }
     }
   }
+`;
+
+const item = `
+  query AssetMovementItem($assetId: String) {
+  assetMovementItem(assetId: $assetId) {
+ ${itemsType}
+    sourceLocations {
+      branchId
+      companyId
+      customerId
+      departmentId
+      movementId
+      teamMemberId
+
+      ${
+        isEnabled('contacts')
+          ? `     
+          branch
+          department
+          company
+          customer
+          teamMember
+        `
+          : ``
+      }
+    }
+    teamMember
+    teamMemberId
+  }
+}
 `;
 
 const itemsTotalCount = `
@@ -46,4 +92,4 @@ const itemsTotalCount = `
 }
 `;
 
-export default { items, itemsTotalCount };
+export default { items, item, itemsTotalCount };

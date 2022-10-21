@@ -34,7 +34,7 @@ export const loadMovementClass = (models: IModels) => {
       const movementItemIds = addedAssets.map(asset => asset._id);
 
       const movement = await models.Movements.create({
-        assetIds: movementItemIds,
+        itemIds: movementItemIds,
         movedAt: doc.movedAt,
         description: doc.description,
         userId
@@ -77,7 +77,7 @@ export const loadMovementClass = (models: IModels) => {
         }
         const movementIds = movements.map(movement => movement._id);
         const movementItemsIds = movements
-          .map(movement => movement.assetIds)
+          .map(movement => movement.itemIds)
           .reduce((pre, cur) => pre.concat(cur))
           .map(id => id);
 
