@@ -21,7 +21,7 @@ ${
 
   type Invoice @key(fields: "_id") {
     _id: String
-    paymentId: String
+    selectedPaymentId: String
     amount: Float
     phone: String
     email: String
@@ -71,4 +71,5 @@ export const queries = `
   checkInvoice(_id:String!, paymentId: String!): Invoice
   invoices(searchValue: String, kind: String, status: String, page: Int, perPage: Int, contentType: String, contentTypeId: String): [Invoice]
   invoicesTotalCount(searchValue: String, kind: String, status: String, contentType: String, contentTypeId: String): invoicesTotalCount
+  getInvoiceUrl(_id: String!, customerId: String, companyId: String): String
 `;

@@ -5,7 +5,7 @@ module.exports = {
   exposes: {
     './routes': './src/routes.tsx',
     './selectPayments': './src/containers/SelectPayments.tsx',
-    './invoiceSection': './src/containers/InvoiceSection.tsx',
+    './invoiceSection': './src/containers/invoice/InvoiceSection.tsx',
     './invoiceForm': './src/containers/invoice/InvoiceForm.tsx',
   },
   routes: {

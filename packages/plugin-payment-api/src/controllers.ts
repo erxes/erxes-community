@@ -27,18 +27,16 @@ router.get('/gateway', async (req, res) => {
     Buffer.from(params as string, 'base64').toString('ascii')
   );
 
-  console.log('data', data);
-
   const subdomain = getSubdomain(req);
   const models = await generateModels(subdomain);
 
-  const filter: any = {};
+  const qry: any = {};
 
-  if (data.paymentIds) {
-    filter._id = { $in: data.paymentIds };
+  if (data.paymentIds && data.paymentIds.length) {
+    qry._id = { $in: data.paymentIds };
   }
 
-  const payments = await models.Payments.find(filter).sort({
+  const payments = await models.Payments.find(qry).sort({
     type: 1
   });
 
@@ -56,16 +54,20 @@ router.post('/gateway', async (req, res) => {
     Buffer.from(params as string, 'base64').toString('ascii')
   );
 
+  console.log('data', data);
+
   const subdomain = getSubdomain(req);
   const models = await generateModels(subdomain);
 
-  const filter: any = {};
+  const qry: any = {};
 
-  if (data.paymentIds) {
-    filter._id = { $in: data.paymentIds };
+  if (data.paymentIds && data.paymentIds.length) {
+    qry._id = { $in: data.paymentIds };
   }
 
-  const payments = await models.Payments.find(filter).sort({
+  console.log('qry', qry);
+
+  const payments = await models.Payments.find(qry).sort({
     type: 1
   });
 
@@ -93,7 +95,11 @@ router.post('/gateway', async (req, res) => {
     });
   }
 
-  if (invoice && invoice.status !== 'paid' && invoice.paymentId !== paymentId) {
+  if (
+    invoice &&
+    invoice.status !== 'paid' &&
+    invoice.selectedPaymentId !== paymentId
+  ) {
     await models.Invoices.updateInvoice(invoice._id, { paymentId });
 
     invoice = await models.Invoices.findOne({ _id: data._id });

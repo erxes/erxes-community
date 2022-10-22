@@ -394,7 +394,11 @@ class RespondBox extends React.Component<Props, State> {
   renderControls = () => {
     return loadDynamicComponent(
       'extendEditorToolbar',
-      { id: this.props.conversation._id },
+      {
+        contentType: 'inbox:conversations',
+        contentTypeId: this.props.conversation._id,
+        customerId: this.props.conversation.customerId
+      },
       true
     );
   };

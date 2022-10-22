@@ -4,7 +4,7 @@ import { field, schemaHooksWrapper } from './utils';
 import { makeInvoiceNo } from '../../utils';
 
 export interface IInvoice {
-  paymentId: string;
+  selectedPaymentId: string;
   amount: number;
   phone: string;
   email: string;
@@ -20,6 +20,8 @@ export interface IInvoice {
 
   apiResponse?: any;
   identifier: string;
+
+  paymentIds?: string[];
 }
 export interface IInvoiceDocument extends IInvoice, Document {
   _id: string;
@@ -33,7 +35,7 @@ export const invoiceSchema = schemaHooksWrapper(
       index: true,
       label: 'Identifier'
     }),
-    paymentId: field({
+    selectedPaymentId: field({
       type: String,
       label: 'payment id'
     }),
@@ -70,6 +72,11 @@ export const invoiceSchema = schemaHooksWrapper(
       type: Date,
       optional: true,
       label: 'Resolved Date for invoice'
+    }),
+    paymentIds: field({
+      type: [String],
+      optional: true,
+      label: 'payment ids'
     })
   }),
   'erxes_invoices'

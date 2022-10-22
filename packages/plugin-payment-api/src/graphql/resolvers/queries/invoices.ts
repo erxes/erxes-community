@@ -40,7 +40,7 @@ const generateFilterQuery = (params: IParam) => {
     query.contentTypeId = contentTypeId;
   }
 
-  query.paymentId = { $exists: true };
+  query.selectedPaymentId = { $exists: true };
 
   return query;
 };
@@ -97,6 +97,51 @@ const queries = {
     counts.total = await count(qry);
 
     return counts;
+  },
+
+  async getInvoiceUrl(
+    _root,
+    {
+      _id,
+      customerId,
+      companyId
+    }: { _id: string; customerId: string; companyId: string },
+    { models }: IContext
+  ) {
+    if (!customerId && !companyId) {
+      throw new Error('customerId or companyId is required');
+    }
+
+    const qry: any = { _id };
+
+    if (customerId) {
+      qry.customerId = customerId;
+    }
+
+    if (companyId) {
+      qry.companyId = companyId;
+    }
+
+    const invoice = await models.Invoices.findOne(qry);
+
+    if (!invoice) {
+      throw new Error(
+        'Invoice had expired either by user or system, or not found'
+      );
+    }
+
+    if (invoice.status === PAYMENT_STATUS.PAID) {
+      throw new Error('Invoice had already been paid');
+    }
+
+    const MAIN_API_DOMAIN =
+      process.env.MAIN_API_DOMAIN || 'http://localhost:4000';
+
+    const base64 = Buffer.from(
+      JSON.stringify({ ...invoice.toJSON() })
+    ).toString('base64');
+
+    return `${MAIN_API_DOMAIN}/pl:payment/gateway?params=${base64}`;
   }
 };
 
