@@ -9,11 +9,7 @@ type Props = {
   movement: IMovementType;
   history: any;
   isChecked: boolean;
-  toggleBulk?: (
-    movement: IMovementType,
-    movementId: string,
-    isChecked?: boolean
-  ) => void;
+  toggleBulk?: (movement: IMovementType, movementId: string, isChecked?: boolean) => void;
 };
 
 class Row extends React.Component<Props> {
@@ -44,14 +40,10 @@ class Row extends React.Component<Props> {
     const renderRow = (
       <tr>
         <td onClick={onClick}>
-          <FormControl
-            checked={isChecked}
-            componentClass="checkbox"
-            onChange={onChange}
-          />
+          <FormControl checked={isChecked} componentClass="checkbox" onChange={onChange} />
         </td>
         <td>
-          <Link to={`/settings/team/details/${user._id}`}>{user.email}</Link>
+          <Link to={`/settings/team/details/${user._id}`}>{user?.details?.fullName}</Link>
         </td>
         <td>{moment(movedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{description}</td>
