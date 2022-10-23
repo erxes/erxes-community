@@ -1,9 +1,9 @@
-import { Model } from 'mongoose';
 import * as _ from 'underscore';
-import { IModels } from '../connectionResolver';
-import { IFlow, IFlowDocument, flowSchema, IJob } from './definitions/flows';
+import { FLOW_STATUSES, JOB_TYPES } from './definitions/constants';
 import { FLOWJOB_TYPES } from '../../../plugin-processes-ui/src/flow/constants';
-import { JOB_TYPES } from './definitions/constants';
+import { flowSchema, IFlow, IFlowDocument, IJob } from './definitions/flows';
+import { IModels } from '../connectionResolver';
+import { Model } from 'mongoose';
 
 export interface IFlowModel extends Model<IFlowDocument> {
   getFlow(_id: string): Promise<IFlowDocument>;
@@ -11,7 +11,7 @@ export interface IFlowModel extends Model<IFlowDocument> {
   updateFlow(_id: string, doc: IFlow): Promise<IFlowDocument>;
   removeFlow(_id: string): void;
   removeFlows(flowIds: string[]): void;
-  checkValidation(jobs?: IJob[]): Promise<Boolean>;
+  checkValidation(jobs?: IJob[]): Promise<String>;
 }
 
 const getProductIds = (job: IJob, jobReferById: any, type = 'need') => {
@@ -166,11 +166,15 @@ export const loadFlowClass = (models: IModels) => {
      * Update Flow
      */
     public static async updateFlow(_id: string, doc: IFlow) {
+      let status = doc.status;
       const flowValidation = await models.Flows.checkValidation(doc.jobs);
+      if (flowValidation !== '' && status === FLOW_STATUSES.ACTIVE) {
+        status = FLOW_STATUSES.DRAFT;
+      }
 
       await models.Flows.updateOne(
         { _id },
-        { $set: { ...doc, flowValidation } }
+        { $set: { ...doc, flowValidation, status } }
       );
 
       const updated = await models.Flows.getFlow(_id);

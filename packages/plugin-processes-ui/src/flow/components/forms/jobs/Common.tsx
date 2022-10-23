@@ -1,28 +1,28 @@
+import Button from '@erxes/ui/src/components/Button';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
+import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import React from 'react';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
-import FormControl from '@erxes/ui/src/components/form/Control';
-import { DURATION_TYPES } from '../../../../constants';
+import Spinner from '@erxes/ui/src/components/Spinner';
+import { __, Alert } from '@erxes/ui/src/utils';
 import { DrawerDetail } from '../../../styles';
-import Button from '@erxes/ui/src/components/Button';
+import { DURATION_TYPES } from '../../../../constants';
+import { FLOWJOB_TYPES } from '../../../constants';
+import { FlowJobFooter } from './styles';
 import {
-  FormWrapper,
   FormColumn,
+  FormWrapper,
   ModalFooter
 } from '@erxes/ui/src/styles/main';
-import { Alert, __ } from '@erxes/ui/src/utils';
-
 import { IJob } from '../../../types';
-import { ScrolledContent } from '../../../styles';
-import { FlowJobFooter } from './styles';
 import { IJobRefer } from '../../../../job/types';
-import Spinner from '@erxes/ui/src/components/Spinner';
+import { ScrolledContent } from '../../../styles';
 
 type Props = {
   closeModal: () => void;
-  activeFlowJob?: IJob;
+  activeFlowJob: IJob;
   addFlowJob: (job: IJob, id?: string, config?: any) => void;
   name: string;
   description: string;
@@ -101,8 +101,26 @@ class CommonForm extends React.Component<Props, State> {
       outDepartmentId
     } = this.state;
 
-    if (!inBranchId || !inDepartmentId || !outBranchId || !outDepartmentId) {
-      return Alert.error('Must fill branch or department');
+    switch (activeFlowJob.type) {
+      case FLOWJOB_TYPES.INCOME:
+        if (!outBranchId || !outDepartmentId) {
+          return Alert.error('Must fill branch or department');
+        }
+        break;
+      case FLOWJOB_TYPES.OUTLET:
+        if (!inBranchId || !inDepartmentId) {
+          return Alert.error('Must fill branch or department');
+        }
+        break;
+      default:
+        if (
+          !inBranchId ||
+          !inDepartmentId ||
+          !outBranchId ||
+          !outDepartmentId
+        ) {
+          return Alert.error('Must fill branch or department');
+        }
     }
 
     this.props.addFlowJob(
@@ -119,7 +137,7 @@ class CommonForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { children, closeModal } = this.props;
+    const { children, closeModal, activeFlowJob } = this.props;
 
     if (this.timer) {
       return <Spinner />;
@@ -175,72 +193,84 @@ class CommonForm extends React.Component<Props, State> {
               </FormGroup>
             </FormColumn>
           </FormWrapper>
-          <FormWrapper>
-            <ControlLabel uppercase={false}>
-              <ul>Info of outgoing for NEED products:</ul>
-            </ControlLabel>
-          </FormWrapper>
-          <FormWrapper>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel required={true}>Branch</ControlLabel>
-                <SelectBranches
-                  label="Choose branch"
-                  name="selectedBranchIds"
-                  initialValue={inBranchId}
-                  onSelect={branchId => this.onSelect('inBranchId', branchId)}
-                  multi={false}
-                />
-              </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel required={true}>Department</ControlLabel>
-                <SelectDepartments
-                  label="Choose department"
-                  name="selectedDepartmentIds"
-                  initialValue={inDepartmentId}
-                  onSelect={departmentId =>
-                    this.onSelect('inDepartmentId', departmentId)
-                  }
-                  multi={false}
-                />
-              </FormGroup>
-            </FormColumn>
-          </FormWrapper>
-          <FormWrapper>
-            <ControlLabel uppercase={false}>
-              <ul>Info of incoming for RESULT products:</ul>
-            </ControlLabel>
-          </FormWrapper>
-          <FormWrapper>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel required={true}>Branch</ControlLabel>
-                <SelectBranches
-                  label="Choose branch"
-                  name="selectedBranchIds"
-                  initialValue={outBranchId}
-                  onSelect={branchId => this.onSelect('outBranchId', branchId)}
-                  multi={false}
-                />
-              </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel required={true}>Department</ControlLabel>
-                <SelectDepartments
-                  label="Choose department"
-                  name="selectedDepartmentIds"
-                  initialValue={outDepartmentId}
-                  onSelect={departmentId =>
-                    this.onSelect('outDepartmentId', departmentId)
-                  }
-                  multi={false}
-                />
-              </FormGroup>
-            </FormColumn>
-          </FormWrapper>
+          {activeFlowJob.type !== FLOWJOB_TYPES.INCOME && (
+            <>
+              <FormWrapper>
+                <ControlLabel uppercase={false}>
+                  <ul>Info of outgoing for NEED products:</ul>
+                </ControlLabel>
+              </FormWrapper>
+              <FormWrapper>
+                <FormColumn>
+                  <FormGroup>
+                    <ControlLabel required={true}>Branch</ControlLabel>
+                    <SelectBranches
+                      label="Choose branch"
+                      name="selectedBranchIds"
+                      initialValue={inBranchId}
+                      onSelect={branchId =>
+                        this.onSelect('inBranchId', branchId)
+                      }
+                      multi={false}
+                    />
+                  </FormGroup>
+                </FormColumn>
+                <FormColumn>
+                  <FormGroup>
+                    <ControlLabel required={true}>Department</ControlLabel>
+                    <SelectDepartments
+                      label="Choose department"
+                      name="selectedDepartmentIds"
+                      initialValue={inDepartmentId}
+                      onSelect={departmentId =>
+                        this.onSelect('inDepartmentId', departmentId)
+                      }
+                      multi={false}
+                    />
+                  </FormGroup>
+                </FormColumn>
+              </FormWrapper>
+            </>
+          )}
+          {activeFlowJob.type !== FLOWJOB_TYPES.OUTLET && (
+            <>
+              <FormWrapper>
+                <ControlLabel uppercase={false}>
+                  <ul>Info of incoming for RESULT products:</ul>
+                </ControlLabel>
+              </FormWrapper>
+              <FormWrapper>
+                <FormColumn>
+                  <FormGroup>
+                    <ControlLabel required={true}>Branch</ControlLabel>
+                    <SelectBranches
+                      label="Choose branch"
+                      name="selectedBranchIds"
+                      initialValue={outBranchId}
+                      onSelect={branchId =>
+                        this.onSelect('outBranchId', branchId)
+                      }
+                      multi={false}
+                    />
+                  </FormGroup>
+                </FormColumn>
+                <FormColumn>
+                  <FormGroup>
+                    <ControlLabel required={true}>Department</ControlLabel>
+                    <SelectDepartments
+                      label="Choose department"
+                      name="selectedDepartmentIds"
+                      initialValue={outDepartmentId}
+                      onSelect={departmentId =>
+                        this.onSelect('outDepartmentId', departmentId)
+                      }
+                      multi={false}
+                    />
+                  </FormGroup>
+                </FormColumn>
+              </FormWrapper>
+            </>
+          )}
         </DrawerDetail>
         <FlowJobFooter>
           <ModalFooter>

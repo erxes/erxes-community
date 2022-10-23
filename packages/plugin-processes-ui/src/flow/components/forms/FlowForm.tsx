@@ -95,7 +95,7 @@ class FlowForm extends React.Component<Props, State> {
       name: lenFlow.length ? flow.name : 'Your flow title',
       flowJobs,
       currentTab: 'flowJobs',
-      isActive: lenFlow.length ? flow.status === 'active' : false,
+      isActive: (flow.status === 'active' && true) || false,
       showDrawer: false,
       showFlowJob: false,
       isZoomable: false,
@@ -182,7 +182,8 @@ class FlowForm extends React.Component<Props, State> {
   componentWillReceiveProps(nextProps) {
     if (nextProps.flow !== this.props.flow) {
       this.setState({
-        flowValidation: nextProps.flow.flowValidation
+        flowValidation: nextProps.flow.flowValidation,
+        isActive: (nextProps.flow.status === 'active' && true) || false
       });
     }
   }
@@ -319,11 +320,7 @@ class FlowForm extends React.Component<Props, State> {
 
     this.setState({ isActive });
 
-    const { save, flow } = this.props;
-
-    if (Object.keys(flow).length) {
-      save({ _id: flow._id, status: isActive ? 'active' : 'draft' });
-    }
+    this.handleSubmit();
   };
 
   doZoom = (step: number, inRange: boolean) => {
@@ -582,7 +579,11 @@ class FlowForm extends React.Component<Props, State> {
         </ToggleWrapper>
         <ToggleWrapper>
           <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>
-          <Toggle defaultChecked={isActive} onChange={this.onToggle} />
+          <Toggle
+            defaultChecked={(flowValidation === '' && isActive) || false}
+            onChange={this.onToggle}
+            disabled={flowValidation === '' ? false : true}
+          />
           <span className={!isActive ? 'active' : ''}>{__('Active')}</span>
         </ToggleWrapper>
         <ActionBarButtonsWrapper>
