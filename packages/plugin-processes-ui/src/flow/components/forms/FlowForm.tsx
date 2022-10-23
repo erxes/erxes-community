@@ -261,9 +261,9 @@ class FlowForm extends React.Component<Props, State> {
   onToggle = e => {
     const isActive = e.target.checked;
 
-    this.setState({ isActive });
-
-    this.handleSubmit();
+    this.setState({ isActive }, () => {
+      this.handleSubmit();
+    });
   };
 
   doZoom = (step: number, inRange: boolean) => {

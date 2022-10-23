@@ -62,6 +62,7 @@ export interface IFlowDocument extends IFlow, Document {
   createdBy?: string;
   updatedAt?: Date;
   updatedBy?: string;
+  jobCount: number;
 }
 
 // FLOW
@@ -101,12 +102,6 @@ export type FlowCategoriesCountQueryResponse = {
 // mutation types
 export type flowsRemoveMutationResponse = {
   flowsRemove: (mutation: { variables: { flowIds: string[] } }) => Promise<any>;
-};
-
-export type FlowCategoriesRemoveMutationResponse = {
-  flowCategoriesRemove: (mutation: {
-    variables: { _id: string };
-  }) => Promise<any>;
 };
 
 export type DetailQueryResponse = {

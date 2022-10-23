@@ -16,5 +16,9 @@ export default {
         isRPC: true
       })) || undefined
     );
+  },
+
+  async jobCount(flow: IFlow, {}, {}: IContext) {
+    return (flow.jobs || []).length;
   }
 };

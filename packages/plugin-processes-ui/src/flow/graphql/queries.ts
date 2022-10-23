@@ -5,16 +5,34 @@ export const flowFields = `
   updatedAt
   updatedBy
   name
-  categoryId
   productId
   product
   status
   flowValidation
+  jobCount
+`;
+
+const flowsQueryDefs = `
+  $categoryId: String,
+  $searchValue: String,
+  $branchId: String,
+  $departmentId: String,
+  $status: String,
+  $validation: String,
+`;
+
+const flowsQueryParams = `
+  categoryId: $categoryId,
+  searchValue: $searchValue,
+  branchId: $branchId,
+  departmentId: $departmentId,
+  status: $status,
+  validation: $validation,
 `;
 
 const flows = `
-query flows($categoryId: String, $searchValue: String) {
-  flows(categoryId: $categoryId, searchValue: $searchValue) {
+query flows($page: Int, $perPage: Int, ${flowsQueryDefs}) {
+  flows(page: $page, perPage: $perPage, ${flowsQueryParams}) {
     ${flowFields}
   }
 }
@@ -38,8 +56,8 @@ query flowDetail($_id: String!) {
 `;
 
 const flowTotalCount = `
-query flowTotalCount($categoryId: String, $searchValue: String) {
-  flowTotalCount(categoryId: $categoryId, searchValue: $searchValue)
+query flowTotalCount(${flowsQueryDefs}) {
+  flowTotalCount(${flowsQueryParams})
 }
 `;
 

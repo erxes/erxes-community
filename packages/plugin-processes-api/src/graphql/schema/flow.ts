@@ -12,6 +12,7 @@ export const types = `
     product: JSON,
     status: String,
     jobs: JSON,
+    jobCount: Int,
     flowValidation: String
   }
 
@@ -30,7 +31,11 @@ const qryParams = `
   categoryId: String,
   searchValue: String,
   excludeIds: Boolean,
-  ids: [String]
+  ids: [String],
+  branchId: String,
+  departmentId: String,
+  status: String,
+  validation: String,
 `;
 
 export const queries = `

@@ -128,7 +128,7 @@ export const loadFlowClass = (models: IModels) => {
       }
 
       if (latestJobs.length > 1) {
-        return 'Many latets jobs';
+        return 'Many latest jobs';
       }
 
       const jobRefers = await models.JobRefers.find({
@@ -167,14 +167,38 @@ export const loadFlowClass = (models: IModels) => {
      */
     public static async updateFlow(_id: string, doc: IFlow) {
       let status = doc.status;
+      console.log(status);
       const flowValidation = await models.Flows.checkValidation(doc.jobs);
+      console.log(
+        flowValidation,
+        'ffffffffffffffff',
+        flowValidation !== '' && status === FLOW_STATUSES.ACTIVE
+      );
       if (flowValidation !== '' && status === FLOW_STATUSES.ACTIVE) {
         status = FLOW_STATUSES.DRAFT;
+      }
+      console.log(status);
+
+      let latestBranchId = '';
+      let latestDepartmentId = '';
+      const latestJobs = doc.jobs?.filter(j => !j.nextJobIds.length) || [];
+      if (latestJobs.length === 1) {
+        const latestJob = latestJobs[0];
+        latestBranchId = (latestJob.config || {}).outBranchId;
+        latestDepartmentId = (latestJob.config || {}).outDepartmentId;
       }
 
       await models.Flows.updateOne(
         { _id },
-        { $set: { ...doc, flowValidation, status } }
+        {
+          $set: {
+            ...doc,
+            flowValidation,
+            status,
+            latestBranchId,
+            latestDepartmentId
+          }
+        }
       );
 
       const updated = await models.Flows.getFlow(_id);
