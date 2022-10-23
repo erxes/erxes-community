@@ -203,13 +203,6 @@ class List extends React.Component<IProps, State> {
     return (
       <Wrapper
         header={<Wrapper.Header title={__('Flow')} submenu={menuContacts} />}
-        // mainHead={
-        //   <HeaderDescription
-        //     icon="/images/actions/30.svg"
-        //     title={'Flow'}
-        //     description={``}
-        //   />
-        // }
         actionBar={
           <Wrapper.ActionBar left={actionBarLeft} right={actionBarRight} />
         }

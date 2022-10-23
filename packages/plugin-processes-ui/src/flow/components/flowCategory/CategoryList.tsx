@@ -1,20 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-import { ActionButtons, SidebarListItem } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Icon from '@erxes/ui/src/components/Icon';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import Tip from '@erxes/ui/src/components/Tip';
+import React from 'react';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
+import Tip from '@erxes/ui/src/components/Tip';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { SidebarList } from '@erxes/ui/src/layout/styles';
-import { TopHeader } from '@erxes/ui/src/styles/main';
 import { __, router } from '@erxes/ui/src/utils';
-
-import CategoryForm from '../../containers/flowCategory/CategoryForm';
 import { IProductCategory } from '../../types';
+import { Link } from 'react-router-dom';
+import { SidebarList } from '@erxes/ui/src/layout/styles';
+import { SidebarListItem } from '@erxes/ui-settings/src/styles';
 
 const { Section } = Wrapper.Sidebar;
 
@@ -28,20 +23,6 @@ interface IProps {
 }
 
 class List extends React.Component<IProps> {
-  renderFormTrigger(trigger: React.ReactNode, category?: IProductCategory) {
-    const content = props => (
-      <CategoryForm
-        {...props}
-        category={category}
-        categories={this.props.flowCategories}
-      />
-    );
-
-    return (
-      <ModalTrigger title="Add category" trigger={trigger} content={content} />
-    );
-  }
-
   clearCategoryFilter = () => {
     router.setParams(this.props.history, { categoryId: null });
   };
@@ -52,18 +33,6 @@ class List extends React.Component<IProps> {
 
     return currentGroup === id;
   };
-
-  renderEditAction(category: IProductCategory) {
-    const trigger = (
-      <Button btnStyle="link">
-        <Tip text={__('Edit')} placement="bottom">
-          <Icon icon="edit" />
-        </Tip>
-      </Button>
-    );
-
-    return this.renderFormTrigger(trigger, category);
-  }
 
   renderRemoveAction(category: IProductCategory) {
     const { remove } = this.props;
@@ -80,7 +49,16 @@ class List extends React.Component<IProps> {
   renderContent() {
     const { flowCategories } = this.props;
 
-    const result: React.ReactNode[] = [];
+    const result: React.ReactNode[] = [
+      <SidebarListItem
+        key={'unknownCategory'}
+        isActive={this.isActive('unknownCategory')}
+      >
+        <Link to={`?categoryId=${'unknownCategory'}`}>
+          {__('!Unknown Category')}
+        </Link>
+      </SidebarListItem>
+    ];
 
     for (const category of flowCategories) {
       const order = category.order || '';
@@ -110,10 +88,6 @@ class List extends React.Component<IProps> {
             {space}
             {name}
           </Link>
-          <ActionButtons>
-            {this.renderEditAction(category)}
-            {this.renderRemoveAction(category)}
-          </ActionButtons>
         </SidebarListItem>
       );
     }
@@ -122,15 +96,8 @@ class List extends React.Component<IProps> {
   }
 
   renderCategoryHeader() {
-    const trigger = (
-      <Button btnStyle="success" icon="plus-circle" block={true}>
-        Add category
-      </Button>
-    );
-
     return (
       <>
-        <TopHeader>{this.renderFormTrigger(trigger)}</TopHeader>
         <Section.Title>
           {__('Categories')}
 
