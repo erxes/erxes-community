@@ -1,6 +1,5 @@
 import * as _ from 'underscore';
 import { FLOW_STATUSES, JOB_TYPES } from './definitions/constants';
-import { FLOWJOB_TYPES } from '../../../plugin-processes-ui/src/flow/constants';
 import { flowSchema, IFlow, IFlowDocument, IJob } from './definitions/flows';
 import { IModels } from '../connectionResolver';
 import { Model } from 'mongoose';
@@ -110,7 +109,7 @@ export const loadFlowClass = (models: IModels) => {
         return 'Has not jobs';
       }
 
-      const endJobs = jobs.filter(j => j.type === FLOWJOB_TYPES.ENDPOINT);
+      const endJobs = jobs.filter(j => j.type === JOB_TYPES.ENDPOINT);
       if (!endJobs || !endJobs.length) {
         return 'Has not endPoint job';
       }
