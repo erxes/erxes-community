@@ -64,6 +64,7 @@ const checkBeforeJobs = (job: IJob, beforeJobs: IJob[], jobReferById: any) => {
   const lessNeedProductIds = jobNeedProductIds.filter(
     np => !beforeResultProductIds.includes(np)
   );
+
   if (lessNeedProductIds.length) {
     return `${label}less products`;
   }
@@ -72,9 +73,8 @@ const checkBeforeJobs = (job: IJob, beforeJobs: IJob[], jobReferById: any) => {
 };
 
 const recursiveChecker = (job: IJob, jobs: IJob[], jobReferById) => {
-  const beforeJobs = jobs.filter(j => j.nextJobIds.includes(job.id));
+  const beforeJobs = jobs.filter(j => (j.nextJobIds || []).includes(job.id));
   const result = checkBeforeJobs(job, beforeJobs, jobReferById);
-
   if (result) {
     return result;
   }
@@ -134,6 +134,7 @@ export const loadFlowClass = (models: IModels) => {
       const jobRefers = await models.JobRefers.find({
         _id: { $in: jobs.map(j => j.config && j.config.jobReferId) }
       }).lean();
+
       const jobReferById = {};
       for (const jobRefer of jobRefers) {
         jobReferById[jobRefer._id] = jobRefer;
