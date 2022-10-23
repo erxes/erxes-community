@@ -167,17 +167,11 @@ export const loadFlowClass = (models: IModels) => {
      */
     public static async updateFlow(_id: string, doc: IFlow) {
       let status = doc.status;
-      console.log(status);
       const flowValidation = await models.Flows.checkValidation(doc.jobs);
-      console.log(
-        flowValidation,
-        'ffffffffffffffff',
-        flowValidation !== '' && status === FLOW_STATUSES.ACTIVE
-      );
+
       if (flowValidation !== '' && status === FLOW_STATUSES.ACTIVE) {
         status = FLOW_STATUSES.DRAFT;
       }
-      console.log(status);
 
       let latestBranchId = '';
       let latestDepartmentId = '';
