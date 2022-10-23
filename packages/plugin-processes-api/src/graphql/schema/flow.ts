@@ -29,11 +29,12 @@ export const types = `
 const qryParams = `
   categoryId: String,
   searchValue: String,
-  excludeIds: Boolean
+  excludeIds: Boolean,
+  ids: [String]
 `;
 
 export const queries = `
-  flows(page: Int, perPage: Int, ids: [String], ${qryParams}): [Flow]
+  flows(page: Int, perPage: Int, ${qryParams}): [Flow]
   flowsAll: [Flow]
   flowTotalCount(${qryParams}): Int
   flowDetail(_id: String!): Flow

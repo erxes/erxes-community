@@ -23,16 +23,20 @@ const generateFilter = async (
   const selector: any = { ...commonQuerySelector };
 
   if (categoryId) {
-    const products = await sendProductsMessage({
-      subdomain,
-      action: 'find',
-      data: { query: {}, categoryId, fields: { _id: 1 }, limit: 10000 },
-      isRPC: true,
-      defaultValue: []
-    });
+    if (categoryId === 'unknownCategory') {
+      selector.productId = { $in: ['', null, undefined] };
+    } else {
+      const products = await sendProductsMessage({
+        subdomain,
+        action: 'find',
+        data: { query: {}, categoryId, fields: { _id: 1 }, limit: 10000 },
+        isRPC: true,
+        defaultValue: []
+      });
 
-    const productIds = products.map(p => p._id);
-    selector.productId = { $in: productIds };
+      const productIds = products.map(p => p._id);
+      selector.productId = { $in: productIds };
+    }
   }
 
   if (searchValue) {

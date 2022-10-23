@@ -1,5 +1,3 @@
-import { queries as productQueries } from '@erxes/ui-products/src/graphql';
-
 export const flowFields = `
   _id
   createdAt
@@ -45,12 +43,22 @@ query flowTotalCount($categoryId: String, $searchValue: String) {
 }
 `;
 
-const flowCategories = productQueries.productCategories;
-const uoms = productQueries.uoms;
-const uomsTotalCount = productQueries.uomsTotalCount;
+const flowCategories = `
+  query flowCategories($status: String) {
+    flowCategories(status: $status) {
+      _id
+      name
+      order
+      code
+      parentId
+      description
+      status
 
-const productsConfigs = productQueries.productsConfigs;
-const productDetail = productQueries.productDetail;
+      isRoot
+      flowCount
+    }
+  }
+`;
 
 const flowCategoriesTotalCount = `
   query flowCategoriesTotalCount {
@@ -65,10 +73,5 @@ export default {
   flows,
   flowsAll,
   flowDetail,
-  flowTotalCount,
-
-  uoms,
-  productsConfigs,
-  productDetail,
-  uomsTotalCount
+  flowTotalCount
 };

@@ -6,7 +6,7 @@ import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import Tip from '@erxes/ui/src/components/Tip';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __, router } from '@erxes/ui/src/utils';
-import { IProductCategory } from '../../types';
+import { IFlowCategory } from '../../types';
 import { Link } from 'react-router-dom';
 import { SidebarList } from '@erxes/ui/src/layout/styles';
 import { SidebarListItem } from '@erxes/ui-settings/src/styles';
@@ -17,7 +17,7 @@ interface IProps {
   history: any;
   queryParams: any;
   remove: (IProductCategory: string) => void;
-  flowCategories: IProductCategory[];
+  flowCategories: IFlowCategory[];
   loading: boolean;
   flowCategoriesCount: number;
 }
@@ -34,7 +34,7 @@ class List extends React.Component<IProps> {
     return currentGroup === id;
   };
 
-  renderRemoveAction(category: IProductCategory) {
+  renderRemoveAction(category: IFlowCategory) {
     const { remove } = this.props;
 
     return (
@@ -72,10 +72,10 @@ class List extends React.Component<IProps> {
       }
 
       const name = category.isRoot ? (
-        `${category.name} (${category.productCount || 0})`
+        `${category.name} (${category.flowCount || 0})`
       ) : (
         <span>
-          {category.name} ({category.productCount || 0})
+          {category.name} ({category.flowCount || 0})
         </span>
       );
 

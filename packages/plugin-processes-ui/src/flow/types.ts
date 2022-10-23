@@ -1,11 +1,20 @@
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IJobRefer } from '../job/types';
-import {
-  IProduct,
-  IProductCategory as IProductCategoryC
-} from '@erxes/ui-products/src/types';
+import { IProduct } from '@erxes/ui-products/src/types';
 
-export type IProductCategory = IProductCategoryC & {};
+export type IFlowCategory = {
+  _id: string;
+  name: string;
+  order: string;
+  code: string;
+  description?: string;
+  attachment?: any;
+  status: string;
+  parentId?: string;
+  createdAt: Date;
+  flowCount: number;
+  isRoot: boolean;
+};
 
 interface IConfig {
   jobReferId?: string;
@@ -82,7 +91,7 @@ export type flowTotalCountQueryResponse = {
 } & QueryResponse;
 
 export type FlowCategoriesQueryResponse = {
-  productCategories: IProductCategory[];
+  flowCategories: any[];
 } & QueryResponse;
 
 export type FlowCategoriesCountQueryResponse = {
@@ -102,10 +111,5 @@ export type FlowCategoriesRemoveMutationResponse = {
 
 export type DetailQueryResponse = {
   jobReferDetail: IJobRefer;
-  loading: boolean;
-};
-
-export type CategoryDetailQueryResponse = {
-  productCategoryDetail: IProductCategory;
   loading: boolean;
 };
