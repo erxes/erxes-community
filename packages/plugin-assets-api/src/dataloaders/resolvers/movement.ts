@@ -11,13 +11,6 @@ export default {
   },
 
   async items(movement: IMovementDocument, {}, { models }: IContext) {
-    return await models.MovementItems.find({ _id: { $in: movement.itemIds } });
-  },
-
-  async selectedAssetIds(movement: IMovementDocument, {}, { models }: IContext) {
-    const movementItems = await models.MovementItems.find({
-      _id: { $in: movement.itemIds }
-    }).lean();
-    return movementItems.map(item => item.assetId);
+    return await models.MovementItems.find({ movementId: movement._id });
   }
 };

@@ -25,7 +25,6 @@ type Props = {
   loading: boolean;
   remove: (ids: string[]) => void;
   refetch: () => void;
-  refetchTotalCount: () => void;
   history: any;
   queryParams: any;
 } & IRouterProps;
@@ -52,12 +51,11 @@ class List extends React.Component<Props, State> {
     </Button>
   );
   renderRightActionBarContent = props => {
-    const { refetch, refetchTotalCount } = this.props;
+    const { refetch } = this.props;
 
     const updatedProps = {
       ...props,
-      refetch,
-      refetchTotalCount
+      refetch
     };
 
     return <Form {...updatedProps} />;
@@ -97,11 +95,7 @@ class List extends React.Component<Props, State> {
   renderRow(props) {
     const { movements, history } = this.props;
 
-    const handleSelecteRow = (
-      movement: IMovementType,
-      movementId: string,
-      isChecked?: boolean
-    ) => {
+    const handleSelecteRow = (movement: IMovementType, movementId: string, isChecked?: boolean) => {
       const { selectedRows } = this.state;
 
       props.toggleBulk(movement, isChecked);
@@ -131,9 +125,7 @@ class List extends React.Component<Props, State> {
     const onchange = () => {
       toggleAll(movements, 'movements');
       this.setState({
-        selectedRows: !isAllSelected
-          ? movements.map(movement => movement._id || '')
-          : []
+        selectedRows: !isAllSelected ? movements.map(movement => movement._id || '') : []
       });
     };
     return (
@@ -141,11 +133,7 @@ class List extends React.Component<Props, State> {
         <thead>
           <tr>
             <th style={{ width: 60 }}>
-              <FormControl
-                checked={isAllSelected}
-                componentClass="checkbox"
-                onChange={onchange}
-              />
+              <FormControl checked={isAllSelected} componentClass="checkbox" onChange={onchange} />
             </th>
             <th>{__('User')}</th>
             <th>{__('Moved At')}</th>
@@ -161,8 +149,13 @@ class List extends React.Component<Props, State> {
   }
 
   render() {
-    const { totalCount, remove, history, queryParams } = this.props;
+    const { totalCount, history, queryParams } = this.props;
     const { selectedRows } = this.state;
+
+    const remove = () => {
+      this.props.remove(selectedRows);
+      this.setState({ selectedRows: [] });
+    };
 
     let rightActionBar = (
       <BarItems>
@@ -177,11 +170,7 @@ class List extends React.Component<Props, State> {
         {this.renderRightActionBar}
         {selectedRows.length > 0 && (
           <Tip text="Remove movement" placement="bottom">
-            <Button
-              btnStyle="danger"
-              icon="cancel-1"
-              onClick={() => remove(selectedRows)}
-            />
+            <Button btnStyle="danger" icon="cancel-1" onClick={remove} />
           </Tip>
         )}
       </BarItems>

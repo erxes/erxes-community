@@ -1,4 +1,4 @@
-import { Button, Icon, ModalTrigger, Tip } from '@erxes/ui/src';
+import { Button, Icon, ModalTrigger, renderFullName, Tip } from '@erxes/ui/src';
 import moment from 'moment';
 import React from 'react';
 import { IMovementItem } from '../../../common/types';
@@ -17,8 +17,7 @@ class Row extends React.Component<Props> {
     assetId,
     movementId,
     trigger,
-    modaltText,
-    item
+    modaltText
   }: {
     assetId?: string;
     movementId?: string;
@@ -30,8 +29,7 @@ class Row extends React.Component<Props> {
       const updatedProps = {
         ...props,
         assetId,
-        movementId,
-        item
+        movementId
       };
       return <Form {...updatedProps} />;
     };
@@ -84,11 +82,10 @@ class Row extends React.Component<Props> {
         <td>{(department && department.title) || '-'}</td>
         <td>{(teamMember && teamMember?.details?.fullName) || '-'}</td>
         <td>{(company && company.primaryName) || '-'}</td>
-        <td>{(customer && customer.primaryEmail) || '-'}</td>
+        <td>{(customer && renderFullName(customer)) || '-'}</td>
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td style={{ width: 60 }}>
           {this.renderForm({ modaltText: 'Detail', assetId, movementId, trigger: editTrigger })}
-          {this.renderForm({ modaltText: 'Add', trigger: addTrigger, item })}
         </td>
       </tr>
     );

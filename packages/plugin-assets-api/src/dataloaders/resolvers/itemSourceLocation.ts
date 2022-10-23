@@ -9,7 +9,7 @@ export default {
     return (movement.branchId && dataLoaders.branch.load(movement.branchId)) || null;
   },
   async customer(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
-    return (await (movement.customerId && dataLoaders.customer.load(movement.customerId))) || null;
+    return (movement.customerId && dataLoaders.customer.load(movement.customerId)) || null;
   },
   async company(movement: IMovementItemDocument, {}, { dataLoaders }: IContext) {
     return (movement.companyId && dataLoaders.company.load(movement.companyId)) || null;

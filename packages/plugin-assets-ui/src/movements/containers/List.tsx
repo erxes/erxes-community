@@ -6,7 +6,7 @@ import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { MovementQueryResponse, MovementsTotalCountQueryResponse } from '../../common/types';
-import { generateParams } from '../../common/utils';
+import { generateParams, movementRefetchQueries } from '../../common/utils';
 import List from '../components/List';
 import { mutations, queries } from '../graphql';
 
@@ -44,13 +44,17 @@ class ListContainer extends React.Component<FinalProps> {
         .catch(error => Alert.error(error.message));
     };
 
+    const refetch = () => {
+      movementsQuery.refetch();
+      movementsTotalCountQuery.refetch();
+    };
+
     const updateProps = {
       ...this.props,
       movements: movementsQuery.assetMovements,
       totalCount: movementsTotalCountQuery.assetMovementTotalCount,
       loading: movementsQuery.loading,
-      refetch: movementsQuery.refetch,
-      refetchTotalCount: movementsTotalCountQuery.refetch,
+      refetch,
       history,
       remove
     };
@@ -59,7 +63,12 @@ class ListContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    return <Bulk content={this.renderList} />;
+    const refetch = () => {
+      this.props.movementsQuery.refetch();
+      this.props.movementsTotalCountQuery.refetch();
+    };
+
+    return <Bulk content={this.renderList} refetch={refetch} />;
   }
 }
 
@@ -80,7 +89,7 @@ export default withProps(
     graphql<Props>(gql(mutations.movementRemove), {
       name: 'movementRemove',
       options: () => ({
-        refetchQueries: ['itemsQuery', 'itemsTotalCount']
+        refetchQueries: movementRefetchQueries()
       })
     })
   )(ListContainer)

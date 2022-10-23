@@ -1,12 +1,14 @@
-import { BarItems, FormControl, router, Table, __ } from '@erxes/ui/src';
+import { BarItems, Button, FormControl, ModalTrigger, router, Table, __ } from '@erxes/ui/src';
 import React from 'react';
 import { menuMovements } from '../../../common/constant';
 import { IMovementItem } from '../../../common/types';
 import { DefaultWrapper } from '../../../common/utils';
+import Form from '../../containers/Form';
 import Row from './Row';
 import SideBar from './Sidebar';
 type Props = {
   items: IMovementItem[];
+  refetch: () => void;
   totalCount: number;
   history: any;
   queryParams: any;
@@ -48,6 +50,20 @@ class MovementItem extends React.Component<Props, State> {
     e.target.value = tmpValue;
   }
 
+  renderForm() {
+    const trigger = <Button btnStyle="success">Add Movement</Button>;
+
+    const content = props => {
+      const updatedProps = {
+        ...props,
+        refetch: this.props.refetch
+      };
+
+      return <Form {...updatedProps} />;
+    };
+    return <ModalTrigger title="Add Movement" content={content} trigger={trigger} size="xl" />;
+  }
+
   renderRow() {
     const { items } = this.props;
     return items.map(movement => <Row key={movement._id} item={movement} />);
@@ -86,6 +102,7 @@ class MovementItem extends React.Component<Props, State> {
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
+        {this.renderForm()}
       </BarItems>
     );
 

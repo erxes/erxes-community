@@ -5,7 +5,7 @@ import { sendContactsMessage, sendCoreMessage } from '../messageBroker';
 
 export default function generateDataLoaderBranch(models: IModels, subdomain) {
   return new DataLoader<string, any>(async (ids: readonly string[]) => {
-    const result: any[] = await sendCoreMessage({
+    const result = await sendCoreMessage({
       subdomain,
       action: 'branches.find',
       data: {
@@ -15,6 +15,6 @@ export default function generateDataLoaderBranch(models: IModels, subdomain) {
       defaultValue: []
     });
     const resultById = _.indexBy(result, '_id');
-    return result;
+    return ids.map(id => resultById[id]);
   });
 }

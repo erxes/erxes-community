@@ -2,7 +2,7 @@ import { movementFilters } from '../../common/graphql/movement';
 
 export const types = contactsAvailable => `
 
-    type SourceLocationItem {
+    type ItemSourceLocation {
         branchId:String,
         departmentId:String,
         customerId:String,
@@ -26,7 +26,7 @@ export const types = contactsAvailable => `
         _id:String,
         assetName:String,
         assetId:String,
-        sourceLocations:SourceLocationItem,
+        sourceLocations:ItemSourceLocation,
         branchId:String,
         departmentId:String,
         customerId:String,
@@ -58,7 +58,6 @@ export const types = contactsAvailable => `
         description:String
         
         user:JSON
-        selectedAssetIds:JSON
         items:[MovementItem]
     }
 

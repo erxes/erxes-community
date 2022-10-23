@@ -12,20 +12,11 @@ import {
   __
 } from '@erxes/ui/src';
 
-import {
-  ContentColumn,
-  ItemRow,
-  ItemText
-} from '@erxes/ui-cards/src/deals/styles';
+import { ContentColumn, ItemRow, ItemText } from '@erxes/ui-cards/src/deals/styles';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import client from '@erxes/ui/src/apolloClient';
-import {
-  DateContainer,
-  FormColumn,
-  FormWrapper,
-  ModalFooter
-} from '@erxes/ui/src/styles/main';
+import { DateContainer, FormColumn, FormWrapper, ModalFooter } from '@erxes/ui/src/styles/main';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -34,11 +25,7 @@ import _loadash from 'lodash';
 import React from 'react';
 import { IMovementItem, IMovementType } from '../../common/types';
 import { CommonFormGroup, CommonItemRow } from '../../common/utils';
-import {
-  ContainerBox,
-  MovementItemContainer,
-  MovementTableWrapper
-} from '../../style';
+import { ContainerBox, MovementItemContainer, MovementTableWrapper } from '../../style';
 import AssetChooser from '../containers/Chooser';
 import { queries } from '../graphql';
 import MovementItems from './MovementItem';
@@ -63,7 +50,7 @@ type State = {
   currentItems: string[];
   description: string;
   movedAt: string;
-  selectedItemIds: string[];
+  selectedItemsIds: string[];
   general: General;
   checkedItems: string[];
 };
@@ -77,9 +64,11 @@ class Form extends React.Component<Props, State> {
 
     const { detail, assetId } = props;
 
+    const selectedItemsIds = detail?.items && detail.items.map(item => item.assetId);
+
     this.state = {
       variables: detail?.items || [],
-      selectedItemIds: detail?.selectedAssetIds || [],
+      selectedItemsIds: selectedItemsIds || [],
       description: detail?.description || '',
       movedAt: detail?.movedAt || '',
       currentItems: [assetId],
@@ -92,15 +81,7 @@ class Form extends React.Component<Props, State> {
     const { variables, movedAt, description } = this.state;
     const { detail } = this.props;
     const items = variables.map(
-      ({
-        assetId,
-        assetName,
-        branchId,
-        departmentId,
-        customerId,
-        companyId,
-        teamMemberId
-      }) => ({
+      ({ assetId, assetName, branchId, departmentId, customerId, companyId, teamMemberId }) => ({
         assetId,
         assetName,
         branchId,
@@ -119,16 +100,16 @@ class Form extends React.Component<Props, State> {
 
   assetChooser(props) {
     const handleSelect = datas => {
-      const selectedItemIds = datas.map(data => data._id);
+      const selectedItemsIds = datas.map(data => data._id);
       client
         .query({
           query: gql(queries.itemsCurrentLocation),
           fetchPolicy: 'network-only',
-          variables: { assetIds: selectedItemIds }
+          variables: { assetIds: selectedItemsIds }
         })
         .then(res => {
           const { currentAssetMovementItems } = res.data;
-          this.setState({ selectedItemIds });
+          this.setState({ selectedItemsIds });
 
           const selectedItems = datas.map(data => ({
             assetId: data._id,
@@ -152,7 +133,7 @@ class Form extends React.Component<Props, State> {
     const updatedProps = {
       ...props,
       handleSelect,
-      selectedAssetIds: this.state.selectedItemIds
+      selectedAssetIds: this.state.selectedItemsIds
     };
 
     return <AssetChooser {...updatedProps} />;
@@ -162,12 +143,7 @@ class Form extends React.Component<Props, State> {
 
   assetChooserContent(trigger) {
     return (
-      <ModalTrigger
-        title="Select Assets"
-        content={this.assetChooser}
-        trigger={trigger}
-        size="lg"
-      />
+      <ModalTrigger title="Select Assets" content={this.assetChooser} trigger={trigger} size="lg" />
     );
   }
 
@@ -175,7 +151,7 @@ class Form extends React.Component<Props, State> {
     return <>{this.assetChooserContent(this.assetChooserTrigger)}</>;
   }
 
-  renderRow(label, asset, value) {
+  renderInfoSelection(label, asset, value) {
     let { variables } = this.state;
 
     let Selection;
@@ -259,15 +235,11 @@ class Form extends React.Component<Props, State> {
 
   handleChangeRowItem = (prevItemId, newItem) => {
     const { variables } = this.state;
-    const newVariables = variables.map(item =>
-      item.assetId === prevItemId ? newItem : item
-    );
-    const removedSeletedItemIds = this.state.selectedItemIds.filter(
-      item => item !== prevItemId
-    );
+    const newVariables = variables.map(item => (item.assetId === prevItemId ? newItem : item));
+    const removedSeletedItemIds = this.state.selectedItemsIds.filter(item => item !== prevItemId);
     this.setState({
       variables: newVariables,
-      selectedItemIds: [...removedSeletedItemIds, newItem.assetId]
+      selectedItemsIds: [...removedSeletedItemIds, newItem.assetId]
     });
   };
 
@@ -365,21 +337,50 @@ class Form extends React.Component<Props, State> {
     );
   }
 
-  renderList = props => {
-    const { variables, currentItems, selectedItemIds } = this.state;
-
+  renderRow() {
+    const { variables, currentItems, selectedItemsIds, checkedItems } = this.state;
     const removeRow = id => {
       const newVariables = variables.filter(item => item.assetId !== id);
-      const newSelectedItems = selectedItemIds.filter(itemId => itemId !== id);
+      const newSelectedItems = selectedItemsIds.filter(itemId => itemId !== id);
       if (currentItems.includes(id)) {
         const newCurrentItems = currentItems.filter(item => item !== id);
         this.setState({ currentItems: newCurrentItems });
       }
       this.setState({
         variables: newVariables,
-        selectedItemIds: newSelectedItems
+        selectedItemsIds: newSelectedItems
       });
     };
+    const onChangeCheckedItems = (id: string) => {
+      if (checkedItems.includes(id)) {
+        return this.setState({ checkedItems: checkedItems.filter(item => item !== id) });
+      }
+      return this.setState({ checkedItems: [...checkedItems, id] });
+    };
+
+    return variables.map(item => (
+      <MovementItems
+        key={item.assetId}
+        item={item}
+        current={currentItems.includes(item.assetId) ? item.assetId : ''}
+        changeCurrent={this.changeCurrentItem}
+        removeRow={removeRow}
+        selectedItems={selectedItemsIds}
+        isChecked={checkedItems.includes(item.assetId)}
+        onChangeBulkItems={onChangeCheckedItems}
+        handleChangeRowItem={this.handleChangeRowItem}
+      >
+        {this.renderInfoSelection('Branches', item, item['branchId'])}
+        {this.renderInfoSelection('Departments', item, item['departmentId'])}
+        {this.renderInfoSelection('Customer', item, item['customerId'])}
+        {this.renderInfoSelection('Company', item, item['companyId'])}
+        {this.renderInfoSelection('Team Member', item, item['teamMemberId'])}
+      </MovementItems>
+    ));
+  }
+
+  renderList() {
+    const { variables, checkedItems } = this.state;
 
     const onChange = () => {
       const { checkedItems } = this.state;
@@ -387,17 +388,6 @@ class Form extends React.Component<Props, State> {
       this.setState({
         checkedItems: checkedItems.length > 0 ? [] : newCheckedItems
       });
-      props.toggleAll(variables, 'variables');
-    };
-
-    const onChangeCheckedItems = (id: string, checked: boolean) => {
-      if (!checked) {
-        const newCheckedItems = this.state.checkedItems.filter(
-          item => item !== id
-        );
-        return this.setState({ checkedItems: newCheckedItems });
-      }
-      this.setState(prev => ({ checkedItems: [...prev.checkedItems, id] }));
     };
 
     return (
@@ -407,7 +397,7 @@ class Form extends React.Component<Props, State> {
             <tr>
               <th style={{ width: 40 }}>
                 <FormControl
-                  checked={props.isAllSelected}
+                  checked={variables.length > 0 && variables.length === checkedItems.length}
                   componentClass="checkbox"
                   onChange={onChange}
                   color="#3B85F4"
@@ -421,96 +411,68 @@ class Form extends React.Component<Props, State> {
               <th>{__('Team Member')}</th>
             </tr>
           </thead>
-          <tbody>
-            {variables.map(item => (
-              <MovementItems
-                key={item.assetId}
-                item={item}
-                current={
-                  currentItems.includes(item.assetId) ? item.assetId : ''
-                }
-                changeCurrent={this.changeCurrentItem}
-                removeRow={removeRow}
-                selectedItems={selectedItemIds}
-                toggleBulk={props.toggleBulk}
-                isChecked={props.bulk.some(
-                  bulk => bulk.assetId === item.assetId
-                )}
-                onChangeBulkItems={onChangeCheckedItems}
-                handleChangeRowItem={this.handleChangeRowItem}
-              >
-                {this.renderRow('Branches', item, item['branchId'])}
-                {this.renderRow('Departments', item, item['departmentId'])}
-                {this.renderRow('Customer', item, item['customerId'])}
-                {this.renderRow('Company', item, item['companyId'])}
-                {this.renderRow('Team Member', item, item['teamMemberId'])}
-              </MovementItems>
-            ))}
-          </tbody>
+          <tbody>{this.renderRow()}</tbody>
         </Table>
       </MovementTableWrapper>
     );
+  }
+  renderContent = (formProps: IFormProps) => {
+    const { closeModal, renderButton, detail } = this.props;
+    const { isSubmitted } = formProps;
+    const { movedAt, description, variables } = this.state;
+
+    return (
+      <ContainerBox column gap={20}>
+        <FormWrapper>
+          <FormColumn>
+            <CommonFormGroup label="Date">
+              <DateContainer>
+                <DateControl
+                  placeholder="Select Date"
+                  onChange={this.handleGeneralDate}
+                  value={movedAt}
+                />
+              </DateContainer>
+            </CommonFormGroup>
+          </FormColumn>
+          <FormColumn>
+            <CommonFormGroup label="Description">
+              <FormControl
+                type="text"
+                name="description"
+                onChange={this.handleGeneralDescription}
+                value={description}
+                required
+              />
+            </CommonFormGroup>
+          </FormColumn>
+        </FormWrapper>
+
+        {variables.length > 0 && this.renderGeneral()}
+        {this.renderList()}
+
+        <ContainerBox justifyCenter>
+          {this.assetChooserContent(<Button icon="plus-circle">{__('Add Asset')}</Button>)}
+        </ContainerBox>
+        {renderButton && (
+          <ModalFooter>
+            <Button btnStyle="simple" onClick={() => closeModal()}>
+              Cancel
+            </Button>
+            {renderButton({
+              text: 'Movement',
+              values: this.generateDoc(),
+              isSubmitted,
+              callback: closeModal,
+              object: !_loadash.isEmpty(detail)
+            })}
+          </ModalFooter>
+        )}
+      </ContainerBox>
+    );
   };
   render() {
-    const renderContent = (formProps: IFormProps) => {
-      const { closeModal, renderButton, detail } = this.props;
-      const { isSubmitted } = formProps;
-      const { movedAt, description, variables } = this.state;
-
-      return (
-        <ContainerBox column gap={20}>
-          <FormWrapper>
-            <FormColumn>
-              <CommonFormGroup label="Date">
-                <DateContainer>
-                  <DateControl
-                    placeholder="Select Date"
-                    onChange={this.handleGeneralDate}
-                    value={movedAt}
-                  />
-                </DateContainer>
-              </CommonFormGroup>
-            </FormColumn>
-            <FormColumn>
-              <CommonFormGroup label="Description">
-                <FormControl
-                  type="text"
-                  name="description"
-                  onChange={this.handleGeneralDescription}
-                  value={description}
-                  required
-                />
-              </CommonFormGroup>
-            </FormColumn>
-          </FormWrapper>
-
-          {variables.length > 0 && this.renderGeneral()}
-
-          <Bulk content={this.renderList} />
-          <ContainerBox justifyCenter>
-            {this.assetChooserContent(
-              <Button icon="plus-circle">{__('Add Asset')}</Button>
-            )}
-          </ContainerBox>
-          {renderButton && (
-            <ModalFooter>
-              <Button btnStyle="simple" onClick={() => closeModal()}>
-                Cancel
-              </Button>
-              {renderButton({
-                text: 'Movement',
-                values: this.generateDoc(),
-                isSubmitted,
-                callback: closeModal,
-                object: !_loadash.isEmpty(detail)
-              })}
-            </ModalFooter>
-          )}
-        </ContainerBox>
-      );
-    };
-
-    return <CommonForm renderContent={renderContent} />;
+    return <CommonForm renderContent={this.renderContent} />;
   }
 }
 

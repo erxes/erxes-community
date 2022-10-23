@@ -3,6 +3,7 @@ import Asset from './asset';
 import AssetCategory from './assetCategory';
 import Movement from './movement';
 import MovementItem from './movementItems';
+import ItemSourceLocation from './itemSourceLocation';
 
 import {
   Asset as assetMutations,
@@ -20,6 +21,7 @@ const resolvers: any = async serviceDiscovery => ({
   ...customScalars,
   Asset,
   AssetCategory,
+  ItemSourceLocation,
   MovementItem,
   Movement,
   Mutation: {

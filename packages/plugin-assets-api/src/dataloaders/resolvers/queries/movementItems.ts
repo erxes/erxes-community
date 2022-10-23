@@ -6,7 +6,7 @@ const movementItemQueries = {
   async assetMovementItems(_root, params, { models }: IContext) {
     const filter = await generateFilter(params, 'movementItems');
 
-    return await paginate(models.MovementItems.find(filter), params);
+    return await paginate(models.MovementItems.find(filter).sort({ createdAt: -1 }), params);
   },
 
   async assetMovementItemsTotalCount(_root, params, { models }: IContext) {

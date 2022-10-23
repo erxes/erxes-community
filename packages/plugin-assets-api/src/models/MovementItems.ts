@@ -6,26 +6,12 @@ import { movementItemsSchema } from './definitions/movements';
 
 export interface IMovementItemModel extends Model<IMovementItemDocument> {
   movementItemsAdd(assets: any): Promise<IMovementItemDocument[]>;
-  movementItemsEdit(
-    movementId: string,
-    items: any[]
-  ): Promise<IMovementItemDocument[]>;
-  movementItemsCurrentLocations(
-    assetIds: string[]
-  ): Promise<IMovementItemDocument[]>;
+  movementItemsEdit(movementId: string, items: any[]): Promise<IMovementItemDocument[]>;
+  movementItemsCurrentLocations(assetIds: string[]): Promise<IMovementItemDocument[]>;
 }
 
 const checkValidation = doc => {
-  console.log(doc);
-  const checker = [
-    doc.customerId,
-    doc.companyId,
-    doc.branchId,
-    doc.departmentId,
-    doc.userId
-  ];
-  console.log(checker);
-  console.log(checker.find(i => i));
+  const checker = [doc.customerId, doc.companyId, doc.branchId, doc.departmentId, doc.teamMemberId];
   return checker.find(i => i);
 };
 
@@ -34,7 +20,7 @@ export const loadMovementItemClass = (models: IModels) => {
     public static async movementItemsAdd(assets: any[]) {
       for (const asset of assets) {
         if (!checkValidation(asset)) {
-          throw new Error('You should provide at least one field');
+          throw new Error(`You should provide at least one field on ${asset.assetName}`);
         }
 
         const sourceLocations = await models.MovementItems.findOne({
@@ -50,13 +36,14 @@ export const loadMovementItemClass = (models: IModels) => {
     }
 
     public static async movementItemsEdit(movementId: string, items: any[]) {
-      const movementItemIds: string[] = [];
+      const itemIds: string[] = [];
+
       for (const item of items) {
         if (!checkValidation(item)) {
-          throw new Error('You should provide at least one field');
+          throw new Error(`You should provide at least one field on ${item.assetName}`);
         }
 
-        const movementItems = await models.MovementItems.findOneAndUpdate(
+        const movementItem = await models.MovementItems.findOneAndUpdate(
           { movementId, assetId: item.assetId },
           { ...item, movementId },
           {
@@ -65,13 +52,9 @@ export const loadMovementItemClass = (models: IModels) => {
             setDefaultsOnInsert: true
           }
         );
-
-        movementItemIds.push(movementItems._id);
+        itemIds.push(movementItem._id);
       }
-      await models.Movements.update(
-        { _id: movementId },
-        { $set: { itemIds: movementItemIds } }
-      );
+      await models.MovementItems.findOneAndRemove({ _id: { $nin: itemIds }, movementId });
     }
 
     public static async movementItemsCurrentLocations(assetIds: string[]) {

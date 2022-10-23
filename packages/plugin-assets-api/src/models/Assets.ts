@@ -3,11 +3,7 @@ import { Model } from 'mongoose';
 import { ASSET_STATUSES } from '../common/constant/asset';
 import { IAsset, IAssetDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
-import {
-  sendCardsMessage,
-  sendContactsMessage,
-  sendFormsMessage
-} from '../messageBroker';
+import { sendCardsMessage, sendContactsMessage, sendFormsMessage } from '../messageBroker';
 import { assetSchema } from './definitions/assets';
 export interface IAssetModel extends Model<IAssetDocument> {
   getAssets(selector: any): Promise<IAssetDocument>;
@@ -106,7 +102,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }).lean();
 
       doc.order = await this.generateOrder(parentAsset, doc);
-      console.log(parentAsset, doc.order);
 
       await models.Assets.updateOne({ _id }, { $set: doc });
 
@@ -170,10 +165,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         const assetObj = await models.Assets.getAssets({ _id: assetId });
 
         // merge custom fields data
-        customFieldsData = [
-          ...customFieldsData,
-          ...(assetObj.customFieldsData || [])
-        ];
+        customFieldsData = [...customFieldsData, ...(assetObj.customFieldsData || [])];
 
         await models.Assets.findByIdAndUpdate(assetId, {
           $set: {
@@ -232,9 +224,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
     static async checkCodeDuplication(code: string) {}
 
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
-      const order = parentAsset
-        ? `${parentAsset.order}/${doc.code}`
-        : `${doc.code}`;
+      const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
 
       return order;
     }

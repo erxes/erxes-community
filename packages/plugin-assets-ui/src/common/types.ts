@@ -114,9 +114,7 @@ export type MutationVariables = {
 };
 
 export type AssetRemoveMutationResponse = {
-  assetsRemove: (mutation: {
-    variables: { assetIds: string[] };
-  }) => Promise<any>;
+  assetsRemove: (mutation: { variables: { assetIds: string[] } }) => Promise<any>;
 };
 
 export type AssetEditMutationResponse = {
@@ -189,6 +187,8 @@ export type MovementItemsQueryResponse = {
 
 export type MovementItemsTotalCountQueryResponse = {
   assetMovementItemsTotalCount: number;
+  loading: boolean;
+  refetch: () => void;
 };
 
 export type MovementQueryResponse = {

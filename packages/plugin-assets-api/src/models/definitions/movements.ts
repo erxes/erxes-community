@@ -3,8 +3,6 @@ import { field, schemaWrapper } from './utils';
 
 export const sourceLocationsShema = new Schema(
   {
-    assetId: field({ type: String, label: 'Asset Id' }),
-    assetName: field({ type: String, label: 'Asset Name' }),
     branchId: field({ type: String, label: 'Branch Id' }),
     departmentId: field({ type: String, label: 'Department Id' }),
     customerId: field({ type: String, label: 'Customer Id' }),
@@ -18,7 +16,7 @@ export const movementItemsSchema = schemaWrapper(
   new Schema({
     assetId: field({ type: String, label: 'Asset Id' }),
     assetName: field({ type: String, label: 'Asset Name' }),
-    createdAt: field({ type: Date, label: 'Created At' }),
+    createdAt: field({ type: Date, label: 'Created At', default: Date.now }),
     branchId: field({ type: String, optional: true, label: 'Branch Id' }),
     departmentId: field({ type: String, optional: true, label: 'Department Id' }),
     teamMemberId: field({ type: String, optional: true, label: 'Team Member Id' }),
@@ -34,7 +32,6 @@ export const movementSchema = schemaWrapper(
     _id: field({ pkey: true }),
     createdAt: field({ type: Date, label: 'Created At' }),
     modifiedAt: field({ type: Date, label: 'Modified At' }),
-    itemIds: field({ type: [String], label: 'Assets' }),
     movedAt: field({ type: Date, label: 'Moved Date' }),
     description: field({ type: String, label: 'Description' }),
     userId: field({ type: String, label: 'User ID' })
