@@ -41,7 +41,6 @@ import {
 import { FLOWJOB_TYPES, FLOWJOBS } from '../../constants';
 import { FormControl } from '@erxes/ui/src/components/form';
 import { IFlowDocument, IJob } from '../../../flow/types';
-import { IJobRefer } from '../../../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
 import { jsPlumb } from 'jsplumb';
 import { Link } from 'react-router-dom';
@@ -110,62 +109,6 @@ class FlowForm extends React.Component<Props, State> {
       flowValidation: flow.flowValidation || ''
     };
   }
-
-  recursiveFlowJobChecker = (
-    flowJobs: IJob[],
-    jobRefers: IJobRefer[],
-    lastFlowJob: IJob
-  ) => {
-    const lastJobRefer =
-      jobRefers.find(jr => jr._id === (lastFlowJob.config.jobReferId || '')) ||
-      ({} as IJobRefer);
-    const boforeFlowJobs = flowJobs.filter(fj =>
-      (fj.nextJobIds || []).includes(lastFlowJob.id)
-    );
-
-    let response = true;
-
-    const lastNeedProducts = lastJobRefer.needProducts;
-
-    if (boforeFlowJobs.length === 0 && (lastNeedProducts || []).length > 0) {
-      response = false;
-    }
-
-    let productIds: string[] = [];
-    for (const beforeFlowJob of boforeFlowJobs) {
-      const beforeJobRefer = jobRefers.find(
-        jr => jr._id === (beforeFlowJob.config.jobReferId || '')
-      );
-      const resultProducts = beforeJobRefer?.resultProducts;
-      const ids = resultProducts?.map(rp => rp.productId);
-
-      productIds =
-        productIds.length === 0 ? ids || [] : productIds.concat(ids || []);
-    }
-
-    for (const lastNeedProduct of lastNeedProducts || []) {
-      if (!productIds.includes(lastNeedProduct.productId)) {
-        response = false;
-      }
-    }
-
-    if (response) {
-      for (const beforeFlowJob of boforeFlowJobs) {
-        response = this.recursiveFlowJobChecker(
-          flowJobs,
-          jobRefers,
-          beforeFlowJob
-        );
-        if (response) {
-          continue;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return response;
-  };
 
   setWrapperRef = node => {
     this.wrapperRef = node;
