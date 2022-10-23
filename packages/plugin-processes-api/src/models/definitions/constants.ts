@@ -32,7 +32,9 @@ export const JOB_TYPES = {
   OUTLET: 'outlet',
   MOVE: 'move',
   FLOW: 'flow',
-  ALL: ['job', 'end', 'income', 'outlet', 'move', 'flow']
+  ALL: ['job', 'end', 'income', 'outlet', 'move', 'flow'],
+  SINGLES: ['income', 'outlet', 'move'],
+  JOBS: ['job', 'end']
 };
 
 export const JOB_STATUSES = {

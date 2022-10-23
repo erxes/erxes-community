@@ -35,10 +35,8 @@ class JobForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { products, activeFlowJob } = props;
+    const { product, activeFlowJob } = props;
     const { config, description } = activeFlowJob;
-
-    const product = products.length && products[0];
 
     const { productId } = config;
 

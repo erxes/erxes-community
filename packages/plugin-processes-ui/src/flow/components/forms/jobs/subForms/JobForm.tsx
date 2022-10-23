@@ -154,7 +154,7 @@ class JobForm extends React.Component<Props, State> {
       <Common
         {...this.props}
         jobRefer={jobRefer}
-        name={(jobRefer && jobRefer.name) || 'Unknown'}
+        name={(jobRefer && `${jobRefer.code} - ${jobRefer.name}`) || 'Unknown'}
         description={description}
         config={{ jobReferId }}
       >

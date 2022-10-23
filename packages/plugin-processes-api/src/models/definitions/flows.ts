@@ -6,16 +6,17 @@ export interface IJob {
   id: string;
   nextJobIds: string[];
   type: string;
-  config: any;
-  // jobReferId?: string;
-  // productId?: string;
-  // durationType: string;
-  // duration: number;
-  // quantity: number;
-  // inBranchId: string;
-  // inDepartmentId: string;
-  // outBranchId: string;
-  // outDepartmentId: string;
+  config: {
+    jobReferId?: string;
+    productId?: string;
+    inBranchId: string;
+    outBranchId: string;
+    inDepartmentId: string;
+    outDepartmentId: string;
+    durationType: string;
+    duration: number;
+    // quantity: number;
+  };
   style: object;
   label: string;
   description: string;
