@@ -44,7 +44,6 @@ export const types = contactsAvailable => `
     attachment: Attachment
     attachmentMore: [Attachment]
     vendorId: String
-    supply: String
     assetCount: Int
 
     category: AssetCategory

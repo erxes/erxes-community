@@ -82,7 +82,6 @@ export interface IAsset {
 
   attachment?: any;
   attachmentMore?: any[];
-  supply: string;
   assetCount: number;
   minimiumCount: number;
   category: IAssetCategory;

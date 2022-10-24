@@ -19,7 +19,6 @@ export const assetParams = `
   customFieldsData: JSON,
   attachment: AttachmentInput,
   attachmentMore: [AttachmentInput],
-  supply: String,
   assetCount: Int,
   vendorId: String,
 `;

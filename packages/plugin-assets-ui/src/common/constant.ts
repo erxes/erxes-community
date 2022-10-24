@@ -12,12 +12,6 @@ export const TYPES = {
   ALL: ['asset', 'service']
 };
 
-export const ASSET_SUPPLY = [
-  { label: 'Unlimited', value: 'unlimited' },
-  { label: 'Limited', value: 'limited' },
-  { label: 'Unique', value: 'unique' }
-];
-
 export const ASSET_INFO = {
   name: 'Name',
   type: 'Type',

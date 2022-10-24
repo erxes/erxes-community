@@ -29,7 +29,6 @@ type Props = {
   closeModal: () => void;
 };
 type State = {
-  disabled: boolean;
   assetCount: number;
   minimiumCount: number;
   attachment?: IAttachment;
@@ -47,7 +46,6 @@ class Form extends React.Component<Props, State> {
     const {
       attachment,
       attachmentMore,
-      supply,
       assetCount,
       minimiumCount,
       vendorId,
@@ -57,7 +55,6 @@ class Form extends React.Component<Props, State> {
     } = asset;
 
     this.state = {
-      disabled: supply === 'limited' ? false : true,
       assetCount: assetCount ? assetCount : 0,
       minimiumCount: minimiumCount ? minimiumCount : 0,
       attachment: attachment ? attachment : undefined,
@@ -122,17 +119,6 @@ class Form extends React.Component<Props, State> {
     this.setState({ description: e.editor.getData() });
   };
 
-  onSupplyChange = e => {
-    const { assetCount, minimiumCount } = this.state;
-    const islimited = e.target.value === 'limited';
-    const isUnique = e.target.value === 'unique';
-
-    this.setState({
-      disabled: islimited ? false : true,
-      assetCount: islimited ? assetCount : isUnique ? 1 : 0,
-      minimiumCount: islimited ? minimiumCount : 0
-    });
-  };
   onComboEvent = (variable: string, e) => {
     let value = '';
 

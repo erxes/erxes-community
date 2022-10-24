@@ -3,7 +3,6 @@ import { Schema } from 'mongoose';
 import {
   ASSET_CATEGORY_STATUSES,
   ASSET_STATUSES,
-  ASSET_SUPPLY,
   ASSET_TYPES
 } from '../../common/constant/asset';
 import { field, schemaWrapper } from './utils';
@@ -68,15 +67,6 @@ export const assetSchema = schemaWrapper(
       optional: true,
       label: 'Status',
       default: 'active',
-      esType: 'keyword',
-      index: true
-    }),
-    supply: field({
-      type: String,
-      enum: ASSET_SUPPLY.ALL,
-      optional: true,
-      label: 'Supply',
-      default: 'unlimited',
       esType: 'keyword',
       index: true
     }),

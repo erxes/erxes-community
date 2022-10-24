@@ -16,7 +16,6 @@ export interface IAsset {
   attachment?: any;
   attachmentMore?: any[];
   status?: string;
-  supply?: string;
   assetCount?: number;
   vendorId?: string;
   vendorCode?: string;

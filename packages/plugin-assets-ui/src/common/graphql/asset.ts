@@ -11,7 +11,6 @@ export const assetParamsDef = `
   $customFieldsData: JSON,
   $attachment: AttachmentInput,
   $attachmentMore: [AttachmentInput],
-  $supply: String,
   $vendorId: String,
 `;
 export const assetParams = `
@@ -26,7 +25,6 @@ export const assetParams = `
   customFieldsData: $customFieldsData,
   attachment: $attachment,
   attachmentMore: $attachmentMore,
-  supply: $supply,
   vendorId: $vendorId,
 `;
 

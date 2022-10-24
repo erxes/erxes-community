@@ -17,12 +17,6 @@ export const ASSET_TYPES = {
   ALL: ['asset', 'service']
 };
 
-export const ASSET_SUPPLY = {
-  UNIQUE: 'unique',
-  LIMITED: 'limited',
-  UNLIMITED: 'unlimited',
-  ALL: ['unique', 'limited', 'unlimited']
-};
 
 export const ASSET_INFO = {
   code: 'Code',
