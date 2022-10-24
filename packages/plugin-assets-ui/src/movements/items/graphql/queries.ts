@@ -1,5 +1,7 @@
 import { isEnabled } from '@erxes/ui/src/utils/core';
 import {
+  commonFilterParams,
+  commonFilterParamsDef,
   dateFilterParams,
   dateFilterParamsDef,
   movementFilterParams,
@@ -32,8 +34,8 @@ const itemsType = `
 `;
 
 const items = `
-query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilterParams}) {
-  assetMovementItems(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef}) {
+query AssetMovementItems ($movementId:String,${movementFilterParams},${dateFilterParams},${commonFilterParams}) {
+  assetMovementItems(movementId: $movementId,${movementFilterParamsDef},${dateFilterParamsDef},${commonFilterParamsDef}) {
     ${itemsType}
     sourceLocations {
       branchId

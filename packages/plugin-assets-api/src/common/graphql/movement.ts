@@ -25,3 +25,8 @@ export const movementFilters = `
     searchValue:String,
     userId:String,
 `;
+
+export const commonFilterParams = `
+    perPage:Int,
+    page:Int,
+`;

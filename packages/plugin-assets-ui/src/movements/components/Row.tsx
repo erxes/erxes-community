@@ -68,7 +68,7 @@ class Row extends React.Component<Props> {
 
     return (
       <ModalTrigger
-        title="Detail Asset  Movement"
+        title="Edit Movement"
         content={renderDetail}
         trigger={renderRow}
         autoOpenKey="showListFormModal"

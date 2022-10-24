@@ -1,4 +1,4 @@
-import { movementFilters } from '../../common/graphql/movement';
+import { movementFilters, commonFilterParams } from '../../common/graphql/movement';
 
 export const types = contactsAvailable => `
 
@@ -77,10 +77,10 @@ export const mutations = `
     assetMovementRemove(ids:[String]):String
 `;
 export const queries = `
-    assetMovements(${movementFilters}):[Movement]
+    assetMovements(${movementFilters},${commonFilterParams}):[Movement]
     assetMovementTotalCount(${movementFilters}):Int
     assetMovement(_id:String):Movement
-    assetMovementItems(${movementFilters}):[MovementItem]
+    assetMovementItems(${movementFilters},${commonFilterParams}):[MovementItem]
     assetMovementItemsTotalCount(${movementFilters}):Int
     assetMovementItem(assetId:String):MovementItem
     currentAssetMovementItems(assetIds:[String]):[MovementItem]

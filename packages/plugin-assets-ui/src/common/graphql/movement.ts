@@ -56,3 +56,12 @@ export const dateFilterParamsDef = `
     createdAtFrom : $createdAtFrom,
     createdAtTo: $createdAtTo
 `;
+
+export const commonFilterParams = `
+    $perPage: Int,
+    $page: Int 
+`;
+export const commonFilterParamsDef = `
+    perPage:$perPage,
+    page:$page
+`;
