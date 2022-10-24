@@ -193,22 +193,20 @@ class Form extends React.Component<Props, State> {
     };
 
     return (
-      <td key={label} className="item">
-        <ItemRow>
-          <ItemText>{label}</ItemText>
-          <ContentColumn flex="3">
-            <MovementItemContainer>
-              <Selection
-                label={`Choose ${label}`}
-                onSelect={handleChange}
-                initialValue={value || ''}
-                multi={false}
-                customOption={{ value: '', label: `Choose ${label}` }}
-              />
-            </MovementItemContainer>
-          </ContentColumn>
-        </ItemRow>
-      </td>
+      <ItemRow key={label} className="item">
+        <ItemText>{label}</ItemText>
+        <ContentColumn flex="3">
+          <MovementItemContainer>
+            <Selection
+              label={`Choose ${label}`}
+              onSelect={handleChange}
+              initialValue={value || ''}
+              multi={false}
+              customOption={{ value: '', label: `Choose ${label}` }}
+            />
+          </MovementItemContainer>
+        </ContentColumn>
+      </ItemRow>
     );
   }
 

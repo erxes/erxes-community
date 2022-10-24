@@ -1,7 +1,6 @@
 export const movementParamsDef = `
     $assetId:String,
     $assetName:String,
-    $userType:String,
     $branchId:String,
     $departmentId:String,
     $customerId:String,
@@ -12,7 +11,6 @@ export const movementParamsDef = `
 export const movementParams = `
     assetId:$assetId,
     assetName:$assetName,
-    userType:$userType
     branchId:$branchId
     departmentId:$departmentId
     customerId:$customerId

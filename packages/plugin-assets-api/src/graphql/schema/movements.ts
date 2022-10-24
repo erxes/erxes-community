@@ -64,7 +64,6 @@ export const types = contactsAvailable => `
     input IMovementItem {
         assetId:String,
         assetName:String,
-        userType:String,
         branchId:String,
         departmentId:String,
         companyId:String,
