@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   ControlLabel,
   DateControl,
@@ -7,7 +8,9 @@ import {
   router,
   SelectTeamMembers,
   Sidebar as CommonSideBar,
-  Tip
+  Tip,
+  Wrapper,
+  __
 } from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import moment from 'moment';
@@ -29,6 +32,7 @@ type State = {
   userId?: string;
 };
 
+const { Section } = Wrapper.Sidebar;
 export class SideBar extends React.Component<Props, State> {
   constructor(props) {
     super(props);
@@ -103,9 +107,33 @@ export class SideBar extends React.Component<Props, State> {
       </CommonFormGroup>
     );
 
+    const fields = [
+      'userId',
+      'createdAtFrom',
+      'createdAtTo',
+      'movedAtFrom',
+      'movedAtTo',
+      'modifiedAtFrom',
+      'modifiedAtTo'
+    ];
+
+    const extraButton = (
+      <Button btnStyle="link" onClick={() => clearParams(fields)}>
+        <Tip text="Clear filters" placement="bottom">
+          <Icon icon="cancel-1" />
+        </Tip>
+      </Button>
+    );
+
     return (
       <CommonSideBar>
-        <ContainerBox column gap={5}>
+        <Section.Title>
+          {__('Addition Filters')}
+          <Section.QuickButtons>
+            {fields.some(field => queryParams[field]) && extraButton}
+          </Section.QuickButtons>
+        </Section.Title>
+        <ContainerBox vertical column gap={5}>
           <FormGroup field="userId" label="Moved User" clearable={queryParams.userId}>
             <SelectTeamMembers
               label="Choose Moved User"

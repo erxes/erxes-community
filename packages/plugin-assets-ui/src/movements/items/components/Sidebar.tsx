@@ -1,6 +1,7 @@
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import {
+  Box,
   Button,
   ControlLabel,
   DateControl,
@@ -8,7 +9,9 @@ import {
   Icon,
   router,
   Sidebar as CommonSideBar,
-  Tip
+  Tip,
+  Wrapper,
+  __
 } from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
@@ -17,6 +20,8 @@ import moment from 'moment';
 import React from 'react';
 import { SelectWithAssets } from '../../../common/utils';
 import { ContainerBox, CustomRangeContainer, EndDateContainer } from '../../../style';
+
+const { Section } = Wrapper.Sidebar;
 
 type Props = {
   history: any;
@@ -46,6 +51,8 @@ class Sidebar extends React.Component<Props, State> {
   }
 
   render() {
+    const { queryParams } = this.props;
+
     const {
       branchId,
       departmentId,
@@ -57,6 +64,16 @@ class Sidebar extends React.Component<Props, State> {
       createdAtTo
     } = this.state;
 
+    const clearParams = field => {
+      if (Array.isArray(field)) {
+        field.forEach(name => {
+          this.setState({ [name]: undefined });
+          return router.removeParams(this.props.history, name);
+        });
+      }
+      this.setState({ [field]: undefined });
+      router.removeParams(this.props.history, field);
+    };
     const FormGroup = ({
       label,
       field,
@@ -68,16 +85,6 @@ class Sidebar extends React.Component<Props, State> {
       clearable?: boolean;
       children: React.ReactNode;
     }) => {
-      const clearParams = field => {
-        if (Array.isArray(field)) {
-          field.forEach(name => {
-            this.setState({ [name]: undefined });
-            return router.removeParams(this.props.history, name);
-          });
-        }
-        this.setState({ [field]: undefined });
-        router.removeParams(this.props.history, field);
-      };
       return (
         <CommonFormGroup>
           <ContainerBox row spaceBetween>
@@ -105,9 +112,34 @@ class Sidebar extends React.Component<Props, State> {
       router.setParams(this.props.history, { page: 1 });
     };
 
+    const fields = [
+      'branchId',
+      'departmentId',
+      'teamMemberId',
+      'companyId',
+      'customerId',
+      'assetId',
+      'createdAtFrom',
+      'createdAtTo'
+    ];
+
+    const extraButton = (
+      <Button btnStyle="link" onClick={() => clearParams(fields)}>
+        <Tip text="Clear filters" placement="bottom">
+          <Icon icon="cancel-1" />
+        </Tip>
+      </Button>
+    );
+
     return (
       <CommonSideBar>
-        <ContainerBox column gap={5}>
+        <Section.Title>
+          {__('Addition Filters')}
+          <Section.QuickButtons>
+            {fields.some(field => queryParams[field]) && extraButton}
+          </Section.QuickButtons>
+        </Section.Title>
+        <ContainerBox vertical column gap={5}>
           <FormGroup label="Branch" field="branchId" clearable={!!branchId}>
             <SelectBranches
               label="Choose Branch"
