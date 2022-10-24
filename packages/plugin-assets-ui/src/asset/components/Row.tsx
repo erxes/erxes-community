@@ -60,7 +60,7 @@ class Row extends React.Component<Props> {
               <MoreContainer>
                 <Button btnStyle="link" onClick={handleParent}>
                   <Tip text="See Child Assets">
-                    <Icon icon="list-2" />
+                    <Icon icon="sitemap-1" />
                   </Tip>
                 </Button>
                 <Badge>{childAssetCount}</Badge>

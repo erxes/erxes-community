@@ -67,14 +67,6 @@ class Row extends React.Component<Props> {
       </Button>
     );
 
-    const addTrigger = (
-      <Button btnStyle="link" style={{ padding: 0 }}>
-        <Tip text="add to new movement" placement="bottom">
-          <Icon icon="file-plus-alt" />
-        </Tip>
-      </Button>
-    );
-
     return (
       <tr>
         <td>{assetName}</td>

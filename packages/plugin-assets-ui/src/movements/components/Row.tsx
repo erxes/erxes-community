@@ -1,4 +1,4 @@
-import { Button, FormControl, ModalTrigger } from '@erxes/ui/src';
+import { Button, FormControl, ModalTrigger, Tip } from '@erxes/ui/src';
 import moment from 'moment';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -50,7 +50,9 @@ class Row extends React.Component<Props> {
         <td>{moment(createdAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>{moment(modifiedAt || '').format('YYYY-MM-DD HH:mm')}</td>
         <td>
-          <Button btnStyle="link" icon="list-2" onClick={handleItems} />
+          <Tip text="see movement assets">
+            <Button btnStyle="link" icon="list-2" onClick={handleItems} />
+          </Tip>
         </td>
       </tr>
     );

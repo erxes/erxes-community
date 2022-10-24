@@ -51,7 +51,11 @@ class MovementItem extends React.Component<Props, State> {
   }
 
   renderForm() {
-    const trigger = <Button btnStyle="success">Add Movement</Button>;
+    const trigger = (
+      <Button btnStyle="success" icon="plus-circle">
+        Add Movement
+      </Button>
+    );
 
     const content = props => {
       const updatedProps = {

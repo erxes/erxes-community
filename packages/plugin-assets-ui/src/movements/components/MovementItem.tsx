@@ -45,7 +45,8 @@ class MovementItems extends React.Component<Props> {
       current,
       removeRow,
       isChecked,
-      onChangeBulkItems
+      onChangeBulkItems,
+      selectedItems
     } = this.props;
 
     const {
@@ -177,6 +178,7 @@ class MovementItems extends React.Component<Props> {
                         name="assetId"
                         onSelect={changeRowItem}
                         initialValue={assetId}
+                        skip={selectedItems?.filter(item => item !== assetId)}
                         customOption={{ value: '', label: 'Choose Asset' }}
                       />
                     </ItemRow>
