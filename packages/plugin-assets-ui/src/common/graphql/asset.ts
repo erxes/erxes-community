@@ -1,7 +1,6 @@
 import { isEnabled } from '@erxes/ui/src/utils/core';
 export const assetParamsDef = `
   $name: String,
-  $type: String,
   $categoryId: String,
   $parentId: String,
   $description: String,
@@ -15,7 +14,6 @@ export const assetParamsDef = `
 `;
 export const assetParams = `
   name: $name,
-  type: $type,
   categoryId: $categoryId,
   parentId: $parentId,
   description: $description,
@@ -63,7 +61,6 @@ const vendorField = `
 export const assetFields = `
   _id
   name
-  type
   code
   order
   categoryId

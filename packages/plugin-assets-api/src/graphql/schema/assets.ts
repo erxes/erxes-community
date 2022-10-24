@@ -34,7 +34,6 @@ export const types = contactsAvailable => `
     name: String
     code: String
     order: String
-    type: String
     description: String
     unitPrice: Float
     categoryId: String
@@ -57,7 +56,6 @@ export const types = contactsAvailable => `
 
 export const queries = `
     assets(
-      type: String,
       categoryId: String,
       parentId: String,
       searchValue: String,
@@ -68,7 +66,13 @@ export const queries = `
       boardId: String,
       ignoreIds:[String]
     ): [Asset]
-    assetsTotalCount(type: String): Int
+    assetsTotalCount(
+      categoryId: String,
+      parentId: String,
+      searchValue: String,
+      page: Int,
+      perPage: Int ids: [String],
+    ): Int
     assetDetail(_id: String): Asset
     assetCategories(parentId: String, searchValue: String, status: String): [AssetCategory]
     assetCategoryDetail(_id: String): AssetCategory

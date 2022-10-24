@@ -2,7 +2,6 @@ import { assetFields } from '../../common/graphql/asset';
 
 const assets = `
   query assets(
-    $type: String,
     $parentId: String,
     $categoryId: String,
     $searchValue: String,
@@ -14,7 +13,6 @@ const assets = `
     $ignoreIds: [String]
   ) {
     assets(
-      type: $type,
       categoryId: $categoryId,
       parentId: $parentId,
       searchValue: $searchValue,
@@ -31,8 +29,20 @@ const assets = `
 `;
 
 const assetsCount = `
-  query assetsTotalCount($type: String) {
-    assetsTotalCount(type: $type)
+  query assetsTotalCount(
+    $parentId: String,
+    $categoryId: String,
+    $searchValue: String,
+    $perPage: Int,
+    $page: Int $ids: [String],
+  ) {
+    assetsTotalCount(
+      categoryId: $categoryId,
+      parentId: $parentId,
+      searchValue: $searchValue,
+      perPage: $perPage,
+      page: $page ids: $ids,
+    )
   }
 `;
 

@@ -11,7 +11,6 @@ export const assetParams = `
   name: String,
   categoryId: String,
   parentId: String,
-  type: String,
   description: String,
   unitPrice: Float,
   code: String,

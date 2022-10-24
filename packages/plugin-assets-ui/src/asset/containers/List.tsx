@@ -137,8 +137,18 @@ export default withProps<Props>(
         fetchPolicy: 'network-only'
       })
     }),
-    graphql(gql(queries.assetsCount), {
-      name: 'assetsCount'
+    graphql<Props>(gql(queries.assetsCount), {
+      name: 'assetsCount',
+      options: ({ queryParams }) => ({
+        variables: {
+          categoryId: queryParams?.categoryId,
+          parentId: queryParams?.parentId,
+          searchValue: queryParams?.searchValue,
+          type: queryParams?.type,
+          ...generatePaginationParams(queryParams || {})
+        },
+        fetchPolicy: 'network-only'
+      })
     }),
     graphql<Props>(gql(queries.assetDetail), {
       name: 'assetDetailQuery',

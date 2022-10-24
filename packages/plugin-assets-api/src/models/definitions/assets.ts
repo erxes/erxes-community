@@ -1,10 +1,6 @@
 import { attachmentSchema, customFieldSchema } from '@erxes/api-utils/src/types';
 import { Schema } from 'mongoose';
-import {
-  ASSET_CATEGORY_STATUSES,
-  ASSET_STATUSES,
-  ASSET_TYPES
-} from '../../common/constant/asset';
+import { ASSET_CATEGORY_STATUSES, ASSET_STATUSES } from '../../common/constant/asset';
 import { field, schemaWrapper } from './utils';
 
 export const assetCategoriesSchema = schemaWrapper(
@@ -41,12 +37,6 @@ export const assetSchema = schemaWrapper(
     order: field({ type: String, label: 'Order' }),
     categoryId: field({ type: String, optional: true, label: 'Category' }),
     parentId: field({ type: String, optional: true, label: 'Parent' }),
-    type: field({
-      type: String,
-      enum: ASSET_TYPES.ALL,
-      default: ASSET_TYPES.ASSET,
-      label: 'Type'
-    }),
     description: field({ type: String, optional: true, label: 'Description' }),
     unitPrice: field({ type: Number, optional: true, label: 'Unit price' }),
     customFieldsData: field({

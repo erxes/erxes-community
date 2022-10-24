@@ -14,7 +14,7 @@ import { IOption, IQueryParams } from '@erxes/ui/src/types';
 import React from 'react';
 import { queries as assetCategoryQueries } from '../asset/category/graphql';
 import { queries as assetQueries } from '../asset/graphql';
-import { ASSET_CATEGORY_STATUS_FILTER, ASSET_TYPE_CHOISES } from './constant';
+import { ASSET_CATEGORY_STATUS_FILTER } from './constant';
 import { CommonFormGroupTypes, IAsset, IAssetCategoryTypes } from './types';
 import { queries as movementQueries } from '../movements/graphql';
 import { queries as movementItemQueries } from '../movements/items/graphql';
@@ -151,19 +151,6 @@ export const assetStatusChoises = __ => {
     options.push({
       value: key,
       label: __(ASSET_CATEGORY_STATUS_FILTER[key])
-    });
-  }
-
-  return options;
-};
-
-export const asssetTypeChoises = __ => {
-  const options: Array<{ value: string; label: string }> = [];
-
-  for (const key of Object.keys(ASSET_TYPE_CHOISES)) {
-    options.push({
-      value: key,
-      label: __(ASSET_TYPE_CHOISES[key])
     });
   }
 

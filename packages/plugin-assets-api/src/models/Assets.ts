@@ -145,7 +145,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
     }
 
     public static async mergeAssets(assetIds: string[], assetFields: IAsset) {
-      const fields = ['name', 'code', 'unitPrice', 'categoryId', 'type'];
+      const fields = ['name', 'code', 'unitPrice', 'categoryId'];
 
       for (const field of fields) {
         if (!assetFields[field]) {
@@ -155,7 +155,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
 
       let customFieldsData: ICustomField[] = [];
       const name: string = assetFields.name || '';
-      const type: string = assetFields.type || '';
       const description: string = assetFields.description || '';
       const categoryId: string = assetFields.categoryId || '';
       const vendorId: string = assetFields.vendorId || '';
@@ -183,7 +182,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         customFieldsData,
         mergedIds: assetIds,
         name,
-        type,
         description,
         categoryId,
         vendorId

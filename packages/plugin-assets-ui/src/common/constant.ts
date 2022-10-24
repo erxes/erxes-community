@@ -6,12 +6,6 @@ export const ASSET_CATEGORY_STATUSES = [
   { label: 'Archived', value: 'archived' }
 ];
 
-export const TYPES = {
-  ASSET: 'asset',
-  SERVICE: 'service',
-  ALL: ['asset', 'service']
-};
-
 export const ASSET_INFO = {
   name: 'Name',
   type: 'Type',
@@ -32,40 +26,12 @@ export const ASSET_INFO = {
   ]
 };
 
-export const ASSET_TYPE_CHOISES = {
-  asset: 'Asset',
-  service: 'Service'
-};
-
 export const ASSET_CATEGORY_STATUS_FILTER = {
   disabled: 'Disabled',
   archived: 'Archived'
 };
 
-export const breadcrumb = [
-  { title: __('Settings'), link: '/settings' },
-  { title: __('Assets') }
-];
-
-export const MOVEMENT_TYPES = [];
-
-export const USER_TYPES = [
-  {
-    label: 'Team Member',
-    key: 'TeamMember',
-    name: 'teamMemberId'
-  },
-  {
-    label: 'Customer',
-    key: 'Customer',
-    name: 'customerId'
-  },
-  {
-    label: 'Company',
-    key: 'Company',
-    name: 'compnayId'
-  }
-];
+export const breadcrumb = [{ title: __('Settings'), link: '/settings' }, { title: __('Assets') }];
 
 export const menuMovements = [
   { title: 'Movements', link: '/asset-movements' },

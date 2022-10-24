@@ -11,17 +11,9 @@ export const ASSET_STATUSES = {
   ALL: ['active', 'deleted']
 };
 
-export const ASSET_TYPES = {
-  ASSET: 'asset',
-  SERVICE: 'service',
-  ALL: ['asset', 'service']
-};
-
-
 export const ASSET_INFO = {
   code: 'Code',
   name: 'Name',
-  type: 'Type',
   category: 'Category',
   parent: 'Parent',
   vendor: 'Vendor',
@@ -31,7 +23,6 @@ export const ASSET_INFO = {
   ALL: [
     { field: 'code', label: 'Code' },
     { field: 'name', label: 'Name' },
-    { field: 'type', label: 'Type' },
     { field: 'category', label: 'Category' },
     { field: 'parent', label: 'Parent' },
     { field: 'vendor', label: 'Vendor' },
