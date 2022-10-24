@@ -24,7 +24,7 @@ type FinalProps = {
   currentUser: IUser;
 } & Props;
 
-const AssetDetailsContainer = (props: FinalProps) => {
+const AssetDetailContainer = (props: FinalProps) => {
   const { assetDetailQuery, currentUser } = props;
 
   if (assetDetailQuery.loading) {
@@ -57,5 +57,5 @@ export default withProps<Props>(
         }
       })
     })
-  )(AssetDetailsContainer)
+  )(AssetDetailContainer)
 );

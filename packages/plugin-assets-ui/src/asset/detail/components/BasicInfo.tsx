@@ -44,7 +44,7 @@ class BasicInfo extends React.Component<Props> {
       <li>
         <FieldStyle>{__(`Vendor`)}</FieldStyle>
 
-        <Link to={`/companies/details/${vendor._id}`}>
+        <Link to={`/companies/detail/${vendor._id}`}>
           <SidebarCounter>{vendor.primaryName || ''}</SidebarCounter>
         </Link>
       </li>

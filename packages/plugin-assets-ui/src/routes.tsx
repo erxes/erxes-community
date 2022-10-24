@@ -12,54 +12,29 @@ const AssetMovements = asyncComponent(() =>
 );
 
 const AssetMovementItems = asyncComponent(() =>
-  import(
-    /* webpackChunkName: "List - Asset Movement Item" */ './movements/items/containers/List'
-  )
+  import(/* webpackChunkName: "List - Asset Movement Item" */ './movements/items/containers/List')
 );
 
-const AssetDetails = asyncComponent(() =>
-  import(
-    /* webpackChunkName: "List - Assets" */ './asset/detail/containers/Details'
-  )
+const AssetDetail = asyncComponent(() =>
+  import(/* webpackChunkName: "List - Assets" */ './asset/detail/containers/Detail')
 );
 
 const assets = ({ history, location }) => {
-  return (
-    <AssetList
-      history={history}
-      queryParams={queryString.parse(location.search)}
-    />
-  );
+  return <AssetList history={history} queryParams={queryString.parse(location.search)} />;
 };
 
-const details = ({ history, location, match }) => {
+const detail = ({ history, location, match }) => {
   const id = match.params.id;
 
-  return (
-    <AssetDetails
-      history={history}
-      queryParams={queryString.parse(location.search)}
-      id={id}
-    />
-  );
+  return <AssetDetail history={history} queryParams={queryString.parse(location.search)} id={id} />;
 };
 
 const movements = props => {
-  return (
-    <AssetMovements
-      {...props}
-      queryParams={queryString.parse(location.search)}
-    />
-  );
+  return <AssetMovements {...props} queryParams={queryString.parse(location.search)} />;
 };
 
 const movementItems = props => {
-  return (
-    <AssetMovementItems
-      {...props}
-      queryParams={queryString.parse(location.search)}
-    />
-  );
+  return <AssetMovementItems {...props} queryParams={queryString.parse(location.search)} />;
 };
 
 const routes = () => {
@@ -67,17 +42,13 @@ const routes = () => {
     <React.Fragment>
       <Route path="/settings/assets/" exact component={assets} />
       <Route
-        path="/settings/assets/details/:id"
+        path="/settings/assets/detail/:id"
         exact={true}
-        key="/settings/assets/details/:id"
-        component={details}
+        key="/settings/assets/detail/:id"
+        component={detail}
       />
       <Route path="/asset-movements" exact={true} component={movements} />
-      <Route
-        path="/asset-movement-items"
-        exact={true}
-        component={movementItems}
-      />
+      <Route path="/asset-movement-items" exact={true} component={movementItems} />
     </React.Fragment>
   );
 };

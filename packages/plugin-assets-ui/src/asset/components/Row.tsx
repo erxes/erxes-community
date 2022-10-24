@@ -30,7 +30,7 @@ class Row extends React.Component<Props> {
     };
 
     const onTrClick = () => {
-      history.push(`/settings/assets/details/${asset._id}`);
+      history.push(`/settings/assets/detail/${asset._id}`);
     };
 
     const handleParent = () => {

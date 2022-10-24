@@ -239,8 +239,6 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
 
-    static async checkCodeDuplication(code: string) {}
-
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
       const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
 
