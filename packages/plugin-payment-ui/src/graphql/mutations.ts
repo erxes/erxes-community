@@ -32,7 +32,9 @@ const paymentRemove = gql`
 
 const createInvoice = gql`
 mutation createInvoice(${createInvoiceParamDefs}) {
-  createInvoice(${createInvoiceParams})
+  createInvoice(${createInvoiceParams}){
+    _id
+  }
 }
 `;
 

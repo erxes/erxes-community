@@ -6,7 +6,7 @@ module.exports = {
     './routes': './src/routes.tsx',
     './selectPayments': './src/containers/SelectPayments.tsx',
     './invoiceSection': './src/containers/invoice/InvoiceSection.tsx',
-    './invoiceForm': './src/containers/invoice/InvoiceForm.tsx',
+    './invoiceTrigger': './src/containers/invoice/InvoiceTrigger.tsx',
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
@@ -14,7 +14,7 @@ module.exports = {
     module: './routes'
   },
   extendFormOptions: './selectPayments',
-  extendEditorToolbar: './invoiceForm',
+  extendEditorToolbar: './invoiceTrigger',
   menus: [
     {
       text: 'Invoices',

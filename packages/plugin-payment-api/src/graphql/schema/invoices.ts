@@ -59,12 +59,12 @@ const mutationParams = `
   companyId: String
   contentType: String
   contentTypeId: String
-  redirectUri: String
   paymentIds: [String]
 `;
 
 export const mutations = `
-  generateInvoiceUrl(${mutationParams}): String
+  generateInvoiceUrl(${mutationParams} redirectUri: String): String
+  createInvoice(${mutationParams}): Invoice
 `;
 
 export const queries = `

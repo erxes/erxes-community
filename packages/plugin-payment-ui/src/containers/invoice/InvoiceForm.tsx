@@ -4,6 +4,7 @@ import React from 'react';
 
 import InvoiceForm from '../../components/invoice/InvoiceForm';
 import { mutations } from '../../graphql';
+import { getGqlString } from '../utils';
 
 type Props = {
   contentType: string;
@@ -27,7 +28,9 @@ function InvoiceFormContainer(props: Props) {
   }: IButtonMutateProps) => {
     return (
       <ButtonMutate
-        mutation={object ? mutations.createInvoice : mutations.createInvoice}
+        mutation={getGqlString(
+          object ? mutations.createInvoice : mutations.createInvoice
+        )}
         variables={values}
         callback={callback}
         refetchQueries={[]}
@@ -36,7 +39,7 @@ function InvoiceFormContainer(props: Props) {
         icon="check-circle"
         successMessage={`You successfully ${
           object ? 'updated' : 'added'
-        } a place`}
+        } a invoice`}
       />
     );
   };

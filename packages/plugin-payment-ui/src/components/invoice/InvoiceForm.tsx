@@ -1,26 +1,16 @@
-import Box from '@erxes/ui/src/components/Box';
 import Button from '@erxes/ui/src/components/Button';
-import EmptyState from '@erxes/ui/src/components/EmptyState';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import Icon from '@erxes/ui/src/components/Icon';
-import Label from '@erxes/ui/src/components/Label';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import Table from '@erxes/ui/src/components/table';
-import Tip from '@erxes/ui/src/components/Tip';
-import { SectionBodyItem } from '@erxes/ui/src/layout/styles';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { __ } from '@erxes/ui/src/utils/core';
 import React, { useState } from 'react';
 
 import { IInvoice } from '../../types';
+import SelectPayments from '../../containers/SelectPayments';
 
-export type Props = {
-  invoice?: IInvoice;
-
+type Props = {
   contentTypeId: string;
   contentType: string;
   customerId?: string;
@@ -29,14 +19,18 @@ export type Props = {
   phone?: string;
   email?: string;
 
+  invoice?: IInvoice;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
 };
 
-const InvoiceForm = (props: Props) => {
+const PlaceForm = (props: Props) => {
   const { invoice } = props;
+  const [amount, setAmount] = useState<number>(
+    (invoice && invoice.amount) || 0
+  );
 
-  const [amount, setAmount] = useState(invoice ? invoice.amount : 0);
+  const [paymentIds, setPaymentIdes] = useState<string[]>([]);
 
   const generateDoc = () => {
     const finalValues: any = {};
@@ -45,7 +39,17 @@ const InvoiceForm = (props: Props) => {
       finalValues._id = invoice._id;
     }
 
-    // finalValues.name = name;
+    finalValues.amount = amount;
+    finalValues.contentTypeId = props.contentTypeId;
+    finalValues.contentType = props.contentType;
+    finalValues.customerId = props.customerId;
+    finalValues.companyId = props.companyId;
+    finalValues.description = props.description;
+    finalValues.phone = props.phone;
+    finalValues.email = props.email;
+    finalValues.paymentIds = paymentIds;
+
+    console.log(finalValues);
 
     return {
       ...finalValues
@@ -54,6 +58,11 @@ const InvoiceForm = (props: Props) => {
 
   const onChangeInput = e => {
     const { id, value } = e.target;
+    setAmount(Number(value));
+  };
+
+  const onChangePayments = (values: string[]) => {
+    setPaymentIdes(values);
   };
 
   const renderContent = (formProps: IFormProps) => {
@@ -62,9 +71,16 @@ const InvoiceForm = (props: Props) => {
 
     return (
       <>
+        <SelectPayments
+          defaultValue={paymentIds}
+          description="Select payment methods"
+          isRequired={true}
+          onChange={onChangePayments}
+        />
+
         <FormGroup>
-          <ControlLabel>Name</ControlLabel>
-          <p>station name or place name</p>
+          <ControlLabel>Amount</ControlLabel>
+          <p> please </p>
           <FormControl
             {...formProps}
             id="amount"
@@ -75,6 +91,7 @@ const InvoiceForm = (props: Props) => {
             onChange={onChangeInput}
           />
         </FormGroup>
+
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal} icon="times-circle">
             Close
@@ -95,4 +112,4 @@ const InvoiceForm = (props: Props) => {
   return <Form renderContent={renderContent} />;
 };
 
-export default InvoiceForm;
+export default PlaceForm;

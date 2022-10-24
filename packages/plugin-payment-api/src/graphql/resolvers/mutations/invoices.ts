@@ -29,6 +29,10 @@ const mutations = {
     ).toString('base64');
 
     return `${MAIN_API_DOMAIN}/pl:payment/gateway?params=${base64}`;
+  },
+
+  async createInvoice(_root, params: InvoiceParams, { models }: IContext) {
+    return models.Invoices.create({ ...params, identifier: makeInvoiceNo(32) });
   }
 };
 
