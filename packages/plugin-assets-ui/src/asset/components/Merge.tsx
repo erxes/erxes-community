@@ -41,6 +41,10 @@ class AssetsMerge extends React.Component<Props, State> {
       selectedValues.categoryId = selectedValues.category._id;
     }
 
+    if (selectedValues.parent) {
+      selectedValues.parentId = selectedValues.parent._id;
+    }
+
     if (selectedValues.vendor) {
       selectedValues.vendorId = selectedValues.vendor._id;
     }
@@ -58,6 +62,13 @@ class AssetsMerge extends React.Component<Props, State> {
     const selectedValues = { ...this.state.selectedValues };
 
     if (type === 'plus-1') {
+      if (key === 'parent') {
+        delete selectedValues.category;
+      }
+      if (key === 'category') {
+        delete selectedValues.parent;
+      }
+
       selectedValues[key] = value;
 
       if (key === 'links') {
@@ -113,6 +124,9 @@ class AssetsMerge extends React.Component<Props, State> {
       case 'category':
         return this.renderCategoryInfo(value);
 
+      case 'parent':
+        return this.renderParentInfo(value);
+
       case 'vendor':
         return this.renderVendorInfo(value);
 
@@ -126,6 +140,15 @@ class AssetsMerge extends React.Component<Props, State> {
       <Info>
         <InfoTitle>{__('Name')}: </InfoTitle>
         <InfoDetail>{value.name}</InfoDetail>
+      </Info>
+    );
+  }
+
+  renderParentInfo(value) {
+    return (
+      <Info>
+        <InfoTitle>{__('Name')}</InfoTitle>
+        <InfoTitle>{value.name}</InfoTitle>
       </Info>
     );
   }

@@ -8,7 +8,6 @@ import Row from './Row';
 import SideBar from './Sidebar';
 type Props = {
   items: IMovementItem[];
-  refetch: () => void;
   totalCount: number;
   history: any;
   queryParams: any;
@@ -60,7 +59,7 @@ class MovementItem extends React.Component<Props, State> {
     const content = props => {
       const updatedProps = {
         ...props,
-        refetch: this.props.refetch
+        queryParams: this.props.queryParams || {}
       };
 
       return <Form {...updatedProps} />;
@@ -69,8 +68,10 @@ class MovementItem extends React.Component<Props, State> {
   }
 
   renderRow() {
-    const { items } = this.props;
-    return items.map(movement => <Row key={movement._id} item={movement} />);
+    const { items, queryParams } = this.props;
+    return items.map(movement => (
+      <Row key={movement._id} item={movement} queryParams={queryParams} />
+    ));
   }
 
   renderList() {

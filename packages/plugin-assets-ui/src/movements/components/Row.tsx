@@ -10,6 +10,7 @@ type Props = {
   history: any;
   isChecked: boolean;
   toggleBulk?: (movement: IMovementType, movementId: string, isChecked?: boolean) => void;
+  queryParams: any;
 };
 
 class Row extends React.Component<Props> {
@@ -60,7 +61,8 @@ class Row extends React.Component<Props> {
     const renderDetail = props => {
       const updatedProps = {
         ...props,
-        movementId: _id
+        movementId: _id,
+        queryParams: this.props.queryParams
       };
 
       return <Form {...updatedProps} />;

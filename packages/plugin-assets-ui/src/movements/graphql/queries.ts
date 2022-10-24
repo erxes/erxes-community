@@ -62,8 +62,8 @@ const movements = `
 }
 `;
 const movementsTotalCount = `
-  query AssetMovementTotalCount(${dateFilterParams}) {
-    assetMovementTotalCount(${dateFilterParamsDef})
+  query AssetMovementTotalCount(${dateFilterParams},${commonFilterParams}) {
+    assetMovementTotalCount(${dateFilterParamsDef},${commonFilterParamsDef})
   }
 `;
 

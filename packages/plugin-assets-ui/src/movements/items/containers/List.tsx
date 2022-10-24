@@ -30,18 +30,11 @@ class MovementItemsContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
-    const refetch = () => {
-      const { itemsQuery, itemsTotalCount } = this.props;
-      itemsQuery.refetch();
-      itemsTotalCount.refetch();
-    };
-
     const updatedProps = {
       items: itemsQuery.assetMovementItems || [],
       totalCount: itemsTotalCount.assetMovementItemsTotalCount,
       history,
-      queryParams,
-      refetch
+      queryParams
     };
 
     return <MovementItem {...updatedProps} />;

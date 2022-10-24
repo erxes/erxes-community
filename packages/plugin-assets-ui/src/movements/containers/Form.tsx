@@ -13,8 +13,7 @@ type Props = {
   movementId?: string;
   assetId?: string;
   closeModal: () => void;
-  refetch?: () => void;
-  refetchTotalCount?: () => void;
+  queryParams: any;
 };
 
 type FinalProps = {
@@ -27,15 +26,6 @@ class FormContainer extends React.Component<FinalProps> {
   }
 
   renderButton = ({ text, values, isSubmitted, callback, object }: IButtonMutateProps) => {
-    const afterSavedDb = () => {
-      const { refetch, refetchTotalCount, movementDetail } = this.props;
-
-      refetch && refetch();
-      refetchTotalCount && refetchTotalCount();
-      movementDetail && movementDetail.refetch();
-      callback && callback();
-    };
-
     let mutation = mutations.movementAdd;
     if (object) {
       mutation = mutations.movementEdit;
@@ -46,7 +36,7 @@ class FormContainer extends React.Component<FinalProps> {
         mutation={mutation}
         variables={values}
         callback={callback}
-        refetchQueries={movementRefetchQueries()}
+        refetchQueries={movementRefetchQueries(this.props.queryParams)}
         isSubmitted={isSubmitted}
         type="submit"
         uppercase={false}

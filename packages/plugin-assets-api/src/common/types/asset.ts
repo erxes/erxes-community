@@ -56,6 +56,7 @@ export interface IMovementItem {
   departmentId: string;
   teamMemberId: string;
   companyId: string;
+  movementId: string;
   sourceLocations: {
     branchId: string;
     departmentId: string;

@@ -168,22 +168,37 @@ export const getRefetchQueries = () => {
   ];
 };
 
-export const movementRefetchQueries = () => {
+export const movementRefetchQueries = queryParams => {
   return [
     {
-      query: gql(movementQueries.movements)
+      query: gql(movementQueries.movements),
+      variables: {
+        ...generateParams({ queryParams })
+      }
     },
     {
-      query: gql(movementQueries.movementsTotalCount)
+      query: gql(movementQueries.movementsTotalCount),
+      variables: {
+        ...generateParams({ queryParams })
+      }
     },
     {
-      query: gql(movementQueries.movementDetail)
+      query: gql(movementQueries.movementDetail),
+      variables: {
+        ...generateParams({ queryParams })
+      }
     },
     {
-      query: gql(movementItemQueries.items)
+      query: gql(movementItemQueries.items),
+      variables: {
+        ...generateParams({ queryParams })
+      }
     },
     {
-      query: gql(movementItemQueries.itemsTotalCount)
+      query: gql(movementItemQueries.itemsTotalCount),
+      variables: {
+        ...generateParams({ queryParams })
+      }
     }
   ];
 };

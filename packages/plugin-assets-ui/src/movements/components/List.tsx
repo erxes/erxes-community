@@ -24,7 +24,6 @@ type Props = {
   totalCount: number;
   loading: boolean;
   remove: (ids: string[]) => void;
-  refetch: () => void;
   history: any;
   queryParams: any;
 } & IRouterProps;
@@ -51,11 +50,11 @@ class List extends React.Component<Props, State> {
     </Button>
   );
   renderRightActionBarContent = props => {
-    const { refetch } = this.props;
+    const { queryParams } = this.props;
 
     const updatedProps = {
       ...props,
-      refetch
+      queryParams
     };
 
     return <Form {...updatedProps} />;
@@ -93,7 +92,7 @@ class List extends React.Component<Props, State> {
   }
 
   renderRow(props) {
-    const { movements, history } = this.props;
+    const { movements, history, queryParams } = this.props;
 
     const handleSelecteRow = (movement: IMovementType, movementId: string, isChecked?: boolean) => {
       const { selectedRows } = this.state;
@@ -114,6 +113,7 @@ class List extends React.Component<Props, State> {
         history={history}
         toggleBulk={handleSelecteRow}
         isChecked={props.bulk.includes(movement)}
+        queryParams={queryParams}
       />
     ));
   }

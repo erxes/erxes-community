@@ -6,6 +6,7 @@ import Form from '../../containers/Form';
 
 type Props = {
   item: IMovementItem;
+  queryParams: any;
 };
 
 class Row extends React.Component<Props> {
@@ -29,7 +30,8 @@ class Row extends React.Component<Props> {
       const updatedProps = {
         ...props,
         assetId,
-        movementId
+        movementId,
+        queryParams: this.props.queryParams || {}
       };
       return <Form {...updatedProps} />;
     };

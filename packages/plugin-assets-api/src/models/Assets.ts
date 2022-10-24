@@ -33,6 +33,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         throw new Error('Code must be unique');
       }
 
+      if (!doc.parentId && !doc.categoryId) {
+        throw new Error('You must choose  category or  parent');
+      }
+
       const parentAsset = await models.Assets.findOne({
         _id: doc.parentId
       }).lean();
@@ -139,13 +143,23 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
 
       const child_assets_ids = child_assets.map(asset => asset._id);
 
+      const movementItems = await models.MovementItems.find({
+        assetId: { $in: [...unUsedIds, ...child_assets_ids] }
+      });
+      const movement_ids = movementItems.map(movementItem => movementItem.movementId);
+      const movement_items_ids = movementItems.map(movementItem => movementItem._id);
+
+      await models.Movements.deleteMany({ _id: { $in: [...new Set(movement_ids)] } });
+      await models.MovementItems.deleteMany({ _id: { $in: movement_items_ids } });
+
       await models.Assets.deleteMany({ _id: { $in: child_assets_ids } });
 
       return response;
     }
 
     public static async mergeAssets(assetIds: string[], assetFields: IAsset) {
-      const fields = ['name', 'code', 'unitPrice', 'categoryId'];
+      const fields = ['name', 'code', 'unitPrice'];
+      const checkParent = [assetFields.parentId, assetFields.categoryId];
 
       for (const field of fields) {
         if (!assetFields[field]) {
@@ -153,10 +167,15 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         }
       }
 
+      if (!checkParent.find(i => i)) {
+        throw new Error(`Can not merge assets. Must choose Parent or Category field`);
+      }
+
       let customFieldsData: ICustomField[] = [];
       const name: string = assetFields.name || '';
       const description: string = assetFields.description || '';
-      const categoryId: string = assetFields.categoryId || '';
+      const categoryId = assetFields.categoryId || undefined;
+      const parentId = assetFields.parentId || undefined;
       const vendorId: string = assetFields.vendorId || '';
       const usedIds: string[] = [];
 
@@ -184,6 +203,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         name,
         description,
         categoryId,
+        parentId,
         vendorId
       });
 

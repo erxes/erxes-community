@@ -78,7 +78,7 @@ export const mutations = `
 `;
 export const queries = `
     assetMovements(${movementFilters},${commonFilterParams}):[Movement]
-    assetMovementTotalCount(${movementFilters}):Int
+    assetMovementTotalCount(${movementFilters},${commonFilterParams}):Int
     assetMovement(_id:String):Movement
     assetMovementItems(${movementFilters},${commonFilterParams}):[MovementItem]
     assetMovementItemsTotalCount(${movementFilters}):Int

@@ -36,17 +36,10 @@ class ListContainer extends React.Component<FinalProps> {
       confirm()
         .then(() => {
           this.props.movementRemove({ variables: { ids } }).then(() => {
-            movementsQuery.refetch();
-            movementsTotalCountQuery.refetch();
             Alert.success('Removed movement');
           });
         })
         .catch(error => Alert.error(error.message));
-    };
-
-    const refetch = () => {
-      movementsQuery.refetch();
-      movementsTotalCountQuery.refetch();
     };
 
     const updateProps = {
@@ -54,7 +47,6 @@ class ListContainer extends React.Component<FinalProps> {
       movements: movementsQuery.assetMovements,
       totalCount: movementsTotalCountQuery.assetMovementTotalCount,
       loading: movementsQuery.loading,
-      refetch,
       history,
       remove
     };
@@ -88,8 +80,8 @@ export default withProps(
     }),
     graphql<Props>(gql(mutations.movementRemove), {
       name: 'movementRemove',
-      options: () => ({
-        refetchQueries: movementRefetchQueries()
+      options: ({ queryParams }) => ({
+        refetchQueries: movementRefetchQueries(queryParams)
       })
     })
   )(ListContainer)
