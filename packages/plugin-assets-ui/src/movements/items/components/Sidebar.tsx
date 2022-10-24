@@ -102,6 +102,7 @@ class Sidebar extends React.Component<Props, State> {
 
       this.setState({ [name]: value });
       router.setParams(this.props.history, { [name]: value });
+      router.setParams(this.props.history, { page: 1 });
     };
 
     return (

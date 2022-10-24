@@ -44,6 +44,7 @@ export class SideBar extends React.Component<Props, State> {
     value = moment(value).format('YYYY/MM/DD hh:mm');
     this.setState({ [field]: value });
     router.setParams(this.props.history, { [field]: value });
+    router.setParams(this.props.history, { page: 1 });
   }
 
   handleValue(value, name) {
