@@ -1,7 +1,6 @@
-import { debugRequest, debugResponse, debugTwitter } from './debuggers';
-import Accounts from './models/Accounts';
-import Integrations from './models/Integrations';
-import { downloadAttachment, getEnv } from './utils';
+import { debugRequest, debugResponse, debugTwitter } from '../debuggers';
+import { Accounts, Integrations } from './models';
+import { downloadAttachment, getEnv } from '../utils';
 import * as twitterUtils from './api';
 import { ConversationMessages, Conversations } from './models';
 import receiveDms from './receiveDms';
@@ -149,9 +148,7 @@ const init = async app => {
       erxesApiId: integrationId
     });
 
-    const account: any = await Accounts.findOne({
-      _id: integration?.accountId
-    });
+    const account = await Accounts.findOne({ _id: integration.accountId });
 
     const recipientId = conversation.senderId;
 

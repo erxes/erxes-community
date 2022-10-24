@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import * as queryString from 'querystring';
 import * as request from 'request-promise';
 import { debugTwitter } from './debuggers';
-import { IAccount } from './models/Accounts';
+import { IAccount } from './models/definitions/twitter';
 import { getConfig, getEnv } from './utils';
 
 interface ITwitterConfig {

@@ -1,78 +1,3 @@
-const commonParamsDef = `
-  $name: String!,
-  $brandId: String!,
-  $languageCode: String,
-  $channelIds: [String]
-`;
-
-const commonParams = `
-  name: $name,
-  brandId: $brandId,
-  languageCode: $languageCode,
-  channelIds: $channelIds
-`;
-
-const mailParamsDef = `
-  $erxesApiId: String!,
-  $replyTo: [String],
-  $inReplyTo: String,
-  $headerId: String,
-  $threadId: String,
-  $messageId: String,
-  $references: [String]
-  $replyToMessageId: String,
-  $subject: String!,
-  $kind: String,
-  $body: String!,
-  $to: [String]!,
-  $cc: [String],
-  $bcc: [String] ,
-  $from: String!,
-  $shouldResolve: Boolean,
-  $attachments: [JSON],
-  $customerId: String
-`;
-
-const mailParams = `
-  erxesApiId: $erxesApiId,
-  replyTo: $replyTo,
-  inReplyTo: $inReplyTo,
-  headerId: $headerId,
-  threadId: $threadId,
-  messageId: $messageId,
-  kind: $kind,
-  references: $references,
-  replyToMessageId: $replyToMessageId,
-  subject: $subject,
-  body: $body,
-  to: $to,
-  cc: $cc,
-  bcc: $bcc,
-  from: $from,
-  shouldResolve: $shouldResolve,
-  attachments: $attachments,
-  customerId: $customerId
-`;
-
-const integrationSendMail = ` 
-  mutation integrationSendMail(${mailParamsDef}) {
-    integrationSendMail(${mailParams})
-  }
-`;
-
-const integrationsCreateMessenger = `
-  mutation integrationsCreateMessengerIntegration(${commonParamsDef}) {
-    integrationsCreateMessengerIntegration(${commonParams}) {
-      _id
-      brand {
-        _id
-        name
-        code
-      }
-    }
-  }
-`;
-
 const integrationsCreateExternalIntegration = `
   mutation integrationsCreateExternalIntegration($name: String!, $brandId: String!, $accountId: String, $kind: String!,$channelIds: [String], $data: JSON) {
     integrationsCreateExternalIntegration(name: $name, brandId: $brandId, accountId: $accountId, kind: $kind, channelIds: $channelIds, data: $data) {
@@ -89,14 +14,6 @@ const integrationsCreateExternalIntegration = `
 const integrationsEditCommonFields = `
   mutation integrationsEditCommonFields($_id: String!, $name: String!, $brandId: String!, $channelIds: [String], $data: JSON) {
     integrationsEditCommonFields(_id: $_id, name: $name, brandId: $brandId, channelIds: $channelIds, data: $data) {
-      _id
-    }
-  }
-`;
-
-const integrationsEditMessenger = `
-  mutation integrationsEditMessengerIntegration($_id: String!, ${commonParamsDef}) {
-    integrationsEditMessengerIntegration(_id: $_id, ${commonParams}) {
       _id
     }
   }
@@ -124,18 +41,6 @@ const integrationsSaveMessengerAppearance = `
 const integrationsRemove = `
   mutation integrationsRemove($_id: String!) {
     integrationsRemove(_id: $_id)
-  }
-`;
-
-const messengerAppSave = `
-  mutation messengerAppSave(
-    $integrationId: String!
-    $messengerApps: MessengerAppsInput
-  ) {
-    messengerAppSave(
-      integrationId: $integrationId
-      messengerApps: $messengerApps
-    )
   }
 `;
 
@@ -175,15 +80,11 @@ export default {
   integrationsArchive,
   integrationsRepair,
   integrationsUpdateConfigs,
-  integrationsCreateMessenger,
   integrationsCreateExternalIntegration,
   integrationsEditCommonFields,
-  integrationsEditMessenger,
   integrationsSaveMessengerConfigs,
   integrationsSaveMessengerAppearance,
   integrationsRemove,
   removeAccount,
-  integrationSendMail,
-  integrationsSendSms,
-  messengerAppSave
+  integrationsSendSms
 };
