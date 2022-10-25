@@ -212,21 +212,6 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
     const { detailLoading, categoryId } = this.props;
     const { riskAssessment } = this.state;
 
-    const CustomFormGroup = ({
-      children,
-      label,
-      required,
-      row,
-      spaceBetween
-    }: CustomFromGroupProps) => {
-      return (
-        <FormGroupRow horizontal={row} spaceBetween={spaceBetween}>
-          <ControlLabel required={required}>{label}</ControlLabel>
-          {children}
-        </FormGroupRow>
-      );
-    };
-
     if (detailLoading) {
       return <Spinner objective />;
     }
@@ -264,8 +249,9 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
     return (
       <>
         <FormGroup>
-          <ControlLabel>{__('Name')}</ControlLabel>
+          <ControlLabel required>{__('Name')}</ControlLabel>
           <FormControl
+            {...formProps}
             key="name"
             name="name"
             type="text"
@@ -277,6 +263,7 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
         <FormGroup>
           <ControlLabel>{__('Description')}</ControlLabel>
           <FormControl
+            {...formProps}
             name="description"
             componentClass="textarea"
             value={riskAssessment.description}
