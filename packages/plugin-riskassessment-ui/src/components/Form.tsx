@@ -282,7 +282,13 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
         </FormGroup>
         <FormGroup>
           <ControlLabel>{__('Calculate Methods')}</ControlLabel>
-          <Select options={calculateMethods} multi={false} onChange={handleChangeCalculateMethod} />
+          <Select
+            placeholder={__('Select Calculate Method')}
+            value={riskAssessment?.calculateMethod}
+            options={calculateMethods}
+            multi={false}
+            onChange={handleChangeCalculateMethod}
+          />
         </FormGroup>
         <FormWrapper>
           {['Name', 'Logic', 'Value', 'Status Color'].map(head => (
