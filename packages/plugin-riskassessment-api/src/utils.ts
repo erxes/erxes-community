@@ -14,7 +14,7 @@ export const validRiskAssessment = async params => {
 
   const { calculateLogics } = params;
 
-  if (!calculateLogics.length) {
+  if (!calculateLogics || !calculateLogics.length) {
     throw new Error('You must specify at least one logics to calculate the risk assessment');
   }
 
