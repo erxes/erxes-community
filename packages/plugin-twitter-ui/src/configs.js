@@ -4,8 +4,9 @@ module.exports = {
   port: 3015,
   exposes: {
     './routes': './src/routes.tsx',
-    './inboxIntegrationSettings': './src/components/Twitter.tsx',
-    './inboxIntegrationForm': './src/components/Twitter.tsx',
+    './inboxIntegrationTwitterSettings':
+      './src/components/IntegrationSettings.tsx',
+    './inboxIntegrationTwitterForm': './src/components/Twitter.tsx',
     './inboxConversationDetail': './src/components/Twitter.tsx'
   },
   routes: {
@@ -13,8 +14,8 @@ module.exports = {
     scope: 'twitter',
     module: './routes'
   },
-  inboxIntegrationSettings: './inboxIntegrationSettings',
-  inboxIntegrationForm: './inboxIntegrationForm',
+  inboxIntegrationTwitterSettings: './inboxIntegrationTwitterSettings',
+  inboxIntegrationTwitterForm: './inboxIntegrationTwitterForm',
   inboxConversationDetail: './inboxConversationDetail',
   inboxIntegration: {
     name: 'TWITTER',

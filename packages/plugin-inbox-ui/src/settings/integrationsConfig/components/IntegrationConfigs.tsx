@@ -205,7 +205,7 @@ class IntegrationConfigs extends React.Component<Props, State> {
         )} */}
 
         {loadDynamicComponent(
-          'inboxIntegrationSettings',
+          'inboxIntegrationTwitterSettings',
           {
             renderItem: this.renderItem
           },

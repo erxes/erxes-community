@@ -42,11 +42,8 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
 
   renderContent = (formProps: IFormProps) => {
     const { onRemoveAccount, onAccountSelect, renderButton } = this.props;
-    console.log(onAccountSelect, '==================');
-    // console.log(onRemoveAccount, '==================');
 
     const { values, isSubmitted } = formProps;
-    console.log(formProps, 'formProps:::::');
 
     return (
       <>
