@@ -7,6 +7,7 @@ export interface ICPNotification {
   link?: string;
   receiver?: string;
   notifType?: string;
+  clientPortalId: string;
 }
 
 export interface ICPNotificationDocument extends ICPNotification, Document {
@@ -34,5 +35,9 @@ export const cpNotificationSchema = new Schema({
   }),
   notifType: field({
     type: String
+  }),
+  clientPortalId: field({
+    type: String,
+    index: true
   })
 });
