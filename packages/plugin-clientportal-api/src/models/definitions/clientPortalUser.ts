@@ -39,6 +39,39 @@ export interface IUserDocument extends IUser, Document {
   isEmailVerified: boolean;
 }
 
+export const notificationConfigSchema = new Schema(
+  {
+    notifType: field({
+      type: String
+    }),
+    isAllowed: field({
+      type: Boolean,
+      default: true
+    })
+  },
+  { _id: false }
+);
+
+export const notificationSettingsSchema = new Schema(
+  {
+    receiveByEmail: field({
+      type: Boolean,
+      default: true
+    }),
+    receiveBySMS: field({
+      type: Boolean,
+      default: true
+    }),
+
+    // notification configs
+    configs: field({
+      type: [notificationConfigSchema],
+      default: []
+    })
+  },
+  { _id: false }
+);
+
 export const clientPortalUserSchema = new Schema({
   _id: field({ pkey: true }),
   type: field({
@@ -117,6 +150,12 @@ export const clientPortalUserSchema = new Schema({
     type: Number,
     label: 'Session count',
     optional: true
+  }),
+
+  // notification settings
+  notificationSettings: field({
+    type: notificationSettingsSchema,
+    default: {}
   })
 });
 
