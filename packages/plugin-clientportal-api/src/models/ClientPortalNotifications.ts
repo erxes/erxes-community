@@ -62,10 +62,13 @@ export const loadNotificationClass = (models: IModels) => {
       createdUserId: string
     ) {
       // if receiver is configured to get this notification
-      const config = await models.NotificationConfigurations.findOne({
-        user: doc.receiver,
-        notifType: doc.notifType
+      const user = await models.ClientPortalUsers.getUser({
+        _id: doc.receiver
       });
+
+      const config = user.notificationSettings.configs.find(
+        c => c.notifType === doc.notifType
+      );
 
       // receiver disabled this notification
       if (config && !config.isAllowed) {

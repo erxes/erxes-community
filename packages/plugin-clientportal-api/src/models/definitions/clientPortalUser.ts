@@ -3,6 +3,18 @@ import { Document, Schema } from 'mongoose';
 import { USER_LOGIN_TYPES } from './constants';
 import { field } from './utils';
 
+export interface INotificationConfig {
+  notifType: string;
+  label: string;
+  isAllowed: boolean;
+}
+
+export interface INotifcationSettings {
+  receiveByEmail: boolean;
+  receiveBySMS: boolean;
+  configs: INotificationConfig[];
+}
+
 export interface IUser {
   email?: string;
   phone?: string;
@@ -27,6 +39,7 @@ export interface IUser {
   isOnline: boolean;
   lastSeenAt: Date;
   sessionCount: number;
+  notificationSettings: INotifcationSettings;
 }
 
 export interface IUserDocument extends IUser, Document {
@@ -47,6 +60,9 @@ export const notificationConfigSchema = new Schema(
     isAllowed: field({
       type: Boolean,
       default: true
+    }),
+    label: field({
+      type: String
     })
   },
   { _id: false }
