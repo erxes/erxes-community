@@ -60,7 +60,7 @@ class IntegrationFormContainer extends React.Component<FinalProps, State> {
       onChannelChange: this.onChannelChange
     };
 
-    return loadDynamicComponent('inboxIntegrationTwitterForm', updatedProps);
+    return loadDynamicComponent('inboxIntegrationForm', updatedProps);
   }
 }
 

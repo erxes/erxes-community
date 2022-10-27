@@ -179,33 +179,8 @@ class IntegrationConfigs extends React.Component<Props, State> {
         <CollapseContent title="Telnyx SMS">
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
-
-        <CollapseContent title="Twitter">
-          <Info>
-            <a
-              target="_blank"
-              href="https://erxes.org/administrator/system-config#twitter"
-              rel="noopener noreferrer"
-            >
-              {__('Learn how to set Twitter Integration Variables')}
-            </a>
-          </Info>
-          {this.renderItem('TWITTER_CONSUMER_KEY')}
-          {this.renderItem('TWITTER_CONSUMER_SECRET')}
-          {this.renderItem('TWITTER_ACCESS_TOKEN')}
-          {this.renderItem('TWITTER_ACCESS_TOKEN_SECRET')}
-          {this.renderItem('TWITTER_WEBHOOK_ENV')}
-        </CollapseContent>
-        {/* {loadDynamicComponent(
-          'inboxIntegrationSettings',
-          {
-            renderItem: this.renderItem
-          },
-          true
-        )} */}
-
         {loadDynamicComponent(
-          'inboxIntegrationTwitterSettings',
+          'inboxIntegrationSettings',
           {
             renderItem: this.renderItem
           },

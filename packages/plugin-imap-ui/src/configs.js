@@ -1,12 +1,12 @@
 module.exports = {
-  name: "imap",
+  name: 'imap',
   scope: 'imap',
   port: 3014,
   exposes: {
     './routes': './src/routes.tsx',
-    "./inboxIntegrationSettings": "./src/components/IntegrationSettings.tsx",
-    "./inboxIntegrationForm": "./src/components/IntegrationForm.tsx",
-    "./inboxConversationDetail": "./src/components/ConversationDetail.tsx",
+    './inboxIntegrationSettings': './src/components/IntegrationSettings.tsx',
+    './inboxIntegrationForm': './src/components/IntegrationForm.tsx',
+    './inboxConversationDetail': './src/components/ConversationDetail.tsx'
   },
   routes: {
     url: 'http://localhost:3014/remoteEntry.js',
