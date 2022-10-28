@@ -5,7 +5,7 @@ import {
 } from './graphql/resolvers/customResolvers/deal';
 import { conversationConvertToCard } from './models/utils';
 import { getCardItem } from './utils';
-import { notifiedUserIds } from './graphql/utils';
+import { notifiedUserIds, createConformity } from './graphql/utils';
 import { generateModels } from './connectionResolver';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { publishHelper } from './graphql/resolvers/mutations/utils';
@@ -30,9 +30,29 @@ export const initBroker = async cl => {
   consumeRPCQueue('cards:tasks.create', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
+    const task = await models.Tasks.create(data);
+
+    if (data.customerId) {
+      const customer = await sendContactsMessage({
+        subdomain,
+        action: 'customers.findOne',
+        data: { _id: data.customerId },
+        isRPC: true,
+        defaultValue: null
+      });
+
+      if (customer) {
+        await createConformity(subdomain, {
+          customerIds: [customer._id],
+          mainType: 'task',
+          mainTypeId: task._id
+        });
+      }
+    }
+
     return {
       status: 'success',
-      data: await models.Tasks.create(data)
+      data: task
     };
   });
 

@@ -204,9 +204,11 @@ export const loadConformityClass = (models: IModels, subdomain: string) => {
     }
 
     public static async getConformities(doc: IGetConformityBulk) {
-      if (isUsingElk()) {
-        return findElk(subdomain, { ...getQueryConformities({ ...doc }) });
-      }
+      // if (isUsingElk()) {
+      //   return findElk(subdomain, { ...getQueryConformities({ ...doc }) });
+      // }
+
+      console.log('**********************', doc);
 
       return models.Conformities.aggregate([
         {
