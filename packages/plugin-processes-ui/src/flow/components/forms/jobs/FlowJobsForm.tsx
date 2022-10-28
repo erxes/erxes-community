@@ -4,11 +4,12 @@ import { __ } from '@erxes/ui/src/utils';
 import { FLOWJOB_TYPES, FLOWJOBS } from '../../../constants';
 import { FlowJobBox } from './styles';
 import { IJob } from '../../../types';
-import { ScrolledContent } from '../../../styles';
+import { ScrolledContent, CloseIcon } from '../../../styles';
 
 type Props = {
   flowJobsOfEnd?: IJob;
   onClickFlowJob: (flowJob: IJob) => void;
+  setMainState: (param: any) => void;
 };
 
 type State = {
@@ -25,32 +26,6 @@ class FlowJobsForm extends React.Component<Props, State> {
       isFavourite: false
     };
   }
-
-  tabOnClick = (currentTab: string) => {
-    this.setState({ currentTab });
-  };
-
-  onFavourite = (flowJob, e) => {
-    e.stopPropagation();
-
-    this.setState({ isFavourite: !this.state.isFavourite });
-
-    const flowJobsLocalStorage =
-      localStorage.getItem('automations_favourite_flowJobs') || '[]';
-
-    let flowJobs = JSON.parse(flowJobsLocalStorage);
-
-    if (flowJobs.find(item => item.type === flowJob.type)) {
-      flowJobs = flowJobs.filter(item => item.type !== flowJob.type);
-    } else {
-      flowJobs.push(flowJob);
-    }
-
-    localStorage.setItem(
-      'automations_favourite_flowJobs',
-      JSON.stringify(flowJobs)
-    );
-  };
 
   renderBox(flowJob, index) {
     const { flowJobsOfEnd, onClickFlowJob } = this.props;
@@ -89,6 +64,17 @@ class FlowJobsForm extends React.Component<Props, State> {
   render() {
     return (
       <>
+        <CloseIcon
+          onClick={() => {
+            this.props.setMainState({
+              usedPopup: false,
+              showDrawer: false
+            });
+          }}
+        >
+          {__('Close')}
+          <Icon icon="angle-double-right" size={20} />
+        </CloseIcon>
         <ScrolledContent>{this.renderContent()}</ScrolledContent>
       </>
     );

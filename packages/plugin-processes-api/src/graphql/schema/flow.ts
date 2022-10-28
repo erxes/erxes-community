@@ -14,6 +14,8 @@ export const types = `
     jobs: JSON,
     jobCount: Int,
     flowValidation: String
+    needProducts: JSON
+    resultProducts: JSON
   }
 
   input JobInput {

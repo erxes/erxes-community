@@ -15,6 +15,7 @@ import {
   ActionBarButtonsWrapper,
   BackButton,
   BackIcon,
+  CloseIcon,
   Container,
   FlowFormContainer,
   RightDrawerContainer,
@@ -134,7 +135,7 @@ class FlowForm extends React.Component<Props, State> {
 
   componentDidMount() {
     this.connectInstance();
-    document.addEventListener('click', this.handleClickOutside, true);
+    // document.addEventListener('click', this.handleClickOutside, true);
   }
 
   componentDidUpdate(_prevState) {
@@ -610,6 +611,16 @@ class FlowForm extends React.Component<Props, State> {
     if (showFlowJob && activeFlowJob) {
       return (
         <>
+          <CloseIcon
+            onClick={() => {
+              this.setState({
+                showDrawer: false
+              });
+            }}
+          >
+            {__('Close')}
+            <Icon icon="angle-double-right" size={20} />
+          </CloseIcon>
           <BackIcon onClick={onBackAction}>
             <Icon icon="angle-left" size={20} /> {__('Back to jobs')}
           </BackIcon>
@@ -629,6 +640,7 @@ class FlowForm extends React.Component<Props, State> {
       <FlowJobsForm
         onClickFlowJob={this.onClickFlowJob}
         flowJobsOfEnd={flowJobs.find(fj => fj.type === FLOWJOB_TYPES.ENDPOINT)}
+        setMainState={this.setMainState}
       />
     );
   }

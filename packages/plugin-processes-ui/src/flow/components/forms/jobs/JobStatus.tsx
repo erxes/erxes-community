@@ -4,7 +4,7 @@ import { __ } from '@erxes/ui/src/utils';
 import { DisabledSpan } from '../../../styles';
 import { FLOWJOB_TYPES } from '../../../../flow/constants';
 import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
-import { IJob } from '../../../types';
+import { IFlowDocument, IJob } from '../../../types';
 import { IJobRefer } from '../../../../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
 
@@ -14,23 +14,30 @@ type Props = {
   flowJobs: IJob[];
   setUsedPopup: (check: boolean) => void;
   jobRefers: IJobRefer[];
+  subFlows: IFlowDocument[];
   products: IProduct[];
 };
 
 type State = {
   jobReferById: any;
   productById: any;
+  subFlowById: any;
 };
 
 class JobStatus extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { jobRefers, products } = this.props;
+    const { jobRefers, products, subFlows } = this.props;
 
     const jobReferById = {};
     for (const jobRefer of jobRefers) {
       jobReferById[jobRefer._id] = jobRefer;
+    }
+
+    const subFlowById = {};
+    for (const flow of subFlows) {
+      subFlowById[flow._id] = flow;
     }
 
     const productById = {};
@@ -40,6 +47,7 @@ class JobStatus extends React.Component<Props, State> {
 
     this.state = {
       jobReferById,
+      subFlowById,
       productById
     };
   }
@@ -48,6 +56,7 @@ class JobStatus extends React.Component<Props, State> {
     const matchProductIds = matchProducts.length
       ? matchProducts.map(p => p.product._id)
       : [];
+
     return products.map(product => {
       if (!product.product) {
         return <li>Unknown product</li>;
@@ -74,7 +83,7 @@ class JobStatus extends React.Component<Props, State> {
     match?: { jobs: IJob[]; type: string },
     kind = 'result'
   ) {
-    const { jobReferById, productById } = this.state;
+    const { jobReferById, productById, subFlowById } = this.state;
     const jobConfig = job.config;
     let matchProducts: any[] = [];
     if (match) {
@@ -106,7 +115,7 @@ class JobStatus extends React.Component<Props, State> {
       }
     }
 
-    if (!jobConfig.jobReferId && !jobConfig.productId) {
+    if (!jobConfig.jobReferId && !jobConfig.productId && !jobConfig.subFlowId) {
       return (
         <ul key={Math.random()}>
           <b>{title}</b>
@@ -121,8 +130,18 @@ class JobStatus extends React.Component<Props, State> {
       if ([FLOWJOB_TYPES.JOB, FLOWJOB_TYPES.ENDPOINT].includes(job.type)) {
         const jobRefer = jobReferById[jobConfig.jobReferId] || {};
         products =
-          kind === 'need' ? jobRefer.needProducts : jobRefer.resultProducts;
+          kind === 'need'
+            ? jobRefer.needProducts || []
+            : jobRefer.resultProducts || [];
       }
+    }
+
+    if (jobConfig.subFlowId && FLOWJOB_TYPES.FLOW === job.type) {
+      const subFlow = subFlowById[jobConfig.subFlowId] || {};
+      products =
+        kind === 'need'
+          ? subFlow.needProducts || []
+          : subFlow.resultProducts || [];
     }
 
     if (jobConfig.productId) {

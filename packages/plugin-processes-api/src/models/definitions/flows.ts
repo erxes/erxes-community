@@ -9,6 +9,7 @@ export interface IJob {
   config: {
     jobReferId?: string;
     productId?: string;
+    subFlowId?: string;
     inBranchId: string;
     outBranchId: string;
     inDepartmentId: string;

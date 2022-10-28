@@ -1,6 +1,7 @@
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IJobRefer } from '../job/types';
 import { IProduct } from '@erxes/ui-products/src/types';
+import { IProductsData } from '../types';
 
 export type IFlowCategory = {
   _id: string;
@@ -19,7 +20,7 @@ export type IFlowCategory = {
 interface IConfig {
   jobReferId?: string;
   productId?: string;
-  flowId?: string;
+  subFlowId?: string;
 
   quantity?: number;
 
@@ -54,6 +55,8 @@ export interface IFlow {
   status: string;
   flowValidation?: string;
   jobs?: IJob[];
+  needProducts?: IProductsData[];
+  resultProducts?: IProductsData[];
 }
 
 export interface IFlowDocument extends IFlow, Document {
@@ -63,12 +66,19 @@ export interface IFlowDocument extends IFlow, Document {
   updatedAt?: Date;
   updatedBy?: string;
   jobCount: number;
+  needProducts?: IProductsData[];
+  resultProducts?: IProductsData[];
 }
 
 // FLOW
 
 export type FlowsQueryResponse = {
   flows: IFlowDocument[];
+  refetch: (variables?: {
+    searchValue?: string;
+    perPage?: number;
+    categoryId?: string;
+  }) => void;
 } & QueryResponse;
 
 export type FlowsAllQueryResponse = {

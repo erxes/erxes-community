@@ -13,6 +13,7 @@ export const flowFields = `
 `;
 
 const flowsQueryDefs = `
+  $ids: [String]
   $categoryId: String,
   $searchValue: String,
   $branchId: String,
@@ -22,6 +23,7 @@ const flowsQueryDefs = `
 `;
 
 const flowsQueryParams = `
+  ids: $ids,
   categoryId: $categoryId,
   searchValue: $searchValue,
   branchId: $branchId,
@@ -31,11 +33,21 @@ const flowsQueryParams = `
 `;
 
 const flows = `
-query flows($page: Int, $perPage: Int, ${flowsQueryDefs}) {
-  flows(page: $page, perPage: $perPage, ${flowsQueryParams}) {
-    ${flowFields}
+  query flows($page: Int, $perPage: Int, ${flowsQueryDefs}) {
+    flows(page: $page, perPage: $perPage, ${flowsQueryParams}) {
+      ${flowFields}
+    }
   }
-}
+`;
+
+const subFlows = `
+  query flows($page: Int, $perPage: Int, ${flowsQueryDefs}) {
+    flows(page: $page, perPage: $perPage, ${flowsQueryParams}) {
+      ${flowFields}
+      needProducts
+      resultProducts
+    }
+  }
 `;
 
 const flowsAll = `
@@ -89,6 +101,7 @@ export default {
   flowCategoriesTotalCount,
 
   flows,
+  subFlows,
   flowsAll,
   flowDetail,
   flowTotalCount
