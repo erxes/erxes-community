@@ -17,7 +17,7 @@ module.exports = {
   inboxIntegrationForm: './inboxIntegrationForm',
   inboxConversationDetail: './inboxConversationDetail',
   inboxIntegration: {
-    name: 'TWITTER',
+    name: 'Twitter',
     description: '',
     inMessenger: false,
     isAvailable: true,

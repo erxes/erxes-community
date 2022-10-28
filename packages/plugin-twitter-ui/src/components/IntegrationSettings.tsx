@@ -2,42 +2,23 @@ import CollapseContent from '@erxes/ui/src/components/CollapseContent';
 import React from 'react';
 import Info from '@erxes/ui/src/components/Info';
 import { __ } from 'coreui/utils';
-import {
-  ControlLabel,
-  FormControl,
-  FormGroup
-} from '@erxes/ui/src/components/form';
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import { IFormProps } from '@erxes/ui/src/types';
 import Form from '@erxes/ui/src/components/form/Form';
-import { ModalFooter } from '@erxes/ui/src/styles/main';
-import Button from '@erxes/ui/src/components/Button';
+import { IConfigsMap } from '@erxes/ui-settings/src/general/types';
 
-class TwitterSettings extends React.Component<any> {
-  generateDoc = (values: {
-    consumerKey: string;
-    consumerSecret: string;
-    accessToken: string;
-    accessTokenSecret: string;
-    webhookEnv: string;
-  }) => {
-    return {
-      consumerKey: values.consumerKey,
-      consumerSecret: values.consumerSecret,
-      kind: 'twitter',
-      accessToken: values.accessToken,
-      accessTokenSecret: values.accessTokenSecret,
-      webhookEnv: values.webhookEnv
-    };
-  };
-  renderField = ({ label, name }: { label: string; name: string }) => {
-    return (
-      <FormGroup>
-        <ControlLabel required={true}>{label}</ControlLabel>
-        <FormControl name={name} required={true} autoFocus={name === 'name'} />
-      </FormGroup>
-    );
-  };
+type Props = {
+  renderItem: (
+    key: string,
+    type?: string,
+    description?: string,
+    defaultValue?: string,
+    label?: string
+  ) => void;
 
+  configsMap: IConfigsMap;
+};
+
+class TwitterSettings extends React.Component<Props> {
   renderContent = (formProps: IFormProps) => {
     return (
       <>
@@ -52,26 +33,41 @@ class TwitterSettings extends React.Component<any> {
             </a>
           </Info>
 
-          {this.renderField({
-            label: 'Twitter Consumer Key',
-            name: 'TWITTER_CONSUMER_KEY'
-          })}
-          {this.renderField({
-            label: 'Twitter Consumer Secret',
-            name: 'TWITTER_CONSUMER_SECRET'
-          })}
-          {this.renderField({
-            label: 'Twitter Access Token',
-            name: 'TWITTER_ACCESS_TOKEN'
-          })}
-          {this.renderField({
-            label: 'Twitter Access Token Secret',
-            name: 'TWITTER_ACCESS_TOKEN_SECRET'
-          })}
-          {this.renderField({
-            label: 'Twitter Webhook Env',
-            name: 'TWITTER_WEBHOOK_ENV'
-          })}
+          {this.props.renderItem(
+            'TWITTER_CONSUMER_KEY',
+            'text',
+            '',
+            '',
+            'Twitter Consumer Key'
+          )}
+          {this.props.renderItem(
+            'TWITTER_CONSUMER_SECRET',
+            'text',
+            '',
+            '',
+            'Twitter Consumer Secret'
+          )}
+          {this.props.renderItem(
+            'TWITTER_ACCESS_TOKEN',
+            'text',
+            '',
+            '',
+            'Twitter Access Token'
+          )}
+          {this.props.renderItem(
+            'TWITTER_ACCESS_TOKEN_SECRET',
+            'text',
+            '',
+            '',
+            'Twitter Access Token Secret'
+          )}
+          {this.props.renderItem(
+            'TWITTER_WEBHOOK_ENV',
+            'text',
+            '',
+            '',
+            'Twitter Webhook Env'
+          )}
         </CollapseContent>
       </>
     );
