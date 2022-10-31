@@ -1,4 +1,4 @@
-import { CollapseContent } from '@erxes/ui/src/components';
+import { CollapseContent, Pagination } from '@erxes/ui/src/components';
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
@@ -16,7 +16,10 @@ type Props = {
   items: any;
 };
 
-type State = {};
+type State = {
+  openCollapse: Number;
+  loading: boolean;
+};
 
 export const menuPos = [
   { title: 'Check deals', link: '/check-synced-deals' },
@@ -28,7 +31,10 @@ export const menuPos = [
 class InventoryCategory extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {};
+    this.state = {
+      openCollapse: -1,
+      loading: false
+    };
   }
 
   renderRow = (data: any) => {
@@ -71,6 +77,13 @@ class InventoryCategory extends React.Component<Props, State> {
         right={syncButton}
       />
     );
+
+    const pagination = (
+      <div>
+        <Pagination count={10} />
+      </div>
+    );
+
     return (
       <>
         {header}
@@ -83,14 +96,33 @@ class InventoryCategory extends React.Component<Props, State> {
           </thead>
           <tbody>{this.renderRow(data)}</tbody>
         </Table>
+        {pagination}
       </>
     );
   };
+
   render() {
     const { items } = this.props;
+    const { openCollapse } = this.state;
+
     const onClickCheck = () => {
       this.props.toCheckCategories();
     };
+
+    const checkOpenCollapse = (num: number): boolean => {
+      return openCollapse == num ? true : false;
+    };
+
+    const onChangeCollapse = (num: number): void => {
+      if (num !== openCollapse) {
+        this.setState({ loading: true });
+
+        this.setState({ openCollapse: num }, () => {
+          this.setState({ loading: false });
+        });
+      }
+    };
+
     const checkButton = (
       <>
         <Button
@@ -110,9 +142,14 @@ class InventoryCategory extends React.Component<Props, State> {
         <br />
         <CollapseContent
           title={__(
-            'Create Categories' +
+            'Create categories' +
               (items.create ? ':  ' + items.create.count : '')
           )}
+          id={'1'}
+          onClick={() => {
+            onChangeCollapse(1);
+          }}
+          open={checkOpenCollapse(1)}
         >
           <DataWithLoader
             data={
@@ -121,7 +158,6 @@ class InventoryCategory extends React.Component<Props, State> {
                 : []
             }
             loading={false}
-            count={3}
             emptyText={'Please check first.'}
             emptyIcon="leaf"
             size="large"
@@ -133,6 +169,11 @@ class InventoryCategory extends React.Component<Props, State> {
             'Update categories' +
               (items.update ? ':  ' + items.update.count : '')
           )}
+          id={'2'}
+          onClick={() => {
+            onChangeCollapse(2);
+          }}
+          open={checkOpenCollapse(2)}
         >
           <DataWithLoader
             data={
@@ -150,6 +191,11 @@ class InventoryCategory extends React.Component<Props, State> {
             'Delete categories' +
               (items.delete ? ':  ' + items.delete.count : '')
           )}
+          id={'3'}
+          onClick={() => {
+            onChangeCollapse(3);
+          }}
+          open={checkOpenCollapse(3)}
         >
           <DataWithLoader
             data={
@@ -173,7 +219,12 @@ class InventoryCategory extends React.Component<Props, State> {
             submenu={menuPos}
           />
         }
-        content={<DataWithLoader data={content} loading={this.props.loading} />}
+        content={
+          <DataWithLoader
+            data={content}
+            loading={this.props.loading || this.state.loading}
+          />
+        }
         hasBorder
       />
     );
