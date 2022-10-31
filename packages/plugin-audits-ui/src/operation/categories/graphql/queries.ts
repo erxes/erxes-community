@@ -1,8 +1,14 @@
-const operations = `
-    query OperationCategories {
-  auditOperationCategories
-  auditOperationCategoriesTotalCount
+const operationCategories = `
+    query OperationsCategories {
+  auditOperationsCategories
+  auditOperationsCategoriesTotalCount
 }
 `;
 
-export default { operations };
+const operationCategory = `
+query OperationsCategory($_id: String) {
+  auditOperationsCategory(_id: $_id)
+}
+`;
+
+export default { operationCategories, operationCategory };

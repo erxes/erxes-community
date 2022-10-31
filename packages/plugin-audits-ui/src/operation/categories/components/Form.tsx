@@ -1,13 +1,15 @@
+import { Button, ControlLabel, Form as CommonForm, FormControl, FormGroup } from '@erxes/ui/src';
+import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps, IQueryParams, IRouterProps } from '@erxes/ui/src/types';
 import React from 'react';
-import { Button, ControlLabel, Form as CommonForm, FormControl, FormGroup } from '@erxes/ui/src';
+import { IOperationCategories } from '../../common/types';
 import { SelectWithOperationCategory } from '../../common/utils';
-import { ModalFooter } from '@erxes/ui/src/styles/main';
 
 type Props = {
   queryParams: IQueryParams;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
+  category?: IOperationCategories;
 } & IRouterProps;
 
 type State = {
@@ -30,24 +32,25 @@ class Form extends React.Component<Props, State> {
   }
 
   renderForm(formProps: IFormProps) {
-    const { renderButton, closeModal } = this.props;
+    const { renderButton, closeModal, category } = this.props;
     const { values, isSubmitted } = formProps;
 
     return (
       <>
         <FormGroup>
           <ControlLabel required>Name</ControlLabel>
-          <FormControl {...formProps} required type="text" name="name" />
+          <FormControl {...formProps} required type="text" name="name" value={category?.name} />
         </FormGroup>
         <FormGroup>
           <ControlLabel required>Code</ControlLabel>
-          <FormControl {...formProps} required type="text" name="code" />
+          <FormControl {...formProps} required type="text" name="code" value={category?.code} />
         </FormGroup>
         <SelectWithOperationCategory
           label="Choose Parent Category"
           name="parentId"
           onSelect={value => this.setState({ parentId: value })}
           multi={false}
+          initialValue={category?.parentId}
         />
         <ModalFooter>
           <Button btnStyle="simple" onClick={() => closeModal()}>

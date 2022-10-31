@@ -1,6 +1,11 @@
 import { gql } from 'apollo-server-express';
 
 import {
+  mutations as riskFormSubmissionMutations,
+  queries as riskFormSubmissionQueries,
+  types as riskFormSubmissionTypes
+} from '../graphql/schemas/riskAssessments//formSubmissions';
+import {
   mutations as riskCategoryMutations,
   queries as riskCategoryQueries,
   types as riskCategoryTypes
@@ -11,11 +16,6 @@ import {
   types as riskConformityTypes
 } from '../graphql/schemas/riskAssessments/conformities';
 import {
-  mutations as riskFormSubmissionMutations,
-  queries as riskFormSubmissionQueries,
-  types as riskFormSubmissionTypes
-} from '../graphql/schemas/riskAssessments//formSubmissions';
-import {
   mutations as riskAssessmentMutations,
   queries as riskAssessmentQueries,
   types as riskAssessmentTypes
@@ -25,6 +25,11 @@ import {
   queries as operationCategoryQueries,
   types as operationCategoryTypes
 } from './schemas/operations/categories';
+import {
+  mutations as operationMutations,
+  queries as operationQueries,
+  types as operationTypes
+} from './schemas/operations/operations';
 
 const typeDefs = async _serviceDiscovery => {
   return gql`
@@ -36,6 +41,7 @@ const typeDefs = async _serviceDiscovery => {
     ${riskFormSubmissionTypes}
     ${riskAssessmentTypes}
     ${operationCategoryTypes}
+    ${operationTypes}
     
     extend type Query {
       ${riskCategoryQueries}
@@ -43,6 +49,7 @@ const typeDefs = async _serviceDiscovery => {
       ${riskFormSubmissionQueries}
       ${riskAssessmentQueries}
       ${operationCategoryQueries}
+      ${operationQueries}
     }
     
     extend type Mutation {
@@ -51,6 +58,7 @@ const typeDefs = async _serviceDiscovery => {
       ${riskFormSubmissionMutations}
       ${riskAssessmentMutations}
       ${operationCategoryMutations}
+      ${operationMutations}
     }
   `;
 };

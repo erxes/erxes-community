@@ -1,8 +1,10 @@
-import React from 'react';
 import { SelectWithSearch } from '@erxes/ui/src';
 import { IOption, IQueryParams } from '@erxes/ui/src/types';
-import { IOperationCategories } from './types';
+import gql from 'graphql-tag';
+import React from 'react';
 import { queries as categoryQueries } from '../categories/graphql';
+import { queries as operationQueries } from '../graphql';
+import { IOperationCategories } from './types';
 
 export const SelectWithOperationCategory = ({
   label,
@@ -49,14 +51,29 @@ export const SelectWithOperationCategory = ({
   return (
     <SelectWithSearch
       label={label}
-      queryName="auditOperationCategories"
+      queryName="auditOperationsCategories"
       name={name}
       initialValue={defaultValue}
       generateOptions={generateCategoryOptions}
       onSelect={onSelect}
-      customQuery={categoryQueries.operations}
+      customQuery={categoryQueries.operationCategories}
       customOption={customOption ? customOption : { value: '', label: 'Choose a Category' }}
       multi={multi}
     />
   );
 };
+
+export const subOption = category => {
+  const { order } = category;
+  const foundedString = order.match(/[/]/gi);
+  return '\u00A0 '.repeat(foundedString.length);
+};
+
+export const refetchQueries = queryParams => [
+  {
+    query: gql(categoryQueries.operationCategories)
+  },
+  {
+    query: gql(operationQueries.operations)
+  }
+];

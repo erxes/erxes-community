@@ -1,7 +1,13 @@
-const operationAdd = `
-mutation AuditOperationCategoryAdd($doc: JSON) {
-  auditOperationCategoryAdd(doc: $doc)
+const addCategory = `
+mutation AuditOperationsCategoryAdd($doc: JSON) {
+  auditOperationsCategoryAdd(doc: $doc)
 }
 `;
 
-export default { operationAdd };
+const removeCategory = ` 
+mutation AuditOperationsCategoryRemove($id: String) {
+  auditOperationsCategoryRemove(_id: $id)
+}
+`;
+
+export default { addCategory, removeCategory };

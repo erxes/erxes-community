@@ -14,6 +14,8 @@ export interface IOperationsDocument extends Document {
   name: String;
   description: String;
   categoryId: String;
+  order: String;
+  code: String;
 }
 export interface IOperationCategoriesDocument extends Document {
   _id: string;

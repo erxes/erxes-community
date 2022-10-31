@@ -1,5 +1,7 @@
-import OperationsQueries from './categories';
+import OperationCategoriesQueries from './categories';
+import OperationQueries from './operations';
 
 export default {
-  ...OperationsQueries
+  ...OperationCategoriesQueries,
+  ...OperationQueries
 };

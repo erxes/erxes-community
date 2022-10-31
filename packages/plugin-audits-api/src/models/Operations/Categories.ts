@@ -5,7 +5,7 @@ import { operationCategoriesSchema } from '../definitions/operations';
 export interface IOperationCategoriesModel extends Model<IOperationCategoriesDocument> {
   categoryAdd(doc: any): Promise<IOperationCategoriesDocument>;
   categoryEdit(_id: string, doc: any): Promise<IOperationCategoriesDocument>;
-  categoriesRemove(_ids: string[]): Promise<IOperationCategoriesDocument>;
+  categoryRemove(_ids: string): Promise<IOperationCategoriesDocument>;
 }
 
 export const loadOperationCategories = (models: IModels, subdomain: string) => {
@@ -16,7 +16,8 @@ export const loadOperationCategories = (models: IModels, subdomain: string) => {
     public static async categoryEdit(_id: string, doc: any) {
       return 'updated';
     }
-    public static async categoriesRemove(_ids: string[]) {
+    public static async categoryRemove(_id: string) {
+      await models.OperationCategories.findByIdAndDelete({ _id });
       return 'removed';
     }
   }

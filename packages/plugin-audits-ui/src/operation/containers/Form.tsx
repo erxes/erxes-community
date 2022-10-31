@@ -1,13 +1,15 @@
-import { IQueryParams, IRouterProps } from '@erxes/ui/src/types';
-import React from 'react';
-import * as compose from 'lodash.flowright';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { ButtonMutate } from '@erxes/ui/src';
+import { IButtonMutateProps, IQueryParams, IRouterProps } from '@erxes/ui/src/types';
 import { withProps } from '@erxes/ui/src/utils/core';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { refetchQueries } from '../common/utils';
 import Form from '../components/Form';
+import { mutations } from '../graphql';
 
 type Props = {
   queryParams: IQueryParams;
+  closeModal: () => void;
 } & IRouterProps;
 
 class FormContainer extends React.Component<Props> {
@@ -16,8 +18,26 @@ class FormContainer extends React.Component<Props> {
   }
 
   render() {
+    const renderButton = ({ text, values, isSubmitted, callback, object }: IButtonMutateProps) => {
+      let mutation = mutations.operationAdd;
+
+      return (
+        <ButtonMutate
+          mutation={mutation}
+          variables={values}
+          callback={callback}
+          refetchQueries={refetchQueries(this.props.queryParams)}
+          isSubmitted={isSubmitted}
+          type="submit"
+          uppercase={false}
+          successMessage={`You successfully added a ${text}`}
+        />
+      );
+    };
+
     const updatedProps = {
-      ...this.props
+      ...this.props,
+      renderButton
     };
 
     return <Form {...updatedProps} />;

@@ -1,13 +1,39 @@
 import { ActionButtons, SidebarListItem } from '@erxes/ui-settings/src/styles';
-import { Box, Button, confirm, ControlLabel, DataWithLoader, DateControl, FormControl, FormGroup, Icon, ModalTrigger, router, Sidebar, SidebarList, Spinner, Tip, Wrapper, __ } from '@erxes/ui/src';
+import {
+  Box,
+  Button,
+  confirm,
+  ControlLabel,
+  DataWithLoader,
+  DateControl,
+  FormControl,
+  FormGroup,
+  Icon,
+  ModalTrigger,
+  router,
+  Sidebar,
+  SidebarList,
+  Spinner,
+  Tip,
+  Wrapper,
+  __
+} from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IRouterProps } from '@erxes/ui/src/types';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Box as StatusBox,
+  ClearableBtn,
+  ColorBox,
+  CustomRangeContainer,
+  EndDateContainer,
+  FormContainer as Container,
+  Padding
+} from '../../../styles';
 import { statusColorConstant } from '../../common/constants';
 import { commonRefetchType } from '../../common/types';
 import { subOption } from '../../common/utils';
-import { Box as StatusBox, ClearableBtn, ColorBox, CustomRangeContainer, EndDateContainer, FormContainer as Container, Padding } from '../../../styles';
 import FormContainer from '../containers/Form';
 
 type Props = {
@@ -67,7 +93,14 @@ class AssessmentCategories extends React.Component<Props, State> {
       return <FormContainer refetch={this.props.refetch} closeModal={closeModal} />;
     };
 
-    return <ModalTrigger isAnimate title="Add New Assessment Category" content={content} trigger={trigger} />;
+    return (
+      <ModalTrigger
+        isAnimate
+        title="Add New Assessment Category"
+        content={content}
+        trigger={trigger}
+      />
+    );
   };
 
   removeQueryParams = () => {
@@ -111,10 +144,24 @@ class AssessmentCategories extends React.Component<Props, State> {
     );
 
     const content = ({ closeModal }) => {
-      return <FormContainer trigger={trigger} categoryId={category._id} formId={category.formId} closeModal={closeModal} />;
+      return (
+        <FormContainer
+          trigger={trigger}
+          categoryId={category._id}
+          formId={category.formId}
+          closeModal={closeModal}
+        />
+      );
     };
 
-    return <ModalTrigger isAnimate title="Edit Assessment Category" content={content} trigger={trigger} />;
+    return (
+      <ModalTrigger
+        isAnimate
+        title="Edit Assessment Category"
+        content={content}
+        trigger={trigger}
+      />
+    );
   }
 
   renderCategoryRemoveAction(id: string) {
@@ -142,7 +189,14 @@ class AssessmentCategories extends React.Component<Props, State> {
 
     return (
       <SidebarList>
-        <DataWithLoader data={this.renderContent()} loading={loading} count={totalCount} emptyText="There is no risk asssessment category" emptyIcon="folder-2" size="small" />
+        <DataWithLoader
+          data={this.renderContent()}
+          loading={loading}
+          count={totalCount}
+          emptyText="There is no risk asssessment category"
+          emptyIcon="folder-2"
+          size="small"
+        />
       </SidebarList>
     );
   }
@@ -172,7 +226,12 @@ class AssessmentCategories extends React.Component<Props, State> {
       <Padding horizontal vertical>
         <FormGroup>
           <ControlLabel>{__('Search Categories')}</ControlLabel>
-          <FormControl type="text" placeholder="type a search" value={this.state.searchValue} onChange={this.handleSearch} />
+          <FormControl
+            type="text"
+            placeholder="type a search"
+            value={this.state.searchValue}
+            onChange={this.handleSearch}
+          />
         </FormGroup>
       </Padding>
     );
@@ -225,7 +284,11 @@ class AssessmentCategories extends React.Component<Props, State> {
           <CustomForm label="Status" field={'status'} clearable={!!this.props.queryParams.status}>
             <Container row>
               {statusColorConstant.map(status => (
-                <StatusBox selected={this.props.queryParams.Status === status.name} onClick={() => selectStatus(status.name)} key={status.color}>
+                <StatusBox
+                  selected={this.props.queryParams.Status === status.name}
+                  onClick={() => selectStatus(status.name)}
+                  key={status.color}
+                >
                   <Container row gap align="center">
                     <ColorBox color={status.color} />
                   </Container>
@@ -241,14 +304,28 @@ class AssessmentCategories extends React.Component<Props, State> {
               </Tip>
             </Button>
           </Container>
-          <CustomForm label="Created Date Range" field={['from', 'to']} clearable={queryParams?.from || queryParams?.to}>
+          <CustomForm
+            label="Created Date Range"
+            field={['from', 'to']}
+            clearable={queryParams?.from || queryParams?.to}
+          >
             <CustomRangeContainer>
               <DateContainer>
-                <DateControl name="from" value={from} placeholder="select from date " onChange={e => dateOrder(e, 'from')} />
+                <DateControl
+                  name="from"
+                  value={from}
+                  placeholder="select from date "
+                  onChange={e => dateOrder(e, 'from')}
+                />
               </DateContainer>
               <EndDateContainer>
                 <DateContainer>
-                  <DateControl name="to" value={to} placeholder="select to date " onChange={e => dateOrder(e, 'to')} />
+                  <DateControl
+                    name="to"
+                    value={to}
+                    placeholder="select to date "
+                    onChange={e => dateOrder(e, 'to')}
+                  />
                 </DateContainer>
               </EndDateContainer>
             </CustomRangeContainer>

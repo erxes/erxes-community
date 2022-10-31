@@ -1,8 +1,10 @@
 export const types = ``;
 export const mutations = `
-    auditOperationCategoryAdd(doc:JSON):String
+    auditOperationsCategoryAdd(doc:JSON):JSON
+    auditOperationCategoryRemove(_id:String):String
 `;
 export const queries = `
-    auditOperationCategories:JSON
-    auditOperationCategoriesTotalCount:Int
+    auditOperationsCategories:JSON
+    auditOperationsCategoriesTotalCount:Int
+    auditOperationsCategory(_id:String):JSON
 `;

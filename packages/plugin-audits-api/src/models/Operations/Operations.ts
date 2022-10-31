@@ -11,6 +11,9 @@ export interface IOperationsModel extends Model<IOperationsDocument> {
 export const loadOperations = (models: IModels, subdomain: string) => {
   class Operations {
     public static async operationAdd(doc: any) {
+      const { parentId, code, name } = doc;
+      const order = this.getOrder(parentId, code, name);
+      await models.Operations.create({ ...doc, order });
       return 'added';
     }
     public static async operationEdit(_id: string, doc: any) {
@@ -18,6 +21,10 @@ export const loadOperations = (models: IModels, subdomain: string) => {
     }
     public static async operationsRemove(_ids: string[]) {
       return 'removed';
+    }
+    static async getOrder(_id: string, code: string, name: string) {
+      const parent = await models.Operations.findOne({ _id });
+      return parent ? `${parent.order}/${code}` : `${name}${code}`;
     }
   }
 
