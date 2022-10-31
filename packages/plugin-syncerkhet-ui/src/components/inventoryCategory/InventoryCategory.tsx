@@ -37,8 +37,10 @@ class InventoryCategory extends React.Component<Props, State> {
     };
   }
 
-  renderRow = (data: any) => {
-    return data.map(c => <Row history={history} key={c.code} category={c} />);
+  renderRow = (data: any, action: string) => {
+    return data.map(c => (
+      <Row history={history} key={c.code} category={c} action={action} />
+    ));
   };
 
   renderTable = (data: any, action: string) => {
@@ -98,10 +100,10 @@ class InventoryCategory extends React.Component<Props, State> {
             <tr>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
-              <th>{__('Sync Status')}</th>
+              {action === 'UPDATE' ? <th>{__('Update Status')}</th> : <th></th>}
             </tr>
           </thead>
-          <tbody>{this.renderRow(data)}</tbody>
+          <tbody>{this.renderRow(data, action)}</tbody>
         </Table>
         {pagination}
       </>

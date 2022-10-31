@@ -3,11 +3,12 @@ import React from 'react';
 type Props = {
   category: any;
   history: any;
+  action: string;
 };
 
 class Row extends React.Component<Props> {
   render() {
-    const { category } = this.props;
+    const { category, action } = this.props;
 
     const onTrClick = () => {};
 
@@ -17,7 +18,7 @@ class Row extends React.Component<Props> {
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
-        <td>{'false'}</td>
+        {action === 'UPDATE' ? <td>false</td> : <td></td>}
       </tr>
     );
   }
