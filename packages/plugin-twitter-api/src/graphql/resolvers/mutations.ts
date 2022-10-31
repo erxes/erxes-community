@@ -4,9 +4,9 @@ import { downloadAttachment } from '../../utils';
 import receiveDms from '../../receiveDms';
 
 const twitterMutations = {
-  async twitterWebhookPost(_root, { data }) {
+  async twitterWebhookPost(_root, { data }, { models }: IContext) {
     try {
-      await receiveDms(data);
+      await receiveDms(data, models);
     } catch (e) {
       return new Error(e);
     }

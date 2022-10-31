@@ -1,5 +1,5 @@
-import { debugRequest, debugResponse, debugTwitter } from '../debuggers';
-import { Accounts, Integrations } from './models';
+import { debugRequest, debugResponse, debugTwitter } from './debuggers';
+import { Accounts, Integrations } from '../models';
 import { downloadAttachment, getEnv } from '../utils';
 import * as twitterUtils from './api';
 import { ConversationMessages, Conversations } from './models';
@@ -12,7 +12,7 @@ const init = async app => {
     return res.redirect(twitterAuthUrl);
   });
 
-  app.get(`/twitter/callback/add`, async (req, res) => {
+  app.get(`/twitter/callback/add`, async (_root, { req, res }, { models }) => {
     const response = await twitterUtils.veriyfyLoginToken(
       req.query.oauth_token,
       req.query.oauth_verifier

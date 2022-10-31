@@ -22,6 +22,7 @@ import {
   loadIntegrationClass,
   loadConfigClass
 } from './models/Twitter';
+import { createGenerateModels } from '@erxes/api-utils/src/core';
 
 export interface IModels {
   Customers: ICustomerModel;
@@ -77,3 +78,7 @@ export const loadClasses = (
 
   return models;
 };
+export const generateModels = createGenerateModels<IModels>(
+  models,
+  loadClasses
+);

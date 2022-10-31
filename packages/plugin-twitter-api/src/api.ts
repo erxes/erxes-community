@@ -2,7 +2,6 @@ import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import * as queryString from 'querystring';
 import * as request from 'request-promise';
-import { debugTwitter } from './debuggers';
 import { IAccount } from './models/definitions/twitter';
 import { getConfig, getEnv } from './utils';
 
@@ -57,6 +56,8 @@ export const getTwitterAuthUrl = async (): Promise<{
         const twitterAuthUrl =
           'https://api.twitter.com/oauth/authenticate?force_login=true&oauth_token=' +
           responseParams.oauth_token;
+
+        console.log(twitterAuthUrl, 'TWITTER_URL');
 
         resolve({
           responseParams,
@@ -120,9 +121,7 @@ export const registerWebhook = async () => {
   const twitterConfig = await getTwitterConfig();
 
   return new Promise(async (resolve, reject) => {
-    const webhooks = await retreiveWebhooks().catch(e => {
-      debugTwitter(`Could not retreive webhooks ${e.message}`);
-    });
+    const webhooks = await retreiveWebhooks().catch(e => {});
 
     const DOMAIN = getEnv({ name: 'DOMAIN' });
 
@@ -131,7 +130,6 @@ export const registerWebhook = async () => {
       webhooks.find(webhook => webhook.url === `${DOMAIN}/twitter/webhook`);
 
     if (webhookObj) {
-      debugTwitter('Webhook already exists');
       return;
     }
 
@@ -150,21 +148,15 @@ export const registerWebhook = async () => {
     };
 
     for (const webhook of webhooks || []) {
-      await deleteWebhook(webhook.id).catch(e => {
-        debugTwitter(`Could not retreive webhooks ${e.message}`);
-      });
+      await deleteWebhook(webhook.id).catch(e => {});
     }
-
-    debugTwitter('Registering webhook');
 
     request
       .post(requestOptions)
       .then(res => {
-        debugTwitter('Successfully registered twitter webhook');
         resolve(res);
       })
       .catch(er => {
-        debugTwitter(er.message);
         reject(er.message);
       });
   });

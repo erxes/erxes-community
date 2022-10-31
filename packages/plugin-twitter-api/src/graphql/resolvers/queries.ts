@@ -1,6 +1,5 @@
 import { IContext } from '../../connectionResolver';
 import { getEnv } from '../../utils';
-import { debugTwitter } from '../../debuggers';
 import receiveDms from '../../receiveDms';
 import * as twitterUtils from '../../api';
 
@@ -8,7 +7,9 @@ const TwitterQueries = {
   async twitterLogin(_root) {
     const { twitterAuthUrl } = await twitterUtils.getTwitterAuthUrl();
     return twitterAuthUrl;
+    console.log();
   },
+
   async twitterCallbackAdd(
     _root,
     { oauth_token, oauth_verifier, oauth_token_secret, redirect },
@@ -49,11 +50,11 @@ const TwitterQueries = {
       return 'Error: crc_token missing from request.';
     }
   },
-  async twitterWebhookGet(_root, { req, res }, { models }: IContext) {
+  async twitterWebhookGet(_root, { req, res }) {
     const crc_token = req.query.crc_token;
 
     if (crc_token) {
-      const hash = await models.twitterUtils.getChallengeResponse(crc_token);
+      const hash = await twitterUtils.getChallengeResponse(crc_token);
 
       res.status(200);
       return res.json({
@@ -68,7 +69,6 @@ const TwitterQueries = {
     const account = await models.Accounts.findOne({ _id: accountId });
 
     if (!account) {
-      debugTwitter(`Error Twitter: Account not found with ${accountId}`);
       return new Error('Account not found');
     }
 

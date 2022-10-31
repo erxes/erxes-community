@@ -1,43 +1,22 @@
 import { gql } from 'apollo-server-express';
 
-const types = `
- 
-`;
-
 const queries = `
-  imapConversationDetail(conversationId: String!): [IMap]
-  imapGetIntegrations: [IMapIntegration]
-  imapLogs: [JSON]
+  twitterLogin: String
+  twitterCallbackAdd(oauth_token: String, oauth_verifier: String,   oauth_token_secret: String, redirect: String ): String
+  twitterWebhook: String
+  twitterWebhookGet: String
+  twitterGetAccount(accountId: String): String
 `;
 
 const mutations = `
-  imapSendMail(
-    integrationId: String
-    conversationId: String
-    subject: String!
-    body: String
-    to: [String]!
-    cc: [String]
-    bcc: [String]
-    from: String!
-    shouldResolve: Boolean
-    headerId: String
-    replyTo: [String]
-    inReplyTo: String
-    threadId: String
-    messageId: String
-    replyToMessageId: String
-    references: [String]
-    attachments: [JSON]
-    customerId: String
-  ): JSON
+  twitterWebhookPost(data: JSON): JSON
+  twitterCreateIntegration(accountId: String, integrationId: String, data: JSON, kind: String): String
+  twitterReply(attachments: String, conversationId: String, content: String, integrationId: String): String
 `;
 
 const typeDefs = gql`
   scalar JSON
   scalar Date
-
-  ${types}
 
   extend type Query {
     ${queries}

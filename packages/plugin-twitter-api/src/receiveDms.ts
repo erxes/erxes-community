@@ -1,5 +1,3 @@
-import Accounts from './models/Accounts';
-import Integrations from './models/Integrations';
 import {
   createConverstaionMessage,
   getOrCreateConversation,
@@ -26,7 +24,7 @@ const extractUrlFromAttachment = attachment => {
   return null;
 };
 
-const receiveDms = async requestBody => {
+const receiveDms = async (requestBody, models) => {
   const { direct_message_events } = requestBody;
 
   const users: IUsers = requestBody.users;
@@ -51,17 +49,18 @@ const receiveDms = async requestBody => {
         attachments.push({ ...extractUrlFromAttachment(attachment) });
       }
 
-      const account = await Accounts.findOne({ uid: receiverId });
+      const account = await models.Accounts.findOne({ uid: receiverId });
 
       if (!account) {
         return;
       }
 
-      const integration = await Integrations.getIntegration({
+      const integration = await models.Integrations.getIntegration({
         $and: [{ accountId: account._id }, { kind: 'twitter-dm' }]
       });
 
       const customer = await getOrCreateCustomer(
+        models,
         integration,
         senderId,
         users[senderId]
@@ -71,6 +70,7 @@ const receiveDms = async requestBody => {
       const customerErxesApiId: any = customer.erxesApiId;
 
       const conversation = await getOrCreateConversation(
+        models,
         senderId,
         receiverId,
         integration._id,
@@ -80,6 +80,7 @@ const receiveDms = async requestBody => {
       );
 
       await createConverstaionMessage(
+        models,
         event,
         content,
         attachments,

@@ -56,21 +56,7 @@ class Accounts extends React.Component<Props, { accountId?: string }> {
   }
 
   renderButton() {
-    const { onAdd, kind } = this.props;
-
-    if (kind === 'gmail' || kind === 'nylas-gmail') {
-      return <GoogleButton href="#add" onClick={onAdd} />;
-    }
-
-    if (kind === 'facebook') {
-      return (
-        <FacebookButton onClick={onAdd}>
-          <Icon icon="facebook-official" />
-          {__('Continue with Facebook')}
-        </FacebookButton>
-      );
-    }
-
+    const { onAdd } = this.props;
     return (
       <Button btnStyle="primary" icon="plus-circle" onClick={onAdd}>
         Add Account

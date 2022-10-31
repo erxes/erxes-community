@@ -1,11 +1,9 @@
 import { sendRPCMessage } from './messageBroker';
-import { IIntegrationDocument } from './models/Integrations';
 import {
-  ConversationMessages,
-  Conversations,
-  Customers,
-  IConversationDocument
-} from './models';
+  IConversationDocument,
+  IIntegrationDocument
+} from './models/definitions/twitter';
+import { IModels } from './connectionResolver';
 
 export interface IUser {
   id: string;
@@ -22,11 +20,12 @@ export interface IUser {
 }
 
 export const getOrCreateCustomer = async (
+  models: IModels,
   integration: IIntegrationDocument,
   userId: string,
   receiver: IUser
 ) => {
-  let customer = await Customers.findOne({ userId });
+  let customer = await models.Customers.findOne({ userId });
 
   if (customer) {
     return customer;
@@ -34,7 +33,7 @@ export const getOrCreateCustomer = async (
 
   // save on integrations db
   try {
-    customer = await Customers.create({
+    customer = await models.Customers.create({
       userId: receiver.id,
       // not integrationId on erxes-api !!
       integrationId: integration._id,
@@ -66,7 +65,7 @@ export const getOrCreateCustomer = async (
     customer.erxesApiId = apiCustomerResponse._id;
     await customer.save();
   } catch (e) {
-    await Customers.deleteOne({ _id: customer._id });
+    await models.Customers.deleteOne({ _id: customer._id });
     throw new Error(e);
   }
 
@@ -74,6 +73,7 @@ export const getOrCreateCustomer = async (
 };
 
 export const getOrCreateConversation = async (
+  models: IModels,
   senderId: string,
   receiverId: string,
   integrationId: string,
@@ -81,7 +81,7 @@ export const getOrCreateConversation = async (
   customerErxesApiId: string,
   integrationErxesApiId: string
 ) => {
-  let conversation = await Conversations.findOne({
+  let conversation = await models.Conversations.findOne({
     senderId,
     receiverId
   });
@@ -94,7 +94,7 @@ export const getOrCreateConversation = async (
 
   // save on integrations db
   try {
-    conversation = await Conversations.create({
+    conversation = await models.Conversations.create({
       senderId,
       receiverId,
       content,
@@ -123,7 +123,7 @@ export const getOrCreateConversation = async (
 
     await conversation.save();
   } catch (e) {
-    await Conversations.deleteOne({ _id: conversation._id });
+    await models.Conversations.deleteOne({ _id: conversation._id });
     throw new Error(e);
   }
 
@@ -131,6 +131,7 @@ export const getOrCreateConversation = async (
 };
 
 export const createConverstaionMessage = async (
+  models: IModels,
   event: any,
   content: string,
   attachments: any[],
@@ -138,13 +139,13 @@ export const createConverstaionMessage = async (
   conversation: IConversationDocument
 ) => {
   const { id, created_timestamp } = event;
-  const conversationMessage = await ConversationMessages.findOne({
+  const conversationMessage = await models.ConversationMessages.findOne({
     messageId: id
   });
 
   if (!conversationMessage) {
     // save on integrations db
-    await ConversationMessages.create({
+    await models.ConversationMessages.create({
       conversationId: conversation._id,
       messageId: id,
       timestamp: created_timestamp,
@@ -164,7 +165,7 @@ export const createConverstaionMessage = async (
         })
       });
     } catch (e) {
-      await ConversationMessages.deleteOne({ messageId: id });
+      await models.ConversationMessages.deleteOne({ messageId: id });
       throw new Error(e);
     }
   }

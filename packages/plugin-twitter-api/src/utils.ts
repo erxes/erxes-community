@@ -1,11 +1,8 @@
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
 // import * as sanitizeHtml from 'sanitize-html';
-import { debugBase, debugExternalRequests } from './debuggers';
 import memoryStorage from './inmemoryStorage';
 // import { sendRPCMessage } from './messageBroker';
-import Configs from './models/Configs';
-import { IParticipants, IProviderSettings } from './nylas/types';
 // import { sendDailyRequest } from './videoCall/controller';
 // import { IRecording } from './videoCall/models';
 
@@ -26,8 +23,6 @@ interface IRequestParams {
       | {
           [key: string]: string | number | boolean | any;
         }
-      | IProviderSettings
-      | IParticipants[]
       | {
           [key: string]: {
             [key: string]: string | boolean | any;
@@ -67,16 +62,8 @@ export const sendRequest = ({
     const reqBody = JSON.stringify(body || {});
     const reqParams = JSON.stringify(params || {});
 
-    debugExternalRequests(`
-        Sending request
-        url: ${url}
-        method: ${method}
-        body: ${reqBody}
-        params: ${reqParams}
-      `);
-
     request({
-      uri: encodeURI(url),
+      uri: encodeURI(''),
       method,
       headers: {
         'Content-Type': headerType || 'application/json',
@@ -90,21 +77,12 @@ export const sendRequest = ({
       json: true
     })
       .then(res => {
-        debugExternalRequests(`
-        Success from ${url}
-        requestBody: ${reqBody}
-        requestParams: ${reqParams}
-        responseBody: ${JSON.stringify(res)}
-      `);
-
         return resolve(res);
       })
       .catch(e => {
         if (e.code === 'ECONNREFUSED') {
-          debugExternalRequests(`Failed to connect ${url}`);
           throw new Error(`Failed to connect ${url}`);
         } else {
-          debugExternalRequests(`Error occurred in ${url}: ${e.body}`);
           reject(e);
         }
       });
@@ -139,7 +117,6 @@ export const getEnv = ({
   }
 
   if (!value) {
-    debugBase(`Missing environment variable configuration for ${name}`);
   }
 
   return value || '';
@@ -187,7 +164,7 @@ export const downloadAttachment = urlOrName => {
   });
 };
 
-export const getConfigs = async () => {
+export const getConfigs = async models => {
   const configsCache = await memoryStorage().get('configs_erxes_integrations');
 
   if (configsCache && configsCache !== '{}') {
@@ -195,7 +172,7 @@ export const getConfigs = async () => {
   }
 
   const configsMap = {};
-  const configs = await Configs.find({});
+  const configs = await models.Configs.find({});
 
   for (const config of configs) {
     configsMap[config.code] = config.value;
@@ -206,8 +183,8 @@ export const getConfigs = async () => {
   return configsMap;
 };
 
-export const getConfig = async (code, defaultValue?) => {
-  const configs = await getConfigs();
+export const getConfig = async (code, defaultValue?, models?) => {
+  const configs = await getConfigs(models);
 
   if (!configs[code]) {
     return defaultValue;
