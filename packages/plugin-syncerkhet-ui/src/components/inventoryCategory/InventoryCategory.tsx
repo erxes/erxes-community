@@ -3,7 +3,7 @@ import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { __ } from '@erxes/ui/src/utils/core';
+import { router, __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import Row from './InventoryCategoryRow';
 
@@ -42,9 +42,28 @@ class InventoryCategory extends React.Component<Props, State> {
   };
 
   renderTable = (data: any, action: string) => {
-    const data_len = data.length;
+    const { queryParams } = this.props;
 
-    if (data_len > 20) {
+    if (Object.keys(queryParams).length !== 0) {
+      if (queryParams.perPage !== undefined && queryParams.page == undefined) {
+        data = data.slice(queryParams.perPage * 0, queryParams.perPage * 1);
+      }
+
+      if (queryParams.page !== undefined) {
+        if (queryParams.perPage !== undefined) {
+          data = data.slice(
+            Number(queryParams.page - 1) * queryParams.perPage,
+            Number((queryParams.page - 1) * queryParams.perPage) +
+              Number(queryParams.perPage)
+          );
+        } else {
+          data = data.slice(
+            (queryParams.page - 1) * 20,
+            (queryParams.page - 1) * 20 + 20
+          );
+        }
+      }
+    } else {
       data = data.slice(0, 20);
     }
 
@@ -63,20 +82,7 @@ class InventoryCategory extends React.Component<Props, State> {
         </Button>
       </>
     );
-    const header = (
-      <Wrapper.ActionBar
-        left={
-          data_len > 20 ? (
-            <>20 of {data_len} </>
-          ) : (
-            <>
-              {data_len} of {data_len}
-            </>
-          )
-        }
-        right={syncButton}
-      />
-    );
+    const header = <Wrapper.ActionBar right={syncButton} />;
 
     const pagination = (
       <div>
@@ -92,6 +98,7 @@ class InventoryCategory extends React.Component<Props, State> {
             <tr>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
+              <th>{__('Sync Status')}</th>
             </tr>
           </thead>
           <tbody>{this.renderRow(data)}</tbody>
@@ -121,6 +128,7 @@ class InventoryCategory extends React.Component<Props, State> {
           this.setState({ loading: false });
         });
       }
+      router.removeParams(this.props.history, 'page', 'perPage');
     };
 
     const checkButton = (
@@ -151,18 +159,21 @@ class InventoryCategory extends React.Component<Props, State> {
           }}
           open={checkOpenCollapse(1)}
         >
-          <DataWithLoader
-            data={
-              items.create
-                ? this.renderTable(items.create?.items, 'CREATE')
-                : []
-            }
-            loading={false}
-            emptyText={'Please check first.'}
-            emptyIcon="leaf"
-            size="large"
-            objective={true}
-          />
+          <>
+            <DataWithLoader
+              data={
+                items.create
+                  ? this.renderTable(items.create?.items, 'CREATE')
+                  : []
+              }
+              loading={false}
+              emptyText={'Please check first.'}
+              emptyIcon="leaf"
+              size="large"
+              objective={true}
+            />
+            <Pagination count={items.create?.count || 0} />
+          </>
         </CollapseContent>
         <CollapseContent
           title={__(
@@ -175,16 +186,21 @@ class InventoryCategory extends React.Component<Props, State> {
           }}
           open={checkOpenCollapse(2)}
         >
-          <DataWithLoader
-            data={
-              items.update ? this.renderTable(items.update.items, 'UPDATE') : []
-            }
-            loading={false}
-            emptyText={'Please check first.'}
-            emptyIcon="leaf"
-            size="large"
-            objective={true}
-          />
+          <>
+            <DataWithLoader
+              data={
+                items.update
+                  ? this.renderTable(items.update.items, 'UPDATE')
+                  : []
+              }
+              loading={false}
+              emptyText={'Please check first.'}
+              emptyIcon="leaf"
+              size="large"
+              objective={true}
+            />
+            <Pagination count={items.update?.count || 0} />
+          </>
         </CollapseContent>
         <CollapseContent
           title={__(
@@ -197,16 +213,21 @@ class InventoryCategory extends React.Component<Props, State> {
           }}
           open={checkOpenCollapse(3)}
         >
-          <DataWithLoader
-            data={
-              items.delete ? this.renderTable(items.delete.items, 'DELETE') : []
-            }
-            loading={false}
-            emptyText={'Please check first.'}
-            emptyIcon="leaf"
-            size="large"
-            objective={true}
-          />
+          <>
+            <DataWithLoader
+              data={
+                items.delete
+                  ? this.renderTable(items.delete.items, 'DELETE')
+                  : []
+              }
+              loading={false}
+              emptyText={'Please check first.'}
+              emptyIcon="leaf"
+              size="large"
+              objective={true}
+            />
+            <Pagination count={items.delete?.count || 0} />
+          </>
         </CollapseContent>
       </>
     );

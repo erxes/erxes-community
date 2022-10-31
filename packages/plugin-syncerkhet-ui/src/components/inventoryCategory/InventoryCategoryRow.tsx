@@ -17,6 +17,7 @@ class Row extends React.Component<Props> {
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
+        <td>{'false'}</td>
       </tr>
     );
   }
