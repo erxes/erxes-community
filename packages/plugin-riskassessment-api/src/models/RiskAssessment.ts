@@ -156,23 +156,6 @@ export const loadRiskAssessment = (model: IModels, subdomain: string) => {
       }
 
       return await model.RiskAssessment.findOne(filter).select(fieldsSkip);
-
-      // const match = { $match: filter };
-
-      // const lookup = {
-      //   $lookup: {
-      //     from: 'risk_assessment_categories',
-      //     localField: 'categoryId',
-      //     foreignField: '_id',
-      //     as: 'category'
-      //   }
-      // };
-      // const unwind = {
-      //   $unwind: '$category'
-      // };
-
-      // const [first] = await model.RiskAssessment.aggregate([match, lookup, unwind]);
-      // return first;
     }
   }
   riskAssessmentSchema.loadClass(RiskAssessment);
