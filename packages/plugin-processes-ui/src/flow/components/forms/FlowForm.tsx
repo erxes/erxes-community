@@ -534,15 +534,27 @@ class FlowForm extends React.Component<Props, State> {
           {flowValidation === '' && this.renderLabelInfo('success', 'True')}
           {flowValidation && this.renderLabelInfo('danger', flowValidation)}
         </ToggleWrapper>
-        <ToggleWrapper>
-          <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>
-          <Toggle
-            defaultChecked={(flowValidation === '' && isActive) || false}
-            onChange={this.onToggle}
-            disabled={flowValidation === '' ? false : true}
-          />
-          <span className={!isActive ? 'active' : ''}>{__('Active')}</span>
-        </ToggleWrapper>
+        {(this.props.flow.isSub && (
+          <ToggleWrapper>
+            <span className={'active'}>{__('SubFlow')}</span>
+            <Toggle
+              defaultChecked={(flowValidation === '' && isActive) || false}
+              onChange={this.onToggle}
+              disabled={flowValidation === '' ? false : true}
+            />
+          </ToggleWrapper>
+        )) || (
+          <ToggleWrapper>
+            <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>
+            <Toggle
+              defaultChecked={(flowValidation === '' && isActive) || false}
+              onChange={this.onToggle}
+              disabled={flowValidation === '' ? false : true}
+            />
+            <span className={!isActive ? 'active' : ''}>{__('Active')}</span>
+          </ToggleWrapper>
+        )}
+
         <ActionBarButtonsWrapper>
           <Button
             btnStyle="simple"
@@ -640,6 +652,7 @@ class FlowForm extends React.Component<Props, State> {
       <FlowJobsForm
         onClickFlowJob={this.onClickFlowJob}
         flowJobsOfEnd={flowJobs.find(fj => fj.type === FLOWJOB_TYPES.ENDPOINT)}
+        isSub={this.props.flow.isSub}
         setMainState={this.setMainState}
       />
     );

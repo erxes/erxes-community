@@ -117,6 +117,7 @@ class JobForm extends React.Component<Props, State> {
             name: 'Flows',
             flows: subFlow ? [subFlow] : []
           }}
+          isSub={true}
           limit={1}
         />
       );

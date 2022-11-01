@@ -11,11 +11,16 @@ export const types = `
     productId: String,
     product: JSON,
     status: String,
+    isSub: Boolean,
     jobs: JSON,
     jobCount: Int,
     flowValidation: String
-    needProducts: JSON
-    resultProducts: JSON
+    latestBranchId: String
+    latestDepartmentId: String
+    latestBranch: JSON
+    latestDepartment: JSON
+    latestNeedProducts: JSON
+    latestResultProducts: JSON
   }
 
   input JobInput {
@@ -33,6 +38,7 @@ const qryParams = `
   categoryId: String,
   searchValue: String,
   excludeIds: Boolean,
+  isSub: Boolean,
   ids: [String],
   branchId: String,
   departmentId: String,
@@ -54,6 +60,7 @@ const flowParams = `
   categoryId: String,
   productId: String,
   status: String,
+  isSub: Boolean,
   flowValidation: String,
   jobs: [JobInput],
 `;

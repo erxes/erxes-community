@@ -54,27 +54,29 @@ class JobStatus extends React.Component<Props, State> {
 
   renderProducts = (products, matchProducts: any[]) => {
     const matchProductIds = matchProducts.length
-      ? matchProducts.map(p => p.product._id)
+      ? matchProducts.map(p => p.productId)
       : [];
 
-    return products.map(product => {
-      if (!product.product) {
-        return <li>Unknown product</li>;
+    return ((products || []).filter(p => p.product && p.product._id) || []).map(
+      product => {
+        if (!product.product) {
+          return <li>Unknown product</li>;
+        }
+
+        const productId = product.product._id;
+        const name = `${product.product.code} - ${product.product.name}` || '';
+
+        if (matchProducts.length && !matchProductIds.includes(productId)) {
+          return (
+            <DisabledSpan>
+              <li>{name}</li>
+            </DisabledSpan>
+          );
+        }
+
+        return <li>{name}</li>;
       }
-
-      const productId = product.product._id;
-      const name = `${product.product.code} - ${product.product.name}` || '';
-
-      if (matchProducts.length && !matchProductIds.includes(productId)) {
-        return (
-          <DisabledSpan>
-            <li>{name}</li>
-          </DisabledSpan>
-        );
-      }
-
-      return <li>{name}</li>;
-    });
+    );
   };
 
   renderBlock(
@@ -109,8 +111,19 @@ class JobStatus extends React.Component<Props, State> {
                 matchJob.type
               ))
           ) {
-            matchProducts.push({ product: matchProduct });
+            matchProducts.push({
+              productId: matchProduct._id,
+              product: matchProduct
+            });
           }
+        }
+        if (matchConfig.subFlowId) {
+          const matchSubFlow = subFlowById[matchConfig.subFlowId] || {};
+          matchProducts = matchProducts.concat(
+            match.type === 'need'
+              ? matchSubFlow.latestNeedProducts
+              : matchSubFlow.latestResultProducts
+          );
         }
       }
     }
@@ -140,8 +153,8 @@ class JobStatus extends React.Component<Props, State> {
       const subFlow = subFlowById[jobConfig.subFlowId] || {};
       products =
         kind === 'need'
-          ? subFlow.needProducts || []
-          : subFlow.resultProducts || [];
+          ? subFlow.latestNeedProducts || []
+          : subFlow.latestResultProducts || [];
     }
 
     if (jobConfig.productId) {

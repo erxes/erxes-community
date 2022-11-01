@@ -15,6 +15,7 @@ type Props = {
   data: { name: string; flows: IFlow[] };
   categoryId?: string;
   status?: string[];
+  isSub?: boolean;
   flowValidation?: string[];
   onChangeCategory: (catgeoryId: string) => void;
   closeModal: () => void;
@@ -86,16 +87,16 @@ class FlowChooser extends React.Component<FinalProps, { perPage: number }> {
 export default withProps<Props>(
   compose(
     graphql<
-      { categoryId: string },
+      { categoryId?: string; isSub?: boolean },
       FlowsQueryResponse,
-      { perPage: number; categoryId: string }
+      { perPage: number; categoryId?: string; isSub?: boolean }
     >(gql(flowQueries.flows), {
       name: 'flowsQuery',
       options: props => ({
         variables: {
           perPage: 20,
           categoryId: props.categoryId,
-          validation: 'true'
+          isSub: props.isSub
         },
         fetchPolicy: 'network-only'
       })

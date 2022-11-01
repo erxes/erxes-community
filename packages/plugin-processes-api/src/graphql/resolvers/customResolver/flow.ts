@@ -1,7 +1,7 @@
-import { JOB_TYPES } from '../../../models/definitions/constants';
 import { IContext } from '../../../connectionResolver';
-import { sendProductsMessage } from '../../../messageBroker';
-import { IFlow } from '../../../models/definitions/flows';
+import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
+import { IFlow, IFlowDocument } from '../../../models/definitions/flows';
+import { getProductAndUoms } from './utils';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
@@ -23,47 +23,63 @@ export default {
     return (flow.jobs || []).length;
   },
 
-  async resultProducs(flow: IFlow, {}, {}: IContext) {
-    const endJobs = (flow.jobs || []).filter(
-      j => !j.nextJobIds || !j.nextJobIds.length
-    );
+  async latestBranch(flow: IFlowDocument, {}, { subdomain }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: 'branches.findOne',
+      data: { _id: flow.latestBranchId },
+      isRPC: true,
+      defaultValue: {}
+    });
+  },
 
-    const resultProducts = [];
-    const jobReferIds: string[] = [];
-    const productIds: string[] = [];
-    const subFlowIds: string[] = [];
+  async latestDepartment(flow: IFlowDocument, {}, { subdomain }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: 'departments.findOne',
+      data: { _id: flow.latestDepartmentId },
+      isRPC: true,
+      defaultValue: {}
+    });
+  },
 
-    for (const job of endJobs) {
-      const config = job.config;
-      if ([JOB_TYPES.ENDPOINT, JOB_TYPES.JOB].includes(job.type)) {
-        if (config.jobReferId) {
-          jobReferIds.push(config.jobReferId);
-        }
-      }
+  async latestNeedProducts(flow: IFlowDocument, {}, { subdomain }: IContext) {
+    const latestNeedProducts = flow.latestNeedProducts || [];
 
-      if ([JOB_TYPES.MOVE, JOB_TYPES.INCOME].includes(job.type)) {
-        if (config.productId) {
-          productIds.push(config.productId);
-        }
-      }
-
-      if (job.type === JOB_TYPES.FLOW) {
-        if (config.subFlowId) {
-          subFlowIds.push(config.subFlowId);
-        }
-      }
+    if (!latestNeedProducts || !latestNeedProducts.length) {
+      return latestNeedProducts;
     }
 
-    // const { productById, uomById } = await getProductAndUoms(
-    //   subdomain,
-    //   resultProducts
-    // );
+    const { productById, uomById } = await getProductAndUoms(
+      subdomain,
+      latestNeedProducts
+    );
 
-    // for await (const result of resultProducts) {
-    //   result.product = productById[result.productId] || {};
-    //   result.uom = uomById[result.uomId] || {};
-    // }
+    for (const need of latestNeedProducts || []) {
+      need.product = productById[need.productId] || {};
+      need.uom = uomById[need.uomId] || {};
+    }
 
-    return resultProducts;
+    return latestNeedProducts;
+  },
+
+  async latestResultProducts(flow: IFlowDocument, {}, { subdomain }: IContext) {
+    const latestResultProducts = flow.latestResultProducts || [];
+
+    if (!latestResultProducts || !latestResultProducts.length) {
+      return latestResultProducts;
+    }
+
+    const { productById, uomById } = await getProductAndUoms(
+      subdomain,
+      latestResultProducts
+    );
+
+    for (const result of latestResultProducts) {
+      result.product = productById[result.productId] || {};
+      result.uom = uomById[result.uomId] || {};
+    }
+
+    return latestResultProducts;
   }
 };

@@ -53,6 +53,7 @@ export interface IFlow {
   productId?: string;
   product?: IProduct;
   status: string;
+  isSub?: boolean;
   flowValidation?: string;
   jobs?: IJob[];
   needProducts?: IProductsData[];
@@ -66,8 +67,12 @@ export interface IFlowDocument extends IFlow, Document {
   updatedAt?: Date;
   updatedBy?: string;
   jobCount: number;
-  needProducts?: IProductsData[];
-  resultProducts?: IProductsData[];
+  latestBranchId?: String;
+  latestDepartmentId?: String;
+  latestBranch?: any;
+  latestDepartment?: any;
+  latestNeedProducts?: IProductsData[];
+  latestResultProducts?: IProductsData[];
 }
 
 // FLOW
@@ -76,6 +81,7 @@ export type FlowsQueryResponse = {
   flows: IFlowDocument[];
   refetch: (variables?: {
     searchValue?: string;
+    isSub?: boolean;
     perPage?: number;
     categoryId?: string;
   }) => void;

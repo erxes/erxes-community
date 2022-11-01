@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
-import { IJobRefer } from './jobs';
+import { IJobRefer, IProductsData, productsDataSchema } from './jobs';
 
 export interface IJob {
   id: string;
@@ -16,7 +16,8 @@ export interface IJob {
     outDepartmentId: string;
     durationType: string;
     duration: number;
-    // quantity: number;
+    quantity?: number;
+    uomId?: string;
   };
   style: object;
   label: string;
@@ -32,6 +33,7 @@ export interface IFlow {
   categoryId?: string;
   productId?: string;
   status: string;
+  isSub: boolean;
   flowValidation: string;
   jobs?: IJobDocument[];
 }
@@ -42,6 +44,10 @@ export interface IFlowDocument extends IFlow, Document {
   createdBy: string;
   updatedAt: Date;
   updatedBy: string;
+  latestBranchId: string;
+  latestDepartmentId: string;
+  latestResultProducts: IProductsData[];
+  latestNeedProducts: IProductsData[];
 }
 
 export const jobSchema = new Schema(
@@ -75,6 +81,7 @@ export const flowSchema = schemaHooksWrapper(
       index: true
     }),
     status: field({ type: String, label: 'Status' }),
+    isSub: field({ type: Boolean, optional: true, label: 'Is Sub Flow' }),
     flowValidation: field({
       type: String,
       optional: true,
@@ -86,7 +93,21 @@ export const flowSchema = schemaHooksWrapper(
     updatedBy: { type: String },
     jobs: field({ type: [jobSchema], optional: true, label: 'Jobs' }),
     latestBranchId: { type: String, optional: true },
-    latestDepartmentId: { type: String, optional: true }
+    latestDepartmentId: { type: String, optional: true },
+    latestResultProducts: {
+      type: {
+        type: [productsDataSchema],
+        optional: true,
+        label: 'Result products'
+      }
+    },
+    latestNeedProducts: {
+      type: {
+        type: [productsDataSchema],
+        optional: true,
+        label: 'Need products'
+      }
+    }
   }),
   'erxes_flows'
 );

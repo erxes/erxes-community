@@ -8,6 +8,7 @@ import { ScrolledContent, CloseIcon } from '../../../styles';
 
 type Props = {
   flowJobsOfEnd?: IJob;
+  isSub?: boolean;
   onClickFlowJob: (flowJob: IJob) => void;
   setMainState: (param: any) => void;
 };
@@ -28,8 +29,12 @@ class FlowJobsForm extends React.Component<Props, State> {
   }
 
   renderBox(flowJob, index) {
-    const { flowJobsOfEnd, onClickFlowJob } = this.props;
+    const { flowJobsOfEnd, isSub, onClickFlowJob } = this.props;
     if (flowJobsOfEnd && flowJob.type === FLOWJOB_TYPES.ENDPOINT) {
+      return <></>;
+    }
+
+    if (isSub && flowJob.type === FLOWJOB_TYPES.FLOW) {
       return <></>;
     }
 
