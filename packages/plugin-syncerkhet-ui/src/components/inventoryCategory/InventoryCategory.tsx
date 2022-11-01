@@ -42,8 +42,7 @@ class InventoryCategory extends React.Component<Props, State> {
       <Row history={history} key={c.code} category={c} action={action} />
     ));
   };
-
-  renderTable = (data: any, action: string) => {
+  calculatePagination = (data: any) => {
     const { queryParams } = this.props;
 
     if (Object.keys(queryParams).length !== 0) {
@@ -69,9 +68,20 @@ class InventoryCategory extends React.Component<Props, State> {
       data = data.slice(0, 20);
     }
 
+    return data;
+  };
+
+  excludeSyncTrue = (data: any) => {
+    return data.filter(d => d.syncStatus == false);
+  };
+
+  renderTable = (data: any, action: string) => {
+    data = this.calculatePagination(data);
     const onClickSync = () => {
+      data = this.excludeSyncTrue(data);
       this.props.toSyncCategories(action, data);
     };
+
     const syncButton = (
       <>
         <Button
@@ -86,12 +96,6 @@ class InventoryCategory extends React.Component<Props, State> {
     );
     const header = <Wrapper.ActionBar right={syncButton} />;
 
-    const pagination = (
-      <div>
-        <Pagination count={10} />
-      </div>
-    );
-
     return (
       <>
         {header}
@@ -100,12 +104,13 @@ class InventoryCategory extends React.Component<Props, State> {
             <tr>
               <th>{__('Code')}</th>
               <th>{__('Name')}</th>
-              {action === 'UPDATE' ? <th>{__('Update Status')}</th> : <th></th>}
+              {action === 'UPDATE' ? <th>{__('Update Status')}</th> : <></>}
+              {action === 'CREATE' ? <th>{__('Create Status')}</th> : <></>}
+              {action === 'DELETE' ? <th>{__('Delete Status')}</th> : <></>}
             </tr>
           </thead>
           <tbody>{this.renderRow(data, action)}</tbody>
         </Table>
-        {pagination}
       </>
     );
   };

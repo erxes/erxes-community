@@ -12,13 +12,45 @@ class Row extends React.Component<Props> {
 
     const onTrClick = () => {};
 
-    const { name, code } = category;
+    const { name, code, syncStatus } = category;
 
     return (
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
-        {action === 'UPDATE' ? <td>false</td> : <td></td>}
+        {action === 'CREATE' ? (
+          <td>
+            {syncStatus === false ? (
+              <></>
+            ) : (
+              <span style={{ color: '#27ae60' }}> Synced </span>
+            )}
+          </td>
+        ) : (
+          <></>
+        )}
+        {action === 'UPDATE' ? (
+          <td>
+            {syncStatus === false ? (
+              <></>
+            ) : (
+              <span style={{ color: '#27ae60' }}> Synced </span>
+            )}
+          </td>
+        ) : (
+          <></>
+        )}
+        {action === 'DELETE' ? (
+          <td>
+            {syncStatus === false ? (
+              <></>
+            ) : (
+              <span style={{ color: '#27ae60' }}> Synced </span>
+            )}
+          </td>
+        ) : (
+          <></>
+        )}
       </tr>
     );
   }
