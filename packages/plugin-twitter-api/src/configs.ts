@@ -4,6 +4,8 @@ import resolvers from './graphql/resolvers';
 import { initBroker } from './messageBroker';
 import { generateModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import initApp from './index';
+import { initMemoryStorage } from './inmemoryStorage';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -35,34 +37,17 @@ export default {
 
   onServerInit: async options => {
     mainDb = options.db;
+
     const app = options.app;
 
-    debug = options.debug;
-    graphqlPubsub = options.pubsubClient;
+    initMemoryStorage();
 
     initBroker(options.messageBrokerClient);
 
-    app.get('/twitter/login', async (_req, res) => {
-      // const { twitterAuthUrl } = await twitterUtils.getTwitterAuthUrl();
+    initApp(app);
 
-      return res.redirect('twitter');
-    });
-    app.get('/connect-twitter', async (req: any, res, _next) => {
-      console.log('HAHAHA');
+    graphqlPubsub = options.pubsubClient;
 
-      if (!req.user) {
-        return res.end('forbidden');
-      }
-
-      const { link, kind, type } = req.query;
-
-      let url = `${process.env.REACT_APP_DOMAIN_URL}/${link}?kind=${kind}&userId=${req.user._id}`;
-
-      if (type) {
-        url = `${url}&type=${type}`;
-      }
-
-      return res.redirect(url);
-    });
+    debug = options.debug;
   }
 };

@@ -47,9 +47,13 @@ class AccountContainer extends React.Component<FinalProps, {}> {
 
     const { REACT_APP_API_URL } = getEnv();
 
-    const url = `${REACT_APP_API_URL}pl:twitter/connect-integration?link=${addLink}&kind=${kind}`;
-
-    this.popupWindow(url, 'Integration', window, 660, 750);
+    this.popupWindow(
+      `${REACT_APP_API_URL}/pl:twitter/${addLink}?kind=${kind}`,
+      'Integration',
+      window,
+      660,
+      750
+    );
   };
 
   removeAccount = (accountId: string) => {

@@ -1,11 +1,11 @@
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
-// import * as sanitizeHtml from 'sanitize-html';
+import * as sanitizeHtml from 'sanitize-html';
+import { IModels } from './connectionResolver';
+import { debugBase, debugExternalRequests } from './debuggers';
 import memoryStorage from './inmemoryStorage';
-// import { sendRPCMessage } from './messageBroker';
-// import { sendDailyRequest } from './videoCall/controller';
-// import { IRecording } from './videoCall/models';
-
+import { sendRPCMessage } from './messageBroker';
+import Configs from './models/Configs';
 dotenv.config();
 interface IRequestParams {
   url?: string;
@@ -31,23 +31,23 @@ interface IRequestParams {
   };
 }
 
-// /**
-//  * Check and throw error when concurrent
-//  * @param {Object} e - error
-//  * @param {String} name - model
-//  * @returns throw Error
-//  */
-// export const checkConcurrentError = (e: any, name: string) => {
-//   throw new Error(
-//     e.message.includes('duplicate')
-//       ? `Concurrent request: nylas ${name} duplication`
-//       : e
-//   );
-// };
+/**
+ * Check and throw error when concurrent
+ * @param {Object} e - error
+ * @param {String} name - model
+ * @returns throw Error
+ */
+export const checkConcurrentError = (e: any, name: string) => {
+  throw new Error(
+    e.message.includes('duplicate')
+      ? `Concurrent request: nylas ${name} duplication`
+      : e
+  );
+};
 
-// /**
-//  * Send request
-//  */
+/**
+ * Send request
+ */
 export const sendRequest = ({
   url,
   headerType,
@@ -62,8 +62,16 @@ export const sendRequest = ({
     const reqBody = JSON.stringify(body || {});
     const reqParams = JSON.stringify(params || {});
 
+    debugExternalRequests(`
+        Sending request
+        url: ${url}
+        method: ${method}
+        body: ${reqBody}
+        params: ${reqParams}
+      `);
+
     request({
-      uri: encodeURI(''),
+      uri: encodeURI(url!),
       method,
       headers: {
         'Content-Type': headerType || 'application/json',
@@ -77,12 +85,21 @@ export const sendRequest = ({
       json: true
     })
       .then(res => {
+        debugExternalRequests(`
+        Success from ${url}
+        requestBody: ${reqBody}
+        requestParams: ${reqParams}
+        responseBody: ${JSON.stringify(res)}
+      `);
+
         return resolve(res);
       })
       .catch(e => {
         if (e.code === 'ECONNREFUSED') {
+          debugExternalRequests(`Failed to connect ${url}`);
           throw new Error(`Failed to connect ${url}`);
         } else {
+          debugExternalRequests(`Error occurred in ${url}: ${e.body}`);
           reject(e);
         }
       });
@@ -94,14 +111,14 @@ export const sendRequest = ({
  * @param {String} body
  * @returns {String} striped text
  */
-// export const cleanHtml = (body: string) => {
-//   const clean = sanitizeHtml(body || '', {
-//     allowedTags: [],
-//     allowedAttributes: {}
-//   }).trim();
+export const cleanHtml = (body: string) => {
+  const clean = sanitizeHtml(body || '', {
+    allowedTags: [],
+    allowedAttributes: {}
+  }).trim();
 
-//   return clean.substring(0, 65);
-// };
+  return clean.substring(0, 65);
+};
 
 export const getEnv = ({
   name,
@@ -117,22 +134,23 @@ export const getEnv = ({
   }
 
   if (!value) {
+    debugBase(`Missing environment variable configuration for ${name}`);
   }
 
   return value || '';
 };
 
-// /**
-//  * Compose functions
-//  * @param {Functions} fns
-//  * @returns {Promise} fns value
-//  */
-// export const compose = (...fns) => arg =>
-//   fns.reduceRight((p, f) => p.then(f), Promise.resolve(arg));
+/**
+ * Compose functions
+ * @param {Functions} fns
+ * @returns {Promise} fns value
+ */
+export const compose = (...fns) => arg =>
+  fns.reduceRight((p, f) => p.then(f), Promise.resolve(arg));
 
-// /*
-//  * Generate url depending on given file upload publicly or not
-//  */
+/*
+ * Generate url depending on given file upload publicly or not
+ */
 export const generateAttachmentUrl = (urlOrName: string) => {
   const MAIN_API_DOMAIN = getEnv({ name: 'MAIN_API_DOMAIN' });
 
@@ -164,7 +182,7 @@ export const downloadAttachment = urlOrName => {
   });
 };
 
-export const getConfigs = async models => {
+export const getConfigs = async () => {
   const configsCache = await memoryStorage().get('configs_erxes_integrations');
 
   if (configsCache && configsCache !== '{}') {
@@ -172,7 +190,7 @@ export const getConfigs = async models => {
   }
 
   const configsMap = {};
-  const configs = await models.Configs.find({});
+  const configs = await Configs.find({});
 
   for (const config of configs) {
     configsMap[config.code] = config.value;
@@ -183,8 +201,8 @@ export const getConfigs = async models => {
   return configsMap;
 };
 
-export const getConfig = async (code, defaultValue?, models?) => {
-  const configs = await getConfigs(models);
+export const getConfig = async (code, defaultValue?) => {
+  const configs = await getConfigs();
 
   if (!configs[code]) {
     return defaultValue;
@@ -193,62 +211,42 @@ export const getConfig = async (code, defaultValue?, models?) => {
   return configs[code];
 };
 
-// export const getCommonGoogleConfigs = async () => {
-//   const response = await sendRPCMessage({ action: 'get-configs' });
+export const getCommonGoogleConfigs = async () => {
+  const response = await sendRPCMessage({ action: 'get-configs' });
 
-//   const configs = response.configs;
+  const configs = response.configs;
 
-//   return {
-//     GOOGLE_PROJECT_ID: configs.GOOGLE_PROJECT_ID,
-//     GOOGLE_CLIENT_ID: configs.GOOGLE_CLIENT_ID,
-//     GOOGLE_CLIENT_SECRET: configs.GOOGLE_CLIENT_SECRET,
-//     GOOGLE_GMAIL_TOPIC: configs.GOOGLE_GMAIL_TOPIC
-//   };
-// };
+  return {
+    GOOGLE_PROJECT_ID: configs.GOOGLE_PROJECT_ID,
+    GOOGLE_CLIENT_ID: configs.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: configs.GOOGLE_CLIENT_SECRET,
+    GOOGLE_GMAIL_TOPIC: configs.GOOGLE_GMAIL_TOPIC
+  };
+};
 
-// export const resetConfigsCache = () => {
-//   memoryStorage().set('configs_erxes_integrations', '');
-// };
+export const resetConfigsCache = () => {
+  memoryStorage().set('configs_erxes_integrations', '');
+};
 
-// export const generateUid = () => {
-//   return (
-//     '_' +
-//     Math.random()
-//       .toString(36)
-//       .substr(2, 9)
-//   );
-// };
+export const generateUid = () => {
+  return (
+    '_' +
+    Math.random()
+      .toString(36)
+      .substr(2, 9)
+  );
+};
 
-// export const isAfter = (
-//   expiresTimestamp: number,
-//   defaultMillisecond?: number
-// ) => {
-//   const millisecond = defaultMillisecond || new Date().getTime();
-//   const expiresMillisecond = new Date(expiresTimestamp * 1000).getTime();
+export const isAfter = (
+  expiresTimestamp: number,
+  defaultMillisecond?: number
+) => {
+  const millisecond = defaultMillisecond || new Date().getTime();
+  const expiresMillisecond = new Date(expiresTimestamp * 1000).getTime();
 
-//   if (expiresMillisecond > millisecond) {
-//     return true;
-//   }
+  if (expiresMillisecond > millisecond) {
+    return true;
+  }
 
-//   return false;
-// };
-
-// export const getRecordings = async (recordings: IRecording[]) => {
-//   const newRecordings: IRecording[] = [];
-
-//   for (const record of recordings) {
-//     if (!record.expires || (record.expires && !isAfter(record.expires))) {
-//       const accessLinkResponse = await sendDailyRequest(
-//         `/api/v1/recordings/${record.id}/access-link`,
-//         'GET'
-//       );
-
-//       record.expires = accessLinkResponse.expires;
-//       record.url = accessLinkResponse.download_link;
-//     }
-
-//     newRecordings.push(record);
-//   }
-
-//   return newRecordings;
-// };
+  return false;
+};
