@@ -57,7 +57,6 @@ export const queries = `
 
 const flowParams = `
   name: String,
-  categoryId: String,
   productId: String,
   status: String,
   isSub: Boolean,
