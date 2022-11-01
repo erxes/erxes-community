@@ -8,7 +8,7 @@ import {
 } from '../../../utils/consumeInventory';
 
 const inventoryMutations = {
-  async toCheckProducts(_root, { subdomain }: IContext) {
+  async toCheckProducts(_root, _params, { subdomain }: IContext) {
     const config = await getConfig(subdomain, 'ERKHET', {});
 
     if (!config.apiToken || !config.apiKey || !config.apiSecret) {
@@ -48,7 +48,6 @@ const inventoryMutations = {
         is_gen_fk: 'true'
       }
     });
-    console.log(response);
 
     if (!response && Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
@@ -92,7 +91,7 @@ const inventoryMutations = {
     };
   },
 
-  async toCheckCategories(_root, { subdomain }: IContext) {
+  async toCheckCategories(_root, _params, { subdomain }: IContext) {
     const config = await getConfig(subdomain, 'ERKHET', {});
 
     if (!config.apiToken || !config.apiKey || !config.apiSecret) {

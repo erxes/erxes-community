@@ -30,6 +30,7 @@ export const commonMutationVariables = `
   $priority: String,
   $sourceConversationIds: [String],
   $customFieldsData: JSON,
+  $tagIds: [String]
 `;
 
 export const commonMutationParams = `
@@ -48,6 +49,7 @@ export const commonMutationParams = `
   priority: $priority,
   sourceConversationIds: $sourceConversationIds,
   customFieldsData: $customFieldsData,
+  tagIds: $tagIds
 `;
 
 export const commonDragVariables = `
@@ -85,6 +87,7 @@ export const commonListFields = `
   hasNotified
   score
   number
+  tagIds
   customProperties
 `;
 
@@ -96,6 +99,17 @@ export const commonFields = `
   pipeline {
     _id
     name
+    tagId
+
+    ${
+      isEnabled('tags')
+        ? `
+        tag {
+          order
+        }
+    `
+        : ``
+    }
   }
   boardId
   ${
@@ -124,6 +138,18 @@ export const commonFields = `
   `
       : ``
   }
+  ${
+    isEnabled('tags')
+      ? `
+  tags {
+    _id
+    name
+    colorCode
+  }
+  `
+      : ``
+  }
+  tagIds
   startDate
   closeDate
   description
