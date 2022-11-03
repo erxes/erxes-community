@@ -48,7 +48,7 @@ export const loadClasses = (
 
   models.Customers = db.model<ICustomerDocument, ICustomerModel>(
     'customers_twitter',
-    loadCustomerClass(models)
+    loadCustomerClass()
   );
 
   models.Conversations = db.model<IConversationDocument, IConversationModel>(

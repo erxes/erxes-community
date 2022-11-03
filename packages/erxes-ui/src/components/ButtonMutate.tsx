@@ -85,8 +85,6 @@ class ButtonMutate extends React.Component<Props, { isLoading: boolean }> {
     if (!disableLoading) {
       this.setState({ isLoading: true });
     }
-
-    console.log('edit', mutation, variables);
     client
       .mutate({
         mutation: gql(mutation),

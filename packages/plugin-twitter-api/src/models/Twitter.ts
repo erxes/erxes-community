@@ -15,7 +15,7 @@ import {
 
 export interface ICustomerModel extends Model<ICustomerDocument> {}
 
-export const loadCustomerClass = models => {
+export const loadCustomerClass = () => {
   class Customer {}
 
   customerSchema.loadClass(Customer);

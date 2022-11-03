@@ -1,5 +1,37 @@
 import { isEnabled } from '@erxes/ui/src/utils/core';
 
+const commonParamsDef = `
+  $channelId: String,
+  $brandId: String,
+  $kind: String,
+  $perPage: Int,
+  $page: Int,
+  $searchValue: String
+  $status: String
+`;
+
+const commonParams = `
+  channelId: $channelId,
+  brandId: $brandId,
+  kind: $kind,
+  perPage: $perPage,
+  page: $page,
+  searchValue: $searchValue
+  status: $status
+`;
+
+const commonFields = `
+  _id
+  name
+  brandId
+  languageCode
+  isActive
+  channels {
+    _id
+    name
+  }
+`;
+
 const brands = `
   query brands {
     brands {
@@ -50,8 +82,39 @@ const integrationsGetTwitterAccount = `
   }
 `;
 
+const integrations = `
+  query integrations(${commonParamsDef}) {
+    integrations(${commonParams}) {
+      ${commonFields}
+
+      kind
+      brand {
+        _id
+        name
+        code
+      }
+      webhookData
+      leadData
+      formId
+      tagIds
+      tags {
+        _id
+        colorCode
+        name
+      }
+      form {
+        _id
+        title
+        code
+      }
+      healthStatus
+    }
+  }
+`;
+
 export default {
   brands,
+  integrations,
   integrationTotalCount,
   integrationsGetConfigs,
   integrationsGetIntegrationDetail,

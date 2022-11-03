@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
 import * as sanitizeHtml from 'sanitize-html';
-import { IModels } from './connectionResolver';
-import { debugBase, debugExternalRequests } from './debuggers';
 import memoryStorage from './inmemoryStorage';
 import { sendRPCMessage } from './messageBroker';
 import Configs from './models/Configs';
@@ -62,14 +60,6 @@ export const sendRequest = ({
     const reqBody = JSON.stringify(body || {});
     const reqParams = JSON.stringify(params || {});
 
-    debugExternalRequests(`
-        Sending request
-        url: ${url}
-        method: ${method}
-        body: ${reqBody}
-        params: ${reqParams}
-      `);
-
     request({
       uri: encodeURI(url!),
       method,
@@ -85,21 +75,12 @@ export const sendRequest = ({
       json: true
     })
       .then(res => {
-        debugExternalRequests(`
-        Success from ${url}
-        requestBody: ${reqBody}
-        requestParams: ${reqParams}
-        responseBody: ${JSON.stringify(res)}
-      `);
-
         return resolve(res);
       })
       .catch(e => {
         if (e.code === 'ECONNREFUSED') {
-          debugExternalRequests(`Failed to connect ${url}`);
           throw new Error(`Failed to connect ${url}`);
         } else {
-          debugExternalRequests(`Error occurred in ${url}: ${e.body}`);
           reject(e);
         }
       });
@@ -134,7 +115,6 @@ export const getEnv = ({
   }
 
   if (!value) {
-    debugBase(`Missing environment variable configuration for ${name}`);
   }
 
   return value || '';

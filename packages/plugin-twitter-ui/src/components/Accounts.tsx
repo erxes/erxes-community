@@ -1,18 +1,10 @@
-import {
-  AccountBox,
-  AccountItem,
-  AccountTitle,
-  FacebookButton,
-  GoogleButton
-} from '../styles';
+import { AccountBox, AccountItem, AccountTitle } from '../styles';
 import { IAccount, IntegrationTypes } from '../types';
 import { __, confirm } from 'coreui/utils';
-
 import Button from '@erxes/ui/src/components/Button';
 import { CenterText } from '@erxes/ui-log/src/activityLogs/styles';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import { IFormProps } from '@erxes/ui/src/types';
-import Icon from '@erxes/ui/src/components/Icon';
 import React from 'react';
 
 type Props = {
@@ -41,7 +33,7 @@ class Accounts extends React.Component<Props, { accountId?: string }> {
   };
 
   onSelectAccount = (accountId: string) => {
-    this.props.onSelect(accountId);
+    this.props.onSelect && this.props.onSelect(accountId);
 
     this.setState({ accountId: accountId || '' });
   };

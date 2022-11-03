@@ -1,44 +1,7 @@
 import { IContext } from '../../connectionResolver';
-import { getEnv } from '../../utils';
-import receiveDms from '../../receiveDms';
 import * as twitterUtils from '../../api';
 
 const TwitterQueries = {
-  async twitterLogin(_root) {
-    const { twitterAuthUrl } = await twitterUtils.getTwitterAuthUrl();
-    return twitterAuthUrl;
-    console.log();
-  },
-
-  async twitterCallbackAdd(
-    _root,
-    { oauth_token, oauth_verifier, oauth_token_secret, redirect },
-    { models }: IContext
-  ) {
-    const response = await twitterUtils.veriyfyLoginToken(
-      oauth_token,
-      oauth_verifier
-    );
-
-    const profile = await twitterUtils.verifyUser(
-      oauth_token,
-      oauth_token_secret
-    );
-
-    await models.Accounts.create({
-      token: oauth_token,
-      tokenSecret: oauth_token_secret,
-      name: profile.screen_name,
-      kind: 'twitter',
-      uid: profile.id_str
-    });
-
-    const MAIN_APP_DOMAIN = getEnv({ name: 'MAIN_APP_DOMAIN' });
-
-    const url = `${MAIN_APP_DOMAIN}/settings/integrations?twitterAuthorized=true`;
-
-    return redirect(url);
-  },
   async twitterWebhook(_root, { crc_token_param }) {
     const crc_token = crc_token_param;
 

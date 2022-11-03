@@ -1,8 +1,6 @@
 import * as React from 'react';
-
 import { IButtonMutateProps, IRouterProps } from '@erxes/ui/src/types';
 import { mutations, queries } from '../graphql';
-
 import { Alert } from '@erxes/ui/src/utils';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import Twitter from '../components/Twitter';

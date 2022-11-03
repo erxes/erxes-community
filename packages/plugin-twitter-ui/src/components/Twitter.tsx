@@ -42,7 +42,6 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
 
   renderContent = (formProps: IFormProps) => {
     const { onRemoveAccount, onAccountSelect, renderButton } = this.props;
-
     const { values, isSubmitted } = formProps;
 
     return (
@@ -57,7 +56,7 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
 
         <Accounts
           kind="twitter"
-          addLink="twitter/login"
+          addLink="login"
           onSelect={onAccountSelect}
           onRemove={onRemoveAccount}
           formProps={formProps}

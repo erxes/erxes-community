@@ -1,6 +1,5 @@
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
-import * as queryString from 'querystring';
 import * as request from 'request-promise';
 import { IAccount } from './models/definitions/twitter';
 import { getConfig, getEnv } from './utils';
@@ -31,7 +30,7 @@ export const getTwitterConfig = async (): Promise<ITwitterConfig> => {
 };
 
 export const getTwitterAuthUrl = async (): Promise<{
-  responseParams: queryString.ParsedUrlQuery;
+  responseParams;
   twitterAuthUrl: string;
 }> => {
   const twitterConfig = await getTwitterConfig();
@@ -40,7 +39,7 @@ export const getTwitterAuthUrl = async (): Promise<{
     url: 'https://api.twitter.com/oauth/request_token',
     method: 'POST',
     oauth: {
-      callback: `${getEnv({ name: 'DOMAIN' })}/twitter/callback/add`,
+      callback: `http://localhost:4000/pl:twitter/callback/add`,
       consumer_key: twitterConfig.oauth.consumer_key,
       consumer_secret: twitterConfig.oauth.consumer_secret
     }
@@ -51,13 +50,13 @@ export const getTwitterAuthUrl = async (): Promise<{
       .post(requestOptions)
       .then(response => {
         // construct sign-in URL from returned authorization token
-        const responseParams = queryString.parse(response);
+        const responseParams: any = Object.fromEntries(
+          new URLSearchParams(response)
+        );
 
         const twitterAuthUrl =
           'https://api.twitter.com/oauth/authenticate?force_login=true&oauth_token=' +
           responseParams.oauth_token;
-
-        console.log(twitterAuthUrl, 'TWITTER_URL');
 
         resolve({
           responseParams,
@@ -381,7 +380,7 @@ export const upload = async base64 => {
   });
 };
 
-export const veriyfyLoginToken = async (
+export const verifyLoginToken = async (
   oauthToken,
   oauthVerifier
 ): Promise<{
@@ -409,7 +408,9 @@ export const veriyfyLoginToken = async (
     request
       .post(requestOptions)
       .then(res => {
-        const responseParams: any = queryString.parse(res);
+        const responseParams: any = Object.fromEntries(
+          new URLSearchParams(res)
+        );
 
         resolve({ ...responseParams });
       })
