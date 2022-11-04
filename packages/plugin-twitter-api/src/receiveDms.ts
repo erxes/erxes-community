@@ -1,9 +1,11 @@
 import {
-  createConverstaionMessage,
+  createConversationMessage,
   getOrCreateConversation,
   getOrCreateCustomer,
   IUser
 } from './store';
+import Accounts from './models/Accounts';
+import Integrations from './models/Integrations';
 
 export interface IUsers {
   [key: string]: IUser;
@@ -24,7 +26,7 @@ const extractUrlFromAttachment = attachment => {
   return null;
 };
 
-const receiveDms = async (requestBody, models) => {
+const receiveDms = async requestBody => {
   const { direct_message_events } = requestBody;
 
   const users: IUsers = requestBody.users;
@@ -49,18 +51,17 @@ const receiveDms = async (requestBody, models) => {
         attachments.push({ ...extractUrlFromAttachment(attachment) });
       }
 
-      const account = await models.Accounts.findOne({ uid: receiverId });
+      const account = await Accounts.findOne({ uid: receiverId });
 
       if (!account) {
         return;
       }
 
-      const integration = await models.Integrations.getIntegration({
+      const integration = await Integrations.getIntegration({
         $and: [{ accountId: account._id }, { kind: 'twitter-dm' }]
       });
 
       const customer = await getOrCreateCustomer(
-        models,
         integration,
         senderId,
         users[senderId]
@@ -70,7 +71,6 @@ const receiveDms = async (requestBody, models) => {
       const customerErxesApiId: any = customer.erxesApiId;
 
       const conversation = await getOrCreateConversation(
-        models,
         senderId,
         receiverId,
         integration._id,
@@ -79,8 +79,7 @@ const receiveDms = async (requestBody, models) => {
         integration.erxesApiId
       );
 
-      await createConverstaionMessage(
-        models,
+      await createConversationMessage(
         event,
         content,
         attachments,

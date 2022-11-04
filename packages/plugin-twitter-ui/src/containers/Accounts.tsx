@@ -65,7 +65,7 @@ class AccountContainer extends React.Component<FinalProps, {}> {
         onRemove(accountId);
       })
       .catch(e => {
-        Alert.error(e.message);
+        // Alert.error(e.message);
       });
   };
 

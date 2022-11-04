@@ -10,7 +10,6 @@ const init = async app => {
 
     return res.redirect(twitterAuthUrl);
   });
-
   app.get(`/callback/add`, async (req, res) => {
     const response = await twitterUtils.verifyLoginToken(
       req.query.oauth_token,
@@ -40,26 +39,22 @@ const init = async app => {
     if (crc_token) {
       const hash = await twitterUtils.getChallengeResponse(crc_token);
 
-      res.status(200);
       return res.json({
         response_token: `sha256=${hash}`
       });
     } else {
-      res.status(400);
-      return res.send('Error: crc_token missing from request.');
+      return 'Error: crc_token missing from request.';
     }
   });
-
   app.post('/twitter/webhook', async (req, res, models: IModels) => {
     try {
-      await receiveDms(req.body, models);
+      await receiveDms(req.body);
     } catch (e) {
       return new Error(e);
     }
 
     res.sendStatus(200);
   });
-
   app.get('/twitter/get-account', async (req, res, models: IModels) => {
     const account = await models.Accounts.findOne({ _id: req.query.accountId });
 
@@ -69,8 +64,7 @@ const init = async app => {
 
     return account.uid;
   });
-
-  app.post('/twitter/create-integration', async (req, res, models: IModels) => {
+  app.post('/twitter/create-integration', async (req, models: IModels) => {
     const { accountId, integrationId, data, kind } = req.body;
 
     const prevEntry = await models.Integrations.findOne({
@@ -101,10 +95,7 @@ const init = async app => {
         await twitterUtils.subscribeToWebhook(account);
       }
     }
-
-    return res.json({ status: 'ok ' });
   });
-
   app.post('/twitter/reply', async (req, models: IModels) => {
     const { attachments, conversationId, content, integrationId } = req.body;
 

@@ -5,6 +5,8 @@ import {
 } from './models/definitions/twitter';
 import { IModels } from './connectionResolver';
 
+let models: IModels;
+
 export interface IUser {
   id: string;
   created_timestamp: string;
@@ -20,7 +22,6 @@ export interface IUser {
 }
 
 export const getOrCreateCustomer = async (
-  models: IModels,
   integration: IIntegrationDocument,
   userId: string,
   receiver: IUser
@@ -73,7 +74,6 @@ export const getOrCreateCustomer = async (
 };
 
 export const getOrCreateConversation = async (
-  models: IModels,
   senderId: string,
   receiverId: string,
   integrationId: string,
@@ -130,8 +130,7 @@ export const getOrCreateConversation = async (
   return conversation;
 };
 
-export const createConverstaionMessage = async (
-  models: IModels,
+export const createConversationMessage = async (
   event: any,
   content: string,
   attachments: any[],

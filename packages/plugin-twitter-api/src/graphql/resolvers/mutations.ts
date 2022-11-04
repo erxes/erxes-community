@@ -6,7 +6,7 @@ import receiveDms from '../../receiveDms';
 const twitterMutations = {
   async twitterWebhookPost(_root, { data }, { models }: IContext) {
     try {
-      await receiveDms(data, models);
+      await receiveDms(data);
     } catch (e) {
       return new Error(e);
     }
