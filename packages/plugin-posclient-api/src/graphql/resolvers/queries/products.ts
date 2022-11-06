@@ -56,7 +56,7 @@ const generateFilter = async (
     filter.$or = [
       { name: { $in: [regex] } },
       { code: { $in: [regex] } },
-      { barcodes: { $in: [regex] } }
+      { barcodes: { $in: [searchValue] } }
     ];
   }
   return filter;
