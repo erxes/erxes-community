@@ -1,6 +1,6 @@
-import { ICommonFormProps } from '@erxes/ui-settings/src/common/types';
 import CommonForm from '@erxes/ui-settings/src/common/components/Form';
-import { Button, Spinner, Tip, FormGroup, __ } from '@erxes/ui/src';
+import { ICommonFormProps } from '@erxes/ui-settings/src/common/types';
+import { Button, FormGroup, Spinner, Tip, __ } from '@erxes/ui/src';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { ColorPick, ColorPicker, FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
@@ -9,17 +9,18 @@ import React from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import TwitterPicker from 'react-color/lib/Twitter';
-import { COLORS, calculateMethods } from '../common/constants';
+import Select from 'react-select-plus';
+import { calculateMethods, COLORS } from '../common/constants';
 import { RiskAssessmentsType, RiskCalculateLogicType } from '../common/types';
 import { SelectWithCategory } from '../common/utils';
-import { FormContainer, FormGroupRow } from '../styles';
-import Select from 'react-select-plus';
+import { FormContainer } from '../styles';
 
 type Props = {
   assessmentDetail?: RiskAssessmentsType;
   detailLoading?: boolean;
   renderButton?: (props: IButtonMutateProps) => JSX.Element;
   categoryId?: string;
+  fieldsSkip?: any;
 } & ICommonFormProps;
 
 type CustomFromGroupProps = {
@@ -53,12 +54,20 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
 
   generateDoc(values) {
     const { riskAssessment } = this.state;
-    const { assessmentDetail } = this.props;
+    const { assessmentDetail, fieldsSkip } = this.props;
     if (assessmentDetail) {
       delete values.logic;
       delete values.value;
       delete values.value2;
       riskAssessment.calculateLogics?.forEach(logic => delete logic.__typename);
+      if (fieldsSkip) {
+        return {
+          ...values,
+          calculateMethod: riskAssessment.calculateMethod,
+          categoryId: riskAssessment.categoryId,
+          calculateLogics: riskAssessment.calculateLogics
+        };
+      }
       return {
         id: assessmentDetail._id,
         doc: { ...values, calculateLogics: riskAssessment.calculateLogics }
@@ -75,11 +84,17 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
         riskAssessment.calculateLogics &&
         riskAssessment?.calculateLogics.map(logic =>
           logic._id === _id
-            ? { ...logic, [name]: ['value', 'value2'].includes(name) ? parseInt(value) : value }
+            ? {
+                ...logic,
+                [name]: ['value', 'value2'].includes(name) ? parseInt(value) : value
+              }
             : logic
         );
       this.setState(prev => ({
-        riskAssessment: { ...prev.riskAssessment, calculateLogics: newVariables }
+        riskAssessment: {
+          ...prev.riskAssessment,
+          calculateLogics: newVariables
+        }
       }));
     };
 
@@ -89,7 +104,10 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
         riskAssessment.calculateLogics &&
         riskAssessment?.calculateLogics.filter(logic => logic._id !== _id);
       this.setState(prev => ({
-        riskAssessment: { ...prev.riskAssessment, calculateLogics: removedLogicRows }
+        riskAssessment: {
+          ...prev.riskAssessment,
+          calculateLogics: removedLogicRows
+        }
       }));
     };
 
@@ -101,7 +119,10 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
           logic._id === _id ? { ...logic, color: hex } : logic
         );
       this.setState(prev => ({
-        riskAssessment: { ...prev.riskAssessment, calculateLogics: newVariables }
+        riskAssessment: {
+          ...prev.riskAssessment,
+          calculateLogics: newVariables
+        }
       }));
     };
 
@@ -233,11 +254,15 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
     };
     const handleState = e => {
       const { name, value } = e.currentTarget as HTMLInputElement;
-      this.setState(prev => ({ riskAssessment: { ...prev.riskAssessment, [name]: value } }));
+      this.setState(prev => ({
+        riskAssessment: { ...prev.riskAssessment, [name]: value }
+      }));
     };
 
     const handleChangeCategory = value => {
-      this.setState(prev => ({ riskAssessment: { ...prev.riskAssessment, categoryId: value } }));
+      this.setState(prev => ({
+        riskAssessment: { ...prev.riskAssessment, categoryId: value }
+      }));
     };
 
     const handleChangeCalculateMethod = ({ value }) => {
@@ -306,13 +331,16 @@ class Form extends React.Component<Props & ICommonFormProps, State> {
   };
 
   render() {
-    const { assessmentDetail, renderButton } = this.props;
+    const { assessmentDetail, renderButton, fieldsSkip } = this.props;
 
     const renderBtn = () => {
       if (!assessmentDetail?.status) {
         return renderButton;
       }
       if (assessmentDetail.status === 'In Progress') {
+        return renderButton;
+      }
+      if (fieldsSkip) {
         return renderButton;
       }
     };
