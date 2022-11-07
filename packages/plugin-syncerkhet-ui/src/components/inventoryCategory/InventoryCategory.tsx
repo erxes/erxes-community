@@ -38,9 +38,7 @@ class InventoryCategory extends React.Component<Props, State> {
   }
 
   renderRow = (data: any, action: string) => {
-    return data.map(c => (
-      <Row history={history} key={c.code} category={c} action={action} />
-    ));
+    return data.map(c => <Row key={c.code} category={c} action={action} />);
   };
   calculatePagination = (data: any) => {
     const { queryParams } = this.props;
@@ -135,7 +133,6 @@ class InventoryCategory extends React.Component<Props, State> {
           this.setState({ loading: false });
         });
       }
-      router.removeParams(this.props.history, 'page', 'perPage');
     };
 
     const checkButton = (

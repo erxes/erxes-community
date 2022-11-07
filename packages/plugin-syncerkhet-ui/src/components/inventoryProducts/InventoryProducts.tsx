@@ -1,6 +1,6 @@
 import React from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { router, __ } from '@erxes/ui/src/utils/core';
+import { __ } from '@erxes/ui/src/utils/core';
 import Table from '@erxes/ui/src/components/table';
 import Button from '@erxes/ui/src/components/Button';
 import Row from './InventoryProductsRow';
@@ -12,7 +12,6 @@ import {
 
 type Props = {
   loading: boolean;
-  history: any;
   queryParams: any;
   toCheckProducts: () => void;
   toSyncProducts: (action: string, products: any[]) => void;
@@ -36,7 +35,7 @@ class InventoryProducts extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      openCollapse: -1,
+      openCollapse: 0,
       loading: false
     };
   }
@@ -45,9 +44,7 @@ class InventoryProducts extends React.Component<Props, State> {
     if (data.length > 100) {
       data = data.slice(0, 100);
     }
-    return data.map(p => (
-      <Row history={history} key={p.code} product={p} action={action} />
-    ));
+    return data.map(p => <Row key={p.code} product={p} action={action} />);
   };
   calculatePagination = (data: any) => {
     const { queryParams } = this.props;
@@ -144,11 +141,16 @@ class InventoryProducts extends React.Component<Props, State> {
           this.setState({ loading: false });
         });
       }
-      router.removeParams(this.props.history, 'page', 'perPage');
     };
 
     const checkButton = (
       <>
+        <span>
+          {items &&
+            items.matched &&
+            items.matched.count &&
+            `Matched: ${items.matched.count}`}
+        </span>
         <Button
           btnStyle="warning"
           size="small"
@@ -244,6 +246,7 @@ class InventoryProducts extends React.Component<Props, State> {
         </CollapseContent>
       </>
     );
+
     return (
       <Wrapper
         header={

@@ -2,7 +2,6 @@ import React from 'react';
 
 type Props = {
   product: any;
-  history: any;
   action: any;
 };
 
@@ -12,14 +11,14 @@ class Row extends React.Component<Props> {
 
     const onTrClick = () => {};
 
-    const { name, code, barcode, unit_price, syncStatus } = product;
+    const { name, code, barcodes, unit_price, unitPrice, syncStatus } = product;
 
     return (
       <tr onClick={onTrClick}>
         <td>{code}</td>
         <td>{name}</td>
-        <td>{barcode}</td>
-        <td>{parseFloat(unit_price)}</td>
+        <td>{barcodes}</td>
+        <td>{parseFloat(unit_price || unitPrice)}</td>
         {action === 'CREATE' ? (
           <td>
             {syncStatus === false ? (

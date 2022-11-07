@@ -14,9 +14,9 @@ import {
   ToCheckCategoriesMutationResponse,
   ToSyncCategoriesMutationResponse
 } from '../types';
+
 type Props = {
   queryParams: any;
-  history: any;
 };
 
 type FinalProps = {} & Props &

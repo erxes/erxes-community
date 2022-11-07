@@ -2,7 +2,6 @@ import React from 'react';
 
 type Props = {
   category: any;
-  history: any;
   action: string;
 };
 
