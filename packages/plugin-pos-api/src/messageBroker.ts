@@ -164,6 +164,18 @@ export const initBroker = async cl => {
     );
 
     const newOrder = await models.PosOrders.findOne({ _id: order._id }).lean();
+
+    if (newOrder.customerId) {
+      sendAutomationsMessage({
+        subdomain,
+        action: 'trigger',
+        data: {
+          type: 'pos:posOrder',
+          targets: [newOrder]
+        }
+      });
+    }
+
     await confirmLoyalties(subdomain, newOrder);
 
     // ===> sync cards config then
@@ -275,6 +287,26 @@ export const initBroker = async cl => {
       status: 'success'
     };
   });
+
+  consumeRPCQueue(
+    'pos:getModuleRelation',
+    async ({ data: { module, target } }) => {
+      // need to check pos-order or pos
+
+      let filter;
+
+      if (module.includes('contacts')) {
+        if (target.customerId) {
+          filter = { _id: target.customerId };
+        }
+      }
+
+      return {
+        status: 'success',
+        data: filter
+      };
+    }
+  );
 
   consumeRPCQueue('pos:findSlots', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
@@ -484,6 +516,17 @@ export const sendPosclientMessage = async (
     serviceName,
     ...args,
     action: lastAction
+  });
+};
+
+export const sendAutomationsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'automations',
+    ...args
   });
 };
 
