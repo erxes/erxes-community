@@ -1,15 +1,17 @@
 module.exports = {
   name: "pos",
+  scope: "pos",
   port: 3016,
   exposes: {
     "./routes": "./src/routes.tsx",
-
+    "./automation": "./src/automations/automation.tsx",
   },
   routes: {
     url: "http://localhost:3016/remoteEntry.js",
     scope: "pos",
     module: "./routes",
   },
+  automation: "./automation",
   menus: [
     {
       text: "Pos Orders",
