@@ -1,6 +1,13 @@
 import * as _ from 'underscore';
 import { FLOW_STATUSES, JOB_TYPES } from './definitions/constants';
 import { flowSchema, IFlow, IFlowDocument, IJob } from './definitions/flows';
+import {
+  getLatestJob,
+  getLatestLocations,
+  getNeedProductsFromFlow,
+  getResultProductsFromFlow,
+  recursiveChecker
+} from './utils';
 import { IModels } from '../connectionResolver';
 import { Model } from 'mongoose';
 
@@ -12,82 +19,6 @@ export interface IFlowModel extends Model<IFlowDocument> {
   removeFlows(flowIds: string[]): void;
   checkValidation(jobs?: IJob[]): Promise<String>;
 }
-
-const getProductIds = (job: IJob, jobReferById: any, type = 'need') => {
-  const jobConfig = job.config;
-  const key = type === 'need' ? 'needProducts' : 'resultProducts';
-  let productIds: string[] = [];
-  if (jobConfig.jobReferId && JOB_TYPES.JOBS.includes(job.type)) {
-    productIds =
-      ((jobReferById[jobConfig.jobReferId] || {})[key] || []).map(
-        p => p.productId
-      ) || [];
-  }
-
-  if (jobConfig.productId) {
-    const types = [JOB_TYPES.MOVE];
-    if (type === 'need') {
-      types.push(JOB_TYPES.OUTLET);
-    } else {
-      types.push(JOB_TYPES.INCOME);
-    }
-    if (types.includes(job.type)) {
-      productIds = [jobConfig.productId];
-    }
-  }
-  return productIds;
-};
-
-const checkBeforeJobs = (job: IJob, beforeJobs: IJob[], jobReferById: any) => {
-  const label = `${job.label.substring(0, 10)}... `;
-  const jobConfig = job.config;
-
-  const jobNeedProductIds = getProductIds(job, jobReferById);
-  let beforeResultProductIds: string[] = [];
-
-  for (const beforeJob of beforeJobs) {
-    const beforeConfig = beforeJob.config;
-
-    if (jobConfig.inBranchId !== beforeConfig.outBranchId) {
-      return `${label}wrong In Branch`;
-    }
-    if (jobConfig.inDepartmentId !== beforeConfig.outDepartmentId) {
-      return `${label}wrong In Department`;
-    }
-
-    beforeResultProductIds = beforeResultProductIds.concat(
-      getProductIds(beforeJob, jobReferById, 'result')
-    );
-  }
-
-  const lessNeedProductIds = jobNeedProductIds.filter(
-    np => !beforeResultProductIds.includes(np)
-  );
-
-  if (lessNeedProductIds.length) {
-    return `${label}less products`;
-  }
-
-  return '';
-};
-
-const recursiveChecker = (job: IJob, jobs: IJob[], jobReferById) => {
-  const beforeJobs = jobs.filter(j => (j.nextJobIds || []).includes(job.id));
-  const result = checkBeforeJobs(job, beforeJobs, jobReferById);
-  if (result) {
-    return result;
-  }
-
-  if (beforeJobs && beforeJobs.length) {
-    for (const beforeJob of beforeJobs) {
-      const results = recursiveChecker(beforeJob, jobs, jobReferById);
-      if (results) {
-        return results;
-      }
-    }
-  }
-  return '';
-};
 
 export const loadFlowClass = (models: IModels) => {
   class Flow {
@@ -105,12 +36,12 @@ export const loadFlowClass = (models: IModels) => {
     }
 
     public static async checkValidation(jobs?: IJob[]) {
-      if (!jobs || !jobs.length) {
+      if (!jobs || !(jobs || []).length) {
         return 'Has not jobs';
       }
 
       const endJobs = jobs.filter(j => j.type === JOB_TYPES.ENDPOINT);
-      if (!endJobs || !endJobs.length) {
+      if (!endJobs || !(endJobs || []).length) {
         return 'Has not endPoint job';
       }
 
@@ -119,7 +50,7 @@ export const loadFlowClass = (models: IModels) => {
       }
 
       const latestJobs = jobs.filter(
-        j => !j.nextJobIds || !j.nextJobIds.length
+        j => !j.nextJobIds || !(j.nextJobIds || []).length
       );
 
       if (!latestJobs || !latestJobs.length) {
@@ -153,8 +84,29 @@ export const loadFlowClass = (models: IModels) => {
      * Create a flow
      */
     public static async createFlow(doc: IFlow) {
+      const flowValidation = await models.Flows.checkValidation(doc.jobs);
+
+      const latestJob = await getLatestJob(models, doc.jobs || []);
+      const { latestBranchId, latestDepartmentId } = getLatestLocations(
+        latestJob
+      );
+      const latestResultProducts = await getResultProductsFromFlow(
+        models,
+        latestJob
+      );
+      const latestNeedProducts = await getNeedProductsFromFlow(
+        models,
+        doc.jobs || []
+      );
+
       const flow = await models.Flows.create({
         ...doc,
+        status: FLOW_STATUSES.DRAFT,
+        flowValidation,
+        latestBranchId,
+        latestDepartmentId,
+        latestResultProducts,
+        latestNeedProducts,
         createdAt: new Date()
       });
 
@@ -172,14 +124,18 @@ export const loadFlowClass = (models: IModels) => {
         status = FLOW_STATUSES.DRAFT;
       }
 
-      let latestBranchId = '';
-      let latestDepartmentId = '';
-      const latestJobs = doc.jobs?.filter(j => !j.nextJobIds.length) || [];
-      if (latestJobs.length === 1) {
-        const latestJob = latestJobs[0];
-        latestBranchId = (latestJob.config || {}).outBranchId;
-        latestDepartmentId = (latestJob.config || {}).outDepartmentId;
-      }
+      const latestJob = await getLatestJob(models, doc.jobs || []);
+      const { latestBranchId, latestDepartmentId } = getLatestLocations(
+        latestJob
+      );
+      const latestResultProducts = await getResultProductsFromFlow(
+        models,
+        latestJob
+      );
+      const latestNeedProducts = await getNeedProductsFromFlow(
+        models,
+        doc.jobs || []
+      );
 
       await models.Flows.updateOne(
         { _id },
@@ -189,7 +145,9 @@ export const loadFlowClass = (models: IModels) => {
             flowValidation,
             status,
             latestBranchId,
-            latestDepartmentId
+            latestDepartmentId,
+            latestResultProducts,
+            latestNeedProducts
           }
         }
       );
