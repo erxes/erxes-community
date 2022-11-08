@@ -4,6 +4,7 @@ import {
   sendMessage as sendCommonMessage
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
+import { generateModels } from './connectionResolver';
 
 dotenv.config();
 
@@ -11,6 +12,24 @@ let client;
 
 export const initBroker = async cl => {
   client = cl;
+
+  const { consumeRPCQueue } = client;
+
+  consumeRPCQueue(
+    'imap:createIntegration',
+    async ({ subdomain, data: { doc, integrationId } }) => {
+      const models = await generateModels(subdomain);
+
+      await models.Integrations.create({
+        inboxId: integrationId,
+        ...(doc || {})
+      });
+
+      return {
+        status: 'success'
+      };
+    }
+  );
 };
 
 export default function() {

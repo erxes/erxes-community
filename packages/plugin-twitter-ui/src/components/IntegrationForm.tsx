@@ -16,6 +16,7 @@ type Props = {
   onAccountSelect: (accountId?: string) => void;
   onRemoveAccount: (accountId: string) => void;
   closeModal: () => void;
+  callback: () => void;
   accountId: string;
   twitterAccountId: string;
 };
@@ -33,7 +34,8 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
     const { accountId, twitterAccountId } = this.props;
 
     return {
-      ...values,
+      name: values.name,
+      brandId: values.brandId,
       kind: 'twitter-dm',
       accountId,
       data: { twitterAccountId }
@@ -41,7 +43,12 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const { onRemoveAccount, onAccountSelect, renderButton } = this.props;
+    const {
+      onRemoveAccount,
+      onAccountSelect,
+      renderButton,
+      callback
+    } = this.props;
     const { values, isSubmitted } = formProps;
 
     return (
@@ -67,7 +74,7 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
             name: 'integration',
             values: this.generateDoc(values),
             isSubmitted,
-            callback: this.props.closeModal
+            callback
           })}
         </ModalFooter>
       </>
