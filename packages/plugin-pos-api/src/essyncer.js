@@ -1,7 +1,7 @@
 module.exports = [
   {
     name: "pos_orders",
-    schema: "{}",
+    schema: "{'items': <nested>}",
     script: "",
   }
 ];
