@@ -5,8 +5,8 @@ module.exports = {
   exposes: {
     './routes': './src/routes.tsx',
     './inboxIntegrationSettings': './src/components/IntegrationSettings.tsx',
-    './inboxIntegrationForm': './src/components/Twitter.tsx',
-    './inboxConversationDetail': './src/components/Twitter.tsx'
+    './inboxIntegrationForm': './src/components/IntegrationForm.tsx'
+
   },
   routes: {
     url: 'http://localhost:3015/remoteEntry.js',
@@ -15,7 +15,6 @@ module.exports = {
   },
   inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxIntegrationForm: './inboxIntegrationForm',
-  inboxConversationDetail: './inboxConversationDetail',
   inboxIntegration: {
     name: 'Twitter',
     description: '',
