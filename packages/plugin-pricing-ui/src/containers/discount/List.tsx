@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import queryString from 'query-string';
 // local
 import { queries } from '../../graphql';
-import ListComponent from '../../components/pricing/List';
+import ListComponent from '../../components/discount/List';
 
 const ListContainer = () => {
   const location = useLocation();
