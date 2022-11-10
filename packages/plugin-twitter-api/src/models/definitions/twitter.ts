@@ -68,134 +68,14 @@ export const conversationMessageSchema = new Schema({
   content: String
 });
 
-export interface IAccount {
-  kind: string;
-  email: string;
-  username?: string;
-  host: string;
-  password: string;
-  imapHost: string;
-  smtpHost: string;
-  imapPort: number;
-  smtpPort: number;
-  nylasToken: string;
-  nylasTokenSecret: string;
-  token: string;
-  tokenSecret?: string;
-  expireDate?: string;
-  scope?: string;
-  name: string;
-  billingState?: string;
-  uid: string;
-  googleAccessToken?: string;
-  nylasAccountId?: string;
-  nylasBillingState?: string;
-}
-export interface IAccountDocument extends IAccount, Document {}
-
-export const accountSchema = new Schema({
-  _id: field({ pkey: true }),
-  kind: {
-    type: String
-  },
-  billingState: {
-    type: String,
-    optional: true
-  },
-  email: {
-    type: String
-  },
-  username: {
-    type: String,
-    optional: true
-  },
-  host: {
-    type: String
-  },
-  imapHost: {
-    type: String
-  },
-  smtpHost: {
-    type: String
-  },
-  imapPort: {
-    type: Number
-  },
-  smtpPort: {
-    type: Number
-  },
-  password: {
-    type: String,
-    optional: true
-  },
-  googleAccessToken: {
-    type: String,
-    optional: true
-  },
-  nylasToken: {
-    type: String
-  },
-  nylasTokenSecret: {
-    type: String,
-    optional: true
-  },
-  token: {
-    type: String
-  },
-  tokenSecret: {
-    type: String,
-    optional: true
-  },
-  scope: {
-    type: String,
-    optional: true
-  },
-  expireDate: {
-    type: String,
-    optional: true
-  },
-  name: { type: String },
-  uid: { type: String },
-  nylasAccountId: {
-    type: String,
-    optional: true
-  },
-  nylasBillingState: {
-    type: String,
-    optional: true
-  }
-});
-
 export interface IIntegration {
   kind: string;
   accountId: string;
-  emailScope?: string;
-  nylasToken?: string;
-  nylasAccountId?: string;
-  nylasBillingState?: string;
   erxesApiId: string;
-  facebookPageIds?: string[];
-  facebookPageTokensMap?: { [key: string]: string };
   email: string;
-  googleAccessToken?: string;
   phoneNumber: string;
   recordUrl: string;
   expiration?: string;
-  gmailHistoryId?: string;
-  chatfuelConfigs?: { [key: string]: string };
-  telegramBotToken?: string;
-  viberBotToken?: string;
-  lineChannelId?: string;
-  lineChannelSecret?: string;
-  twilioSid?: string;
-  twilioAuthToken?: string;
-  twilioPhoneSid?: string;
-  smoochDisplayName?: string;
-  smoochIntegrationId?: string;
-  whatsappinstanceId?: string;
-  whatsappToken?: string;
-  telnyxPhoneNumber?: string;
-  telnyxProfileId?: string;
   healthStatus?: string;
   error?: string;
 }
@@ -218,46 +98,8 @@ export const integrationSchema = new Schema({
     label: 'CallPro record url',
     optional: true
   }),
-  emailScope: String,
-  googleAccessToken: field({
-    type: String,
-    optional: true
-  }),
-  nylasToken: String,
-  nylasAccountId: String,
-  nylasBillingState: String,
-  facebookPageIds: field({
-    type: [String],
-    label: 'Facebook page ids',
-    optional: true
-  }),
   email: String,
   expiration: String,
-  gmailHistoryId: String,
-  facebookPageTokensMap: field({
-    type: Object,
-    default: {}
-  }),
-  chatfuelConfigs: field({
-    type: Object,
-    default: {}
-  }),
-  telegramBotToken: String,
-  viberBotToken: String,
-  lineChannelId: String,
-  lineChannelSecret: String,
-  twilioSid: String,
-  twilioAuthToken: String,
-  twilioPhoneSid: String,
-  smoochDisplayName: String,
-  smoochIntegrationId: String,
-  whatsappinstanceId: String,
-  whatsappToken: String,
-  telnyxPhoneNumber: field({ type: String, label: 'Telnyx phone number' }),
-  telnyxProfileId: field({
-    type: String,
-    label: 'Telnyx messaging profile id'
-  }),
   healthStatus: String,
   error: String
 });

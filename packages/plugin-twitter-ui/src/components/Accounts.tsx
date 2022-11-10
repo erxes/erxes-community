@@ -84,7 +84,7 @@ class Accounts extends React.Component<Props, { accountId?: string }> {
           <Button
             onClick={this.onSelectAccount.bind(this, account._id)}
             btnStyle={
-              this.state.accountId === account._id ? 'primary' : 'simple'
+              this.state.accountId === account._id ? 'simple' : 'primary'
             }
           >
             {this.state.accountId === account._id

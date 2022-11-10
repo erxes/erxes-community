@@ -1,5 +1,6 @@
 import { IContext } from '../../connectionResolver';
 import * as twitterUtils from '../../api';
+import Accounts from '../../models/Accounts';
 
 const TwitterQueries = {
   async twitterWebhook(_root, { crc_token_param }) {
@@ -28,8 +29,8 @@ const TwitterQueries = {
       return res.send('Error: crc_token missing from request.');
     }
   },
-  async twitterGetAccount(_root, { accountId }, { models }: IContext) {
-    const account = await models.Accounts.findOne({ _id: accountId });
+  async twitterGetAccount(_root, { accountId }) {
+    const account = await Accounts.findOne({ _id: accountId });
 
     if (!account) {
       return new Error('Account not found');

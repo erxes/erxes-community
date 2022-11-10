@@ -5,20 +5,17 @@ import {
   ICustomerDocument,
   IConversationDocument,
   IConversationMessageDocument,
-  IAccountDocument,
   IIntegrationDocument
 } from './models/definitions/twitter';
 import {
   ICustomerModel,
   IConversationModel,
   IConversationMessageModel,
-  IAccountModel,
   IIntegrationModel,
   IConfigModel,
   loadCustomerClass,
   loadConversationClass,
   loadConversationMessageClass,
-  loadAccountClass,
   loadIntegrationClass,
   loadConfigClass
 } from './models/Twitter';
@@ -28,7 +25,6 @@ export interface IModels {
   Customers: ICustomerModel;
   Conversations: IConversationModel;
   ConversationMessages: IConversationMessageModel;
-  Accounts: IAccountModel;
   Integrations: IIntegrationModel;
   Configs: IConfigModel;
 }
@@ -47,12 +43,12 @@ export const loadClasses = (
   models = {} as IModels;
 
   models.Customers = db.model<ICustomerDocument, ICustomerModel>(
-    'customers_twitter',
+    'customers_twitters',
     loadCustomerClass()
   );
 
   models.Conversations = db.model<IConversationDocument, IConversationModel>(
-    'conversations_twitter',
+    'conversations_twitters',
     loadConversationClass(models)
   );
 
@@ -61,18 +57,13 @@ export const loadClasses = (
     IConversationMessageModel
   >('conversation_messages_twitters', loadConversationMessageClass(models));
 
-  models.Accounts = db.model<IAccountDocument, IAccountModel>(
-    'twitter_account',
-    loadAccountClass(models)
-  );
-
   models.Integrations = db.model<IIntegrationDocument, IIntegrationModel>(
-    'twitter_integration',
+    'twitter_integrations',
     loadIntegrationClass(models)
   );
 
   models.Configs = db.model<IConfigDocument, IConfigModel>(
-    'twitter_config',
+    'twitter_configs',
     loadConfigClass(models)
   );
 

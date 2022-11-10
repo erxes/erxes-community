@@ -46,7 +46,7 @@ const init = async app => {
       return 'Error: crc_token missing from request.';
     }
   });
-  app.post('/twitter/webhook', async (req, res, models: IModels) => {
+  app.post('/twitter/webhook', async (req, res) => {
     try {
       await receiveDms(req.body);
     } catch (e) {
@@ -56,7 +56,7 @@ const init = async app => {
     res.sendStatus(200);
   });
   app.get('/twitter/get-account', async (req, res, models: IModels) => {
-    const account = await models.Accounts.findOne({ _id: req.query.accountId });
+    const account = await Accounts.findOne({ _id: req.query.accountId });
 
     if (!account) {
       return 'Account not found';
@@ -75,7 +75,7 @@ const init = async app => {
       return `You already have integration on this account`;
     }
 
-    const account = await models.Accounts.getAccount({ _id: accountId });
+    const account = await Accounts.getAccount({ _id: accountId });
 
     await models.Integrations.create({
       kind,
@@ -126,7 +126,7 @@ const init = async app => {
       erxesApiId: integrationId
     });
 
-    const account = await models.Accounts.findOne({
+    const account = await Accounts.findOne({
       _id: integration?.accountId
     });
 

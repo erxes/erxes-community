@@ -1,8 +1,6 @@
 import { gql } from 'apollo-server-express';
 
 const queries = `
-  twitterLogin: String
-  twitterCallbackAdd(oauth_token: String, oauth_verifier: String,   oauth_token_secret: String, redirect: String ): String
   twitterWebhook: String
   twitterWebhookGet: String
   twitterGetAccount(accountId: String): String

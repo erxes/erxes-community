@@ -4,11 +4,9 @@ import {
   IConversationDocument,
   IConversationMessageDocument,
   IIntegrationDocument,
-  IAccountDocument,
   IConfigDocument,
   conversationSchema,
   customerSchema,
-  accountSchema,
   integrationSchema,
   configSchema
 } from './definitions/twitter';
@@ -54,28 +52,6 @@ export const loadConversationMessageClass = models => {
   conversationSchema.loadClass(ConversationMessage);
 
   return conversationSchema;
-};
-
-export interface IAccountModel extends Model<IAccountDocument> {
-  getAccount(selector): Promise<IAccountDocument>;
-}
-
-export const loadAccountClass = models => {
-  class Account {
-    public static async getAccount(selector) {
-      const account = await models.Accounts.findOne(selector);
-
-      if (!account) {
-        throw new Error('Account not found');
-      }
-
-      return account;
-    }
-  }
-
-  accountSchema.loadClass(Account);
-
-  return accountSchema;
 };
 
 export interface IIntegrationModel extends Model<IIntegrationDocument> {

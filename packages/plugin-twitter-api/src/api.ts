@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
-import { IAccount } from './models/definitions/twitter';
+import { IAccount } from './models/Accounts';
 import { getConfig, getEnv } from './utils';
 
 interface ITwitterConfig {
@@ -39,7 +39,7 @@ export const getTwitterAuthUrl = async (): Promise<{
     url: 'https://api.twitter.com/oauth/request_token',
     method: 'POST',
     oauth: {
-      callback: `http://localhost:4000/pl:twitter/callback/add`,
+      callback: `${getEnv({ name: 'DOMAIN' })}/pl:twitter/callback/add`,
       consumer_key: twitterConfig.oauth.consumer_key,
       consumer_secret: twitterConfig.oauth.consumer_secret
     }

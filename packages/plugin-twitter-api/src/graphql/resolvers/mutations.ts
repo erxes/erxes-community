@@ -2,6 +2,8 @@ import { IContext } from '../../connectionResolver';
 import * as twitterUtils from '../../api';
 import { downloadAttachment } from '../../utils';
 import receiveDms from '../../receiveDms';
+import Accounts from '../../models/Accounts';
+import Integrations from '../../models/Integrations';
 
 const twitterMutations = {
   async twitterWebhookPost(_root, { data }, { models }: IContext) {
@@ -24,9 +26,9 @@ const twitterMutations = {
       return new Error(`You already have integration on this account`);
     }
 
-    const account = await models.Accounts.getAccount({ _id: accountId });
+    const account = await Accounts.getAccount({ _id: accountId });
 
-    await models.Integrations.create({
+    await Integrations.create({
       kind,
       accountId,
       erxesApiId: integrationId,
@@ -77,7 +79,7 @@ const twitterMutations = {
       erxesApiId: integrationId
     });
 
-    const account: any = await models.Accounts.findOne({
+    const account: any = await Accounts.findOne({
       _id: integration?.accountId
     });
 
