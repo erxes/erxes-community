@@ -77,7 +77,7 @@ loadClass();
 
 // tslint:disable-next-line
 const Accounts = model<IAccountDocument, IAccountModel>(
-  'twitter_accounts',
+  'accounts',
   accountSchema
 );
 
