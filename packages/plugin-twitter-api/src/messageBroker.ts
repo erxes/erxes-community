@@ -16,9 +16,12 @@ export const initBroker = async cl => {
   const { consumeRPCQueue } = client;
 
   consumeRPCQueue(
-    'imap:createIntegration',
+    'twitter:createIntegration',
     async ({ subdomain, data: { doc, integrationId } }) => {
       const models = await generateModels(subdomain);
+
+      console.log('DOC=============>', doc);
+      console.log('INTEGRATIONID=========>', integrationId);
 
       await models.Integrations.create({
         inboxId: integrationId,
