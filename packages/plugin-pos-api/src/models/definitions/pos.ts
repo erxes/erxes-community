@@ -75,6 +75,7 @@ export interface IPos {
   kioskExcludeProductIds?: string;
   deliveryConfig?: any;
   cardsConfig?: any;
+  dealsIntegrationConfig?: any;
   checkRemainder?: boolean;
   permissionConfig?: any;
 }
@@ -242,6 +243,10 @@ export const posSchema = schemaHooksWrapper(
     }),
     deliveryConfig: field({ type: Object, label: 'Delivery Config' }),
     cardsConfig: field({ type: Object, label: 'Cards Config' }),
+    dealsIntegrationConfig: field({
+      type: Object,
+      label: 'Deals Integration Config'
+    }),
     checkRemainder: field({ type: Boolean, optional: true }),
     permissionConfig: field({
       type: Object,

@@ -36,6 +36,7 @@ const posCommonFields = `
   kioskExcludeProductIds: [String]
   deliveryConfig: JSON
   cardsConfig: JSON
+  dealsIntegrationConfig: JSON
   checkRemainder: Boolean
   permissionConfig: JSON
 `;
@@ -59,6 +60,7 @@ const posOrderFields = contactsEnabled => `
   mobileAmount: Float,
   totalAmount: Float,
   finalAmount: Float,
+  mergedAmount: Float,
   shouldPrintEbarimt: Boolean,
   printedEbarimt: Boolean,
   billType: String,

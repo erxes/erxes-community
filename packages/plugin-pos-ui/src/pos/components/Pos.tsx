@@ -25,6 +25,7 @@ import GeneralStep from './step/GeneralStep';
 import { IProductCategory } from '@erxes/ui-products/src/types';
 import { Link } from 'react-router-dom';
 import React from 'react';
+import DealsIntegrationConfig from './step/DealsIntegrationConfig';
 import PermissionStep from './step/Permission';
 
 type Props = {
@@ -54,6 +55,7 @@ type State = {
   erkhetConfig: any;
   deliveryConfig: any;
   cardsConfig: any;
+  dealsIntegrationConfig: any;
   checkRemainder: boolean;
 };
 
@@ -88,6 +90,7 @@ class Pos extends React.Component<Props, State> {
       erkhetConfig: pos.erkhetConfig,
       deliveryConfig: pos.deliveryConfig,
       cardsConfig: pos.cardsConfig,
+      dealsIntegrationConfig: pos.dealsIntegrationConfig,
       slots: props.slots || [],
       checkRemainder: pos.checkRemainder || false
     };
@@ -105,7 +108,8 @@ class Pos extends React.Component<Props, State> {
       ebarimtConfig,
       erkhetConfig,
       deliveryConfig,
-      cardsConfig
+      cardsConfig,
+      dealsIntegrationConfig
     } = this.state;
 
     if (!pos.name) {
@@ -159,6 +163,7 @@ class Pos extends React.Component<Props, State> {
       kioskExcludeProductIds: pos.kioskExcludeProductIds || [],
       deliveryConfig,
       cardsConfig,
+      dealsIntegrationConfig,
       checkRemainder,
       permissionConfig: pos.permissionConfig || {}
     };
@@ -353,6 +358,14 @@ class Pos extends React.Component<Props, State> {
                 noButton={true}
               >
                 <CardsConfig onChange={this.onChange} pos={pos} />
+              </Step>
+              <Step
+                img="/images/icons/erxes-07.svg"
+                title={'Deals Integration Config'}
+                onClick={this.onStepClick}
+                noButton={true}
+              >
+                <DealsIntegrationConfig onChange={this.onChange} pos={pos} />
               </Step>
             </Steps>
             <ControlWrapper>

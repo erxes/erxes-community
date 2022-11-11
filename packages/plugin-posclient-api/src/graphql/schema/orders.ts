@@ -94,6 +94,7 @@ export const types = `
     modifiedAt: Date
     totalAmount: Float
     finalAmount: Float
+    mergedAmount: Float
     shouldPrintEbarimt: Boolean
     printedEbarimt: Boolean
     billId: String

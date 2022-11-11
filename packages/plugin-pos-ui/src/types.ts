@@ -57,6 +57,7 @@ export type IPos = {
   kioskExcludeProductIds?: string[];
   deliveryConfig?: any;
   cardsConfig?: any;
+  dealsIntegrationConfig?: any;
   checkRemainder?: boolean;
   permissionConfig?: any;
 };
