@@ -6,7 +6,6 @@ export interface ICustomer {
   erxesApiId?: string;
   userId: string;
   integrationId: string;
-
   name: string;
   screenName: string;
   profilePic;
