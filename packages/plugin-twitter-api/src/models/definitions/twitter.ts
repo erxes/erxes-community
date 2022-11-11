@@ -70,6 +70,9 @@ export const conversationMessageSchema = new Schema({
 
 export interface IIntegration {
   kind: string;
+  name: string;
+  brandId: string;
+  channelIds: [string];
   accountId: string;
   erxesApiId: string;
   email: string;
@@ -86,6 +89,9 @@ export interface IIntegrationDocument extends IIntegration, Document {}
 export const integrationSchema = new Schema({
   _id: field({ pkey: true }),
   kind: String,
+  name: String,
+  brandId: String,
+  channelIds: [String],
   accountId: String,
   erxesApiId: String,
   phoneNumber: field({

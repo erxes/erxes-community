@@ -33,7 +33,7 @@ const init = async app => {
 
     return res.redirect(url);
   });
-  app.get('/twitter/webhook', async (req, res) => {
+  app.get('/webhook', async (req, res) => {
     const crc_token = req.query.crc_token;
 
     if (crc_token) {
@@ -55,7 +55,7 @@ const init = async app => {
 
     res.sendStatus(200);
   });
-  app.get('/twitter/get-account', async (req, res, models: IModels) => {
+  app.get('/get-account', async (req, res, models: IModels) => {
     const account = await Accounts.findOne({ _id: req.query.accountId });
 
     if (!account) {
@@ -64,7 +64,7 @@ const init = async app => {
 
     return account.uid;
   });
-  app.post('/twitter/create-integration', async (req, models: IModels) => {
+  app.post('/create-integration', async (req, models: IModels) => {
     const { accountId, integrationId, data, kind } = req.body;
 
     const prevEntry = await models.Integrations.findOne({
@@ -96,7 +96,7 @@ const init = async app => {
       }
     }
   });
-  app.post('/twitter/reply', async (req, models: IModels) => {
+  app.post('/reply', async (req, models: IModels) => {
     const { attachments, conversationId, content, integrationId } = req.body;
 
     if (attachments.length > 1) {

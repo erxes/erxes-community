@@ -268,7 +268,7 @@ const integrationMutations = {
           action: 'createIntegration',
           data: {
             integrationId: integration._id,
-            doc: data
+            doc: doc
           },
           isRPC: true
         });

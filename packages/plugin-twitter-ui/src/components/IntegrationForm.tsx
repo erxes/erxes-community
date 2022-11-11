@@ -10,6 +10,7 @@ import FormGroup from '@erxes/ui/src/components/form/Group';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import SelectBrand from '../containers/SelectBrand';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -19,6 +20,8 @@ type Props = {
   callback: () => void;
   accountId: string;
   twitterAccountId: string;
+  channelIds: string[];
+  onChannelChange: () => void;
 };
 
 class Twitter extends React.Component<Props, { loading: boolean }> {
@@ -30,13 +33,18 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
     };
   }
 
-  generateDoc = (values: { name: string; brandId: string }) => {
+  generateDoc = (values: {
+    name: string;
+    brandId: string;
+    channelIds: string;
+  }) => {
     const { accountId, twitterAccountId } = this.props;
 
     return {
       name: values.name,
       brandId: values.brandId,
-      kind: 'twitter-dm',
+      channelIds: values.channelIds,
+      kind: 'twitter',
       accountId,
       data: { twitterAccountId }
     };
@@ -47,7 +55,9 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
       onRemoveAccount,
       onAccountSelect,
       renderButton,
-      callback
+      callback,
+      channelIds,
+      onChannelChange
     } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -60,6 +70,11 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
         </FormGroup>
 
         <SelectBrand isRequired={true} formProps={formProps} />
+        <SelectChannels
+          defaultValue={channelIds}
+          isRequired={true}
+          onChange={onChannelChange}
+        />
 
         <Accounts
           kind="twitter"

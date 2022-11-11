@@ -43,19 +43,19 @@ export const loadClasses = (
   models = {} as IModels;
 
   models.Customers = db.model<ICustomerDocument, ICustomerModel>(
-    'customers_twitters',
+    'twitter_customers',
     loadCustomerClass()
   );
 
   models.Conversations = db.model<IConversationDocument, IConversationModel>(
-    'conversations_twitters',
+    'twitter_conversations',
     loadConversationClass(models)
   );
 
   models.ConversationMessages = db.model<
     IConversationMessageDocument,
     IConversationMessageModel
-  >('conversation_messages_twitters', loadConversationMessageClass(models));
+  >('twitter_messages_conversations', loadConversationMessageClass(models));
 
   models.Integrations = db.model<IIntegrationDocument, IIntegrationModel>(
     'twitter_integrations',
