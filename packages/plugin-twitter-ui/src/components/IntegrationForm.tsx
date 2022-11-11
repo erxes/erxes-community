@@ -61,6 +61,8 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
     } = this.props;
     const { values, isSubmitted } = formProps;
 
+    console.log(channelIds, 'channelId');
+
     return (
       <>
         {this.state.loading && <Spinner />}
