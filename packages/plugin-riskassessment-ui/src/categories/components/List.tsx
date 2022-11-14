@@ -342,8 +342,8 @@ class AssessmentCategories extends React.Component<Props, State> {
           {this.rightActionBar}
           {this.renderCategoriesFilter()}
           {this.renderCategories()}
-          {this.renderListFilter()}
         </Section>
+          {this.renderListFilter()}
       </Sidebar>
     );
   }

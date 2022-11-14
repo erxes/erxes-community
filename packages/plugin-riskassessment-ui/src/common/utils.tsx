@@ -6,7 +6,8 @@ import {
   __,
   Pagination,
   ControlLabel,
-  SelectWithSearch
+  SelectWithSearch,
+  Icon
 } from '@erxes/ui/src';
 import { CustomFormGroupProps, RiskAssessmentCategory } from './types';
 import { FormGroupRow } from '../styles';
@@ -70,7 +71,12 @@ export const CustomFormGroup = ({
 export const subOption = category => {
   const { order } = category;
   const foundedString = order.match(/[/]/gi);
-  return '\u00A0 '.repeat(foundedString.length);
+  return (
+    <>
+      {'\u00A0 '.repeat(foundedString.length)}
+      <Icon icon="arrows-up-right" color="#3CCC38" />
+    </>
+  );
 };
 
 export const SelectWithCategory = ({
