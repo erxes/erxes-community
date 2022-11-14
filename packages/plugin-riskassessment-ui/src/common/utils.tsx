@@ -1,18 +1,18 @@
-import React from 'react';
 import {
-  Wrapper,
-  Spinner,
-  DataWithLoader,
-  __,
-  Pagination,
   ControlLabel,
+  DataWithLoader,
+  Icon,
+  Pagination,
   SelectWithSearch,
-  Icon
+  Spinner,
+  Wrapper,
+  __
 } from '@erxes/ui/src';
-import { CustomFormGroupProps, RiskAssessmentCategory } from './types';
-import { FormGroupRow } from '../styles';
 import { IOption, IQueryParams } from '@erxes/ui/src/types';
+import React from 'react';
 import { queries as categoryQueries } from '../categories/graphql';
+import { FormGroupRow } from '../styles';
+import { CustomFormGroupProps, RiskAssessmentCategory } from './types';
 
 export const DefaultWrapper = ({
   title,

@@ -14,7 +14,7 @@ ${
     : ''
 }
 
-  type ClientPortalUser {
+  type ClientPortalUser @key(fields: "_id") {
     _id: String!
     createdAt: Date
     modifiedAt: Date
@@ -42,6 +42,8 @@ ${
     sessionCount: Int
 
     clientPortal: ClientPortal
+
+    notificationSettings: UserNotificationSettings
 
     ${
       isContactsEnabled
