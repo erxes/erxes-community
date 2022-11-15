@@ -1,3 +1,9 @@
 import { __ } from '@erxes/ui/src/utils';
 
-export const submenu = [{ title: __('Discount'), link: '/pricing/discount' }];
+export const SUBMENU = [{ title: __('Discounts'), link: '/pricing/discounts' }];
+export const STATUS_FILTER_OPTIONS = [
+  'active',
+  'disabled',
+  'completed',
+  'archived'
+];

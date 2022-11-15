@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import { __ } from '@erxes/ui/src/utils/core';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Button from '@erxes/ui/src/components/Button';
+import { Title } from '@erxes/ui/src/styles/main';
 // local
 
-export default function ActionBar() {
+export default function Actionbar() {
   const renderRight = () => (
-    <Link to="/pricing/discount/create">
+    <Link to="/pricing/discounts/create">
       <Button
         type="button"
         btnStyle="success"
@@ -20,5 +21,7 @@ export default function ActionBar() {
     </Link>
   );
 
-  return <Wrapper.ActionBar right={renderRight()} />;
+  const renderLeft = () => <Title>All discounts</Title>;
+
+  return <Wrapper.ActionBar left={renderLeft()} right={renderRight()} />;
 }

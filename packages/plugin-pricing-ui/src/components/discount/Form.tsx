@@ -11,16 +11,43 @@ import {
   Indicator
 } from '@erxes/ui/src/components/step/styles';
 // local
-import ContentStep from './step/ContentStep';
+import ContentStep from './step/Contents';
+import OptionsStep from './step/Options';
+import RulesStep from './step/Rules';
+import ExpirationStep from './step/Expiration';
 
-const Form = () => {
+type Props = {
+  add: (data: any) => void;
+};
+
+const Form = (props: Props) => {
+  const { add } = props;
+
+  // Hooks
   const [formValues, setFormValues] = useState<any>({
+    // Contents
     name: '',
-    amount: 0,
+    amountValue: null,
+    amountType: 'fixed', // "fixed", "percentage"
     products: [],
-    productCategory: []
+    productCategories: [],
+    productsExcluded: [],
+
+    // Rules
+    quantityType: null, // null || "minimum" || "exact",
+    quantityValue: null,
+    minPurchaseEnabled: false,
+    minPurchaseValue: 0,
+
+    // Options
+    departmentIds: [],
+    branchIds: [],
+    unitIds: []
+
+    // Schedules
   });
 
+  // Functions
   const handleState = (key: string, value: any) => {
     const tempState = { ...formValues };
     tempState[key] = value;
@@ -28,9 +55,19 @@ const Form = () => {
     setFormValues(tempState);
   };
 
+  const handleSave = () => {
+    const document: any = { ...formValues };
+
+    if (!document.quantityType) delete document.quantityType;
+
+    if (!document.quantityValue) delete document.quantityValue;
+
+    add(document);
+  };
+
   const renderButtons = () => {
     const cancelButton = (
-      <Link to="/pricing/discount">
+      <Link to="/pricing/discounts">
         <Button btnStyle="simple" icon="times-circle">
           Cancel
         </Button>
@@ -40,7 +77,7 @@ const Form = () => {
     return (
       <Button.Group>
         {cancelButton}
-        <Button btnStyle="success" icon="check-circle">
+        <Button btnStyle="success" icon="check-circle" onClick={handleSave}>
           {/* {isActionLoading && <SmallLoader />} */}
           Save
         </Button>
@@ -51,17 +88,17 @@ const Form = () => {
   return (
     <StepWrapper>
       <Steps>
-        <Step img="/images/icons/erxes-12.svg" title="Content">
+        <Step img="/images/icons/erxes-12.svg" title="Contents">
           <ContentStep formValues={formValues} handleState={handleState} />
         </Step>
-        <Step img="/images/icons/erxes-13.svg" title="Content">
-          <ContentStep formValues={formValues} handleState={handleState} />
+        <Step img="/images/icons/erxes-24.svg" title="Rules">
+          <RulesStep formValues={formValues} handleState={handleState} />
         </Step>
-        <Step img="/images/icons/erxes-14.svg" title="Content">
-          <ContentStep formValues={formValues} handleState={handleState} />
+        <Step img="/images/icons/erxes-03.svg" title="Options">
+          <OptionsStep formValues={formValues} handleState={handleState} />
         </Step>
-        <Step img="/images/icons/erxes-15.svg" title="Content">
-          <ContentStep formValues={formValues} handleState={handleState} />
+        <Step img="/images/icons/erxes-21.svg" title="Expiration">
+          <ExpirationStep formValues={formValues} handleState={handleState} />
         </Step>
       </Steps>
       <ControlWrapper>

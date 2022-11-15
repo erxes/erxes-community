@@ -2,13 +2,13 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 
-const discount = asyncComponent(() =>
-  import(/* webpackChunkName: "Settings List - Pricing" */ './page/Discount')
+const discounts = asyncComponent(() =>
+  import(/* webpackChunkName: "Settings List - Pricing" */ './page/Discounts')
 );
 
-const discountCreate = asyncComponent(() =>
+const discountsCreate = asyncComponent(() =>
   import(
-    /* webpackChunkName: "Settings List - Pricing - Create Discount" */ './page/DiscountCreate'
+    /* webpackChunkName: "Settings List - Pricing - Create Discount" */ './page/DiscountsCreate'
   )
 );
 
@@ -17,16 +17,16 @@ const routes = () => {
     <React.Fragment>
       <Route
         exact={true}
-        path="/pricing/discount"
-        key="/pricing/discount"
-        component={discount}
+        path="/pricing/discounts"
+        key="/pricing/discounts"
+        component={discounts}
       />
 
       <Route
         exact={true}
-        path="/pricing/discount/create"
-        key="/pricing/discount/create"
-        component={discountCreate}
+        path="/pricing/discounts/create"
+        key="/pricing/discounts/create"
+        component={discountsCreate}
       />
     </React.Fragment>
   );

@@ -8,6 +8,16 @@ const discounts = `
       createdBy
       updatedAt
       updatedBy
+      createdUser {
+        details {
+          fullName
+        }
+      }
+      updatedUser {
+        details {
+          fullName
+        }
+      }
     }
   }
 `;
