@@ -1,7 +1,3 @@
-import {
-  moduleRequireLogin,
-  moduleCheckPermission
-} from '@erxes/api-utils/src/permissions';
 import { IContext, models } from '../../../connectionResolver';
 import {
   IDiscount,
@@ -11,7 +7,7 @@ import {
 const discountMutations = {
   discountAdd: async (
     _root: any,
-    doc: IDiscount,
+    { doc }: { doc: IDiscount },
     { models, user }: IContext
   ) => {
     return await models.Discounts.discountAdd(doc, user._id);
@@ -19,13 +15,17 @@ const discountMutations = {
 
   discountEdit: async (
     _root: any,
-    doc: IDiscountDocument,
+    { doc }: { doc: IDiscountDocument },
     { models, user }: IContext
   ) => {
     return await models.Discounts.discountEdit(doc._id, doc, user._id);
   },
 
-  discountRemove: async (_root: any, id: string, { models }: IContext) => {
+  discountRemove: async (
+    _root: any,
+    { id }: { id: string },
+    { models }: IContext
+  ) => {
     return await models.Discounts.discountRemove(id);
   }
 };

@@ -28,8 +28,10 @@ export const loadDiscountClass = (models: IModels) => {
     public static async discountAdd(doc: IDiscount, userId: string) {
       return models.Discounts.create({
         ...doc,
+        createdAt: new Date(),
         createdBy: userId,
-        createdAt: new Date()
+        updatedAt: new Date(),
+        updatedBy: userId
       });
     }
 
@@ -49,7 +51,13 @@ export const loadDiscountClass = (models: IModels) => {
 
       if (!result) return new Error(`Can't find discount`);
 
-      await models.Discounts.findByIdAndUpdate(id, { $set: doc });
+      await models.Discounts.findByIdAndUpdate(id, {
+        $set: {
+          ...doc,
+          updatedAt: new Date(),
+          updatedBy: userId
+        }
+      });
 
       return await models.Discounts.findById(id);
     }
