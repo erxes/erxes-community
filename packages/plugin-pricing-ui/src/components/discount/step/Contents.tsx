@@ -16,10 +16,6 @@ type Props = {
 const ContentStep = (props: Props) => {
   const { formValues, handleState } = props;
 
-  // Hooks
-  const [isCategoryRequired, setCategoryRequired] = useState<boolean>(false);
-  const [isPercentage, setPercentage] = useState<boolean>(false);
-
   // Functions
   const renderBaseForm = () => (
     <>
@@ -29,7 +25,7 @@ const ContentStep = (props: Props) => {
           type="text"
           name="name"
           placeholder={__('Name')}
-          defaultValue={formValues.name}
+          value={formValues.name}
           required={true}
           onChange={(event: any) =>
             handleState('name', (event.target as HTMLInputElement).value)
@@ -73,37 +69,50 @@ const ContentStep = (props: Props) => {
     </>
   );
 
+  console.log(formValues.appliesToCategory);
+
   const renderProductForm = () => (
     <>
       <FormGroup>
         <FormLabel>{__('Applies to')}</FormLabel>
         <FormControl
           componentClass="radio"
-          name="isCategory"
-          onChange={() => setCategoryRequired(true)}
+          name="appliesToCategory"
+          onChange={() => handleState('appliesToCategory', true)}
+          defaultChecked={formValues.appliesToCategory === true}
         >
           Specific Category
         </FormControl>
         <FormControl
           componentClass="radio"
-          name="isCategory"
-          onChange={() => setCategoryRequired(false)}
-          defaultChecked
+          name="appliesToCategory"
+          onChange={() => handleState('appliesToCategory', false)}
+          defaultChecked={formValues.appliesToCategory === false}
         >
           Specific Product
         </FormControl>
       </FormGroup>
 
-      {isCategoryRequired ? (
+      {formValues.appliesToCategory ? (
         <>
           <FormGroup>
             <FormLabel required={true}>{__('Product categories')}</FormLabel>
             <SelectProductCategory
-              name="productCategories"
+              name="categories"
               label="Choose Product Categories"
-              initialValue={formValues.productCategories}
-              onSelect={productCategory =>
-                handleState('productCategories', productCategory)
+              initialValue={formValues.categories}
+              onSelect={categories => handleState('categories', categories)}
+              multi={true}
+            />
+          </FormGroup>
+          <FormGroup>
+            <FormLabel required={true}>{__('Exclude categories')}</FormLabel>
+            <SelectProductCategory
+              name="categoriesExcluded"
+              label="Choose Product Categories"
+              initialValue={formValues.categoriesExcluded}
+              onSelect={categories =>
+                handleState('categoriesExcluded', categories)
               }
               multi={true}
             />

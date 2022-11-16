@@ -6,9 +6,15 @@ const discounts = asyncComponent(() =>
   import(/* webpackChunkName: "Settings List - Pricing" */ './page/Discounts')
 );
 
-const discountsCreate = asyncComponent(() =>
+const discountCreate = asyncComponent(() =>
   import(
-    /* webpackChunkName: "Settings List - Pricing - Create Discount" */ './page/DiscountsCreate'
+    /* webpackChunkName: "Settings List - Pricing - Create Discount" */ './page/DiscountCreate'
+  )
+);
+
+const discountEdit = asyncComponent(() =>
+  import(
+    /* webpackChunkName: "Settings List - Pricing - Edit Discount" */ './page/DiscountEdit'
   )
 );
 
@@ -26,7 +32,14 @@ const routes = () => {
         exact={true}
         path="/pricing/discounts/create"
         key="/pricing/discounts/create"
-        component={discountsCreate}
+        component={discountCreate}
+      />
+
+      <Route
+        exact={true}
+        path="/pricing/discounts/edit/:id"
+        key="/pricing/discounts/edit/"
+        component={discountEdit}
       />
     </React.Fragment>
   );

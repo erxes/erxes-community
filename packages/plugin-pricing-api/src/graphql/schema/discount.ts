@@ -17,9 +17,13 @@ export const types = () => `
     status: String,
     amountValue: Float,
     amountType: String,
+
+    applyType: String,
+
     products: [String],
-    productCategories: [String],
     productsExcluded: [String],
+    categories: [String],
+    categoriesExcluded, [String],
 
     quantityType: String,
     quantityValue: Float,
@@ -43,9 +47,13 @@ export const types = () => `
     status: String,
     amountValue: Float,
     amountType: String,
+
+    applyType: String,
+
     products: [String],
-    productCategories: [String],
     productsExcluded: [String],
+    categories: [String],
+    categoriesExcluded, [String],
 
     quantityType: String,
     quantityValue: Float,
@@ -63,9 +71,13 @@ export const types = () => `
     status: String,
     amountValue: Float,
     amountType: String,
+
+    applyType: String,
+
     products: [String],
-    productCategories: [String],
     productsExcluded: [String],
+    categories: [String],
+    categoriesExcluded, [String],
 
     quantityType: String,
     quantityValue: Float,

@@ -1,4 +1,4 @@
-export const STATUS = {
+export const STATUS_TYPES = {
   ACTIVE: 'active',
   DISABLED: 'disabled',
   COMPLETED: 'completed',
@@ -6,14 +6,20 @@ export const STATUS = {
   ALL: ['active', 'disabled', 'completed', 'archived']
 };
 
-export const AMOUNT_TYPE = {
+export const AMOUNT_TYPES = {
   FIXED: 'fixed',
   PERCENTAGE: 'percentage',
   ALL: ['fixed', 'percentage']
 };
 
-export const QUANTITY_TYPE = {
+export const QUANTITY_TYPES = {
   MINIMUM: 'minimum',
   EXACT: 'exact',
   ALL: ['minimum', 'fixed']
+};
+
+export const APPLY_TYPES = {
+  PRODUCT: 'product',
+  CATEGORY: 'category',
+  ALL: ['product', 'category']
 };

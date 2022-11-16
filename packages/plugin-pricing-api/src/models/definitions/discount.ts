@@ -1,20 +1,30 @@
 import { Document, Schema } from 'mongoose';
 import { field } from './utils';
-import { STATUS, AMOUNT_TYPE, QUANTITY_TYPE } from './constants';
+import {
+  STATUS_TYPES,
+  AMOUNT_TYPES,
+  QUANTITY_TYPES,
+  APPLY_TYPES
+} from './constants';
 
 export interface IDiscount {
   name: string;
   status: string;
   amountType: string;
   amountValue: number;
-  products?: string[];
-  productCategories?: string[];
+
+  applyType: string;
+
+  products: string[];
   productsExcluded: string[];
+  categories: string[];
+  categoriesExcluded: string[];
 
   quantityType?: string;
   quantityValue?: number;
   minPurchaseEnabled?: boolean;
   minPurchaseValue?: number;
+
   departmentIds?: string[];
   branchIds?: string[];
   unitIds?: string[];
@@ -34,37 +44,49 @@ export const discountSchema = new Schema({
   name: field({ type: String, label: 'Name' }),
   status: field({
     type: String,
-    enum: STATUS.ALL,
-    default: STATUS.ACTIVE,
+    enum: STATUS_TYPES.ALL,
+    default: STATUS_TYPES.ACTIVE,
     label: 'Status'
   }),
   amountType: field({
     type: String,
-    enum: AMOUNT_TYPE.ALL,
-    default: AMOUNT_TYPE.FIXED,
+    enum: AMOUNT_TYPES.ALL,
+    default: AMOUNT_TYPES.FIXED,
     label: 'Amount Type'
   }),
   amountValue: field({
     type: Number,
     label: 'Amount Value'
   }),
+
+  applyType: field({
+    type: String,
+    enum: APPLY_TYPES.ALL,
+    default: APPLY_TYPES.PRODUCT,
+    label: 'Apply Type'
+  }),
+
   products: field({
     type: [String],
     label: 'Products'
-  }),
-  productCategories: field({
-    type: [String],
-    label: 'Product Categories'
   }),
   productsExcluded: field({
     type: [String],
     label: 'Excluded Products'
   }),
+  categories: field({
+    type: [String],
+    label: 'Product Categories'
+  }),
+  categoriesExcluded: field({
+    type: [String],
+    label: 'Excluded Categories'
+  }),
 
   // Rules
   quantityType: field({
     type: String,
-    enum: QUANTITY_TYPE.ALL,
+    enum: QUANTITY_TYPES.ALL,
     label: 'Quantity Type'
   }),
   quantityValue: field({

@@ -45,7 +45,7 @@ const Row = (props: Props) => {
             </Button>
           </Tip>
           <Tip text={__('Edit')} placement="bottom">
-            <Link to="/pricing/discounts/edit">
+            <Link to={`/pricing/discounts/edit/${data._id && data._id}`}>
               <Button type="button" btnStyle="link" size="small">
                 <Icon icon="edit-3" />
               </Button>
