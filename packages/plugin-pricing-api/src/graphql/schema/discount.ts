@@ -23,7 +23,7 @@ export const types = () => `
     products: [String],
     productsExcluded: [String],
     categories: [String],
-    categoriesExcluded, [String],
+    categoriesExcluded: [String],
 
     quantityType: String,
     quantityValue: Float,
@@ -53,7 +53,7 @@ export const types = () => `
     products: [String],
     productsExcluded: [String],
     categories: [String],
-    categoriesExcluded, [String],
+    categoriesExcluded: [String],
 
     quantityType: String,
     quantityValue: Float,
@@ -66,7 +66,7 @@ export const types = () => `
   }
 
   input DiscountEditInput {
-    id: String,
+    _id: String,
     name: String,
     status: String,
     amountValue: Float,
@@ -77,7 +77,7 @@ export const types = () => `
     products: [String],
     productsExcluded: [String],
     categories: [String],
-    categoriesExcluded, [String],
+    categoriesExcluded: [String],
 
     quantityType: String,
     quantityValue: Float,

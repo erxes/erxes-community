@@ -116,6 +116,8 @@ export const discountSchema = new Schema({
     label: 'Unit Ids'
   }),
 
+  // Intervals
+
   // Timestamps
   createdAt: field({ type: Date, default: new Date(), label: 'Created At' }),
   createdBy: field({ type: String, label: 'Created By' }),

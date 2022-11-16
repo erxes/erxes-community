@@ -22,9 +22,9 @@ const Options = (props: Props) => {
       <FormGroup>
         <FormLabel>{__('Departments')}</FormLabel>
         <SelectDepartment
-          name="departments"
+          name="departmentIds"
           label="Choose Departments"
-          initialValue={formValues.departments || []}
+          initialValue={formValues.departmentIds || []}
           onSelect={departments => handleState('departmentIds', departments)}
           multi={true}
         />
@@ -32,9 +32,9 @@ const Options = (props: Props) => {
       <FormGroup>
         <FormLabel>{__('Branches')}</FormLabel>
         <SelectBranches
-          name="branches"
+          name="branchIds"
           label="Choose Branches"
-          initialValue={formValues.branches || []}
+          initialValue={formValues.branchIds || []}
           onSelect={branches => handleState('branchIds', branches)}
           multi={true}
         />
@@ -42,9 +42,9 @@ const Options = (props: Props) => {
       <FormGroup>
         <FormLabel>{__('Units')}</FormLabel>
         <SelectUnits
-          name="units"
+          name="unitIds"
           label="Choose Units"
-          initialValue={formValues.units || []}
+          initialValue={formValues.unitIds || []}
           onSelect={units => handleState('unitIds', units)}
           multi={true}
         />

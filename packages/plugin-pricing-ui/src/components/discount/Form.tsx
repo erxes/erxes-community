@@ -28,15 +28,16 @@ const Form = (props: Props) => {
   const [formValues, setFormValues] = useState<any>({
     // Contents
     name: data.name ? data.name : '',
+    status: data.status ? data.status : 'active',
     amountValue: data.amountValue ? data.amountValue : 0,
     amountType: data.amountType ? data.amountType : 'fixed', // "fixed", "percentage"
 
-    applyType: data.applyType ? data.applyType : 'product', // "product", "category"
+    applyType: data.applyType ? data.applyType : 'category', // "product", "category"
 
     products: data.products ? data.products : [],
     productsExcluded: data.productExcluded ? data.productExcluded : [],
-    categories: data.productCategories ? data.productCategories : [],
-    categoriesExcluded: data.categories ? data.categories : [],
+    categories: data.categories ? data.categories : [],
+    categoriesExcluded: data.categoriesExcluded ? data.categoriesExcluded : [],
 
     // Rules
     quantityType: data.quantityType ? data.quantityType : null, // null || "minimum" || "exact",
@@ -54,7 +55,7 @@ const Form = (props: Props) => {
     // Schedules
   });
 
-  useEffect(() => setFormValues(data), [data]);
+  useEffect(() => data.name && setFormValues(data), [data]);
 
   // Functions
   const handleState = (key: string, value: any) => {
@@ -64,12 +65,10 @@ const Form = (props: Props) => {
     setFormValues(tempState);
   };
 
-  const handleSave = () => {
+  const handleSubmit = () => {
     const document: any = { ...formValues };
 
-    if (!document.quantityType) delete document.quantityType;
-
-    if (!document.quantityValue) delete document.quantityValue;
+    if (document.__typename) delete document.__typename;
 
     submit(document);
   };
@@ -86,7 +85,7 @@ const Form = (props: Props) => {
     return (
       <Button.Group>
         {cancelButton}
-        <Button btnStyle="success" icon="check-circle" onClick={handleSave}>
+        <Button btnStyle="success" icon="check-circle" onClick={handleSubmit}>
           {/* {isActionLoading && <SmallLoader />} */}
           Save
         </Button>

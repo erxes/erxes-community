@@ -12,8 +12,10 @@ type Props = {
 };
 
 const RowContainer = (props: Props) => {
+  const { data } = props;
   // Hooks
   const [remove] = useMutation(gql(mutations.discountRemove));
+  const [edit] = useMutation(gql(mutations.discountEdit));
 
   const discountRemove = () => {
     confirm()
@@ -30,7 +32,28 @@ const RowContainer = (props: Props) => {
       .catch((error: any) => Alert.error(error.message));
   };
 
-  return <RowComponent {...props} remove={discountRemove} />;
+  const handleStatus = (status: string) => {
+    confirm()
+      .then(() => {
+        edit({
+          variables: { doc: { _id: data._id, status } },
+          refetchQueries: ['discounts']
+        })
+          .then(() => {
+            Alert.success('Request successful!');
+          })
+          .catch((error: any) => Alert.error(error.message));
+      })
+      .catch((error: any) => Alert.error(error.message));
+  };
+
+  return (
+    <RowComponent
+      {...props}
+      remove={discountRemove}
+      handleStatus={handleStatus}
+    />
+  );
 };
 
 export default RowContainer;

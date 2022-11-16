@@ -44,12 +44,14 @@ export const loadDiscountClass = (models: IModels) => {
      */
     public static async discountEdit(
       id: string,
-      doc: IDiscount,
+      doc: IDiscount | any,
       userId: string
     ) {
       const result = await models.Discounts.findById(id);
 
       if (!result) return new Error(`Can't find discount`);
+
+      if (doc._id) delete doc._id;
 
       await models.Discounts.findByIdAndUpdate(id, {
         $set: {

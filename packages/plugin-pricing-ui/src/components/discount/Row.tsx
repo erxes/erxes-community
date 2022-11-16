@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import ActionButtons from '@erxes/ui/src/components/ActionButtons';
 import Button from '@erxes/ui/src/components/Button';
 import Tip from '@erxes/ui/src/components/Tip';
-import Tags from '@erxes/ui/src/components/Tags';
+import Label from '@erxes/ui/src/components/Label';
 import Icon from '@erxes/ui/src/components/Icon';
 import { __ } from '@erxes/ui/src/utils';
 import { DateWrapper } from '@erxes/ui/src/styles/main';
@@ -13,12 +13,75 @@ import { DateWrapper } from '@erxes/ui/src/styles/main';
 type Props = {
   data: any;
   remove: () => void;
+  handleStatus: (status: string) => void;
 };
 
 const Row = (props: Props) => {
-  const { data = {}, remove } = props;
+  const { data = {}, remove, handleStatus } = props;
 
-  const archive = () => {};
+  // Functions
+  const generateStatusStyle = () => {
+    switch (data.status) {
+      case 'active':
+      case 'completed':
+        return 'success';
+      case 'archived':
+        return 'warning';
+      default:
+        return 'simple';
+    }
+  };
+
+  const renderArchiveButton = () => {
+    if (data.status === 'archived')
+      return (
+        <Tip text={__('Unarchive')} placement="bottom">
+          <Button
+            type="button"
+            btnStyle="link"
+            onClick={() => handleStatus('active')}
+            size="small"
+          >
+            <Icon icon="redo" />
+          </Button>
+        </Tip>
+      );
+    else
+      return (
+        <Tip text={__('Archive')} placement="bottom">
+          <Button
+            type="button"
+            btnStyle="link"
+            onClick={() => handleStatus('archived')}
+            size="small"
+          >
+            <Icon icon="archive-alt" />
+          </Button>
+        </Tip>
+      );
+  };
+
+  const renderCompleteButton = () => {
+    if (
+      data.status !== 'archived' &&
+      data.status !== 'disabled' &&
+      data.status !== 'completed'
+    )
+      return (
+        <Tip text={__('Mark as Complete')} placement="bottom">
+          <Button
+            type="button"
+            btnStyle="link"
+            onClick={() => handleStatus('completed')}
+            size="small"
+          >
+            <Icon icon="check-circle" />
+          </Button>
+        </Tip>
+      );
+
+    return;
+  };
 
   const renderActions = () => {
     return (
@@ -28,22 +91,14 @@ const Row = (props: Props) => {
             <Button
               type="button"
               btnStyle="link"
-              onClick={archive}
+              onClick={() => {}}
               size="small"
             >
               <Icon icon="graph-bar" />
             </Button>
           </Tip>
-          <Tip text={__('Archive')} placement="bottom">
-            <Button
-              type="button"
-              btnStyle="link"
-              onClick={archive}
-              size="small"
-            >
-              <Icon icon="archive-alt" />
-            </Button>
-          </Tip>
+          {renderArchiveButton()}
+          {renderCompleteButton()}
           <Tip text={__('Edit')} placement="bottom">
             <Link to={`/pricing/discounts/edit/${data._id && data._id}`}>
               <Button type="button" btnStyle="link" size="small">
@@ -61,22 +116,13 @@ const Row = (props: Props) => {
     );
   };
 
-  console.log(data);
-
   return (
     <tr>
       <td>{data.name && data.name}</td>
       <td>
-        <Tags
-          tags={[
-            {
-              _id: 'statusTag',
-              type: '',
-              name: data.status && data.status,
-              colorCode: data.status === 'active' ? 'green' : 'grey'
-            }
-          ]}
-        />
+        <Label lblStyle={generateStatusStyle()} ignoreTrans={true}>
+          {data.status && data.status}
+        </Label>
       </td>
       <td>
         <b>{data.createdUser && data.createdUser.details.fullName}</b>

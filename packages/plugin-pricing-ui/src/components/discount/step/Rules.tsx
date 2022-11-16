@@ -38,6 +38,7 @@ const Rules = (props: Props) => {
             }
           ]}
           onChange={(e: any) => handleState('quantityType', e.target.value)}
+          defaultValue={formValues.quantityType}
         />
       </FormGroup>
       {formValues.quantityType && (
@@ -66,6 +67,7 @@ const Rules = (props: Props) => {
           onChange={(e: any) =>
             handleState('minPurchaseEnabled', e.target.checked)
           }
+          defaultChecked={formValues.minPurchaseEnabled}
         />
         <br />
         {formValues.minPurchaseEnabled === true && (

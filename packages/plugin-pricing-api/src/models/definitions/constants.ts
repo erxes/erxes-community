@@ -13,9 +13,10 @@ export const AMOUNT_TYPES = {
 };
 
 export const QUANTITY_TYPES = {
+  NULL: null,
   MINIMUM: 'minimum',
   EXACT: 'exact',
-  ALL: ['minimum', 'fixed']
+  ALL: [null, 'minimum', 'exact']
 };
 
 export const APPLY_TYPES = {

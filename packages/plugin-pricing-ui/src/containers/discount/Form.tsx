@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 // erxes
+import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import { Alert } from '@erxes/ui/src/utils';
 // local
 import { queries, mutations } from '../../graphql';
@@ -14,9 +15,21 @@ const FormContainer = () => {
   const { id } = useParams();
   const [add] = useMutation(gql(mutations.discountAdd));
   const [edit] = useMutation(gql(mutations.discountEdit));
-  const discountDetail = useQuery(gql(queries.discountDetail), {
-    variables: { id: id }
-  });
+  const discountDetail = id
+    ? useQuery(gql(queries.discountDetail), {
+        variables: { id: id },
+        fetchPolicy: 'network-only',
+        notifyOnNetworkStatusChange: true
+      })
+    : {
+        data: {},
+        loading: false
+      };
+
+  // Declaration
+  const discountData = discountDetail.data
+    ? discountDetail.data.discountDetail
+    : {};
 
   // Functions
   const discountAdd = (data: any) => {
@@ -47,9 +60,9 @@ const FormContainer = () => {
   };
 
   return (
-    <FormComponent
-      submit={submit}
-      data={discountDetail.data ? discountDetail.data.discountDetail : {}}
+    <DataWithLoader
+      data={<FormComponent submit={submit} data={id ? discountData : {}} />}
+      loading={id ? discountDetail.loading : false}
     />
   );
 };

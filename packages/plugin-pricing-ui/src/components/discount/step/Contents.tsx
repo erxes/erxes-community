@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Datetime from '@nateradebaugh/react-datetime';
 // erxes
+import Table from '@erxes/ui/src/components/table';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import FormLabel from '@erxes/ui/src/components/form/Label';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
+import { DateContainer } from '@erxes/ui/src/styles/main';
 import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 import { __ } from '@erxes/ui/src/utils';
 
@@ -33,12 +36,39 @@ const ContentStep = (props: Props) => {
         />
       </FormGroup>
       <FormGroup>
-        <FormLabel required={true}>{__('Amount Type')}</FormLabel>
+        <FormLabel>{__('Status')}</FormLabel>
+        <FormControl
+          name="status"
+          componentClass="select"
+          options={[
+            {
+              label: 'Active',
+              value: 'active'
+            },
+            {
+              label: 'Archived',
+              value: 'archived'
+            },
+            {
+              label: 'Completed',
+              value: 'completed'
+            },
+            {
+              label: 'Disabled',
+              value: 'disabled'
+            }
+          ]}
+          onChange={(e: any) => handleState('status', e.target.value)}
+          defaultValue={formValues.status}
+        />
+      </FormGroup>
+      <FormGroup>
+        <FormLabel>{__('Amount Type')}</FormLabel>
         <FormControl
           componentClass="radio"
           name="amountType"
           onChange={() => handleState('amountType', 'fixed')}
-          defaultChecked
+          defaultChecked={formValues.amountType === 'fixed'}
         >
           Fixed
         </FormControl>
@@ -46,6 +76,7 @@ const ContentStep = (props: Props) => {
           componentClass="radio"
           name="amountType"
           onChange={() => handleState('amountType', 'percentage')}
+          defaultChecked={formValues.amountType === 'percentage'}
         >
           Percentage
         </FormControl>
@@ -69,47 +100,45 @@ const ContentStep = (props: Props) => {
     </>
   );
 
-  console.log(formValues.appliesToCategory);
-
   const renderProductForm = () => (
     <>
       <FormGroup>
         <FormLabel>{__('Applies to')}</FormLabel>
         <FormControl
           componentClass="radio"
-          name="appliesToCategory"
-          onChange={() => handleState('appliesToCategory', true)}
-          defaultChecked={formValues.appliesToCategory === true}
+          name="applyType"
+          onChange={() => handleState('applyType', 'category')}
+          defaultChecked={formValues.applyType === 'category'}
         >
           Specific Category
         </FormControl>
         <FormControl
           componentClass="radio"
-          name="appliesToCategory"
-          onChange={() => handleState('appliesToCategory', false)}
-          defaultChecked={formValues.appliesToCategory === false}
+          name="applyType"
+          onChange={() => handleState('applyType', 'product')}
+          defaultChecked={formValues.applyType === 'product'}
         >
           Specific Product
         </FormControl>
       </FormGroup>
 
-      {formValues.appliesToCategory ? (
+      {formValues.applyType === 'category' ? (
         <>
           <FormGroup>
-            <FormLabel required={true}>{__('Product categories')}</FormLabel>
+            <FormLabel>{__('Product categories')}</FormLabel>
             <SelectProductCategory
               name="categories"
-              label="Choose Product Categories"
+              label="Choose categories"
               initialValue={formValues.categories}
               onSelect={categories => handleState('categories', categories)}
               multi={true}
             />
           </FormGroup>
           <FormGroup>
-            <FormLabel required={true}>{__('Exclude categories')}</FormLabel>
+            <FormLabel>{__('Exclude categories')}</FormLabel>
             <SelectProductCategory
               name="categoriesExcluded"
-              label="Choose Product Categories"
+              label="Choose categories to exclude"
               initialValue={formValues.categoriesExcluded}
               onSelect={categories =>
                 handleState('categoriesExcluded', categories)
@@ -121,7 +150,7 @@ const ContentStep = (props: Props) => {
             <FormLabel>{__('Exclude products')}</FormLabel>
             <SelectProducts
               name="productsExcluded"
-              label="Choose Product to exclude"
+              label="Choose products to exclude"
               initialValue={formValues.productsExcluded}
               onSelect={products => handleState('productsExcluded', products)}
               multi={true}
@@ -130,10 +159,10 @@ const ContentStep = (props: Props) => {
         </>
       ) : (
         <FormGroup>
-          <FormLabel required={true}>{__('Products')}</FormLabel>
+          <FormLabel>{__('Products')}</FormLabel>
           <SelectProducts
             name="products"
-            label="Choose Products"
+            label="Choose products"
             initialValue={formValues.products}
             onSelect={products => handleState('products', products)}
             multi={true}
@@ -143,11 +172,89 @@ const ContentStep = (props: Props) => {
     </>
   );
 
+  const renderDateRanger = () => {
+    return (
+      <Table bordered responsive>
+        <tbody>
+          <tr>
+            <td>
+              <FormGroup>
+                <FormLabel>{__('Start Date')}</FormLabel>
+                <FormControl componentClass="checkbox" name="startDate" />
+              </FormGroup>
+            </td>
+            <td>
+              <FormGroup>
+                <DateContainer>
+                  <Datetime
+                    inputProps={{ placeholder: __('Select Date') }}
+                    dateFormat="MM/DD/YYYY"
+                    closeOnSelect={true}
+                    timeFormat={false}
+                    utc={true}
+                  />
+                </DateContainer>
+              </FormGroup>
+            </td>
+            <td>
+              <FormGroup>
+                <DateContainer>
+                  <Datetime
+                    inputProps={{ placeholder: __('Select Time') }}
+                    dateFormat={false}
+                    closeOnSelect={true}
+                    timeFormat={true}
+                    utc={true}
+                  />
+                </DateContainer>
+              </FormGroup>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <FormGroup>
+                <FormLabel>{__('End Date')}</FormLabel>
+                <FormControl componentClass="checkbox" name="startDate" />
+              </FormGroup>
+            </td>
+            <td>
+              <FormGroup>
+                <DateContainer>
+                  <Datetime
+                    inputProps={{ placeholder: __('Select Date') }}
+                    dateFormat="MM/DD/YYYY"
+                    closeOnSelect={true}
+                    timeFormat={false}
+                    utc={true}
+                  />
+                </DateContainer>
+              </FormGroup>
+            </td>
+            <td>
+              <FormGroup>
+                <DateContainer>
+                  <Datetime
+                    inputProps={{ placeholder: __('Select Time') }}
+                    dateFormat={false}
+                    closeOnSelect={true}
+                    timeFormat={true}
+                    utc={true}
+                  />
+                </DateContainer>
+              </FormGroup>
+            </td>
+          </tr>
+        </tbody>
+      </Table>
+    );
+  };
+
   return (
     <FlexItem>
       <LeftItem>
         {renderBaseForm()}
         {renderProductForm()}
+        {renderDateRanger()}
       </LeftItem>
     </FlexItem>
   );
