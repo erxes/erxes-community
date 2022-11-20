@@ -172,7 +172,7 @@ class Form extends React.Component<IProps, IState> {
         afterDbSave,
         type: 'risk-assessment',
         isReadyToSave: this.state.isReadyToSave,
-        hideOptionalFields: false
+        hideOptionalFields: true
       };
       if (formId) {
         return (
