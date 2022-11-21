@@ -67,6 +67,10 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
 
       for (const [key, value] of Object.entries(formSubmissions)) {
         const { optionsValues } = fields.find(field => field._id === key);
+        if(!optionsValues){
+          newSubmission.push({ ...filter, fieldId: key, value });
+          break;
+        }
         const optValues = optionsValues
           .split('\n')
           .map(item => {
