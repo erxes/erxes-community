@@ -47,20 +47,7 @@ export interface IAccount {
 }
 
 // query types
-export type IntegrationTypes =
-  | 'facebook'
-  | 'gmail'
-  | 'nylas-gmail'
-  | 'nylas-exchange'
-  | 'nylas-imap'
-  | 'nylas-office365'
-  | 'nylas-outlook'
-  | 'nylas-yahoo'
-  | 'twitter'
-  | 'smooch-telegram'
-  | 'smooch-viber'
-  | 'smooch-line'
-  | 'smooch-twilio';
+export type IntegrationTypes = 'twitter';
 
 export type IntegrationDetailQueryResponse = {
   integrationDetail: IIntegration;

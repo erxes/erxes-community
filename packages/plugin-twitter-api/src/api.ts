@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
 import { IAccount } from './models/Accounts';
@@ -16,6 +17,8 @@ interface ITwitterConfig {
 }
 
 dotenv.config();
+
+const DOMAIN = getEnv({ name: 'DOMAIN' });
 
 export const getTwitterConfig = async (): Promise<ITwitterConfig> => {
   return {
@@ -39,7 +42,7 @@ export const getTwitterAuthUrl = async (): Promise<{
     url: 'https://api.twitter.com/oauth/request_token',
     method: 'POST',
     oauth: {
-      callback: `${getEnv({ name: 'DOMAIN' })}/pl:twitter/callback/add`,
+      callback: `${DOMAIN}/pl:twitter/callback/add`,
       consumer_key: twitterConfig.oauth.consumer_key,
       consumer_secret: twitterConfig.oauth.consumer_secret
     }
@@ -120,13 +123,11 @@ export const registerWebhook = async () => {
   const twitterConfig = await getTwitterConfig();
 
   return new Promise(async (resolve, reject) => {
-    const webhooks = await retreiveWebhooks().catch(e => {});
-
-    const DOMAIN = getEnv({ name: 'DOMAIN' });
+    const webhooks = await retrieveWebhooks().catch(e => {});
 
     const webhookObj =
       webhooks &&
-      webhooks.find(webhook => webhook.url === `${DOMAIN}/twitter/webhook`);
+      webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
 
     if (webhookObj) {
       return;
@@ -142,7 +143,7 @@ export const registerWebhook = async () => {
         'Content-type': 'application/x-www-form-urlencoded'
       },
       form: {
-        url: `${DOMAIN}/twitter/webhook`
+        url: `${DOMAIN}/pl:twitter/webhook`
       }
     };
 
@@ -156,6 +157,8 @@ export const registerWebhook = async () => {
         resolve(res);
       })
       .catch(er => {
+        console.log('ERROR message', er.message);
+
         reject(er.message);
       });
   });
@@ -169,7 +172,7 @@ interface IWebhook {
   update_webhook_url: string;
 }
 
-export const retreiveWebhooks = async (): Promise<IWebhook[]> => {
+export const retrieveWebhooks = async (): Promise<IWebhook[]> => {
   const twitterConfig = await getTwitterConfig();
 
   return new Promise((resolve, reject) => {
@@ -314,18 +317,25 @@ interface IMessage {
   };
 }
 
+export const message = async => {};
+
 export const reply = async (
   receiverId: string,
   content: string,
   attachment,
   account: IAccount
 ): Promise<IMessage> => {
+  console.log(receiverId, content, attachment, account, '0000000000000000');
+
   const twitterConfig = await getTwitterConfig();
 
   return new Promise((resolve, reject) => {
     const requestOptions = {
       url: 'https://api.twitter.com/1.1/direct_messages/events/new.json',
       oauth: twitterConfig.oauth,
+      headers: {
+        'Content-type': 'application/json'
+      },
       body: {
         event: {
           type: 'message_create',
@@ -349,6 +359,8 @@ export const reply = async (
     request
       .post(requestOptions)
       .then(res => {
+        console.log('RES ni yu we', res);
+
         resolve(res);
       })
       .catch(e => {

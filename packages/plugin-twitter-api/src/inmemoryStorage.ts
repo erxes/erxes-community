@@ -19,3 +19,9 @@ export const initMemoryStorage = () => {
 export default function() {
   return client;
 }
+
+export const set = async (key: string, value: any) => {
+  try {
+    client.set(key, value);
+  } catch (e) {}
+};

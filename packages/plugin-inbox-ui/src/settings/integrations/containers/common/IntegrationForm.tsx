@@ -34,8 +34,6 @@ class IntegrationFormContainer extends React.Component<FinalProps, State> {
     isSubmitted,
     callback
   }: IButtonMutateProps) => {
-    console.log('VALUES============>', values);
-
     const { type } = this.props;
 
     return (

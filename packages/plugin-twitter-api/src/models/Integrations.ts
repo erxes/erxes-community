@@ -50,7 +50,11 @@ export interface IIntegrationModel extends Model<IIntegrationDocument> {
 export const loadClass = () => {
   class Integration {
     public static async getIntegration(selector) {
+      console.log('selector:::::::::::::::::', selector);
+
       const integration = await Integrations.findOne(selector);
+
+      console.log('END BAINA UU TEGEED', integration);
 
       if (!integration) {
         throw new Error('Integration not found');

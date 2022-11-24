@@ -1,8 +1,10 @@
-import { downloadAttachment, getEnv } from './utils';
+import { downloadAttachment, getConfig, getEnv } from './utils';
 import * as twitterUtils from './api';
 import receiveDms from './receiveDms';
 import { IModels } from './connectionResolver';
 import Accounts from './models/Accounts';
+import { ConversationMessages, Conversations } from './models/Conversations';
+import Integrations from './models/Integrations';
 
 const init = async app => {
   app.get('/login', async (_req, res) => {
@@ -19,6 +21,7 @@ const init = async app => {
       response.oauth_token,
       response.oauth_token_secret
     );
+
     await Accounts.create({
       token: response.oauth_token,
       tokenSecret: response.oauth_token_secret,
@@ -46,7 +49,9 @@ const init = async app => {
       return 'Error: crc_token missing from request.';
     }
   });
-  app.post('/twitter/webhook', async (req, res) => {
+  app.post('/webhook', async (req, res) => {
+    console.log('Twitter Post Webhook ajillaj baina uu? ');
+
     try {
       await receiveDms(req.body);
     } catch (e) {
@@ -55,7 +60,7 @@ const init = async app => {
 
     res.sendStatus(200);
   });
-  app.get('/get-account', async (req, res, models: IModels) => {
+  app.get('/get-account', async (req, _res) => {
     const account = await Accounts.findOne({ _id: req.query.accountId });
 
     if (!account) {
@@ -64,10 +69,10 @@ const init = async app => {
 
     return account.uid;
   });
-  app.post('/create-integration', async (req, models: IModels) => {
+  app.post('/create-integration', async (req, _res) => {
     const { accountId, integrationId, data, kind } = req.body;
 
-    const prevEntry = await models.Integrations.findOne({
+    const prevEntry = await Integrations.findOne({
       accountId
     });
 
@@ -76,8 +81,9 @@ const init = async app => {
     }
 
     const account = await Accounts.getAccount({ _id: accountId });
+    console.log('=============+++++');
 
-    await models.Integrations.create({
+    await Integrations.create({
       kind,
       accountId,
       erxesApiId: integrationId,
@@ -96,7 +102,9 @@ const init = async app => {
       }
     }
   });
-  app.post('/reply', async (req, models: IModels) => {
+  app.post('/reply', async (req, _res) => {
+    console.log('END YUM IRJIINUU REPLY');
+
     const { attachments, conversationId, content, integrationId } = req.body;
 
     if (attachments.length > 1) {
@@ -118,11 +126,11 @@ const init = async app => {
       attachment.media.id = JSON.parse(response).media_id_string;
     }
 
-    const conversation = await models.Conversations.getConversation({
+    const conversation = await Conversations.getConversation({
       erxesApiId: conversationId
     });
 
-    const integration = await models.Integrations.findOne({
+    const integration = await Integrations.findOne({
       erxesApiId: integrationId
     });
 
@@ -144,7 +152,7 @@ const init = async app => {
     const { message_data } = message_create;
 
     // save on integrations db
-    await models.ConversationMessages.create({
+    await ConversationMessages.create({
       conversationId: conversation._id,
       messageId: id,
       timestamp: created_timestamp,

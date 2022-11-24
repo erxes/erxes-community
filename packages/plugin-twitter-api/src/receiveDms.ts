@@ -29,6 +29,8 @@ const extractUrlFromAttachment = attachment => {
 const receiveDms = async requestBody => {
   const { direct_message_events } = requestBody;
 
+  console.log('REQUEST BODY', requestBody);
+
   const users: IUsers = requestBody.users;
 
   if (!direct_message_events) {
@@ -37,6 +39,9 @@ const receiveDms = async requestBody => {
 
   for (const event of direct_message_events) {
     const { type, message_create } = event;
+
+    console.log('type', type);
+    console.log('message_create', message_create);
 
     const senderId = message_create.sender_id;
     const receiverId = message_create.target.recipient_id;
@@ -53,13 +58,21 @@ const receiveDms = async requestBody => {
 
       const account = await Accounts.findOne({ uid: receiverId });
 
+      console.log('account========>', account);
+
       if (!account) {
         return;
       }
 
+      console.log('11111111111111111');
+      console.log('Account::::::::::', account);
+
       const integration = await Integrations.getIntegration({
-        $and: [{ accountId: account._id }, { kind: 'twitter-dm' }]
+        $and: [{ id: account._id }, { kind: 'twitter' }]
       });
+      console.log('INTEGRATIONNNNNNNNNNNn', integration);
+
+      console.log('222222222222222222');
 
       const customer = await getOrCreateCustomer(
         integration,
@@ -67,8 +80,19 @@ const receiveDms = async requestBody => {
         users[senderId]
       );
 
+      console.log('3333333333333333333');
+
       const content = message_data.text;
       const customerErxesApiId: any = customer.erxesApiId;
+
+      console.log('======================================');
+
+      console.log('SenderId', senderId);
+      console.log('ReceiverId', receiverId);
+      console.log('IntegrationId', integration.id);
+      console.log('Content', content);
+      console.log('CustomerErxesApiId', customerErxesApiId);
+      console.log('Integration erxesApiId', integration.erxesApiId);
 
       const conversation = await getOrCreateConversation(
         senderId,

@@ -40,13 +40,16 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
   }) => {
     const { accountId, twitterAccountId } = this.props;
 
+    console.log('Account ID:::', accountId);
+    console.log('Twitter Account ID:::', twitterAccountId);
+
     return {
       name: values.name,
       brandId: values.brandId,
       channelIds: values.channelIds,
       kind: 'twitter',
       accountId,
-      data: { twitterAccountId }
+      twitterAccountId
     };
   };
 
@@ -61,7 +64,8 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
     } = this.props;
     const { values, isSubmitted } = formProps;
 
-    console.log(channelIds, 'channelId');
+    console.log('Account ID:::', this.props.accountId);
+    console.log('Twitter Account ID:::', this.props.twitterAccountId);
 
     return (
       <>
