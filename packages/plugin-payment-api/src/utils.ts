@@ -10,6 +10,7 @@ import { PAYMENT_KINDS } from './constants';
 import { IInvoiceDocument } from './models/definitions/invoices';
 import { IPaymentDocument } from './models/definitions/payments';
 import redisUtils from './redisUtils';
+import { monpayHandler } from './api/monpay/api';
 
 export const getHandler = async (req, res) => {
   const { route } = req;
@@ -34,6 +35,10 @@ export const getHandler = async (req, res) => {
     switch (kind) {
       case PAYMENT_KINDS.QPAY:
         invoice = await qPayHandler(models, query);
+        break;
+      case PAYMENT_KINDS.MONPAY:
+        invoice = await monpayHandler(models, query);
+        break;
     }
 
     if (invoice) {
