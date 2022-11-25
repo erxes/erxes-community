@@ -4,7 +4,7 @@ import { PAYMENT_KINDS, PAYMENT_STATUS } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { IPaymentDocument } from '../../models/definitions/payments';
 import { IMonpayConfig, IMonpayInvoice } from '../types';
-import { QR_GENERATE_URL, TOKEN_URL } from './constants';
+import { QR_GENERATE_URL, QR_CHECK_URL, TOKEN_URL } from './constants';
 
 export const generateToken = async config => {
   const { clientId, clientSecret } = config;
@@ -75,6 +75,32 @@ export const checkInvoice = async (
   payment: IPaymentDocument
 ) => {
   const { username, accountId } = payment.config as IMonpayConfig;
+
+  const requestOptions = {
+    url: `${QR_CHECK_URL}?uuid=${invoice.identifier}`,
+    method: 'GET',
+    headers: {
+      Authorization:
+        'Basic ' + Buffer.from(`${username}:${accountId}`).toString('base64'),
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    }
+  };
+
+  try {
+    const res = await sendRequest(requestOptions);
+
+    switch (res.code) {
+      case 0:
+        return PAYMENT_STATUS.PAID;
+      case 23:
+        return PAYMENT_STATUS.PENDING;
+      default:
+        return PAYMENT_STATUS.FAILED;
+    }
+  } catch (e) {
+    throw new Error(e.message);
+  }
 };
 
 export const monpayHandler = async (models: IModels, queryParams) => {

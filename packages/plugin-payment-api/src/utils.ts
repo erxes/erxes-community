@@ -1,16 +1,15 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 
-import { qPayHandler } from './api/qPay/utils';
+import * as monpayUtils from './api/monpay/api';
 import * as qPayUtils from './api/qPay/utils';
-import { hmac256, socialPayHandler } from './api/socialPay/utils';
 import * as socialPayUtils from './api/socialPay/utils';
+import { IMonpayConfig } from './api/types';
 import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
 import { PAYMENT_KINDS } from './constants';
 import { IInvoiceDocument } from './models/definitions/invoices';
 import { IPaymentDocument } from './models/definitions/payments';
 import redisUtils from './redisUtils';
-import { monpayHandler } from './api/monpay/api';
 
 export const getHandler = async (req, res) => {
   const { route } = req;
@@ -34,10 +33,10 @@ export const getHandler = async (req, res) => {
     let invoice: any;
     switch (kind) {
       case PAYMENT_KINDS.QPAY:
-        invoice = await qPayHandler(models, query);
+        invoice = await qPayUtils.qPayHandler(models, query);
         break;
       case PAYMENT_KINDS.MONPAY:
-        invoice = await monpayHandler(models, query);
+        invoice = await monpayUtils.monpayHandler(models, query);
         break;
     }
 
@@ -75,7 +74,7 @@ export const postHandler = async (req, res) => {
     let invoice: any;
     switch (type) {
       case PAYMENT_KINDS.SOCIAL_PAY:
-        invoice = await socialPayHandler(models, body);
+        invoice = await socialPayUtils.socialPayHandler(models, body);
     }
 
     if (invoice) {
@@ -167,7 +166,7 @@ export const checkInvoice = async (
 
       const { body } = await socialPayUtils.socialPayInvoiceCheck({
         amount: invoice.amount,
-        checksum: hmac256(
+        checksum: socialPayUtils.hmac256(
           inStoreSPKey,
           inStoreSPTerminal + invoice.identifier + invoice.amount
         ),
@@ -180,7 +179,9 @@ export const checkInvoice = async (
       }
 
       return 'paid';
-    default:
-      return 'pending';
+
+    case PAYMENT_KINDS.MONPAY:
+      // check monpay invoice
+      const { username, accountId } = payment.config as IMonpayConfig;
   }
 };
