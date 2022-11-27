@@ -24,6 +24,7 @@ module.exports = {
       url: '/processes/performances',
       icon: 'icon-file-check-alt',
       location: 'mainNavigation',
+      scope: 'processes',
       permission: 'showWorks'
     }
   ]

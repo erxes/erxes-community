@@ -2,22 +2,18 @@ import {
   DURATION_TYPES,
   FLOW_STATUSES,
   WORK_STATUSES
-} from 'src/models/definitions/constants';
-import { generateModels, IModels } from '../connectionResolver';
-import { sendProductsMessage, sendSalesplansMessage } from '../messageBroker';
-import { IProcess, ICurrentJob } from '../models/definitions/processes';
+} from '../models/definitions/constants';
+import { IFlowDocument, IJobDocument } from '../models/definitions/flows';
 import {
   IJobReferDocument,
   IProductDocument,
   IProductsData
 } from '../models/definitions/jobs';
-import {
-  IFlow,
-  IFlowDocument,
-  IJobDocument
-} from 'src/models/definitions/flows';
+import { IModels } from '../connectionResolver';
+import { IProcess } from '../models/definitions/processes';
 import { IWork } from '../models/definitions/works';
 import { JOB_TYPES } from '../models/definitions/constants';
+import { sendProductsMessage, sendSalesplansMessage } from '../messageBroker';
 
 interface IListArgs {
   dayPlans: any[];
@@ -38,11 +34,8 @@ export class consumeSalesPlans {
 
   private flows: IFlowDocument[] = [];
   private flowByProducId: { [_id: string]: IFlowDocument } = {};
-  private jobRefers: IJobReferDocument[] = [];
   private jobRefersById: { [_id: string]: IJobReferDocument } = {};
-  private subFlows: IFlowDocument[] = [];
   private subFlowsById: { [_id: string]: IFlowDocument } = {};
-  private products: IProductDocument[] = [];
   private productsById: { [_id: string]: IProductDocument } = {};
 
   private bulkCreateWorks: IWork[] = [];
@@ -87,7 +80,7 @@ export class consumeSalesPlans {
 
     const flowByProducId = {};
     for (const flow of flows) {
-      flowByProducId[flow._id] = flow;
+      flowByProducId[flow.productId] = flow;
     }
 
     this.flows = flows;
@@ -120,6 +113,7 @@ export class consumeSalesPlans {
     const subFlows = await this.models.Flows.find({
       _id: { $in: cSubFlowIds }
     }).lean();
+
     for (const flow of subFlows) {
       for (const job of flow.jobs || []) {
         const config = job.config;
@@ -171,11 +165,8 @@ export class consumeSalesPlans {
     const productsById = {};
     products.forEach(pr => (productsById[pr._id] = pr));
 
-    this.jobRefers = jobRefers;
     this.jobRefersById = jobRefersById;
-    this.subFlows = subFlows;
     this.subFlowsById = subFlowsById;
-    this.products = products;
     this.productsById = productsById;
   }
 
@@ -303,7 +294,7 @@ export class consumeSalesPlans {
         endAt: dueDate,
         jobId: job.id,
         flowId: flow._id,
-        // productId: string;
+        productId: flow.productId,
         count,
         intervalId: timeId,
         inBranchId: config.inBranchId,
@@ -357,7 +348,7 @@ export class consumeSalesPlans {
         endAt: dueDate,
         jobId: job.id,
         flowId: flow._id,
-        // productId: string;
+        productId: flow.productId,
         count,
         intervalId: timeId,
         inBranchId: config.inBranchId,
@@ -426,10 +417,14 @@ export class consumeSalesPlans {
         continue;
       }
 
-      const referInfos = this.getReferInfos(flow);
+      const referInfos = await this.getReferInfos(flow);
 
       for (const value of values) {
         const { timeId, count } = value;
+
+        if (!count) {
+          continue;
+        }
 
         let time = timesById[timeId];
 
@@ -465,6 +460,8 @@ export class consumeSalesPlans {
           timeId
         );
       }
+
+      this.result.success.push(dayPlan._id);
     }
 
     if (bulkCreateProcesses.length) {

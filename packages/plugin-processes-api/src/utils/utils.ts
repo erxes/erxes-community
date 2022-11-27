@@ -136,7 +136,7 @@ export const initDocWork = async (
   flow: IFlowDocument,
   jobRefer: IJobReferDocument,
   productId: string,
-  count: string,
+  count: number,
   subdomain: string,
   job?: IJobDocument,
   intervalId?: string
@@ -157,12 +157,12 @@ export const initDocWork = async (
     outBranchId: job?.config.outBranchId,
     outDepartmentId: job?.config.outDepartmentId,
     needProducts: await initProducts(
-      parseInt(count, 10),
+      count,
       jobRefer.needProducts || [],
       subdomain
     ),
     resultProducts: await initProducts(
-      parseInt(count, 10),
+      count,
       jobRefer.resultProducts || [],
       subdomain
     )

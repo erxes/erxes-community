@@ -1,12 +1,10 @@
 import * as _ from 'underscore';
-import { FLOW_STATUSES, JOB_TYPES } from './definitions/constants';
+import { FLOW_STATUSES } from './definitions/constants';
 import {
   processSchema,
   IProcess,
-  IProcessDocument,
-  IWork
+  IProcessDocument
 } from './definitions/processes';
-import { recursiveChecker } from './utils';
 import { IModels } from '../connectionResolver';
 import { Model } from 'mongoose';
 
@@ -16,7 +14,6 @@ export interface IProcessModel extends Model<IProcessDocument> {
   updateProcess(_id: string, doc: IProcess): Promise<IProcessDocument>;
   removeProcess(_id: string): void;
   removeProcesses(processIds: string[]): void;
-  checkValidation(jobs?: IWork[]): Promise<String>;
 }
 
 export const loadProcessClass = (models: IModels) => {
@@ -38,14 +35,9 @@ export const loadProcessClass = (models: IModels) => {
      * Create a process
      */
     public static async createProcess(doc: IProcess) {
-      const processValidation = await models.Processes.checkValidation(
-        doc.works
-      );
-
       const process = await models.Processes.create({
         ...doc,
         status: FLOW_STATUSES.DRAFT,
-        processValidation,
         createdAt: new Date()
       });
 
