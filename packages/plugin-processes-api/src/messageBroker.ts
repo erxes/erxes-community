@@ -26,12 +26,16 @@ export const initBroker = async cl => {
         data: { _ids: dayPlans.map(d => d._id), status: 'pending' }
       });
 
-      await consumeSalesPlans(subdomain, {
+      const models = await generateModels(subdomain);
+
+      const qb = new consumeSalesPlans(models, subdomain, {
         dayPlans,
         date,
         branchId,
         departmentId
       });
+
+      await qb.run();
     }
   );
 

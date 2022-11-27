@@ -10,8 +10,8 @@ export interface IWork {
   endAt: Date;
   jobId: string;
   flowId: string;
-  productId: string;
-  count: string;
+  productId?: string;
+  count: number;
   intervalId?: string;
   inBranchId?: string;
   inDepartmentId?: string;
@@ -37,7 +37,7 @@ export const workSchema = schemaHooksWrapper(
     jobId: field({ type: String, label: 'jobId' }),
     flowId: field({ type: String, label: 'flowId' }),
     productId: field({ type: String, label: 'productId' }),
-    count: field({ type: String, label: 'count' }),
+    count: field({ type: Number, label: 'count' }),
     intervalId: field({ type: String, label: 'Interval Id' }),
     inBranchId: field({ type: String, optional: true, label: 'branchId' }),
     inDepartmentId: field({

@@ -1,9 +1,9 @@
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 import { IJobRefer, productsDataSchema } from './jobs';
-import { IFlow } from './flows';
+import { IFlow, IFlowDocument } from './flows';
 
-export interface IWork {
+export interface ICurrentJob {
   id: string;
   jobId: string;
   quantity: number;
@@ -26,12 +26,13 @@ export interface IWork {
   style: object;
 }
 
-export interface IWorkDocument extends IWork {
+export interface ICurrentJobDocument extends ICurrentJob {
   jobRefer: IJobRefer;
 }
 
 export interface IProcess {
   flowId: string;
+  flow: IFlowDocument;
   dueDate: Date;
   branchId: string;
   departmentId: string;
@@ -40,7 +41,8 @@ export interface IProcess {
   quantity: number;
   status: string;
   isSub: boolean;
-  works?: IWork[];
+  referInfos: any;
+  currentJobs?: ICurrentJob[];
 }
 
 export interface IProcessDocument extends IProcess, Document {
@@ -52,7 +54,7 @@ export interface IProcessDocument extends IProcess, Document {
   currentFlow: IFlow;
 }
 
-export const workSchema = new Schema(
+export const currenctJobSchema = new Schema(
   {
     id: { type: String, required: true },
     type: { type: String, required: true },
@@ -69,6 +71,8 @@ export const workSchema = new Schema(
 export const processSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
+    flowId: field({ type: String, label: 'flow' }),
+    flow: field({ type: Object, label: 'flow' }),
     name: { type: String, required: true },
     categoryId: field({
       type: String,
@@ -93,7 +97,7 @@ export const processSchema = schemaHooksWrapper(
     createdBy: { type: String },
     updatedAt: { type: Date, default: new Date(), label: 'Updated date' },
     updatedBy: { type: String },
-    works: field({ type: [workSchema], optional: true, label: 'Jobs' }),
+    jobs: field({ type: [currenctJobSchema], optional: true, label: 'Jobs' }),
     latestBranchId: { type: String, optional: true },
     latestDepartmentId: { type: String, optional: true },
     latestResultProducts: {
