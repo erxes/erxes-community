@@ -1,29 +1,30 @@
 const workFields = `
-_id
-name
-    status
-    jobId
-    job
-    flow
-    product
-    inBranch
-    inDepartment
-    outBranch
-    outDepartment
-    startAt
-    count
-    interval
-    intervalId
-    needProducts
-    resultProducts
-      `;
+  _id
+  name
+  status
+  jobId
+  job
+  flow
+  product
+  inBranch
+  inDepartment
+  outBranch
+  outDepartment
+  startAt
+  dueDate
+  count
+  interval
+  intervalId
+  needProducts
+  resultProducts
+`;
 
 const works = `
-query works($page: Int, $perPage: Int, $searchValue: String) {
-  works(page: $page, perPage: $perPage, searchValue: $searchValue) {
-    ${workFields}
+  query works($page: Int, $perPage: Int, $searchValue: String) {
+    works(page: $page, perPage: $perPage, searchValue: $searchValue) {
+      ${workFields}
+    }
   }
-}
 `;
 
 const worksTotalCount = `
@@ -32,101 +33,105 @@ const worksTotalCount = `
   }
 `;
 
-const overallWorkFields = `_id
-status
-startAt
-job
-flow
-interval
-intervalId
-outBranch
-outDepartment
-inBranch
-inDepartment
-needProducts
-resultProducts`;
+const overallWorkFields = `
+  _id
+  status
+  startAt
+  job
+  flow
+  interval
+  intervalId
+  outBranch
+  outDepartment
+  inBranch
+  inDepartment
+  needProducts
+  resultProducts
+`;
 
 const overallWorks = `
-query overallWorks($page: Int, $perPage: Int, $searchValue: String) {
-  overallWorks(page: $page, perPage: $perPage, searchValue: $searchValue) {
-    ${overallWorkFields}
+  query overallWorks($page: Int, $perPage: Int, $searchValue: String) {
+    overallWorks(page: $page, perPage: $perPage, searchValue: $searchValue) {
+      ${overallWorkFields}
+    }
   }
-}`;
+`;
 
 const overallWorksSideBar = `
-query overallWorksSideBar($inBranchId: String, $inDepartmentId: String, $outBranchId: String, $outDepartmentId: String,$jobReferId: String) {
-  overallWorksSideBar(inBranchId: $inBranchId, inDepartmentId: $inDepartmentId, outBranchId: $outBranchId, outDepartmentId: $outDepartmentId,jobReferId: $jobReferId) {
-    _id
-    intervalId
-    interval
-    job
+  query overallWorksSideBar($inBranchId: String, $inDepartmentId: String, $outBranchId: String, $outDepartmentId: String,$jobReferId: String) {
+    overallWorksSideBar(inBranchId: $inBranchId, inDepartmentId: $inDepartmentId, outBranchId: $outBranchId, outDepartmentId: $outDepartmentId,jobReferId: $jobReferId) {
+      _id
+      intervalId
+      interval
+      job
+    }
   }
-}`;
+`;
 
 const sideBarDetailFields = `
-_id
-    job
-    jobId
-    flow
-    flowId
-    interval
-    intervalId
-    outBranch
-    outDepartment
-    inBranch
-    inDepartment
-    needProductsDetail
-    needProducts
-    resultProductsDetail
-    resultProducts
-
+  _id
+  job
+  jobId
+  flow
+  flowId
+  interval
+  intervalId
+  outBranch
+  outDepartment
+  inBranch
+  inDepartment
+  needProductsDetail
+  needProducts
+  resultProductsDetail
+  resultProducts
 `;
 
 const overallWorksSideBarDetail = `
-query OverallWorksSideBarDetail($id: String) {
-  overallWorksSideBarDetail(id: $id) {
-    ${sideBarDetailFields}
+  query OverallWorksSideBarDetail($id: String) {
+    overallWorksSideBarDetail(id: $id) {
+      ${sideBarDetailFields}
+    }
   }
-}
 `;
 
 const overallWorksTotalCount = `
-query overallWorksTotalCount($searchValue: String) {
-  overallWorksTotalCount(searchValue: $searchValue)
-}
+  query overallWorksTotalCount($searchValue: String) {
+    overallWorksTotalCount(searchValue: $searchValue)
+  }
 `;
 
 const performFields = `
-    _id
-    needProducts
-    resultProducts
-    productId
-    count
-    status
-    overallWorkId
-    overallWork
-    startAt`;
+  _id
+  needProducts
+  resultProducts
+  productId
+  count
+  status
+  overallWorkId
+  overallWork
+  startAt
+`;
 
 const performs = `
-query performs {
-  performs {
-   ${performFields}
+  query performs {
+    performs {
+    ${performFields}
+    }
   }
-}
 `;
 
 const performsByOverallWorkId = `
-query performsByOverallWorkId($overallWorkId: String) {
-  performsByOverallWorkId(overallWorkId: $overallWorkId) {
-    ${performFields}
+  query performsByOverallWorkId($overallWorkId: String) {
+    performsByOverallWorkId(overallWorkId: $overallWorkId) {
+      ${performFields}
+    }
   }
-}
 `;
 
 const performsTotalCount = `
-query performsTotalCount {
-  performsTotalCount
-}
+  query performsTotalCount {
+    performsTotalCount
+  }
 `;
 
 const performsByOverallWorkIdTotalCount = `
@@ -136,9 +141,9 @@ const performsByOverallWorkIdTotalCount = `
 `;
 
 const allProducts = `
-query allProducts {
-  allProducts
-}
+  query allProducts {
+    allProducts
+  }
 `;
 
 export default {

@@ -22,13 +22,12 @@ class Row extends React.Component<Props> {
       outBranch,
       outDepartment,
       startAt,
+      dueDate,
       count,
       intervalId,
       needProducts,
       resultProducts
     } = work;
-
-    const date = startAt.toString().split('T');
 
     return (
       <tr>
@@ -45,7 +44,8 @@ class Row extends React.Component<Props> {
         <td>{intervalId}</td>
         <td>{(needProducts || []).length}</td>
         <td>{(resultProducts || []).length}</td>
-        <td>{date[0]}</td>
+        <td>{startAt}</td>
+        <td>{dueDate.toLocaleString()}</td>
       </tr>
     );
   }
