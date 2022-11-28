@@ -28,8 +28,9 @@ const discountDetail = `
       _id
       name
       status
-      amountType
-      amountValue
+      type
+      value
+      bonusProduct
 
       applyType
 
@@ -38,14 +39,44 @@ const discountDetail = `
       categories
       categoriesExcluded
 
-      quantityType
-      quantityValue
-      minPurchaseEnabled
-      minPurchaseValue
-      
+      isStartDateEnabled
+      isEndDateEnabled
+
+      startDate
+      endDate
+
       branchIds
       departmentIds
-      unitIds
+      boardId
+      pipelineId
+      stageId
+
+      isQuantityEnabled
+      quantityRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isPriceEnabled
+      priceRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isExpiryEnabled
+      expiryRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isRepeatEnabled
+      repeatRules {
+        type
+        value
+      }
     }
   }
 `;

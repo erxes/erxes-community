@@ -5,7 +5,6 @@ import { __ } from '@erxes/ui/src/utils/core';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Button from '@erxes/ui/src/components/Button';
 import { Title } from '@erxes/ui/src/styles/main';
-// local
 
 export default function Actionbar() {
   const renderRight = () => (

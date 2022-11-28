@@ -13,7 +13,7 @@ type Props = {
   refetch: () => void;
 };
 
-const List = (props: Props) => {
+export default function List(props: Props) {
   const { data, loading, refetch } = props;
 
   // Functions
@@ -48,6 +48,4 @@ const List = (props: Props) => {
       }
     />
   );
-};
-
-export default List;
+}

@@ -16,7 +16,7 @@ type Props = {
   handleStatus: (status: string) => void;
 };
 
-const Row = (props: Props) => {
+export default function Row(props: Props) {
   const { data = {}, remove, handleStatus } = props;
 
   // Functions
@@ -87,16 +87,6 @@ const Row = (props: Props) => {
     return (
       <td>
         <ActionButtons>
-          <Tip text={__('Statistic')} placement="bottom">
-            <Button
-              type="button"
-              btnStyle="link"
-              onClick={() => {}}
-              size="small"
-            >
-              <Icon icon="graph-bar" />
-            </Button>
-          </Tip>
           {renderArchiveButton()}
           {renderCompleteButton()}
           <Tip text={__('Edit')} placement="bottom">
@@ -142,6 +132,4 @@ const Row = (props: Props) => {
       {renderActions()}
     </tr>
   );
-};
-
-export default Row;
+}

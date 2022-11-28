@@ -4,21 +4,26 @@ import FormGroup from '@erxes/ui/src/components/form/Group';
 import FormLabel from '@erxes/ui/src/components/form/Label';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartment from '@erxes/ui/src/team/containers/SelectDepartments';
-import SelectUnits from '@erxes/ui/src/team/containers/SelectUnits';
+import { isEnabled } from '@erxes/ui/src/utils/core';
+import BoardSelectContainer from '@erxes/ui-cards/src/boards/containers/BoardSelect';
 import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 import { __ } from '@erxes/ui/src/utils';
+// local
+import { Block } from '../../../styles';
+import { DiscountData } from '../../../types';
 
 type Props = {
-  formValues: any;
+  formValues: DiscountData;
   handleState: (key: string, value: any) => void;
 };
 
-const Options = (props: Props) => {
+export default function Options(props: Props) {
   const { formValues, handleState } = props;
 
   // Functions
   const renderProductForm = () => (
-    <>
+    <Block>
+      <h4>{__('Location')}</h4>
       <FormGroup>
         <FormLabel>{__('Departments')}</FormLabel>
         <SelectDepartment
@@ -39,24 +44,38 @@ const Options = (props: Props) => {
           multi={true}
         />
       </FormGroup>
-      <FormGroup>
-        <FormLabel>{__('Units')}</FormLabel>
-        <SelectUnits
-          name="unitIds"
-          label="Choose Units"
-          initialValue={formValues.unitIds || []}
-          onSelect={units => handleState('unitIds', units)}
-          multi={true}
-        />
-      </FormGroup>
-    </>
+    </Block>
   );
+
+  const renderBoardForm = () => {
+    if (isEnabled('cards'))
+      return (
+        <Block>
+          <h4>{__('Stage')}</h4>
+          <BoardSelectContainer
+            type="deal"
+            autoSelectStage={false}
+            boardId={formValues.boardId}
+            pipelineId={formValues.pipelineId}
+            stageId={formValues.stageId}
+            onChangeBoard={boardId => handleState('boardId', boardId)}
+            onChangePipeline={pipelineId =>
+              handleState('pipelineId', pipelineId)
+            }
+            onChangeStage={stageId => handleState('stageId', stageId)}
+          />
+        </Block>
+      );
+
+    return;
+  };
 
   return (
     <FlexItem>
-      <LeftItem>{renderProductForm()}</LeftItem>
+      <LeftItem>
+        {renderProductForm()}
+        {renderBoardForm()}
+      </LeftItem>
     </FlexItem>
   );
-};
-
-export default Options;
+}

@@ -4,8 +4,9 @@ const discountAdd = `
       _id
       name
       status
-      amountValue
-      amountType
+      type
+      value
+      bonusProduct
 
       applyType
 
@@ -13,15 +14,45 @@ const discountAdd = `
       productsExcluded
       categories
       categoriesExcluded
-  
-      quantityType
-      quantityValue
-      minPurchaseEnabled
-      minPurchaseValue
-  
-      departmentIds
+
+      isStartDateEnabled
+      isEndDateEnabled
+
+      startDate
+      endDate
+      
       branchIds
-      unitIds
+      departmentIds
+      boardId
+      pipelineId
+      stageId
+
+      isQuantityEnabled
+      quantityRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isPriceEnabled
+      priceRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isExpiryEnabled
+      expiryRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isRepeatEnabled
+      repeatRules {
+        type
+        value
+      }
   
       createdAt
       createdBy
@@ -37,8 +68,9 @@ const discountEdit = `
       _id
       name
       status
-      amountValue
-      amountType
+      type
+      value
+      bonusProduct
 
       applyType
 
@@ -46,16 +78,46 @@ const discountEdit = `
       productsExcluded
       categories
       categoriesExcluded
-  
-      quantityType
-      quantityValue
-      minPurchaseEnabled
-      minPurchaseValue
-  
-      departmentIds
+
+      isStartDateEnabled
+      isEndDateEnabled
+
+      startDate
+      endDate
+      
       branchIds
-      unitIds
-  
+      departmentIds
+      boardId
+      pipelineId
+      stageId
+
+      isQuantityEnabled
+      quantityRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isPriceEnabled
+      priceRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isExpiryEnabled
+      expiryRules {
+        type
+        typeValue
+        discountValue
+      }
+
+      isRepeatEnabled
+      repeatRules {
+        type
+        value
+      }
+
       createdAt
       createdBy
       updatedAt
