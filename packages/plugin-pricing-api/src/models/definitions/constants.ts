@@ -1,26 +1,36 @@
 export const STATUS_TYPES = {
   ACTIVE: 'active',
-  DISABLED: 'disabled',
-  COMPLETED: 'completed',
   ARCHIVED: 'archived',
-  ALL: ['active', 'disabled', 'completed', 'archived']
+  DRAFT: 'draft',
+  COMPLETED: 'completed',
+  ALL: ['active', 'draft', 'archived', 'completed']
 };
 
 export const AMOUNT_TYPES = {
   FIXED: 'fixed',
+  SUBTRACTION: 'subtraction',
   PERCENTAGE: 'percentage',
-  ALL: ['fixed', 'percentage']
-};
-
-export const QUANTITY_TYPES = {
-  NULL: null,
-  MINIMUM: 'minimum',
-  EXACT: 'exact',
-  ALL: [null, 'minimum', 'exact']
+  BONUS: 'bonus',
+  ALL: ['fixed', 'subtraction', 'percentage', 'bonus']
 };
 
 export const APPLY_TYPES = {
   PRODUCT: 'product',
   CATEGORY: 'category',
   ALL: ['product', 'category']
+};
+
+export const RULE_TYPES = {
+  MINIMUM: 'minimum',
+  EXACT: 'exact',
+  EVERY: 'every',
+  ALL: ['minimum', 'exact', 'every']
+};
+
+export const EXPIRY_TYPES = {
+  DAY: 'day',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+  ALL: ['day', 'week', 'month', 'year']
 };

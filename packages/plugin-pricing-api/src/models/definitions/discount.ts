@@ -1,17 +1,23 @@
 import { Document, Schema } from 'mongoose';
 import { field } from './utils';
+import { STATUS_TYPES, AMOUNT_TYPES, APPLY_TYPES } from './constants';
 import {
-  STATUS_TYPES,
-  AMOUNT_TYPES,
-  QUANTITY_TYPES,
-  APPLY_TYPES
-} from './constants';
+  IQuantity,
+  IPrice,
+  IExpiry,
+  IRepeat,
+  quantitySchema,
+  priceSchema,
+  expirySchema,
+  repeatSchema
+} from './rules';
 
 export interface IDiscount {
   name: string;
   status: string;
-  amountType: string;
-  amountValue: number;
+  type: string;
+  value: number;
+  bonusProduct?: string;
 
   applyType: string;
 
@@ -20,14 +26,29 @@ export interface IDiscount {
   categories: string[];
   categoriesExcluded: string[];
 
-  quantityType?: string;
-  quantityValue?: number;
-  minPurchaseEnabled?: boolean;
-  minPurchaseValue?: number;
+  isStartDateEnabled?: boolean;
+  isEndDateEnabled?: boolean;
+
+  startDate?: Date;
+  endDate?: Date;
 
   departmentIds?: string[];
   branchIds?: string[];
-  unitIds?: string[];
+  boardId?: string;
+  pipelineId?: string;
+  stageId?: string;
+
+  isQuantityEnabled?: boolean;
+  quantityRules?: IQuantity[];
+
+  isPriceEnabled?: boolean;
+  priceRules?: IPrice[];
+
+  isExpiryEnabled?: boolean;
+  expiryRules?: IExpiry[];
+
+  isRepeatEnabled?: boolean;
+  repeatRules?: IRepeat[];
 
   createdBy?: string;
   updatedBy?: string;
@@ -40,7 +61,7 @@ export interface IDiscountDocument extends IDiscount, Document {
 export const discountSchema = new Schema({
   _id: field({ pkey: true }),
 
-  // Contents
+  // Generals
   name: field({ type: String, label: 'Name' }),
   status: field({
     type: String,
@@ -48,15 +69,19 @@ export const discountSchema = new Schema({
     default: STATUS_TYPES.ACTIVE,
     label: 'Status'
   }),
-  amountType: field({
+  type: field({
     type: String,
     enum: AMOUNT_TYPES.ALL,
     default: AMOUNT_TYPES.FIXED,
     label: 'Amount Type'
   }),
-  amountValue: field({
+  value: field({
     type: Number,
     label: 'Amount Value'
+  }),
+  bonusProduct: field({
+    type: String,
+    label: 'Bonus Product'
   }),
 
   applyType: field({
@@ -83,23 +108,24 @@ export const discountSchema = new Schema({
     label: 'Excluded Categories'
   }),
 
-  // Rules
-  quantityType: field({
-    type: String,
-    enum: QUANTITY_TYPES.ALL,
-    label: 'Quantity Type'
-  }),
-  quantityValue: field({
-    type: Number,
-    label: 'Quantity Value'
-  }),
-  minPurchaseEnabled: field({
+  isStartDateEnabled: field({
     type: Boolean,
-    label: 'Minimum purchase'
+    default: false,
+    label: 'Start Date Enabled'
   }),
-  minPurchaseValue: field({
-    type: Number,
-    label: 'Minimum purchase value'
+  isEndDateEnabled: field({
+    type: Boolean,
+    default: false,
+    label: 'End Date Enabled'
+  }),
+
+  startDate: field({
+    type: Date,
+    label: 'Start Date'
+  }),
+  endDate: field({
+    type: Date,
+    label: 'End Date'
   }),
 
   // Locations
@@ -111,12 +137,55 @@ export const discountSchema = new Schema({
     type: [String],
     label: 'Branch Ids'
   }),
-  unitIds: field({
-    type: [String],
-    label: 'Unit Ids'
+  boardId: field({
+    type: String,
+    label: 'Board Id'
+  }),
+  pipelineId: field({
+    type: String,
+    label: 'Pipeline Id'
+  }),
+  stageId: field({
+    type: String,
+    label: 'Stage Id'
   }),
 
-  // Intervals
+  // Rules
+  isQuantityEnabled: field({
+    type: Boolean,
+    label: 'Quantity Enabled'
+  }),
+  quantityRules: field({
+    type: [quantitySchema],
+    label: 'Quantity Rules'
+  }),
+
+  isPriceEnabled: field({
+    type: Boolean,
+    label: 'Price Enabled'
+  }),
+  priceRules: field({
+    type: [priceSchema],
+    label: 'Price Rules'
+  }),
+
+  isExpiryEnabled: field({
+    type: Boolean,
+    label: 'Expiry Enabled'
+  }),
+  expiryRules: field({
+    type: [expirySchema],
+    label: 'Expiry Rules'
+  }),
+
+  isRepeatEnabled: field({
+    type: Boolean,
+    label: 'Repeat Enabled'
+  }),
+  repeatRules: field({
+    type: [repeatSchema],
+    label: 'Repeat Rules'
+  }),
 
   // Timestamps
   createdAt: field({ type: Date, default: new Date(), label: 'Created At' }),

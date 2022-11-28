@@ -11,12 +11,36 @@ export const types = () => `
     _id: String! @external
   }
 
+  type Quantity {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  type Price {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  type Expiry {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  type Repeat {
+    type: String,
+    value: String,
+  }
+
   type Discount @key(fields: "_id") @cacheControl(maxAge: 3) {
     _id: String,
     name: String,
     status: String,
-    amountValue: Float,
-    amountType: String,
+    type: String,
+    value: Float,
+    bonusProduct: String,
 
     applyType: String,
 
@@ -25,14 +49,29 @@ export const types = () => `
     categories: [String],
     categoriesExcluded: [String],
 
-    quantityType: String,
-    quantityValue: Float,
-    minPurchaseEnabled: Boolean,
-    minPurchaseValue: Float,
+    isStartDateEnabled: Boolean,
+    isEndDateEnabled: Boolean,
 
-    departmentIds: [String],
+    startDate: Date,
+    endDate: Date,
+
     branchIds: [String],
-    unitIds: [String],
+    departmentIds: [String],
+    boardId: String,
+    pipelineId: String,
+    stageId: String,
+    
+    isQuantityEnabled: Boolean,
+    quantityRules: [Quantity],
+
+    isPriceEnabled: Boolean,
+    priceRules: [Price],
+
+    isExpiryEnabled: Boolean,
+    expiryRules: [Expiry],
+
+    isRepeatEnabled: Boolean,
+    repeatRules: [Repeat],
 
     createdAt: Date,
     createdBy: String,
@@ -42,11 +81,36 @@ export const types = () => `
     updatedUser: User
   }
 
+  input QuantityInput {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  input PriceInput {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  input ExpiryInput {
+    type: String,
+    typeValue: String,
+    discountValue: String,
+  }
+
+  input RepeatInput {
+    type: String,
+    value: String,
+  }
+
   input DiscountAddInput {
+    _id: String,
     name: String,
     status: String,
-    amountValue: Float,
-    amountType: String,
+    type: String,
+    value: Float,
+    bonusProduct: String,
 
     applyType: String,
 
@@ -55,22 +119,41 @@ export const types = () => `
     categories: [String],
     categoriesExcluded: [String],
 
-    quantityType: String,
-    quantityValue: Float,
-    minPurchaseEnabled: Boolean,
-    minPurchaseValue: Float,
+    isStartDateEnabled: Boolean,
+    isEndDateEnabled: Boolean,
 
-    departmentIds: [String],
+    startDate: Date,
+    endDate: Date,
+    
     branchIds: [String],
-    unitIds: [String]
+    departmentIds: [String],
+    boardId: String,
+    pipelineId: String,
+    stageId: String,
+
+    isQuantityEnabled: Boolean,
+    quantityRules: [QuantityInput],
+
+    isPriceEnabled: Boolean,
+    priceRules: [PriceInput],
+
+    isExpiryEnabled: Boolean,
+    expiryRules: [ExpiryInput],
+
+    isRepeatEnabled: Boolean,
+    repeatRules: [RepeatInput],
   }
 
   input DiscountEditInput {
     _id: String,
     name: String,
     status: String,
-    amountValue: Float,
-    amountType: String,
+    type: String,
+    value: Float,
+    bonusProduct: String,
+
+    isMinPurchaseEnabled: Boolean,
+    minPurchaseValue: Float,
 
     applyType: String,
 
@@ -79,14 +162,29 @@ export const types = () => `
     categories: [String],
     categoriesExcluded: [String],
 
-    quantityType: String,
-    quantityValue: Float,
-    minPurchaseEnabled: Boolean,
-    minPurchaseValue: Float,
+    isStartDateEnabled: Boolean,
+    isEndDateEnabled: Boolean,
 
-    departmentIds: [String],
+    startDate: Date,
+    endDate: Date,
+    
     branchIds: [String],
-    unitIds: [String],
+    departmentIds: [String],
+    boardId: String,
+    pipelineId: String,
+    stageId: String,
+
+    isQuantityEnabled: Boolean,
+    quantityRules: [QuantityInput],
+
+    isPriceEnabled: Boolean,
+    priceRules: [PriceInput],
+
+    isExpiryEnabled: Boolean,
+    expiryRules: [ExpiryInput],
+
+    isRepeatEnabled: Boolean,
+    repeatRules: [RepeatInput],
   }
 `;
 
