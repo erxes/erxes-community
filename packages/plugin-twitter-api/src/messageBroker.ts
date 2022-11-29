@@ -18,12 +18,11 @@ export const initBroker = async cl => {
   consumeRPCQueue(
     'twitter:createIntegration',
     async ({ subdomain, data: { doc, integrationId } }) => {
+      console.log('DOC dotor yu bn', doc);
+
       const models = await generateModels(subdomain);
 
-      console.log('DOC=============>', doc);
-      console.log('INTEGRATIONID=========>', integrationId);
-
-      await models.Integrations.create({
+      const integration = await models.Integrations.create({
         inboxId: integrationId,
         ...(doc || {})
       });
@@ -55,7 +54,4 @@ export const sendInboxMessage = (args: ISendMessageArgs) => {
     serviceName: 'inbox',
     ...args
   });
-};
-export const sendRPCMessage = async (message): Promise<any> => {
-  return client.sendRPCMessage('rpc_queue:integrations_to_api', message);
 };

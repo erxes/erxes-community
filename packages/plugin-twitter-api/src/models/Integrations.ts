@@ -2,6 +2,7 @@ import { Document, Model, model, Schema } from 'mongoose';
 import { field } from './utils';
 
 export interface IIntegration {
+  inboxId: string;
   kind: string;
   name: string;
   brandId: string;

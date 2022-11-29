@@ -5,7 +5,9 @@ import {
   ICustomerDocument,
   IConversationDocument,
   IConversationMessageDocument,
-  IIntegrationDocument
+  IIntegrationDocument,
+  IAccountDocument,
+  accountSchema
 } from './models/definitions/twitter';
 import {
   ICustomerModel,
@@ -13,11 +15,13 @@ import {
   IConversationMessageModel,
   IIntegrationModel,
   IConfigModel,
+  IAccountModel,
   loadCustomerClass,
   loadConversationClass,
   loadConversationMessageClass,
   loadIntegrationClass,
-  loadConfigClass
+  loadConfigClass,
+  loadAccountClass
 } from './models/Twitter';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
 
@@ -27,6 +31,7 @@ export interface IModels {
   ConversationMessages: IConversationMessageModel;
   Integrations: IIntegrationModel;
   Configs: IConfigModel;
+  Accounts: IAccountModel;
 }
 
 export interface IContext extends IMainContext {
@@ -55,7 +60,7 @@ export const loadClasses = (
   models.ConversationMessages = db.model<
     IConversationMessageDocument,
     IConversationMessageModel
-  >('twitter_messages_conversations', loadConversationMessageClass(models));
+  >('twitter_conversation_messages', loadConversationMessageClass(models));
 
   models.Integrations = db.model<IIntegrationDocument, IIntegrationModel>(
     'twitter_integrations',
@@ -65,6 +70,10 @@ export const loadClasses = (
   models.Configs = db.model<IConfigDocument, IConfigModel>(
     'twitter_configs',
     loadConfigClass(models)
+  );
+  models.Accounts = db.model<IAccountDocument, IAccountModel>(
+    'twitter_accounts',
+    loadAccountClass(models)
   );
 
   return models;

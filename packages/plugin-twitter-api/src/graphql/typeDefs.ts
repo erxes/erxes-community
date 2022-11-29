@@ -4,6 +4,7 @@ const queries = `
   twitterWebhook: String
   twitterWebhookGet: String
   twitterGetAccount(accountId: String): String
+  twitterAccounts: JSON
 `;
 
 const mutations = `

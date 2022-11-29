@@ -4,8 +4,7 @@ import {
   getOrCreateCustomer,
   IUser
 } from './store';
-import Accounts from './models/Accounts';
-import Integrations from './models/Integrations';
+import { IModels } from './connectionResolver';
 
 export interface IUsers {
   [key: string]: IUser;
@@ -26,7 +25,7 @@ const extractUrlFromAttachment = attachment => {
   return null;
 };
 
-const receiveDms = async requestBody => {
+const receiveDms = async (models: IModels, subdomain, requestBody) => {
   const { direct_message_events } = requestBody;
 
   console.log('REQUEST BODY', requestBody);
@@ -39,9 +38,6 @@ const receiveDms = async requestBody => {
 
   for (const event of direct_message_events) {
     const { type, message_create } = event;
-
-    console.log('type', type);
-    console.log('message_create', message_create);
 
     const senderId = message_create.sender_id;
     const receiverId = message_create.target.recipient_id;
@@ -56,25 +52,24 @@ const receiveDms = async requestBody => {
         attachments.push({ ...extractUrlFromAttachment(attachment) });
       }
 
-      const account = await Accounts.findOne({ uid: receiverId });
+      const account = await models.Accounts.findOne({ uid: receiverId });
 
       console.log('account========>', account);
 
       if (!account) {
         return;
       }
+      console.log('models================ ', models);
 
-      console.log('11111111111111111');
-      console.log('Account::::::::::', account);
-
-      const integration = await Integrations.getIntegration({
-        $and: [{ id: account._id }, { kind: 'twitter' }]
+      const integration = await models.Integrations.getIntegration({
+        accountId: account._id
       });
-      console.log('INTEGRATIONNNNNNNNNNNn', integration);
 
       console.log('222222222222222222');
 
       const customer = await getOrCreateCustomer(
+        models,
+        subdomain,
         integration,
         senderId,
         users[senderId]
@@ -85,30 +80,28 @@ const receiveDms = async requestBody => {
       const content = message_data.text;
       const customerErxesApiId: any = customer.erxesApiId;
 
-      console.log('======================================');
-
-      console.log('SenderId', senderId);
-      console.log('ReceiverId', receiverId);
-      console.log('IntegrationId', integration.id);
-      console.log('Content', content);
-      console.log('CustomerErxesApiId', customerErxesApiId);
-      console.log('Integration erxesApiId', integration.erxesApiId);
-
       const conversation = await getOrCreateConversation(
+        models,
+        subdomain,
         senderId,
         receiverId,
         integration._id,
         content,
-        customerErxesApiId,
-        integration.erxesApiId
+        integration.inboxId,
+        customerErxesApiId
       );
 
+      console.log('CONVERSATION:::::::::', conversation);
+
       await createConversationMessage(
+        models,
+        subdomain,
         event,
         content,
         attachments,
         customerErxesApiId,
-        conversation
+        conversation,
+        integration
       );
     }
   }

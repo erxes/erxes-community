@@ -8,7 +8,9 @@ import {
   conversationSchema,
   customerSchema,
   integrationSchema,
-  configSchema
+  configSchema,
+  IAccountDocument,
+  accountSchema
 } from './definitions/twitter';
 
 export interface ICustomerModel extends Model<ICustomerDocument> {}
@@ -55,13 +57,17 @@ export const loadConversationMessageClass = models => {
 };
 
 export interface IIntegrationModel extends Model<IIntegrationDocument> {
-  getIntegration(selector): Promise<IIntegrationDocument>;
+  getIntegration(accountId): Promise<IIntegrationDocument>;
 }
 
 export const loadIntegrationClass = models => {
   class Integration {
-    public static async getIntegration(selector) {
-      const integration = await models.Integrations.findOne(selector);
+    public static async getIntegration(accountId) {
+      console.log('A1::::::::::');
+      console.log('MODELS NI YU WE', models);
+      console.log('ACCOUNTID', accountId);
+
+      const integration = await models.Integrations.findOne(accountId);
 
       if (!integration) {
         throw new Error('Integration not found');
@@ -144,4 +150,25 @@ export const loadConfigClass = models => {
   configSchema.loadClass(Config);
 
   return configSchema;
+};
+
+export interface IAccountModel extends Model<IAccountDocument> {
+  getAccount(selector): Promise<IAccountDocument>;
+}
+export const loadAccountClass = models => {
+  class Account {
+    public static async getAccount(selector) {
+      const account = await models.Accounts.findOne(selector);
+
+      if (!account) {
+        throw new Error('Account not found');
+      }
+
+      return account;
+    }
+  }
+
+  accountSchema.loadClass(Account);
+
+  return accountSchema;
 };

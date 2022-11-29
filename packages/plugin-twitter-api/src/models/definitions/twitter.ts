@@ -54,6 +54,7 @@ export interface IConversationMessage {
   messageId: string;
   conversationId: string;
   content: string;
+  timestamp: Date;
 }
 
 export interface IConversationMessageDocument
@@ -64,49 +65,23 @@ export const conversationMessageSchema = new Schema({
   _id: field({ pkey: true }),
   messageId: { type: String, unique: true },
   conversationId: String,
-  content: String
+  content: String,
+  timestamp: Date
 });
 
 export interface IIntegration {
-  kind: string;
+  inboxId: string;
   name: string;
-  brandId: string;
-  channelIds: [string];
   accountId: string;
-  erxesApiId: string;
-  email: string;
-  phoneNumber: string;
-  recordUrl: string;
-  expiration?: string;
-  healthStatus?: string;
-  error?: string;
 }
 
 export interface IIntegrationDocument extends IIntegration, Document {}
 
 // schema for integration document
 export const integrationSchema = new Schema({
-  _id: field({ pkey: true }),
-  kind: String,
+  inboxId: String,
   name: String,
-  brandId: String,
-  channelIds: [String],
-  accountId: String,
-  erxesApiId: String,
-  phoneNumber: field({
-    type: String,
-    label: 'CallPro phone number',
-    optional: true
-  }),
-  recordUrl: field({
-    type: String,
-    label: 'CallPro record url',
-    optional: true
-  }),
-  email: String,
-  expiration: String,
-  healthStatus: String,
-  error: String
+  accountId: String
 });
 
 export interface IConfig {
@@ -118,6 +93,55 @@ export interface IConfigDocument extends IConfig, Document {
   _id: string;
 }
 
+export interface IAccount {
+  kind: string;
+  email: string;
+  username?: string;
+  token: string;
+  tokenSecret?: string;
+  expireDate?: string;
+  scope?: string;
+  name: string;
+  billingState?: string;
+  uid: string;
+}
+
+export interface IAccountDocument extends IAccount, Document {}
+
+export const accountSchema = new Schema({
+  _id: field({ pkey: true }),
+  kind: {
+    type: String
+  },
+  billingState: {
+    type: String,
+    optional: true
+  },
+  email: {
+    type: String
+  },
+  username: {
+    type: String,
+    optional: true
+  },
+  token: {
+    type: String
+  },
+  tokenSecret: {
+    type: String,
+    optional: true
+  },
+  scope: {
+    type: String,
+    optional: true
+  },
+  expireDate: {
+    type: String,
+    optional: true
+  },
+  name: { type: String },
+  uid: { type: String }
+});
 // Mongoose schemas ===========
 
 export const configSchema = new Schema({

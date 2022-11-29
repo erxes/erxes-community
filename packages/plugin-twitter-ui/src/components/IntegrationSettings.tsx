@@ -68,6 +68,13 @@ class TwitterSettings extends React.Component<Props> {
             '',
             'Twitter Webhook Env'
           )}
+          {this.props.renderItem(
+            'TWITTER_BEARER_TOKEN',
+            'text',
+            '',
+            '',
+            'Twitter Bearer Token'
+          )}
         </CollapseContent>
       </>
     );

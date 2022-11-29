@@ -86,7 +86,6 @@ const integrations = `
   query integrations(${commonParamsDef}) {
     integrations(${commonParams}) {
       ${commonFields}
-
       kind
       brand {
         _id

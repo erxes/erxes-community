@@ -1,4 +1,3 @@
-import Accounts from '../../models/Accounts';
 import Configs from '../../models/Configs';
 
 const TwitterQueries = {

@@ -1,7 +1,6 @@
 import * as twitterApi from './api';
 import { getConfig } from './utils';
 import * as twitterUtils from './api';
-import receiveDms from './receiveDms';
 
 export const initStart = async app => {
   const TWITTER_CONSUMER_KEY = await getConfig('TWITTER_CONSUMER_KEY');
@@ -23,20 +22,5 @@ export const initStart = async app => {
     } else {
       return 'Error: crc_token missing from request.';
     }
-  });
-  app.post('/webhook', async (req, res) => {
-    console.log('RESONSE NI YU WEee?', res);
-
-    console.log('Twitter Post Webhook ajillaj baina uu? ');
-
-    console.log('REquest body bol: ', req);
-
-    try {
-      await receiveDms(req.body);
-    } catch (e) {
-      return new Error(e);
-    }
-
-    res.sendStatus(200);
   });
 };

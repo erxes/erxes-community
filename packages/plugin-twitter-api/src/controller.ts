@@ -1,10 +1,8 @@
 import { downloadAttachment, getConfig, getEnv } from './utils';
 import * as twitterUtils from './api';
 import receiveDms from './receiveDms';
-import { IModels } from './connectionResolver';
-import Accounts from './models/Accounts';
-import { ConversationMessages, Conversations } from './models/Conversations';
-import Integrations from './models/Integrations';
+import { generateModels, IModels } from './connectionResolver';
+import { getSubdomain } from '@erxes/api-utils/src/core';
 
 const init = async app => {
   app.get('/login', async (_req, res) => {
@@ -13,6 +11,9 @@ const init = async app => {
     return res.redirect(twitterAuthUrl);
   });
   app.get(`/callback/add`, async (req, res) => {
+    const subdomain = getSubdomain(req);
+    const models = await generateModels(subdomain);
+
     const response = await twitterUtils.verifyLoginToken(
       req.query.oauth_token,
       req.query.oauth_verifier
@@ -22,7 +23,7 @@ const init = async app => {
       response.oauth_token_secret
     );
 
-    await Accounts.create({
+    await models.Accounts.create({
       token: response.oauth_token,
       tokenSecret: response.oauth_token_secret,
       name: profile.screen_name,
@@ -49,19 +50,40 @@ const init = async app => {
       return 'Error: crc_token missing from request.';
     }
   });
+  app.put('/webhook', async (_req, res) => {
+    const bearerToken = (await twitterUtils.getTwitterConfig())
+      .twitterBearerToken;
+
+    try {
+      await twitterUtils.twitterPutWebhook(bearerToken);
+    } catch (e) {
+      console.log(e);
+    }
+    return res.json({ success: true });
+  });
+
   app.post('/webhook', async (req, res) => {
     console.log('Twitter Post Webhook ajillaj baina uu? ');
 
+    const subdomain = getSubdomain(req);
+    const models = await generateModels(subdomain);
+
     try {
-      await receiveDms(req.body);
+      await receiveDms(models, subdomain, req.body);
     } catch (e) {
+      console.log('Webhook post husel deerh aldaanii medeelel:', e);
+
       return new Error(e);
     }
 
     res.sendStatus(200);
   });
   app.get('/get-account', async (req, _res) => {
-    const account = await Accounts.findOne({ _id: req.query.accountId });
+    const subdomain = getSubdomain(req);
+    const models = await generateModels(subdomain);
+    console.log('Herwee ajillawal heleerei: ');
+
+    const account = await models.Accounts.findOne({ _id: req.query.accountId });
 
     if (!account) {
       return 'Account not found';
@@ -70,9 +92,15 @@ const init = async app => {
     return account.uid;
   });
   app.post('/create-integration', async (req, _res) => {
+    const subdomain = getSubdomain(req);
+    const models = await generateModels(subdomain);
+    console.log(
+      'END YMAR NEG YUM ORJ IRWEL HELEEREI++++++++++++++++++++++++++++'
+    );
+
     const { accountId, integrationId, data, kind } = req.body;
 
-    const prevEntry = await Integrations.findOne({
+    const prevEntry = await models.Integrations.findOne({
       accountId
     });
 
@@ -80,10 +108,10 @@ const init = async app => {
       return `You already have integration on this account`;
     }
 
-    const account = await Accounts.getAccount({ _id: accountId });
+    const account = await models.Accounts.getAccount({ _id: accountId });
     console.log('=============+++++');
 
-    await Integrations.create({
+    await models.Integrations.create({
       kind,
       accountId,
       erxesApiId: integrationId,
@@ -103,6 +131,8 @@ const init = async app => {
     }
   });
   app.post('/reply', async (req, _res) => {
+    const subdomain = getSubdomain(req);
+    const models = await generateModels(subdomain);
     console.log('END YUM IRJIINUU REPLY');
 
     const { attachments, conversationId, content, integrationId } = req.body;
@@ -126,15 +156,15 @@ const init = async app => {
       attachment.media.id = JSON.parse(response).media_id_string;
     }
 
-    const conversation = await Conversations.getConversation({
+    const conversation = await models.Conversations.getConversation({
       erxesApiId: conversationId
     });
 
-    const integration = await Integrations.findOne({
+    const integration = await models.Integrations.findOne({
       erxesApiId: integrationId
     });
 
-    const account = await Accounts.findOne({
+    const account = await models.Accounts.findOne({
       _id: integration?.accountId
     });
 
@@ -152,7 +182,10 @@ const init = async app => {
     const { message_data } = message_create;
 
     // save on integrations db
-    await ConversationMessages.create({
+
+    console.log('+++++++++++++++++');
+
+    await models.ConversationMessages.create({
       conversationId: conversation._id,
       messageId: id,
       timestamp: created_timestamp,

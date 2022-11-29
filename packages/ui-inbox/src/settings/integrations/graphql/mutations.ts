@@ -82,7 +82,6 @@ const integrationsCreateExternalIntegration = `
         name
         code
       }
-      accountId
     }
   }
 `;

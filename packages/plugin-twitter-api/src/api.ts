@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 
 import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
-import { IAccount } from './models/Accounts';
+import { IAccount } from './models/definitions/twitter';
 import { getConfig, getEnv } from './utils';
 
 interface ITwitterConfig {
@@ -28,7 +28,8 @@ export const getTwitterConfig = async (): Promise<ITwitterConfig> => {
       token: await getConfig('TWITTER_ACCESS_TOKEN'),
       token_secret: await getConfig('TWITTER_ACCESS_TOKEN_SECRET')
     },
-    twitterWebhookEnvironment: await getConfig('TWITTER_WEBHOOK_ENV')
+    twitterWebhookEnvironment: await getConfig('TWITTER_WEBHOOK_ENV'),
+    twitterBearerToken: await getConfig('TWITTER_BEARER_TOKEN')
   };
 };
 
@@ -72,41 +73,46 @@ export const getTwitterAuthUrl = async (): Promise<{
   });
 };
 
-export const getTwitterBearerToken = async () => {
+export const twitterPutWebhook = async bearerToken => {
+  console.log('DDDDDDD');
+
   const twitterConfig = await getTwitterConfig();
+  console.log('EEEEEEEE', twitterConfig);
 
-  // just return the bearer token if we already have one
-  if (twitterConfig.twitterBearerToken) {
-    return new Promise((resolve, _reject) => {
-      resolve(twitterConfig.twitterBearerToken);
-    });
-  }
+  const webhookResponse = await retrieveWebhooks();
+  const webhookId = webhookResponse[0].id;
 
-  // construct request for bearer token
-  const requestOptions = {
-    url: 'https://api.twitter.com/oauth2/token',
-    method: 'POST',
-    auth: {
-      user: twitterConfig.oauth.consumer_key,
-      pass: twitterConfig.oauth.consumer_secret
-    },
-    form: {
-      grant_type: 'client_credentials'
-    }
-  };
+  return new Promise(async (resolve, reject) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: {
+        Authorization:
+          `Bearer ${bearerToken}` || twitterConfig.twitterBearerToken
+      },
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks/' +
+        webhookId +
+        '.json'
+    };
 
-  return new Promise((resolve, reject) => {
-    request(requestOptions, (error, response) => {
-      if (error) {
-        reject(error);
-      } else {
-        const jsonBody = JSON.parse(response.body);
+    console.log('REQUEST OPTIONS', requestOptions);
 
-        twitterConfig.twitterBearerToken = jsonBody.access_token;
+    request
+      .put(requestOptions)
+      .then(res => {
+        console.log('cccccccccccccc');
 
-        resolve(twitterConfig.twitterBearerToken);
-      }
-    });
+        console.log('res ni yu we ==========', res.body);
+
+        resolve(res);
+      })
+      .catch(er => {
+        console.log('ERROR message', er.message);
+
+        reject(er.message);
+      });
   });
 };
 
@@ -154,6 +160,8 @@ export const registerWebhook = async () => {
     request
       .post(requestOptions)
       .then(res => {
+        console.log('res ni yu we ==========', res.body);
+
         resolve(res);
       })
       .catch(er => {
@@ -228,28 +236,28 @@ export const deleteWebhook = async webhookId => {
   });
 };
 
-export const unsubscribe = async (userId: string) => {
-  const twitterConfig = await getTwitterConfig();
+// export const unsubscribe = async (userId: string) => {
+//   const twitterConfig = await getTwitterConfig();
 
-  return new Promise(async (resolve, reject) => {
-    const bearer = await getTwitterBearerToken();
-    const requestOptions = {
-      url: `https://api.twitter.com/1.1/account_activity/all/${twitterConfig.twitterWebhookEnvironment}/subscriptions/${userId}.json`,
-      auth: {
-        bearer
-      }
-    };
+//   return new Promise(async (resolve, reject) => {
+//     const bearer = await getTwitterBearerToken();
+//     const requestOptions = {
+//       url: `https://api.twitter.com/1.1/account_activity/all/${twitterConfig.twitterWebhookEnvironment}/subscriptions/${userId}.json`,
+//       auth: {
+//         bearer
+//       }
+//     };
 
-    request
-      .delete(requestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
+//     request
+//       .delete(requestOptions)
+//       .then((res) => {
+//         resolve(res);
+//       })
+//       .catch((e) => {
+//         reject(e);
+//       });
+//   });
+// };
 
 export const subscribeToWebhook = async (account: IAccount) => {
   const twitterConfig = await getTwitterConfig();
