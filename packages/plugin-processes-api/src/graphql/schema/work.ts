@@ -15,19 +15,17 @@ export const types = `
     job: JSON,
     flowId: String,
     flow: JSON,
-    productId: String,
-    product: JSON,
     count: String,
     intervalId: String,
     interval: JSON,
     inBranchId: String,
-    inBranch: String
+    inBranch: Branch
     inDepartmentId: String,
-    inDepartment: String
+    inDepartment: Department,
     outBranchId: String,
-    outBranch: String,
+    outBranch: Branch,
     outDepartmentId: String,
-    outDepartment: String
+    outDepartment: Department,
     needProducts: JSON,
     resultProducts: JSON
   }

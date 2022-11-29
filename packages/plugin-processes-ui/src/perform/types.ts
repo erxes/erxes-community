@@ -1,3 +1,4 @@
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { QueryResponse } from '@erxes/ui/src/types';
 
 // query types
@@ -12,19 +13,18 @@ export interface IWork {
   job: any;
   flowId: string;
   flow: any;
-  productId: string;
-  product: any;
   count: string;
   intervalId?: string;
   interval: any;
+
   inBranchId?: string;
-  inBranch: string;
   inDepartmentId?: string;
-  inDepartment: string;
   outBranchId?: string;
-  outBranch: string;
   outDepartmentId?: string;
-  outDepartment: string;
+  inBranch: IBranch;
+  inDepartment: IDepartment;
+  outBranch: IBranch;
+  outDepartment: IDepartment;
   needProducts?: any[];
   resultProducts?: any[];
 }

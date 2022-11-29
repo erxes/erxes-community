@@ -135,7 +135,6 @@ export const initDocOverallWork = (work: IWork) => {
 export const initDocWork = async (
   flow: IFlowDocument,
   jobRefer: IJobReferDocument,
-  productId: string,
   count: number,
   subdomain: string,
   job?: IJobDocument,
@@ -149,7 +148,6 @@ export const initDocWork = async (
     endAt: new Date(),
     jobId: job?.config.jobReferId || '',
     flowId: flow._id,
-    productId,
     count,
     intervalId,
     inBranchId: job?.config.inBranchId,
@@ -320,7 +318,7 @@ export const recursiveCatchBeforeJobs = async (
   const totalBeforeJobsRecursive: any[] = [];
 
   for (const recursiveJob of recursiveJobs) {
-    const { flow, productId, count, jobRefers, models } = params;
+    const { flow, count, jobRefers, models } = params;
 
     const lastJobRefer = getJobRefers(
       [recursiveJob?.config.jobReferId || ''],
@@ -330,7 +328,6 @@ export const recursiveCatchBeforeJobs = async (
     const doc: IWork = await initDocWork(
       flow,
       lastJobRefer[0],
-      productId,
       count,
       subdomain,
       recursiveJob,

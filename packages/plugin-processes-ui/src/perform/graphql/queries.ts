@@ -5,11 +5,10 @@ const workFields = `
   jobId
   job
   flow
-  product
-  inBranch
-  inDepartment
-  outBranch
-  outDepartment
+  inBranchId
+  inDepartmentId
+  outBranchId
+  outDepartmentId
   startAt
   dueDate
   count
@@ -17,6 +16,31 @@ const workFields = `
   intervalId
   needProducts
   resultProducts
+
+  inDepartment {
+    _id
+    code
+    title
+    parentId
+  }
+  inBranch {
+    _id
+    code
+    title,
+    parentId
+  }
+  outDepartment {
+    _id
+    code
+    title
+    parentId
+  }
+  outBranch {
+    _id
+    code
+    title,
+    parentId
+  }
 `;
 
 const works = `

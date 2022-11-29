@@ -24,75 +24,46 @@ export default {
     return { name: flow?.name || '', status: flow?.status };
   },
 
-  async product(work: IWorkDocument, {}, { subdomain }: IContext) {
-    const { productId } = work;
-
-    const product =
-      (await sendProductsMessage({
-        subdomain,
-        action: 'findOne',
-        data: { _id: productId || '' },
-        isRPC: true
-      })) || null;
-
-    const { name, code } = product;
-
-    return { name, code };
-  },
-
   async inBranch(work: IWorkDocument, {}, { subdomain }: IContext) {
     const { inBranchId } = work;
 
-    const branch =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'branches.findOne',
-        data: { _id: inBranchId || '' },
-        isRPC: true
-      })) || null;
-
-    return branch ? branch.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'branches.findOne',
+      data: { _id: inBranchId || '' },
+      isRPC: true
+    });
   },
 
   async outBranch(work: IWorkDocument, {}, { subdomain }: IContext) {
     const { outBranchId } = work;
-
-    const branch =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'branches.findOne',
-        data: { _id: outBranchId || '' },
-        isRPC: true
-      })) || null;
-
-    return branch ? branch.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'branches.findOne',
+      data: { _id: outBranchId || '' },
+      isRPC: true
+    });
   },
 
   async inDepartment(work: IWorkDocument, {}, { subdomain }: IContext) {
     const { inDepartmentId } = work;
 
-    const department =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'departments.findOne',
-        data: { _id: inDepartmentId || '' },
-        isRPC: true
-      })) || null;
-
-    return department ? department.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'departments.findOne',
+      data: { _id: inDepartmentId || '' },
+      isRPC: true
+    });
   },
 
   async outDepartment(work: IWorkDocument, {}, { subdomain }: IContext) {
     const { outDepartmentId } = work;
 
-    const department =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'departments.findOne',
-        data: { _id: outDepartmentId || '' },
-        isRPC: true
-      })) || null;
-
-    return department ? department.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'departments.findOne',
+      data: { _id: outDepartmentId || '' },
+      isRPC: true
+    });
   }
 };

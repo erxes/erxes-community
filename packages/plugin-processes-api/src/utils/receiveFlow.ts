@@ -58,7 +58,6 @@ export const rf = async (models: IModels, subdomain: string, params) => {
         const doc: IWork = await initDocWork(
           flow,
           lastJobRefer[0],
-          productId,
           count,
           subdomain,
           lastJob,
@@ -78,7 +77,6 @@ export const rf = async (models: IModels, subdomain: string, params) => {
           level,
           {
             flow,
-            productId,
             count,
             branchId,
             departmentId,
@@ -98,7 +96,6 @@ export const rf = async (models: IModels, subdomain: string, params) => {
           const docLeft: IWork = await initDocWork(
             flow,
             leftJobRefer[0],
-            productId,
             count,
             subdomain,
             responseleftjob,
