@@ -12,7 +12,8 @@ export const initBroker = async cl => {
   consumeQueue(
     'processes:createWorks',
     async ({ subdomain, data: { dayPlans, date, branchId, departmentId } }) => {
-      if (!(branchId && departmentId && date && new Date(date) > new Date())) {
+      // if (!(branchId && departmentId && date && new Date(date) > new Date())) {
+      if (!(branchId && departmentId && date)) {
         throw new Error('not valid data');
       }
 

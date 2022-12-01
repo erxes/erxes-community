@@ -11,8 +11,6 @@ export const types = `
     dueDate: Date,
     startAt: Date,
     endAt: Date,
-    jobId: String,
-    job: JSON,
     flowId: String,
     flow: JSON,
     count: String,

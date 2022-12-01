@@ -61,7 +61,7 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
 };
 
 const overallWorkQueries = {
-  overallWorks(
+  async overallWorks(
     _root,
     params: IParam & {
       page: number;
@@ -70,6 +70,38 @@ const overallWorkQueries = {
     { models, commonQuerySelector }: IContext
   ) {
     const selector = generateFilter(params, commonQuerySelector);
+    await models.Works.aggregate([
+      { $match: selector },
+      { $sort: { dueDate: 1 } },
+      {
+        $project: {
+          _id: 1,
+          inBranchId: 1,
+          inDepartmentId: 1,
+          outBranchId: 1,
+          outDepartmentId: 1,
+          dueDate: 1,
+          needProducts: 1,
+          resultProducts: 1,
+          type: 1,
+          typeId: 1
+        }
+      },
+      {
+        $group: {
+          _id: {
+            inBranchId: '$inBranchId',
+            inDepartmentId: '$inDepartmentId',
+            outBranchId: '$outBranchId',
+            outDepartmentId: '$outDepartmentId',
+            type: '$type',
+            typeId: '$typeId'
+          },
+          needProducts: { $push: '$needProducts' },
+          resultProducts: { $push: '$resultProducts' }
+        }
+      }
+    ]);
     return paginate(models.OverallWorks.find(selector).lean(), { ...params });
   },
 

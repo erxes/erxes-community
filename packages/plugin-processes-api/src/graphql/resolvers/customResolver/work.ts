@@ -1,20 +1,10 @@
-import { IJobRefer } from './../../../models/definitions/jobs';
 import { IWorkDocument } from './../../../models/definitions/works';
 import { IContext } from '../../../connectionResolver';
-import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
+import { sendCoreMessage } from '../../../messageBroker';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
     return models.Works.findOne({ _id });
-  },
-
-  async job(work: IWorkDocument, {}, { models }: IContext) {
-    const { jobId } = work;
-    const jobRefer: IJobRefer | null = await models.JobRefers.findOne({
-      _id: jobId
-    });
-
-    return { label: jobRefer?.name || '', description: jobRefer?.code || '' };
   },
 
   async flow(work: IWorkDocument, {}, { models }: IContext) {

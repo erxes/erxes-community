@@ -159,7 +159,9 @@ class DayLabels extends React.Component<Props, State> {
             right={this.actionBarRight()}
           />
         }
+        mainHead={'header'}
         leftSidebar={<Sidebar queryParams={queryParams} history={history} />}
+        rightSidebar={<Sidebar queryParams={queryParams} history={history} />}
         content={
           <DataWithLoader
             data={content}

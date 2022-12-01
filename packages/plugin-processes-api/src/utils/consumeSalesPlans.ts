@@ -292,7 +292,8 @@ export class consumeSalesPlans {
         dueDate,
         startAt: newDueDate,
         endAt: dueDate,
-        jobId: job.id,
+        type: jobRefer.type,
+        typeId: jobRefer._id,
         flowId: flow._id,
         count,
         intervalId: timeId,
@@ -345,7 +346,8 @@ export class consumeSalesPlans {
         dueDate,
         startAt: newDueDate,
         endAt: dueDate,
-        jobId: job.id,
+        type: job.type,
+        typeId: product._id,
         flowId: flow._id,
         count,
         intervalId: timeId,
@@ -386,7 +388,6 @@ export class consumeSalesPlans {
 
     await this.getFlows();
     await this.prepareDatas();
-
     const timeframes = await sendSalesplansMessage({
       subdomain: this.subdomain,
       action: 'timeframes.find',

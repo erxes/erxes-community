@@ -2,8 +2,6 @@ const workFields = `
   _id
   name
   status
-  jobId
-  job
   flow
   inBranchId
   inDepartmentId

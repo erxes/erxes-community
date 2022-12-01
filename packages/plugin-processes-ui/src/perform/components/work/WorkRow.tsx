@@ -29,7 +29,6 @@ class Row extends React.Component<Props> {
     const {
       name,
       status,
-      job,
       flow,
       inBranch,
       inDepartment,
@@ -46,7 +45,6 @@ class Row extends React.Component<Props> {
       <tr>
         <td>{name}</td>
         <td>{status}</td>
-        <td>{job ? job.label : ''}</td>
         <td>{flow ? flow.name : ''}</td>
         <td>{count || 0}</td>
         <td>{this.renderLoc(inBranch)}</td>

@@ -100,7 +100,6 @@ class List extends React.Component<IProps, State> {
             <tr>
               <th>{__('Name')}</th>
               <th>{__('Status')}</th>
-              <th>{__('Job')}</th>
               <th>{__('Flow')}</th>
               <th>{__('Count')}</th>
               <th>{__('In Branch')}</th>

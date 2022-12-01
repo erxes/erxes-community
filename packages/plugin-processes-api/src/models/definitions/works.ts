@@ -1,4 +1,5 @@
 import { Document, Schema } from 'mongoose';
+import { JOB_TYPES } from './constants';
 import { productsDataSchema } from './jobs';
 import { field, schemaHooksWrapper } from './utils';
 
@@ -8,7 +9,8 @@ export interface IWork {
   dueDate: Date;
   startAt: Date;
   endAt: Date;
-  jobId: string;
+  type: string;
+  typeId: string;
   flowId: string;
   count: number;
   intervalId?: string;
@@ -33,6 +35,12 @@ export const workSchema = schemaHooksWrapper(
     _id: field({ pkey: true }),
     name: field({ type: String, optional: true, label: 'Name' }),
     status: field({ type: String, label: 'Status' }),
+    type: field({
+      type: String,
+      enum: JOB_TYPES.ALL,
+      label: 'Type'
+    }),
+    typeId: field({ type: String, label: 'jobId' }), // jobReferId || productId || ~subFlowId
     jobId: field({ type: String, label: 'jobId' }),
     flowId: field({ type: String, label: 'flowId' }),
     count: field({ type: Number, label: 'count' }),

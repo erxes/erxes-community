@@ -7,11 +7,11 @@ const WorkList = asyncComponent(() =>
   import(/* webpackChunkName: "WorkList" */ './containers/WorkList')
 );
 
-const OverallWorkList = asyncComponent(() =>
-  import(
-    /* webpackChunkName: "OverallWorkList" */ './containers/OverallWorkList'
-  )
-);
+// const OverallWorkList = asyncComponent(() =>
+//   import(
+//     /* webpackChunkName: "OverallWorkList" */ './containers/OverallWorkList'
+//   )
+// );
 
 const PerformList = asyncComponent(() =>
   import(/* webpackChunkName: "PerformList" */ './containers/PerformList')
@@ -32,14 +32,14 @@ const workList = ({ location, history }) => {
   );
 };
 
-const overallWorkList = ({ location, history }) => {
-  return (
-    <OverallWorkList
-      queryParams={queryString.parse(location.search)}
-      history={history}
-    />
-  );
-};
+// const overallWorkList = ({ location, history }) => {
+//   return (
+//     <OverallWorkList
+//       queryParams={queryString.parse(location.search)}
+//       history={history}
+//     />
+//   );
+// };
 
 const performList = ({ location, history }) => {
   return (
@@ -68,12 +68,12 @@ const routes = () => {
         key="/processes/works"
         component={workList}
       />
-      <Route
+      {/* <Route
         path="/processes/overallWorks"
         exact={true}
         key="/processes/overallWorks"
         component={overallWorkList}
-      />
+      /> */}
       <Route
         path="/processes/performances"
         exact={true}

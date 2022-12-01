@@ -9,8 +9,6 @@ export interface IWork {
   dueDate: Date;
   startAt: Date;
   endAt: Date;
-  jobId: string;
-  job: any;
   flowId: string;
   flow: any;
   count: string;
