@@ -149,7 +149,7 @@ const SideContent = styledTS<{
   position: relative;
   flex-direction: column;
   flex-shrink: 0;
-  width: ${props => (props.wide ? '30%' : '290px')};
+  width: ${props => (props.wide ? '340px' : '290px')};
   flex: ${props => (props.half ? '1' : 'none')};
   background: ${props => (props.full ? colors.colorWhite : 'none')};
   margin: 0 ${dimensions.unitSpacing}px;
@@ -537,7 +537,7 @@ const AuthBox = styled.div`
 const AuthItem = styledTS<{ order?: number }>(styled.div)`
   position: relative;
   width: 50%;
-
+  
   @media (max-width: 768px) {
     width: 100%;
     order: ${props => (props.order ? props.order : 0)};
