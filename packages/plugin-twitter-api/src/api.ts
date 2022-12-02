@@ -73,49 +73,6 @@ export const getTwitterAuthUrl = async (): Promise<{
   });
 };
 
-export const twitterPutWebhook = async bearerToken => {
-  console.log('DDDDDDD');
-
-  const twitterConfig = await getTwitterConfig();
-  console.log('EEEEEEEE', twitterConfig);
-
-  const webhookResponse = await retrieveWebhooks();
-  const webhookId = webhookResponse[0].id;
-
-  return new Promise(async (resolve, reject) => {
-    const requestOptions = {
-      method: 'PUT',
-      headers: {
-        Authorization:
-          `Bearer ${bearerToken}` || twitterConfig.twitterBearerToken
-      },
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/webhooks/' +
-        webhookId +
-        '.json'
-    };
-
-    console.log('REQUEST OPTIONS', requestOptions);
-
-    request
-      .put(requestOptions)
-      .then(res => {
-        console.log('cccccccccccccc');
-
-        console.log('res ni yu we ==========', res.body);
-
-        resolve(res);
-      })
-      .catch(er => {
-        console.log('ERROR message', er.message);
-
-        reject(er.message);
-      });
-  });
-};
-
 export const getChallengeResponse = async crcToken => {
   const twitterConfig = await getTwitterConfig();
 
@@ -131,13 +88,14 @@ export const registerWebhook = async () => {
   return new Promise(async (resolve, reject) => {
     const webhooks = await retrieveWebhooks().catch(e => {});
 
-    const webhookObj =
-      webhooks &&
-      webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
+    // const webhookObj =
+    //   webhooks &&
+    //   webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
+    // console.log('webhookObj======>', webhookObj);
 
-    if (webhookObj) {
-      return;
-    }
+    // if (webhookObj) {
+    //   return;
+    // }
 
     const requestOptions = {
       url:
@@ -160,13 +118,47 @@ export const registerWebhook = async () => {
     request
       .post(requestOptions)
       .then(res => {
-        console.log('res ni yu we ==========', res.body);
-
         resolve(res);
       })
       .catch(er => {
         console.log('ERROR message', er.message);
 
+        reject(er.message);
+      });
+  });
+};
+export const twitterPutWebhook = async () => {
+  const bearerToken = (await getTwitterConfig()).twitterBearerToken;
+
+  const twitterConfig = await getTwitterConfig();
+  const webhookResponse = await retrieveWebhooks();
+  const webhookId = webhookResponse[0].id;
+
+  console.log('Bearer Token', bearerToken);
+
+  console.log('222222222', webhookId);
+
+  return new Promise(async (resolve, reject) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: {
+        Authorization:
+          `Bearer ${bearerToken}` || twitterConfig.twitterBearerToken
+      },
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks/' +
+        webhookId +
+        '.json'
+    };
+
+    request
+      .put(requestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(er => {
         reject(er.message);
       });
   });
@@ -259,7 +251,7 @@ export const deleteWebhook = async webhookId => {
 //   });
 // };
 
-export const subscribeToWebhook = async (account: IAccount) => {
+export const subscribeToWebhook = async () => {
   const twitterConfig = await getTwitterConfig();
 
   return new Promise((resolve, reject) => {
@@ -272,8 +264,8 @@ export const subscribeToWebhook = async (account: IAccount) => {
       resolveWithFullResponse: true
     };
 
-    subRequestOptions.oauth.token = account.token;
-    subRequestOptions.oauth.token_secret = account.tokenSecret;
+    // subRequestOptions.oauth.token = account.token;
+    // subRequestOptions.oauth.token_secret = account.tokenSecret;
 
     request
       .post(subRequestOptions)

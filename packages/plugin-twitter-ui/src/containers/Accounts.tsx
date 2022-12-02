@@ -1,35 +1,29 @@
 import * as compose from 'lodash.flowright';
-
+import { Alert, getEnv, withProps } from '@erxes/ui/src/utils';
 import {
   AccountsQueryResponse,
   IntegrationTypes,
   RemoveAccountMutationResponse
 } from '../types';
-import { Alert, getEnv, withProps } from '@erxes/ui/src/utils';
-import { mutations, queries } from '../graphql';
-
 import Accounts from '../components/Accounts';
-import { IFormProps } from '@erxes/ui/src/types';
 import Info from '@erxes/ui/src/components/Info';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
+import { queries, mutations } from '../graphql';
 
 type Props = {
   kind: IntegrationTypes;
-  addLink: string;
-  onSelect: (accountId?: string) => void;
-  onRemove: (accountId: string) => void;
-  formProps?: IFormProps;
-  renderForm?: () => JSX.Element;
+  onSelectAccount: (accountId: string) => void;
+  accountId: string;
 };
 
 type FinalProps = {
   integrationsAccountsQuery: AccountsQueryResponse;
+  removeAccount: any;
 } & Props &
   RemoveAccountMutationResponse;
-
 class AccountContainer extends React.Component<FinalProps, {}> {
   popupWindow(url, title, win, w, h) {
     const y = win.top.outerHeight / 2 + win.top.screenY - h / 2;
@@ -43,12 +37,10 @@ class AccountContainer extends React.Component<FinalProps, {}> {
   }
 
   onAdd = () => {
-    const { addLink, kind } = this.props;
-
     const { REACT_APP_API_URL } = getEnv();
 
     this.popupWindow(
-      `${REACT_APP_API_URL}/pl:twitter/${addLink}?kind=${kind}`,
+      `${REACT_APP_API_URL}/pl:twitter/login`,
       'Integration',
       window,
       660,
@@ -57,25 +49,24 @@ class AccountContainer extends React.Component<FinalProps, {}> {
   };
 
   removeAccount = (accountId: string) => {
-    const { removeAccount, onRemove } = this.props;
+    const { removeAccount } = this.props;
 
     removeAccount({ variables: { _id: accountId } })
       .then(() => {
         Alert.success('You successfully removed an account');
-        onRemove(accountId);
+
+        this.props.integrationsAccountsQuery.refetch();
       })
       .catch(e => {
-        // Alert.error(e.message);
+        Alert.error(e.message);
       });
   };
 
   render() {
     const {
-      kind,
-      renderForm,
       integrationsAccountsQuery,
-      onSelect,
-      formProps
+      onSelectAccount,
+      accountId
     } = this.props;
 
     if (integrationsAccountsQuery.loading) {
@@ -90,13 +81,11 @@ class AccountContainer extends React.Component<FinalProps, {}> {
 
     return (
       <Accounts
-        kind={kind}
+        accountId={accountId}
+        onSelectAccount={onSelectAccount}
         onAdd={this.onAdd}
         removeAccount={this.removeAccount}
-        onSelect={onSelect}
         accounts={accounts}
-        formProps={formProps}
-        renderForm={renderForm}
       />
     );
   }
@@ -104,7 +93,7 @@ class AccountContainer extends React.Component<FinalProps, {}> {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, RemoveAccountMutationResponse, { _id: string }>(
+    graphql<Props, RemoveAccountMutationResponse>(
       gql(mutations.removeAccount),
       {
         name: 'removeAccount',

@@ -27,34 +27,18 @@ export const customerSchema = new Schema({
 });
 
 export interface IConversation {
-  // id on erxes-api
-  erxesApiId?: string;
-  timestamp: Date;
-  senderId: string;
-  receiverId: string;
-  content: string;
-  integrationId: string;
+  conversationId: string;
 }
 
 export interface IConversationDocument extends IConversation, Document {}
 
-export const conversationSchema = new Schema({
-  _id: field({ pkey: true }),
-  erxesApiId: String,
-  timestamp: Date,
-  senderId: { type: String, index: true },
-  receiverId: { type: String, index: true },
-  integrationId: String,
-  content: String
-});
-
-conversationSchema.index({ senderId: 1, receiverId: 1 }, { unique: true });
-
 export interface IConversationMessage {
-  messageId: string;
+  messageId: number;
   conversationId: string;
   content: string;
   timestamp: Date;
+  senderId: string;
+  receiverId: string;
 }
 
 export interface IConversationMessageDocument
@@ -63,7 +47,7 @@ export interface IConversationMessageDocument
 
 export const conversationMessageSchema = new Schema({
   _id: field({ pkey: true }),
-  messageId: { type: String, unique: true },
+  messageId: { type: Number, unique: true },
   conversationId: String,
   content: String,
   timestamp: Date
@@ -148,4 +132,33 @@ export const configSchema = new Schema({
   _id: field({ pkey: true }),
   code: field({ type: String, unique: true }),
   value: field({ type: Object })
+});
+export interface IMessageDocument extends IMessage, Document {}
+
+export interface IMessage {
+  inboxIntegrationId: string;
+  inboxConversationId: string;
+  messageId: string;
+  senderId: string;
+  content: string;
+  receiverId: string;
+}
+
+export const attachmentSchema = new Schema(
+  {
+    filename: String,
+    mimeType: String,
+    size: Number,
+    attachmentId: String
+  },
+  { _id: false }
+);
+
+export const messageSchema = new Schema({
+  inboxIntegrationId: String,
+  inboxConversationId: String,
+  messageId: { type: String, unique: true },
+  senderId: String,
+  content: String,
+  receiverId: String
 });

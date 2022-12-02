@@ -5,6 +5,7 @@ import {
   IUser
 } from './store';
 import { IModels } from './connectionResolver';
+import Accounts from './models/Accounts';
 
 export interface IUsers {
   [key: string]: IUser;
@@ -28,8 +29,6 @@ const extractUrlFromAttachment = attachment => {
 const receiveDms = async (models: IModels, subdomain, requestBody) => {
   const { direct_message_events } = requestBody;
 
-  console.log('REQUEST BODY', requestBody);
-
   const users: IUsers = requestBody.users;
 
   if (!direct_message_events) {
@@ -37,10 +36,11 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
   }
 
   for (const event of direct_message_events) {
-    const { type, message_create } = event;
+    const { type, message_create, id } = event;
 
     const senderId = message_create.sender_id;
     const receiverId = message_create.target.recipient_id;
+    const eventId = id;
 
     if (type === 'message_create') {
       const { message_data } = message_create;
@@ -52,20 +52,15 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         attachments.push({ ...extractUrlFromAttachment(attachment) });
       }
 
-      const account = await models.Accounts.findOne({ uid: receiverId });
-
-      console.log('account========>', account);
+      const account = await Accounts.findOne({ uid: receiverId });
 
       if (!account) {
         return;
       }
-      console.log('models================ ', models);
 
       const integration = await models.Integrations.getIntegration({
         accountId: account._id
       });
-
-      console.log('222222222222222222');
 
       const customer = await getOrCreateCustomer(
         models,
@@ -75,23 +70,19 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         users[senderId]
       );
 
-      console.log('3333333333333333333');
-
       const content = message_data.text;
-      const customerErxesApiId: any = customer.erxesApiId;
+      const customerId: any = customer.erxesApiId;
 
       const conversation = await getOrCreateConversation(
         models,
         subdomain,
+        integration.inboxId,
         senderId,
         receiverId,
-        integration._id,
-        content,
-        integration.inboxId,
-        customerErxesApiId
+        eventId,
+        customerId,
+        content
       );
-
-      console.log('CONVERSATION:::::::::', conversation);
 
       await createConversationMessage(
         models,
@@ -99,9 +90,10 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         event,
         content,
         attachments,
-        customerErxesApiId,
         conversation,
-        integration
+        integration,
+        senderId,
+        receiverId
       );
     }
   }

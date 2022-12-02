@@ -111,6 +111,30 @@ const integrations = `
   }
 `;
 
+const detail = `
+  query twitterConversationDetail($conversationId: String!) {
+      twitterConversationDetail(conversationId: $conversationId) {
+          _id
+          data
+      }
+  }
+`;
+
+const accounts = `
+  query twitterAccounts {
+    twitterAccounts 
+  }
+`;
+
+const getTwitterConversationMessages = `
+  query getTwitterConversationMessages($conversationId: String!) {
+    getTwitterConversationMessages(conversationId: $conversationId) {
+      _id
+      content
+    }
+  }
+`;
+
 export default {
   brands,
   integrations,
@@ -119,5 +143,8 @@ export default {
   integrationsGetIntegrationDetail,
   integrationsGetAccounts,
   integrationsGetIntegrations,
-  integrationsGetTwitterAccount
+  integrationsGetTwitterAccount,
+  detail,
+  accounts,
+  getTwitterConversationMessages
 };

@@ -1,81 +1,84 @@
-import * as React from 'react';
-
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 
-import Accounts from '../containers/Accounts';
+import Button from '@erxes/ui/src/components/Button';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
-import SelectBrand from '../containers/SelectBrand';
-import Spinner from '@erxes/ui/src/components/Spinner';
+import React from 'react';
+import SelectBrand from '@erxes/ui-inbox/src/settings/integrations/containers/SelectBrand';
 import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
+import Accounts from '../containers/Accounts';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
-  onAccountSelect: (accountId?: string) => void;
-  onRemoveAccount: (accountId: string) => void;
-  closeModal: () => void;
   callback: () => void;
-  accountId: string;
-  twitterAccountId: string;
-  channelIds: string[];
   onChannelChange: () => void;
+  channelIds: string[];
 };
 
-class Twitter extends React.Component<Props, { loading: boolean }> {
+type State = {
+  accountId: string;
+};
+class IntegrationForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      loading: false
+      accountId: ''
     };
   }
 
-  generateDoc = (values: {
-    name: string;
-    brandId: string;
-    channelIds: string;
-  }) => {
-    const { accountId, twitterAccountId } = this.props;
+  onSelectAccount = (accountId: string) => {
+    this.setState({ accountId });
+  };
 
-    console.log('Account ID:::', accountId);
-    console.log('Twitter Account ID:::', twitterAccountId);
-
+  generateDoc = (values: { name: string; brandId: string }) => {
     return {
       name: values.name,
       brandId: values.brandId,
-      channelIds: values.channelIds,
       kind: 'twitter',
-      accountId,
-      twitterAccountId
+      accountId: this.state.accountId
     };
   };
 
-  renderContent = (formProps: IFormProps) => {
-    const {
-      onRemoveAccount,
-      onAccountSelect,
-      renderButton,
-      callback,
-      channelIds,
-      onChannelChange
-    } = this.props;
-    const { values, isSubmitted } = formProps;
+  renderField = ({
+    label,
+    fieldName,
+    formProps
+  }: {
+    label: string;
+    fieldName: string;
+    formProps: IFormProps;
+  }) => {
+    return (
+      <FormGroup>
+        <ControlLabel required={true}>{label}</ControlLabel>
+        <FormControl
+          {...formProps}
+          name={fieldName}
+          required={true}
+          autoFocus={fieldName === 'name'}
+        />
+      </FormGroup>
+    );
+  };
 
-    console.log('Account ID:::', this.props.accountId);
-    console.log('Twitter Account ID:::', this.props.twitterAccountId);
+  renderContent = (formProps: IFormProps) => {
+    const { renderButton, callback, onChannelChange, channelIds } = this.props;
+    const { values, isSubmitted } = formProps;
 
     return (
       <>
-        {this.state.loading && <Spinner />}
-        <FormGroup>
-          <ControlLabel required={true}>Name</ControlLabel>
-          <FormControl {...formProps} name="name" required={true} />
-        </FormGroup>
+        {this.renderField({ label: 'Name', fieldName: 'name', formProps })}
 
-        <SelectBrand isRequired={true} formProps={formProps} />
+        <SelectBrand
+          isRequired={true}
+          formProps={formProps}
+          description={'Which specific Brand does this integration belong to?'}
+        />
+
         <SelectChannels
           defaultValue={channelIds}
           isRequired={true}
@@ -84,15 +87,20 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
 
         <Accounts
           kind="twitter"
-          addLink="login"
-          onSelect={onAccountSelect}
-          onRemove={onRemoveAccount}
-          formProps={formProps}
+          onSelectAccount={this.onSelectAccount}
+          accountId={this.state.accountId}
         />
 
         <ModalFooter>
+          <Button
+            btnStyle="simple"
+            type="button"
+            onClick={callback}
+            icon="times-circle"
+          >
+            Cancel
+          </Button>
           {renderButton({
-            name: 'integration',
             values: this.generateDoc(values),
             isSubmitted,
             callback
@@ -107,4 +115,4 @@ class Twitter extends React.Component<Props, { loading: boolean }> {
   }
 }
 
-export default Twitter;
+export default IntegrationForm;

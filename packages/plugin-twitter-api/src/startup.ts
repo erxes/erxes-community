@@ -7,6 +7,9 @@ export const initStart = async app => {
   if (TWITTER_CONSUMER_KEY) {
     try {
       await twitterApi.registerWebhook();
+      // alham alhamaar heregjuulne
+      // await twitterApi.twitterPutWebhook();
+      // await twitterApi.subscribeToWebhook();
     } catch (e) {}
   }
 

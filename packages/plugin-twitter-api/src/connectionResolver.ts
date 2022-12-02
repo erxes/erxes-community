@@ -3,35 +3,34 @@ import * as mongoose from 'mongoose';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import {
   ICustomerDocument,
-  IConversationDocument,
   IConversationMessageDocument,
   IIntegrationDocument,
   IAccountDocument,
-  accountSchema
+  IMessageDocument
 } from './models/definitions/twitter';
 import {
   ICustomerModel,
-  IConversationModel,
   IConversationMessageModel,
   IIntegrationModel,
   IConfigModel,
   IAccountModel,
+  IMessageModel,
   loadCustomerClass,
-  loadConversationClass,
   loadConversationMessageClass,
   loadIntegrationClass,
   loadConfigClass,
-  loadAccountClass
+  loadAccountClass,
+  loadMessageClass
 } from './models/Twitter';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
 
 export interface IModels {
   Customers: ICustomerModel;
-  Conversations: IConversationModel;
   ConversationMessages: IConversationMessageModel;
   Integrations: IIntegrationModel;
   Configs: IConfigModel;
   Accounts: IAccountModel;
+  Messages: IMessageModel;
 }
 
 export interface IContext extends IMainContext {
@@ -52,11 +51,6 @@ export const loadClasses = (
     loadCustomerClass()
   );
 
-  models.Conversations = db.model<IConversationDocument, IConversationModel>(
-    'twitter_conversations',
-    loadConversationClass(models)
-  );
-
   models.ConversationMessages = db.model<
     IConversationMessageDocument,
     IConversationMessageModel
@@ -74,6 +68,10 @@ export const loadClasses = (
   models.Accounts = db.model<IAccountDocument, IAccountModel>(
     'twitter_accounts',
     loadAccountClass(models)
+  );
+  models.Messages = db.model<IMessageDocument, IMessageModel>(
+    'twitter_messages',
+    loadMessageClass(models)
   );
 
   return models;

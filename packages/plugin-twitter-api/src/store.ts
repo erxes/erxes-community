@@ -4,8 +4,6 @@ import {
   IIntegrationDocument
 } from './models/definitions/twitter';
 import { IModels, models } from './connectionResolver';
-import { Customers } from './models/Customers';
-import { Conversations } from './models/Conversations';
 
 export interface IUser {
   id: string;
@@ -86,65 +84,48 @@ export const getOrCreateCustomer = async (
 export const getOrCreateConversation = async (
   models: IModels,
   subdomain: string,
+  inboxId: string,
   senderId: string,
   receiverId: string,
-  integrationId: string,
-  content: string,
-  inboxId: string,
-  customerErxesApiId: string
+  eventId: string,
+  customerId: string,
+  content: string
 ) => {
-  let conversation = await models.Conversations.findOne({
-    senderId,
-    receiverId
+  let conversationId;
+
+  const relatedMessage = await models.Messages.findOne({
+    senderId: senderId
   });
 
-  if (conversation) {
-    return conversation;
-  }
-
-  // create conversation
-
-  // save on integrations db
-  try {
-    conversation = await models.Conversations.create({
-      senderId,
-      receiverId,
-      content,
-      integrationId
-    });
-  } catch (e) {
-    throw new Error(
-      e.message.includes('duplicate')
-        ? 'Concurrent request: conversation duplication'
-        : e
-    );
-  }
-
-  // save on api
-  try {
-    const apiConversationResponse = await sendInboxMessage({
+  if (relatedMessage) {
+    conversationId = relatedMessage.inboxConversationId;
+  } else {
+    const { _id } = await sendInboxMessage({
       subdomain,
       action: 'integrations.receive',
       data: {
         action: 'create-or-update-conversation',
         payload: JSON.stringify({
-          customerId: customerErxesApiId,
           integrationId: inboxId,
+          senderId,
+          receiverId,
+          customerId: customerId,
           content
         })
       },
       isRPC: true
     });
-
-    conversation.erxesApiId = apiConversationResponse._id;
-
-    await conversation.save();
-  } catch (e) {
-    await models.Conversations.deleteOne({ _id: conversation._id });
-    throw new Error(e);
+    conversationId = _id;
   }
-
-  return conversation;
+  await models.Messages.create({
+    inboxIntegrationId: inboxId,
+    inboxConversationId: conversationId,
+    messageId: eventId,
+    senderId: senderId,
+    content: content,
+    receiverId: receiverId
+  });
+  return conversationId;
 };
 
 export const createConversationMessage = async (
@@ -153,25 +134,21 @@ export const createConversationMessage = async (
   event: any,
   content: string,
   attachments: any[],
-  customerErxesApiId: string,
-  conversation: IConversationDocument,
-  integration
+  conversationId: string,
+  integration,
+  senderId: string,
+  receiverId: string
 ) => {
-  console.log('event ni yu we', event);
-
   const { id, created_timestamp } = event;
-
-  console.log('id yu we', id);
 
   const conversationMessage = await models.ConversationMessages.findOne({
     messageId: id
   });
-  console.log('conversationMessage::::::::::::::', conversationMessage);
 
   if (!conversationMessage) {
     // save on integrations db
     await models.ConversationMessages.create({
-      conversationId: conversation._id,
+      conversationId: conversationId,
       messageId: id,
       content,
       timestamp: created_timestamp
@@ -188,9 +165,10 @@ export const createConversationMessage = async (
           payload: JSON.stringify({
             integrationId: integration.inboxId,
             content,
-            conversationId: conversation.erxesApiId,
-            customerId: customerErxesApiId,
-            attachments
+            conversationId: conversationId,
+            attachments,
+            senderId,
+            receiverId
           })
         },
         isRPC: true

@@ -3,6 +3,7 @@ import * as twitterUtils from './api';
 import receiveDms from './receiveDms';
 import { generateModels, IModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import Accounts from './models/Accounts';
 
 const init = async app => {
   app.get('/login', async (_req, res) => {
@@ -23,7 +24,7 @@ const init = async app => {
       response.oauth_token_secret
     );
 
-    await models.Accounts.create({
+    await Accounts.create({
       token: response.oauth_token,
       tokenSecret: response.oauth_token_secret,
       name: profile.screen_name,
@@ -51,11 +52,8 @@ const init = async app => {
     }
   });
   app.put('/webhook', async (_req, res) => {
-    const bearerToken = (await twitterUtils.getTwitterConfig())
-      .twitterBearerToken;
-
     try {
-      await twitterUtils.twitterPutWebhook(bearerToken);
+      await twitterUtils.twitterPutWebhook();
     } catch (e) {
       console.log(e);
     }
@@ -63,8 +61,6 @@ const init = async app => {
   });
 
   app.post('/webhook', async (req, res) => {
-    console.log('Twitter Post Webhook ajillaj baina uu? ');
-
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
 
@@ -78,62 +74,10 @@ const init = async app => {
 
     res.sendStatus(200);
   });
-  app.get('/get-account', async (req, _res) => {
-    const subdomain = getSubdomain(req);
-    const models = await generateModels(subdomain);
-    console.log('Herwee ajillawal heleerei: ');
 
-    const account = await models.Accounts.findOne({ _id: req.query.accountId });
-
-    if (!account) {
-      return 'Account not found';
-    }
-
-    return account.uid;
-  });
-  app.post('/create-integration', async (req, _res) => {
-    const subdomain = getSubdomain(req);
-    const models = await generateModels(subdomain);
-    console.log(
-      'END YMAR NEG YUM ORJ IRWEL HELEEREI++++++++++++++++++++++++++++'
-    );
-
-    const { accountId, integrationId, data, kind } = req.body;
-
-    const prevEntry = await models.Integrations.findOne({
-      accountId
-    });
-
-    if (prevEntry) {
-      return `You already have integration on this account`;
-    }
-
-    const account = await models.Accounts.getAccount({ _id: accountId });
-    console.log('=============+++++');
-
-    await models.Integrations.create({
-      kind,
-      accountId,
-      erxesApiId: integrationId,
-      twitterAccountId: data.twitterAccountId
-    });
-
-    try {
-      await twitterUtils.subscribeToWebhook(account);
-    } catch (e) {
-      // deleting previous subscription
-      if (e.message.includes('already exists')) {
-        await twitterUtils.removeFromWebhook(account);
-
-        // adding new subscription
-        await twitterUtils.subscribeToWebhook(account);
-      }
-    }
-  });
   app.post('/reply', async (req, _res) => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
-    console.log('END YUM IRJIINUU REPLY');
 
     const { attachments, conversationId, content, integrationId } = req.body;
 
@@ -156,8 +100,8 @@ const init = async app => {
       attachment.media.id = JSON.parse(response).media_id_string;
     }
 
-    const conversation = await models.Conversations.getConversation({
-      erxesApiId: conversationId
+    const conversation: any = await models.ConversationMessages.findOne({
+      conversationId: conversationId
     });
 
     const integration = await models.Integrations.findOne({
@@ -183,10 +127,8 @@ const init = async app => {
 
     // save on integrations db
 
-    console.log('+++++++++++++++++');
-
     await models.ConversationMessages.create({
-      conversationId: conversation._id,
+      conversationId: conversationId,
       messageId: id,
       timestamp: created_timestamp,
       content: message_data.text

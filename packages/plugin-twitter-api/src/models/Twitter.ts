@@ -5,13 +5,16 @@ import {
   IConversationMessageDocument,
   IIntegrationDocument,
   IConfigDocument,
-  conversationSchema,
+  conversationMessageSchema,
   customerSchema,
   integrationSchema,
   configSchema,
   IAccountDocument,
-  accountSchema
+  accountSchema,
+  IMessageDocument,
+  messageSchema
 } from './definitions/twitter';
+import { IModels } from '../connectionResolver';
 
 export interface ICustomerModel extends Model<ICustomerDocument> {}
 
@@ -23,50 +26,24 @@ export const loadCustomerClass = () => {
   return customerSchema;
 };
 
-export interface IConversationModel extends Model<IConversationDocument> {
-  getConversation(selector): Promise<IConversationDocument>;
-}
-
-export const loadConversationClass = models => {
-  class Conversation {
-    public static async getConversation(selector) {
-      const conversation = await models.Conversations.findOne(selector);
-
-      if (!conversation) {
-        throw new Error('Conversation not found');
-      }
-
-      return conversation;
-    }
-  }
-
-  conversationSchema.loadClass(Conversation);
-
-  return conversationSchema;
-};
-
 export interface IConversationMessageModel
   extends Model<IConversationMessageDocument> {}
 
 export const loadConversationMessageClass = models => {
   class ConversationMessage {}
 
-  conversationSchema.loadClass(ConversationMessage);
+  conversationMessageSchema.loadClass(ConversationMessage);
 
-  return conversationSchema;
+  return conversationMessageSchema;
 };
 
 export interface IIntegrationModel extends Model<IIntegrationDocument> {
   getIntegration(accountId): Promise<IIntegrationDocument>;
 }
 
-export const loadIntegrationClass = models => {
+export const loadIntegrationClass = (models: IModels) => {
   class Integration {
     public static async getIntegration(accountId) {
-      console.log('A1::::::::::');
-      console.log('MODELS NI YU WE', models);
-      console.log('ACCOUNTID', accountId);
-
       const integration = await models.Integrations.findOne(accountId);
 
       if (!integration) {
@@ -80,6 +57,16 @@ export const loadIntegrationClass = models => {
   integrationSchema.loadClass(Integration);
 
   return integrationSchema;
+};
+
+export interface IMessageModel extends Model<IMessageDocument> {}
+
+export const loadMessageClass = models => {
+  class Message {}
+
+  messageSchema.loadClass(Message);
+
+  return messageSchema;
 };
 
 export interface IConfig {

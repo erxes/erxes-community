@@ -373,3 +373,17 @@ export type IntegrationsCountQueryResponse = {
   integrationsTotalCount: IntegrationsCount;
   loading: boolean;
 };
+export interface IConversationMessage {
+  content: string;
+  attachments?: any;
+  conversationId: string;
+  fromBot?: boolean;
+  customerId?: string;
+  userId?: string;
+  isCustomerRead?: boolean;
+  botData?: any;
+
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
