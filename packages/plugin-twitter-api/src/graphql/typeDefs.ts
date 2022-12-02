@@ -6,7 +6,6 @@ const types = `
     title: String
     data: JSON
   }
-
 `;
 
 const queries = `

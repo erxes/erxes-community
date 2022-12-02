@@ -18,8 +18,6 @@ export const initBroker = async cl => {
   consumeRPCQueue(
     'twitter:createIntegration',
     async ({ subdomain, data: { doc, integrationId } }) => {
-      console.log('DOC dotor yu bn', doc);
-
       const models = await generateModels(subdomain);
 
       const integration = await models.Integrations.create({

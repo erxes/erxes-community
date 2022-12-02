@@ -65,10 +65,12 @@ export const loadClasses = (
     'twitter_configs',
     loadConfigClass(models)
   );
+
   models.Accounts = db.model<IAccountDocument, IAccountModel>(
     'twitter_accounts',
     loadAccountClass(models)
   );
+
   models.Messages = db.model<IMessageDocument, IMessageModel>(
     'twitter_messages',
     loadMessageClass(models)

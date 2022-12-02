@@ -5,6 +5,8 @@ import * as request from 'request-promise';
 import { IAccount } from './models/definitions/twitter';
 import { getConfig, getEnv } from './utils';
 
+dotenv.config();
+const DOMAIN = getEnv({ name: 'DOMAIN' });
 interface ITwitterConfig {
   oauth: {
     consumer_key: string;
@@ -15,10 +17,6 @@ interface ITwitterConfig {
   twitterBearerToken?: string;
   twitterWebhookEnvironment: string;
 }
-
-dotenv.config();
-
-const DOMAIN = getEnv({ name: 'DOMAIN' });
 
 export const getTwitterConfig = async (): Promise<ITwitterConfig> => {
   return {
@@ -80,316 +78,6 @@ export const getChallengeResponse = async crcToken => {
     .createHmac('sha256', twitterConfig.oauth.consumer_secret)
     .update(crcToken)
     .digest('base64');
-};
-
-export const registerWebhook = async () => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise(async (resolve, reject) => {
-    const webhooks = await retrieveWebhooks().catch(e => {});
-
-    // const webhookObj =
-    //   webhooks &&
-    //   webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
-    // console.log('webhookObj======>', webhookObj);
-
-    // if (webhookObj) {
-    //   return;
-    // }
-
-    const requestOptions = {
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/webhooks.json',
-      oauth: twitterConfig.oauth,
-      headers: {
-        'Content-type': 'application/x-www-form-urlencoded'
-      },
-      form: {
-        url: `${DOMAIN}/pl:twitter/webhook`
-      }
-    };
-
-    for (const webhook of webhooks || []) {
-      await deleteWebhook(webhook.id).catch(e => {});
-    }
-
-    request
-      .post(requestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(er => {
-        console.log('ERROR message', er.message);
-
-        reject(er.message);
-      });
-  });
-};
-export const twitterPutWebhook = async () => {
-  const bearerToken = (await getTwitterConfig()).twitterBearerToken;
-
-  const twitterConfig = await getTwitterConfig();
-  const webhookResponse = await retrieveWebhooks();
-  const webhookId = webhookResponse[0].id;
-
-  console.log('Bearer Token', bearerToken);
-
-  console.log('222222222', webhookId);
-
-  return new Promise(async (resolve, reject) => {
-    const requestOptions = {
-      method: 'PUT',
-      headers: {
-        Authorization:
-          `Bearer ${bearerToken}` || twitterConfig.twitterBearerToken
-      },
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/webhooks/' +
-        webhookId +
-        '.json'
-    };
-
-    request
-      .put(requestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(er => {
-        reject(er.message);
-      });
-  });
-};
-
-interface IWebhook {
-  id: string;
-  url: string;
-  valid: boolean;
-  created_timestamp: string;
-  update_webhook_url: string;
-}
-
-export const retrieveWebhooks = async (): Promise<IWebhook[]> => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    const requestOptions = {
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/webhooks.json',
-      oauth: twitterConfig.oauth
-    };
-
-    request
-      .get(requestOptions)
-      .then(body => {
-        resolve(JSON.parse(body));
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
-
-export const deleteWebhook = async webhookId => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    // if no webhook id provided, assume there is none to delete
-    if (!webhookId) {
-      resolve('ok');
-      return;
-    }
-
-    // construct request to delete webhook config
-    const requestOptions = {
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/webhooks/' +
-        webhookId +
-        '.json',
-      oauth: twitterConfig.oauth,
-      resolveWithFullResponse: true
-    };
-
-    request
-      .delete(requestOptions)
-      .then(() => {
-        resolve('ok');
-      })
-      .catch(() => {
-        reject();
-      });
-  });
-};
-
-// export const unsubscribe = async (userId: string) => {
-//   const twitterConfig = await getTwitterConfig();
-
-//   return new Promise(async (resolve, reject) => {
-//     const bearer = await getTwitterBearerToken();
-//     const requestOptions = {
-//       url: `https://api.twitter.com/1.1/account_activity/all/${twitterConfig.twitterWebhookEnvironment}/subscriptions/${userId}.json`,
-//       auth: {
-//         bearer
-//       }
-//     };
-
-//     request
-//       .delete(requestOptions)
-//       .then((res) => {
-//         resolve(res);
-//       })
-//       .catch((e) => {
-//         reject(e);
-//       });
-//   });
-// };
-
-export const subscribeToWebhook = async () => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    const subRequestOptions = {
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/subscriptions.json',
-      oauth: twitterConfig.oauth,
-      resolveWithFullResponse: true
-    };
-
-    // subRequestOptions.oauth.token = account.token;
-    // subRequestOptions.oauth.token_secret = account.tokenSecret;
-
-    request
-      .post(subRequestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
-
-export const removeFromWebhook = async (account: IAccount) => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    const requestOptions = {
-      url:
-        'https://api.twitter.com/1.1/account_activity/all/' +
-        twitterConfig.twitterWebhookEnvironment +
-        '/subscriptions.json',
-      oauth: twitterConfig.oauth
-    };
-
-    requestOptions.oauth.token = account.token;
-    requestOptions.oauth.token_secret = account.tokenSecret;
-
-    request
-      .delete(requestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
-
-interface IMessage {
-  event: {
-    type: string;
-    id: string;
-    created_timestamp: string;
-    message_create: {
-      message_data: {
-        text: string;
-      };
-    };
-  };
-}
-
-export const message = async => {};
-
-export const reply = async (
-  receiverId: string,
-  content: string,
-  attachment,
-  account: IAccount
-): Promise<IMessage> => {
-  console.log(receiverId, content, attachment, account, '0000000000000000');
-
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    const requestOptions = {
-      url: 'https://api.twitter.com/1.1/direct_messages/events/new.json',
-      oauth: twitterConfig.oauth,
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: {
-        event: {
-          type: 'message_create',
-          message_create: {
-            target: {
-              recipient_id: receiverId
-            },
-            message_data: {
-              text: content,
-              attachment: attachment.media.id ? attachment : null
-            }
-          }
-        }
-      },
-      json: true
-    };
-
-    requestOptions.oauth.token = account.token;
-    requestOptions.oauth.token_secret = account.tokenSecret;
-
-    request
-      .post(requestOptions)
-      .then(res => {
-        console.log('RES ni yu we', res);
-
-        resolve(res);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
-};
-
-export const upload = async base64 => {
-  const twitterConfig = await getTwitterConfig();
-
-  return new Promise((resolve, reject) => {
-    const requestOptions = {
-      url: 'https://upload.twitter.com/1.1/media/upload.json',
-      oauth: twitterConfig.oauth,
-      form: {
-        media_data: base64
-      }
-    };
-
-    request
-      .post(requestOptions)
-      .then(res => {
-        resolve(res);
-      })
-      .catch(e => {
-        reject(e);
-      });
-  });
 };
 
 export const verifyLoginToken = async (
@@ -457,6 +145,313 @@ export const verifyUser = async (
       .get(requestOptions)
       .then(res => {
         resolve(JSON.parse(res));
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+interface IWebhook {
+  id: string;
+  url: string;
+  valid: boolean;
+  created_timestamp: string;
+  update_webhook_url: string;
+}
+export const registerWebhook = async () => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise(async (resolve, reject) => {
+    const webhooks = await retrieveWebhooks().catch(e => {});
+
+    const webhookObj =
+      webhooks &&
+      webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
+
+    if (webhookObj) {
+      return;
+    }
+
+    const requestOptions = {
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks.json',
+      oauth: twitterConfig.oauth,
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded'
+      },
+      form: {
+        url: `${DOMAIN}/pl:twitter/webhook`
+      }
+    };
+
+    for (const webhook of webhooks || []) {
+      await deleteWebhook(webhook.id).catch(e => {});
+    }
+
+    request
+      .post(requestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(er => {
+        console.log('ERROR message', er.message);
+
+        reject(er.message);
+      });
+  });
+};
+
+export const retrieveWebhooks = async (): Promise<IWebhook[]> => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    const requestOptions = {
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks.json',
+      oauth: twitterConfig.oauth
+    };
+
+    request
+      .get(requestOptions)
+      .then(body => {
+        resolve(JSON.parse(body));
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+export const twitterPutWebhook = async () => {
+  const bearerToken = (await getTwitterConfig()).twitterBearerToken;
+
+  const twitterConfig = await getTwitterConfig();
+  const webhookResponse = await retrieveWebhooks();
+  const webhookId = webhookResponse[0].id;
+
+  console.log('Bearer Token', bearerToken);
+
+  console.log('222222222', webhookId);
+
+  return new Promise(async (resolve, reject) => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: {
+        Authorization:
+          `Bearer ${bearerToken}` || twitterConfig.twitterBearerToken
+      },
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks/' +
+        webhookId +
+        '.json'
+    };
+
+    request
+      .put(requestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(er => {
+        reject(er.message);
+      });
+  });
+};
+
+export const subscribeToWebhook = async () => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    const subRequestOptions = {
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/subscriptions.json',
+      oauth: twitterConfig.oauth,
+      resolveWithFullResponse: true
+    };
+
+    // subRequestOptions.oauth.token = account.token;
+    // subRequestOptions.oauth.token_secret = account.tokenSecret;
+
+    request
+      .post(subRequestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+export const deleteWebhook = async webhookId => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    // if no webhook id provided, assume there is none to delete
+    if (!webhookId) {
+      resolve('ok');
+      return;
+    }
+
+    // construct request to delete webhook config
+    const requestOptions = {
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/webhooks/' +
+        webhookId +
+        '.json',
+      oauth: twitterConfig.oauth,
+      resolveWithFullResponse: true
+    };
+
+    request
+      .delete(requestOptions)
+      .then(() => {
+        resolve('ok');
+      })
+      .catch(() => {
+        reject();
+      });
+  });
+};
+
+export const unsubscribe = async (userId: string) => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise(async (resolve, reject) => {
+    const bearer = (await getTwitterConfig()).twitterBearerToken;
+    const requestOptions = {
+      url: `https://api.twitter.com/1.1/account_activity/all/${twitterConfig.twitterWebhookEnvironment}/subscriptions/${userId}.json`,
+      auth: {
+        bearer
+      }
+    };
+
+    request
+      .delete(requestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+export const removeFromWebhook = async (account: IAccount) => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    const requestOptions = {
+      url:
+        'https://api.twitter.com/1.1/account_activity/all/' +
+        twitterConfig.twitterWebhookEnvironment +
+        '/subscriptions.json',
+      oauth: twitterConfig.oauth
+    };
+
+    requestOptions.oauth.token = account.token;
+    requestOptions.oauth.token_secret = account.tokenSecret;
+
+    request
+      .delete(requestOptions)
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+interface IMessage {
+  event: {
+    type: string;
+    id: string;
+    created_timestamp: string;
+    message_create: {
+      message_data: {
+        text: string;
+      };
+    };
+  };
+}
+
+export const reply = async (
+  receiverId: string,
+  content: string,
+  attachment,
+  account: IAccount
+): Promise<IMessage> => {
+  console.log(receiverId, content, attachment, account, '0000000000000000');
+
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    const requestOptions = {
+      url: 'https://api.twitter.com/1.1/direct_messages/events/new.json',
+      oauth: twitterConfig.oauth,
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: {
+        event: {
+          type: 'message_create',
+          message_create: {
+            target: {
+              recipient_id: receiverId
+            },
+            message_data: {
+              text: content,
+              attachment: attachment.media.id ? attachment : null
+            }
+          }
+        }
+      },
+      json: true
+    };
+
+    requestOptions.oauth.token = account.token;
+    requestOptions.oauth.token_secret = account.tokenSecret;
+
+    request
+      .post(requestOptions)
+      .then(res => {
+        console.log('RES ni yu we', res);
+
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+};
+
+export const upload = async base64 => {
+  const twitterConfig = await getTwitterConfig();
+
+  return new Promise((resolve, reject) => {
+    const requestOptions = {
+      url: 'https://upload.twitter.com/1.1/media/upload.json',
+      oauth: twitterConfig.oauth,
+      form: {
+        media_data: base64
+      }
+    };
+
+    request
+      .post(requestOptions)
+      .then(res => {
+        resolve(res);
       })
       .catch(e => {
         reject(e);

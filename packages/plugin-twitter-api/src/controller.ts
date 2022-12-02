@@ -11,6 +11,7 @@ const init = async app => {
 
     return res.redirect(twitterAuthUrl);
   });
+
   app.get(`/callback/add`, async (req, res) => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
@@ -38,6 +39,7 @@ const init = async app => {
 
     return res.redirect(url);
   });
+
   app.get('/webhook', async (req, res) => {
     const crc_token = req.query.crc_token;
 
@@ -51,6 +53,7 @@ const init = async app => {
       return 'Error: crc_token missing from request.';
     }
   });
+
   app.put('/webhook', async (_req, res) => {
     try {
       await twitterUtils.twitterPutWebhook();

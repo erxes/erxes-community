@@ -81,7 +81,7 @@ export const getOrCreateCustomer = async (
   return customer;
 };
 
-export const getOrCreateConversation = async (
+export const getOrCreateConversationAndMessage = async (
   models: IModels,
   subdomain: string,
   inboxId: string,
@@ -89,7 +89,9 @@ export const getOrCreateConversation = async (
   receiverId: string,
   eventId: string,
   customerId: string,
-  content: string
+  content: string,
+  integration,
+  attachments: any[]
 ) => {
   let conversationId;
 
@@ -125,57 +127,27 @@ export const getOrCreateConversation = async (
     content: content,
     receiverId: receiverId
   });
-  return conversationId;
-};
-
-export const createConversationMessage = async (
-  models: IModels,
-  subdomain: string,
-  event: any,
-  content: string,
-  attachments: any[],
-  conversationId: string,
-  integration,
-  senderId: string,
-  receiverId: string
-) => {
-  const { id, created_timestamp } = event;
-
-  const conversationMessage = await models.ConversationMessages.findOne({
-    messageId: id
-  });
-
-  if (!conversationMessage) {
-    // save on integrations db
-    await models.ConversationMessages.create({
-      conversationId: conversationId,
-      messageId: id,
-      content,
-      timestamp: created_timestamp
+  try {
+    await sendInboxMessage({
+      subdomain,
+      action: 'integrations.receive',
+      data: {
+        action: 'create-conversation-message',
+        metaInfo: 'replaceContent',
+        payload: JSON.stringify({
+          integrationId: integration.inboxId,
+          content,
+          conversationId: conversationId,
+          attachments,
+          senderId,
+          receiverId
+        })
+      },
+      isRPC: true
     });
-
-    // save message on api
-    try {
-      await sendInboxMessage({
-        subdomain,
-        action: 'integrations.receive',
-        data: {
-          action: 'create-conversation-message',
-          metaInfo: 'replaceContent',
-          payload: JSON.stringify({
-            integrationId: integration.inboxId,
-            content,
-            conversationId: conversationId,
-            attachments,
-            senderId,
-            receiverId
-          })
-        },
-        isRPC: true
-      });
-    } catch (e) {
-      await models.ConversationMessages.deleteOne({ messageId: id });
-      throw new Error(e);
-    }
+  } catch (e) {
+    await models.ConversationMessages.deleteOne({ messageId: eventId });
+    throw new Error(e);
   }
+  return conversationId;
 };

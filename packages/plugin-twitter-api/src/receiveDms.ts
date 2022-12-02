@@ -1,6 +1,5 @@
 import {
-  createConversationMessage,
-  getOrCreateConversation,
+  getOrCreateConversationAndMessage,
   getOrCreateCustomer,
   IUser
 } from './store';
@@ -73,7 +72,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
       const content = message_data.text;
       const customerId: any = customer.erxesApiId;
 
-      const conversation = await getOrCreateConversation(
+      await getOrCreateConversationAndMessage(
         models,
         subdomain,
         integration.inboxId,
@@ -81,19 +80,9 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         receiverId,
         eventId,
         customerId,
-        content
-      );
-
-      await createConversationMessage(
-        models,
-        subdomain,
-        event,
         content,
-        attachments,
-        conversation,
         integration,
-        senderId,
-        receiverId
+        attachments
       );
     }
   }
