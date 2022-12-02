@@ -1,59 +1,103 @@
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
-export interface IWork {
-  _id?: string;
-  name?: string;
+export interface IOverallWork {
+  _id: string;
+  workIds: string[];
+  name: string;
   status: string;
-  dueDate: Date;
-  startAt: Date;
-  endAt: Date;
-  flowId: string;
-  flow: any;
-  count: string;
-  intervalId?: string;
-  interval: any;
+  inBranchId: string;
+  inDepartmentId: string;
+  outBranchId: string;
+  outDepartmentId: string;
+  count: number;
+  needProducts: any;
+  resultProducts: any;
 
-  inBranchId?: string;
-  inDepartmentId?: string;
-  outBranchId?: string;
-  outDepartmentId?: string;
-  inBranch: IBranch;
   inDepartment: IDepartment;
-  outBranch: IBranch;
+  inBranch: IBranch;
   outDepartment: IDepartment;
-  needProducts?: any[];
-  resultProducts?: any[];
+  outBranch: IBranch;
 }
 
-export type IWorkDet = {
-  _id: string;
-  createdAt: Date;
-  createdBy: string;
-  updatedAt: Date;
-  updatedBy: string;
-} & IWork;
+export type IOverallWorkDet = {
+  startAt: Date;
+  dueDate: Date;
+  interval: any;
+  intervalId: string;
+  needProductsData: any;
+  resultProductsData: any;
+} & IOverallWork;
 
-export type WorksQueryResponse = {
-  works: IWork[];
+export type OverallWorksQueryResponse = {
+  overallWorks: IOverallWork[];
   loading: boolean;
   refetch: () => void;
 } & QueryResponse;
 
-export type WorkDetailQueryResponse = {
-  workDetail: IWorkDet;
+export type OverallWorksCountQueryResponse = {
+  overallWorksCount: number;
+  loading: boolean;
+  refetch: () => void;
+} & QueryResponse;
+
+export type OverallWorkDetailQueryResponse = {
+  overallWorkDetail: IOverallWorkDet;
   loading: boolean;
   refetch: () => void;
 };
 
-export type ListQueryVariables = {
-  page?: number;
-  perPage?: number;
-  search?: string;
-};
-
-export type WorksSummaryQueryResponse = {
-  worksSummary: any;
+export type PerformsQueryResponse = {
+  performs: IOverallWorkDet;
   loading: boolean;
   refetch: () => void;
+};
+
+export type PerformsCountQueryResponse = {
+  performsCount: number;
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type IPerformAddParams = {
+  jobType: string;
+  jobReferId: string;
+  productId: string;
+
+  inBranchId: string;
+  inDepartmentId: string;
+  outBranchId: string;
+  outDepartmentId: string;
+};
+
+export type ICommonParams = {
+  count: number;
+  startAt: Date;
+  endAt: Date;
+  status: string;
+
+  needProducts: any;
+  resultProducts: any;
+};
+
+export type PerformAddMutationResponse = {
+  performAdd: (mutation: {
+    variables: IPerformAddParams & ICommonParams;
+  }) => Promise<any>;
+};
+
+export type PerformEditMutationResponse = {
+  performEdit: (mutation: {
+    variables: IPerformAddParams & ICommonParams & { _id: string };
+  }) => Promise<any>;
+};
+
+export type PerformChangeMutationResponse = {
+  performChange: (mutation: {
+    variables: ICommonParams & { _id: string };
+  }) => Promise<any>;
+};
+
+export type PerformRemoveMutationResponse = {
+  performRemove: (mutation: { variables: { _id: string } }) => Promise<any>;
 };

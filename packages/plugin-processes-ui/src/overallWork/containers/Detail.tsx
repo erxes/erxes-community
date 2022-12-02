@@ -3,13 +3,13 @@ import gql from 'graphql-tag';
 import Detail from '../components/Detail';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import { IWork } from '../types';
+import { IOverallWork } from '../types';
 import { WorkDetailQueryResponse } from '../types';
 import { queries, mutations } from '../graphql';
 import { Spinner, withProps } from '@erxes/ui/src';
 
 type Props = {
-  work: IWork;
+  work: IOverallWork;
 };
 
 type FinalProps = {
@@ -32,7 +32,7 @@ class OrdersDetailContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
-    const work = workDetailQuery.workDetail;
+    const work = workDetailQuery.overallWorkDetail;
 
     const updatedProps = {
       ...this.props,
@@ -46,7 +46,7 @@ class OrdersDetailContainer extends React.Component<FinalProps> {
 export default withProps<Props>(
   compose(
     graphql<Props, WorkDetailQueryResponse, { _id: string }>(
-      gql(queries.posOrderDetail),
+      gql(queries.overallWorkDetail),
       {
         name: 'workDetailQuery',
         options: ({ work }) => ({

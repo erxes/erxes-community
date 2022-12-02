@@ -10,11 +10,11 @@ import {
   Table
 } from '@erxes/ui/src';
 import { FinanceAmount, FlexRow } from '../../styles';
-import { IWorkDet } from '../types';
+import { IOverallWorkDet } from '../types';
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 
 type Props = {
-  work: IWorkDet;
+  work: IOverallWorkDet;
 };
 
 type State = {};

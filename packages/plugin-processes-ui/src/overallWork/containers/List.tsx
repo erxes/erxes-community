@@ -6,13 +6,12 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
 import {
-  ListQueryVariables,
-  WorksQueryResponse,
-  WorksSummaryQueryResponse
+  OverallWorksCountQueryResponse,
+  OverallWorksQueryResponse
 } from '../types';
-import { mutations, queries } from '../graphql';
+import { queries } from '../graphql';
 import { withRouter } from 'react-router-dom';
-import { Bulk, withProps, router, Alert, Spinner } from '@erxes/ui/src';
+import { Bulk, withProps, router, Spinner } from '@erxes/ui/src';
 import { IQueryParams } from '@erxes/ui/src/types';
 
 type Props = {
@@ -21,8 +20,8 @@ type Props = {
 };
 
 type FinalProps = {
-  ordersQuery: WorksQueryResponse;
-  ordersSummaryQuery: WorksSummaryQueryResponse;
+  overallWorksQuery: OverallWorksQueryResponse;
+  overallWorksCountQuery: OverallWorksCountQueryResponse;
 } & Props &
   IRouterProps;
 
@@ -96,20 +95,19 @@ class OrdersContainer extends React.Component<FinalProps, State> {
   };
 
   render() {
-    const { ordersQuery, ordersSummaryQuery } = this.props;
+    const { overallWorksQuery, overallWorksCountQuery } = this.props;
 
-    if (ordersSummaryQuery.loading || ordersQuery.loading) {
+    if (overallWorksCountQuery.loading || overallWorksQuery.loading) {
       return <Spinner />;
     }
 
-    const summary = ordersSummaryQuery.worksSummary;
-    const list = ordersQuery.works || [];
+    const overallWorks = overallWorksQuery.overallWorks || [];
+    const totalCount = overallWorksCountQuery.overallWorksCount || 0;
 
     const updatedProps = {
       ...this.props,
-      orders: list,
-      summary,
-      loading: ordersQuery.loading,
+      overallWorks,
+      totalCount,
 
       onFilter: this.onFilter,
       onSelect: this.onSelect,
@@ -123,7 +121,7 @@ class OrdersContainer extends React.Component<FinalProps, State> {
     };
 
     const refetch = () => {
-      this.props.ordersQuery.refetch();
+      this.props.overallWorksQuery.refetch();
     };
 
     return <Bulk content={ordersList} refetch={refetch} />;
@@ -137,38 +135,37 @@ const generateParams = ({ queryParams }) => ({
     ? parseInt(queryParams.sortDirection, 10)
     : undefined,
   search: queryParams.search,
-  paidStartDate: queryParams.paidStartDate,
-  paidEndDate: queryParams.paidEndDate,
-  createdStartDate: queryParams.createdStartDate,
-  createdEndDate: queryParams.createdEndDate,
-  paidDate: queryParams.paidDate,
-  userId: queryParams.userId,
-  customerId: queryParams.customerId,
-  posId: queryParams.posId
+  startDate: queryParams.startDate,
+  endDate: queryParams.endDate,
+  branchId: queryParams.branchId,
+  departmentId: queryParams.departmentId,
+  productCategoryId: queryParams.productCategoryId,
+  productId: queryParams.productId,
+  jobCategoryId: queryParams.jobCategoryId,
+  jobReferId: queryParams.jobReferId
 });
 
 export default withProps<Props>(
   compose(
-    graphql<{ queryParams: any }, WorksQueryResponse, ListQueryVariables>(
-      gql(queries.posOrders),
+    graphql<{ queryParams: any }, OverallWorksQueryResponse, {}>(
+      gql(queries.overallWorks),
       {
-        name: 'ordersQuery',
+        name: 'overallWorksQuery',
         options: ({ queryParams }) => ({
           variables: generateParams({ queryParams }),
           fetchPolicy: 'network-only'
         })
       }
     ),
-    graphql<
-      { queryParams: any },
-      WorksSummaryQueryResponse,
-      ListQueryVariables
-    >(gql(queries.posOrdersSummary), {
-      name: 'ordersSummaryQuery',
-      options: ({ queryParams }) => ({
-        variables: generateParams({ queryParams }),
-        fetchPolicy: 'network-only'
-      })
-    })
+    graphql<{ queryParams: any }, OverallWorksCountQueryResponse, {}>(
+      gql(queries.overallWorksCount),
+      {
+        name: 'overallWorksCountQuery',
+        options: ({ queryParams }) => ({
+          variables: generateParams({ queryParams }),
+          fetchPolicy: 'network-only'
+        })
+      }
+    )
   )(withRouter<IRouterProps>(OrdersContainer))
 );

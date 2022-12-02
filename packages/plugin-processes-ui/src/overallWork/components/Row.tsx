@@ -4,11 +4,11 @@ import Detail from '../containers/Detail';
 import React from 'react';
 import { ModalTrigger, confirm } from '@erxes/ui/src';
 import { FinanceAmount } from '../../styles';
-import { IWork } from '../types';
+import { IOverallWork } from '../types';
 import moment from 'moment';
 
 type Props = {
-  work: IWork;
+  work: IOverallWork;
   history: any;
   onSyncErkhet: (workId: string) => void;
   onReturnBill: (workId: string) => void;

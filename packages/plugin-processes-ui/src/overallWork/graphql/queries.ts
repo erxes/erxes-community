@@ -1,20 +1,17 @@
-import { queries as productQueries } from '@erxes/ui-products/src/graphql';
-import { isEnabled } from '@erxes/ui/src/utils/core';
-
 const listParamsDef = `
   $page: Int
   $perPage: Int
   $sortField: String
   $sortDirection: Int
   $search: String
-  $paidStartDate: Date
-  $paidEndDate: Date
-  $createdStartDate: Date
-  $createdEndDate: Date
-  $paidDate: String
-  $userId: String
-  $customerId: String
-  $posId: String
+  $startDate: Date
+  $endDate: Date
+  $branchId: String
+  $departmentId: String
+  $productCategoryId: String
+  $productId: String
+  $jobCategoryId: String
+  $jobReferId: String
 `;
 
 const listParamsValue = `
@@ -23,128 +20,148 @@ const listParamsValue = `
   sortField: $sortField
   sortDirection: $sortDirection
   search: $search
-  paidStartDate: $paidStartDate
-  paidEndDate: $paidEndDate
-  createdStartDate: $createdStartDate
-  createdEndDate: $createdEndDate
-  paidDate: $paidDate
-  userId: $userId
-  customerId: $customerId
-  posId: $posId
+  startDate: $startDate
+  endDate: $endDate
+  branchId: $branchId
+  departmentId: $departmentId
+  productCategoryId: $productCategoryId
+  productId: $productId
+  jobCategoryId: $jobCategoryId
+  jobReferId: $jobReferId
 `;
 
-export const orderFields = `
+const detailParamsDef = `
+  $startDate: Date
+  $endDate: Date
+  $branchId: String
+  $departmentId: String
+  $productId: String
+  $jobReferId: String
+`;
+
+const detailParamsValue = `
+  startDate: $startDate
+  endDate: $endDate
+  branchId: $branchId
+  departmentId: $departmentId
+  productId: $productId
+  jobReferId: $jobReferId
+`;
+
+export const overallWorkFields = `
   _id
-  createdAt
+  workIds
+  name
   status
-  paidDate
-  number
-  customerId
-  cardAmount
-  cashAmount
-  receivableAmount
-  mobileAmount
-  totalAmount
-  finalAmount
-  shouldPrintEbarimt
-  printedEbarimt
-  billType
-  billId
-  registerNumber
-  oldBillId
-  type
-  userId
-  items
-  posToken
+  inBranchId
+  inDepartmentId
+  outBranchId
+  outDepartmentId
+  count
+  needProducts
+  resultProducts
 
-  syncedErkhet
-
-  posName
-  origin
-  user {
+  inDepartment {
     _id
-    email
+    code
+    title
+    parentId
   }
-  ${
-    isEnabled('contacts')
-      ? `
-        customer {
-          _id
-          firstName
-          lastName
-          middleName
-          primaryEmail
-          primaryPhone
-        }
-      `
-      : ``
+  inBranch {
+    _id
+    code
+    title,
+    parentId
   }
-
+  outDepartment {
+    _id
+    code
+    title
+    parentId
+  }
+  outBranch {
+    _id
+    code
+    title,
+    parentId
+  }
 `;
 
-const posOrders = `
-  query posOrders(${listParamsDef}) {
-    posOrders(${listParamsValue}) {
-      ${orderFields}
+export const overallWorkDetailFields = `
+  ${overallWorkFields}
+  startAt
+  dueDate
+  interval
+  intervalId
+  needProductsData
+  resultProductsData
+`;
+
+export const performFields = `
+  _id
+  jobType
+  jobReferId
+  productId
+
+  inBranchId
+  inDepartmentId
+  outBranchId
+  outDepartmentId
+
+  needProducts
+  resultProducts
+  needConfirmInfo
+  resultConfirmInfo
+  count
+  status
+  startAt
+  endAt
+  createdAt
+  modifiedAt
+  createdBy
+  modifiedBy
+`;
+
+const overallWorks = `
+  query overallWorks(${listParamsDef}) {
+    overallWorks(${listParamsValue}) {
+      ${overallWorkFields}
     }
   }
 `;
 
-const posOrdersSummary = `
-  query posOrdersSummary(${listParamsDef}) {
-    posOrdersSummary(${listParamsValue})
+const overallWorksCount = `
+  query overallWorks(${listParamsDef}) {
+    overallWorks(${listParamsValue})
   }
 `;
 
-const posOrderDetail = `
-  query posOrderDetail($_id: String) {
-    posOrderDetail(_id: $_id) {
-      ${orderFields}
-      putResponses
-      deliveryInfo
+const overallWorkDetail = `
+  query overallWorkDetail(${detailParamsDef}) {
+    overallWorkDetail(${detailParamsValue}) {
+      ${overallWorkDetailFields}
     }
   }
 `;
 
-const posProducts = `
-  query posProducts(
-    $categoryId: String,
-    $searchValue: String,
-    ${listParamsDef}
-  ) {
-    posProducts(
-      categoryId: $categoryId,
-      searchValue: $searchValue,
-      ${listParamsValue}
-    ) {
-      products {
-        _id
-        name
-        type
-        code
-        categoryId
-        unitPrice
-        category {
-          _id
-          code
-          name
-        }
-        counts
-        count
-        amount
-      }
-
-      totalCount
+const performs = `
+  query performs(${detailParamsDef}) {
+    performs(${detailParamsValue}) {
+      ${performFields}
     }
   }
 `;
 
-const productCategories = productQueries.productCategories;
+const performsCount = `
+  query performs(${detailParamsDef}) {
+    performs(${detailParamsValue}) Int
+  }
+`;
 
 export default {
-  posOrders,
-  posOrdersSummary,
-  posOrderDetail,
-  posProducts,
-  productCategories
+  overallWorks,
+  overallWorksCount,
+  overallWorkDetail,
+  performs,
+  performsCount
 };

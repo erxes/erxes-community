@@ -1,30 +1,80 @@
-import { orderFields } from './queries';
+import { performFields } from './queries';
 
-const posOrderSyncErkhet = `
-  mutation posOrderSyncErkhet($_id: String!) {
-    posOrderSyncErkhet(_id: $_id){
-      ${orderFields}
+const addParamDefs = `
+  $jobType: String,
+  $jobReferId: String,
+  $productId: String,
+
+  $inBranchId: String,
+  $inDepartmentId: String,
+  $outBranchId: String,
+  $outDepartmentId: String,
+`;
+
+const addParams = `
+  jobType: $jobType,
+  jobReferId: $jobReferId,
+  productId: $productId,
+
+  inBranchId: $inBranchId,
+  inDepartmentId: $inDepartmentId,
+  outBranchId: $outBranchId,
+  outDepartmentId: $outDepartmentId,
+`;
+
+const commonParamDefs = `
+  $count: Float,
+  $startAt: Date,
+  $endAt: Date,
+  $status: String,
+
+  $needProducts: JSON,
+  $resultProducts: JSON,
+`;
+
+const commonParams = `
+  count: $count,
+  startAt: $startAt,
+  endAt: $endAt,
+  status: $status,
+
+  needProducts: $needProducts,
+  resultProducts: $resultProducts,
+`;
+
+const performAdd = `
+  mutation performAdd(${addParamDefs}, ${commonParamDefs}) {
+    performAdd(${addParams}, ${commonParams}) {
+      ${performFields}
     }
   }
 `;
 
-const posOrderReturnBill = `
-  mutation posOrderReturnBill($_id: String!) {
-    posOrderReturnBill(_id: $_id){
-      ${orderFields}
+const performEdit = `
+  mutation performEdit($_id: String!, ${addParamDefs}, ${commonParamDefs}) {
+    performEdit(_id: $_id, ${addParams}, ${commonParams}) {
+      ${performFields}
     }
   }
 `;
 
-const posOrderChangePayments = `
-  mutation posOrderChangePayments($_id: String!, $cashAmount: Float, $receivableAmount: Float, $cardAmount: Float, $mobileAmount: Float) {
-    posOrderChangePayments(_id: $_id, cashAmount: $cashAmount, receivableAmount: $receivableAmount, cardAmount: $cardAmount, mobileAmount: $mobileAmount){
-      ${orderFields}
+const performChange = `
+  mutation performChange($_id: String!, ${commonParamDefs}) {
+    performChange(_id: $_id, ${commonParams}) {
+      ${performFields}
     }
   }
 `;
+
+const performRemove = `
+  mutation performRemove($_id: String!) {
+    performRemove(_id: $_id)
+  }
+`;
+
 export default {
-  posOrderSyncErkhet,
-  posOrderReturnBill,
-  posOrderChangePayments
+  performAdd,
+  performEdit,
+  performChange,
+  performRemove
 };
