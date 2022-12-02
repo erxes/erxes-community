@@ -13,29 +13,23 @@ export const init = async () => {
 
   if (TWITTER_CONSUMER_KEY) {
     try {
-      await twitterApi.registerWebhook();
+      await setupNylas();
+      await createNylasWebhook();
     } catch (e) {
-      debugError(`failed to setup twitter: ${e.message}`);
+      debugError(`failed to setup nylas: ${e.message}`);
     }
-  }
 
-  try {
-    await setupNylas();
-    await createNylasWebhook();
-  } catch (e) {
-    debugError(`failed to setup nylas: ${e.message}`);
-  }
+    try {
+      await setupWhatsapp();
+    } catch (e) {
+      debugError(`failed to setup whatsapp: ${e.message}`);
+    }
 
-  try {
-    await setupWhatsapp();
-  } catch (e) {
-    debugError(`failed to setup whatsapp: ${e.message}`);
-  }
-
-  try {
-    await setupSmooch();
-    await setupSmoochWebhook();
-  } catch (e) {
-    debugError(`failed to setup smooch: ${e.message}`);
+    try {
+      await setupSmooch();
+      await setupSmoochWebhook();
+    } catch (e) {
+      debugError(`failed to setup smooch: ${e.message}`);
+    }
   }
 };
