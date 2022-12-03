@@ -117,12 +117,7 @@ const init = async app => {
 
     const recipientId = conversation.senderId;
 
-    const message = await twitterUtils.reply(
-      recipientId,
-      content,
-      attachment,
-      account!
-    );
+    const message = await twitterUtils.reply(recipientId, content);
 
     const { event } = message;
     const { id, created_timestamp, message_create } = event;

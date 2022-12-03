@@ -388,12 +388,8 @@ interface IMessage {
 
 export const reply = async (
   receiverId: string,
-  content: string,
-  attachment,
-  account: IAccount
+  content: string
 ): Promise<IMessage> => {
-  console.log(receiverId, content, attachment, account, '0000000000000000');
-
   const twitterConfig = await getTwitterConfig();
 
   return new Promise((resolve, reject) => {
@@ -411,8 +407,8 @@ export const reply = async (
               recipient_id: receiverId
             },
             message_data: {
-              text: content,
-              attachment: attachment.media.id ? attachment : null
+              text: content
+              // attachment: attachment.media.id ? attachment : null
             }
           }
         }
@@ -420,14 +416,12 @@ export const reply = async (
       json: true
     };
 
-    requestOptions.oauth.token = account.token;
-    requestOptions.oauth.token_secret = account.tokenSecret;
+    // requestOptions.oauth.token = account.token;
+    // requestOptions.oauth.token_secret = account.tokenSecret;
 
     request
       .post(requestOptions)
       .then(res => {
-        console.log('RES ni yu we', res);
-
         resolve(res);
       })
       .catch(e => {

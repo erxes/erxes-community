@@ -5,6 +5,7 @@ import {
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
 import { generateModels } from './connectionResolver';
+import { handleTwitterMessage } from './handleTwitterMessage';
 
 dotenv.config();
 
@@ -28,6 +29,27 @@ export const initBroker = async cl => {
       return {
         status: 'success'
       };
+    }
+  );
+
+  consumeRPCQueue(
+    'integrations:api_to_twitter_integrations',
+    async ({ subdomain, data }) => {
+      const models = await generateModels(subdomain);
+
+      const { action, type } = data;
+      let response: any = null;
+
+      try {
+        if (action === 'reply') {
+          response = { data: await handleTwitterMessage(models, data) };
+        }
+      } catch (e) {
+        response = {
+          status: 'error',
+          errorMessage: e.message
+        };
+      }
     }
   );
 };

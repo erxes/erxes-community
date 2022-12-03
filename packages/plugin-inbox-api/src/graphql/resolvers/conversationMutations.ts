@@ -117,6 +117,31 @@ const sendConversationToIntegrations = async (
       );
     }
   }
+  if (type === 'twitter') {
+    const content = strip(doc.content);
+
+    try {
+      await sendIntegrationsMessage({
+        subdomain,
+        action: 'api_to_twitter_integrations',
+        data: {
+          action,
+          type,
+          payload: JSON.stringify({
+            integrationId,
+            conversationId,
+            content: content.replace(/&amp;/g, '&'),
+            attachments: doc.attachments || []
+          })
+        },
+        isRPC: true
+      });
+    } catch (e) {
+      throw new Error(
+        `Your message not sent Error: ${e.message}. Go to integrations list and fix it`
+      );
+    }
+  }
 
   if (requestName) {
     return sendIntegrationsMessage({
@@ -410,6 +435,20 @@ const conversationMutations = {
       action,
       facebookMessageTag
     );
+
+    if (kind === 'twitter') {
+      (type = 'twitter'), (action = 'reply');
+
+      await sendConversationToIntegrations(
+        subdomain,
+        type,
+        integrationId,
+        conversationId,
+        requestName,
+        doc,
+        action
+      );
+    }
 
     const dbMessage = await models.ConversationMessages.getMessage(message._id);
 
