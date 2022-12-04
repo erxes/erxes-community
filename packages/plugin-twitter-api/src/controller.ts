@@ -25,7 +25,7 @@ const init = async app => {
       response.oauth_token_secret
     );
 
-    await Accounts.create({
+    await models.Accounts.create({
       token: response.oauth_token,
       tokenSecret: response.oauth_token_secret,
       name: profile.screen_name,

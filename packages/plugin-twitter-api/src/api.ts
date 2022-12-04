@@ -189,8 +189,6 @@ export const registerWebhook = async () => {
         resolve(res);
       })
       .catch(er => {
-        console.log('ERROR message', er.message);
-
         reject(er.message);
       });
   });

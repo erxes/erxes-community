@@ -1,15 +1,13 @@
-// import { Accounts } from '../../models';
-import { IContext } from '@erxes/api-utils/src/types';
+import { IContext } from '../../connectionResolver';
 
 const twitterMutations = {
-  //   async twitterAccountRemove(
-  //     _root,
-  //     { _id }: { _id: string },
-  //     _context: IContext
-  //   ) {
-  //     await Accounts.removeAccount(_id);
-  //     return 'deleted';
-  //   }
+  async twitterAccountRemove(
+    _root,
+    { _id }: { _id: string },
+    { models }: IContext
+  ) {
+    await models.Accounts.deleteOne({ _id });
+  }
 };
 
 export default twitterMutations;

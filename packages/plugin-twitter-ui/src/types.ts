@@ -57,11 +57,6 @@ export type MessengerAppsQueryResponse = {
   messengerApps: IMessengerApps;
 } & QueryResponse;
 
-export type AccountsQueryResponse = {
-  integrationsGetAccounts: IAccount[];
-  error?: Error;
-} & QueryResponse;
-
 // mutation types
 export type SaveMessengerMutationVariables = {
   name: string;

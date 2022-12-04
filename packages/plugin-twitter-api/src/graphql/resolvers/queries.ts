@@ -20,6 +20,15 @@ const TwitterQueries = {
         }
       };
     });
+  },
+  async twitterGetAccounts(
+    _root,
+    { kind }: { kind: string },
+    { models }: IContext
+  ) {
+    const selector = { kind };
+
+    return models.Accounts.find(selector);
   }
 };
 export default TwitterQueries;

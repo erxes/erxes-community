@@ -1,10 +1,6 @@
 import * as compose from 'lodash.flowright';
 import { Alert, getEnv, withProps } from '@erxes/ui/src/utils';
-import {
-  AccountsQueryResponse,
-  IntegrationTypes,
-  RemoveAccountMutationResponse
-} from '../types';
+import { IntegrationTypes } from '../types';
 import Accounts from '../components/Accounts';
 import Info from '@erxes/ui/src/components/Info';
 import React from 'react';
@@ -20,10 +16,9 @@ type Props = {
 };
 
 type FinalProps = {
-  integrationsAccountsQuery: AccountsQueryResponse;
+  twitterAccounts: any;
   removeAccount: any;
-} & Props &
-  RemoveAccountMutationResponse;
+} & Props;
 class AccountContainer extends React.Component<FinalProps, {}> {
   popupWindow(url, title, win, w, h) {
     const y = win.top.outerHeight / 2 + win.top.screenY - h / 2;
@@ -55,7 +50,7 @@ class AccountContainer extends React.Component<FinalProps, {}> {
       .then(() => {
         Alert.success('You successfully removed an account');
 
-        this.props.integrationsAccountsQuery.refetch();
+        this.props.twitterAccounts.refetch();
       })
       .catch(e => {
         Alert.error(e.message);
@@ -63,21 +58,17 @@ class AccountContainer extends React.Component<FinalProps, {}> {
   };
 
   render() {
-    const {
-      integrationsAccountsQuery,
-      onSelectAccount,
-      accountId
-    } = this.props;
+    const { twitterAccounts, onSelectAccount, accountId } = this.props;
 
-    if (integrationsAccountsQuery.loading) {
+    if (twitterAccounts.loading) {
       return <Spinner objective={true} />;
     }
 
-    if (integrationsAccountsQuery.error) {
-      return <Info>{integrationsAccountsQuery.error.message}</Info>;
+    if (twitterAccounts.error) {
+      return <Info>{twitterAccounts.error.message}</Info>;
     }
 
-    const accounts = integrationsAccountsQuery.integrationsGetAccounts || [];
+    const accounts = twitterAccounts.twitterGetAccounts || [];
 
     return (
       <Accounts
@@ -93,25 +84,19 @@ class AccountContainer extends React.Component<FinalProps, {}> {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, RemoveAccountMutationResponse>(
-      gql(mutations.removeAccount),
-      {
-        name: 'removeAccount',
-        options: {
-          refetchQueries: ['integrationsGetAccounts']
+    graphql<Props>(gql(mutations.removeAccount), {
+      name: 'removeAccount',
+      options: {
+        refetchQueries: ['integrationsGetAccounts']
+      }
+    }),
+    graphql<Props>(gql(queries.getAccounts), {
+      name: 'twitterAccounts',
+      options: ({ kind }) => ({
+        variables: {
+          kind
         }
-      }
-    ),
-    graphql<Props, AccountsQueryResponse>(
-      gql(queries.integrationsGetAccounts),
-      {
-        name: 'integrationsAccountsQuery',
-        options: ({ kind }) => ({
-          variables: {
-            kind
-          }
-        })
-      }
-    )
+      })
+    })
   )(AccountContainer)
 );

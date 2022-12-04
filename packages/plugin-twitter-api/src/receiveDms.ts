@@ -4,8 +4,6 @@ import {
   IUser
 } from './store';
 import { IModels } from './connectionResolver';
-import Accounts from './models/Accounts';
-
 export interface IUsers {
   [key: string]: IUser;
 }
@@ -51,7 +49,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         attachments.push({ ...extractUrlFromAttachment(attachment) });
       }
 
-      const account = await Accounts.findOne({ uid: receiverId });
+      const account = await models.Accounts.findOne({ uid: receiverId });
 
       if (!account) {
         return;

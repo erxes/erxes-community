@@ -10,10 +10,11 @@ const types = `
 
 const queries = `
   twitterConversationDetail(conversationId: String!): [ITwitter]
+  twitterGetAccounts(kind: String): JSON
 `;
 
 const mutations = `
-  twitterReply(attachments: String, conversationId: String, content: String, integrationId: String): String
+  twitterAccountRemove(_id: String!): String
 `;
 
 const typeDefs = gql`

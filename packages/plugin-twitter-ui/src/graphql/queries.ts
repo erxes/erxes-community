@@ -64,9 +64,9 @@ const integrationsGetIntegrationDetail = `
   }
 `;
 
-const integrationsGetAccounts = `
-  query integrationsGetAccounts($kind: String) {
-    integrationsGetAccounts(kind: $kind)
+const getAccounts = `
+  query twitterGetAccounts($kind: String) {
+    twitterGetAccounts(kind: $kind)
   }
 `;
 
@@ -141,7 +141,7 @@ export default {
   integrationTotalCount,
   integrationsGetConfigs,
   integrationsGetIntegrationDetail,
-  integrationsGetAccounts,
+  getAccounts,
   integrationsGetIntegrations,
   integrationsGetTwitterAccount,
   detail,

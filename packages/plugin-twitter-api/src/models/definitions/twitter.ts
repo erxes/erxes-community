@@ -78,15 +78,10 @@ export interface IConfigDocument extends IConfig, Document {
 }
 
 export interface IAccount {
-  kind: string;
-  email: string;
-  username?: string;
   token: string;
   tokenSecret?: string;
-  expireDate?: string;
-  scope?: string;
   name: string;
-  billingState?: string;
+  kind: string;
   uid: string;
 }
 
@@ -94,20 +89,7 @@ export interface IAccountDocument extends IAccount, Document {}
 
 export const accountSchema = new Schema({
   _id: field({ pkey: true }),
-  kind: {
-    type: String
-  },
-  billingState: {
-    type: String,
-    optional: true
-  },
-  email: {
-    type: String
-  },
-  username: {
-    type: String,
-    optional: true
-  },
+
   token: {
     type: String
   },
@@ -115,15 +97,10 @@ export const accountSchema = new Schema({
     type: String,
     optional: true
   },
-  scope: {
-    type: String,
-    optional: true
-  },
-  expireDate: {
-    type: String,
-    optional: true
-  },
   name: { type: String },
+  kind: {
+    type: String
+  },
   uid: { type: String }
 });
 // Mongoose schemas ===========
