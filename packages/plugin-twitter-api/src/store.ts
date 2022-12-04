@@ -151,3 +151,32 @@ export const getOrCreateConversationAndMessage = async (
   }
   return conversationId;
 };
+
+export const saveReplyMessage = async (
+  models: IModels,
+  subdomain: string,
+  senderId: string,
+  text: string
+) => {
+  const res = await models.Messages.create({
+    senderId: senderId,
+    content: text
+  });
+
+  try {
+    await sendInboxMessage({
+      subdomain,
+      action: 'integrations.receive',
+      data: {
+        action: 'create-or-update-conversation',
+        payload: JSON.stringify({
+          senderId,
+          content: text
+        })
+      },
+      isRPC: true
+    });
+  } catch (e) {
+    throw new Error(e);
+  }
+};

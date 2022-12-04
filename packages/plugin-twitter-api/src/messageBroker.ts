@@ -42,7 +42,10 @@ export const initBroker = async cl => {
 
       try {
         if (action === 'reply') {
-          response = { data: await handleTwitterMessage(models, data) };
+          response = {
+            status: 'success',
+            data: await handleTwitterMessage(models, data)
+          };
         }
       } catch (e) {
         response = {
@@ -50,6 +53,7 @@ export const initBroker = async cl => {
           errorMessage: e.message
         };
       }
+      return response;
     }
   );
 };

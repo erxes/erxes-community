@@ -17,9 +17,19 @@ class Detail extends React.Component<any> {
     const messages = messagesQuery.twitterConversationDetail || [];
 
     return messages.map(message => {
-      // garaar ogson hudlaa utganuud
-      const isStaff = false;
       const isSameUser = false;
+      if (message.data.customer) {
+        const isStaff = false;
+        return (
+          <SimpleMessage
+            message={message.data}
+            isStaff={isStaff}
+            isSameUser={isSameUser}
+          />
+        );
+      }
+      const isStaff = true;
+
       return (
         <SimpleMessage
           message={message.data}

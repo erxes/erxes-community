@@ -16,7 +16,14 @@ export const handleTwitterMessage = async (models: IModels, msg) => {
     try {
       if (content) {
         try {
-          await reply(receiverId, content);
+          const replyMessage = await reply(receiverId, content);
+          console.log('replyMessage', replyMessage);
+          await models.Messages.create({
+            inboxIntegrationId: integrationId,
+            inboxConversationId: conversationId,
+            messageId: replyMessage.event.id,
+            content: replyMessage.event.message_create.message_data.text
+          });
         } catch (e) {
           throw new Error(e.message);
         }

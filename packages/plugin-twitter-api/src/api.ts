@@ -165,14 +165,6 @@ export const registerWebhook = async () => {
   return new Promise(async (resolve, reject) => {
     const webhooks = await retrieveWebhooks().catch(e => {});
 
-    const webhookObj =
-      webhooks &&
-      webhooks.find(webhook => webhook.url === `${DOMAIN}/pl:twitter/webhook`);
-
-    if (webhookObj) {
-      return;
-    }
-
     const requestOptions = {
       url:
         'https://api.twitter.com/1.1/account_activity/all/' +
@@ -233,10 +225,6 @@ export const twitterPutWebhook = async () => {
   const twitterConfig = await getTwitterConfig();
   const webhookResponse = await retrieveWebhooks();
   const webhookId = webhookResponse[0].id;
-
-  console.log('Bearer Token', bearerToken);
-
-  console.log('222222222', webhookId);
 
   return new Promise(async (resolve, reject) => {
     const requestOptions = {
