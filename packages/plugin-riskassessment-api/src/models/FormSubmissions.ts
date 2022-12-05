@@ -41,10 +41,16 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
       const filter = generateFields(params);
 
       const formId = await getFormId(model, cardId, cardType);
-      const { riskAssessmentId } = await model.RiskConfimity.findOne({
+      const conformity = await model.RiskConfimity.findOne({
         cardId,
         cardType
       }).lean();
+
+      if (!conformity) {
+        throw new Error(`Not selected some risk assessment on ${cardType}`);
+      }
+
+      const { riskAssessmentId } = conformity;
 
       const { resultScore, calculateMethod } = await model.RiskAssessment.findOne({
         _id: riskAssessmentId
@@ -67,7 +73,7 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
 
       for (const [key, value] of Object.entries(formSubmissions)) {
         const { optionsValues } = fields.find(field => field._id === key);
-        if(!optionsValues){
+        if (!optionsValues) {
           newSubmission.push({ ...filter, fieldId: key, value });
           break;
         }
@@ -84,16 +90,18 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
           }, [])
           .filter(item => item);
         const fieldValue = optValues.find(option => option.label === value);
-        switch (calculateMethod) {
-          case 'Multiply':
-            sumNumber *= parseInt(fieldValue.value);
-            break;
-          case 'Addition':
-            sumNumber += parseInt(fieldValue.value);
-            break;
-        }
+        if (fieldValue) {
+          switch (calculateMethod) {
+            case 'Multiply':
+              sumNumber *= parseInt(fieldValue.value);
+              break;
+            case 'Addition':
+              sumNumber += parseInt(fieldValue.value);
+              break;
+          }
 
-        newSubmission.push({ ...filter, fieldId: key, value });
+          newSubmission.push({ ...filter, fieldId: key, value });
+        }
       }
 
       await model.RiskAssessment.findOneAndUpdate(
