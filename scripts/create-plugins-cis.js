@@ -16,6 +16,7 @@ var plugins = [
   { name: 'inbox', ui: true, api: true },
   { name: 'automations', ui: true, api: true },
   { name: 'calendar', ui: true },
+  { name: 'cars', ui: true, api: true },
   { name: 'cards', ui: true, api: true },
   { name: 'chats', ui: true, api: true },
   { name: 'clientportal', ui: true, api: true },
@@ -50,7 +51,8 @@ var plugins = [
   { name: 'imap', ui: true, api: true },
   { name: 'block', ui: true, api: true },
   { name: 'assets', ui: true, api: true },
-  { name: 'riskassessment', ui: true, api: true }
+  { name: 'riskassessment', ui: true, api: true },
+  { name: 'forum', ui: true, api: true }
 ];
 
 const pluginsMap = {};
