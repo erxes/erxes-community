@@ -52,6 +52,7 @@ export type OverallWorksCountQueryResponse = {
 export type OverallWorkDetailQueryResponse = {
   overallWorkDetail: IOverallWorkDet;
   loading: boolean;
+  error?: Error;
   refetch: () => void;
 };
 

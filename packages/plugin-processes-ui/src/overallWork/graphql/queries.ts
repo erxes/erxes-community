@@ -45,22 +45,26 @@ const listParamsValue = `
 const detailParamsDef = `
   $startDate: Date
   $endDate: Date
+  $type: String
   $inBranchId: String
   $outBranchId: String
   $inDepartmentId: String
   $outDepartmentId: String
   $productId: String
+  $productCategoryId: String
   $jobReferId: String
 `;
 
 const detailParamsValue = `
   startDate: $startDate
   endDate: $endDate
+  type: $type
   inBranchId: $inBranchId
   outBranchId: $outBranchId
   inDepartmentId: $inDepartmentId
   outDepartmentId: $outDepartmentId
   productId: $productId
+  productCategoryId: $productCategoryId
   jobReferId: $jobReferId
 `;
 

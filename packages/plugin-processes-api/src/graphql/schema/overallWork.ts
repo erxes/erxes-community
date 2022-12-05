@@ -65,12 +65,14 @@ const qryParams = `
 const detailParamsDef = `
   startDate: Date
   endDate: Date
+  type: String
+  productCategoryId: String
+  productId: String
+  jobReferId: String
   inBranchId: String
   outBranchId: String
   inDepartmentId: String
   outDepartmentId: String
-  productId: String
-  jobReferId: String
 `;
 
 export const queries = `

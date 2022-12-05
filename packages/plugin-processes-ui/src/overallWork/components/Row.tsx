@@ -3,10 +3,12 @@ import React from 'react';
 import { FinanceAmount } from '../../styles';
 import { IOverallWork } from '../types';
 import moment from 'moment';
+import queryString from 'query-string';
 
 type Props = {
   work: IOverallWork;
   history: any;
+  queryParams: any;
 };
 
 class PutResponseRow extends React.Component<Props> {
@@ -29,9 +31,19 @@ class PutResponseRow extends React.Component<Props> {
   }
 
   render() {
-    const { work, history } = this.props;
+    const { work, history, queryParams } = this.props;
     const onTrClick = () => {
-      history.push(`/processes/overallWorkDetail`);
+      let typeFilter: any = { jobReferId: work.key.typeId };
+      if (!['job', 'end'].includes(work.type)) {
+        typeFilter = { productId: work.key.typeId };
+      }
+      work.type = history.push(
+        `/processes/overallWorkDetail?${queryString.stringify({
+          ...queryParams,
+          ...work.key,
+          ...typeFilter
+        })}`
+      );
     };
 
     const onClick = e => {

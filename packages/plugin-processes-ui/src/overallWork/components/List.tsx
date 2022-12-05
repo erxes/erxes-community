@@ -12,15 +12,11 @@ import Sidebar from './Sidebar';
 interface IProps extends IRouterProps {
   overallWorks: IOverallWork[];
   totalCount: number;
-  bulk: any[];
-  isAllSelected: boolean;
   history: any;
   queryParams: any;
-
-  summary: any;
 }
 
-class Orders extends React.Component<IProps, {}> {
+class OverallWorks extends React.Component<IProps, {}> {
   constructor(props) {
     super(props);
   }
@@ -46,7 +42,12 @@ class Orders extends React.Component<IProps, {}> {
           </thead>
           <tbody id="overallWorks">
             {(overallWorks || []).map(work => (
-              <Row work={work} key={Math.random()} history={history} />
+              <Row
+                work={work}
+                key={Math.random()}
+                history={history}
+                queryParams={queryParams}
+              />
             ))}
           </tbody>
         </Table>
@@ -74,4 +75,4 @@ class Orders extends React.Component<IProps, {}> {
   }
 }
 
-export default withRouter<IRouterProps>(Orders);
+export default withRouter<IRouterProps>(OverallWorks);

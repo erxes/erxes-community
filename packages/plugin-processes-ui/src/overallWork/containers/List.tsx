@@ -10,7 +10,7 @@ import {
 } from '../types';
 import { queries } from '../graphql';
 import { withRouter } from 'react-router-dom';
-import { Bulk, withProps, router, Spinner } from '@erxes/ui/src';
+import { withProps, router, Spinner } from '@erxes/ui/src';
 
 type Props = {
   queryParams: any;
@@ -45,15 +45,7 @@ class OverallWorksContainer extends React.Component<FinalProps> {
       totalCount
     };
 
-    const ordersList = props => {
-      return <List {...updatedProps} {...props} />;
-    };
-
-    const refetch = () => {
-      this.props.overallWorksQuery.refetch();
-    };
-
-    return <Bulk content={ordersList} refetch={refetch} />;
+    return <List {...updatedProps} />;
   }
 }
 

@@ -1,6 +1,9 @@
 import _ from 'lodash';
+import DetailLeftSidebar from './DetailLeftSidebar';
+import EmptyState from '@erxes/ui/src/components/EmptyState';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import React from 'react';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import {
   __,
   FieldStyle,
@@ -9,16 +12,23 @@ import {
   Table
 } from '@erxes/ui/src';
 import { FinanceAmount, FlexRow } from '../../styles';
-import { IOverallWorkDet } from '../types';
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
+import { IOverallWorkDet } from '../types';
+import { IRouterProps } from '@erxes/ui/src/types';
+import { menuNavs } from '../../constants';
+import { withRouter } from 'react-router-dom';
+import DetailRightSidebar from './DetailRightSidebar';
 
 type Props = {
+  history: any;
+  queryParams: any;
   work: IOverallWorkDet;
-};
+  errorMsg?: string;
+} & IRouterProps;
 
 type State = {};
 
-class PutResponseDetail extends React.Component<Props, State> {
+class OverallWorkDetail extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
@@ -75,42 +85,40 @@ class PutResponseDetail extends React.Component<Props, State> {
     return value;
   };
 
+  renderContent() {
+    const { work, queryParams, history, errorMsg } = this.props;
+    if (errorMsg) {
+      return (
+        <EmptyState
+          text={errorMsg.replace('GraphQL error: ', '')}
+          size="full"
+          image={'/images/actions/11.svg'}
+        />
+      );
+    }
+    return <>MainContent</>;
+  }
+
   render() {
-    const { work } = this.props;
+    const { queryParams, history, work } = this.props;
+
+    const mainContent = this.renderContent();
+
     return (
-      <SidebarList>
-        <Table whiteSpace="nowrap" bordered={true} hover={true}>
-          <thead>
-            <tr>
-              <th>{__('Product')}</th>
-              <th>{__('Count')}</th>
-              <th>{__('Unit Price')}</th>
-              <th>{__('Amount')}</th>
-            </tr>
-          </thead>
-          <tbody id="orderItems">
-            {/* {(work.items || []).map(item => (
-              <tr key={item._id}>
-                <td>{item.productName}</td>
-                <td>{item.count}</td>
-                <td>{item.unitPrice}</td>
-                <td>{item.count * item.unitPrice}</td>
-              </tr>
-            ))} */}
-          </tbody>
-        </Table>
-
-        {this.renderRow('Total Amount', this.displayValue(work, 'totalAmount'))}
-
-        <ul>
-          {this.renderEditRow('Cash Amount', 'cashAmount')}
-          {this.renderEditRow('Card Amount', 'cardAmount')}
-          {this.renderEditRow('Mobile Amount', 'mobileAmount')}
-          {this.renderEditRow('Receivable Amount', 'receivableAmount')}
-        </ul>
-      </SidebarList>
+      <Wrapper
+        header={
+          <Wrapper.Header title={__(`Overall works`)} submenu={menuNavs} />
+        }
+        leftSidebar={
+          <DetailLeftSidebar queryParams={queryParams} history={history} />
+        }
+        rightSidebar={
+          <DetailRightSidebar queryParams={queryParams} work={work} />
+        }
+        content={mainContent}
+      />
     );
   }
 }
 
-export default PutResponseDetail;
+export default withRouter<IRouterProps>(OverallWorkDetail);

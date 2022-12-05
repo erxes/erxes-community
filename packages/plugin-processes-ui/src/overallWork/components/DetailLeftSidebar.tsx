@@ -17,7 +17,6 @@ import { MenuFooter, SidebarFilters } from '../../styles';
 import { SidebarList as List } from '@erxes/ui/src/layout';
 import { Wrapper } from '@erxes/ui/src/layout';
 import { IQueryParams } from '@erxes/ui/src/types';
-import SelectJobCategory from '../../job/containers/category/SelectJobCategory';
 import SelectJobRefer from '../../job/containers/refer/SelectJobRefer';
 import { JOB_TYPE_CHOISES } from '../../constants';
 import Button from '@erxes/ui/src/components/Button';
@@ -37,7 +36,7 @@ const generateQueryParams = ({ location }) => {
   return queryString.parse(location.search);
 };
 
-class Sidebar extends React.Component<Props, State> {
+class DetailLeftSidebar extends React.Component<Props, State> {
   private timer?: NodeJS.Timer;
 
   constructor(props) {
@@ -119,22 +118,6 @@ class Sidebar extends React.Component<Props, State> {
     if (['end', 'job'].includes(filterParams.type)) {
       return (
         <>
-          <FormGroup>
-            <ControlLabel>Job Category</ControlLabel>
-            <SelectJobCategory
-              label="Choose product category"
-              name="productCategoryId"
-              initialValue={filterParams.productCategoryId || ''}
-              customOption={{
-                value: '',
-                label: '...Clear product category filter'
-              }}
-              onSelect={categoryId =>
-                this.setFilter('productCategoryId', categoryId)
-              }
-              multi={false}
-            />
-          </FormGroup>
           <FormGroup>
             <ControlLabel>Job Refer</ControlLabel>
             <SelectJobRefer
@@ -336,4 +319,4 @@ class Sidebar extends React.Component<Props, State> {
   }
 }
 
-export default Sidebar;
+export default DetailLeftSidebar;
