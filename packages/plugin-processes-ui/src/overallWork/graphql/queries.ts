@@ -14,6 +14,7 @@ const paginateParams = `
 
 const listParamsDef = `
   $search: String
+  $type: String
   $startDate: Date
   $endDate: Date
   $inBranchId: String
@@ -28,6 +29,7 @@ const listParamsDef = `
 
 const listParamsValue = `
   search: $search
+  type: $type
   startDate: $startDate
   endDate: $endDate
   inBranchId: $inBranchId
@@ -74,11 +76,22 @@ export const overallWorkFields = `
   }
   type
   workIds
-  name
-  status
   count
   needProducts
   resultProducts
+
+  jobRefer {
+    _id
+    code
+    name
+    categoryId
+  }
+  product {
+    _id
+    code
+    name
+    categoryId
+  }
 
   inDepartment {
     _id

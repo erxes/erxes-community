@@ -1,20 +1,11 @@
-import {
-  __,
-  DataWithLoader,
-  Pagination,
-  Table,
-  Wrapper,
-  BarItems
-} from '@erxes/ui/src';
-import { IRouterProps, IQueryParams } from '@erxes/ui/src/types';
+import { __, DataWithLoader, Pagination, Table, Wrapper } from '@erxes/ui/src';
+import { IRouterProps } from '@erxes/ui/src/types';
 import { menuNavs } from '../../constants';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
 import { TableWrapper } from '../../styles';
 import { IOverallWork } from '../types';
-import HeaderDescription from './MainHead';
-import RightMenu from './RightMenu';
 import Row from './Row';
 import Sidebar from './Sidebar';
 
@@ -26,64 +17,16 @@ interface IProps extends IRouterProps {
   history: any;
   queryParams: any;
 
-  onSearch: (search: string) => void;
-  onFilter: (filterParams: IQueryParams) => void;
-  onSelect: (values: string[] | string, key: string) => void;
-  isFiltered: boolean;
-  clearFilter: () => void;
   summary: any;
 }
 
 class Orders extends React.Component<IProps, {}> {
-  private timer?: NodeJS.Timer = undefined;
-
   constructor(props) {
     super(props);
   }
 
-  moveCursorAtTheEnd = e => {
-    const tmpValue = e.target.value;
-    e.target.value = '';
-    e.target.value = tmpValue;
-  };
-
   render() {
-    const {
-      overallWorks,
-      totalCount,
-      history,
-      queryParams,
-      onFilter,
-      onSelect,
-      onSearch,
-      isFiltered,
-      clearFilter,
-      summary
-    } = this.props;
-
-    const rightMenuProps = {
-      onFilter,
-      onSelect,
-      onSearch,
-      isFiltered,
-      clearFilter,
-      queryParams
-    };
-
-    const actionBarRight = (
-      <BarItems>
-        <RightMenu {...rightMenuProps} />
-      </BarItems>
-    );
-
-    const header = (
-      <HeaderDescription
-        icon="/images/actions/26.svg"
-        title={__('Summary')}
-        summary={summary}
-        actionBar={actionBarRight}
-      />
-    );
+    const { overallWorks, totalCount, history, queryParams } = this.props;
 
     const mainContent = (
       <TableWrapper>
@@ -93,11 +36,11 @@ class Orders extends React.Component<IProps, {}> {
               <th>{__('Type')}</th>
               <th>{__('Job')}</th>
               <th>{__('Product')}</th>
+              <th>{__('Count')}</th>
               <th>{__('In Branch')}</th>
               <th>{__('In Department')}</th>
               <th>{__('Out Branch')}</th>
               <th>{__('Out Department')}</th>
-              <th>{__('Count')}</th>
               <th>{__('Actions')}</th>
             </tr>
           </thead>
@@ -113,20 +56,15 @@ class Orders extends React.Component<IProps, {}> {
     return (
       <Wrapper
         header={
-          <Wrapper.Header
-            title={__(`Overall works`)}
-            queryParams={queryParams}
-            submenu={menuNavs}
-          />
+          <Wrapper.Header title={__(`Overall works`)} submenu={menuNavs} />
         }
-        mainHead={header}
         leftSidebar={<Sidebar queryParams={queryParams} history={history} />}
         footer={<Pagination count={totalCount} />}
         content={
           <DataWithLoader
             data={mainContent}
             loading={false}
-            count={(overallWorks || []).length}
+            count={totalCount}
             emptyText="Add in your first work!"
             emptyImage="/images/actions/1.svg"
           />

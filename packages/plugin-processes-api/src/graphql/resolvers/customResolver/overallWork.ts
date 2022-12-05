@@ -1,10 +1,10 @@
+import { IContext } from '../../../connectionResolver';
 import {
   IOverallProductsData,
   IOverallWork
 } from './../../../models/definitions/overallWorks';
-import { IContext } from '../../../connectionResolver';
-import { sendCoreMessage } from '../../../messageBroker';
-import { IJobRefer } from '../../../models/definitions/jobs';
+import { JOB_TYPES } from '../../../models/definitions/constants';
+import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
 
 const getProductsData = productsData => {
   const quantityByKey = {};
@@ -43,13 +43,29 @@ export default {
     return type;
   },
 
-  async job(work: IOverallWork, {}, { models }: IContext) {
-    const { jobId } = work;
-    const jobRefer: IJobRefer | null = await models.JobRefers.findOne({
-      _id: jobId
-    });
+  async jobRefer(work: IOverallWork, {}, { models }: IContext) {
+    const { key } = work;
+    const { type, typeId } = key;
+    if (![JOB_TYPES.ENDPOINT, JOB_TYPES.JOB].includes(type)) {
+      return;
+    }
 
-    return { label: jobRefer?.name || '', description: jobRefer?.code || '' };
+    return await models.JobRefers.findOne({ _id: typeId }).lean();
+  },
+
+  async product(work: IOverallWork, {}, { subdomain }: IContext) {
+    const { key } = work;
+    const { type, typeId } = key;
+    if ([JOB_TYPES.ENDPOINT, JOB_TYPES.JOB].includes(type)) {
+      return;
+    }
+
+    return await sendProductsMessage({
+      subdomain,
+      action: 'findOne',
+      data: { _id: typeId },
+      isRPC: true
+    });
   },
 
   async inBranch(work: IOverallWork, {}, { subdomain }: IContext) {

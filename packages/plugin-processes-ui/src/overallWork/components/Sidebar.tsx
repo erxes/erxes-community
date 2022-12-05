@@ -1,46 +1,98 @@
-import { SidebarList as List } from '@erxes/ui/src/layout';
-import { Wrapper } from '@erxes/ui/src/layout';
-import { __, router } from '@erxes/ui/src/utils';
-import React from 'react';
-import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import { SidebarFilters } from '../../styles';
+import FormGroup from '@erxes/ui/src/components/form/Group';
 import Icon from '@erxes/ui/src/components/Icon';
-import Tip from '@erxes/ui/src/components/Tip';
+import moment from 'moment';
+import queryString from 'query-string';
+import React from 'react';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
+import Tip from '@erxes/ui/src/components/Tip';
+import { __, router } from '@erxes/ui/src/utils';
 import { DateContainer } from '@erxes/ui/src/styles/main';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
-import moment from 'moment';
+import { MenuFooter, SidebarFilters } from '../../styles';
+import { SidebarList as List } from '@erxes/ui/src/layout';
+import { Wrapper } from '@erxes/ui/src/layout';
+import { IQueryParams } from '@erxes/ui/src/types';
+import SelectJobCategory from '../../job/containers/category/SelectJobCategory';
+import SelectJobRefer from '../../job/containers/refer/SelectJobRefer';
+import { JOB_TYPE_CHOISES } from '../../constants';
+import Button from '@erxes/ui/src/components/Button';
 
 interface Props {
   history: any;
   queryParams: any;
 }
 
+type State = {
+  filterParams: IQueryParams;
+};
+
 const { Section } = Wrapper.Sidebar;
 
-class Sidebar extends React.Component<Props> {
+const generateQueryParams = ({ location }) => {
+  return queryString.parse(location.search);
+};
+
+class Sidebar extends React.Component<Props, State> {
   private timer?: NodeJS.Timer;
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      filterParams: this.props.queryParams
+    };
+  }
+
+  onSelect = (values: string[] | string, key: string) => {
+    const params = generateQueryParams(this.props.history);
+    router.removeParams(this.props.history, 'page');
+
+    if (params[key] === values) {
+      return router.removeParams(this.props.history, key);
+    }
+
+    return router.setParams(this.props.history, { [key]: values });
+  };
+
+  isFiltered = (): boolean => {
+    const params = generateQueryParams(this.props.history);
+
+    for (const param in params) {
+      if (
+        [
+          'type',
+          'startDate',
+          'endDate',
+          'jobReferId',
+          'jobCategoryId',
+          'productId',
+          'productCategoryId',
+          'inBranchId',
+          'inDepartmentId',
+          'outBranchId',
+          'outDepartmentId'
+        ].includes(param)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   clearFilter = () => {
-    router.removeParams(
-      this.props.history,
-      'date',
-      'filterStatus',
-      'branchId',
-      'departmentId',
-      'productCategoryId',
-      'productId'
-    );
+    const params = generateQueryParams(this.props.history);
+    router.removeParams(this.props.history, ...Object.keys(params));
   };
 
   setFilter = (name, value) => {
-    router.removeParams(this.props.history, 'page');
-    router.setParams(this.props.history, { [name]: value });
+    const { filterParams } = this.state;
+    this.setState({ filterParams: { ...filterParams, [name]: value } });
   };
 
   onInputChange = e => {
@@ -57,25 +109,107 @@ class Sidebar extends React.Component<Props> {
     }, 500);
   };
 
-  onSelectDate = value => {
-    const strVal = moment(value).format('YYYY/MM/DD');
-    this.setFilter('date', strVal);
+  onSelectDate = (value, name) => {
+    console.log(value, name);
+    const strVal = moment(value).format('YYYY-MM-DD HH:mm');
+    this.setFilter(name, strVal);
   };
 
+  runFilter = () => {
+    const { filterParams } = this.state;
+    router.removeParams(this.props.history, 'page');
+    router.setParams(this.props.history, { ...filterParams });
+  };
+
+  renderSpec() {
+    const { filterParams } = this.state;
+
+    if (!filterParams.type) {
+      return '';
+    }
+
+    if (['end', 'job'].includes(filterParams.type)) {
+      return (
+        <>
+          <FormGroup>
+            <ControlLabel>Job Category</ControlLabel>
+            <SelectJobCategory
+              label="Choose product category"
+              name="productCategoryId"
+              initialValue={filterParams.productCategoryId || ''}
+              customOption={{
+                value: '',
+                label: '...Clear product category filter'
+              }}
+              onSelect={categoryId =>
+                this.setFilter('productCategoryId', categoryId)
+              }
+              multi={false}
+            />
+          </FormGroup>
+          <FormGroup>
+            <ControlLabel>Job Refer</ControlLabel>
+            <SelectJobRefer
+              label="Choose jobRefer"
+              name="jobReferId"
+              initialValue={filterParams.jobReferId || ''}
+              customOption={{
+                value: '',
+                label: '...Clear jobRefer filter'
+              }}
+              onSelect={jobReferId => this.setFilter('jobReferId', jobReferId)}
+              multi={false}
+            />
+          </FormGroup>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <FormGroup>
+          <ControlLabel>Product Category</ControlLabel>
+          <SelectProductCategory
+            label="Choose product category"
+            name="productCategoryId"
+            initialValue={filterParams.productCategoryId || ''}
+            customOption={{
+              value: '',
+              label: '...Clear product category filter'
+            }}
+            onSelect={categoryId =>
+              this.setFilter('productCategoryId', categoryId)
+            }
+            multi={false}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Product</ControlLabel>
+          <SelectProducts
+            label="Choose product"
+            name="productId"
+            initialValue={filterParams.productId || ''}
+            customOption={{
+              value: '',
+              label: '...Clear product filter'
+            }}
+            onSelect={productId => this.setFilter('productId', productId)}
+            multi={false}
+          />
+        </FormGroup>
+      </>
+    );
+  }
+
   render() {
-    const { queryParams } = this.props;
+    const { filterParams } = this.state;
 
     return (
       <Wrapper.Sidebar hasBorder>
         <Section.Title>
           {__('Filters')}
           <Section.QuickButtons>
-            {(router.getParam(this.props.history, 'filterStatus') ||
-              router.getParam(this.props.history, 'branchId') ||
-              router.getParam(this.props.history, 'departmentId') ||
-              router.getParam(this.props.history, 'productCategoryId') ||
-              router.getParam(this.props.history, 'productId') ||
-              router.getParam(this.props.history, 'date')) && (
+            {this.isFiltered() && (
               <a href="#cancel" tabIndex={0} onClick={this.clearFilter}>
                 <Tip text={__('Clear filter')} placement="bottom">
                   <Icon icon="cancel-1" />
@@ -87,105 +221,127 @@ class Sidebar extends React.Component<Props> {
         <SidebarFilters>
           <List id="SettingsSidebar">
             <FormGroup>
-              <ControlLabel required={true}>{__(`Date`)}</ControlLabel>
-              <DateContainer>
-                <DateControl
-                  name="createdAtFrom"
-                  placeholder="Choose date"
-                  value={queryParams.date || ''}
-                  onChange={this.onSelectDate}
-                />
-              </DateContainer>
+              <ControlLabel>Type</ControlLabel>
+              <FormControl
+                name="type"
+                componentClass="select"
+                defaultValue={filterParams.type}
+                required={false}
+                onChange={e =>
+                  this.setFilter(
+                    'type',
+                    (e.currentTarget as HTMLInputElement).value
+                  )
+                }
+              >
+                <option value="">All type</option>
+                {Object.keys(JOB_TYPE_CHOISES).map(jt => (
+                  <option value={jt} key={Math.random()}>
+                    {JOB_TYPE_CHOISES[jt]}
+                  </option>
+                ))}
+              </FormControl>
             </FormGroup>
+            {this.renderSpec()}
             <FormGroup>
-              <ControlLabel>Branch</ControlLabel>
+              <ControlLabel>In Branch</ControlLabel>
               <SelectBranches
                 label="Choose branch"
-                name="branchId"
-                initialValue={queryParams.branchId || ''}
+                name="inBranchId"
+                initialValue={filterParams.inBranchId || ''}
                 customOption={{
                   value: '',
                   label: '...Clear branch filter'
                 }}
-                onSelect={branchId => this.setFilter('branchId', branchId)}
+                onSelect={branchId => this.setFilter('inBranchId', branchId)}
                 multi={false}
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Department</ControlLabel>
+              <ControlLabel>In Department</ControlLabel>
               <SelectDepartments
                 label="Choose department"
-                name="departmentId"
-                initialValue={queryParams.departmentId || ''}
+                name="inDepartmentId"
+                initialValue={filterParams.inDepartmentId || ''}
                 customOption={{
                   value: '',
                   label: '...Clear department filter'
                 }}
                 onSelect={departmentId =>
-                  this.setFilter('departmentId', departmentId)
+                  this.setFilter('inDepartmentId', departmentId)
                 }
                 multi={false}
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Product Category</ControlLabel>
-              <SelectProductCategory
-                label="Choose product category"
-                name="productCategoryId"
-                initialValue={queryParams.productCategoryId || ''}
+              <ControlLabel>Out Branch</ControlLabel>
+              <SelectBranches
+                label="Choose branch"
+                name="outBranchId"
+                initialValue={filterParams.outBranchId || ''}
                 customOption={{
                   value: '',
-                  label: '...Clear product category filter'
+                  label: '...Clear branch filter'
                 }}
-                onSelect={categoryId =>
-                  this.setFilter('productCategoryId', categoryId)
-                }
+                onSelect={branchId => this.setFilter('outBranchId', branchId)}
                 multi={false}
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Product</ControlLabel>
-              <SelectProducts
-                label="Choose product"
-                name="productId"
-                initialValue={queryParams.productId || ''}
+              <ControlLabel>Out Department</ControlLabel>
+              <SelectDepartments
+                label="Choose department"
+                name="outDepartmentId"
+                initialValue={filterParams.outDepartmentId || ''}
                 customOption={{
                   value: '',
-                  label: '...Clear product filter'
+                  label: '...Clear department filter'
                 }}
-                onSelect={productId => this.setFilter('productId', productId)}
+                onSelect={departmentId =>
+                  this.setFilter('outDepartmentId', departmentId)
+                }
                 multi={false}
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Status</ControlLabel>
-              <FormControl
-                name="filterStatus"
-                componentClass="select"
-                defaultValue={queryParams.filterStatus}
-                required={false}
-                onChange={e =>
-                  this.setFilter(
-                    'filterStatus',
-                    (e.currentTarget as HTMLInputElement).value
-                  )
-                }
-              >
-                <option key={''} value={''}>
-                  {' '}
-                  {'All status'}{' '}
-                </option>
-                <option key={'active'} value={'active'}>
-                  {' '}
-                  {'active'}{' '}
-                </option>
-                <option key={'archived'} value={'archived'}>
-                  {' '}
-                  {'archived'}{' '}
-                </option>
-              </FormControl>
+              <ControlLabel required={true}>{__(`Start Date`)}</ControlLabel>
+              <DateContainer>
+                <DateControl
+                  name="startDate"
+                  dateFormat="YYYY/MM/DD"
+                  timeFormat={true}
+                  placeholder="Choose date"
+                  value={filterParams.startDate || ''}
+                  onChange={value => this.onSelectDate(value, 'startDate')}
+                />
+              </DateContainer>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel required={true}>{__(`End Date`)}</ControlLabel>
+              <DateContainer>
+                <DateControl
+                  name="endDate"
+                  dateFormat="YYYY/MM/DD"
+                  timeFormat={true}
+                  placeholder="Choose date"
+                  defaultValue={filterParams.startDate || ''}
+                  value={filterParams.endDate || ''}
+                  onChange={value => this.onSelectDate(value, 'endDate')}
+                />
+              </DateContainer>
             </FormGroup>
           </List>
+          <MenuFooter>
+            <Button
+              block={true}
+              btnStyle="success"
+              uppercase={false}
+              onClick={this.runFilter}
+              icon="filter"
+            >
+              {__('Filter')}
+            </Button>
+          </MenuFooter>
         </SidebarFilters>
       </Wrapper.Sidebar>
     );

@@ -3,8 +3,8 @@ const commontTypes = `
   key: OverallWorkId
   workIds: [String]
   type: String
-  name: String
-  status: String
+  jobRefer: JobRefer
+  product: Product
   count: Float
   needProducts: JSON
   resultProducts: JSON
@@ -49,6 +49,7 @@ const paginateParams = `
 
 const qryParams = `
   search: String
+  type: String
   startDate: Date
   endDate: Date
   inBranchId: String

@@ -1,4 +1,4 @@
-import { getPureDate } from '@erxes/api-utils/src/core';
+import { getPureDate, getToday, getTomorrow } from '@erxes/api-utils/src/core';
 // import {
 //   checkPermission,
 //   requireLogin
@@ -7,6 +7,7 @@ import { IContext } from '../../../connectionResolver';
 
 interface IParam {
   search: string;
+  type: string;
   startDate: Date;
   endDate: Date;
   inBranchId: string;
@@ -28,7 +29,8 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
     inDepartmentId,
     outBranchId,
     outDepartmentId,
-    jobReferId
+    jobReferId,
+    type
   } = params;
   const selector: any = { ...commonQuerySelector };
 
@@ -47,13 +49,21 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
     selector.name = new RegExp(`.*${search}.*`, 'i');
   }
 
-  if (outBranchId && outDepartmentId) {
+  if (type) {
+    selector.type = type;
+  }
+
+  if (outBranchId) {
     selector.outBranchId = outBranchId;
+  }
+  if (outDepartmentId) {
     selector.outDepartmentId = outDepartmentId;
   }
 
-  if (inBranchId && inDepartmentId) {
+  if (inBranchId) {
     selector.inBranchId = inBranchId;
+  }
+  if (inDepartmentId) {
     selector.inDepartmentId = inDepartmentId;
   }
 
@@ -61,14 +71,11 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
     selector.jobId = jobReferId;
   }
 
-  if (!Object.keys(selector)) {
+  if (!Object.keys(selector).length) {
     const dueQry: any = {};
-    if (startDate) {
-      dueQry.$gte = getPureDate(startDate);
-    }
-    if (endDate) {
-      dueQry.$lte = getPureDate(endDate);
-    }
+    dueQry.$gte = getPureDate(getToday(getPureDate(new Date(), -1)));
+    dueQry.$lte = getPureDate(getTomorrow(getPureDate(new Date(), -1)));
+
     if (Object.keys(dueQry).length) {
       selector.dueDate = dueQry;
     }
@@ -87,6 +94,7 @@ const overallWorkQueries = {
     { models, commonQuerySelector }: IContext
   ) {
     const selector = generateFilter(params, commonQuerySelector);
+
     const { page = 0, perPage = 0 } = params;
     const _page = Number(page || '1');
     const _limit = Number(perPage || '20');

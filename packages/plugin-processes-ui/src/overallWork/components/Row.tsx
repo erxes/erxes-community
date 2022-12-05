@@ -16,16 +16,17 @@ class PutResponseRow extends React.Component<Props> {
     }
     return `${obj.code} - ${obj.title}`;
   }
+
+  displayWithNameInfo(obj) {
+    if (!obj) {
+      return '';
+    }
+    return `${obj.code} - ${obj.name}`;
+  }
   displayValue(work, name) {
     const value = _.get(work, name);
     return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
   }
-
-  // modalContent = _props => {
-  //   const { work } = this.props;
-
-  //   return <Detail work={work} />;
-  // };
 
   render() {
     const { work, history } = this.props;
@@ -40,13 +41,13 @@ class PutResponseRow extends React.Component<Props> {
     return (
       <tr onClick={onTrClick} key={Math.random()}>
         <td>{work.type}</td>
-        <td>{}</td>
-        <td>{}</td>
+        <td>{this.displayWithNameInfo(work.jobRefer)}</td>
+        <td>{this.displayWithNameInfo(work.product)}</td>
+        <td key={'receivableAmount'}>{this.displayValue(work, 'count')}</td>
         <td>{this.displayLocInfo(work.inBranch)}</td>
         <td>{this.displayLocInfo(work.inDepartment)}</td>
         <td>{this.displayLocInfo(work.outBranch)}</td>
         <td>{this.displayLocInfo(work.outDepartment)}</td>
-        <td key={'receivableAmount'}>{this.displayValue(work, 'count')}</td>
         <td key={'actions'} onClick={onClick}></td>
       </tr>
     );

@@ -1,7 +1,6 @@
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
 import List from '../components/List';
-import queryString from 'query-string';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
@@ -12,7 +11,6 @@ import {
 import { queries } from '../graphql';
 import { withRouter } from 'react-router-dom';
 import { Bulk, withProps, router, Spinner } from '@erxes/ui/src';
-import { IQueryParams } from '@erxes/ui/src/types';
 
 type Props = {
   queryParams: any;
@@ -25,66 +23,10 @@ type FinalProps = {
 } & Props &
   IRouterProps;
 
-const generateQueryParams = ({ location }) => {
-  return queryString.parse(location.search);
-};
-
 class OverallWorksContainer extends React.Component<FinalProps> {
   constructor(props) {
     super(props);
   }
-
-  onSearch = (search: string) => {
-    router.removeParams(this.props.history, 'page');
-
-    if (!search) {
-      return router.removeParams(this.props.history, 'search');
-    }
-
-    router.setParams(this.props.history, { search });
-  };
-
-  onSelect = (values: string[] | string, key: string) => {
-    const params = generateQueryParams(this.props.history);
-    router.removeParams(this.props.history, 'page');
-
-    if (params[key] === values) {
-      return router.removeParams(this.props.history, key);
-    }
-
-    return router.setParams(this.props.history, { [key]: values });
-  };
-
-  onFilter = (filterParams: IQueryParams) => {
-    router.removeParams(this.props.history, 'page');
-
-    for (const key of Object.keys(filterParams)) {
-      if (filterParams[key]) {
-        router.setParams(this.props.history, { [key]: filterParams[key] });
-      } else {
-        router.removeParams(this.props.history, key);
-      }
-    }
-
-    return router;
-  };
-
-  isFiltered = (): boolean => {
-    const params = generateQueryParams(this.props.history);
-
-    for (const param in params) {
-      if ([''].includes(param)) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-  clearFilter = () => {
-    const params = generateQueryParams(this.props.history);
-    router.removeParams(this.props.history, ...Object.keys(params));
-  };
 
   render() {
     const { overallWorksQuery, overallWorksCountQuery } = this.props;
@@ -100,13 +42,7 @@ class OverallWorksContainer extends React.Component<FinalProps> {
     const updatedProps = {
       ...this.props,
       overallWorks,
-      totalCount,
-
-      onFilter: this.onFilter,
-      onSelect: this.onSelect,
-      onSearch: this.onSearch,
-      isFiltered: this.isFiltered(),
-      clearFilter: this.clearFilter
+      totalCount
     };
 
     const ordersList = props => {
@@ -127,11 +63,13 @@ const generateParams = ({ queryParams }) => ({
   sortDirection: queryParams.sortDirection
     ? parseInt(queryParams.sortDirection, 10)
     : undefined,
-  search: queryParams.search,
+  type: queryParams.type,
   startDate: queryParams.startDate,
   endDate: queryParams.endDate,
-  branchId: queryParams.branchId,
-  departmentId: queryParams.departmentId,
+  inBranchId: queryParams.inBranchId,
+  inDepartmentId: queryParams.inDepartmentId,
+  outBranchId: queryParams.outBranchId,
+  outDepartmentId: queryParams.outDepartmentId,
   productCategoryId: queryParams.productCategoryId,
   productId: queryParams.productId,
   jobCategoryId: queryParams.jobCategoryId,

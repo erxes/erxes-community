@@ -1,5 +1,8 @@
-import { QueryResponse } from '@erxes/ui/src/types';
 import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+
+import { IProduct } from '@erxes/ui-products/src/types';
+import { QueryResponse } from '@erxes/ui/src/types';
+import { IJobRefer } from '../job/types';
 
 export interface IOverallWorkKey {
   type: string;
@@ -14,16 +17,15 @@ export interface IOverallWork {
   key: IOverallWorkKey;
   type: string;
   workIds: string[];
-  name: string;
-  status: string;
   count: number;
   needProducts: any;
   resultProducts: any;
-
-  inDepartment: IDepartment;
-  inBranch: IBranch;
-  outDepartment: IDepartment;
-  outBranch: IBranch;
+  jobRefer?: IJobRefer;
+  product?: IProduct;
+  inDepartment?: IDepartment;
+  inBranch?: IBranch;
+  outDepartment?: IDepartment;
+  outBranch?: IBranch;
 }
 
 export type IOverallWorkDet = {

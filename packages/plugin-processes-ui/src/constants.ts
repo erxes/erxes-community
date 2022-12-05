@@ -31,8 +31,8 @@ export const menuSettings = [
 ];
 
 export const menuNavs = [
-  { title: 'OverallWorks', link: '/processes/overallWorks' },
-  { title: 'Assignments', link: '/processes/performances' },
+  { title: 'Overall Works', link: '/processes/overallWorks' },
+  { title: 'Overall Work Detail', link: '/processes/overallWorkDetail' },
   { title: 'Works', link: '/processes/works' },
   { title: 'Performances', link: '/processes/performanceList' }
 ];
