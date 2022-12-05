@@ -1,4 +1,4 @@
-import { paginate } from '@erxes/api-utils/src/core';
+import { getPureDate } from '@erxes/api-utils/src/core';
 // import {
 //   checkPermission,
 //   requireLogin
@@ -6,23 +6,24 @@ import { paginate } from '@erxes/api-utils/src/core';
 import { IContext } from '../../../connectionResolver';
 
 interface IParam {
-  searchValue?: string;
-  inBranchId?: string;
-  inDepartmentId?: string;
-  outBranchId?: string;
-  outDepartmentId?: string;
-  ids: string[];
-  excludeIds: boolean;
-  id: string;
+  search: string;
+  startDate: Date;
+  endDate: Date;
+  inBranchId: string;
+  outBranchId: string;
+  inDepartmentId: string;
+  outDepartmentId: string;
+  productCategoryId: string;
+  productId: string;
+  jobCategoryId: string;
   jobReferId: string;
 }
 
 const generateFilter = (params: IParam, commonQuerySelector) => {
   const {
-    searchValue,
-    ids,
-    id,
-    excludeIds,
+    search,
+    startDate,
+    endDate,
     inBranchId,
     inDepartmentId,
     outBranchId,
@@ -31,12 +32,19 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
   } = params;
   const selector: any = { ...commonQuerySelector };
 
-  if (id) {
-    selector._id = id;
+  const dueQry: any = {};
+  if (startDate) {
+    dueQry.$gte = getPureDate(startDate);
+  }
+  if (endDate) {
+    dueQry.$lte = getPureDate(endDate);
+  }
+  if (Object.keys(dueQry).length) {
+    selector.dueDate = dueQry;
   }
 
-  if (searchValue) {
-    selector.name = new RegExp(`.*${searchValue}.*`, 'i');
+  if (search) {
+    selector.name = new RegExp(`.*${search}.*`, 'i');
   }
 
   if (outBranchId && outDepartmentId) {
@@ -53,8 +61,17 @@ const generateFilter = (params: IParam, commonQuerySelector) => {
     selector.jobId = jobReferId;
   }
 
-  if (ids && ids.length > 0) {
-    selector._id = { [excludeIds ? '$nin' : '$in']: ids };
+  if (!Object.keys(selector)) {
+    const dueQry: any = {};
+    if (startDate) {
+      dueQry.$gte = getPureDate(startDate);
+    }
+    if (endDate) {
+      dueQry.$lte = getPureDate(endDate);
+    }
+    if (Object.keys(dueQry).length) {
+      selector.dueDate = dueQry;
+    }
   }
 
   return selector;
@@ -70,7 +87,11 @@ const overallWorkQueries = {
     { models, commonQuerySelector }: IContext
   ) {
     const selector = generateFilter(params, commonQuerySelector);
-    await models.Works.aggregate([
+    const { page = 0, perPage = 0 } = params;
+    const _page = Number(page || '1');
+    const _limit = Number(perPage || '20');
+
+    const res = await models.Works.aggregate([
       { $match: selector },
       { $sort: { dueDate: 1 } },
       {
@@ -84,7 +105,8 @@ const overallWorkQueries = {
           needProducts: 1,
           resultProducts: 1,
           type: 1,
-          typeId: 1
+          typeId: 1,
+          count: 1
         }
       },
       {
@@ -98,11 +120,57 @@ const overallWorkQueries = {
             typeId: '$typeId'
           },
           needProducts: { $push: '$needProducts' },
-          resultProducts: { $push: '$resultProducts' }
+          resultProducts: { $push: '$resultProducts' },
+          workIds: { $push: '$_id' },
+          count: { $sum: '$count' }
+        }
+      },
+      {
+        $skip: (_page - 1) * _limit
+      },
+      {
+        $limit: _limit
+      }
+    ]);
+    console.log(res);
+    return res;
+  },
+
+  async overallWorksCount(
+    _root,
+    params: IParam & {
+      page: number;
+      perPage: number;
+    },
+    { models, commonQuerySelector }: IContext
+  ) {
+    const selector = generateFilter(params, commonQuerySelector);
+
+    const res = await models.Works.aggregate([
+      { $match: selector },
+      {
+        $project: {
+          _id: 1,
+          inBranchId: 1,
+          inDepartmentId: 1,
+          outBranchId: 1,
+          outDepartmentId: 1
+        }
+      },
+      {
+        $group: {
+          _id: {
+            inBranchId: '$inBranchId',
+            inDepartmentId: '$inDepartmentId',
+            outBranchId: '$outBranchId',
+            outDepartmentId: '$outDepartmentId',
+            type: '$type',
+            typeId: '$typeId'
+          }
         }
       }
     ]);
-    return paginate(models.OverallWorks.find(selector).lean(), { ...params });
+    return res.length;
   },
 
   overallWorksSideBar(

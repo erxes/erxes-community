@@ -1,15 +1,20 @@
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
-export interface IOverallWork {
-  _id: string;
-  workIds: string[];
-  name: string;
-  status: string;
+export interface IOverallWorkKey {
+  type: string;
+  typeId: string;
   inBranchId: string;
   inDepartmentId: string;
   outBranchId: string;
   outDepartmentId: string;
+}
+export interface IOverallWork {
+  _id: IOverallWorkKey;
+  type: string;
+  workIds: string[];
+  name: string;
+  status: string;
   count: number;
   needProducts: any;
   resultProducts: any;

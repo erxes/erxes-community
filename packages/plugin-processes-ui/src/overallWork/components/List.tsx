@@ -2,7 +2,6 @@ import {
   __,
   DataWithLoader,
   Pagination,
-  SortHandler,
   Table,
   Wrapper,
   BarItems
@@ -13,14 +12,14 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 
 import { TableWrapper } from '../../styles';
-import { IWork } from '../types';
+import { IOverallWork } from '../types';
 import HeaderDescription from './MainHead';
 import RightMenu from './RightMenu';
 import Row from './Row';
 
 interface IProps extends IRouterProps {
-  works: IWork[];
-  loading: boolean;
+  overallWorks: IOverallWork[];
+  totalCount: number;
   bulk: any[];
   isAllSelected: boolean;
   history: any;
@@ -32,9 +31,6 @@ interface IProps extends IRouterProps {
   isFiltered: boolean;
   clearFilter: () => void;
   summary: any;
-
-  onSyncErkhet: (workId: string) => void;
-  onReturnBill: (workId: string) => void;
 }
 
 class Orders extends React.Component<IProps, {}> {
@@ -52,18 +48,16 @@ class Orders extends React.Component<IProps, {}> {
 
   render() {
     const {
-      works,
+      overallWorks,
+      totalCount,
       history,
-      loading,
       queryParams,
       onFilter,
       onSelect,
       onSearch,
       isFiltered,
       clearFilter,
-      summary,
-      onSyncErkhet,
-      onReturnBill
+      summary
     } = this.props;
 
     const rightMenuProps = {
@@ -95,60 +89,20 @@ class Orders extends React.Component<IProps, {}> {
         <Table whiteSpace="nowrap" bordered={true} hover={true}>
           <thead>
             <tr>
-              <th>
-                <SortHandler sortField={'number'} label={__('Bill number')} />
-              </th>
-              <th>
-                <SortHandler sortField={'paidDate'} label={__('Date')} />
-              </th>
-              <th>
-                <SortHandler
-                  sortField={'cashAmount'}
-                  label={__('Cash Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler
-                  sortField={'receivableAmount'}
-                  label={__('Receivable Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler
-                  sortField={'cardAmount'}
-                  label={__('Card Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler
-                  sortField={'mobileAmount'}
-                  label={__('Mobile Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler sortField={'totalAmount'} label={__('Amount')} />
-              </th>
-              <th>
-                <SortHandler sortField={'customerId'} label={__('Customer')} />
-              </th>
-              <th>
-                <SortHandler sortField={'posName'} label={__('Pos')} />
-              </th>
-              <th>
-                <SortHandler sortField={'user'} label={__('User')} />
-              </th>
-              <th>Үйлдлүүд</th>
+              <th>{__('Type')}</th>
+              <th>{__('Job')}</th>
+              <th>{__('Product')}</th>
+              <th>{__('In Branch')}</th>
+              <th>{__('In Department')}</th>
+              <th>{__('Out Branch')}</th>
+              <th>{__('Out Department')}</th>
+              <th>{__('Count')}</th>
+              <th>{__('Actions')}</th>
             </tr>
           </thead>
-          <tbody id="works">
-            {(works || []).map(work => (
-              <Row
-                work={work}
-                key={work._id}
-                history={history}
-                onSyncErkhet={onSyncErkhet}
-                onReturnBill={onReturnBill}
-              />
+          <tbody id="overallWorks">
+            {(overallWorks || []).map(work => (
+              <Row work={work} key={Math.random()} history={history} />
             ))}
           </tbody>
         </Table>
@@ -165,12 +119,12 @@ class Orders extends React.Component<IProps, {}> {
           />
         }
         mainHead={header}
-        footer={<Pagination count={(summary || {}).count} />}
+        footer={<Pagination count={totalCount} />}
         content={
           <DataWithLoader
             data={mainContent}
-            loading={loading}
-            count={(works || []).length}
+            loading={false}
+            count={(overallWorks || []).length}
             emptyText="Add in your first work!"
             emptyImage="/images/actions/1.svg"
           />

@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Button from '@erxes/ui/src/components/Button';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import React from 'react';
 import {

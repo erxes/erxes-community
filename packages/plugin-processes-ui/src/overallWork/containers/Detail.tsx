@@ -1,11 +1,13 @@
+import { IRouterProps } from '@erxes/ui/src/types';
+import { withRouter } from 'react-router-dom';
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
 import Detail from '../components/Detail';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { IOverallWork } from '../types';
-import { WorkDetailQueryResponse } from '../types';
-import { queries, mutations } from '../graphql';
+import { OverallWorkDetailQueryResponse } from '../types';
+import { queries } from '../graphql';
 import { Spinner, withProps } from '@erxes/ui/src';
 
 type Props = {
@@ -13,8 +15,9 @@ type Props = {
 };
 
 type FinalProps = {
-  workDetailQuery: WorkDetailQueryResponse;
-} & Props;
+  overallWorkDetailQuery: OverallWorkDetailQueryResponse;
+} & Props &
+  IRouterProps;
 
 class OrdersDetailContainer extends React.Component<FinalProps> {
   constructor(props) {
@@ -26,13 +29,13 @@ class OrdersDetailContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { workDetailQuery } = this.props;
+    const { overallWorkDetailQuery } = this.props;
 
-    if (workDetailQuery.loading) {
+    if (overallWorkDetailQuery.loading) {
       return <Spinner />;
     }
 
-    const work = workDetailQuery.overallWorkDetail;
+    const work = overallWorkDetailQuery.overallWorkDetail;
 
     const updatedProps = {
       ...this.props,
@@ -45,17 +48,17 @@ class OrdersDetailContainer extends React.Component<FinalProps> {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, WorkDetailQueryResponse, { _id: string }>(
+    graphql<{ queryParams }, OverallWorkDetailQueryResponse, {}>(
       gql(queries.overallWorkDetail),
       {
-        name: 'workDetailQuery',
-        options: ({ work }) => ({
-          variables: {
-            _id: work._id || ''
-          },
-          fetchPolicy: 'network-only'
-        })
+        name: 'overallWorkDetailQuery'
+        // options: ({ work }) => ({
+        //   variables: {
+        //     _id: work._id || ''
+        //   },
+        //   fetchPolicy: 'network-only'
+        // })
       }
     )
-  )(OrdersDetailContainer)
+  )(withRouter<IRouterProps>(OrdersDetailContainer))
 );

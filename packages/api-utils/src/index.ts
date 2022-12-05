@@ -37,6 +37,7 @@ import { field, schemaWrapper } from './definitions/utils';
 
 import { IColumnLabel } from './types';
 import { afterQueryWrapper } from './quiriesWrappers';
+import { getPureDate } from './core';
 
 export { getEnv }; // ({ name, defaultValue })
 export { getUserDetail }; // (user: IUserDocument)
@@ -46,6 +47,7 @@ export { regexSearchText }; // ( searchValue: string, searchKey = "searchText" )
 export { sendRequest }; // ( { url, method, headers, form, body, params }: IRequestParams, errorMessage ?: string )
 export { sendToWebhook };
 export { fixDate };
+export { getPureDate };
 export { getDate };
 export { getToday };
 export { getNextMonth };
@@ -85,6 +87,7 @@ export default {
   sendRequest,
   sendToWebhook,
   fixDate,
+  getPureDate,
   getDate,
   getToday,
   getNextMonth,

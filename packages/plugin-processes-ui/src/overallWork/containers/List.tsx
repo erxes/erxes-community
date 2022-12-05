@@ -25,21 +25,13 @@ type FinalProps = {
 } & Props &
   IRouterProps;
 
-type State = {
-  loading: boolean;
-};
-
 const generateQueryParams = ({ location }) => {
   return queryString.parse(location.search);
 };
 
-class OrdersContainer extends React.Component<FinalProps, State> {
+class OverallWorksContainer extends React.Component<FinalProps> {
   constructor(props) {
     super(props);
-
-    this.state = {
-      loading: false
-    };
   }
 
   onSearch = (search: string) => {
@@ -102,6 +94,7 @@ class OrdersContainer extends React.Component<FinalProps, State> {
     }
 
     const overallWorks = overallWorksQuery.overallWorks || [];
+
     const totalCount = overallWorksCountQuery.overallWorksCount || 0;
 
     const updatedProps = {
@@ -167,5 +160,5 @@ export default withProps<Props>(
         })
       }
     )
-  )(withRouter<IRouterProps>(OrdersContainer))
+  )(withRouter<IRouterProps>(OverallWorksContainer))
 );

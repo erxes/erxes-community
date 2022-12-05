@@ -1,13 +1,25 @@
-const listParamsDef = `
+const paginateDefs = `
   $page: Int
   $perPage: Int
   $sortField: String
   $sortDirection: Int
+`;
+
+const paginateParams = `
+  page: $page
+  perPage: $perPage
+  sortField: $sortField
+  sortDirection: $sortDirection
+`;
+
+const listParamsDef = `
   $search: String
   $startDate: Date
   $endDate: Date
-  $branchId: String
-  $departmentId: String
+  $inBranchId: String
+  $outBranchId: String
+  $inDepartmentId: String
+  $outDepartmentId: String
   $productCategoryId: String
   $productId: String
   $jobCategoryId: String
@@ -15,15 +27,13 @@ const listParamsDef = `
 `;
 
 const listParamsValue = `
-  page: $page
-  perPage: $perPage
-  sortField: $sortField
-  sortDirection: $sortDirection
   search: $search
   startDate: $startDate
   endDate: $endDate
-  branchId: $branchId
-  departmentId: $departmentId
+  inBranchId: $inBranchId
+  outBranchId: $outBranchId
+  inDepartmentId: $inDepartmentId
+  outDepartmentId: $outDepartmentId
   productCategoryId: $productCategoryId
   productId: $productId
   jobCategoryId: $jobCategoryId
@@ -33,8 +43,10 @@ const listParamsValue = `
 const detailParamsDef = `
   $startDate: Date
   $endDate: Date
-  $branchId: String
-  $departmentId: String
+  $inBranchId: String
+  $outBranchId: String
+  $inDepartmentId: String
+  $outDepartmentId: String
   $productId: String
   $jobReferId: String
 `;
@@ -42,21 +54,27 @@ const detailParamsDef = `
 const detailParamsValue = `
   startDate: $startDate
   endDate: $endDate
-  branchId: $branchId
-  departmentId: $departmentId
+  inBranchId: $inBranchId
+  outBranchId: $outBranchId
+  inDepartmentId: $inDepartmentId
+  outDepartmentId: $outDepartmentId
   productId: $productId
   jobReferId: $jobReferId
 `;
 
 export const overallWorkFields = `
-  _id
+  _id {
+    inBranchId
+    inDepartmentId
+    outBranchId
+    outDepartmentId
+    type
+    typeId
+  }
+  type
   workIds
   name
   status
-  inBranchId
-  inDepartmentId
-  outBranchId
-  outDepartmentId
   count
   needProducts
   resultProducts
@@ -123,16 +141,16 @@ export const performFields = `
 `;
 
 const overallWorks = `
-  query overallWorks(${listParamsDef}) {
-    overallWorks(${listParamsValue}) {
+  query overallWorks(${listParamsDef}, ${paginateDefs}) {
+    overallWorks(${listParamsValue}, ${paginateParams}) {
       ${overallWorkFields}
     }
   }
 `;
 
 const overallWorksCount = `
-  query overallWorks(${listParamsDef}) {
-    overallWorks(${listParamsValue})
+  query overallWorksCount(${listParamsDef}) {
+    overallWorksCount(${listParamsValue})
   }
 `;
 

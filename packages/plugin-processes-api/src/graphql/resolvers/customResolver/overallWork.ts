@@ -1,11 +1,46 @@
-import { IOverallWorkDocument } from './../../../models/definitions/overallWorks';
+import {
+  IOverallProductsData,
+  IOverallWorkDocument
+} from './../../../models/definitions/overallWorks';
 import { IContext } from '../../../connectionResolver';
 import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
 import { IJobRefer } from '../../../models/definitions/jobs';
 
+const getProductsData = productsData => {
+  const quantityByKey = {};
+  const result: IOverallProductsData[] = [];
+
+  for (const perProductsData of productsData) {
+    for (const productData of perProductsData) {
+      const key = `${productData.productId}_${productData.uomId}`;
+      if (!Object.keys(quantityByKey)) {
+        quantityByKey[key] = 0;
+      }
+
+      quantityByKey[key] = quantityByKey[key] + productData.quantity;
+    }
+  }
+
+  for (const key of Object.keys(quantityByKey)) {
+    const [productId, uomId] = key.split('_');
+    result.push({
+      productId,
+      uomId,
+      quantity: quantityByKey[key]
+    });
+  }
+  return result;
+};
+
 export default {
   __resolveReference({ _id }, { models }: IContext) {
     return models.Works.findOne({ _id });
+  },
+
+  async type(work: IOverallWorkDocument, {}, {}) {
+    const { _id } = work;
+    const { type } = _id;
+    return type;
   },
 
   async job(work: IOverallWorkDocument, {}, { models }: IContext) {
@@ -17,134 +52,71 @@ export default {
     return { label: jobRefer?.name || '', description: jobRefer?.code || '' };
   },
 
-  async flow(work: IOverallWorkDocument, {}, { models }: IContext) {
-    const { flowId } = work;
-    const flow = await models.Flows.findOne({ _id: flowId });
-
-    return { name: flow?.name || '', status: flow?.status };
-  },
-
   async inBranch(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { inBranchId } = work;
+    const { _id } = work;
+    const { inBranchId } = _id;
 
-    const branch =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'branches.findOne',
-        data: { _id: inBranchId || '' },
-        isRPC: true
-      })) || null;
-
-    return branch ? branch.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'branches.findOne',
+      data: { _id: inBranchId || '' },
+      isRPC: true
+    });
   },
 
   async outBranch(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { outBranchId } = work;
+    const { _id } = work;
+    const { outBranchId } = _id;
 
-    const branch =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'branches.findOne',
-        data: { _id: outBranchId || '' },
-        isRPC: true
-      })) || null;
-
-    return branch ? branch.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'branches.findOne',
+      data: { _id: outBranchId || '' },
+      isRPC: true
+    });
   },
 
   async inDepartment(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { inDepartmentId } = work;
+    const { _id } = work;
+    const { inDepartmentId } = _id;
 
-    const department =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'departments.findOne',
-        data: { _id: inDepartmentId || '' },
-        isRPC: true
-      })) || null;
-
-    return department ? department.title : '';
+    return await sendCoreMessage({
+      subdomain,
+      action: 'departments.findOne',
+      data: { _id: inDepartmentId || '' },
+      isRPC: true
+    });
   },
 
   async outDepartment(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { outDepartmentId } = work;
+    const { _id } = work;
+    const { outDepartmentId } = _id;
 
-    const department =
-      (await sendCoreMessage({
-        subdomain,
-        action: 'departments.findOne',
-        data: { _id: outDepartmentId || '' },
-        isRPC: true
-      })) || null;
-
-    return department ? department.title : '';
-  },
-  async needProductsDetail(
-    overallWork: IOverallWorkDocument,
-    {},
-    { models, subdomain }: IContext
-  ) {
-    const jobRefers = await models.OverallWorks.findOne({
-      _id: overallWork._id
+    return await sendCoreMessage({
+      subdomain,
+      action: 'departments.findOne',
+      data: { _id: outDepartmentId || '' },
+      isRPC: true
     });
+  },
 
-    const needProducts = jobRefers?.needProducts || [];
+  async needProducts(overallWork: IOverallWorkDocument, {}, {}) {
+    const { needProducts } = overallWork;
 
-    for await (const need of needProducts) {
-      const uom =
-        (await sendProductsMessage({
-          subdomain,
-          action: 'uoms.findOne',
-          data: { _id: need.uomId || '' },
-          isRPC: true
-        })) || null;
-
-      const product =
-        (await sendProductsMessage({
-          subdomain,
-          action: 'findOne',
-          data: { _id: need.productId || '' },
-          isRPC: true
-        })) || null;
-
-      need.product = product;
-      need.uom = uom;
+    if (!needProducts || !needProducts.length) {
+      return [];
     }
 
-    return needProducts;
+    return getProductsData(needProducts);
   },
-  async resultProductsDetail(
-    overallWork: IOverallWorkDocument,
-    {},
-    { models, subdomain }: IContext
-  ) {
-    const jobRefers = await models.OverallWorks.findOne({
-      _id: overallWork._id
-    });
 
-    const resultProducts = jobRefers?.resultProducts || [];
+  async resultProducts(overallWork: IOverallWorkDocument, {}, {}) {
+    const { resultProducts } = overallWork;
 
-    for await (const result of resultProducts) {
-      const uom =
-        (await sendProductsMessage({
-          subdomain,
-          action: 'uoms.findOne',
-          data: { _id: result.uomId || '' },
-          isRPC: true
-        })) || null;
-
-      const product =
-        (await sendProductsMessage({
-          subdomain,
-          action: 'findOne',
-          data: { _id: result.productId || '' },
-          isRPC: true
-        })) || null;
-
-      result.product = product;
-      result.uom = uom;
+    if (!resultProducts || !resultProducts.length) {
+      return [];
     }
 
-    return resultProducts;
+    return getProductsData(resultProducts);
   }
 };

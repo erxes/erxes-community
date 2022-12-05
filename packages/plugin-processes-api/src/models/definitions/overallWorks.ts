@@ -2,6 +2,12 @@ import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 import { IProductsDataDocument, productsDataSchema } from './jobs';
 
+export interface IOverallProductsData {
+  productId: string;
+  quantity: number;
+  uomId: string;
+}
+
 export interface IOverallWork {
   status: string;
   dueDate: Date;
@@ -15,14 +21,12 @@ export interface IOverallWork {
   outDepartmentId?: string;
   inBranchId?: string;
   inDepartmentId?: string;
-  needProducts?: IProductsDataDocument[];
-  resultProducts?: IProductsDataDocument[];
+  needProducts?: IProductsDataDocument[][];
+  resultProducts?: IProductsDataDocument[][];
 }
 
 export interface IOverallWorkDocument extends IOverallWork, Document {
-  _id: string;
-  createdAt: Date;
-  createdBy: string;
+  _id: any;
 }
 
 export const overallWorkSchema = schemaHooksWrapper(
