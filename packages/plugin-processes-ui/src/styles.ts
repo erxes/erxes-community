@@ -180,3 +180,9 @@ export const MenuFooter = styled.footer`
   padding: 10px 20px;
   max-width: 95%;
 `;
+
+export const SidebarFilters = styledTS(styled.div)`
+  overflow: hidden;
+  padding: 5px 15px 30px 15px;
+  height: 100%;
+`;

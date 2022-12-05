@@ -10,7 +10,8 @@ export interface IOverallWorkKey {
   outDepartmentId: string;
 }
 export interface IOverallWork {
-  _id: IOverallWorkKey;
+  _id: string;
+  key: IOverallWorkKey;
   type: string;
   workIds: string[];
   name: string;

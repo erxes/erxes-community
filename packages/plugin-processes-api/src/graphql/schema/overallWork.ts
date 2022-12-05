@@ -1,5 +1,6 @@
 const commontTypes = `
-  _id: OverallWorkId
+  _id: String
+  key: OverallWorkId
   workIds: [String]
   type: String
   name: String

@@ -63,7 +63,8 @@ const detailParamsValue = `
 `;
 
 export const overallWorkFields = `
-  _id {
+  _id
+  key {
     inBranchId
     inDepartmentId
     outBranchId

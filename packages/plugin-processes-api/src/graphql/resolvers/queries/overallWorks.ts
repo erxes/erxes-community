@@ -130,9 +130,33 @@ const overallWorkQueries = {
       },
       {
         $limit: _limit
+      },
+      {
+        $project: {
+          _id: {
+            $concat: [
+              '$_id.type',
+              '_',
+              '$_id.typeId',
+              '_',
+              '$_id.inBranchId',
+              '_',
+              '$_id.inDepartmentId',
+              '_',
+              '$_id.outBranchId',
+              '_',
+              '$_id.outDepartmentId'
+            ]
+          },
+          key: '$_id',
+          needProducts: 1,
+          resultProducts: 1,
+          workIds: 1,
+          count: 1
+        }
       }
     ]);
-    console.log(res);
+
     return res;
   },
 
@@ -171,34 +195,6 @@ const overallWorkQueries = {
       }
     ]);
     return res.length;
-  },
-
-  overallWorksSideBar(
-    _root,
-    params: IParam,
-    { models, commonQuerySelector }: IContext
-  ) {
-    const selector = generateFilter(params, commonQuerySelector);
-    return models.OverallWorks.find(selector).lean();
-  },
-
-  overallWorksSideBarDetail(
-    _root,
-    params: IParam,
-    { models, commonQuerySelector }: IContext
-  ) {
-    const selector = generateFilter(params, commonQuerySelector);
-    return models.OverallWorks.findOne(selector).lean();
-  },
-
-  overallWorksTotalCount(
-    _root,
-    params: IParam,
-    { commonQuerySelector, models }: IContext
-  ) {
-    const selector = generateFilter(params, commonQuerySelector);
-
-    return models.OverallWorks.find(selector).count();
   }
 };
 

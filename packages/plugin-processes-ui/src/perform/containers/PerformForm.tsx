@@ -1,7 +1,7 @@
 import * as compose from 'lodash.flowright';
 
 import { AllProductsQueryResponse, IOverallWorkDocument } from '../types';
-import { IJobRefer, IProduct } from '../../job/types';
+import { IJobRefer } from '../../job/types';
 
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import Form from '../components/perform/PerformForm';
@@ -13,6 +13,7 @@ import { graphql } from 'react-apollo';
 import { mutations } from '../graphql';
 import { queries } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils';
+import { IProduct } from '@erxes/ui-products/src/types';
 
 type Props = {
   closeModal: () => void;

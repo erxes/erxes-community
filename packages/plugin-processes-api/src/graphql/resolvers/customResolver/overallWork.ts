@@ -1,9 +1,9 @@
 import {
   IOverallProductsData,
-  IOverallWorkDocument
+  IOverallWork
 } from './../../../models/definitions/overallWorks';
 import { IContext } from '../../../connectionResolver';
-import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
+import { sendCoreMessage } from '../../../messageBroker';
 import { IJobRefer } from '../../../models/definitions/jobs';
 
 const getProductsData = productsData => {
@@ -37,13 +37,13 @@ export default {
     return models.Works.findOne({ _id });
   },
 
-  async type(work: IOverallWorkDocument, {}, {}) {
-    const { _id } = work;
-    const { type } = _id;
+  async type(work: IOverallWork, {}, {}) {
+    const { key } = work;
+    const { type } = key;
     return type;
   },
 
-  async job(work: IOverallWorkDocument, {}, { models }: IContext) {
+  async job(work: IOverallWork, {}, { models }: IContext) {
     const { jobId } = work;
     const jobRefer: IJobRefer | null = await models.JobRefers.findOne({
       _id: jobId
@@ -52,9 +52,13 @@ export default {
     return { label: jobRefer?.name || '', description: jobRefer?.code || '' };
   },
 
-  async inBranch(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { _id } = work;
-    const { inBranchId } = _id;
+  async inBranch(work: IOverallWork, {}, { subdomain }: IContext) {
+    const { key } = work;
+    const { inBranchId } = key;
+
+    if (!inBranchId) {
+      return;
+    }
 
     return await sendCoreMessage({
       subdomain,
@@ -64,9 +68,13 @@ export default {
     });
   },
 
-  async outBranch(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { _id } = work;
-    const { outBranchId } = _id;
+  async outBranch(work: IOverallWork, {}, { subdomain }: IContext) {
+    const { key } = work;
+    const { outBranchId } = key;
+
+    if (!outBranchId) {
+      return;
+    }
 
     return await sendCoreMessage({
       subdomain,
@@ -76,9 +84,12 @@ export default {
     });
   },
 
-  async inDepartment(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { _id } = work;
-    const { inDepartmentId } = _id;
+  async inDepartment(work: IOverallWork, {}, { subdomain }: IContext) {
+    const { key } = work;
+    const { inDepartmentId } = key;
+    if (!inDepartmentId) {
+      return;
+    }
 
     return await sendCoreMessage({
       subdomain,
@@ -88,9 +99,12 @@ export default {
     });
   },
 
-  async outDepartment(work: IOverallWorkDocument, {}, { subdomain }: IContext) {
-    const { _id } = work;
-    const { outDepartmentId } = _id;
+  async outDepartment(work: IOverallWork, {}, { subdomain }: IContext) {
+    const { key } = work;
+    const { outDepartmentId } = key;
+    if (!outDepartmentId) {
+      return;
+    }
 
     return await sendCoreMessage({
       subdomain,
@@ -100,7 +114,7 @@ export default {
     });
   },
 
-  async needProducts(overallWork: IOverallWorkDocument, {}, {}) {
+  async needProducts(overallWork: IOverallWork, {}, {}) {
     const { needProducts } = overallWork;
 
     if (!needProducts || !needProducts.length) {
@@ -110,7 +124,7 @@ export default {
     return getProductsData(needProducts);
   },
 
-  async resultProducts(overallWork: IOverallWorkDocument, {}, {}) {
+  async resultProducts(overallWork: IOverallWork, {}, {}) {
     const { resultProducts } = overallWork;
 
     if (!resultProducts || !resultProducts.length) {

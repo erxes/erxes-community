@@ -16,6 +16,7 @@ import { IOverallWork } from '../types';
 import HeaderDescription from './MainHead';
 import RightMenu from './RightMenu';
 import Row from './Row';
+import Sidebar from './Sidebar';
 
 interface IProps extends IRouterProps {
   overallWorks: IOverallWork[];
@@ -113,12 +114,13 @@ class Orders extends React.Component<IProps, {}> {
       <Wrapper
         header={
           <Wrapper.Header
-            title={__(`Pos Orders`)}
+            title={__(`Overall works`)}
             queryParams={queryParams}
             submenu={menuNavs}
           />
         }
         mainHead={header}
+        leftSidebar={<Sidebar queryParams={queryParams} history={history} />}
         footer={<Pagination count={totalCount} />}
         content={
           <DataWithLoader
