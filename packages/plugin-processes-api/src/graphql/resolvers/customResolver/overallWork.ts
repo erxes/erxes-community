@@ -1,36 +1,12 @@
+import { getProductsData } from './utils';
 import { IContext } from '../../../connectionResolver';
-import {
-  IOverallProductsData,
-  IOverallWork
-} from './../../../models/definitions/overallWorks';
+import { IOverallWork } from './../../../models/definitions/overallWorks';
 import { JOB_TYPES } from '../../../models/definitions/constants';
-import { sendCoreMessage, sendProductsMessage } from '../../../messageBroker';
-
-const getProductsData = productsData => {
-  const quantityByKey = {};
-  const result: IOverallProductsData[] = [];
-
-  for (const perProductsData of productsData) {
-    for (const productData of perProductsData) {
-      const key = `${productData.productId}_${productData.uomId}`;
-      if (!Object.keys(quantityByKey)) {
-        quantityByKey[key] = 0;
-      }
-
-      quantityByKey[key] = quantityByKey[key] + productData.quantity;
-    }
-  }
-
-  for (const key of Object.keys(quantityByKey)) {
-    const [productId, uomId] = key.split('_');
-    result.push({
-      productId,
-      uomId,
-      quantity: quantityByKey[key]
-    });
-  }
-  return result;
-};
+import {
+  sendCoreMessage,
+  sendInventoriesMessage,
+  sendProductsMessage
+} from '../../../messageBroker';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
@@ -134,7 +110,7 @@ export default {
     const { needProducts } = overallWork;
 
     if (!needProducts || !needProducts.length) {
-      return [];
+      return;
     }
 
     return getProductsData(needProducts);
@@ -144,7 +120,7 @@ export default {
     const { resultProducts } = overallWork;
 
     if (!resultProducts || !resultProducts.length) {
-      return [];
+      return;
     }
 
     return getProductsData(resultProducts);

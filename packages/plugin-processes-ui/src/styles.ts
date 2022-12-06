@@ -2,6 +2,7 @@ import { colors, dimensions } from '@erxes/ui/src/styles';
 import styled from 'styled-components';
 import { Table } from '@erxes/ui/src';
 import styledTS from 'styled-components-ts';
+import { SideContent } from '@erxes/ui/src/layout/styles';
 
 export const FinanceAmount = styled.div`
   float: right;
@@ -185,4 +186,13 @@ export const SidebarFilters = styledTS(styled.div)`
   overflow: hidden;
   padding: 5px 15px 30px 15px;
   height: 100%;
+`;
+
+export const CustomSideContent = styledTS<{
+  wide?: boolean;
+  half?: boolean;
+  full?: boolean;
+  hasBorder?: boolean;
+}>(styled(SideContent))`
+  width: ${props => (props.wide ? '440px' : '290px')};
 `;

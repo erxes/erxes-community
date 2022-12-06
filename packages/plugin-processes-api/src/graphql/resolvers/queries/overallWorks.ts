@@ -6,6 +6,8 @@ import { sendProductsMessage } from '../../../messageBroker';
 // } from '@erxes/api-utils/src/permissions';
 import { IContext, IModels } from '../../../connectionResolver';
 import { JOB_TYPES } from '../../../models/definitions/constants';
+import { needProductsData, resultProductsData } from './utils';
+import { getProductsData } from '../customResolver/utils';
 
 interface IParam {
   search: string;
@@ -139,7 +141,7 @@ const overallWorkQueries = {
     },
     { models, commonQuerySelector, subdomain }: IContext
   ) {
-    const selector = generateFilter(
+    const selector = await generateFilter(
       subdomain,
       models,
       params,
@@ -227,7 +229,7 @@ const overallWorkQueries = {
     },
     { models, commonQuerySelector, subdomain }: IContext
   ) {
-    const selector = generateFilter(
+    const selector = await generateFilter(
       subdomain,
       models,
       params,
@@ -266,7 +268,6 @@ const overallWorkQueries = {
     params: IParam,
     { models, commonQuerySelector, subdomain }: IContext
   ) {
-    console.log('11111111111111111111', params);
     const {
       inBranchId,
       inDepartmentId,
@@ -318,7 +319,7 @@ const overallWorkQueries = {
       );
     }
 
-    const selector = generateFilter(
+    const selector = await generateFilter(
       subdomain,
       models,
       params,
@@ -385,11 +386,32 @@ const overallWorkQueries = {
       }
     ]);
 
+    console.log(res.length, 'kkkkkkkkkkkkkkkkkkkkkk');
     if (!res.length) {
       throw new Error('not found overall work');
     }
 
-    return res;
+    const overallWork = res[0];
+    // console.log(overallWork)
+
+    // console.log(overallWork.needProducts)
+    overallWork.needProducts =
+      getProductsData(overallWork.needProducts || []) || [];
+    // console.log('xxxxxxxxxxxxxxxxxxxxx', overallWork.needProducts, 'cccccccccccccccccccccccccc')
+    overallWork.resultProducts =
+      getProductsData(overallWork.resultProducts || []) || [];
+
+    overallWork.needProductsData = await needProductsData(
+      subdomain,
+      overallWork
+    );
+    // console.log(overallWork.needProductsData)
+    overallWork.resultProductsData = await resultProductsData(
+      subdomain,
+      overallWork
+    );
+
+    return overallWork;
   }
 };
 

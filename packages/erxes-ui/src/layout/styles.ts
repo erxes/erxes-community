@@ -537,7 +537,7 @@ const AuthBox = styled.div`
 const AuthItem = styledTS<{ order?: number }>(styled.div)`
   position: relative;
   width: 50%;
-  
+
   @media (max-width: 768px) {
     width: 100%;
     order: ${props => (props.order ? props.order : 0)};

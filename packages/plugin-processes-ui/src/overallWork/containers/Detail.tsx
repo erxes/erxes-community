@@ -35,18 +35,18 @@ class OverallWorkDetailContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
-    let errorMsg: string;
+    let errorMsg: string = '';
     if (overallWorkDetailQuery.error) {
       errorMsg = overallWorkDetailQuery.error.message;
       Alert.error(errorMsg);
     }
 
-    const work = overallWorkDetailQuery.overallWorkDetail;
+    const overallWork = overallWorkDetailQuery.overallWorkDetail;
 
     const updatedProps = {
       ...this.props,
       errorMsg,
-      work
+      overallWork
     };
 
     return <Detail {...updatedProps} />;

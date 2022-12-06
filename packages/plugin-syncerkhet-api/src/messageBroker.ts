@@ -17,7 +17,7 @@ export const initBroker = async cl => {
     return;
   });
 
-  consumeRPCQueue('syncerkhet:afterQuery', async ({ subdomain, data }) => {
+  consumeRPCQueue('riskass:afterQuery', async ({ subdomain, data }) => {
     return {
       status: 'success',
       data: await afterQueryHandlers(subdomain, data)

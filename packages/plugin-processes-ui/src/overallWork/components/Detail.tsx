@@ -22,7 +22,7 @@ import DetailRightSidebar from './DetailRightSidebar';
 type Props = {
   history: any;
   queryParams: any;
-  work: IOverallWorkDet;
+  overallWork: IOverallWorkDet;
   errorMsg?: string;
 } & IRouterProps;
 
@@ -35,8 +35,8 @@ class OverallWorkDetail extends React.Component<Props, State> {
     this.state = {};
   }
 
-  displayValue(work, name) {
-    const value = _.get(work, name);
+  displayValue(overallWork, name) {
+    const value = _.get(overallWork, name);
     return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
   }
 
@@ -86,7 +86,7 @@ class OverallWorkDetail extends React.Component<Props, State> {
   };
 
   renderContent() {
-    const { work, queryParams, history, errorMsg } = this.props;
+    const { overallWork, queryParams, history, errorMsg } = this.props;
     if (errorMsg) {
       return (
         <EmptyState
@@ -100,7 +100,7 @@ class OverallWorkDetail extends React.Component<Props, State> {
   }
 
   render() {
-    const { queryParams, history, work } = this.props;
+    const { queryParams, history, overallWork } = this.props;
 
     const mainContent = this.renderContent();
 
@@ -113,7 +113,10 @@ class OverallWorkDetail extends React.Component<Props, State> {
           <DetailLeftSidebar queryParams={queryParams} history={history} />
         }
         rightSidebar={
-          <DetailRightSidebar queryParams={queryParams} work={work} />
+          <DetailRightSidebar
+            queryParams={queryParams}
+            overallWork={overallWork}
+          />
         }
         content={mainContent}
       />
