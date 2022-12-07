@@ -9,8 +9,10 @@ import Toggle from '@erxes/ui/src/components/Toggle';
 import { __ } from '@erxes/ui/src/utils';
 import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 // local
+import DiscountInput from '../form/DiscountInput';
 import { Table } from '../../../styles';
 import { DiscountData } from '../../../types';
+import { RULE_OPTIONS, DISCOUNT_OPTIONS } from '../../../constants';
 
 type Props = {
   formValues: DiscountData;
@@ -30,38 +32,25 @@ export default function Price(props: Props) {
 
   const handleAdd = () => {
     const temp = [...formValues.priceRules];
-    temp.push({ type: 'exact' });
+    temp.push({ type: 'exact', discountType: 'default' });
     handleState('priceRules', [...temp]);
   };
 
   const handleDelete = (index: number) => {
     const temp = [...formValues.priceRules];
-    if (temp.length > 1) temp.splice(index, 1);
+    if (temp.length >= 1) temp.splice(index, 1);
     handleState('priceRules', [...temp]);
   };
 
   const renderRow = (item: any, index: number) => {
     return (
-      <tr key={index}>
+      <tr key={'price' + item}>
         <td>
           <FormGroup>
             <FormControl
               name="type"
               componentClass="select"
-              options={[
-                {
-                  label: 'Exact',
-                  value: 'exact'
-                },
-                {
-                  label: 'Minimum',
-                  value: 'minimum'
-                },
-                {
-                  label: 'Every',
-                  value: 'every'
-                }
-              ]}
+              options={RULE_OPTIONS}
               onChange={(e: any) => handleChange(index, 'type', e.target.value)}
               value={item.type || 'exact'}
             />
@@ -70,28 +59,42 @@ export default function Price(props: Props) {
         <td>
           <FormGroup>
             <FormControl
-              componentClass="number"
               name="value"
+              type="number"
               placeholder={__('0.00$')}
               onChange={(e: any) =>
-                handleChange(index, 'typeValue', e.target.value)
+                handleChange(index, 'value', parseFloat(e.target.value))
               }
-              value={item.typeValue || ''}
+              value={item.value || ''}
+              required
             />
           </FormGroup>
         </td>
         <td>
           <FormGroup>
             <FormControl
-              componentClass="number"
-              name="value"
-              placeholder={__('e.g. 20% (leave empty for default)')}
+              name="discountType"
+              componentClass="select"
+              options={DISCOUNT_OPTIONS}
               onChange={(e: any) =>
-                handleChange(index, 'discountValue', e.target.value)
+                handleChange(index, 'discountType', e.target.value)
               }
-              value={item.discountValue || ''}
+              value={item.discountType || 'default'}
             />
           </FormGroup>
+        </td>
+        <td>
+          <DiscountInput
+            type={item.discountType}
+            value={item.discountValue}
+            handleChange={(value: number) =>
+              handleChange(index, 'discountValue', value)
+            }
+            bonusValue={item.discountBonusProduct}
+            handleBonusChange={(value: any) =>
+              handleChange(index, 'discountBonusProduct', value)
+            }
+          />
         </td>
         <td>
           <Tip text={__('Delete')} placement="bottom">
@@ -115,7 +118,8 @@ export default function Price(props: Props) {
             <thead>
               <tr>
                 <th>{__('Rule type')}</th>
-                <th>{__('Type value')}</th>
+                <th>{__('Rule value')}</th>
+                <th>{__('Discount type')}</th>
                 <th>{__('Discount value')}</th>
                 <th>{__('Actions')}</th>
               </tr>

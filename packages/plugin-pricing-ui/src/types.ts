@@ -1,7 +1,19 @@
+export type Rule = {
+  type?: string;
+  value?: string;
+  discountType?: string;
+  discountValue?: string;
+};
+
+export type RepeatValue = {
+  label: string;
+  value: string;
+};
+
 export type DiscountData = {
   name: string;
   status: 'active' | 'archive' | 'draft' | 'completed';
-  value: number | string;
+  value: number;
   type: 'fixed' | 'subtraction' | 'percentage' | 'bonus';
   bonusProduct?: string;
 
@@ -25,37 +37,18 @@ export type DiscountData = {
   stageId: string;
 
   isQuantityEnabled: boolean;
-  quantityRules: [
-    {
-      type?: string;
-      typeValue?: string;
-      discountValue?: string;
-    }
-  ];
+  quantityRules: Rule[];
 
   isPriceEnabled: boolean;
-  priceRules: [
-    {
-      type?: string;
-      typeValue?: string;
-      discountValue?: string;
-    }
-  ];
+  priceRules: Rule[];
 
   isExpiryEnabled: boolean;
-  expiryRules: [
-    {
-      type?: string;
-      typeValue?: string;
-      discountValue?: string;
-    }
-  ];
+  expiryRules: Rule[];
 
   isRepeatEnabled: boolean;
   repeatRules: [
     {
       type?: string;
-      value?: string;
     }
   ];
 };

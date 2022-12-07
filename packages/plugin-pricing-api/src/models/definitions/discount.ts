@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { field } from './utils';
-import { STATUS_TYPES, AMOUNT_TYPES, APPLY_TYPES } from './constants';
+import { STATUS_TYPES, DISCOUNT_TYPES, APPLY_TYPES } from './constants';
 import {
   IQuantity,
   IPrice,
@@ -62,17 +62,21 @@ export const discountSchema = new Schema({
   _id: field({ pkey: true }),
 
   // Generals
-  name: field({ type: String, label: 'Name' }),
+  name: field({
+    type: String,
+    label: 'Name'
+  }),
   status: field({
     type: String,
     enum: STATUS_TYPES.ALL,
     default: STATUS_TYPES.ACTIVE,
     label: 'Status'
   }),
+
   type: field({
     type: String,
-    enum: AMOUNT_TYPES.ALL,
-    default: AMOUNT_TYPES.FIXED,
+    enum: DISCOUNT_TYPES.ALL,
+    default: DISCOUNT_TYPES.FIXED,
     label: 'Amount Type'
   }),
   value: field({

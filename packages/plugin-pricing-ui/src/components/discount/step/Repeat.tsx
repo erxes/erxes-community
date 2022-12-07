@@ -28,10 +28,6 @@ type Props = {
 export default function Repeat(props: Props) {
   const { formValues, handleState } = props;
 
-  // Hooks
-  const [weekValue, setWeekValue] = useState<any>([]);
-  const [monthValue, setMonthValue] = useState<any>([]);
-
   // Functions
   const handleChange = (index: number, key: string, value: any) => {
     const temp = [...formValues.repeatRules];
@@ -55,11 +51,11 @@ export default function Repeat(props: Props) {
   const renderWeekForm = (item: any, index: number) => (
     <FormGroup>
       <Select
-        placeholder={__('Select a weekday')}
-        value={weekValue}
-        options={WEEK_OPTIONS}
         name="weekForm"
-        onChange={(value: any) => setWeekValue(value)}
+        value={item.weekValue}
+        placeholder={__('Select a weekday')}
+        options={WEEK_OPTIONS}
+        onChange={(value: any) => handleChange(index, 'weekValue', value)}
         multi
       />
     </FormGroup>
@@ -68,23 +64,23 @@ export default function Repeat(props: Props) {
   const renderMonthForm = (item: any, index: number) => {
     let options: any = [];
 
-    options.push({ label: 'Last day of the month', value: 'monthLastDay' });
+    options.push({ label: 'Last day of the month', value: 'lastDay' });
 
     for (let i = 1; i <= 31; i++) {
       options.push({
-        value: i.toString(),
-        label: i
+        label: i,
+        value: i.toString()
       });
     }
 
     return (
       <FormGroup>
         <Select
-          placeholder={__('Select a day')}
-          value={monthValue}
-          options={options}
-          onChange={(value: any) => setMonthValue(value)}
           name="monthForm"
+          value={item.monthValue || []}
+          placeholder={__('Select a day')}
+          options={options}
+          onChange={(value: any) => handleChange(index, 'monthValue', value)}
           multi
         />
       </FormGroup>
@@ -102,8 +98,10 @@ export default function Repeat(props: Props) {
               closeOnSelect={true}
               timeFormat={false}
               utc={true}
-              value={formValues.startDate || undefined}
-              onChange={(date: any) => handleState('startDate', date)}
+              value={item.yearStartValue || undefined}
+              onChange={(value: any) =>
+                handleChange(index, 'yearStartValue', value)
+              }
             />
           </DateContainer>
         </FormGroup>
@@ -117,8 +115,10 @@ export default function Repeat(props: Props) {
               closeOnSelect={true}
               timeFormat={false}
               utc={true}
-              value={formValues.endDate || undefined}
-              onChange={(date: any) => handleState('endDate', date)}
+              value={item.yearEndValue || undefined}
+              onChange={(value: any) =>
+                handleChange(index, 'yearEndValue', value)
+              }
             />
           </DateContainer>
         </FormGroup>
@@ -128,8 +128,6 @@ export default function Repeat(props: Props) {
 
   const renderInputForm = (item: any, index: number) => {
     switch (item.type) {
-      case 'everyDay':
-        return;
       case 'everyWeek':
         return renderWeekForm(item, index);
       case 'everyMonth':
@@ -137,20 +135,12 @@ export default function Repeat(props: Props) {
       case 'everyYear':
         return renderYearForm(item, index);
       default:
-        return (
-          <FormGroup>
-            <FormControl
-              type="text"
-              name="value"
-              placeholder="Value (e.g. 1,4,25,31)"
-            />
-          </FormGroup>
-        );
+        return;
     }
   };
 
   const renderRow = (item: any, index: number) => (
-    <tr>
+    <tr key={'repeat' + item}>
       <td>
         <FormGroup>
           <FormControl
@@ -194,7 +184,7 @@ export default function Repeat(props: Props) {
             <thead>
               <tr>
                 <th>{__('Rule type')}</th>
-                <th>{__('Type value')}</th>
+                <th>{__('Rule value')}</th>
                 <th>{__('Actions')}</th>
               </tr>
             </thead>

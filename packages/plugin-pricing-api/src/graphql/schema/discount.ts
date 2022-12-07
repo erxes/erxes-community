@@ -13,25 +13,39 @@ export const types = () => `
 
   type Quantity {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
   }
 
   type Price {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
   }
 
   type Expiry {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
+  }
+
+  type RepeatValue {
+    label: String,
+    value: String,
   }
 
   type Repeat {
     type: String,
-    value: String,
+    weekValue: [RepeatValue],
+    monthValue: [RepeatValue],
+    yearStartValue: Date,
+    yearEndValue: Date,
   }
 
   type Discount @key(fields: "_id") @cacheControl(maxAge: 3) {
@@ -83,25 +97,39 @@ export const types = () => `
 
   input QuantityInput {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
   }
 
   input PriceInput {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
   }
 
   input ExpiryInput {
     type: String,
-    typeValue: String,
-    discountValue: String,
+    value: Float,
+    discountType: String,
+    discountValue: Float,
+    discountBonusProduct: String,
+  }
+
+  input RepeatValueInput {
+    label: String,
+    value: String,
   }
 
   input RepeatInput {
     type: String,
-    value: String,
+    weekValue: [RepeatValueInput],
+    monthValue: [RepeatValueInput],
+    yearStartValue: Date,
+    yearEndValue: Date,
   }
 
   input DiscountAddInput {

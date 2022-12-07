@@ -9,9 +9,10 @@ import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from '@erxes/ui/src/utils';
 import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 // local
+import DiscountInput from '../form/DiscountInput';
 import { Table } from '../../../styles';
-import { DATE_OPTIONS } from '../../../constants';
 import { DiscountData } from '../../../types';
+import { DATE_OPTIONS, DISCOUNT_OPTIONS } from '../../../constants';
 
 type Props = {
   formValues: DiscountData;
@@ -31,7 +32,7 @@ export default function Expiry(props: Props) {
 
   const handleAdd = () => {
     const temp = [...formValues.expiryRules];
-    temp.push({ type: 'day' });
+    temp.push({ type: 'day', discountType: 'default' });
     handleState('expiryRules', temp);
   };
 
@@ -42,13 +43,12 @@ export default function Expiry(props: Props) {
   };
 
   const renderRow = (item: any, index: number) => (
-    <tr>
+    <tr key={'expiry' + item}>
       <td>
         <FormGroup>
           <FormControl
             name="type"
             componentClass="select"
-            placeholder={__('Select Type')}
             options={DATE_OPTIONS}
             onChange={(e: any) => handleChange(index, 'type', e.target.value)}
             value={item.type || 'day'}
@@ -58,28 +58,40 @@ export default function Expiry(props: Props) {
       <td>
         <FormGroup>
           <FormControl
-            type="text"
             name="value"
-            placeholder={__('e.g. 20')}
+            type="number"
             onChange={(e: any) =>
-              handleChange(index, 'typeValue', e.target.value)
+              handleChange(index, 'value', parseFloat(e.target.value))
             }
-            value={item.typeValue || ''}
+            value={item.value || ''}
           />
         </FormGroup>
       </td>
       <td>
         <FormGroup>
           <FormControl
-            type="text"
-            name="value"
-            placeholder={__('e.g. 10%')}
+            name="discountType"
+            componentClass="select"
+            options={DISCOUNT_OPTIONS}
             onChange={(e: any) =>
-              handleChange(index, 'discountValue', e.target.value)
+              handleChange(index, 'discountType', e.target.value)
             }
-            value={item.discountValue || ''}
+            value={item.discountType || 'default'}
           />
         </FormGroup>
+      </td>
+      <td>
+        <DiscountInput
+          type={item.discountType}
+          value={item.discountValue}
+          handleChange={(value: number) =>
+            handleChange(index, 'discountValue', value)
+          }
+          bonusValue={item.discountBonusProduct}
+          handleBonusChange={(value: any) =>
+            handleChange(index, 'discountBonusProduct', value)
+          }
+        />
       </td>
       <td>
         <Tip text={__('Delete')} placement="bottom">
@@ -112,7 +124,8 @@ export default function Expiry(props: Props) {
             <thead>
               <tr>
                 <th>{__('Rule type')}</th>
-                <th>{__('Type value')}</th>
+                <th>{__('Rule value')}</th>
+                <th>{__('Discount type')}</th>
                 <th>{__('Discount value')}</th>
                 <th>{__('Actions')}</th>
               </tr>

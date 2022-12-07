@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import Button from '@erxes/ui/src/components/Button';
 import Step from '@erxes/ui/src/components/step/Step';
 import Steps from '@erxes/ui/src/components/step/Steps';
-import { __ } from '@erxes/ui/src/utils';
+import { Alert, __ } from '@erxes/ui/src/utils';
 import {
   StepWrapper,
   ControlWrapper,
@@ -30,44 +30,42 @@ export default function Form(props: Props) {
   // Hooks
   const [formValues, setFormValues] = useState<DiscountData>({
     // General
-    name: data.name ? data.name : '',
-    status: data.status ? data.status : 'active', // "active", "archive", "draft", "completed"
-    type: data.type ? data.type : 'fixed', // "fixed", "subtraction", "percentage", "bonus"
-    value: data.value ? data.value : 0,
-    bonusProduct: data.bonusProduct ? data.bonusProduct : null,
+    name: data.name || '',
+    status: data.status || 'active', // "active", "archive", "draft", "completed"
+    type: data.type || 'fixed', // "fixed", "subtraction", "percentage", "bonus"
+    value: data.value || 0,
+    bonusProduct: data.bonusProduct || null,
 
-    applyType: data.applyType ? data.applyType : 'category', // "product", "category"
-    products: data.products ? data.products : [],
-    productsExcluded: data.productExcluded ? data.productExcluded : [],
-    categories: data.categories ? data.categories : [],
-    categoriesExcluded: data.categoriesExcluded ? data.categoriesExcluded : [],
+    applyType: data.applyType || 'category', // "product", "category"
+    products: data.products || [],
+    productsExcluded: data.productExcluded || [],
+    categories: data.categories || [],
+    categoriesExcluded: data.categoriesExcluded || [],
 
-    isStartDateEnabled: data.isStartDateEnabled
-      ? data.isStartDateEnabled
-      : false,
-    isEndDateEnabled: data.isEndDateEnabled ? data.isEndDateEnabled : false,
-    startDate: data.startDate ? data.startDate : null,
-    endDate: data.endData ? data.endData : null,
+    isStartDateEnabled: data.isStartDateEnabled || false,
+    isEndDateEnabled: data.isEndDateEnabled || false,
+    startDate: data.startDate || null,
+    endDate: data.endData || null,
 
     // Options
-    departmentIds: data.departmentIds ? data.departmentIds : [],
-    branchIds: data.branchIds ? data.branchIds : [],
-    boardId: data.boardId ? data.boardId : null,
-    pipelineId: data.pipelineId ? data.pipelineId : null,
-    stageId: data.stageId ? data.stageId : null,
+    departmentIds: data.departmentIds || [],
+    branchIds: data.branchIds || [],
+    boardId: data.boardId || null,
+    pipelineId: data.pipelineId || null,
+    stageId: data.stageId || null,
 
     // Rules
-    isQuantityEnabled: data.isQuantityEnabled ? data.isQuantityEnabled : false,
-    quantityRules: data.quantityRules ? data.quantityRules : [],
+    isQuantityEnabled: data.isQuantityEnabled || false,
+    quantityRules: data.quantityRules || [],
 
-    isPriceEnabled: data.isPriceEnabled ? data.isPriceEnabled : false,
-    priceRules: data.priceRules ? data.priceRules : [],
+    isPriceEnabled: data.isPriceEnabled || false,
+    priceRules: data.priceRules || [],
 
-    isExpiryEnabled: data.isExpiryEnabled ? data.isExpiryEnabled : false,
-    expiryRules: data.expiryRules ? data.expiryRules : [],
+    isExpiryEnabled: data.isExpiryEnabled || false,
+    expiryRules: data.expiryRules || [],
 
-    isRepeatEnabled: data.isRepeatEnabled ? data.isRepeatEnabled : false,
-    repeatRules: data.repeatRules ? data.repeatRules : []
+    isRepeatEnabled: data.isRepeatEnabled || false,
+    repeatRules: data.repeatRules || []
   });
 
   useEffect(() => data.name && setFormValues(data), [data]);
@@ -83,15 +81,25 @@ export default function Form(props: Props) {
   const handleSubmit = () => {
     const document: any = { ...formValues };
 
-    if (document.__typename) delete document.__typename;
+    if (!document.name) return Alert.error(__('Enter discount name'));
 
-    if (document.quantityRules)
-      document.quantityRules.map(
-        (item: any) => item.__typename && delete item.__typename
-      );
+    if (document.priceRules.length === 0) document.isPriceEnabled = false;
+
+    if (document.quantityRules.length === 0) document.isQuantityEnabled = false;
+
+    if (document.expiryRules.length === 0) document.isExpiryEnabled = false;
+
+    if (document.repeatRules.length === 0) document.isRepeatEnabled = false;
+
+    if (document.__typename) delete document.__typename;
 
     if (document.priceRules)
       document.priceRules.map(
+        (item: any) => item.__typename && delete item.__typename
+      );
+
+    if (document.quantityRules)
+      document.quantityRules.map(
         (item: any) => item.__typename && delete item.__typename
       );
 
@@ -101,9 +109,15 @@ export default function Form(props: Props) {
       );
 
     if (document.repeatRules)
-      document.repeatRules.map(
-        (item: any) => item.__typename && delete item.__typename
-      );
+      document.repeatRules.map((item: any) => {
+        item.__typename && delete item.__typename;
+
+        if (item.weekValue)
+          item.weekValue.map((v: any) => v.__typename && delete v.__typename);
+
+        if (item.monthValue)
+          item.monthValue.map((v: any) => v.__typename && delete v.__typename);
+      });
 
     submit(document);
   };
@@ -121,7 +135,6 @@ export default function Form(props: Props) {
       <Button.Group>
         {cancelButton}
         <Button btnStyle="success" icon="check-circle" onClick={handleSubmit}>
-          {/* {isActionLoading && <SmallLoader />} */}
           Save
         </Button>
       </Button.Group>

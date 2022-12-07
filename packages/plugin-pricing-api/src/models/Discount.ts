@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import * as _ from 'underscore';
-import { IModels, models } from '../connectionResolver';
+import { IModels } from '../connectionResolver';
 import {
   IDiscount,
   IDiscountDocument,

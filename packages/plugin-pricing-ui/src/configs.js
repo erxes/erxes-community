@@ -13,10 +13,10 @@ module.exports = {
   menus: [
     {
       text: "Pricing",
-      to: "/pricing/discounts",
-      image: "/images/icons/erxes-06.svg",
-      location: "settings",
-      scope: "pricing"
+      url: "/pricing/discounts",
+      icon: 'icon-pricetag-alt',
+      location: "mainNavigation",
+      permission: 'showPricing'
     }
   ]
 };

@@ -30,28 +30,43 @@ const discountAdd = `
       isQuantityEnabled
       quantityRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isPriceEnabled
       priceRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isExpiryEnabled
       expiryRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isRepeatEnabled
       repeatRules {
         type
-        value
+        weekValue {
+          label
+          value
+        }
+        monthValue {
+          label
+          value
+        }
+        yearStartValue
+        yearEndValue
       }
   
       createdAt
@@ -94,28 +109,43 @@ const discountEdit = `
       isQuantityEnabled
       quantityRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isPriceEnabled
       priceRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isExpiryEnabled
       expiryRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
+        discountBonusProduct
       }
 
       isRepeatEnabled
       repeatRules {
         type
-        value
+        weekValue {
+          label
+          value
+        }
+        monthValue {
+          label
+          value
+        }
+        yearStartValue
+        yearEndValue
       }
 
       createdAt

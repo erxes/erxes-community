@@ -4,34 +4,72 @@ export const SUBMENU = [{ title: __('Discounts'), link: '/pricing/discounts' }];
 
 export const STATUS_FILTER_OPTIONS = ['active', 'archived', 'completed'];
 
+export const RULE_OPTIONS = [
+  {
+    label: 'Exact',
+    value: 'exact'
+  },
+  {
+    label: 'Every',
+    value: 'every'
+  },
+  {
+    label: 'Minimum',
+    value: 'minimum'
+  }
+];
+
+export const DISCOUNT_OPTIONS = [
+  {
+    label: 'Default',
+    value: 'default'
+  },
+  {
+    label: 'Fixed',
+    value: 'fixed'
+  },
+  {
+    label: 'Subtraction',
+    value: 'subtraction'
+  },
+  {
+    label: 'Percentage',
+    value: 'percentage'
+  },
+  {
+    label: 'Bonus',
+    value: 'bonus'
+  }
+];
+
 export const WEEK_OPTIONS = [
   {
     label: 'Monday',
-    value: 1
+    value: '1'
   },
   {
     label: 'Tuesday',
-    value: 2
+    value: '2'
   },
   {
     label: 'Wednesday',
-    value: 3
+    value: '3'
   },
   {
     label: 'Thursday',
-    value: 4
+    value: '4'
   },
   {
     label: 'Friday',
-    value: 5
+    value: '5'
   },
   {
     label: 'Saturday',
-    value: 6
+    value: '6'
   },
   {
     label: 'Sunday',
-    value: 7
+    value: '0'
   }
 ];
 

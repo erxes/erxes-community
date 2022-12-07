@@ -54,28 +54,40 @@ const discountDetail = `
       isQuantityEnabled
       quantityRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
       }
 
       isPriceEnabled
       priceRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
       }
 
       isExpiryEnabled
       expiryRules {
         type
-        typeValue
+        value
+        discountType
         discountValue
       }
 
       isRepeatEnabled
       repeatRules {
         type
-        value
+        weekValue {
+          label
+          value
+        }
+        monthValue {
+          label
+          value
+        }
+        yearStartValue
+        yearEndValue
       }
     }
   }

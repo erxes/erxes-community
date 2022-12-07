@@ -15,6 +15,7 @@ const FormContainer = () => {
   const { id } = useParams();
   const [add] = useMutation(gql(mutations.discountAdd));
   const [edit] = useMutation(gql(mutations.discountEdit));
+
   const discountDetail = id
     ? useQuery(gql(queries.discountDetail), {
         variables: { id: id },

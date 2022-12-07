@@ -15,6 +15,7 @@ import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 import { __ } from '@erxes/ui/src/utils';
 // local
 import { Table } from '../../../styles';
+import DiscountInput from '../form/DiscountInput';
 import { DiscountData } from '../../../types';
 
 type Props = {
@@ -26,6 +27,14 @@ export default function General(props: Props) {
   const { formValues, handleState } = props;
 
   // Functions
+  const handleChange = (value: number) => {
+    handleState('value', value);
+  };
+
+  const handleBonusChange = (value: any) => {
+    handleState('bonusProduct', value);
+  };
+
   const renderProductForm = () => {
     if (formValues.applyType === 'category')
       return (
@@ -117,85 +126,55 @@ export default function General(props: Props) {
     </FormGroup>
   );
 
-  const renderDiscountInput = () => {
-    switch (formValues.type) {
-      case 'fixed':
-        return (
-          <FormGroup>
-            <FormLabel required={true}>{__('Discount value')}</FormLabel>
-            <FormControl
-              type="number"
-              name="value"
-              placeholder="0.00"
-              defaultValue={formValues.value}
-              required={true}
-              onChange={(event: any) =>
-                handleState(
-                  'value',
-                  parseFloat((event.target as HTMLInputElement).value)
-                )
-              }
+  const renderDateRanger = () => {
+    return (
+      <>
+        <FormGroup>
+          <FormControl
+            componentClass="checkbox"
+            name="startDate"
+            checked={formValues.isStartDateEnabled}
+            onChange={(event: any) =>
+              handleState('isStartDateEnabled', event.target.checked)
+            }
+          />
+          <FormLabel>{__('Start Date')}</FormLabel>
+          <DateContainer>
+            <Datetime
+              inputProps={{ placeholder: __('Select Date') }}
+              dateFormat="MM/DD/YYYY"
+              closeOnSelect={true}
+              timeFormat={true}
+              utc={true}
+              value={formValues.startDate || undefined}
+              onChange={(date: any) => handleState('startDate', date)}
             />
-          </FormGroup>
-        );
-
-      case 'subtraction':
-        return (
-          <FormGroup>
-            <FormLabel required={true}>{__('Discount value')}</FormLabel>
-            <FormControl
-              type="number"
-              name="value"
-              placeholder="0.00"
-              defaultValue={formValues.value}
-              required={true}
-              onChange={(event: any) =>
-                handleState(
-                  'value',
-                  parseFloat((event.target as HTMLInputElement).value)
-                )
-              }
+          </DateContainer>
+        </FormGroup>
+        <FormGroup>
+          <FormControl
+            componentClass="checkbox"
+            name="endDate"
+            checked={formValues.isEndDateEnabled}
+            onChange={(event: any) =>
+              handleState('isEndDateEnabled', event.target.checked)
+            }
+          />
+          <FormLabel>{__('End Date')}</FormLabel>
+          <DateContainer>
+            <Datetime
+              inputProps={{ placeholder: __('Select Date') }}
+              dateFormat="MM/DD/YYYY"
+              closeOnSelect={true}
+              timeFormat={true}
+              utc={true}
+              value={formValues.endDate || undefined}
+              onChange={(date: any) => handleState('endDate', date)}
             />
-          </FormGroup>
-        );
-
-      case 'percentage':
-        return (
-          <FormGroup>
-            <FormLabel required={true}>{__('Discount percentage')}</FormLabel>
-            <FormControl
-              type="number"
-              name="value"
-              placeholder="0%"
-              min={0}
-              max={100}
-              defaultValue={formValues.value}
-              required={true}
-              onChange={(event: any) =>
-                handleState(
-                  'value',
-                  parseFloat((event.target as HTMLInputElement).value)
-                )
-              }
-            />
-          </FormGroup>
-        );
-      case 'bonus':
-        return (
-          <FormGroup>
-            <FormLabel>{__('Bonus product')}</FormLabel>
-            <SelectProducts
-              name="value"
-              label="Choose bonus products"
-              initialValue={formValues.bonusProduct}
-              onSelect={product => handleState('bonusProduct', product)}
-              multi={false}
-            />
-          </FormGroup>
-        );
-      default:
-        return;
-    }
+          </DateContainer>
+        </FormGroup>
+      </>
+    );
   };
 
   const renderBaseForm = () => (
@@ -265,113 +244,25 @@ export default function General(props: Props) {
             />
           </FormGroup>
           {renderDiscountOptions()}
-          {renderDiscountInput()}
+          <DiscountInput
+            type={formValues.type}
+            value={formValues.value}
+            handleChange={(value: number) => handleState('value', value)}
+            bonusValue={formValues.bonusProduct}
+            handleBonusChange={(value: any) =>
+              handleState('bonusProduct', value)
+            }
+            isLabelOn={true}
+          />
+          {renderDateRanger()}
         </FormColumn>
       </FormWrapper>
     </>
   );
 
-  const renderDateRanger = () => {
-    return (
-      <Table>
-        <tbody>
-          <tr>
-            <td>
-              <FormGroup>
-                <FormControl
-                  componentClass="checkbox"
-                  name="startDate"
-                  checked={formValues.isStartDateEnabled}
-                  onChange={(event: any) =>
-                    handleState('isStartDateEnabled', event.target.checked)
-                  }
-                />
-                <FormLabel>{__('Start Date')}</FormLabel>
-              </FormGroup>
-            </td>
-            <td>
-              <FormGroup>
-                <DateContainer>
-                  <Datetime
-                    inputProps={{ placeholder: __('Select Date') }}
-                    dateFormat="MM/DD/YYYY"
-                    closeOnSelect={true}
-                    timeFormat={false}
-                    utc={true}
-                    value={formValues.startDate || undefined}
-                    onChange={(date: any) => handleState('startDate', date)}
-                  />
-                </DateContainer>
-              </FormGroup>
-            </td>
-            <td>
-              <FormGroup>
-                <DateContainer>
-                  <Datetime
-                    inputProps={{ placeholder: __('Select Time') }}
-                    dateFormat={false}
-                    closeOnSelect={true}
-                    timeFormat={true}
-                    utc={true}
-                  />
-                </DateContainer>
-              </FormGroup>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <FormGroup>
-                <FormControl
-                  componentClass="checkbox"
-                  name="endDate"
-                  checked={formValues.isEndDateEnabled}
-                  onChange={(event: any) =>
-                    handleState('isEndDateEnabled', event.target.checked)
-                  }
-                />
-                <FormLabel>{__('End Date')}</FormLabel>
-              </FormGroup>
-            </td>
-            <td>
-              <FormGroup>
-                <DateContainer>
-                  <Datetime
-                    inputProps={{ placeholder: __('Select Date') }}
-                    dateFormat="MM/DD/YYYY"
-                    closeOnSelect={true}
-                    timeFormat={false}
-                    utc={true}
-                    value={formValues.endDate || undefined}
-                    onChange={(date: any) => handleState('endDate', date)}
-                  />
-                </DateContainer>
-              </FormGroup>
-            </td>
-            <td>
-              <FormGroup>
-                <DateContainer>
-                  <Datetime
-                    inputProps={{ placeholder: __('Select Time') }}
-                    dateFormat={false}
-                    closeOnSelect={true}
-                    timeFormat={true}
-                    utc={true}
-                  />
-                </DateContainer>
-              </FormGroup>
-            </td>
-          </tr>
-        </tbody>
-      </Table>
-    );
-  };
-
   return (
     <FlexItem>
-      <LeftItem>
-        {renderBaseForm()}
-        {renderDateRanger()}
-      </LeftItem>
+      <LeftItem>{renderBaseForm()}</LeftItem>
     </FlexItem>
   );
 }

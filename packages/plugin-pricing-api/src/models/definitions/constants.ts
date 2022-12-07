@@ -6,12 +6,13 @@ export const STATUS_TYPES = {
   ALL: ['active', 'draft', 'archived', 'completed']
 };
 
-export const AMOUNT_TYPES = {
+export const DISCOUNT_TYPES = {
+  DEFAULT: 'default',
   FIXED: 'fixed',
   SUBTRACTION: 'subtraction',
   PERCENTAGE: 'percentage',
   BONUS: 'bonus',
-  ALL: ['fixed', 'subtraction', 'percentage', 'bonus']
+  ALL: ['default', 'fixed', 'subtraction', 'percentage', 'bonus']
 };
 
 export const APPLY_TYPES = {
