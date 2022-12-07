@@ -9,7 +9,7 @@ import { customerToErkhet, companyToErkhet } from './utils/customerToErkhet';
 import { sendCardsMessage } from './messageBroker';
 
 export default {
-  'cards:ticket': ['create'],
+  'cards:deal': ['update'],
   'products:productCategory': ['create', 'update', 'delete'],
   'products:product': ['create', 'update', 'delete'],
   'contacts:customer': ['create', 'update', 'delete'],
