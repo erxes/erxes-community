@@ -15,7 +15,7 @@ import { IRouterProps } from '@erxes/ui/src/types';
 import { __, router } from '@erxes/ui/src/utils';
 
 import { menuNavs } from '../../../constants';
-import { IOverallWorkDocument, IPerformDocument } from '../../types';
+import { IPerformDocument } from '../../types';
 import Row from './PerformRow';
 
 interface IProps extends IRouterProps {
@@ -24,7 +24,6 @@ interface IProps extends IRouterProps {
   performs: IPerformDocument[];
   performsCount: number;
   loading: boolean;
-  overallWorkDetail: IOverallWorkDocument;
   searchValue: string;
 }
 

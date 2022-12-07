@@ -11,10 +11,12 @@ import { IOverallWorkDet } from '../types';
 import CollapseContent from '@erxes/ui/src/components/CollapseContent';
 import { SidebarMainContent } from '@erxes/ui/src/layout/styles';
 import Table from '@erxes/ui/src/components/table';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
 
 interface Props {
   overallWork?: IOverallWorkDet;
   queryParams: any;
+  counts: any;
 }
 
 type State = {
@@ -35,7 +37,7 @@ class DetailRightSidebar extends React.Component<Props, State> {
   }
 
   render() {
-    const { overallWork } = this.props;
+    const { overallWork, counts } = this.props;
     if (!overallWork) {
       return (
         <CustomSideContent wide={true} hasBorder={true}>
@@ -63,7 +65,12 @@ class DetailRightSidebar extends React.Component<Props, State> {
           </Section.Title>
           <SidebarMainContent>
             <List id="OverallWorkRightSidebar">
-              <CollapseContent title={__('Need side')} open={true}>
+              <CollapseContent
+                title={__(
+                  `Need side ( ${counts.minPotentialCount.toLocaleString()} )`
+                )}
+                open={true}
+              >
                 <Table>
                   <thead>
                     <tr>
@@ -91,7 +98,12 @@ class DetailRightSidebar extends React.Component<Props, State> {
                   </tbody>
                 </Table>
               </CollapseContent>
-              <CollapseContent title={__('Result side')} open={true}>
+              <CollapseContent
+                title={__(
+                  `Result side ( ${counts.maxMadeCount.toLocaleString()} )`
+                )}
+                open={true}
+              >
                 <Table>
                   <thead>
                     <tr>

@@ -1,33 +1,30 @@
 import * as compose from 'lodash.flowright';
-
-import { IOverallWorkDocument } from '../types';
-import { IJobRefer } from '../../job/types';
-
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import Form from '../components/perform/PerformForm';
+import gql from 'graphql-tag';
+import React from 'react';
+import { graphql } from 'react-apollo';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { IFlowDocument } from '../../flow/types';
-import React from 'react';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { IJobRefer } from '../../job/types';
 import { mutations } from '../graphql';
 import { queries } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils';
+import { IOverallWorkDet } from '../../overallWork/types';
+import { IProductsData } from '../../types';
 
 type Props = {
   closeModal: () => void;
   history: any;
-  overallWorkDetail: IOverallWorkDocument;
-  max: number;
-  jobRefers: IJobRefer[];
-  flows: IFlowDocument[];
+  overallWorkDetail?: IOverallWorkDet;
+  max?: number;
 };
 
 type FinalProps = {} & Props;
 
 class ProductFormContainer extends React.Component<FinalProps> {
   render() {
-    const { overallWorkDetail, max, jobRefers, flows } = this.props;
+    const { overallWorkDetail, max } = this.props;
 
     const renderButton = ({
       name,
@@ -51,7 +48,7 @@ class ProductFormContainer extends React.Component<FinalProps> {
         startAt: new Date(),
         endAt: new Date(),
         dueDate: new Date(),
-        overallWorkId: overallWorkDetail._id,
+        overallWorkId: overallWorkDetail?._id,
         status: 'new',
         count: Number(count).toString(),
         needProducts: performNeedProducts,
@@ -78,13 +75,7 @@ class ProductFormContainer extends React.Component<FinalProps> {
     };
 
     return (
-      <Form
-        {...updatedProps}
-        overallWorkDetail={overallWorkDetail}
-        max={max}
-        jobRefers={jobRefers}
-        flows={flows}
-      />
+      <Form {...updatedProps} overallWorkDetail={overallWorkDetail} max={max} />
     );
   }
 }

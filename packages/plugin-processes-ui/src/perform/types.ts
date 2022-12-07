@@ -35,38 +35,6 @@ export interface IWorkDocument extends IWork, Document {
   updatedBy: string;
 }
 
-export interface IOverallWork {
-  status: string;
-  dueDate: Date;
-  startAt: Date;
-  endAt: Date;
-  assignUserIds: string[];
-  jobId: string;
-  job: any;
-  flowId: string;
-  flow: any;
-  intervalId?: string;
-  interval: any;
-  outBranchId?: string;
-  outBranch: string;
-  outDepartmentId?: string;
-  outDepartment: string;
-  inBranchId?: string;
-  inBranch: any;
-  inDepartmentId?: string;
-  inDepartment: string;
-  needProducts?: any[];
-  resultProducts?: any[];
-  needProductsDetail?: any[];
-  resultProductsDetail?: any[];
-}
-
-export interface IOverallWorkDocument extends IOverallWork, Document {
-  _id: string;
-  createdAt: Date;
-  createdBy: string;
-}
-
 export interface IPerform {
   overallWorkId: string;
   overallWork: any;
@@ -92,22 +60,6 @@ export type WorksQueryResponse = {
 
 export type WorksTotalCountQueryResponse = {
   worksTotalCount: number;
-} & QueryResponse;
-
-export type OverallWorksQueryResponse = {
-  overallWorks: IOverallWork[];
-} & QueryResponse;
-
-export type OverallWorksSideBarQueryResponse = {
-  overallWorksSideBar: IOverallWork[];
-} & QueryResponse;
-
-export type OverallWorksSideBarDetailQueryResponse = {
-  overallWorksSideBarDetail: IOverallWorkDocument;
-} & QueryResponse;
-
-export type OverallWorksTotalCountQueryResponse = {
-  overallWorksTotalCount: number;
 } & QueryResponse;
 
 export type PerformsQueryResponse = {

@@ -291,7 +291,6 @@ class DetailLeftSidebar extends React.Component<Props, State> {
                   dateFormat="YYYY/MM/DD"
                   timeFormat={true}
                   placeholder="Choose date"
-                  defaultValue={filterParams.startDate || ''}
                   value={filterParams.endDate || ''}
                   onChange={value => this.onSelectDate(value, 'endDate')}
                 />

@@ -17,6 +17,7 @@ import { withRouter } from 'react-router-dom';
 import DetailRightSidebar from './DetailRightSidebar';
 import PerformRow from './PerformRow';
 import { BarItems } from '@erxes/ui/src/layout/styles';
+import Form from '../../perform/containers/PerformForm';
 
 type Props = {
   history: any;
@@ -26,13 +27,54 @@ type Props = {
   performs: IPerform[];
 } & IRouterProps;
 
-type State = {};
+type State = {
+  minPotentialCount: number;
+  maxMadeCount: number;
+};
 
 class OverallWorkDetail extends React.Component<Props, State> {
+  calcMinPotentialCount = () => {
+    const { overallWork } = this.props;
+    if (!overallWork) {
+      return 0;
+    }
+
+    let count = overallWork.needProductsData[0].liveRem;
+
+    for (const data of overallWork.needProductsData) {
+      if (count > data.liveRem) {
+        count = data.liveRem;
+      }
+    }
+
+    return count;
+  };
+
+  calcMaxMadeCount = () => {
+    const { overallWork } = this.props;
+    if (!overallWork) {
+      return 0;
+    }
+
+    let count = overallWork.resultProductsData[0].liveRem;
+
+    for (const data of overallWork.resultProductsData) {
+      const diff = data.quantity + data.reserveRem - data.liveRem;
+      if (count < diff) {
+        count = diff;
+      }
+    }
+
+    return count;
+  };
+
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      minPotentialCount: this.calcMinPotentialCount(),
+      maxMadeCount: this.calcMaxMadeCount()
+    };
   }
 
   displayValue(overallWork, name) {
@@ -142,14 +184,19 @@ class OverallWorkDetail extends React.Component<Props, State> {
       </Button>
     );
 
-    // const modalContent = props => <Form {...props} />;
-    const modalContent = props => <></>;
+    const modalContent = props => (
+      <Form
+        {...props}
+        overallWorkDetail={overallWork}
+        max={this.state.minPotentialCount}
+      />
+    );
 
     const actionBarRight = (
       <BarItems>
         <ModalTrigger
           title="Add Performance"
-          size="lg"
+          size="xl"
           trigger={trigger}
           autoOpenKey="showProductModal"
           content={modalContent}
@@ -174,6 +221,7 @@ class OverallWorkDetail extends React.Component<Props, State> {
           <DetailRightSidebar
             queryParams={queryParams}
             overallWork={overallWork}
+            counts={this.state}
           />
         }
         content={mainContent}
