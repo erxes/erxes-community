@@ -1,4 +1,4 @@
-import { __, DataWithLoader, Pagination, Table, Wrapper } from '@erxes/ui/src';
+import { __ } from '@erxes/ui/src/utils';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { menuNavs } from '../../constants';
 import React from 'react';
@@ -8,6 +8,10 @@ import { TableWrapper } from '../../styles';
 import { IOverallWork } from '../types';
 import Row from './Row';
 import Sidebar from './Sidebar';
+import Table from '@erxes/ui/src/components/table';
+import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 
 interface IProps extends IRouterProps {
   overallWorks: IOverallWork[];
@@ -43,8 +47,8 @@ class OverallWorks extends React.Component<IProps, {}> {
           <tbody id="overallWorks">
             {(overallWorks || []).map(work => (
               <Row
-                work={work}
                 key={Math.random()}
+                work={work}
                 history={history}
                 queryParams={queryParams}
               />

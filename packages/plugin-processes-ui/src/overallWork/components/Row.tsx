@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React from 'react';
 import { FinanceAmount } from '../../styles';
 import { IOverallWork } from '../types';
-import moment from 'moment';
 import queryString from 'query-string';
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
   queryParams: any;
 };
 
-class PutResponseRow extends React.Component<Props> {
+class OverallWorkRow extends React.Component<Props> {
   displayLocInfo(obj) {
     if (!obj) {
       return '';
@@ -57,7 +56,6 @@ class PutResponseRow extends React.Component<Props> {
         <td>{this.displayWithNameInfo(work.product)}</td>
         <td key={'receivableAmount'}>{this.displayValue(work, 'count')}</td>
         <td>{this.displayLocInfo(work.inBranch)}</td>
-        <td>{this.displayLocInfo(work.inDepartment)}</td>
         <td>{this.displayLocInfo(work.outBranch)}</td>
         <td>{this.displayLocInfo(work.outDepartment)}</td>
         <td key={'actions'} onClick={onClick}></td>
@@ -66,4 +64,4 @@ class PutResponseRow extends React.Component<Props> {
   }
 }
 
-export default PutResponseRow;
+export default OverallWorkRow;

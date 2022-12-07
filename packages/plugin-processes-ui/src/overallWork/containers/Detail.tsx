@@ -5,7 +5,10 @@ import React from 'react';
 import { Alert, Spinner, withProps } from '@erxes/ui/src';
 import { graphql } from 'react-apollo';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { OverallWorkDetailQueryResponse } from '../types';
+import {
+  OverallWorkDetailQueryResponse,
+  PerformsQueryResponse
+} from '../types';
 import { queries } from '../graphql';
 import { withRouter } from 'react-router-dom';
 
@@ -16,6 +19,7 @@ type Props = {
 
 type FinalProps = {
   overallWorkDetailQuery: OverallWorkDetailQueryResponse;
+  performsQuery: PerformsQueryResponse;
 } & Props &
   IRouterProps;
 
@@ -29,9 +33,9 @@ class OverallWorkDetailContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    const { overallWorkDetailQuery } = this.props;
+    const { overallWorkDetailQuery, performsQuery } = this.props;
 
-    if (overallWorkDetailQuery.loading) {
+    if (overallWorkDetailQuery.loading || performsQuery.loading) {
       return <Spinner />;
     }
 
@@ -42,11 +46,13 @@ class OverallWorkDetailContainer extends React.Component<FinalProps> {
     }
 
     const overallWork = overallWorkDetailQuery.overallWorkDetail;
+    const performs = performsQuery.performs;
 
     const updatedProps = {
       ...this.props,
       errorMsg,
-      overallWork
+      overallWork,
+      performs
     };
 
     return <Detail {...updatedProps} />;
@@ -77,6 +83,13 @@ export default withProps<Props>(
           fetchPolicy: 'network-only'
         })
       }
-    )
+    ),
+    graphql<{ queryParams }, PerformsQueryResponse, {}>(gql(queries.performs), {
+      name: 'performsQuery',
+      options: ({ queryParams }) => ({
+        variables: generateParams({ queryParams }),
+        fetchPolicy: 'network-only'
+      })
+    })
   )(withRouter<IRouterProps>(OverallWorkDetailContainer))
 );

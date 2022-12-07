@@ -83,18 +83,19 @@ class DetailLeftSidebar extends React.Component<Props, State> {
     this.setState({ filterParams: { ...filterParams, [name]: value } });
   };
 
-  onInputChange = e => {
-    e.preventDefault();
+  onchangeType = e => {
+    const { filterParams } = this.state;
+    const value = (e.currentTarget as HTMLInputElement).value;
 
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-
-    const value = e.target.value;
-    const name = e.target.name;
-    this.timer = setTimeout(() => {
-      this.setFilter(name, value);
-    }, 500);
+    this.setState({
+      filterParams: {
+        ...filterParams,
+        jobReferId: '',
+        productId: '',
+        productCategoryId: '',
+        type: value
+      }
+    });
   };
 
   onSelectDate = (value, name) => {
@@ -104,7 +105,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
 
   runFilter = () => {
     const { filterParams } = this.state;
-    router.removeParams(this.props.history, 'page');
+
     router.setParams(this.props.history, { ...filterParams });
   };
 
@@ -198,12 +199,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
                 componentClass="select"
                 value={filterParams.type}
                 required={false}
-                onChange={e =>
-                  this.setFilter(
-                    'type',
-                    (e.currentTarget as HTMLInputElement).value
-                  )
-                }
+                onChange={this.onchangeType}
               >
                 <option value="">All type</option>
                 {Object.keys(JOB_TYPE_CHOISES).map(jt => (

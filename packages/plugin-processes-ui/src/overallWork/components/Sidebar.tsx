@@ -299,7 +299,10 @@ class Sidebar extends React.Component<Props, State> {
                   dateFormat="YYYY/MM/DD"
                   timeFormat={true}
                   placeholder="Choose date"
-                  value={filterParams.startDate || ''}
+                  value={
+                    filterParams.startDate ||
+                    moment(new Date(new Date().setHours(0, 0, 0)))
+                  }
                   onChange={value => this.onSelectDate(value, 'startDate')}
                 />
               </DateContainer>
@@ -312,8 +315,14 @@ class Sidebar extends React.Component<Props, State> {
                   dateFormat="YYYY/MM/DD"
                   timeFormat={true}
                   placeholder="Choose date"
-                  defaultValue={filterParams.startDate || ''}
-                  value={filterParams.endDate || ''}
+                  value={
+                    filterParams.endDate ||
+                    moment(
+                      new Date(
+                        new Date().setHours(0, 0, 0) + 24 * 60 * 60 * 1000
+                      )
+                    )
+                  }
                   onChange={value => this.onSelectDate(value, 'endDate')}
                 />
               </DateContainer>

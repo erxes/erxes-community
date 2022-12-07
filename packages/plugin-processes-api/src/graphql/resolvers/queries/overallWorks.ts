@@ -152,7 +152,7 @@ const overallWorkQueries = {
     const _page = Number(page || '1');
     const _limit = Number(perPage || '20');
 
-    const res = await models.Works.aggregate([
+    const groupedWorks = await models.Works.aggregate([
       { $match: selector },
       { $sort: { dueDate: 1 } },
       {
@@ -218,7 +218,7 @@ const overallWorkQueries = {
       }
     ]);
 
-    return res;
+    return groupedWorks;
   },
 
   async overallWorksCount(
@@ -236,7 +236,7 @@ const overallWorkQueries = {
       commonQuerySelector
     );
 
-    const res = await models.Works.aggregate([
+    const groupedWorks = await models.Works.aggregate([
       { $match: selector },
       {
         $project: {
@@ -260,7 +260,7 @@ const overallWorkQueries = {
         }
       }
     ]);
-    return res.length;
+    return groupedWorks.length;
   },
 
   async overallWorkDetail(
@@ -313,11 +313,11 @@ const overallWorkQueries = {
       throw new Error('Must choose in or out location infos');
     }
 
-    if (!jobReferId && !(productId || productCategoryId)) {
-      throw new Error(
-        'Must choose job refef or product or product category on filter'
-      );
-    }
+    // if (!jobReferId && !(productId || productCategoryId)) {
+    //   throw new Error(
+    //     'Must choose job refer or product or product category on filter'
+    //   );
+    // }
 
     const selector = await generateFilter(
       subdomain,
@@ -326,7 +326,7 @@ const overallWorkQueries = {
       commonQuerySelector
     );
 
-    const res = await models.Works.aggregate([
+    const groupedWorks = await models.Works.aggregate([
       { $match: selector },
       { $sort: { dueDate: 1 } },
       {
@@ -386,18 +386,27 @@ const overallWorkQueries = {
       }
     ]);
 
-    console.log(res.length, 'kkkkkkkkkkkkkkkkkkkkkk');
-    if (!res.length) {
+    if (!groupedWorks.length) {
       throw new Error('not found overall work');
     }
 
-    const overallWork = res[0];
-    // console.log(overallWork)
+    let overallWork = groupedWorks[0];
 
-    // console.log(overallWork.needProducts)
+    if (JOB_TYPES.SINGLES.includes(type)) {
+      let needData = [];
+      let resultData = [];
+
+      for (const work of groupedWorks) {
+        needData = needData.concat(work.needProducts.map(w => w));
+        resultData = resultData.concat(work.resultProducts.map(w => w));
+      }
+      overallWork.needProducts = needData;
+      overallWork.resultProducts = resultData;
+    }
+
     overallWork.needProducts =
       getProductsData(overallWork.needProducts || []) || [];
-    // console.log('xxxxxxxxxxxxxxxxxxxxx', overallWork.needProducts, 'cccccccccccccccccccccccccc')
+
     overallWork.resultProducts =
       getProductsData(overallWork.resultProducts || []) || [];
 
@@ -405,7 +414,7 @@ const overallWorkQueries = {
       subdomain,
       overallWork
     );
-    // console.log(overallWork.needProductsData)
+
     overallWork.resultProductsData = await resultProductsData(
       subdomain,
       overallWork

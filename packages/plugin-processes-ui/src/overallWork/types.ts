@@ -37,6 +37,30 @@ export type IOverallWorkDet = {
   resultProductsData: any;
 } & IOverallWork;
 
+export type IPerform = {
+  _id: string;
+  overallWorkId: string;
+  overallWorkKey: IOverallWorkKey;
+  type: string;
+  typeId: string;
+  count: string;
+  status: string;
+  startAt: Date;
+  endAt: Date;
+  dueAt: Date;
+  needProducts: any[];
+  resultProducts: any[];
+  inDepartmentId?: string;
+  inBranchId?: string;
+  outDepartmentId?: string;
+  outBranchId?: string;
+
+  inDepartment?: IDepartment;
+  inBranch?: IBranch;
+  outDepartment?: IDepartment;
+  outBranch?: IBranch;
+};
+
 export type OverallWorksQueryResponse = {
   overallWorks: IOverallWork[];
   loading: boolean;

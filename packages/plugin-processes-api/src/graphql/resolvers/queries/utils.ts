@@ -1,4 +1,3 @@
-import { getProductsData } from '../customResolver/utils';
 import { IOverallWork } from './../../../models/definitions/overallWorks';
 import {
   sendProductsMessage,

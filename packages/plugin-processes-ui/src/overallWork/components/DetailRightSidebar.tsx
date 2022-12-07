@@ -13,7 +13,7 @@ import { SidebarMainContent } from '@erxes/ui/src/layout/styles';
 import Table from '@erxes/ui/src/components/table';
 
 interface Props {
-  overallWork: IOverallWorkDet;
+  overallWork?: IOverallWorkDet;
   queryParams: any;
 }
 
@@ -36,6 +36,15 @@ class DetailRightSidebar extends React.Component<Props, State> {
 
   render() {
     const { overallWork } = this.props;
+    if (!overallWork) {
+      return (
+        <CustomSideContent wide={true} hasBorder={true}>
+          <SidebarFilters>
+            <Section.Title>{__('Filters')}</Section.Title>
+          </SidebarFilters>
+        </CustomSideContent>
+      );
+    }
 
     return (
       <CustomSideContent wide={true} hasBorder={true}>
@@ -67,7 +76,7 @@ class DetailRightSidebar extends React.Component<Props, State> {
                   </thead>
                   <tbody id="overallWorks">
                     {(overallWork.needProductsData || []).map(data => (
-                      <tr>
+                      <tr key={Math.random()}>
                         <td>
                           {data.product
                             ? `${data.product.code} - ${data.product.name}`
@@ -95,7 +104,7 @@ class DetailRightSidebar extends React.Component<Props, State> {
                   </thead>
                   <tbody id="overallWorks">
                     {(overallWork.resultProductsData || []).map(data => (
-                      <tr>
+                      <tr key={Math.random()}>
                         <td>
                           {data.product
                             ? `${data.product.code} - ${data.product.name}`

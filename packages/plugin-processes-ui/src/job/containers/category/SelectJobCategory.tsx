@@ -31,7 +31,8 @@ export default ({
   initialValue,
   multi = true,
   label,
-  name
+  name,
+  customOption
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -49,6 +50,7 @@ export default ({
       showAvatar={false}
       label={label}
       queryName="jobCategories"
+      customOption={customOption}
       name={name}
       customQuery={queries.jobCategories}
       initialValue={defaultValue}

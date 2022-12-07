@@ -23,7 +23,8 @@ export default ({
   initialValue,
   multi = true,
   label,
-  name
+  name,
+  customOption
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -42,6 +43,7 @@ export default ({
       label={label}
       queryName="jobRefers"
       name={name}
+      customOption={customOption}
       customQuery={queries.jobRefers}
       initialValue={defaultValue}
       generateOptions={generateProductOptions}

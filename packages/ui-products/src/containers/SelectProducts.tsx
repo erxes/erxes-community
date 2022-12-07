@@ -20,6 +20,7 @@ export function generateProductOptions(array: IProduct[] = []): IOption[] {
 export default ({
   queryParams,
   onSelect,
+  customOption,
   initialValue,
   multi = true,
   label,
@@ -42,6 +43,7 @@ export default ({
       label={label}
       queryName="products"
       name={name}
+      customOption={customOption}
       customQuery={queries.products}
       initialValue={defaultValue}
       generateOptions={generateProductOptions}
