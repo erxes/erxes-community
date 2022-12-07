@@ -1,6 +1,6 @@
 import * as compose from 'lodash.flowright';
 
-import { AllProductsQueryResponse, IOverallWorkDocument } from '../types';
+import { IOverallWorkDocument } from '../types';
 import { IJobRefer } from '../../job/types';
 
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
@@ -13,7 +13,6 @@ import { graphql } from 'react-apollo';
 import { mutations } from '../graphql';
 import { queries } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils';
-import { IProduct } from '@erxes/ui-products/src/types';
 
 type Props = {
   closeModal: () => void;
@@ -24,25 +23,11 @@ type Props = {
   flows: IFlowDocument[];
 };
 
-type FinalProps = {
-  allProductsQuery: AllProductsQueryResponse;
-} & Props;
+type FinalProps = {} & Props;
 
 class ProductFormContainer extends React.Component<FinalProps> {
   render() {
-    const {
-      overallWorkDetail,
-      max,
-      jobRefers,
-      flows,
-      allProductsQuery
-    } = this.props;
-
-    if (allProductsQuery.loading) {
-      return null;
-    }
-
-    const products: IProduct[] = allProductsQuery.allProducts || [];
+    const { overallWorkDetail, max, jobRefers, flows } = this.props;
 
     const renderButton = ({
       name,
@@ -99,7 +84,6 @@ class ProductFormContainer extends React.Component<FinalProps> {
         max={max}
         jobRefers={jobRefers}
         flows={flows}
-        products={products}
       />
     );
   }
@@ -114,10 +98,4 @@ const getRefetchQueries = test => {
   ];
 };
 
-export default withProps<Props>(
-  compose(
-    graphql<Props, AllProductsQueryResponse, {}>(gql(queries.allProducts), {
-      name: 'allProductsQuery'
-    })
-  )(ProductFormContainer)
-);
+export default withProps<Props>(compose()(ProductFormContainer));

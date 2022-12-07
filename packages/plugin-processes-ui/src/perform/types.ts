@@ -125,7 +125,3 @@ export type PerformsTotalCountQueryResponse = {
 export type PerformsByOverallWorkIdTotalCountQueryResponse = {
   performsByOverallWorkIdTotalCount: number;
 } & QueryResponse;
-
-export type AllProductsQueryResponse = {
-  allProducts: any[];
-} & QueryResponse;

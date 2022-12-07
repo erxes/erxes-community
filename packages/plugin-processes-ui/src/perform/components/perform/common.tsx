@@ -1,6 +1,7 @@
 import { IProduct } from '@erxes/ui-products/src/types';
 import { IFlowDocument } from '../../../flow/types';
-import { IJobRefer, IProductsData } from '../../../job/types';
+import { IJobRefer } from '../../../job/types';
+import { IProductsData } from '../../../types';
 import { IOverallWorkDocument } from '../../types';
 
 export const calculateCount = (

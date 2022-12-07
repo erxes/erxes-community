@@ -17,7 +17,6 @@ import { __, router } from '@erxes/ui/src/utils';
 import { menuNavs } from '../../../constants';
 import { IOverallWorkDocument, IPerformDocument } from '../../types';
 import Row from './PerformRow';
-import OverallWorkSideBarDetail from '../../containers/OverallWorkSideBarDetail';
 
 interface IProps extends IRouterProps {
   history: any;
@@ -114,19 +113,6 @@ class List extends React.Component<IProps, State> {
 
     e.target.value = '';
     e.target.value = tmpValue;
-  }
-
-  renderLeftDetail() {
-    const { queryParams } = this.props;
-    const overallWorkId = queryParams.overallWorkId || null;
-
-    if (overallWorkId) {
-      return (
-        <OverallWorkSideBarDetail queryParams={queryParams} history={history} />
-      );
-    } else {
-      return null;
-    }
   }
 
   render() {
