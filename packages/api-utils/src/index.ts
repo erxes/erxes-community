@@ -6,6 +6,8 @@ import {
   getEnv,
   getNextMonth,
   getToday,
+  getPureDate,
+  getTomorrow,
   getUserDetail,
   paginate,
   regexSearchText,
@@ -50,6 +52,8 @@ export { fixDate };
 export { getPureDate };
 export { getDate };
 export { getToday };
+export { getPureDate };
+export { getTomorrow };
 export { getNextMonth };
 export { checkUserIds };
 export { chunkArray };
@@ -90,6 +94,8 @@ export default {
   getPureDate,
   getDate,
   getToday,
+  getPureDate,
+  getTomorrow,
   getNextMonth,
   checkUserIds,
   chunkArray,
