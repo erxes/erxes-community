@@ -34,8 +34,7 @@ export default ({
   multi = true,
   customOption,
   label,
-  name,
-  customOption
+  name
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -54,7 +53,6 @@ export default ({
       label={label}
       queryName="productCategories"
       name={name}
-      customOption={customOption}
       customQuery={queries.productCategories}
       initialValue={defaultValue}
       generateOptions={generateProductOptions}
