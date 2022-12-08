@@ -542,15 +542,21 @@ async function startServer() {
     }
 
     if (documents) {
-      if (documents.editorAttributes) {
-        consumeRPCQueue(
-          `${configs.name}:documents.editorAttributes`,
-          async args => ({
-            status: 'success',
-            data: await documents.editorAttributes()
-          })
-        );
-      }
+      consumeRPCQueue(
+        `${configs.name}:documents.editorAttributes`,
+        async args => ({
+          status: 'success',
+          data: await documents.editorAttributes()
+        })
+      );
+
+      consumeRPCQueue(
+        `${configs.name}:documents.replaceContent`,
+        async args => ({
+          status: 'success',
+          data: await documents.replaceContent(args)
+        })
+      );
     }
   } // end configs.meta if
 

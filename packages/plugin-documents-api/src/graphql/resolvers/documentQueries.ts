@@ -6,22 +6,24 @@ import { sendCommonMessage } from '../../messageBroker';
 const documentQueries = {
   documents(
     _root,
-    {
-      limit
-    }: {
-      limit: number;
-    },
+    { limit, contentType }: { limit: number; contentType: string },
     { models }: IContext
   ) {
     const sort = { date: -1 };
 
+    const selector: any = {};
+
+    if (contentType) {
+      selector.contentType = contentType;
+    }
+
     if (limit) {
-      return models.Documents.find({})
+      return models.Documents.find(selector)
         .sort(sort)
         .limit(limit);
     }
 
-    return paginate(models.Documents.find({}), {}).sort(sort);
+    return paginate(models.Documents.find(selector), {}).sort(sort);
   },
 
   documentsDetail(_root, { _id }, { models }: IContext) {

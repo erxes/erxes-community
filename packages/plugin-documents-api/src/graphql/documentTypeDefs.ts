@@ -20,6 +20,7 @@ const params = `
   limit: Int,
   page: Int,
   perPage: Int,
+  contentType: String
 `;
 
 export const queries = `
