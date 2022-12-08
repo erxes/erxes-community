@@ -3,6 +3,7 @@ import resolvers from './graphql/resolvers';
 
 import { generateModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import { initBroker } from './messageBroker';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -30,6 +31,8 @@ export default {
 
   onServerInit: async options => {
     mainDb = options.db;
+
+    initBroker(options.messageBrokerClient);
 
     debug = options.debug;
     graphqlPubsub = options.pubsubClient;

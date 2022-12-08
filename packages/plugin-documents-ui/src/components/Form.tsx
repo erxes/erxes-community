@@ -1,7 +1,7 @@
 import Button from '@erxes/ui/src/components/Button';
 import React from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import EditorCK from '@erxes/ui/src/components/EditorCK';
+import EditorCK from '../containers/EditorCK';
 import { __ } from 'coreui/utils';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormControl from '@erxes/ui/src/components/form/Control';
@@ -45,8 +45,9 @@ class Form extends React.Component<Props, State> {
 
   render() {
     const { obj } = this.props;
+    const { content } = this.state;
 
-    const content = (
+    const formContent = (
       <>
         <FormGroup>
           <ControlLabel required={true}>Name</ControlLabel>
@@ -60,14 +61,21 @@ class Form extends React.Component<Props, State> {
         </FormGroup>
 
         <FormGroup>
-          <ControlLabel required={true}>Content</ControlLabel>
+          <div style={{ float: 'left', width: '800px', marginRight: '50px' }}>
+            <EditorCK
+              content={obj.content}
+              onChange={this.onContentChange}
+              height={600}
+              name="document-form"
+            />
+          </div>
 
-          <EditorCK
-            content={obj.content}
-            onChange={this.onContentChange}
-            height={200}
-            name="document-form"
-          />
+          <div
+            style={{ float: 'left' }}
+            dangerouslySetInnerHTML={{ __html: content || '' }}
+          ></div>
+
+          <div style={{ clear: 'both' }} />
         </FormGroup>
 
         <Button
@@ -91,7 +99,7 @@ class Form extends React.Component<Props, State> {
         header={
           <Wrapper.Header title={__('Documents')} breadcrumb={breadcrumb} />
         }
-        content={content}
+        content={formContent}
         transparent={true}
         hasBorder
       />

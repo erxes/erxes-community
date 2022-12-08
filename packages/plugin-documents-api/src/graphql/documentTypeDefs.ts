@@ -9,6 +9,11 @@ export const types = `
     name: String!
     content: String
   }
+
+  type DocumentEditorAttribute {
+    value: String
+    name: String
+  }
 `;
 
 const params = `
@@ -20,6 +25,7 @@ const params = `
 export const queries = `
   documents(${params}): [Document]
   documentsDetail(_id: String!): Document
+  documentsGetEditorAttributes(contentType: String!): [DocumentEditorAttribute]
   documentsTotalCount: Int
 `;
 

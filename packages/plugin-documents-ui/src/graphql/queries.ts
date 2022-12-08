@@ -20,6 +20,15 @@ const documentsDetail = `
   }
 `;
 
+const editorAttributes = `
+  query documentsGetEditorAttributes($contentType: String!) {
+    documentsGetEditorAttributes(contentType: $contentType) {
+      value
+      name
+    }
+  }
+`;
+
 const totalCount = `
   query documentsTotalCount {
     documentsTotalCount
@@ -29,5 +38,6 @@ const totalCount = `
 export default {
   documents,
   documentsDetail,
+  editorAttributes,
   totalCount
 };
