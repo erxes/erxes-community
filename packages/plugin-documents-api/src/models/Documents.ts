@@ -33,9 +33,10 @@ export const loadDocumentClass = models => {
     /**
      * Marks documents as read
      */
-    public static saveDocument({ _id, doc }) {
+    public static async saveDocument({ _id, doc }) {
       if (_id) {
-        return models.Documents.update({ _id }, { $set: doc });
+        await models.Documents.update({ _id }, { $set: doc });
+        return models.Documents.findOne({ _id });
       }
 
       doc.createdAt = new Date();

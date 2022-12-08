@@ -17,17 +17,29 @@ const documents = ({ location, history }) => {
   );
 };
 
-const documentsCreate = ({ location, history }) => {
+const documentsCreate = ({ history }) => {
   return <Form history={history} />;
+};
+
+const documentsEdit = ({ history, match }) => {
+  const _id = match.params._id;
+  return <Form history={history} _id={_id} />;
 };
 
 const routes = () => (
   <>
     <Route path="/settings/documents/" exact={true} component={documents} />
+
     <Route
       path="/settings/documents/create"
       exact={true}
       component={documentsCreate}
+    />
+
+    <Route
+      path="/settings/documents/edit/:_id"
+      exact={true}
+      component={documentsEdit}
     />
   </>
 );

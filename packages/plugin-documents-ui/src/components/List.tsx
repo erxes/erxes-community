@@ -50,6 +50,13 @@ function List({ list, remove }: Props) {
                     icon="times-circle"
                   />
                 </Tip>
+
+                <Button
+                  btnStyle="link"
+                  href={`/settings/documents/edit/${obj._id}`}
+                >
+                  Edit
+                </Button>
               </td>
             </tr>
           );

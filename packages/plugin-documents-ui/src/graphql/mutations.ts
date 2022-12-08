@@ -1,10 +1,12 @@
 const commonParamsDef = `
+  $_id: String,
   $contentType: String!,
   $name: String!,
   $content: String,
 `;
 
 const commonParams = `
+  _id: $_id,
   contentType: $contentType,
   name: $name,
   content: $content,

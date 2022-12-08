@@ -19,7 +19,8 @@ const params = `
 
 export const queries = `
   documents(${params}): [Document]
-  documentCounts: Int
+  documentsDetail(_id: String!): Document
+  documentsTotalCount: Int
 `;
 
 export const mutations = `

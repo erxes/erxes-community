@@ -3,9 +3,6 @@ import { paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../connectionResolver';
 
 const documentQueries = {
-  /**
-   * Documents list
-   */
   documents(
     _root,
     {
@@ -26,10 +23,11 @@ const documentQueries = {
     return paginate(models.Documents.find({}), {}).sort(sort);
   },
 
-  /**
-   * Document counts
-   */
-  documentCounts(_root, _ars, { models }: IContext) {
+  documentsDetail(_root, { _id }, { models }: IContext) {
+    return models.Documents.findOne({ _id });
+  },
+
+  documentsTotalCount(_root, _args, { models }: IContext) {
     return models.Documents.find({}).countDocuments();
   }
 };

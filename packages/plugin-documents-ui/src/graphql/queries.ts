@@ -9,6 +9,17 @@ const documents = `
   }
 `;
 
+const documentsDetail = `
+  query documentsDetail($_id: String!) {
+    documentsDetail(_id: $_id) {
+      _id
+      contentType
+      name
+      content
+    }
+  }
+`;
+
 const totalCount = `
   query documentsTotalCount {
     documentsTotalCount
@@ -17,5 +28,6 @@ const totalCount = `
 
 export default {
   documents,
+  documentsDetail,
   totalCount
 };

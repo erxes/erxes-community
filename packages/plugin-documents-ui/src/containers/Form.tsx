@@ -6,16 +6,24 @@ import { graphql } from 'react-apollo';
 import Form from '../components/Form';
 import { mutations, queries } from '../graphql';
 
-type FinalProps = {
-  saveMutation;
-  history;
+type Props = {
+  _id: String;
 };
 
+type FinalProps = {
+  detailQuery?;
+  saveMutation;
+  history;
+} & Props;
 class Container extends React.Component<FinalProps> {
   render() {
-    const { saveMutation, history } = this.props;
+    const { _id, detailQuery, saveMutation, history } = this.props;
 
-    const save = ({ _id, doc }: any) => {
+    if (detailQuery && detailQuery.loading) {
+      return null;
+    }
+
+    const save = (doc: any) => {
       saveMutation({
         variables: { _id, contentType: 'cards', ...doc }
       })
@@ -29,6 +37,7 @@ class Container extends React.Component<FinalProps> {
 
     const updatedProps = {
       ...this.props,
+      obj: detailQuery ? detailQuery.documentsDetail || {} : {},
       save
     };
 
@@ -36,10 +45,16 @@ class Container extends React.Component<FinalProps> {
   }
 }
 
-export default withProps(
+export default withProps<Props>(
   compose(
-    graphql(gql(queries.documents), {
-      name: 'listQuery'
+    graphql<Props>(gql(queries.documentsDetail), {
+      name: 'detailQuery',
+      skip: ({ _id }) => !_id,
+      options: ({ _id }) => ({
+        variables: {
+          _id
+        }
+      })
     }),
 
     // mutations

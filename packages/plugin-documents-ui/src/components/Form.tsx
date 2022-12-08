@@ -8,7 +8,8 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 
 type Props = {
-  save: (args: { _id?: String; doc }) => void;
+  obj: any;
+  save: (doc) => void;
 };
 
 type State = {
@@ -20,7 +21,9 @@ class Form extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    this.state = { name: '', content: '' };
+    const { obj } = props;
+
+    this.state = { name: obj.name, content: obj.content };
   }
 
   onContentChange = e => {
@@ -35,14 +38,14 @@ class Form extends React.Component<Props, State> {
     const { name, content } = this.state;
 
     this.props.save({
-      doc: {
-        name,
-        content
-      }
+      name,
+      content
     });
   };
 
   render() {
+    const { obj } = this.props;
+
     const content = (
       <>
         <FormGroup>
@@ -51,6 +54,7 @@ class Form extends React.Component<Props, State> {
             name="name"
             required={true}
             autoFocus={true}
+            defaultValue={obj.name}
             onChange={this.onChangeField.bind(this, 'name')}
           />
         </FormGroup>
@@ -59,7 +63,7 @@ class Form extends React.Component<Props, State> {
           <ControlLabel required={true}>Content</ControlLabel>
 
           <EditorCK
-            content={''}
+            content={obj.content}
             onChange={this.onContentChange}
             height={200}
             name="document-form"
