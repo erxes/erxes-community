@@ -1,5 +1,5 @@
 import { generateModels } from './connectionResolver';
-import { sendCoreMessage } from './messageBroker';
+import { sendCoreMessage, sendProductsMessage } from './messageBroker';
 
 export default {
   editorAttributes: async () => {
@@ -71,6 +71,46 @@ export default {
       users
         .map(user => `${user.firstName || ''} ${user.lastName || ''}`)
         .join(',')
+    );
+
+    const productsData = item.productsData || [];
+
+    const productRows: string[] = [];
+
+    for (const pd of productsData) {
+      if (!pd || !pd.productId) {
+        continue;
+      }
+
+      const product = await sendProductsMessage({
+        subdomain,
+        action: 'findOne',
+        data: { _id: pd.productId },
+        isRPC: true
+      });
+
+      if (!product) {
+        continue;
+      }
+
+      productRows.push(`
+        <tr>
+          <td>${product.name}</td>
+          <td>${pd.quantity}</td>
+          <td>${pd.unitPrice}</td>
+        </tr>
+     `);
+    }
+
+    replacedContent = replacedContent.replace(
+      '{{ productsInfo }}',
+      `
+        <table>
+          <tbody>
+            ${productRows}
+          </tbody>
+        </table>
+      `
     );
 
     return replacedContent;
