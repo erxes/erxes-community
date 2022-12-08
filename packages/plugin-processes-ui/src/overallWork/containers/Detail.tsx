@@ -10,6 +10,7 @@ import {
   PerformsQueryResponse
 } from '../types';
 import { queries } from '../graphql';
+import { queries as performQueries } from '../../perform/graphql';
 import { withRouter } from 'react-router-dom';
 
 type Props = {
@@ -84,12 +85,15 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<{ queryParams }, PerformsQueryResponse, {}>(gql(queries.performs), {
-      name: 'performsQuery',
-      options: ({ queryParams }) => ({
-        variables: generateParams({ queryParams }),
-        fetchPolicy: 'network-only'
-      })
-    })
+    graphql<{ queryParams }, PerformsQueryResponse, {}>(
+      gql(performQueries.performs),
+      {
+        name: 'performsQuery',
+        options: ({ queryParams }) => ({
+          variables: generateParams({ queryParams }),
+          fetchPolicy: 'network-only'
+        })
+      }
+    )
   )(withRouter<IRouterProps>(OverallWorkDetailContainer))
 );

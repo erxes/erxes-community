@@ -1,6 +1,6 @@
 const commontTypes = `
   _id: String
-  key: OverallWorkId
+  key: OverallWorkKey
   workIds: [String]
   type: String
   jobRefer: JobRefer
@@ -16,7 +16,7 @@ const commontTypes = `
 `;
 
 export const types = `
-  type OverallWorkId {
+  type OverallWorkKey {
     inBranchId: String
     inDepartmentId: String
     outBranchId: String

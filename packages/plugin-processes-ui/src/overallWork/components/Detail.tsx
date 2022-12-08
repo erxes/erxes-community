@@ -149,14 +149,8 @@ class OverallWorkDetail extends React.Component<Props, State> {
       <Table whiteSpace="nowrap" bordered={true} hover={true}>
         <thead>
           <tr>
-            <th>{__('Type')}</th>
-            <th>{__('Job')}</th>
-            <th>{__('Product')}</th>
             <th>{__('Count')}</th>
-            <th>{__('In Branch')}</th>
-            <th>{__('In Department')}</th>
-            <th>{__('Out Branch')}</th>
-            <th>{__('Out Department')}</th>
+            <th>{__('Status')}</th>
             <th>{__('Actions')}</th>
           </tr>
         </thead>

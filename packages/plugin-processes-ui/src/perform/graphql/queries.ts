@@ -55,29 +55,86 @@ const worksTotalCount = `
   }
 `;
 
-const performFields = `
+const paginateDefs = `
+  $page: Int
+  $perPage: Int
+  $sortField: String
+  $sortDirection: Int
+`;
+
+const paginateParams = `
+  page: $page
+  perPage: $perPage
+  sortField: $sortField
+  sortDirection: $sortDirection
+`;
+
+const detailParamsDef = `
+  $startDate: Date
+  $endDate: Date
+  $type: String
+  $inBranchId: String
+  $outBranchId: String
+  $inDepartmentId: String
+  $outDepartmentId: String
+  $productId: String
+  $productCategoryId: String
+  $jobReferId: String
+`;
+
+const detailParamsValue = `
+  startDate: $startDate
+  endDate: $endDate
+  type: $type
+  inBranchId: $inBranchId
+  outBranchId: $outBranchId
+  inDepartmentId: $inDepartmentId
+  outDepartmentId: $outDepartmentId
+  productId: $productId
+  productCategoryId: $productCategoryId
+  jobReferId: $jobReferId
+`;
+
+export const performFields = `
   _id
-  needProducts
-  resultProducts
+  overallWorkId
+  overallWorkKey {
+    inBranchId
+    inDepartmentId
+    outBranchId
+    outDepartmentId
+    type
+    typeId
+  }
+  createdAt
+  createdBy
+  updatedAt
+  updatedBy
+  dueDate
+  startAt
+  endAt
+  overallWork
+  status
   productId
   count
-  status
-  overallWorkId
-  overallWork
-  startAt
+  needProducts
+  resultProducts
+
+  needConfirmInfo
+  resultConfirmInfo
 `;
 
 const performs = `
-  query performs {
-    performs {
-    ${performFields}
+  query performs(${detailParamsDef}, ${paginateDefs}) {
+    performs(${detailParamsValue}, ${paginateParams}) {
+      ${performFields}
     }
   }
 `;
 
-const performsTotalCount = `
-  query performsTotalCount {
-    performsTotalCount
+const performsCount = `
+  query performs(${detailParamsDef}) {
+    performs(${detailParamsValue}) Int
   }
 `;
 
@@ -85,5 +142,5 @@ export default {
   works,
   worksTotalCount,
   performs,
-  performsTotalCount
+  performsCount
 };

@@ -180,24 +180,8 @@ const overallWorkDetail = `
   }
 `;
 
-const performs = `
-  query performs(${detailParamsDef}) {
-    performs(${detailParamsValue}) {
-      ${performFields}
-    }
-  }
-`;
-
-const performsCount = `
-  query performs(${detailParamsDef}) {
-    performs(${detailParamsValue}) Int
-  }
-`;
-
 export default {
   overallWorks,
   overallWorksCount,
-  overallWorkDetail,
-  performs,
-  performsCount
+  overallWorkDetail
 };

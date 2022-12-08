@@ -52,14 +52,11 @@ class PerformRow extends React.Component<Props> {
 
     return (
       <tr onClick={onTrClick} key={Math.random()}>
-        <td>{perform.type}</td>
+        <td>{perform.count}</td>
+        <td>{perform.status}</td>
         {/* <td>{this.displayWithNameInfo(perform.jobRefer)}</td>
         <td>{this.displayWithNameInfo(perform.product)}</td> */}
-        <td key={'receivableAmount'}>{this.displayValue(perform, 'count')}</td>
-        <td>{this.displayLocInfo(perform.inBranch)}</td>
-        <td>{this.displayLocInfo(perform.inDepartment)}</td>
-        <td>{this.displayLocInfo(perform.outBranch)}</td>
-        <td>{this.displayLocInfo(perform.outDepartment)}</td>
+
         <td key={'actions'} onClick={onClick}></td>
       </tr>
     );
