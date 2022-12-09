@@ -1,8 +1,8 @@
 // import { moduleCheckPermission } from '@erxes/api-utils/src/permissions';
-
 import { putCreateLog, MODULE_NAMES } from '../../../logUtils';
 import { IContext } from '../../../connectionResolver';
 import { IPerform } from '../../../models/definitions/performs';
+import { sendInventoriesMessage } from '../../../messageBroker';
 
 const performMutations = {
   /**
@@ -27,6 +27,12 @@ const performMutations = {
     }
 
     const perform = await models.Performs.createPerform(docModifier(doc));
+
+    await sendInventoriesMessage({
+      subdomain,
+      action: 'remainders.updateMany',
+      data: {}
+    });
 
     await putCreateLog(
       models,

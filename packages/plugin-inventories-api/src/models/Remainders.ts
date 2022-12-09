@@ -31,6 +31,11 @@ export interface IRemainderModel extends Model<IRemainderDocument> {
     _id: string,
     doc: Partial<IRemainder>
   ): Promise<IRemainderDocument>;
+  updateRemainders(
+    branchId: string,
+    departmentId: string,
+    data: { productId: string; uomId: string; diffCount: number }[]
+  );
   removeRemainder(_id: string): void;
 }
 
@@ -244,6 +249,48 @@ export const loadRemainderClass = (models: IModels) => {
     public static async updateRemainder(_id: string, doc: IRemainder) {
       await models.Remainders.findByIdAndUpdate(_id, { $set: { ...doc } });
       return await this.getRemainder(_id);
+    }
+
+    public static async updateRemainders(
+      branchId: string,
+      departmentId: string,
+      productsData: { productId: string; uomId: string; diffCount: number }[]
+    ) {
+      let bulkOps: {
+        updateOne: {
+          filter: any;
+          update: any;
+          upsert: boolean;
+        };
+      }[] = [];
+
+      for (const data of productsData) {
+        bulkOps.push({
+          updateOne: {
+            filter: { productId: data.productId, branchId, departmentId },
+            update: {
+              $inc: { count: data.diffCount },
+              $set: { productId: data.productId, branchId, departmentId }
+            },
+            upsert: true
+          }
+        });
+
+        if (bulkOps.length > 100) {
+          await models.Remainders.bulkWrite(bulkOps);
+          bulkOps = [];
+        }
+      }
+
+      if (bulkOps.length) {
+        await models.Remainders.bulkWrite(bulkOps);
+      }
+
+      return await models.Remainders.find({
+        branchId,
+        departmentId,
+        productId: { $in: productsData.map(p => p.productId) }
+      }).lean();
     }
 
     /**

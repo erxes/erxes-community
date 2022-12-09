@@ -95,6 +95,16 @@ const detailParamsValue = `
   jobReferId: $jobReferId
 `;
 
+const userFields = `
+  _id
+  email
+  username
+  details {
+    fullName
+    shortName
+  }
+`;
+
 export const performFields = `
   _id
   overallWorkId
@@ -106,22 +116,55 @@ export const performFields = `
     type
     typeId
   }
-  createdAt
-  createdBy
-  updatedAt
-  updatedBy
-  dueDate
-  startAt
-  endAt
-  overallWork
   status
-  productId
+  startAt
+  dueDate
+  endAt
   count
+  inBranchId
+  inDepartmentId
+  outBranchId
+  outDepartmentId
   needProducts
   resultProducts
+  inProducts
+  outProducts
 
-  needConfirmInfo
-  resultConfirmInfo
+  inDepartment {
+    _id
+    code
+    title
+    parentId
+  }
+  inBranch {
+    _id
+    code
+    title,
+    parentId
+  }
+  outDepartment {
+    _id
+    code
+    title
+    parentId
+  }
+  outBranch {
+    _id
+    code
+    title,
+    parentId
+  }
+
+  createdAt
+  createdBy
+  modifiedAt
+  modifiedBy
+  createdUser {
+    ${userFields}
+  }
+  modifiedUser {
+    ${userFields}
+  }
 `;
 
 const performs = `
