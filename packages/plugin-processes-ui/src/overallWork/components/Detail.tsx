@@ -160,6 +160,7 @@ class OverallWorkDetail extends React.Component<Props, State> {
             <PerformRow
               key={Math.random()}
               perform={perform}
+              overallWork={overallWork}
               history={history}
               queryParams={queryParams}
             />

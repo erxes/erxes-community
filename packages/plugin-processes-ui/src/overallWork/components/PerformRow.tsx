@@ -1,14 +1,15 @@
 import _ from 'lodash';
 import React from 'react';
 import { FinanceAmount } from '../../styles';
-import Form from './PerformForm';
+import Form from '../containers/PerformForm';
 import moment from 'moment';
 import queryString from 'query-string';
 import Icon from '@erxes/ui/src/components/Icon';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import { IPerform } from '../types';
+import { IOverallWorkDet, IPerform } from '../types';
 
 type Props = {
+  overallWork: IOverallWorkDet;
   perform: IPerform;
   history: any;
   queryParams: any;
@@ -53,7 +54,13 @@ class PerformRow extends React.Component<Props> {
       e.stopPropagation();
     };
 
-    const content = props => <Form {...props} perform={perform} />;
+    const content = props => (
+      <Form
+        {...props}
+        perform={perform}
+        overallWorkDetail={this.props.overallWork}
+      />
+    );
 
     return (
       <tr onClick={onTrClick} key={Math.random()}>
