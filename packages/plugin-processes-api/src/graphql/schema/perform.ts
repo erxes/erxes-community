@@ -81,4 +81,6 @@ const performParams = `
 
 export const mutations = `
   performsAdd(${performParams}): Perform
+  performsEdit(_id: String!, ${performParams}): Perform
+  performsRemove(_id: String!): JSON
 `;

@@ -20,7 +20,7 @@ export const loadPerformClass = (models: IModels) => {
      * Get a perform
      */
     public static async getPerform(_id: string) {
-      const perform = await models.Performs.findOne({ _id });
+      const perform = await models.Performs.findOne({ _id }).lean();
 
       if (!perform) {
         throw new Error('Perform not found');
