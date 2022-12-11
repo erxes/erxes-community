@@ -38,7 +38,7 @@ export type IOverallWorkDet = {
 } & IOverallWork;
 
 export type IPerform = {
-  _id: string;
+  _id?: string;
   overallWorkId: string;
   overallWorkKey: IOverallWorkKey;
   type: string;
@@ -59,6 +59,11 @@ export type IPerform = {
   inBranch?: IBranch;
   outDepartment?: IDepartment;
   outBranch?: IBranch;
+
+  createdAt?: Date;
+  createdBy?: string;
+  modifiedAt?: Date;
+  modifiedBy?: string;
 };
 
 export type OverallWorksQueryResponse = {

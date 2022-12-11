@@ -2,30 +2,29 @@ import Box from '@erxes/ui/src/components/Box';
 import Button from '@erxes/ui/src/components/Button';
 import CommonForm from '@erxes/ui/src/components/form/Form';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
+import moment from 'moment';
 import React from 'react';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { __ } from '@erxes/ui/src/utils';
-import { calculateCount } from './common';
+import {
+  DateContainer,
+  FormColumn,
+  FormWrapper,
+  ModalFooter
+} from '@erxes/ui/src/styles/main';
 import {
   FieldStyle,
   SidebarCounter,
   SidebarList
 } from '@erxes/ui/src/layout/styles';
-import {
-  FormColumn,
-  FormWrapper,
-  ModalFooter,
-  DateContainer
-} from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { IOverallWorkDet } from '../../../overallWork/types';
-import { IProductsData } from '../../../types';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
-import moment from 'moment';
-import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
-import { JOB_TYPE_CHOISES } from '../../../constants';
+import { IOverallWorkDet } from '../types';
+import { IProductsData } from '../../types';
+import { JOB_TYPE_CHOISES } from '../../constants';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -35,10 +34,7 @@ type Props = {
 };
 
 type State = {
-  // jobReferId: string;
   type: string;
-  // typeId: string;
-  // productIds: string;
   count: number;
   date: Date;
   needProducts: IProductsData[];
@@ -49,26 +45,11 @@ type State = {
   outDepartmentId: string;
 };
 
-// type State = {
-//   count: number;
-//   results: any[];
-//   needProducts?: any[];
-//   resultProducts?: any[];
-//   jobRefer?: IJobRefer;
-// };
-
 class Form extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
     const { overallWorkDetail } = this.props;
-
-    // const calculatedObject = calculateCount(
-    //   jobRefers || [],
-    //   flows || [],
-    //   overallWorkDetail
-    // );
-    // const { jobRefer } = calculatedObject;
 
     this.state = {
       date: new Date(),

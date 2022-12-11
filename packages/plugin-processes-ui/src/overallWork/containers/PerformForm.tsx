@@ -1,6 +1,6 @@
 import * as compose from 'lodash.flowright';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
-import Form from '../components/perform/PerformForm';
+import Form from '../components/PerformForm';
 import gql from 'graphql-tag';
 import React from 'react';
 import { graphql } from 'react-apollo';
@@ -12,11 +12,13 @@ import { queries } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils';
 import { IOverallWorkDet } from '../../overallWork/types';
 import { IProductsData } from '../../types';
+import { IPerform } from '../types';
 
 type Props = {
   closeModal: () => void;
   history: any;
   overallWorkDetail?: IOverallWorkDet;
+  perform?: IPerform;
   max?: number;
 };
 
@@ -34,16 +36,6 @@ class ProductFormContainer extends React.Component<FinalProps> {
     }: IButtonMutateProps) => {
       const { count, performNeedProducts, performResultProducts } = values;
 
-      // for (const need of performNeedProducts) {
-      //   need.product = '';
-      //   need.uom = '';
-      // }
-
-      // for (const result of performResultProducts) {
-      //   result.product = '';
-      //   result.uom = '';
-      // }
-
       const doc = {
         startAt: new Date(),
         endAt: new Date(),
@@ -57,7 +49,7 @@ class ProductFormContainer extends React.Component<FinalProps> {
 
       return (
         <ButtonMutate
-          mutation={mutations.performsAdd}
+          mutation={mutations.performAdd}
           variables={doc}
           callback={callback}
           refetchQueries={getRefetchQueries('test refetch')}

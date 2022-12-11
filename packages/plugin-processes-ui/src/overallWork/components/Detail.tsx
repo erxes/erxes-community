@@ -1,23 +1,24 @@
 import _ from 'lodash';
-import { Title } from '@erxes/ui-settings/src/styles';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Button from '@erxes/ui/src/components/Button';
 import DetailLeftSidebar from './DetailLeftSidebar';
+import DetailRightSidebar from './DetailRightSidebar';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
+import Form from '../containers/PerformForm';
 import FormControl from '@erxes/ui/src/components/form/Control';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import PerformRow from './PerformRow';
 import React from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __, FieldStyle, SidebarCounter, Table } from '@erxes/ui/src';
+import { BarItems } from '@erxes/ui/src/layout/styles';
 import { FinanceAmount, FlexRow } from '../../styles';
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
-import { IOverallWorkDet, IPerform } from '../types';
+import { IOverallWorkDet } from '../types';
+import { IPerform } from '../types';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { menuNavs } from '../../constants';
+import { Title } from '@erxes/ui-settings/src/styles';
 import { withRouter } from 'react-router-dom';
-import DetailRightSidebar from './DetailRightSidebar';
-import PerformRow from './PerformRow';
-import { BarItems } from '@erxes/ui/src/layout/styles';
-import Form from '../../perform/containers/PerformForm';
 
 type Props = {
   history: any;

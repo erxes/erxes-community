@@ -1,9 +1,12 @@
 import _ from 'lodash';
 import React from 'react';
 import { FinanceAmount } from '../../styles';
-import { IPerform } from '../types';
+import Form from './PerformForm';
 import moment from 'moment';
 import queryString from 'query-string';
+import Icon from '@erxes/ui/src/components/Icon';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import { IPerform } from '../types';
 
 type Props = {
   perform: IPerform;
@@ -50,14 +53,20 @@ class PerformRow extends React.Component<Props> {
       e.stopPropagation();
     };
 
+    const content = props => <Form {...props} perform={perform} />;
+
     return (
       <tr onClick={onTrClick} key={Math.random()}>
         <td>{perform.count}</td>
         <td>{perform.status}</td>
-        {/* <td>{this.displayWithNameInfo(perform.jobRefer)}</td>
-        <td>{this.displayWithNameInfo(perform.product)}</td> */}
-
-        <td key={'actions'} onClick={onClick}></td>
+        <td key={'actions'} onClick={onClick}>
+          <ModalTrigger
+            title="Edit perform"
+            trigger={<Icon icon="edit" />}
+            size="lg"
+            content={content}
+          />
+        </td>
       </tr>
     );
   }
