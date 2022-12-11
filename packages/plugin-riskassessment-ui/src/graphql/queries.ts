@@ -5,8 +5,8 @@ import {
   riskAssessmentParams
 } from '../common/graphql';
 const list = `
-query RiskAssessments($categoryId: String,${commonPaginateDef}) {
-  riskAssessments(categoryId: $categoryId , ${commonPaginateValue}) {list{${riskAssessmentParams}},totalCount}
+query RiskAssessments($categoryId: String,$ignoreIds:[String],${commonPaginateDef}) {
+  riskAssessments(categoryId: $categoryId , ignoreIds:$ignoreIds,${commonPaginateValue}) {list{${riskAssessmentParams}},totalCount}
   }
 `;
 

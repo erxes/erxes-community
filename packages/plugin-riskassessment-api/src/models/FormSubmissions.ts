@@ -89,10 +89,10 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
           const fieldValue = optValues.find(option => option.label === value);
           switch (calculateMethod) {
             case 'Multiply':
-              sumNumber *= parseInt(fieldValue.value);
+              sumNumber *= parseInt(fieldValue?.value || 0);
               break;
             case 'Addition':
-              sumNumber += parseInt(fieldValue.value);
+              sumNumber += parseInt(fieldValue?.value || 0);
               break;
           }
 

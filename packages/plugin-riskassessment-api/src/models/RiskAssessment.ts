@@ -30,7 +30,8 @@ const statusColors = {
 };
 
 const generateFilter = (
-  params: { _id?: string; categoryId?: string } & IRiskAssessmentField & PaginateField
+  params: { _id?: string; categoryId?: string; ignoreIds?: string[] } & IRiskAssessmentField &
+    PaginateField
 ) => {
   let filter: any = {};
 
@@ -66,6 +67,10 @@ const generateFilter = (
     filter.name = { $regex: new RegExp(escapeRegExp(params.searchValue), 'i') };
   }
 
+  if (params.ignoreIds) {
+    filter._id = { $nin: params.ignoreIds };
+  }
+
   return filter;
 };
 
@@ -84,7 +89,7 @@ const generateOrderFilters = (params: IRiskAssessmentField & PaginateField) => {
 export const loadRiskAssessment = (model: IModels, subdomain: string) => {
   class RiskAssessment {
     public static async riskAssessments(
-      params: { categoryId: string } & IRiskAssessmentField & PaginateField
+      params: { categoryId: string; ignoreIds: string[] } & IRiskAssessmentField & PaginateField
     ) {
       const lookup = {
         $lookup: {

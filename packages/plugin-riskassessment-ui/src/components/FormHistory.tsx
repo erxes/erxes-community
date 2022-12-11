@@ -42,7 +42,7 @@ class FormHistory extends React.Component<Props, State> {
               <Divider>
                 <ControlLabel>{field.text}</ControlLabel>
                 <p>{field.description}</p>
-                <Padding vertical>
+                <Padding horizontal>
                   <FormContainer row>
                     <div style={{ flex: 2, alignSelf: 'center' }}>
                       <ControlLabel>{__('Options:')}</ControlLabel>

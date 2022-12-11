@@ -4,6 +4,7 @@ import * as mongoose from 'mongoose';
 
 import {
   IRiskAssessmentCategoryDocument,
+  IRiskAssessmentsConfigDocument,
   IRiskAssessmentDocument
 } from './models/definitions/riskassessment';
 import {
@@ -14,12 +15,14 @@ import { IRiskFormSubmissionModel, loadRiskFormSubmissions } from './models/Form
 import { IRiskAssessmentModel, loadRiskAssessment } from './models/RiskAssessment';
 import { IRiskAssessmentCategoryModel, loadAssessmentCategory } from './models/Category';
 import { IRiskConfirmityModel, loadRiskConfirmity } from './models/Confirmity';
+import { IRiskAssessmentsConfigModel, loadRiskAssessmentConfig } from './models/Configs';
 
 export interface IModels {
   RiskAssessment: IRiskAssessmentModel;
   RiskAssessmentCategory: IRiskAssessmentCategoryModel;
   RiskConfimity: IRiskConfirmityModel;
   RiksFormSubmissions: IRiskFormSubmissionModel;
+  RiskAssessmentConfigs: IRiskAssessmentsConfigModel;
 }
 
 export interface IContext extends IMainContext {
@@ -47,6 +50,10 @@ export const loadClasses = (db: mongoose.Connection, subdomain: string): IModels
     'risk_form_submissions',
     loadRiskFormSubmissions(models, subdomain)
   );
+  models.RiskAssessmentConfigs = db.model<
+    IRiskAssessmentsConfigDocument,
+    IRiskAssessmentsConfigModel
+  >('risk_assessments_configs', loadRiskAssessmentConfig(models, subdomain));
 
   return models;
 };

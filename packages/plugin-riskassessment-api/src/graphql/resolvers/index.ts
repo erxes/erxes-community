@@ -7,6 +7,7 @@ import RiskAssessment from '../../dataLoaders/resolvers/riskAssessment';
 import RiskConfirmity from '../../dataLoaders/resolvers/riskConfirmity';
 import RiskFormSubmission from '../../dataLoaders/resolvers/riskFormSubmission';
 import FormSubmissionUserType from '../../dataLoaders/resolvers/riskFormSubmissionUsers';
+import RiskAssessmentConfigs from '../../dataLoaders/resolvers/riskAssessmentConfigs';
 
 const resolvers: any = async serviceDiscovery => ({
   ...customScalars,
@@ -15,6 +16,7 @@ const resolvers: any = async serviceDiscovery => ({
   RiskAssessment,
   RiskFormSubmission,
   FormSubmissionUserType,
+  RiskAssessmentConfigs,
 
   Mutation,
   Query

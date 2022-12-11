@@ -7,6 +7,7 @@ import { ICommonListProps, RiskAssessmentsType } from '../common/types';
 import { DefaultWrapper } from '../common/utils';
 import Form from '../containers/Form';
 import TableRow from './Row';
+import { subMenu } from '../common/constants';
 
 type Props = {
   queryParams: any;
@@ -191,7 +192,8 @@ class ListComp extends React.Component<Props, IState> {
           riskAssessmentsRefetch={refetch}
           queryParams={queryParams}
         />
-      )
+      ),
+      subMenu
     };
 
     return <DefaultWrapper {...updatedProps} />;
