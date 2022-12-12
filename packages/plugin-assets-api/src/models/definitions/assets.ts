@@ -35,6 +35,19 @@ export const assetCategoriesSchema = schemaWrapper(
   })
 );
 
+const assetKnowledgeBaseContentSchema = new Schema({
+  _id:field({ pkey:true}),
+  title: field({type:String, label:'Title'}),
+  content:field({ type:String,label:'Content'})
+});
+
+const assetKnowledgeBaseSchema = new Schema({
+  _id: field({ pkey: true }),
+  name: field({ type: String, label: 'Name' }),
+  description: field({ type: String, label: 'Description' }),
+  contents: field({ type: [assetKnowledgeBaseContentSchema], label: 'Contents' })
+});
+
 export const assetSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
@@ -67,6 +80,7 @@ export const assetSchema = schemaWrapper(
       index: true
     }),
     vendorId: field({ type: String, optional: true, label: 'Vendor' }),
-    mergedIds: field({ type: [String], optional: true })
+    mergedIds: field({ type: [String], optional: true }),
+    knowledgeBaseData: field({type:[assetKnowledgeBaseSchema],optinal:true, label: 'Knowledge base data'})
   })
 );

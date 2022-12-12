@@ -30,4 +30,30 @@ const assetsRemove = `
   }
 `;
 
-export default { assetAdd, assetEdit, assetsRemove, assetsMerge };
+const addKnowledgeBase = `
+  mutation AddAssetdKnowledgeBase($assetId: String, $knowledgeBaseData: KnowledgeBaseType) {
+  addAssetdKnowledgeBase(assetId: $assetId, knowledgeBaseData: $knowledgeBaseData)
+}
+`;
+
+const updateKnowledgeBase = `
+  mutation UpdateAssetdKnowledgeBase($assetId: String, $knowledgeBaseData: KnowledgeBaseType) {
+  updateAssetdKnowledgeBase(assetId: $assetId, knowledgeBaseData: $knowledgeBaseData)
+}
+`;
+
+const removeKnowledgeBase = `
+  mutation RemoveAssetdKnowledgeBase($assetId: String, $knowledgeBaseId: String) {
+  removeAssetdKnowledgeBase(assetId: $assetId, knowledgeBaseId: $knowledgeBaseId)
+}
+`;
+
+export default {
+  assetAdd,
+  assetEdit,
+  assetsRemove,
+  assetsMerge,
+  addKnowledgeBase,
+  updateKnowledgeBase,
+  removeKnowledgeBase
+};

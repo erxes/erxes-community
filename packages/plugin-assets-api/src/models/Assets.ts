@@ -3,11 +3,7 @@ import { Model } from 'mongoose';
 import { ASSET_STATUSES } from '../common/constant/asset';
 import { IAsset, IAssetDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
-import {
-  sendCardsMessage,
-  sendContactsMessage,
-  sendFormsMessage
-} from '../messageBroker';
+import { sendCardsMessage, sendContactsMessage, sendFormsMessage } from '../messageBroker';
 import { assetSchema } from './definitions/assets';
 export interface IAssetModel extends Model<IAssetDocument> {
   getAssets(selector: any): Promise<IAssetDocument>;
@@ -15,7 +11,31 @@ export interface IAssetModel extends Model<IAssetDocument> {
   updateAsset(_id: string, doc: IAsset): Promise<IAssetDocument>;
   removeAssets(_ids: string[]): Promise<{ n: number; ok: number }>;
   mergeAssets(assetIds: string[], assetFields: IAsset): Promise<IAssetDocument>;
+  addKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
+  updateKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
+  removeKnowledgeBase(assetId: string, knowledgeBaseId: any): Promise<IAssetDocument>;
 }
+
+const knowledgeBaseDataValidator = (assetId, doc) => {
+  if (!assetId) {
+    throw new Error('You cannot add knowledge base in asset without assetId');
+  }
+  if (!doc.name) {
+    throw new Error('You must provide a title');
+  }
+  if (!doc.description) {
+    throw new Error('You must provide a description');
+  }
+
+  for (const content of doc.content || []) {
+    if (!content.title) {
+      throw new Error('You must provide a title of knowledge base');
+    }
+    if (!content.content) {
+      throw new Error('You must provide a content of knowledge base');
+    }
+  }
+};
 
 export const loadAssetClass = (models: IModels, subdomain: string) => {
   class Asset {
@@ -141,7 +161,9 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       const assets = await models.Assets.find({ _id: { $in: unUsedIds } });
-      const orders = assets.map(asset => asset.order.match(/\\/) ? asset.order : new RegExp(asset.order));
+      const orders = assets.map(asset =>
+        asset.order.match(/\\/) ? asset.order : new RegExp(asset.order)
+      );
 
       const child_assets = await models.Assets.find({ order: { $in: orders } });
 
@@ -150,12 +172,8 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const movementItems = await models.MovementItems.find({
         assetId: { $in: [...unUsedIds, ...child_assets_ids] }
       });
-      const movement_ids = movementItems.map(
-        movementItem => movementItem.movementId
-      );
-      const movement_items_ids = movementItems.map(
-        movementItem => movementItem._id
-      );
+      const movement_ids = movementItems.map(movementItem => movementItem.movementId);
+      const movement_items_ids = movementItems.map(movementItem => movementItem._id);
 
       await models.Movements.deleteMany({
         _id: { $in: [...new Set(movement_ids)] }
@@ -180,9 +198,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       if (!checkParent.find(i => i)) {
-        throw new Error(
-          `Can not merge assets. Must choose Parent or Category field`
-        );
+        throw new Error(`Can not merge assets. Must choose Parent or Category field`);
       }
 
       let customFieldsData: ICustomField[] = [];
@@ -197,10 +213,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         const assetObj = await models.Assets.getAssets({ _id: assetId });
 
         // merge custom fields data
-        customFieldsData = [
-          ...customFieldsData,
-          ...(assetObj.customFieldsData || [])
-        ];
+        customFieldsData = [...customFieldsData, ...(assetObj.customFieldsData || [])];
 
         await models.Assets.findByIdAndUpdate(assetId, {
           $set: {
@@ -256,10 +269,64 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
 
+    public static async addKnowledgeBase(assetId, doc) {
+      try {
+        knowledgeBaseDataValidator(assetId, doc);
+      } catch (e) {
+        throw new Error(e.message);
+      }
+
+      const asset = models.Assets.findOne({ _id: assetId });
+
+      if (!asset) {
+        throw new Error('Not found asset with id:' + assetId);
+      }
+      return await models.Assets.update({ _id: assetId }, { $push: { knowledgeBaseData: doc } });
+    }
+    public static async updateKnowledgeBase(assetId, doc) {
+      try {
+        knowledgeBaseDataValidator(assetId, doc);
+      } catch (e) {
+        throw new Error(e.message);
+      }
+
+      const asset = models.Assets.findOne({ _id: assetId });
+
+      if (!asset) {
+        throw new Error('Not found asset with id:' + assetId);
+      }
+
+      try {
+        await models.Assets.updateOne(
+          { _id: assetId, 'knowledgeBaseData._id': doc._id },
+          {
+            $set: {
+              'knowledgeBaseData.$': doc
+            }
+          }
+        );
+      } catch (e) {
+        console.log(e.message);
+      }
+      return 'updated';
+    }
+
+    public static async removeKnowledgeBase(assetId: string, knowledgeBaseId: any) {
+      if (!assetId) {
+        throw new Error('You cannot remove a knowledge base without assetId');
+      }
+      if (!knowledgeBaseId) {
+        throw new Error('You cannot remove a knowledge base without knowledgeBaseId');
+      }
+
+      return await models.Assets.updateOne(
+        { _id: assetId },
+        { $pull: { knowledgeBaseData: { _id: knowledgeBaseId } } }
+      );
+    }
+
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
-      const order = parentAsset
-        ? `${parentAsset.order}/${doc.code}`
-        : `${doc.code}`;
+      const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
 
       return order;
     }

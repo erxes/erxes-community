@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { models } from './connectionResolver';
 export const generateFilter = async (params, type) => {
   let filter: any = {};
 
@@ -65,6 +66,11 @@ export const generateFilter = async (params, type) => {
     if (type === 'movementItems') {
       filter.assetName = new RegExp(`.*${params.searchValue}.*`, 'i');
     }
+  }
+
+  if (params.parentId) {
+    const movementIds = await models?.MovementItems.find().select({ _id: 1 });
+    console.log({ movementIds });
   }
 
   return filter;

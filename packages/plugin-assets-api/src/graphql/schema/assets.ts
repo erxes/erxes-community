@@ -1,7 +1,4 @@
-import {
-  attachmentInput,
-  attachmentType
-} from '@erxes/api-utils/src/commonTypeDefs';
+import { attachmentInput, attachmentType } from '@erxes/api-utils/src/commonTypeDefs';
 import { assetCategoryParams, assetParams } from '../../common/graphql/asset';
 
 export const types = contactsAvailable => `
@@ -47,12 +44,25 @@ export const types = contactsAvailable => `
     attachmentMore: [Attachment]
     vendorId: String
     assetCount: Int
+    knowledgeBaseData:JSON
 
     category: AssetCategory
     parent:Asset
     isRoot: Boolean
     childAssetCount:Int
     ${contactsAvailable ? 'vendor: Company' : ''}
+    }
+
+    input KnowledgeBaseContent {
+      title: String,
+      content: String
+    }
+
+    input KnowledgeBaseType {
+        _id: String,
+        name:String,
+        description: String,
+        contents:[KnowledgeBaseContent]
     }
 
 `;
@@ -90,5 +100,8 @@ export const mutations = `
     assetsMerge(assetIds: [String], assetFields: JSON): Asset
     assetCategoryAdd(${assetCategoryParams}): AssetCategory
     assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategory
-    assetCategoryRemove(_id: String!): JSON
+    assetCategoryRemove(_id: String!): JSON,
+    addAssetdKnowledgeBase(assetId:String,knowledgeBaseData:KnowledgeBaseType):JSON
+    updateAssetdKnowledgeBase(assetId:String,knowledgeBaseData:KnowledgeBaseType):JSON
+    removeAssetdKnowledgeBase(assetId:String,knowledgeBaseId:String):JSON
 `;
