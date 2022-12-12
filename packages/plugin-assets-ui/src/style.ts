@@ -18,10 +18,12 @@ interface ContainerBoxType {
   marginX?: number;
   marginY?: number;
   rightBorder?: boolean;
+  flexWrap?:boolean;
 }
 
 export const ContainerBox = styledTS<ContainerBoxType>(styled.div)`
     display:flex;
+    flex-wrap:${({flexWrap})=>(flexWrap?'wrap':'')};
     flex-direction:${({ row }) => (row ? 'row' : '')} ${({ column }) => (column ? 'column' : '')};
     gap: ${({ gap }) => (gap ? `${gap}px` : '')};
     place-items: ${({ align }) => (align ? `${align}` : '')};

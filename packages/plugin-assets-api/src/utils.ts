@@ -11,6 +11,14 @@ export const generateFilter = async (params, type) => {
     filter.assetId = params.assetId;
   }
 
+  if(params.parentId){
+    if(params.parentId === '*'){
+      const assets = await models?.Assets.find({parentId:{$exists: false}})
+      const assetIds = (assets||[]).map(asset => asset._id)
+      filter.assetId = {$in:assetIds}
+    }
+  }
+
   if (params.userId) {
     filter.userId = params.userId;
   }

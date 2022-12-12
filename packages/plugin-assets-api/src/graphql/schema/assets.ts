@@ -54,6 +54,7 @@ export const types = contactsAvailable => `
     }
 
     input KnowledgeBaseContent {
+      _id: String,
       title: String,
       content: String
     }

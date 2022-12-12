@@ -62,7 +62,7 @@ class LeftSidebar extends React.Component<Props> {
       <Sidebar wide={true}>
         <BasicInfo asset={asset} refetchQueries={refetchQueries} history={history} />
         <Sidebar.Section>
-          <ContainerBox gap={5}>
+          <ContainerBox gap={5} flexWrap={true}>
             {(knowledgeBaseData || []).map(data => editKnowledgeForm(data))}
           </ContainerBox>
         </Sidebar.Section>

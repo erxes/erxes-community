@@ -235,6 +235,7 @@ export const generateParams = ({ queryParams }) => ({
   companyId: queryParams?.companyId,
   customerId: queryParams?.customerId,
   assetId: queryParams?.assetId,
+  parentId: queryParams?.parentId,
   searchValue: queryParams?.searchValue
 });
 
@@ -246,7 +247,8 @@ export const SelectWithAssets = ({
   multi,
   customOption,
   onSelect,
-  skip
+  skip,
+  additionalOptions
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -256,6 +258,7 @@ export const SelectWithAssets = ({
   initialValue?: string | string[];
   name: string;
   skip?: string[];
+  additionalOptions?:IOption[]
 }) => {
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
@@ -281,6 +284,12 @@ export const SelectWithAssets = ({
     }
     if (skip) {
       list = list.filter(item => !skip.includes(item.value));
+    }
+    if(additionalOptions){
+      console.log(additionalOptions)
+      for(const option of additionalOptions){
+        list.push(option)
+      }
     }
 
     return list;
