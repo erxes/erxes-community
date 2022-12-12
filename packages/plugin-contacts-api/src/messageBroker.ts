@@ -95,6 +95,18 @@ export const initBroker = cl => {
   );
 
   consumeRPCQueue(
+    'contacts:companies.getCompanyName',
+    async ({ subdomain, data: { company } }) => {
+      const models = await generateModels(subdomain);
+
+      return {
+        status: 'success',
+        data: await models.Companies.getCompanyName(company)
+      };
+    }
+  );
+
+  consumeRPCQueue(
     'contacts:companies.findActiveCompanies',
     async ({ subdomain, data: { selector, fields } }) => {
       const models = await generateModels(subdomain);
@@ -162,6 +174,18 @@ export const initBroker = cl => {
       return {
         status: 'success',
         data: await models.Customers.updateMany(selector, modifier)
+      };
+    }
+  );
+
+  consumeRPCQueue(
+    'contacts:companies.updateMany',
+    async ({ subdomain, data: { selector, modifier } }) => {
+      const models = await generateModels(subdomain);
+
+      return {
+        status: 'success',
+        data: await models.Companies.updateMany(selector, modifier)
       };
     }
   );
