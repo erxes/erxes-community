@@ -21,7 +21,8 @@ export const checkPricing = async (
           ...doc.items.map(i => ({
             productId: i.productId,
             quantity: i.count,
-            price: i.unitPrice
+            price: i.unitPrice,
+            manufacturedDate: '1669852' // i.manufacturedDate,
           }))
         ]
       },
@@ -40,9 +41,9 @@ export const checkPricing = async (
     if (discount) {
       if (discount.type.length === 0) continue;
 
-      if (discount.type !== 'bonus') {
-        item.discountAmount = item.unitPrice - discount.value;
-      }
+      if (discount.type !== 'bonus') item.discountAmount = discount.value;
+
+      // adds bonus product
     }
   }
 
