@@ -3,6 +3,7 @@ export type Rule = {
   value?: string;
   discountType?: string;
   discountValue?: string;
+  discountBonusProduct?: string;
 };
 
 export type RepeatValue = {

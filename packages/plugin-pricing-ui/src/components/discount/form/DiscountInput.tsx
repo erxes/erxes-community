@@ -87,19 +87,20 @@ export default function DiscountInput(props: Props) {
         </FormGroup>
       );
     case 'bonus':
-      if (bonusValue && handleBonusChange)
-        return (
-          <FormGroup>
-            {isLabelOn && <FormLabel>{__('Bonus product')}</FormLabel>}
-            <SelectProducts
-              name="value"
-              label="Choose bonus products"
-              initialValue={bonusValue}
-              onSelect={product => handleBonusChange(product)}
-              multi={false}
-            />
-          </FormGroup>
-        );
+      return (
+        <FormGroup>
+          {isLabelOn && <FormLabel>{__('Bonus product')}</FormLabel>}
+          <SelectProducts
+            name="value"
+            label="Choose bonus products"
+            initialValue={bonusValue}
+            onSelect={product =>
+              handleBonusChange && handleBonusChange(product)
+            }
+            multi={false}
+          />
+        </FormGroup>
+      );
 
       return <></>;
     default:

@@ -48,7 +48,8 @@ export const priceSchema = new Schema({
     enum: DISCOUNT_TYPES.ALL,
     default: DISCOUNT_TYPES.DEFAULT
   }),
-  discountValue: field({ type: Number })
+  discountValue: field({ type: Number }),
+  discountBonusProduct: field({ type: String })
 });
 
 export const quantitySchema = new Schema({
@@ -60,7 +61,8 @@ export const quantitySchema = new Schema({
     enum: DISCOUNT_TYPES.ALL,
     default: DISCOUNT_TYPES.DEFAULT
   }),
-  discountValue: field({ type: Number })
+  discountValue: field({ type: Number }),
+  discountBonusProduct: field({ type: String })
 });
 
 export const expirySchema = new Schema({
@@ -72,7 +74,8 @@ export const expirySchema = new Schema({
     enum: DISCOUNT_TYPES.ALL,
     default: DISCOUNT_TYPES.DEFAULT
   }),
-  discountValue: field({ type: Number })
+  discountValue: field({ type: Number }),
+  discountBonusProduct: field({ type: String })
 });
 
 export const repeatValueSchema = new Schema({

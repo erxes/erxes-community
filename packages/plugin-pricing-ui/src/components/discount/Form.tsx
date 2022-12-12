@@ -38,7 +38,7 @@ export default function Form(props: Props) {
 
     applyType: data.applyType || 'category', // "product", "category"
     products: data.products || [],
-    productsExcluded: data.productExcluded || [],
+    productsExcluded: data.productsExcluded || [],
     categories: data.categories || [],
     categoriesExcluded: data.categoriesExcluded || [],
 
@@ -69,6 +69,8 @@ export default function Form(props: Props) {
   });
 
   useEffect(() => data.name && setFormValues(data), [data]);
+
+  console.log(formValues);
 
   // Functions
   const handleState = (key: string, value: any) => {

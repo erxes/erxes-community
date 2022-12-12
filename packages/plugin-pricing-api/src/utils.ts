@@ -10,11 +10,11 @@ const calculateDiscountValue = (
 ) => {
   switch (rule.discountType) {
     case 'fixed':
-      return rule.discountValue;
-    case 'subtraction':
       return price - rule.discountValue;
+    case 'subtraction':
+      return rule.discountValue;
     case 'percentage':
-      return Math.floor(price * (1 - rule.discountValue / 100));
+      return Math.floor(price * (rule.discountValue / 100));
     case 'default':
       if (discount)
         return calculateDiscountValue(
@@ -32,9 +32,11 @@ const checkRuleValidity = (rule: any, checkValue: number) => {
   switch (rule.type) {
     case 'exact':
       if (checkValue === rule.value) return true;
+      return false;
     case 'minimum':
     case 'every':
       if (checkValue >= rule.value) return true;
+      return false;
     default:
       return false;
   }
@@ -232,7 +234,11 @@ export const checkPricing = async (
       }
     }
 
-    result.defaultBonusProduct = discount.bonusProduct;
+    result.default = {
+      type: discount.type || '',
+      value: discount.value || 0,
+      bonusProduct: discount.bonusProduct || ''
+    };
 
     /**
      * Check repeat rules
@@ -290,6 +296,7 @@ export const checkPricing = async (
 
       let pricePassed = false;
       let quantityPassed = false;
+      let expiryPassed = false;
 
       let discountType = '';
       let discountValue = Number.POSITIVE_INFINITY;
@@ -305,12 +312,15 @@ export const checkPricing = async (
         discount.priceRules.length !== 0
       )
         for (const rule of discount.priceRules) {
+          // Check validity
           pricePassed = checkRuleValidity(rule, totalAmount);
           if (!pricePassed) continue;
 
           if (rule.discountType === 'bonus') {
             discountType = rule.discountType;
-            discountBonusProduct = rule.discountBonusProduct;
+            discountBonusProduct = rule.discountBonusProduct
+              ? rule.discountBonusProduct
+              : discount.bonusProduct;
             continue;
           }
 
@@ -321,7 +331,8 @@ export const checkPricing = async (
           );
 
           // Checks if value is lower than past calculated price, override it
-          discountType = rule.discountType;
+          discountType =
+            rule.discountType === 'default' ? discount.type : rule.discountType;
           discountValue = calculatedValue;
         }
 
@@ -335,12 +346,15 @@ export const checkPricing = async (
         discount.quantityRules.length !== 0
       )
         for (const rule of discount.quantityRules) {
+          // Check validity
           quantityPassed = checkRuleValidity(rule, item.quantity);
           if (!quantityPassed) continue;
 
           if (rule.discountType === 'bonus') {
             discountType = rule.discountType;
-            discountBonusProduct = rule.discountBonusProduct;
+            discountBonusProduct = rule.discountBonusProduct
+              ? rule.discountBonusProduct
+              : discount.bonusProduct;
             continue;
           }
 
@@ -365,7 +379,7 @@ export const checkPricing = async (
           }
 
           // Checks if value is lower than past calculated price, override it
-          if (calculatedValue < discountValue) {
+          if (calculatedValue > discountValue) {
             discountType =
               rule.discountType === 'default'
                 ? discount.type
@@ -374,20 +388,54 @@ export const checkPricing = async (
           }
         }
 
-      // TODO: Check expiry rules
+      /**
+       * Check expiry rule
+       */
+      if (!discount.isExpiryEnabled) expiryPassed = true;
+      if (
+        discount.isExpiryEnabled &&
+        discount.expiryRules &&
+        discount.expiryRules.length !== 0
+      ) {
+        for (const rule of discount.expiryRules) {
+          // Check validity
+          const expiredDate = dayjs
+            .unix(parseInt(item.manufacturedDate) * 1000)
+            .add(rule.value, rule.type);
+          if (expiredDate <= dayjs(now)) expiryPassed = true;
+          if (!expiryPassed) continue;
+
+          if (rule.discountType === 'bonus') {
+            discountType = rule.discountType;
+            discountBonusProduct = rule.discountBonusProduct
+              ? rule.discountBonusProduct
+              : discount.bonusProduct;
+            continue;
+          }
+
+          let calculatedValue: number = calculateDiscountValue(
+            rule,
+            item.price,
+            discount
+          );
+
+          // Checks if value is lower than past calculated price, override it
+          if (calculatedValue > discountValue) {
+            discountType =
+              rule.discountType === 'default'
+                ? discount.type
+                : rule.discountType;
+            discountValue = calculatedValue;
+          }
+        }
+      }
 
       // Checks if value is lower than past calculated price, override it
-      if (
-        pricePassed &&
-        quantityPassed
-        // expiryPassed &&
-      ) {
+      if (pricePassed && quantityPassed && expiryPassed) {
         result[item.productId].type = discountType;
         result[item.productId].value = discountValue;
         result[item.productId].bonusProduct = discountBonusProduct;
       }
-
-      console.log(result);
     }
   }
 

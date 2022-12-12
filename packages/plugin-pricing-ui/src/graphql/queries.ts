@@ -57,6 +57,7 @@ const discountDetail = `
         value
         discountType
         discountValue
+        discountBonusProduct
       }
 
       isPriceEnabled
@@ -65,6 +66,7 @@ const discountDetail = `
         value
         discountType
         discountValue
+        discountBonusProduct
       }
 
       isExpiryEnabled
@@ -73,6 +75,7 @@ const discountDetail = `
         value
         discountType
         discountValue
+        discountBonusProduct
       }
 
       isRepeatEnabled
