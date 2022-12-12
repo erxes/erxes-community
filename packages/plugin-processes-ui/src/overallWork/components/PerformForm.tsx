@@ -22,14 +22,15 @@ import {
   SidebarList
 } from '@erxes/ui/src/layout/styles';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { IOverallWorkDet } from '../types';
+import { IOverallWorkDet, IPerform } from '../types';
 import { IProductsData } from '../../types';
 import { JOB_TYPE_CHOISES } from '../../constants';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
-  overallWorkDetail?: IOverallWorkDet;
+  perform?: IPerform;
+  overallWorkDetail: IOverallWorkDet;
   max?: number;
 };
 
@@ -39,10 +40,6 @@ type State = {
   date: Date;
   needProducts: IProductsData[];
   resultProducts: IProductsData[];
-  inBranchId: string;
-  inDepartmentId: string;
-  outBranchId: string;
-  outDepartmentId: string;
 };
 
 class Form extends React.Component<Props, State> {
@@ -56,11 +53,7 @@ class Form extends React.Component<Props, State> {
       count: 1,
       type: overallWorkDetail?.key.type || '',
       needProducts: overallWorkDetail?.needProducts || [],
-      resultProducts: overallWorkDetail?.resultProducts || [],
-      inBranchId: overallWorkDetail?.key.inBranchId || '',
-      inDepartmentId: overallWorkDetail?.key.inDepartmentId || '',
-      outBranchId: overallWorkDetail?.key.outBranchId || '',
-      outDepartmentId: overallWorkDetail?.key.outDepartmentId || ''
+      resultProducts: overallWorkDetail?.resultProducts || []
     };
   }
 
@@ -154,20 +147,25 @@ class Form extends React.Component<Props, State> {
     this.setState({ [name]: value } as any);
   };
 
+  renderLoc(obj) {
+    if (!obj) {
+      return 'unknown';
+    }
+
+    return `${obj.code} - ${obj.title}`;
+  }
+
   renderContent = (formProps: IFormProps) => {
-    const { closeModal, renderButton, max } = this.props;
-    const { isSubmitted } = formProps;
     const {
-      type,
-      count,
-      needProducts,
-      resultProducts,
-      date,
-      inBranchId,
-      inDepartmentId,
-      outBranchId,
-      outDepartmentId
-    } = this.state;
+      closeModal,
+      renderButton,
+      max,
+      overallWorkDetail,
+      perform
+    } = this.props;
+
+    const { isSubmitted } = formProps;
+    const { type, count, needProducts, resultProducts, date } = this.state;
 
     return (
       <>
@@ -226,71 +224,30 @@ class Form extends React.Component<Props, State> {
         <FormWrapper>
           <FormColumn>
             <FormGroup>
-              <ControlLabel>In Branch</ControlLabel>
-              <SelectBranches
-                label="Choose branch"
-                name="inBranchId"
-                initialValue={inBranchId}
-                customOption={{
-                  value: '',
-                  label: '...Clear branch filter'
-                }}
-                onSelect={branchId =>
-                  this.setState({ inBranchId: branchId.toString() })
-                }
-                multi={false}
-              />
+              <ControlLabel>
+                {__(`In Branch`)}: {this.renderLoc(overallWorkDetail.inBranch)}
+              </ControlLabel>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>In Department</ControlLabel>
-              <SelectDepartments
-                label="Choose department"
-                name="inDepartmentId"
-                initialValue={inDepartmentId}
-                customOption={{
-                  value: '',
-                  label: '...Clear department filter'
-                }}
-                onSelect={departmentId =>
-                  this.setState({ inDepartmentId: departmentId.toString() })
-                }
-                multi={false}
-              />
+              <ControlLabel>
+                {__(`In Department`)}:{' '}
+                {this.renderLoc(overallWorkDetail.inDepartment)}
+              </ControlLabel>
             </FormGroup>
           </FormColumn>
 
           <FormColumn>
             <FormGroup>
-              <ControlLabel>Out Branch</ControlLabel>
-              <SelectBranches
-                label="Choose branch"
-                name="outBranchId"
-                initialValue={outBranchId}
-                customOption={{
-                  value: '',
-                  label: '...Clear branch filter'
-                }}
-                onSelect={branchId =>
-                  this.setState({ outBranchId: branchId.toString() })
-                }
-                multi={false}
-              />
+              <ControlLabel>
+                {__(`Out Branch`)}:{' '}
+                {this.renderLoc(overallWorkDetail.outBranch)}
+              </ControlLabel>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Out Department</ControlLabel>
-              <SelectDepartments
-                label="Choose department"
-                name="outDepartmentId"
-                initialValue={outDepartmentId}
-                customOption={{
-                  value: '',
-                  label: '...Clear department filter'
-                }}
-                onSelect={departmentId =>
-                  this.setState({ outDepartmentId: departmentId.toString() })
-                }
-                multi={false}
-              />
+              <ControlLabel>
+                {__(`Out Department`)}:{' '}
+                {this.renderLoc(overallWorkDetail.outDepartment)}
+              </ControlLabel>
             </FormGroup>
           </FormColumn>
         </FormWrapper>

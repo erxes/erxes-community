@@ -70,7 +70,7 @@ class PerformRow extends React.Component<Props> {
           <ModalTrigger
             title="Edit perform"
             trigger={<Icon icon="edit" />}
-            size="lg"
+            size="xl"
             content={content}
           />
         </td>
