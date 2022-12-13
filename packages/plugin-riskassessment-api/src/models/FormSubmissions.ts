@@ -1,16 +1,29 @@
 import { Model } from 'mongoose';
 import { IModels, models } from '../connectionResolver';
-import { sendCardsMessage, sendCoreMessage, sendFormsMessage } from '../messageBroker';
-import { calculateRiskAssessment, checkAllUsersSubmitted, getFormId } from '../utils';
+import {
+  sendCardsMessage,
+  sendCoreMessage,
+  sendFormsMessage
+} from '../messageBroker';
+import {
+  calculateRiskAssessment,
+  checkAllUsersSubmitted,
+  getFormId
+} from '../utils';
 import { IRiskFormSubmissionParams } from './definitions/common';
 import {
   IRiskFormSubmissionDocument,
   riskConformityFormSubmissionSchema
 } from './definitions/confimity';
 
-export interface IRiskFormSubmissionModel extends Model<IRiskFormSubmissionDocument> {
-  formSaveSubmission(params: IRiskFormSubmissionParams): Promise<IRiskFormSubmissionDocument>;
-  formSubmitHistory(riskAssessmentId: string): Promise<IRiskFormSubmissionDocument>;
+export interface IRiskFormSubmissionModel
+  extends Model<IRiskFormSubmissionDocument> {
+  formSaveSubmission(
+    params: IRiskFormSubmissionParams
+  ): Promise<IRiskFormSubmissionDocument>;
+  formSubmitHistory(
+    riskAssessmentId: string
+  ): Promise<IRiskFormSubmissionDocument>;
 }
 
 const generateFields = params => {
@@ -52,7 +65,10 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
 
       const { riskAssessmentId } = conformity;
 
-      const { resultScore, calculateMethod } = await model.RiskAssessment.findOne({
+      const {
+        resultScore,
+        calculateMethod
+      } = await model.RiskAssessment.findOne({
         _id: riskAssessmentId
       }).lean();
 
@@ -79,7 +95,9 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
             .map(item => {
               if (item.match(/=/g)) {
                 const label = item?.substring(0, item.indexOf('='));
-                const value = parseInt(item.substring(item?.indexOf('=') + 1, item.length));
+                const value = parseInt(
+                  item.substring(item?.indexOf('=') + 1, item.length)
+                );
                 if (!Number.isNaN(value)) {
                   return { label, value };
                 }
