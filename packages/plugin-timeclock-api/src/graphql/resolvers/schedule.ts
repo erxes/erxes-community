@@ -1,5 +1,5 @@
 import { IContext } from '../../connectionResolver';
-import { IScheduleDocument } from '../../models/definitions/template';
+import { IScheduleDocument } from '../../models/definitions/timeclock';
 
 export default {
   shifts(schedule: IScheduleDocument, _args, { models }: IContext) {

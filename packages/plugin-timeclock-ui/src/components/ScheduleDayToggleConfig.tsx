@@ -9,7 +9,7 @@ type Props = {
 const ScheduleConfig = (props: Props) => {
   const { toggleWeekDays, weekDay } = props;
 
-  const toggleWeekDay = dayKey => {
+  const toggleWeekDay = () => {
     toggleWeekDays(weekDay);
   };
   return (

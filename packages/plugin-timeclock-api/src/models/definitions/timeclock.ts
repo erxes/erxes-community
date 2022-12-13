@@ -165,3 +165,50 @@ export const payDateSchema = new Schema({
   _id: field({ pkey: true }),
   payDates: field({ type: [Number], label: 'pay dates' })
 });
+
+// common types
+export interface IScheduleReport {
+  date?: string;
+  scheduleStart?: Date;
+  scheduleEnd?: Date;
+  recordedStart?: Date;
+  recordedEnd?: Date;
+  minsLate?: number;
+  minsWorked?: number;
+  include?: boolean;
+}
+
+export interface IUserReport {
+  userId?: string;
+  scheduleReport: IScheduleReport[];
+  totalMinsWorkedToday?: number;
+  totalMinsScheduledToday?: number;
+  totalMinsWorkedThisMonth?: number;
+  totalMinsScheduledThisMonth?: number;
+  totalMinsLateToday?: number;
+  totalMinsLateThisMonth?: number;
+  totalMinsAbsenceThisMonth?: number;
+}
+
+export interface IGroup {
+  userIds: string[];
+  title: string;
+}
+
+export interface IReport {
+  groupTitle: string;
+  groupReport: IUserReport[];
+  groupTotalMinsWorked?: number;
+  groupTotalMinsLate?: number;
+  groupTotalAbsenceMins?: number;
+  groupTotalMinsScheduled?: number;
+}
+
+export interface IUserReport {
+  userId?: string;
+  scheduleReport: IScheduleReport[];
+  totalMinsWorked?: number;
+  totalMinsLate?: number;
+  totalAbsenceMins?: number;
+  totalMinsScheduled?: number;
+}

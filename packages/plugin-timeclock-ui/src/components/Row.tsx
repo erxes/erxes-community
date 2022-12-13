@@ -4,9 +4,7 @@ import { ITimeclock } from '../types';
 import { __ } from '@erxes/ui/src/utils';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
-
-const TimeForm = asyncComponent(() => import('../containers/TimeFormList'));
+import TimeForm from '../containers/TimeFormList';
 
 type Props = {
   timeclock: ITimeclock;

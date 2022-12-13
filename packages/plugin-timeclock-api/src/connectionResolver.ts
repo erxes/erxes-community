@@ -15,7 +15,7 @@ import {
   loadShiftClass,
   IAbsenceTypeModel,
   loadPayDateClass
-} from './models/Template';
+} from './models/Timeclock';
 import {
   IAbsenceDocument,
   IAbsenceTypeDocument,
@@ -23,10 +23,10 @@ import {
   IScheduleDocument,
   IShiftDocument,
   ITimeClockDocument
-} from './models/definitions/template';
+} from './models/definitions/timeclock';
 
 export interface IModels {
-  Templates: ITimeModel;
+  Timeclocks: ITimeModel;
   Absences: IAbsenceModel;
   AbsenceTypes: IAbsenceTypeModel;
   Schedules: IScheduleModel;
@@ -44,7 +44,7 @@ export let models: IModels | null = null;
 export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
 
-  models.Templates = db.model<ITimeClockDocument, ITimeModel>(
+  models.Timeclocks = db.model<ITimeClockDocument, ITimeModel>(
     'timeclock',
     loadTimeClass(models)
   );

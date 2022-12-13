@@ -2,14 +2,15 @@ import Button from '@erxes/ui/src/components/Button';
 import { ITimeclock } from '../types';
 import Row from './Row';
 import { menuTimeClock } from '../menu';
-import { router, __ } from '@erxes/ui/src/utils';
+import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
 import { Title } from '@erxes/ui-settings/src/styles';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
+import SideBarList from '../containers/SideBarList';
+import TimeForm from '../containers/TimeFormList';
 
 type Props = {
   currentDate?: string;
@@ -45,12 +46,6 @@ function List({
     />
   );
 
-  const onUserSelect = (userIds: string[]) => {
-    const usrIds: string[] = [];
-    userIds.map(user => usrIds.push(user));
-    router.setParams(history, { userIds: `${usrIds}` });
-  };
-
   const actionBarRight = (
     <>
       <ModalTrigger
@@ -60,11 +55,6 @@ function List({
       />
     </>
   );
-  // if ('geolocation' in navigator) {
-  //   console.log('activated');
-  // } else {
-  //   console.log('not activated');
-  // }
 
   const title = (
     <Title capitalize={true}>
@@ -100,9 +90,6 @@ function List({
     </Table>
   );
 
-  const SideBarList = asyncComponent(() => import('../containers/SideBarList'));
-  const TimeForm = asyncComponent(() => import('../containers/TimeFormList'));
-
   return (
     <Wrapper
       header={
@@ -117,13 +104,7 @@ function List({
           emptyImage="/images/actions/8.svg"
         />
       }
-      leftSidebar={
-        <SideBarList
-          onUserSelect={onUserSelect}
-          queryParams={queryParams}
-          history={history}
-        />
-      }
+      leftSidebar={<SideBarList queryParams={queryParams} history={history} />}
       transparent={true}
       hasBorder={true}
     />

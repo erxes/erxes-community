@@ -6,14 +6,12 @@ import React from 'react';
 import ConfigList from '../components/ConfigList';
 import {
   AbsenceMutationResponse,
-  AbsenceQueryResponse,
   AbsenceTypeQueryResponse,
   ConfigMutationResponse,
   PayDatesQueryResponse,
   HolidaysQueryResponse
 } from '../types';
 import { mutations, queries } from '../graphql';
-import Spinner from '@erxes/ui/src/components/Spinner';
 import { Alert, confirm } from '@erxes/ui/src/utils';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
@@ -46,9 +44,6 @@ type FinalProps = {
 
 const ListContainer = (props: FinalProps) => {
   const {
-    queryParams,
-    addAbsenceType,
-    editAbsenceType,
     removeAbsenceTypeMutation,
     addPayDateMutation,
     editPayDateMutation,
@@ -58,7 +53,6 @@ const ListContainer = (props: FinalProps) => {
     listPayDatesQuery,
     listHolidaysQuery
   } = props;
-  const { startDate, endDate, userId, reason } = queryParams;
 
   const renderButton = ({
     values,

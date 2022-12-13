@@ -8,7 +8,6 @@ import Table from '@erxes/ui/src/components/table';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import DateRange from './DateRange';
 import dayjs from 'dayjs';
 import DatePicker from './DateTimePicker';
@@ -17,12 +16,15 @@ import ScheduleConfig from './ScheduleDayToggleConfig';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { CustomRow, Input } from '../styles';
+
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row } from '../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import { CustomRangeContainer } from '../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
+import SideBarList from '../containers/SideBarList';
+import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {
   scheduleOfMembers: any;
@@ -34,10 +36,6 @@ type Props = {
   submitRequest: (userId: string[], filledShifts: any) => void;
   submitShift: (userIds: string[], filledShifts: any) => void;
 };
-
-const Datetime = asyncComponent(() =>
-  import(/* webpackChunkName: "Datetime" */ '@nateradebaugh/react-datetime')
-);
 
 function ScheduleList(props: Props) {
   const {
@@ -71,6 +69,7 @@ function ScheduleList(props: Props) {
       Schedule Configuration - Admin
     </Button>
   );
+
   const [dateRangeStart, setDateStart] = useState(new Date());
   const [dateRangeEnd, setDateEnd] = useState(new Date());
   const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
@@ -223,6 +222,7 @@ function ScheduleList(props: Props) {
       </div>
     </div>
   );
+
   const adminModalContent = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <SelectTeamMembers
@@ -290,13 +290,11 @@ function ScheduleList(props: Props) {
                 <Datetime
                   defaultValue={new Date()}
                   dateFormat={false}
-                  timeIntervals={15}
                   timeFormat="hh:mm a"
                 />
                 <Datetime
                   defaultValue={new Date()}
                   dateFormat={false}
-                  timeIntervals={15}
                   timeFormat="hh:mm a"
                 />
               </div>
@@ -306,9 +304,11 @@ function ScheduleList(props: Props) {
       );
     });
   };
+
   const onDateRangeStartChange = (newStart: Date) => {
     setDateStart(newStart);
   };
+
   const onDateRangeEndChange = (newEnd: Date) => {
     setDateEnd(newEnd);
   };
@@ -326,7 +326,9 @@ function ScheduleList(props: Props) {
     const totalDatesArray: string[] = [];
 
     let temp = dayjs(dateRangeStart);
+
     const endRange = dayjs(dateRangeEnd);
+
     while (temp <= endRange) {
       totalDatesArray.push(temp.toDate().toDateString());
       temp = temp.add(1, 'day');
@@ -339,6 +341,7 @@ function ScheduleList(props: Props) {
         shiftStart: new Date(eachDay),
         shiftEnd: new Date(eachDay)
       };
+
       setKeyCounter(eachDay);
     }
 
@@ -441,6 +444,7 @@ function ScheduleList(props: Props) {
       .value;
     setContentType(contType);
   };
+
   const renderSwitchContent = () => {
     switch (contentType) {
       case 'By Date Selection':
@@ -451,6 +455,7 @@ function ScheduleList(props: Props) {
         return adminConfigByDay();
     }
   };
+
   const adminConfigDefault = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -665,12 +670,6 @@ function ScheduleList(props: Props) {
     </Table>
   );
 
-  const SideBarList = asyncComponent(() =>
-    import(
-      /* webpackChunkName: "List - Timeclocks" */ '../containers/SideBarList'
-    )
-  );
-
   return (
     <Wrapper
       header={
@@ -687,13 +686,7 @@ function ScheduleList(props: Props) {
       }
       transparent={true}
       hasBorder={true}
-      leftSidebar={
-        <SideBarList
-          onUserSelect={onUserSelect}
-          queryParams={queryParams}
-          history={history}
-        />
-      }
+      leftSidebar={<SideBarList queryParams={queryParams} history={history} />}
     />
   );
 }

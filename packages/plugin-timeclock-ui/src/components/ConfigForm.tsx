@@ -1,5 +1,5 @@
 import Button from '@erxes/ui/src/components/Button';
-import { router, __ } from '@erxes/ui/src/utils';
+import { __, router } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import {
@@ -27,7 +27,6 @@ type Props = {
   afterSave?: () => void;
   closeModal: () => void;
   renderButton: (props: IButtonMutateProps) => void;
-  removeAbsenceType: (absenceTypeId: string) => void;
   submitPayDatesConfig: (payDates: number[]) => void;
 };
 

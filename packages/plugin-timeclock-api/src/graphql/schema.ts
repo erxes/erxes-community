@@ -103,6 +103,7 @@ export const types = `
   }
 
 `;
+
 export const queries = `
   timeclocks(startDate: Date, endDate: Date, userIds: [String]): [Timeclock]
   absences(startDate: Date, endDate: Date, userId: String): [Absence]
@@ -116,6 +117,7 @@ export const queries = `
   payDates: [PayDate]
   holidays: [Absence]
 `;
+
 const params = `
   userId: String
   _id: String
@@ -131,6 +133,7 @@ const absence_params = `
     explanation: String
     attachment: AttachmentInput
 `;
+
 const absenceType_params = `
     name: String
     explRequired: Boolean

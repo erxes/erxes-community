@@ -16,7 +16,7 @@ type Props = {
 };
 
 const LeftSideBar = (props: Props) => {
-  const { queryParams, history } = props;
+  const { history } = props;
   const [userIds, setUsers] = useState(['']);
   const [selectedBranchId, setBranches] = useState(['']);
   const [deptIds, setDeptIds] = useState(['']);
@@ -25,18 +25,11 @@ const LeftSideBar = (props: Props) => {
     setBranches(selectedBranch);
 
     const branchIds: any[] = [];
-    selectedBranch.map(branch => branchIds.push(branch.valu - e));
+    selectedBranch.map(branch => branchIds.push(branch.value));
 
     router.setParams(history, {
       branchIds: `${branchIds}`
     });
-  };
-
-  const renderBranchOptions = (branches: any[]) => {
-    return branches.map(branch => ({
-      value: branch._id,
-      label: branch.title
-    }));
   };
 
   const onDepartmentSelect = dept => {
@@ -46,7 +39,7 @@ const LeftSideBar = (props: Props) => {
     });
   };
 
-  const onMemberSelect = selectedUserIds => {
+  const onMemberSelect = () => {
     setUsers(userIds);
   };
 
@@ -55,18 +48,14 @@ const LeftSideBar = (props: Props) => {
       <SidebarHeader>
         <CustomRangeContainer>
           <DateControl
-            // value={new Date()}
             required={false}
             name="startDate"
-            // onChange={onSelectDateChange}
             placeholder={'Starting date'}
             dateFormat={'YYYY-MM-DD'}
           />
           <DateControl
-            // value={new Date()}
             required={false}
             name="startDate"
-            // onChange={onSelectDateChange}
             placeholder={'Ending date'}
             dateFormat={'YYYY-MM-DD'}
           />
@@ -91,7 +80,6 @@ const LeftSideBar = (props: Props) => {
         }}
       >
         <SelectTeamMembers
-          // queryParams={queryParams}
           initialValue={userIds}
           label="Team member"
           name="userIds"
@@ -109,7 +97,6 @@ const LeftSideBar = (props: Props) => {
             onChange={onBranchSelect}
             placeholder="Select branch"
             multi={true}
-            // options={branchesList && renderBranchOptions(branchesList)}
           />
         </div>
       </div>

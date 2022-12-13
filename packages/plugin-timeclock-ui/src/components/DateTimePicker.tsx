@@ -1,5 +1,5 @@
 import React from 'react';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
+import Datetime from '@nateradebaugh/react-datetime';
 import Button from '@erxes/ui/src/components/Button';
 import Tip from '@erxes/ui/src/components/Tip';
 
@@ -12,10 +12,6 @@ type Props = {
   changeEndTime: (day_key: string, time: Date) => void;
   removeDate: (day_key: string) => void;
 };
-
-const Datetime = asyncComponent(() =>
-  import(/* webpackChunkName: "Datetime" */ '@nateradebaugh/react-datetime')
-);
 
 const DatePicker = (props: Props) => {
   const {
@@ -48,21 +44,18 @@ const DatePicker = (props: Props) => {
     <div style={{ display: 'flex', flexDirection: 'row' }} key={curr_day_key}>
       <Datetime
         value={startTime_value}
-        timeIntervals={15}
         timeFormat={false}
         onChange={onDateChange}
       />
       <Datetime
         value={startTime_value}
         dateFormat={false}
-        timeIntervals={15}
         timeFormat="hh:mm a"
         onChange={onStartTimeChange}
       />
       <Datetime
         value={endTime_value}
         dateFormat={false}
-        timeIntervals={15}
         timeFormat="hh:mm a"
         onChange={onEndTimeChange}
       />

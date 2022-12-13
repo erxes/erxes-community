@@ -1,18 +1,13 @@
 import { IContext } from '../../connectionResolver';
-import {
-  checkPermission,
-  requireLogin
-} from '@erxes/api-utils/src/permissions';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 import {
   IAbsence,
   ISchedule,
   IShift,
   ITimeClock,
   IAbsenceType
-} from '../../models/definitions/template';
-import { putUpdateLog } from '@erxes/api-utils/src/logUtils';
-import messageBroker from '../../messageBroker';
-import { findBranch, findBranches } from '../../departments';
+} from '../../models/definitions/timeclock';
+import { findBranches } from './utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -39,7 +34,7 @@ interface IAbsenceTypeEdit extends IAbsenceType {
   _id: string;
 }
 
-const templateMutations = {
+const timeclockMutations = {
   /**
    * Creates a new timeclock
    */
@@ -77,15 +72,17 @@ const templateMutations = {
                 Math.pow(Math.sin(longDiff / 2), 2)
           )
         );
+
       // if user's coordinate is within the radius
       if (dist * 1000 <= branch.radius) {
         insideCoordinate = true;
       }
     }
 
-    let template;
+    let timeclock;
+
     if (insideCoordinate) {
-      template = await models.Templates.createTimeClock({
+      timeclock = await models.Timeclocks.createTimeClock({
         shiftStart: new Date(),
         shiftActive: true,
         userId: userId ? `${userId}` : user._id
@@ -93,7 +90,8 @@ const templateMutations = {
     } else {
       throw new Error('User not in the coordinate');
     }
-    return template;
+
+    return timeclock;
   },
 
   async timeclockStop(
@@ -101,7 +99,7 @@ const templateMutations = {
     { _id, userId, longitude, latitude, ...doc }: ITimeClockEdit,
     { models, subdomain, user }: IContext
   ) {
-    const timeclock = await models.Templates.findOne({
+    const timeclock = await models.Timeclocks.findOne({
       _id,
       shiftActive: true
     });
@@ -144,23 +142,13 @@ const templateMutations = {
     }
 
     let updated;
+
     if (insideCoordinate) {
-      updated = await models.Templates.updateTimeClock(_id, {
+      updated = await models.Timeclocks.updateTimeClock(_id, {
         shiftEnd: new Date(),
         shiftActive: false,
         ...doc
       });
-
-      await putUpdateLog(
-        subdomain,
-        messageBroker(),
-        {
-          type: 'timeclock',
-          object: timeclock,
-          newData: doc
-        },
-        user
-      );
     } else {
       throw new Error('User not in the coordinate');
     }
@@ -192,7 +180,6 @@ const templateMutations = {
     { _id, ...doc }: IAbsenceTypeEdit,
     { models }: IContext
   ) {
-    const absenceType = await models.AbsenceTypes.getAbsenceType(_id);
     return models.AbsenceTypes.updateAbsenceType(_id, doc);
   },
 
@@ -200,8 +187,7 @@ const templateMutations = {
    * Removes a single timeclock
    */
   async timeclockRemove(_root, { _id }, { models }: IContext) {
-    const template = await models.Templates.removeTimeClock(_id);
-    return template;
+    return models.Timeclocks.removeTimeClock(_id);
   },
 
   async sendAbsenceRequest(
@@ -209,14 +195,13 @@ const templateMutations = {
     doc: IAbsence,
     { models, docModifier }: IContext
   ) {
-    const absence = await models.Absences.createAbsence(docModifier(doc));
-    return absence;
+    return models.Absences.createAbsence(docModifier(doc));
   },
 
   async solveAbsenceRequest(
     _root,
     { _id, status, ...doc }: IAbsenceEdit,
-    { models, subdomain, user }: IContext
+    { models, user }: IContext
   ) {
     const absence = models.Absences.getAbsence(_id);
     let updated = models.Absences.updateAbsence(_id, {
@@ -224,17 +209,6 @@ const templateMutations = {
       solved: true,
       ...doc
     });
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        type: 'absence',
-        object: absence,
-        newData: doc
-      },
-      user
-    );
 
     const shiftRequest = await absence;
 
@@ -250,7 +224,7 @@ const templateMutations = {
         status: 'Approved'
       });
 
-      const newShift = await models.Shifts.createShift({
+      await models.Shifts.createShift({
         scheduleId: newSchedule._id,
         shiftStart: shiftRequest.startTime,
         shiftEnd: shiftRequest.endTime,
@@ -258,7 +232,7 @@ const templateMutations = {
         status: 'Approved'
       });
 
-      const newTimeClock = await models.Templates.createTimeClock({
+      await models.Timeclocks.createTimeClock({
         userId: user._id,
         shiftStart: shiftRequest.startTime,
         shiftEnd: shiftRequest.endTime,
@@ -272,29 +246,17 @@ const templateMutations = {
   async solveScheduleRequest(
     _root,
     { _id, status, ...doc }: IScheduleEdit,
-    { models, subdomain, user }: IContext
+    { models }: IContext
   ) {
-    const schedule = models.Schedules.getSchedule(_id);
     const updated = models.Schedules.updateSchedule(_id, {
       status: `${status}`,
       solved: true,
       ...doc
     });
 
-    const updateScheduleShifts = await models.Shifts.updateMany(
+    await models.Shifts.updateMany(
       { scheduleId: _id, solved: false },
       { $set: { status: `${status}`, solved: true } }
-    );
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        type: 'schedule',
-        object: schedule,
-        newData: doc
-      },
-      user
     );
 
     return updated;
@@ -303,7 +265,7 @@ const templateMutations = {
   async solveShiftRequest(
     _root,
     { _id, status, ...doc }: IShiftEdit,
-    { models, subdomain, user }: IContext
+    { models }: IContext
   ) {
     const shift = await models.Shifts.getShift(_id);
     const updated = await models.Shifts.updateShift(_id, {
@@ -324,22 +286,11 @@ const templateMutations = {
     }
 
     if (otherShiftsSolved) {
-      const updateSchedule = await models.Schedules.updateOne(
+      await models.Schedules.updateOne(
         { _id: shift.scheduleId },
         { $set: { solved: true, status: 'Solved' } }
       );
     }
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        type: 'schedule_shift',
-        object: shift,
-        newData: doc
-      },
-      user
-    );
 
     return updated;
   },
@@ -424,6 +375,6 @@ const templateMutations = {
   }
 };
 
-// requireLogin(templateMutations, 'timeclocksAdd');
+moduleRequireLogin(timeclockMutations);
 
-export default templateMutations;
+export default timeclockMutations;

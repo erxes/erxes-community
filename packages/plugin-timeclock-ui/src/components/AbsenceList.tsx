@@ -13,9 +13,9 @@ import DateFilter from '@erxes/ui/src/components/DateFilter';
 import { IAbsence, IAbsenceType } from '../types';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import Uploader from '@erxes/ui/src/components/Uploader';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { FlexCenter } from '../styles';
 import { IAttachment } from '@erxes/ui/src/types';
+import SideBarList from '../containers/SideBarList';
 
 type Props = {
   absences: IAbsence[];
@@ -57,6 +57,7 @@ function AbsenceList(props: Props) {
   const modalContent = () => (
     <div style={{ flex: 'column', justifyContent: 'space-around' }}>
       <DateFilter queryParams={queryParams} history={history} />
+
       <SelectTeamMembers
         queryParams={queryParams}
         label={'Team member'}
@@ -64,6 +65,7 @@ function AbsenceList(props: Props) {
         multi={false}
         name="userId"
       />
+
       <Select
         isRequired={true}
         placeholder={__('Reason')}
@@ -198,12 +200,6 @@ function AbsenceList(props: Props) {
         })}
       </tbody>
     </Table>
-  );
-
-  const SideBarList = asyncComponent(() =>
-    import(
-      /* webpackChunkName: "List - Timeclocks" */ '../containers/SideBarList'
-    )
   );
 
   return (

@@ -1,4 +1,4 @@
-import { ITimeClockDocument } from '../../models/definitions/template';
+import { ITimeClockDocument } from '../../models/definitions/timeclock';
 
 export default {
   user(timeclock: ITimeClockDocument) {
