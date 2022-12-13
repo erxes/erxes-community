@@ -86,6 +86,8 @@ export const repeatValueSchema = new Schema({
 export const repeatSchema = new Schema({
   _id: field({ pkey: true }),
   type: field({ type: String }),
+  dayStartValue: field({ type: Date }),
+  dayEndValue: field({ type: Date }),
   weekValue: field({ type: [repeatValueSchema] }),
   monthValue: field({ type: [repeatValueSchema] }),
   yearStartValue: field({ type: Date }),

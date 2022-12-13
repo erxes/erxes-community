@@ -65,9 +65,7 @@ export const checkPricing = async (
   branchId: string,
   orders: any
 ) => {
-  const now = new Date();
-  const dayOfWeek = dayjs(now).day();
-  const dayOfMonth = dayjs(now).date();
+  const now = dayjs(new Date());
   const nowISO = now.toISOString();
   const productIds = orders.map(p => p.productId);
   const result: any = {};
@@ -244,49 +242,59 @@ export const checkPricing = async (
      * Check repeat rules
      */
     let repeatPassed = false;
+    let rulePassCount = 0;
 
     if (!discount.isRepeatEnabled) repeatPassed = true;
     if (
       discount.isRepeatEnabled &&
       discount.repeatRules &&
       discount.repeatRules.length !== 0
-    )
+    ) {
       for (const rule of discount.repeatRules) {
-        if (repeatPassed) break;
-
         switch (rule.type) {
           case 'everyDay':
-            repeatPassed = true;
+            if (
+              rule.dayStartValue &&
+              now.hour() >= dayjs(rule.dayStartValue).hour() &&
+              now.minute() >= dayjs(rule.dayStartValue).minute() &&
+              rule.dayEndValue &&
+              now.hour() <= dayjs(rule.dayEndValue).hour() &&
+              now.minute() <= dayjs(rule.dayEndValue).minute()
+            )
+              rulePassCount++;
             break;
           case 'everyWeek':
             if (
               rule.weekValue &&
-              rule.weekValue.find(i => i.value == dayOfWeek.toString())
+              rule.weekValue.find(i => i.value === now.day().toString())
             )
-              repeatPassed = true;
+              rulePassCount++;
             break;
           case 'everyMonth':
             if (
               rule.monthValue &&
-              rule.monthValue.find(i => i.value === dayOfMonth.toString())
+              rule.monthValue.find(i => i.value === now.date().toString())
             )
-              repeatPassed = true;
+              rulePassCount++;
             break;
           case 'everyYear':
             if (
               rule.yearStartValue &&
-              rule.yearStartValue < nowISO &&
+              now.isAfter(dayjs(rule.yearStartValue)) &&
               rule.yearEndValue &&
-              rule.yearEndValue > nowISO
+              now.isBefore(dayjs(rule.yearEndValue))
             )
-              repeatPassed = true;
+              rulePassCount++;
             break;
           default:
             break;
         }
       }
 
-    if (!repeatPassed) continue;
+      if (rulePassCount === discount.repeatRules.length) repeatPassed = true;
+
+      if (!repeatPassed) continue;
+    }
 
     /**
      * Check rest of the rules
@@ -407,7 +415,8 @@ export const checkPricing = async (
           const expiredDate = dayjs
             .unix(parseInt(item.manufacturedDate) * 1000)
             .add(rule.value, rule.type);
-          if (expiredDate <= dayjs(now)) rulePassed = true;
+          if (now.isAfter(expiredDate)) rulePassed = true;
+          console.log(now.isAfter(expiredDate));
           if (rulePassed) expiryPassed = true;
           if (!rulePassed) continue;
 

@@ -57,6 +57,8 @@ const discountAdd = `
       isRepeatEnabled
       repeatRules {
         type
+        dayStartValue
+        dayEndValue
         weekValue {
           label
           value
@@ -136,6 +138,8 @@ const discountEdit = `
       isRepeatEnabled
       repeatRules {
         type
+        dayStartValue
+        dayEndValue
         weekValue {
           label
           value

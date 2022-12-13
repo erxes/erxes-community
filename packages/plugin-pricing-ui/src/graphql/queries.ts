@@ -81,6 +81,8 @@ const discountDetail = `
       isRepeatEnabled
       repeatRules {
         type
+        dayStartValue
+        dayEndValue
         weekValue {
           label
           value
