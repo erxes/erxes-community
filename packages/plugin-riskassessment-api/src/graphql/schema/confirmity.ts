@@ -1,12 +1,12 @@
 export const types = `
-    type RiskConfirmity {
+    type RiskConformity {
         _id: String,
         cardId: String,
         cardType: String,
         riskAssessmentId: String,
         riskAssessment:JSON
     }
-    type RiskConfirmityDetail{
+    type RiskConformityDetail{
         createdAt: String
         _id: String,
         name: String,
@@ -14,7 +14,7 @@ export const types = `
         categoryId: String,
         status: String,
     }
-    type RiskConfirmityFormDetailType {
+    type RiskConformityFormDetailType {
         fields:JSON,
         submissions:JSON,
         formId: String
@@ -22,14 +22,14 @@ export const types = `
 `;
 
 export const queries = `
-    riskConfirmities(cardId:String,riskAssessmentId:String):[RiskConfirmity]
-    riskConfirmityDetails(cardId:String) :[RiskConfirmity]
-    riskConfirmitySubmissions(cardId:String,cardType:String) :JSON
-    riskConfirmityFormDetail(cardId:String,userId: String,riskAssessmentId:String) :RiskConfirmityFormDetailType
+    riskConformities(cardId:String,riskAssessmentId:String):[RiskConformity]
+    riskConformityDetails(cardId:String) :[RiskConformity]
+    riskConformitySubmissions(cardId:String,cardType:String) :JSON
+    riskConformityFormDetail(cardId:String,userId: String,riskAssessmentId:String) :RiskConformityFormDetailType
 `;
 
 export const mutations = `
-    addRiskConfirmity (cardId: String,cardType:String,riskAssessmentId: String):RiskConfirmity
-    updateRiskConfirmity (cardId: String,cardType:String,riskAssessmentId: String):RiskConfirmity
-    removeRiskConfirmity (cardId: String,cardType:String):String
+    addRiskConformity (cardId: String,cardType:String,riskAssessmentId: String):RiskConformity
+    updateRiskConformity (cardId: String,cardType:String,riskAssessmentId: String):RiskConformity
+    removeRiskConformity (cardId: String,cardType:String):String
 `;

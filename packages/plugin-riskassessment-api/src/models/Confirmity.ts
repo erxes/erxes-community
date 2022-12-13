@@ -1,41 +1,21 @@
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
-import {
-  sendCardsMessage,
-  sendCoreMessage,
-  sendFormsMessage
-} from '../messageBroker';
+import { sendCardsMessage, sendCoreMessage, sendFormsMessage } from '../messageBroker';
 import { calculateRiskAssessment } from '../utils';
-import {
-  IRiskConfirmityField,
-  IRiskConfirmityParams
-} from './definitions/common';
-import {
-  IRiskConfirmityDocument,
-  riskConfirmitySchema
-} from './definitions/confimity';
+import { IRiskConformityField, IRiskConformityParams } from './definitions/common';
+import { IRiskConformityDocument, riskConformitySchema } from './definitions/confimity';
 
-export interface IRiskConfirmityModel extends Model<IRiskConfirmityDocument> {
-  riskConfirmities(
-    params: IRiskConfirmityParams
-  ): Promise<IRiskConfirmityDocument>;
-  riskConfirmitySubmissions(params: {
-    cardId: string;
-  }): Promise<IRiskConfirmityDocument>;
-  riskConfirmityDetails(
-    params: IRiskConfirmityParams
-  ): Promise<IRiskConfirmityDocument>;
-  riskConfirmityAdd(
-    params: IRiskConfirmityField
-  ): Promise<IRiskConfirmityDocument>;
-  riskConfirmityUpdate(
-    params: IRiskConfirmityParams
-  ): Promise<IRiskConfirmityDocument>;
-  riskConfirmityRemove(cardId: string): Promise<IRiskConfirmityDocument>;
-  riskConfirmityFormDetail(params): any;
+export interface IRiskConformityModel extends Model<IRiskConformityDocument> {
+  riskConformities(params: IRiskConformityParams): Promise<IRiskConformityDocument>;
+  riskConformitySubmissions(params: { cardId: string }): Promise<IRiskConformityDocument>;
+  riskConformityDetails(params: IRiskConformityParams): Promise<IRiskConformityDocument>;
+  riskConformityAdd(params: IRiskConformityField): Promise<IRiskConformityDocument>;
+  riskConformityUpdate(params: IRiskConformityParams): Promise<IRiskConformityDocument>;
+  riskConformityRemove(cardId: string): Promise<IRiskConformityDocument>;
+  riskConformityFormDetail(params): any;
 }
 
-const generateFilter = (params: IRiskConfirmityParams) => {
+const generateFilter = (params: IRiskConformityParams) => {
   let filter: any = {};
 
   if (params.cardId) {
@@ -49,16 +29,16 @@ const generateFilter = (params: IRiskConfirmityParams) => {
   return filter;
 };
 
-export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
+export const loadRiskConformity = (model: IModels, subdomain: string) => {
   class RiskConfimity {
-    public static async riskConfirmityAdd(params: IRiskConfirmityField) {
+    public static async riskConformityAdd(params: IRiskConformityField) {
       return model.RiskConfimity.create({ ...params });
     }
-    public static async riskConfirmities(params: IRiskConfirmityParams) {
+    public static async riskConformities(params: IRiskConformityParams) {
       const filter = generateFilter(params);
       return await model.RiskConfimity.find(filter);
     }
-    public static async riskConfirmityDetails(params: IRiskConfirmityParams) {
+    public static async riskConformityDetails(params: IRiskConformityParams) {
       const filter = generateFilter(params);
 
       const result = await model.RiskConfimity.find(filter);
@@ -66,7 +46,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       return result;
     }
 
-    public static async riskConfirmityUpdate(params: IRiskConfirmityParams) {
+    public static async riskConformityUpdate(params: IRiskConformityParams) {
       const { cardId, riskAssessmentId, cardType } = params;
 
       if (!riskAssessmentId) {
@@ -92,7 +72,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       );
     }
 
-    public static async riskConfirmityRemove(cardId: string) {
+    public static async riskConformityRemove(cardId: string) {
       if (!cardId) {
         throw new Error('cardId is required');
       }
@@ -101,7 +81,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       return 'success';
     }
 
-    public static async riskConfirmitySubmissions(params) {
+    public static async riskConformitySubmissions(params) {
       const { cardId, cardType } = params;
 
       if (!cardId) {
@@ -143,9 +123,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
           cardId: cardId,
           formId
         });
-        const submittedUsersIds = [
-          ...new Set(submittedUsers.map(user => user.userId))
-        ];
+        const submittedUsersIds = [...new Set(submittedUsers.map(user => user.userId))];
         return assignedUsers.filter(user =>
           submittedUsersIds.some(submission => submission === user._id)
         );
@@ -154,7 +132,7 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       return assignedUsers;
     }
 
-    public static async riskConfirmityFormDetail(params) {
+    public static async riskConformityFormDetail(params) {
       const { cardId, userId, riskAssessmentId } = params;
 
       if (!cardId) {
@@ -239,6 +217,6 @@ export const loadRiskConfirmity = (model: IModels, subdomain: string) => {
       return formId;
     }
   }
-  riskConfirmitySchema.loadClass(RiskConfimity);
-  return riskConfirmitySchema;
+  riskConformitySchema.loadClass(RiskConfimity);
+  return riskConformitySchema;
 };

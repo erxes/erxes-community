@@ -54,7 +54,7 @@ export type RiskAssessmentCategory = {
   order?: string;
   parent?: RiskAssessmentCategory;
   formName?: string;
-  type: string
+  type: string;
 };
 
 export type RiskAssessmentsCategoriesQueryResponse = {
@@ -88,14 +88,14 @@ export interface ICardRiskAssements {
   riskAssessment: RiskAssessmentsType;
 }
 
-export type ICardRiskConfirmitiesQueryResponse = {
-  riskConfirmities: ICardRiskAssements[];
+export type ICardRiskConformitiesQueryResponse = {
+  riskConformities: ICardRiskAssements[];
   loading: boolean;
   refetch: () => void;
 };
 
 export type IRiskSubmissionsQueryResponse = {
-  riskConfirmitySubmissions: any[];
+  riskConformitySubmissions: any[];
   loading: boolean;
   refetch: () => void;
 };
@@ -109,7 +109,7 @@ export type ICardRiskAssessmentsQueryResponse = {
   refetch: (params: { searchValue: string; perPage: number }) => void;
 };
 export type ICardRiskAssessmentDetailQueryResponse = {
-  riskConfirmityDetails: ICardRiskAssements[];
+  riskConformityDetails: ICardRiskAssements[];
   loading: boolean;
   refetch: () => void;
 };
@@ -122,7 +122,7 @@ type IFormDetailType = {
   formId: string;
 };
 export type IRiskFormDetailQueryResponse = {
-  riskConfirmityFormDetail: IFormDetailType;
+  riskConformityFormDetail: IFormDetailType;
   loading: boolean;
   refetch: () => void;
 };

@@ -22,7 +22,7 @@ export const commonRiskAssessmentTypes = `
     calculateMethod: String
 `;
 
-export const commonRiskConfirmityTypes = `
+export const commonRiskConformityTypes = `
     _id: String!,
     cardId: String!,
     riskAssessmentId: String!,

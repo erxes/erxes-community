@@ -1,6 +1,6 @@
 import { generateModels } from './connectionResolver';
 import { sendCardsMessage } from './messageBroker';
-import { IRiskConfirmityField } from './models/definitions/common';
+import { IRiskConformityField } from './models/definitions/common';
 
 export default {
   'cards:ticket': ['create'],
@@ -51,8 +51,8 @@ export const afterMutationHandlers = async (subdomain, params) => {
             cardId: _id,
             cardType: type.replace('cards:', ''),
             riskAssessmentId: customField.riskAssessmentId
-          } as IRiskConfirmityField;
-          await models.RiskConfimity.riskConfirmityAdd(conformity);
+          } as IRiskConformityField;
+          await models.RiskConfimity.riskConformityAdd(conformity);
         }
       }
     }

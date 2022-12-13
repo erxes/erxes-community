@@ -18,7 +18,7 @@ export const initBroker = async cl => {
     const models = await generateModels(subdomain);
 
     return {
-      data: await models.RiskConfimity.riskConfirmities(data),
+      data: await models.RiskConfimity.riskConformities(data),
       status: 'success'
     };
   });
