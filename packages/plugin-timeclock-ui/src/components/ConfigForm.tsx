@@ -1,58 +1,53 @@
 import Button from '@erxes/ui/src/components/Button';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import {
   CustomRangeContainer,
   FlexRow,
   FlexColumn,
-  Input,
-  FlexCenter,
-  Row
+  FlexCenter
 } from '../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import { IAbsenceType, IPayDates } from '../types';
+import { IAbsence, IAbsenceType, IPayDates, ISchedule } from '../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import DateRange from './DateRange';
+import dayjs from 'dayjs';
 
 type Props = {
-  queryParams: any;
   history: any;
   configType: string;
   absenceType?: IAbsenceType;
+  holiday?: IAbsence;
   payDate?: IPayDates;
   absenceTypes?: IAbsenceType[];
   loading?: boolean;
   afterSave?: () => void;
-  closeModal?: () => void;
+  closeModal: () => void;
   renderButton: (props: IButtonMutateProps) => void;
   removeAbsenceType: (absenceTypeId: string) => void;
   submitPayDatesConfig: (payDates: number[]) => void;
 };
 
 function ConfigForm(props: Props) {
-  const {
-    queryParams,
-    history,
-    absenceTypes,
-    renderButton,
-    removeAbsenceType,
-    submitPayDatesConfig
-  } = props;
-  const { absenceType } = props;
+  const { renderButton, submitPayDatesConfig, history } = props;
+  const { absenceType, holiday } = props;
   const [explanationRequired, setExplRequired] = useState(false);
   const [attachmentRequired, setAttachRequired] = useState(false);
   const [payPeriod, setPayPeriod] = useState('');
-  const [displayConfig, setDisplayConfig] = useState(false);
+
+  const [dateRangeStart, setDateStart] = useState(new Date());
+  const [dateRangeEnd, setDateEnd] = useState(new Date());
+  const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
+  const [dateKeyCounter, setKeyCounter] = useState('');
+
   const [payDates, setpayDates] = useState({
     date1: new Date(),
     date2: new Date()
   });
+
   const { afterSave, closeModal } = props;
 
   const togglePayPeriod = e => {
@@ -78,22 +73,131 @@ function ConfigForm(props: Props) {
     payDates[dateNum] = newDate;
     setpayDates({ ...payDates });
   };
-  const generateDoc = (values: {
-    _id?: string;
-    absenceName: string;
-    explRequired: boolean;
-    attachRequired: boolean;
-  }) => {
-    if (absenceType) {
-      values._id = absenceType._id;
+
+  const onHolidayStartDateChange = (newStart: Date) => {
+    setDateStart(newStart);
+  };
+  const onHolidayEndDateChange = (newEnd: Date) => {
+    setDateEnd(newEnd);
+  };
+
+  const onHolidaySaveDateRange = () => {
+    const format = 'YYYY-MM-DD HH:mm';
+    const formattedStartDate = dayjs(dateRangeStart).format(format);
+    const formattedEndDate = dayjs(dateRangeEnd).format(format);
+
+    router.setParams(history, {
+      startDate: formattedStartDate,
+      endDate: formattedEndDate
+    });
+
+    const totalDatesArray: string[] = [];
+
+    let temp = dayjs(dateRangeStart);
+    const endRange = dayjs(dateRangeEnd);
+    while (temp <= endRange) {
+      totalDatesArray.push(temp.toDate().toDateString());
+      temp = temp.add(1, 'day');
     }
 
-    return {
-      name: values.absenceName,
-      explRequired: explanationRequired,
-      attachRequired: attachmentRequired,
-      _id: values._id
+    const newDatesByRange: ISchedule = scheduleDates;
+
+    for (const eachDay of totalDatesArray) {
+      newDatesByRange[eachDay] = {
+        shiftStart: new Date(eachDay),
+        shiftEnd: new Date(eachDay)
+      };
+      setKeyCounter(eachDay);
+    }
+
+    const difference = Object.keys(newDatesByRange).filter(
+      x => !totalDatesArray.includes(x)
+    );
+
+    for (const removeKey of difference) {
+      delete newDatesByRange[removeKey];
+    }
+
+    setScheduleDates(newDatesByRange);
+  };
+
+  const addHoliday = () => {
+    const dates = scheduleDates;
+    const getLatestDayKey = dateKeyCounter
+      ? dayjs(dateKeyCounter)
+          .add(1, 'day')
+          .toDate()
+          .toDateString()
+      : new Date().toDateString();
+
+    dates[getLatestDayKey] = {
+      shiftStart: new Date(getLatestDayKey),
+      shiftEnd: new Date(getLatestDayKey)
     };
+
+    setScheduleDates(dates);
+    setKeyCounter(getLatestDayKey);
+  };
+  const renderHolidays = () => {
+    console.log(scheduleDates);
+
+    return (
+      <>
+        {Object.keys(scheduleDates).map(date_key => {
+          return (
+            <CustomRangeContainer key={date_key}>
+              <DateControl
+                value={scheduleDates[date_key].shiftStart}
+                required={false}
+                name="startDate"
+                // onChange={onSelectDateChange}
+                placeholder={'Starting date'}
+                dateFormat={'YYYY-MM-DD'}
+              />
+            </CustomRangeContainer>
+          );
+        })}
+      </>
+    );
+  };
+
+  const generateDoc = (
+    values: {
+      _id?: string;
+      holidayName?: string;
+      startDate?: Date;
+      endDate?: Date;
+      absenceName: string;
+      explRequired: boolean;
+      attachRequired: boolean;
+    },
+    name: string
+  ) => {
+    if (name === 'absenceType') {
+      if (absenceType) {
+        values._id = absenceType._id;
+      }
+
+      return {
+        name: values.absenceName,
+        explRequired: explanationRequired,
+        attachRequired: attachmentRequired,
+        _id: values._id
+      };
+    }
+
+    if (name === 'holiday') {
+      if (holiday) {
+        values._id = holiday._id;
+      }
+
+      return {
+        _id: values._id,
+        name: values.holidayName,
+        startDate: values.startDate,
+        endDate: values.endDate
+      };
+    }
   };
 
   const renderConfigContent = () => {
@@ -142,7 +246,8 @@ function ConfigForm(props: Props) {
         </FlexRow>
         <FlexCenter style={{ marginTop: '10px' }}>
           {renderButton({
-            values: generateDoc(values),
+            name: 'absenceType',
+            values: generateDoc(values, 'absenceType'),
             isSubmitted,
             callback: closeModal || afterSave,
             object: absenceType || null
@@ -211,32 +316,41 @@ function ConfigForm(props: Props) {
     </FlexColumn>
   );
 
-  const renderHolidayContent = (formProps: IFormProps) => (
-    <FlexColumn>
-      <ControlLabel required={true}>Holiday Name</ControlLabel>
-      <FormControl
-        {...formProps}
-        name="holidayName"
-        defaultValue={absenceType && absenceType.name}
-        required={true}
-        autoFocus={true}
-      />
-      <CustomRangeContainer>
-        <DateControl
-          value={payDates.date1}
-          required={false}
-          onChange={val => onConfigDateChange('date1', val)}
-          placeholder={'Enter date'}
-          dateFormat={'YYYY-MM-DD'}
+  const renderHolidayContent = (formProps: IFormProps) => {
+    const { values, isSubmitted } = formProps;
+    return (
+      <FlexColumn>
+        <ControlLabel required={true}>Holiday Name</ControlLabel>
+        <FormControl
+          {...formProps}
+          name="holidayName"
+          defaultValue={holiday && holiday.holidayName}
+          required={true}
+          autoFocus={true}
         />
-      </CustomRangeContainer>
-      <FlexCenter>
-        <Button onClick={() => addHoliday()}>Add Holiday</Button>
-        <Button>Submit</Button>
-      </FlexCenter>
-    </FlexColumn>
-  );
-
+        <DateRange
+          startDate={dateRangeStart}
+          endDate={dateRangeEnd}
+          onChangeEnd={onHolidayEndDateChange}
+          onChangeStart={onHolidayStartDateChange}
+          onSaveButton={onHolidaySaveDateRange}
+        />
+        {renderHolidays()}
+        <FlexCenter style={{ marginTop: '10px' }}>
+          <Button btnStyle="primary" onClick={addHoliday}>
+            Add day
+          </Button>
+          {renderButton({
+            name: 'absenceType',
+            values: generateDoc(values, 'holiday'),
+            isSubmitted,
+            callback: closeModal || afterSave,
+            object: absenceType || null
+          })}
+        </FlexCenter>
+      </FlexColumn>
+    );
+  };
   return renderConfigContent();
 }
 

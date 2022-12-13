@@ -37,11 +37,16 @@ const templateQueries = {
       selector.userId = userId;
     }
 
+    selector.status = { $ne: 'Holiday' };
     return models.Absences.find(selector);
   },
 
   absenceTypes(_root, {}, { models }: IContext) {
     return models.AbsenceTypes.find();
+  },
+
+  holidays(_root, {}, { models }: IContext) {
+    return models.Absences.find({ status: 'Holiday' });
   },
 
   async timeclocks(

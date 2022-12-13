@@ -90,7 +90,7 @@ const DateRange = (props: Props) => {
       rootClose={true}
     >
       <PopoverButton>
-        {__('Date')}
+        {__('Select Date Range')}
         <Icon icon="angle-down" />
       </PopoverButton>
     </OverlayTrigger>

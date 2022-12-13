@@ -21,6 +21,7 @@ export const types = `
   type Absence {
     _id: String!
     user: User
+    holidayName: String
     startTime: Date
     endTime: Date
     reason: String
@@ -101,11 +102,6 @@ export const types = `
     payDates: [Int]
   }
 
-  type Holiday {
-    _id: String
-    name: String
-    date: Date
-  }
 `;
 export const queries = `
   timeclocks(startDate: Date, endDate: Date, userIds: [String]): [Timeclock]
@@ -118,7 +114,7 @@ export const queries = `
   absenceDetail(_id: String!): Absence
   scheduleDetail(_id: String!): Schedule
   payDates: [PayDate]
-  holidays: [Holiday]
+  holidays: [Absence]
 `;
 const params = `
   userId: String
@@ -162,4 +158,8 @@ export const mutations = `
   payDateAdd(dateNums: [Int]): PayDate
   payDateEdit(_id: String, dateNums: [Int]): PayDate
   payDateRemove(_id: String): JSON
+  holidayAdd(name: String, startDate: Date, endDate: Date): Absence
+  holidayEdit(_id: String, name: String, startDate: Date, endDate: Date): Absence
+  holidayRemove(_id: String): JSON
+
 `;

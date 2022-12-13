@@ -175,6 +175,16 @@ const listPayDates = `
     } 
   }
 `;
+
+const listHolidays = `
+query listHolidays {
+  holidays {
+    _id
+    holidayName
+    startTime
+    endTime
+  }
+}`;
 export default {
   listReports,
   listReportByUser,
@@ -183,5 +193,6 @@ export default {
   list,
   listAbsence,
   listAbsenceTypes,
-  listPayDates
+  listPayDates,
+  listHolidays
 };

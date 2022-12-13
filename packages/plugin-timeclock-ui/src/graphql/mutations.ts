@@ -103,6 +103,26 @@ const payDateRemove = `
     payDateRemove(_id: $_id)
   }`;
 
+const holidayAdd = `
+  mutation holidayAdd($name: String, $startDate: Date, $endDate: Date){
+    holidayAdd(name: $name, startDate: $startDate, endDate: $endDate){
+      _id
+    }
+  }
+`;
+
+const holidayEdit = `
+  mutation holidayEdit($_id: String, $name: String, $startDate: Date, $endDate: Date){
+    holidayEdit(_id: $_id, name: $name, startDate: $startDate, endDate: $endDate){
+      _id
+    }
+  }`;
+
+const holidayRemove = `
+  mutation holidayRemove($_id: String){
+    holidayRemove(_id: $_id)
+  }`;
+
 export default {
   sendScheduleRequest,
   submitShift,
@@ -118,5 +138,8 @@ export default {
   clockStop,
   payDateAdd,
   payDateEdit,
-  payDateRemove
+  payDateRemove,
+  holidayAdd,
+  holidayEdit,
+  holidayRemove
 };

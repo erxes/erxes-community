@@ -239,7 +239,10 @@ const templateMutations = {
     const shiftRequest = await absence;
 
     // if request is shift request
-    if (shiftRequest.reason.toLocaleLowerCase() === 'shift request') {
+    if (
+      shiftRequest.reason &&
+      shiftRequest.reason.toLocaleLowerCase() === 'shift request'
+    ) {
       updated = models.Absences.updateAbsence(_id, { status: 'Shift', ...doc });
       const newSchedule = await models.Schedules.createSchedule({
         userId: user._id,
@@ -393,6 +396,31 @@ const templateMutations = {
 
   payDateRemove(_root, { _id }, { models }: IContext) {
     return models.PayDates.removePayDate(_id);
+  },
+
+  holidayAdd(_root, { name, startDate, endDate }, { models }: IContext) {
+    return models.Absences.createAbsence({
+      holidayName: name,
+      startTime: startDate,
+      endTime: endDate,
+      status: 'Holiday',
+      solved: true
+    });
+  },
+
+  holidayEdit(_root, { _id, name, startDate, endDate }, { models }: IContext) {
+    models.Absences.getAbsence(_id);
+    const updated = models.Absences.updateAbsence(_id, {
+      holidayName: name,
+      startTime: startDate,
+      endTime: endDate,
+      status: 'Holiday'
+    });
+    return updated;
+  },
+
+  holidayRemove(_root, { _id }, { models }: IContext) {
+    return models.Absences.removeAbsence(_id);
   }
 };
 

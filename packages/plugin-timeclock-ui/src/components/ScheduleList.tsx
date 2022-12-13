@@ -13,7 +13,7 @@ import DateRange from './DateRange';
 import dayjs from 'dayjs';
 import DatePicker from './DateTimePicker';
 import { ISchedule } from '../types';
-import ScheduleConfig from './ScheduleConfig';
+import ScheduleConfig from './ScheduleDayToggleConfig';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { CustomRow, Input } from '../styles';
@@ -635,7 +635,9 @@ function ScheduleList(props: Props) {
         </td>
         {ListShiftContent(
           schedule.shifts.sort(
-            (a, b) => new Date(a.shiftStart) - new Date(b.shiftStart)
+            (a, b) =>
+              new Date(a.shiftStart).getTime() -
+              new Date(b.shiftStart).getTime()
           )
         )}
       </tr>

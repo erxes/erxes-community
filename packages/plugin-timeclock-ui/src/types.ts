@@ -14,6 +14,7 @@ export interface IAbsence {
   user: IUser;
   startTime: Date;
   endTime: Date;
+  holidayName: string;
   reason: string;
   explanation: string;
   solved: boolean;
@@ -100,7 +101,11 @@ export type PayDatesQueryResponse = {
   refetch: () => void;
   loading: boolean;
 };
-
+export type HolidaysQueryResponse = {
+  holidays: IAbsence[];
+  refetch: () => void;
+  loading: boolean;
+};
 export type ScheduleQueryResponse = {
   schedules: IShiftSchedule[];
   refetch: () => void;
@@ -189,6 +194,27 @@ export type ConfigMutationResponse = {
     };
   }) => Promise<any>;
   removePayDateMutation: (params: {
+    variables: {
+      _id: string;
+    };
+  }) => Promise<any>;
+  addHolidayMutation: (params: {
+    variables: {
+      name: string;
+      startDate: string;
+      endDate: string;
+    };
+  }) => Promise<any>;
+
+  editHolidayMutation: (params: {
+    variables: {
+      _id: string;
+      name: string;
+      startDate: string;
+      endDate: string;
+    };
+  }) => Promise<any>;
+  removeHolidayMutation: (params: {
     variables: {
       _id: string;
     };
