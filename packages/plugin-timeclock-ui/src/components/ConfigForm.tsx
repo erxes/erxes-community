@@ -1,18 +1,12 @@
 import Button from '@erxes/ui/src/components/Button';
-import { router, __ } from '@erxes/ui/src/utils';
+import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import {
   CustomRangeContainer,
   FlexRow,
   FlexColumn,
-  Input,
-  FlexCenter,
-  Row
+  FlexCenter
 } from '../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Form from '@erxes/ui/src/components/form/Form';
@@ -21,8 +15,6 @@ import { IAbsenceType, IPayDates } from '../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 
 type Props = {
-  queryParams: any;
-  history: any;
   configType: string;
   absenceType?: IAbsenceType;
   payDate?: IPayDates;
@@ -31,24 +23,15 @@ type Props = {
   afterSave?: () => void;
   closeModal?: () => void;
   renderButton: (props: IButtonMutateProps) => void;
-  removeAbsenceType: (absenceTypeId: string) => void;
   submitPayDatesConfig: (payDates: number[]) => void;
 };
 
 function ConfigForm(props: Props) {
-  const {
-    queryParams,
-    history,
-    absenceTypes,
-    renderButton,
-    removeAbsenceType,
-    submitPayDatesConfig
-  } = props;
+  const { renderButton, submitPayDatesConfig } = props;
   const { absenceType } = props;
   const [explanationRequired, setExplRequired] = useState(false);
   const [attachmentRequired, setAttachRequired] = useState(false);
   const [payPeriod, setPayPeriod] = useState('');
-  const [displayConfig, setDisplayConfig] = useState(false);
   const [payDates, setpayDates] = useState({
     date1: new Date(),
     date2: new Date()

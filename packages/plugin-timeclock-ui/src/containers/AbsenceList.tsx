@@ -7,8 +7,7 @@ import AbsenceList from '../components/AbsenceList';
 import {
   AbsenceMutationResponse,
   AbsenceQueryResponse,
-  AbsenceTypeQueryResponse,
-  ScheduleMutationResponse
+  AbsenceTypeQueryResponse
 } from '../types';
 import { mutations, queries } from '../graphql';
 import Spinner from '@erxes/ui/src/components/Spinner';
@@ -73,6 +72,7 @@ const ListContainer = (props: FinalProps) => {
       .then(() => Alert.success('Successfully sent an absence request'))
       .catch(err => Alert.error(err.message));
   };
+
   const updatedProps = {
     ...props,
     absences: listAbsenceQuery.absences || [],

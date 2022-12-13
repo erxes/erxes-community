@@ -1,10 +1,10 @@
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
-import { Alert, withProps } from '@erxes/ui/src/utils';
+import { withProps } from '@erxes/ui/src/utils';
 import List from '../components/List';
 import { TimeClockMutationResponse, TimeClockQueryResponse } from '../types';
-import { mutations, queries } from '../graphql';
+import { queries } from '../graphql';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';

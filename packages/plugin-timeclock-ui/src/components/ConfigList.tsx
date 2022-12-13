@@ -1,6 +1,6 @@
 import Button from '@erxes/ui/src/components/Button';
 import { menuTimeClock } from '../menu';
-import { router, __ } from '@erxes/ui/src/utils';
+import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import Select from 'react-select-plus';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
@@ -8,29 +8,16 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import {
-  CustomRangeContainer,
-  FlexRow,
-  FlexColumn,
-  Input,
-  FlexCenter,
-  Row,
-  FilterItem
-} from '../styles';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
-import { FormControl } from '@erxes/ui/src/components/form';
+import { Row, FilterItem } from '../styles';
 import { IAbsenceType, IPayDates } from '../types';
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import { IButtonMutateProps } from '@erxes/ui/src/types';
 import Table from '@erxes/ui/src/components/table';
 import Icon from '@erxes/ui/src/components/Icon';
 import Tip from '@erxes/ui/src/components/Tip';
 
-import Form from '@erxes/ui/src/components/form/Form';
 import ConfigForm from './ConfigForm';
 
 type Props = {
-  queryParams: any;
-  history: any;
   absenceTypes?: IAbsenceType[];
   payDates: IPayDates[];
   loading?: boolean;

@@ -19,31 +19,6 @@ const attachmentFields = `
   size
   duration
 `;
-const absenceFields = `
-  _id
-  startTime
-  endTime
-  reason
-  solved
-`;
-const timeclockFields = `
-      _id
-      shiftStart
-      shiftEnd
-`;
-const scheduleFields = `
-    _id
-    user{
-      ${userFields}
-    }
-    shifts{
-      _id
-      shiftStart
-      shiftEnd
-      solved
-      status
-    }
-`;
 
 const list = `
   query listQuery($startDate: Date, $endDate: Date, $userIds: [String]) {

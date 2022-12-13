@@ -1,18 +1,12 @@
 import React from 'react';
 import Popover from 'react-bootstrap/Popover';
-import styled from 'styled-components';
-import { dimensions } from '@erxes/ui/src/styles';
 import { PopoverButton } from '@erxes/ui/src/styles/main';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import Button from '@erxes/ui/src/components/Button';
 import Icon from '@erxes/ui/src/components/Icon';
 import { __ } from '@erxes/ui/src/utils';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { FlexRow, DateName, FlexCenter } from '../styles';
-
-const Datetime = asyncComponent(() =>
-  import(/* webpackChunkName: "Datetime" */ '@nateradebaugh/react-datetime')
-);
+import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {
   startDate: Date;
