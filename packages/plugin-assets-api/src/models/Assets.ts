@@ -17,7 +17,10 @@ export interface IAssetModel extends Model<IAssetDocument> {
   mergeAssets(assetIds: string[], assetFields: IAsset): Promise<IAssetDocument>;
   addKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
   updateKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
-  removeKnowledgeBase(assetId: string, knowledgeBaseId: any): Promise<IAssetDocument>;
+  removeKnowledgeBase(
+    assetId: string,
+    knowledgeBaseId: any
+  ): Promise<IAssetDocument>;
 }
 
 const knowledgeBaseDataValidator = (assetId, doc) => {
@@ -176,8 +179,12 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       const movementItems = await models.MovementItems.find({
         assetId: { $in: [...unUsedIds, ...child_assets_ids] }
       });
-      const movement_ids = movementItems.map(movementItem => movementItem.movementId);
-      const movement_items_ids = movementItems.map(movementItem => movementItem._id);
+      const movement_ids = movementItems.map(
+        movementItem => movementItem.movementId
+      );
+      const movement_items_ids = movementItems.map(
+        movementItem => movementItem._id
+      );
 
       await models.Movements.deleteMany({
         _id: { $in: [...new Set(movement_ids)] }
@@ -202,7 +209,9 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
 
       if (!checkParent.find(i => i)) {
-        throw new Error(`Can not merge assets. Must choose Parent or Category field`);
+        throw new Error(
+          `Can not merge assets. Must choose Parent or Category field`
+        );
       }
 
       let customFieldsData: ICustomField[] = [];
@@ -217,7 +226,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
         const assetObj = await models.Assets.getAssets({ _id: assetId });
 
         // merge custom fields data
-        customFieldsData = [...customFieldsData, ...(assetObj.customFieldsData || [])];
+        customFieldsData = [
+          ...customFieldsData,
+          ...(assetObj.customFieldsData || [])
+        ];
 
         await models.Assets.findByIdAndUpdate(assetId, {
           $set: {
@@ -318,12 +330,17 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return 'updated';
     }
 
-    public static async removeKnowledgeBase(assetId: string, knowledgeBaseId: any) {
+    public static async removeKnowledgeBase(
+      assetId: string,
+      knowledgeBaseId: any
+    ) {
       if (!assetId) {
         throw new Error('You cannot remove a knowledge base without assetId');
       }
       if (!knowledgeBaseId) {
-        throw new Error('You cannot remove a knowledge base without knowledgeBaseId');
+        throw new Error(
+          'You cannot remove a knowledge base without knowledgeBaseId'
+        );
       }
 
       return await models.Assets.updateOne(
@@ -333,7 +350,9 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
     }
 
     public static async generateOrder(parentAsset: IAsset, doc: IAsset) {
-      const order = parentAsset ? `${parentAsset.order}/${doc.code}` : `${doc.code}`;
+      const order = parentAsset
+        ? `${parentAsset.order}/${doc.code}`
+        : `${doc.code}`;
 
       return order;
     }
