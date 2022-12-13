@@ -54,65 +54,70 @@ function AbsenceList(props: Props) {
     setAttachment(files[0]);
   };
 
-  const modalContent = () => (
-    <div style={{ flex: 'column', justifyContent: 'space-around' }}>
-      <DateFilter queryParams={queryParams} history={history} />
+  const modalContent = ({ closeModal }) => {
+    return (
+      <div style={{ flex: 'column', justifyContent: 'space-around' }}>
+        <DateFilter queryParams={queryParams} history={history} />
 
-      <SelectTeamMembers
-        queryParams={queryParams}
-        label={'Team member'}
-        onSelect={onUserSelect}
-        multi={false}
-        name="userId"
-      />
-
-      <Select
-        isRequired={true}
-        placeholder={__('Reason')}
-        onChange={onReasonSelect}
-        value={router.getParam(history, 'reason') || ''}
-        options={
-          absenceTypes &&
-          absenceTypes.map((absenceType, idx) => ({
-            value: absenceType.name,
-            label: absenceType.name,
-            arrayIdx: idx
-          }))
-        }
-      />
-      {absenceTypes.length > 0 && absenceTypes[absenceIdx].explRequired ? (
-        <FormControl
-          type="text"
-          name="reason"
-          placeholder="Please write short explanation"
-          onChange={setInputValue}
-          required={true}
+        <SelectTeamMembers
+          queryParams={queryParams}
+          label={'Team member'}
+          onSelect={onUserSelect}
+          multi={false}
+          name="userId"
         />
-      ) : (
-        <></>
-      )}
 
-      {absenceTypes.length > 0 && absenceTypes[absenceIdx].attachRequired ? (
-        <Uploader
-          text={`Choose a file to upload`}
-          warningText={'Only .jpg or jpeg file is supported.'}
-          single={true}
-          defaultFileList={[]}
-          onChange={onChangeAttachment}
+        <Select
+          placeholder={__('Reason')}
+          onChange={onReasonSelect}
+          value={router.getParam(history, 'reason') || ''}
+          options={
+            absenceTypes &&
+            absenceTypes.map((absenceType, idx) => ({
+              value: absenceType.name,
+              label: absenceType.name,
+              arrayIdx: idx
+            }))
+          }
         />
-      ) : (
-        <></>
-      )}
-      <FlexCenter>
-        <Button style={{ marginTop: 10 }} onClick={onSubmitClick}>
-          {'Submit'}
-        </Button>
-      </FlexCenter>
-    </div>
-  );
+        {absenceTypes.length > 0 && absenceTypes[absenceIdx].explRequired ? (
+          <FormControl
+            type="text"
+            name="reason"
+            placeholder="Please write short explanation"
+            onChange={setInputValue}
+            required={true}
+          />
+        ) : (
+          <></>
+        )}
 
-  const onSubmitClick = () => {
+        {absenceTypes.length > 0 && absenceTypes[absenceIdx].attachRequired ? (
+          <Uploader
+            text={`Choose a file to upload`}
+            warningText={'Only .jpg or jpeg file is supported.'}
+            single={true}
+            defaultFileList={[]}
+            onChange={onChangeAttachment}
+          />
+        ) : (
+          <></>
+        )}
+        <FlexCenter>
+          <Button
+            style={{ marginTop: 10 }}
+            onClick={() => onSubmitClick(closeModal)}
+          >
+            {'Submit'}
+          </Button>
+        </FlexCenter>
+      </div>
+    );
+  };
+
+  const onSubmitClick = closeModal => {
     submitRequest(explanation, attachment);
+    closeModal();
   };
 
   const setInputValue = e => {

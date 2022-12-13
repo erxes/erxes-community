@@ -3,7 +3,7 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import ScheduleList from '../components/ScheduleList';
+import ScheduleList from '../components/schedule/ScheduleList';
 import {
   BranchesQueryResponse,
   IShift,
@@ -70,31 +70,43 @@ const ListContainer = (props: FinalProps) => {
   };
 
   const submitRequest = (
-    selectedUserId: string[],
+    selectedUserIds: string[],
     requestedShifts: IShift[]
   ) => {
-    sendScheduleReqMutation({
-      variables: {
-        userId: `${selectedUserId}`,
-        shifts: requestedShifts
-      }
-    })
-      .then(() => Alert.success('Successfully sent a schedule request'))
-      .catch(err => Alert.error(err.message));
+    if (selectedUserIds[0] === '') {
+      Alert.error('User was not given');
+    } else if (requestedShifts.length === 0) {
+      Alert.error('No shifts were given');
+    } else {
+      sendScheduleReqMutation({
+        variables: {
+          userId: `${selectedUserIds}`,
+          shifts: requestedShifts
+        }
+      })
+        .then(() => Alert.success('Successfully sent a schedule request'))
+        .catch(err => Alert.error(err.message));
+    }
   };
 
   const submitShift = (
     selectedUserIds: string[],
     requestedShifts: IShift[]
   ) => {
-    submitShiftMutation({
-      variables: {
-        userIds: selectedUserIds,
-        shifts: requestedShifts
-      }
-    })
-      .then(() => Alert.success('Successfully sent a schedule request'))
-      .catch(err => Alert.error(err.message));
+    if (selectedUserIds[0] === '') {
+      Alert.error('User was not given');
+    } else if (requestedShifts.length === 0) {
+      Alert.error('No shifts were given');
+    } else {
+      submitShiftMutation({
+        variables: {
+          userIds: selectedUserIds,
+          shifts: requestedShifts
+        }
+      })
+        .then(() => Alert.success('Successfully sent a schedule request'))
+        .catch(err => Alert.error(err.message));
+    }
   };
 
   const updatedProps = {

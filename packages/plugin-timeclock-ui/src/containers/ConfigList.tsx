@@ -3,7 +3,7 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import ConfigList from '../components/ConfigList';
+import ConfigList from '../components/config/ConfigList';
 import {
   AbsenceMutationResponse,
   AbsenceTypeQueryResponse,
@@ -70,6 +70,10 @@ const ListContainer = (props: FinalProps) => {
       mutation = object ? mutations.holidayEdit : mutations.holidayAdd;
     }
 
+    if (name === 'payDate') {
+      mutation = object ? mutations.payDateEdit : mutations.payDateAdd;
+    }
+
     return (
       <ButtonMutate
         mutation={mutation}
@@ -81,6 +85,9 @@ const ListContainer = (props: FinalProps) => {
           },
           {
             query: gql(queries.listHolidays)
+          },
+          {
+            query: gql(queries.listPayDates)
           }
         ]}
         isSubmitted={isSubmitted}
@@ -93,16 +100,6 @@ const ListContainer = (props: FinalProps) => {
     );
   };
 
-  const removeAbsenceType = absenceId => {
-    confirm('Are you sure to remove this absence type').then(() => {
-      removeAbsenceTypeMutation({ variables: { _id: absenceId } })
-        .then(() => Alert.success('Successfully removed an absence type'))
-        .catch(err => {
-          throw new Error(err);
-        });
-    });
-  };
-
   const submitPayDatesConfig = (payDates: number[]) => {
     confirm('Are you sure to submit these dates as pay dates ? ').then(() => {
       addPayDateMutation({ variables: { dateNums: payDates } })
@@ -113,7 +110,17 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
-  const removeHolidayConfig = (_id: string) => {
+  const removeAbsenceType = absenceId => {
+    confirm('Are you sure to remove this absence type').then(() => {
+      removeAbsenceTypeMutation({ variables: { _id: absenceId } })
+        .then(() => Alert.success('Successfully removed an absence type'))
+        .catch(err => {
+          throw new Error(err);
+        });
+    });
+  };
+
+  const removeHoliday = (_id: string) => {
     confirm('Are you sure to remove this holiday').then(() => {
       removeHolidayMutation({ variables: { _id: `${_id}` } })
         .then(() => Alert.success('Successfully removed holiday'))
@@ -123,14 +130,24 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
-  console.log(listPayDatesQuery.payDates);
+  const removePayDate = (_id: string) => {
+    confirm('Are you sure to remove this holiday').then(() => {
+      removePayDateMutation({ variables: { _id: `${_id}` } })
+        .then(() => Alert.success('Successfully removed payDate'))
+        .catch(err => {
+          throw new Error(err);
+        });
+    });
+  };
 
   const updatedProps = {
     ...props,
+    holidays: listHolidaysQuery.holidays,
     absenceTypes: listAbsenceTypesQuery.absenceTypes,
     payDates: listPayDatesQuery.payDates || [],
     removeAbsenceType,
-    removeHolidayConfig,
+    removeHoliday,
+    removePayDate,
     renderButton,
     submitPayDatesConfig
   };
@@ -168,47 +185,23 @@ export default withProps<Props>(
       })
     }),
 
-    graphql<Props, AbsenceMutationResponse>(gql(mutations.absenceTypeAdd), {
-      name: 'addAbsenceType',
-      options: ({ absenceName, explanation, attachment }) => ({
-        variables: {
-          name: absenceName,
-          explRequired: explanation,
-          attachRequired: attachment
-        },
-        refetchQueries: ['absenceTypes']
-      })
-    }),
-
-    graphql<Props, AbsenceMutationResponse>(gql(mutations.absenceTypeEdit), {
-      name: 'editAbsenceType',
-      options: ({ absenceId, absenceName, explanation, attachment }) => ({
-        variables: {
-          _id: absenceId,
-          name: absenceName,
-          explRequired: explanation,
-          attachRequired: attachment
-        },
-        refetchQueries: ['absenceTypes']
-      })
-    }),
-
-    graphql<Props, ConfigMutationResponse>(gql(mutations.payDateAdd), {
-      name: 'addPayDateMutation',
-      options: ({ payDates }) => ({
-        variables: {
-          dateNums: payDates
-        },
-        refetchQueries: ['absenceTypes']
-      })
-    }),
     graphql<Props, ConfigMutationResponse>(gql(mutations.holidayRemove), {
       name: 'removeHolidayMutation',
       options: ({ payDates }) => ({
         variables: {
           dateNums: payDates
         },
-        refetchQueries: ['absenceTypes']
+        refetchQueries: ['holidays']
+      })
+    }),
+
+    graphql<Props, ConfigMutationResponse>(gql(mutations.payDateRemove), {
+      name: 'removePayDateMutation',
+      options: ({ payDates }) => ({
+        variables: {
+          dateNums: payDates
+        },
+        refetchQueries: ['payDates']
       })
     })
   )(ListContainer)

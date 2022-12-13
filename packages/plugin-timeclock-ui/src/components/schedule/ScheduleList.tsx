@@ -1,5 +1,5 @@
 import Button from '@erxes/ui/src/components/Button';
-import { menuTimeClock } from '../menu';
+import { menuTimeClock } from '../../menu';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
@@ -8,22 +8,22 @@ import Table from '@erxes/ui/src/components/table';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
-import DateRange from './DateRange';
+import DateRange from '../datepicker/DateRange';
 import dayjs from 'dayjs';
-import DatePicker from './DateTimePicker';
-import { ISchedule } from '../types';
+import DatePicker from '../datepicker/DateTimePicker';
+import { ISchedule } from '../../types';
 import ScheduleConfig from './ScheduleDayToggleConfig';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
-import { CustomRow, Input } from '../styles';
+import { CustomRow, Input } from '../../styles';
 
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import { Row } from '../styles';
+import { Row } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
-import { CustomRangeContainer } from '../styles';
+import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
-import SideBarList from '../containers/SideBarList';
+import SideBarList from '../../containers/SideBarList';
 import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {
@@ -146,11 +146,13 @@ function ScheduleList(props: Props) {
     setScheduleDates(newScheduleDates);
   };
 
-  const onSubmitClick = () => {
+  const onSubmitClick = closeModal => {
     submitRequest(userIds, Object.values(scheduleDates));
+    closeModal();
   };
-  const onAdminSubmitClick = () => {
+  const onAdminSubmitClick = closeModal => {
     submitShift(userIds, Object.values(scheduleDates));
+    closeModal();
   };
 
   const onUserSelect = users => {
@@ -196,7 +198,7 @@ function ScheduleList(props: Props) {
     );
   };
 
-  const modalContent = () => (
+  const modalContent = ({ closeModal }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <SelectTeamMembers
         queryParams={queryParams}
@@ -216,14 +218,17 @@ function ScheduleList(props: Props) {
         <Button style={{ marginTop: 10 }} onClick={addDay}>
           Add day
         </Button>
-        <Button style={{ marginTop: 10 }} onClick={onSubmitClick}>
+        <Button
+          style={{ marginTop: 10 }}
+          onClick={() => onSubmitClick(closeModal)}
+        >
           {'Submit'}
         </Button>
       </div>
     </div>
   );
 
-  const adminModalContent = () => (
+  const adminModalContent = ({ closeModal }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <SelectTeamMembers
         queryParams={queryParams}
@@ -242,7 +247,10 @@ function ScheduleList(props: Props) {
         <Button style={{ marginTop: 10 }} onClick={addDay}>
           Add day
         </Button>
-        <Button style={{ marginTop: 10 }} onClick={onAdminSubmitClick}>
+        <Button
+          style={{ marginTop: 10 }}
+          onClick={() => onAdminSubmitClick(closeModal)}
+        >
           {'Submit'}
         </Button>
       </div>
@@ -456,7 +464,7 @@ function ScheduleList(props: Props) {
     }
   };
 
-  const adminConfigDefault = () => {
+  const adminConfigDefaultContent = ({ closeModal }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <SelectTeamMembers
@@ -504,7 +512,10 @@ function ScheduleList(props: Props) {
           <Button style={{ marginTop: 10 }} onClick={addDay}>
             Add day
           </Button>
-          <Button style={{ marginTop: 10 }} onClick={onAdminSubmitClick}>
+          <Button
+            style={{ marginTop: 10 }}
+            onClick={() => onAdminSubmitClick(closeModal)}
+          >
             {'Submit'}
           </Button>
         </div>
@@ -528,7 +539,7 @@ function ScheduleList(props: Props) {
         size="lg"
         title={__('Schedule config - Admin')}
         trigger={adminConfigTrigger}
-        content={adminConfigDefault}
+        content={adminConfigDefaultContent}
       />
     </>
   );

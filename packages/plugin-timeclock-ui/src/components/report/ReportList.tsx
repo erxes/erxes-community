@@ -1,5 +1,5 @@
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { menuTimeClock } from '../menu';
+import { menuTimeClock } from '../../menu';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
@@ -11,13 +11,13 @@ import SelectDepartments from '@erxes/ui-settings/src/departments/containers/Sel
 import Button from '@erxes/ui/src/components/Button';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import ReportRow from './ReportRow';
-import { IReport } from '../types';
+import { IReport } from '../../types';
 import {
   FilterWrapper,
   Row,
   FilterItem,
   CustomRangeContainer
-} from '../styles';
+} from '../../styles';
 
 type Props = {
   queryParams: any;

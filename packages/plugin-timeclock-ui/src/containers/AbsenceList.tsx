@@ -59,18 +59,22 @@ const ListContainer = (props: FinalProps) => {
   };
 
   const submitRequest = (expl: string, attchment: IAttachment) => {
-    sendAbsenceReqMutation({
-      variables: {
-        startTime: startDate,
-        endTime: endDate,
-        userId: `${userId}`,
-        reason: `${reason}`,
-        explanation: expl.length > 0 ? expl : undefined,
-        attachment: attchment.url.length > 0 ? attchment : undefined
-      }
-    })
-      .then(() => Alert.success('Successfully sent an absence request'))
-      .catch(err => Alert.error(err.message));
+    if (!reason || !startDate || !endDate) {
+      Alert.error('Please fill all the fields');
+    } else {
+      sendAbsenceReqMutation({
+        variables: {
+          startTime: startDate,
+          endTime: endDate,
+          userId: `${userId}`,
+          reason: `${reason}`,
+          explanation: expl.length > 0 ? expl : undefined,
+          attachment: attchment.url.length > 0 ? attchment : undefined
+        }
+      })
+        .then(() => Alert.success('Successfully sent an absence request'))
+        .catch(err => Alert.error(err.message));
+    }
   };
 
   const updatedProps = {

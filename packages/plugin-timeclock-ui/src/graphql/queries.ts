@@ -143,7 +143,7 @@ const listAbsenceTypes = `
 `;
 
 const listPayDates = `
-  query listPayDatesQuery{
+  query payDates{
     payDates{
       _id
       payDates
@@ -152,7 +152,7 @@ const listPayDates = `
 `;
 
 const listHolidays = `
-query listHolidays {
+query holidays {
   holidays {
     _id
     holidayName

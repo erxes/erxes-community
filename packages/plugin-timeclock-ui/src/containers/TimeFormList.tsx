@@ -29,6 +29,7 @@ type Props = {
   branchIds: string[];
   longitude: number;
   latitude: number;
+  closeModal: () => void;
 };
 
 type FinalProps = {} & Props & TimeClockMutationResponse;

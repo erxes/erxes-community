@@ -3,7 +3,7 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import React from 'react';
-import ReportList from '../components/ReportList';
+import ReportList from '../components/report/ReportList';
 import { queries } from '../graphql';
 import { BranchesQueryResponse, ReportsQueryResponse } from '../types';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';

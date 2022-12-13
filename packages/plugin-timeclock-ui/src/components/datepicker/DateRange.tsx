@@ -5,7 +5,7 @@ import Button from '@erxes/ui/src/components/Button';
 import Icon from '@erxes/ui/src/components/Icon';
 import { __ } from '@erxes/ui/src/utils';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import { FlexRow, DateName, FlexCenter } from '../styles';
+import { FlexRow, DateName, FlexCenter } from '../../styles';
 import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {

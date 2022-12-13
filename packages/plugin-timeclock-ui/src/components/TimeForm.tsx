@@ -11,6 +11,7 @@ type Props = {
   startTime?: Date;
   queryParams: any;
   currentUserId: string;
+  closeModal: () => void;
   startClockTime: (userId: string) => void;
   stopClockTime: (userId: string, timeId: string) => void;
   timeclocks: ITimeclock[];
@@ -23,7 +24,8 @@ const FormComponent = ({
   stopClockTime,
   currentUserId,
   shiftId,
-  shiftStarted
+  shiftStarted,
+  closeModal
 }: Props) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userId, setUserId] = useState(currentUserId);
@@ -43,10 +45,12 @@ const FormComponent = ({
 
   const startClock = () => {
     startClockTime(userId);
+    closeModal();
   };
 
   const stopClock = () => {
     stopClockTime(userId, shiftId);
+    closeModal();
   };
 
   const renderContent = () => {

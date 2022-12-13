@@ -8,6 +8,7 @@ import {
   IAbsenceType
 } from '../../models/definitions/timeclock';
 import { findBranches } from './utils';
+import { loadShiftClass } from '../../models/Timeclock';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -155,27 +156,26 @@ const timeclockMutations = {
 
     return updated;
   },
-  async absenceTypeAdd(
+  absenceTypeAdd(
     _root,
     { name, explRequired, attachRequired },
     { models }: IContext
   ) {
     const explanationReqd: boolean = explRequired;
     const attachReqd: boolean = attachRequired;
-    const absenceType = await models.AbsenceTypes.createAbsenceType({
+
+    return models.AbsenceTypes.createAbsenceType({
       name: `${name}`,
       explRequired: explanationReqd,
       attachRequired: attachReqd
     });
-    return absenceType;
   },
 
-  async absenceTypeRemove(_root, { _id }, { models }: IContext) {
-    const absenceType = await models.AbsenceTypes.removeAbsenceType(_id);
-    return absenceType;
+  absenceTypeRemove(_root, { _id }, { models }: IContext) {
+    return models.AbsenceTypes.removeAbsenceType(_id);
   },
 
-  async absenceTypeEdit(
+  absenceTypeEdit(
     _root,
     { _id, ...doc }: IAbsenceTypeEdit,
     { models }: IContext
@@ -340,9 +340,7 @@ const timeclockMutations = {
   },
 
   payDateEdit(_root, { _id, dateNums }, { models }: IContext) {
-    models.PayDates.getPayDate(_id);
-    const updated = models.PayDates.updatePayDate(_id, { payDates: dateNums });
-    return updated;
+    return models.PayDates.updatePayDate(_id, { payDates: dateNums });
   },
 
   payDateRemove(_root, { _id }, { models }: IContext) {
@@ -359,15 +357,25 @@ const timeclockMutations = {
     });
   },
 
-  holidayEdit(_root, { _id, name, startDate, endDate }, { models }: IContext) {
-    models.Absences.getAbsence(_id);
-    const updated = models.Absences.updateAbsence(_id, {
+  holidayEdit(
+    _root,
+    { _id, name, startDate, endDate, doc },
+    { models }: IContext
+  ) {
+    // const updated = models.Absences.updateAbsence(_id, {
+    //   holidayName: name,
+    //   startTime: startDate,
+    //   endTime: endDate,
+    //   status: 'Holiday',
+    //   ...doc
+    // });
+    return models.Absences.updateAbsence(_id, {
       holidayName: name,
       startTime: startDate,
       endTime: endDate,
-      status: 'Holiday'
+      status: 'Holiday',
+      ...doc
     });
-    return updated;
   },
 
   holidayRemove(_root, { _id }, { models }: IContext) {

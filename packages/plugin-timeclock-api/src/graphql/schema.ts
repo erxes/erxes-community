@@ -164,5 +164,4 @@ export const mutations = `
   holidayAdd(name: String, startDate: Date, endDate: Date): Absence
   holidayEdit(_id: String, name: String, startDate: Date, endDate: Date): Absence
   holidayRemove(_id: String): JSON
-
 `;

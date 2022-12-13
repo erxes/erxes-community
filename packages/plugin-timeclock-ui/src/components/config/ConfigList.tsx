@@ -1,5 +1,5 @@
 import Button from '@erxes/ui/src/components/Button';
-import { menuTimeClock } from '../menu';
+import { menuTimeClock } from '../../menu';
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import Select from 'react-select-plus';
@@ -8,8 +8,8 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import { Row, FilterItem } from '../styles';
-import { IAbsenceType, IPayDates } from '../types';
+import { Row, FilterItem } from '../../styles';
+import { IAbsence, IAbsenceType, IPayDates } from '../../types';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import Table from '@erxes/ui/src/components/table';
 import Icon from '@erxes/ui/src/components/Icon';
@@ -19,15 +19,25 @@ import ConfigForm from './ConfigForm';
 
 type Props = {
   absenceTypes?: IAbsenceType[];
+  holidays?: IAbsence[];
   payDates: IPayDates[];
   loading?: boolean;
   renderButton: (props: IButtonMutateProps) => void;
   removeAbsenceType: (absenceTypeId: string) => void;
+  removeHoliday: (holidayId: string) => void;
+  removePayDate: (payDateId: string) => void;
   submitPayDatesConfig: (payDates: number[]) => void;
 };
 
 function ConfigList(props: Props) {
-  const { absenceTypes, payDates, removeAbsenceType } = props;
+  const {
+    absenceTypes,
+    payDates,
+    holidays,
+    removeAbsenceType,
+    removeHoliday,
+    removePayDate
+  } = props;
   const [selectedType, setType] = useState('Absence types');
 
   const renderSelectionBar = () => {
@@ -88,30 +98,26 @@ function ConfigList(props: Props) {
     );
   };
 
-  const scheduleConfigContent = ({ closeModal }, payDate) => {
+  const payDateContent = ({ closeModal }, payDate) => {
     return (
       <ConfigForm
         {...props}
         closeModal={closeModal}
         payDate={payDate}
-        configType="Schedule"
+        configType="PayDate"
       />
     );
   };
 
-  const holidayConfigContent = ({ closeModal }, absenceType) => {
+  const holidayConfigContent = ({ closeModal }, holiday) => {
     return (
       <ConfigForm
         {...props}
         closeModal={closeModal}
-        absenceType={absenceType}
+        holiday={holiday}
         configType="Holiday"
       />
     );
-  };
-
-  const onRemoveAbsenceType = absenceTypeId => {
-    removeAbsenceType(absenceTypeId);
   };
 
   const actionBarRight = (
@@ -124,7 +130,7 @@ function ConfigList(props: Props) {
       <ModalTrigger
         title={__('Schedule Config')}
         trigger={scheduleConfigTrigger}
-        content={contenProps => scheduleConfigContent(contenProps, null)}
+        content={contenProps => payDateContent(contenProps, null)}
       />
       <ModalTrigger
         title={__('Holiday Config')}
@@ -148,28 +154,53 @@ function ConfigList(props: Props) {
     </Button>
   );
 
-  const removeTrigger = absenceTypeId => (
-    <Tip text={__('Delete')} placement="top">
-      <Button
-        btnStyle="link"
-        onClick={() => onRemoveAbsenceType(absenceTypeId)}
-        icon="times-circle"
-      />
-    </Tip>
-  );
+  const removeTrigger = (_id, configType) => {
+    switch (configType) {
+      case 'absenceType':
+        return (
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removeAbsenceType(_id)}
+              icon="times-circle"
+            />
+          </Tip>
+        );
+      case 'holiday':
+        return (
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removeHoliday(_id)}
+              icon="times-circle"
+            />
+          </Tip>
+        );
+      case 'payDate':
+        return (
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removePayDate(_id)}
+              icon="times-circle"
+            />
+          </Tip>
+        );
+    }
+  };
 
   const content = () => {
     switch (selectedType) {
       case 'Holidays':
-        return;
+        return renderHolidaysContent();
       case 'Pay period':
-        return renderPayPeriodContent();
+        return renderpayDateContent();
       default:
         return renderAbsenceTypesContent();
     }
   };
 
-  const renderPayPeriodContent = () => {
+  const renderpayDateContent = () => {
     return (
       <Table>
         <thead>
@@ -188,10 +219,10 @@ function ConfigList(props: Props) {
                   title="Edit Pay Dates"
                   trigger={editTrigger}
                   content={contenProps =>
-                    scheduleConfigContent(contenProps, payDates[0])
+                    payDateContent(contenProps, payDates[0])
                   }
                 />
-                {removeTrigger(payDates[0]._id)}
+                {removeTrigger(payDates[0]._id, 'payDate')}
               </td>
             </>
           )}
@@ -226,7 +257,60 @@ function ConfigList(props: Props) {
                         absenceConfigContent(contentProps, absenceType)
                       }
                     />
-                    {removeTrigger(absenceType._id)}
+                    {removeTrigger(absenceType._id, 'absenceType')}
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </Table>
+    );
+  };
+
+  const renderHolidaysContent = () => {
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Holiday Name</th>
+            <th>Starting date</th>
+            <th>Ending date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {holidays &&
+            holidays.map(holiday => {
+              return (
+                <tr key={holiday._id}>
+                  <td>{holiday.holidayName}</td>
+                  <td>
+                    {(holiday.startTime &&
+                      new Date(holiday.startTime)
+                        .toDateString()
+                        .split(' ')
+                        .slice(0, 3)
+                        .join(' ')) ||
+                      '-'}
+                  </td>
+                  <td>
+                    {(holiday.endTime &&
+                      new Date(holiday.endTime)
+                        .toDateString()
+                        .split(' ')
+                        .slice(0, 3)
+                        .join(' ')) ||
+                      '-'}
+                  </td>
+                  <td>
+                    <ModalTrigger
+                      title="Edit holiday"
+                      trigger={editTrigger}
+                      content={contentProps =>
+                        holidayConfigContent(contentProps, holiday)
+                      }
+                    />
+                    {removeTrigger(holiday._id, 'holiday')}
                   </td>
                 </tr>
               );
