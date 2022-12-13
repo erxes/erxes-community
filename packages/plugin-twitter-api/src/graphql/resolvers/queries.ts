@@ -16,7 +16,8 @@ const TwitterQueries = {
           messageId: message.messageId,
           content: message.content,
           customer: message.senderId,
-          user: message.receiverId
+          user: message.receiverId,
+          createdAt: message.createdAt
         }
       };
     });

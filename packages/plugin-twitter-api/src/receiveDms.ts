@@ -33,7 +33,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
   }
 
   for (const event of direct_message_events) {
-    const { type, message_create, id } = event;
+    const { type, message_create, id, created_timestamp } = event;
 
     const senderId = message_create.sender_id;
     const receiverId = message_create.target.recipient_id;
@@ -80,7 +80,8 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         customerId,
         content,
         integration,
-        attachments
+        attachments,
+        created_timestamp
       );
     }
   }

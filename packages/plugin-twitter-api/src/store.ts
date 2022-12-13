@@ -91,7 +91,8 @@ export const getOrCreateConversationAndMessage = async (
   customerId: string,
   content: string,
   integration,
-  attachments: any[]
+  attachments: any[],
+  created_timestamp: Date
 ) => {
   let conversationId;
 
@@ -109,8 +110,6 @@ export const getOrCreateConversationAndMessage = async (
         action: 'create-or-update-conversation',
         payload: JSON.stringify({
           integrationId: inboxId,
-          senderId,
-          receiverId,
           customerId: customerId,
           content
         })
@@ -125,7 +124,8 @@ export const getOrCreateConversationAndMessage = async (
     messageId: eventId,
     senderId: senderId,
     content: content,
-    receiverId: receiverId
+    receiverId: receiverId,
+    createdAt: created_timestamp
   });
   try {
     await sendInboxMessage({
@@ -140,7 +140,8 @@ export const getOrCreateConversationAndMessage = async (
           conversationId: conversationId,
           attachments,
           senderId,
-          receiverId
+          receiverId,
+          createdAt: created_timestamp
         })
       },
       isRPC: true

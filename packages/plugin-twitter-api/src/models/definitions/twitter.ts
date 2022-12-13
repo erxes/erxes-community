@@ -119,6 +119,7 @@ export interface IMessage {
   senderId: string;
   content: string;
   receiverId: string;
+  createdAt: Date;
 }
 
 export const attachmentSchema = new Schema(
@@ -137,5 +138,6 @@ export const messageSchema = new Schema({
   messageId: { type: String, unique: true },
   senderId: String,
   content: String,
-  receiverId: String
+  receiverId: String,
+  createdAt: Date
 });
