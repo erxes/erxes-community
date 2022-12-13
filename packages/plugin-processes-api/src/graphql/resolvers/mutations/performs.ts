@@ -14,7 +14,7 @@ const performMutations = {
    * Creates a new flow
    * @param {Object} doc Product document
    */
-  async performsAdd(
+  async performAdd(
     _root,
     doc: IPerform,
     { user, docModifier, models, subdomain }: IContext
@@ -28,7 +28,7 @@ const performMutations = {
       data: {
         branchId: doc.inBranchId,
         departmentId: doc.inDepartmentId,
-        productsData: doc.inProducts.map(ip => ({
+        productsData: (doc.inProducts || []).map(ip => ({
           productId: ip.productId,
           uomId: ip.uomId,
           diffCount: -1 * ip.quantity
@@ -43,7 +43,7 @@ const performMutations = {
       data: {
         branchId: doc.outBranchId,
         departmentId: doc.outDepartmentId,
-        productsData: doc.outProducts.map(op => ({
+        productsData: (doc.outProducts || []).map(op => ({
           productId: op.productId,
           uomId: op.uomId,
           diffCount: op.quantity
@@ -67,7 +67,7 @@ const performMutations = {
     return perform;
   },
 
-  async performsEdit(
+  async performEdit(
     _root,
     doc: IPerform & { _id: string },
     { user, docModifier, models, subdomain }: IContext
@@ -175,12 +175,13 @@ const performMutations = {
     return perform;
   },
 
-  async performsRemove(
+  async performRemove(
     _root,
     { _id }: { _id: string },
     { user, models, subdomain }: IContext
   ) {
     const perform = await models.Performs.getPerform(_id);
+    const removeResponse = await models.Performs.removePerform(_id);
 
     // processes in or inventories credit
     await sendInventoriesMessage({
@@ -189,7 +190,7 @@ const performMutations = {
       data: {
         branchId: perform.inBranchId,
         departmentId: perform.inDepartmentId,
-        productsData: perform.inProducts.map(data => ({
+        productsData: (perform.inProducts || []).map(data => ({
           productId: data.productId,
           uomId: data.uomId,
           diffCount: data.quantity
@@ -204,7 +205,7 @@ const performMutations = {
       data: {
         branchId: perform.outBranchId,
         departmentId: perform.outDepartmentId,
-        productsData: perform.outProducts.map(data => ({
+        productsData: (perform.outProducts || []).map(data => ({
           productId: data.productId,
           uomId: data.uomId,
           diffCount: -1 * data.quantity
@@ -222,7 +223,7 @@ const performMutations = {
       user
     );
 
-    return perform;
+    return removeResponse;
   }
 };
 

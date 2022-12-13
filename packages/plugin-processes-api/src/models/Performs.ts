@@ -56,7 +56,6 @@ export const loadPerformClass = (models: IModels) => {
      * Remove Perform
      */
     public static async removePerform(_id: string) {
-      await models.Performs.getPerform(_id);
       return models.Performs.deleteOne({ _id });
     }
   }

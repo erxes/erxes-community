@@ -12,21 +12,28 @@ const addParamDefs = `
   $inDepartmentId: String
   $outBranchId: String
   $outDepartmentId: String
-  $needProducts: JobProductsInput
-  $resultProducts: JobProductsInput
-  $inProducts: JobProductsInput
-  $outProducts: JobProductsInput
+  $needProducts: JSON
+  $resultProducts: JSON
+  $inProducts: JSON
+  $outProducts: JSON
 `;
 
 const addParams = `
-  jobType: $jobType,
-  jobReferId: $jobReferId,
-  productId: $productId,
-
-  inBranchId: $inBranchId,
-  inDepartmentId: $inDepartmentId,
-  outBranchId: $outBranchId,
-  outDepartmentId: $outDepartmentId,
+  overallWorkId: $overallWorkId
+  overallWorkKey: $overallWorkKey
+  status: $status
+  startAt: $startAt
+  dueDate: $dueDate
+  endAt: $endAt
+  count: $count
+  inBranchId: $inBranchId
+  inDepartmentId: $inDepartmentId
+  outBranchId: $outBranchId
+  outDepartmentId: $outDepartmentId
+  needProducts: $needProducts
+  resultProducts: $resultProducts
+  inProducts: $inProducts
+  outProducts: $outProducts
 `;
 
 const performAdd = `

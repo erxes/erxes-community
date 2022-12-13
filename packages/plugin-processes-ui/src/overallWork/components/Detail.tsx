@@ -26,6 +26,7 @@ type Props = {
   overallWork: IOverallWorkDet;
   errorMsg?: string;
   performs: IPerform[];
+  removePerform: (_id: string) => void;
 } & IRouterProps;
 
 type State = {
@@ -134,7 +135,8 @@ class OverallWorkDetail extends React.Component<Props, State> {
       queryParams,
       history,
       errorMsg,
-      performs
+      performs,
+      removePerform
     } = this.props;
     if (errorMsg) {
       return (
@@ -163,6 +165,7 @@ class OverallWorkDetail extends React.Component<Props, State> {
               overallWork={overallWork}
               history={history}
               queryParams={queryParams}
+              removePerform={removePerform}
             />
           ))}
         </tbody>

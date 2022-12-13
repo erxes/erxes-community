@@ -73,10 +73,10 @@ const performParams = `
   inDepartmentId: String
   outBranchId: String
   outDepartmentId: String
-  needProducts: JobProductsInput
-  resultProducts: JobProductsInput
-  inProducts: JobProductsInput
-  outProducts: JobProductsInput
+  needProducts: JSON
+  resultProducts: JSON
+  inProducts: JSON
+  outProducts: JSON
 `;
 
 export const mutations = `

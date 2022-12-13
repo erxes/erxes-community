@@ -28,23 +28,10 @@ class PerformFormContainer extends React.Component<FinalProps> {
       isSubmitted,
       callback
     }: IButtonMutateProps) => {
-      const { count, performNeedProducts, performResultProducts } = values;
-
-      const doc = {
-        startAt: new Date(),
-        endAt: new Date(),
-        dueDate: new Date(),
-        overallWorkId: overallWorkDetail?._id,
-        status: 'new',
-        count: Number(count).toString(),
-        needProducts: performNeedProducts,
-        resultProducts: performResultProducts
-      };
-
       return (
         <ButtonMutate
-          mutation={mutations.performAdd}
-          variables={doc}
+          mutation={values._id ? mutations.performEdit : mutations.performAdd}
+          variables={values}
           callback={callback}
           refetchQueries={getRefetchQueries()}
           isSubmitted={isSubmitted}
@@ -67,7 +54,7 @@ class PerformFormContainer extends React.Component<FinalProps> {
 }
 
 const getRefetchQueries = () => {
-  return ['performs'];
+  return ['performs', 'overallWorkDetail', 'performsCount'];
 };
 
 export default withProps<Props>(compose()(PerformFormContainer));

@@ -1,11 +1,12 @@
 import _ from 'lodash';
-import React from 'react';
-import { FinanceAmount } from '../../styles';
+import Button from '@erxes/ui/src/components/Button';
 import Form from '../containers/PerformForm';
-import moment from 'moment';
-import queryString from 'query-string';
 import Icon from '@erxes/ui/src/components/Icon';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import React from 'react';
+import Tip from '@erxes/ui/src/components/Tip';
+import { __, confirm } from '@erxes/ui/src/utils';
+import { FinanceAmount } from '../../styles';
 import { IOverallWorkDet, IPerform } from '../types';
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   perform: IPerform;
   history: any;
   queryParams: any;
+  removePerform: (_id: string) => void;
 };
 
 class PerformRow extends React.Component<Props> {
@@ -34,21 +36,17 @@ class PerformRow extends React.Component<Props> {
     return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
   }
 
+  remove = () => {
+    const { removePerform, perform } = this.props;
+
+    confirm(__('Remove this performance?')).then(() => {
+      removePerform(perform._id || '');
+    });
+  };
+
   render() {
-    const { perform, history, queryParams } = this.props;
-    const onTrClick = () => {
-      let typeFilter: any = { jobReferId: perform.overallWorkKey.typeId };
-      if (!['job', 'end'].includes(perform.type)) {
-        typeFilter = { productId: perform.overallWorkKey.typeId };
-      }
-      perform.type = history.push(
-        `/processes/overallWorkDetail?${queryString.stringify({
-          ...queryParams,
-          ...perform.overallWorkKey,
-          ...typeFilter
-        })}`
-      );
-    };
+    const { perform } = this.props;
+    const onTrClick = () => {};
 
     const onClick = e => {
       e.stopPropagation();
@@ -69,10 +67,19 @@ class PerformRow extends React.Component<Props> {
         <td key={'actions'} onClick={onClick}>
           <ModalTrigger
             title="Edit perform"
-            trigger={<Icon icon="edit" />}
+            trigger={
+              <Tip text={__('Edit')} placement="bottom">
+                <Icon icon="edit" />
+              </Tip>
+            }
             size="xl"
             content={content}
           />
+          <Button btnStyle="link" onClick={this.remove}>
+            <Tip text={__('Delete')} placement="bottom">
+              <Icon icon="trash-alt" />
+            </Tip>
+          </Button>
         </td>
       </tr>
     );

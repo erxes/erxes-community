@@ -77,6 +77,53 @@ class Form extends React.Component<Props, State> {
     };
   }
 
+  generateDoc = (values: {
+    _id?: string;
+    needProducts: IProductsData[];
+    resultProducts: IProductsData[];
+  }) => {
+    const { perform, overallWorkDetail } = this.props;
+    const { key } = overallWorkDetail;
+    const {
+      type,
+      inBranchId,
+      inDepartmentId,
+      outBranchId,
+      outDepartmentId,
+      typeId
+    } = key;
+    const finalValues = values;
+    const {
+      count,
+      inProducts,
+      outProducts,
+      needProducts,
+      resultProducts
+    } = this.state;
+
+    if (perform) {
+      finalValues._id = perform._id;
+    }
+
+    return {
+      ...(perform || {}),
+      ...finalValues,
+      overallWorkId: overallWorkDetail._id,
+      overallWorkKey: key,
+      type,
+      typeId,
+      inBranchId,
+      inDepartmentId,
+      outBranchId,
+      outDepartmentId,
+      count,
+      inProducts,
+      outProducts,
+      needProducts,
+      resultProducts
+    };
+  };
+
   renderView = (
     name: string,
     variable: number,
@@ -203,10 +250,15 @@ class Form extends React.Component<Props, State> {
   }
 
   renderContent = (formProps: IFormProps) => {
-    const { closeModal, renderButton, max, overallWorkDetail } = this.props;
-
-    const { isSubmitted } = formProps;
-    const { count, needProducts, resultProducts, startAt, endAt } = this.state;
+    const {
+      closeModal,
+      renderButton,
+      max,
+      overallWorkDetail,
+      perform
+    } = this.props;
+    const { values, isSubmitted } = formProps;
+    const { count, startAt, endAt } = this.state;
 
     return (
       <>
@@ -233,7 +285,7 @@ class Form extends React.Component<Props, State> {
               </ControlLabel>
               <FormControl
                 name="count"
-                defaultValue={this.state.count}
+                defaultValue={count}
                 type="number"
                 max={max}
                 autoFocus={true}
@@ -333,14 +385,10 @@ class Form extends React.Component<Props, State> {
 
           {renderButton({
             name: 'Performance',
-            values: {
-              count,
-              performNeedProducts: needProducts,
-              performResultProducts: resultProducts
-            },
+            values: this.generateDoc(values),
             isSubmitted,
             callback: closeModal,
-            object: null
+            object: perform
           })}
         </ModalFooter>
       </>
