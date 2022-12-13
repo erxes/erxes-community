@@ -1,7 +1,3 @@
-// import {
-//   moduleRequireLogin,
-//   moduleCheckPermission
-// } from '@erxes/api-utils/src/permissions';
 import { IContext } from '../../../connectionResolver';
 import {
   moduleCheckPermission,
