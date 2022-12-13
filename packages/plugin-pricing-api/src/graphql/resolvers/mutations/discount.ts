@@ -3,6 +3,10 @@ import {
   IDiscount,
   IDiscountDocument
 } from '../../../models/definitions/discount';
+import {
+  moduleCheckPermission,
+  moduleRequireLogin
+} from '@erxes/api-utils/src/permissions';
 
 const discountMutations = {
   discountAdd: async (
@@ -29,5 +33,8 @@ const discountMutations = {
     return await models.Discounts.discountRemove(id);
   }
 };
+
+moduleRequireLogin(discountMutations);
+moduleCheckPermission(discountMutations, 'managePricing');
 
 export default discountMutations;
