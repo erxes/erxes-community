@@ -3,7 +3,11 @@ import { Model } from 'mongoose';
 import { ASSET_STATUSES } from '../common/constant/asset';
 import { IAsset, IAssetDocument } from '../common/types/asset';
 import { IModels } from '../connectionResolver';
-import { sendCardsMessage, sendContactsMessage, sendFormsMessage } from '../messageBroker';
+import {
+  sendCardsMessage,
+  sendContactsMessage,
+  sendFormsMessage
+} from '../messageBroker';
 import { assetSchema } from './definitions/assets';
 export interface IAssetModel extends Model<IAssetDocument> {
   getAssets(selector: any): Promise<IAssetDocument>;
@@ -281,7 +285,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       if (!asset) {
         throw new Error('Not found asset with id:' + assetId);
       }
-      return await models.Assets.update({ _id: assetId }, { $push: { knowledgeBaseData: doc } });
+      return await models.Assets.update(
+        { _id: assetId },
+        { $push: { knowledgeBaseData: doc } }
+      );
     }
     public static async updateKnowledgeBase(assetId, doc) {
       try {
@@ -306,7 +313,7 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
           }
         );
       } catch (e) {
-        console.log(e.message);
+        throw new Error(e.message);
       }
       return 'updated';
     }

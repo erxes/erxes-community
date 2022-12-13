@@ -80,10 +80,5 @@ export const generateFilter = async (params, type) => {
     }
   }
 
-  if (params.parentId) {
-    const movementIds = await models?.MovementItems.find().select({ _id: 1 });
-    console.log({ movementIds });
-  }
-
   return filter;
 };

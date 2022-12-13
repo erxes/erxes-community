@@ -24,18 +24,18 @@ import client from '@erxes/ui/src/apolloClient';
 import gql from 'graphql-tag';
 
 type KnowledgeBaseContentType = {
-  _id:string,
-  title:string,
-  isTitleEntered: boolean,
-  content:string
-}
+  _id: string;
+  title: string;
+  isTitleEntered: boolean;
+  content: string;
+};
 
 type KnowledgeBaseDataType = {
-  _id:string,
-  name:string,
-  description:string,
-  contents:KnowledgeBaseContentType[]
-}
+  _id: string;
+  name: string;
+  description: string;
+  contents: KnowledgeBaseContentType[];
+};
 type Props = {
   assetId: string;
   closeModal: () => void;
@@ -44,7 +44,7 @@ type Props = {
 
 type State = {
   currentActiveItems: string[];
-  knowledgeBaseData:KnowledgeBaseDataType
+  knowledgeBaseData: KnowledgeBaseDataType;
 };
 
 class KnowledgeBase extends React.Component<Props, State> {
@@ -53,25 +53,32 @@ class KnowledgeBase extends React.Component<Props, State> {
 
     this.state = {
       currentActiveItems: [],
-      knowledgeBaseData:props. knowledgeBaseData||{}
+      knowledgeBaseData: props.knowledgeBaseData || {}
     };
   }
 
   handleAdd = () => {
     this.setState(({ knowledgeBaseData }) => ({
-      knowledgeBaseData:{...knowledgeBaseData,contents: [...(knowledgeBaseData?.contents || []), { _id: String(Math.random()), content: '', title: '', isTitleEntered: false }]}
+      knowledgeBaseData: {
+        ...knowledgeBaseData,
+        contents: [
+          ...(knowledgeBaseData?.contents || []),
+          { _id: String(Math.random()), content: '', title: '', isTitleEntered: false }
+        ]
+      }
     }));
   };
 
   renderEditor = (content, i) => {
     const { currentActiveItems, knowledgeBaseData } = this.state;
-    console.log('dasd');
     const handleTitleField = e => {
       if (e.key === 'Enter') {
         const updatedContents = knowledgeBaseData?.contents.map(c =>
           c._id === content._id ? { ...c, isTitleEntered: true } : c
         );
-        this.setState({ knowledgeBaseData:{...knowledgeBaseData,contents: updatedContents} });
+        this.setState({
+          knowledgeBaseData: { ...knowledgeBaseData, contents: updatedContents }
+        });
       }
     };
 
@@ -82,14 +89,21 @@ class KnowledgeBase extends React.Component<Props, State> {
         c._id === content._id ? { ...c, title: value } : c
       );
 
-      this.setState({ knowledgeBaseData:{...knowledgeBaseData,contents: updatedContents} });
+      this.setState({
+        knowledgeBaseData: { ...knowledgeBaseData, contents: updatedContents }
+      });
     };
 
     const removeItem = () => {
       const removedActiveItemIds = currentActiveItems.filter(id => id !== content._id);
-      const removeContents = knowledgeBaseData?.contents.filter(c => c._id !== content._id);
+      const removeContents = knowledgeBaseData?.contents.filter(
+        c => c._id !== content._id
+      );
 
-      this.setState({ knowledgeBaseData:{...knowledgeBaseData,contents: removeContents}, currentActiveItems: removedActiveItemIds });
+      this.setState({
+        knowledgeBaseData: { ...knowledgeBaseData, contents: removeContents },
+        currentActiveItems: removedActiveItemIds
+      });
     };
 
     const titleField = (
@@ -118,12 +132,21 @@ class KnowledgeBase extends React.Component<Props, State> {
       const updatedContents = knowledgeBaseData?.contents.map(c =>
         c._id === content._id ? { ...c, content: data } : c
       );
-      this.setState({ knowledgeBaseData:{...knowledgeBaseData,contents: updatedContents} });
+      this.setState({
+        knowledgeBaseData: { ...knowledgeBaseData, contents: updatedContents }
+      });
     };
 
     const handleChangeTitle = () => {
-      this.setState({knowledgeBaseData:{...knowledgeBaseData,contents:knowledgeBaseData.contents.map(c=>c._id === content._id?{...c, isTitleEntered: false}:c)}})
-    }
+      this.setState({
+        knowledgeBaseData: {
+          ...knowledgeBaseData,
+          contents: knowledgeBaseData.contents.map(c =>
+            c._id === content._id ? { ...c, isTitleEntered: false } : c
+          )
+        }
+      });
+    };
 
     return (
       <>
@@ -133,7 +156,9 @@ class KnowledgeBase extends React.Component<Props, State> {
         >
           <td>
             {content.isTitleEntered ? (
-              <span style={{cursor:'pointer'}} onClick={handleChangeTitle}>{content.title}</span>
+              <span style={{ cursor: 'pointer' }} onClick={handleChangeTitle}>
+                {content.title}
+              </span>
             ) : (
               <div style={{ width: 250 }}>{titleField}</div>
             )}
@@ -181,13 +206,17 @@ class KnowledgeBase extends React.Component<Props, State> {
 
     const { assetId } = this.props;
 
-    const updateContents = (knowledgeBaseData?.contents || []).map(({title,content,_id}) => ({
-      title,content,_id
-    }));
+    const updateContents = (knowledgeBaseData?.contents || []).map(
+      ({ title, content, _id }) => ({
+        title,
+        content,
+        _id
+      })
+    );
 
     return {
       assetId,
-      knowledgeBaseData: {...knowledgeBaseData,contents:updateContents}
+      knowledgeBaseData: { ...knowledgeBaseData, contents: updateContents }
     };
   };
 
@@ -202,7 +231,7 @@ class KnowledgeBase extends React.Component<Props, State> {
         })
         .then(() => {
           Alert.success('You have removed the knowledge base from this asset');
-          closeModal()
+          closeModal();
         });
   };
 
@@ -212,7 +241,7 @@ class KnowledgeBase extends React.Component<Props, State> {
 
     const handleChange = e => {
       const { value, name } = e.currentTarget as HTMLInputElement;
-      this.setState({knowledgeBaseData:{...knowledgeBaseData,[name]:value}})
+      this.setState({ knowledgeBaseData: { ...knowledgeBaseData, [name]: value } });
     };
 
     return (
@@ -221,7 +250,12 @@ class KnowledgeBase extends React.Component<Props, State> {
           <FormColumn>
             <FormGroup>
               <ControlLabel>Name</ControlLabel>
-              <FormControl type="text" name="name" value={knowledgeBaseData?.name} onChange={handleChange} />
+              <FormControl
+                type="text"
+                name="name"
+                value={knowledgeBaseData?.name}
+                onChange={handleChange}
+              />
             </FormGroup>
           </FormColumn>
           <FormColumn>
@@ -238,7 +272,11 @@ class KnowledgeBase extends React.Component<Props, State> {
         </FormWrapper>
         <MovementTableWrapper>
           <Table>
-            <tbody>{(knowledgeBaseData?.contents || []).map((content, i) => this.renderEditor(content, i))}</tbody>
+            <tbody>
+              {(knowledgeBaseData?.contents || []).map((content, i) =>
+                this.renderEditor(content, i)
+              )}
+            </tbody>
           </Table>
         </MovementTableWrapper>
 
@@ -256,7 +294,9 @@ class KnowledgeBase extends React.Component<Props, State> {
           )}
           <ButtonMutate
             mutation={
-              this.props.knowledgeBaseData ? mutations.updateKnowledgeBase : mutations.addKnowledgeBase
+              this.props.knowledgeBaseData
+                ? mutations.updateKnowledgeBase
+                : mutations.addKnowledgeBase
             }
             variables={this.generateDoc()}
             type="submit"
