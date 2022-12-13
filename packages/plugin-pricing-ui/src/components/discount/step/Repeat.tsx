@@ -48,8 +48,48 @@ export default function Repeat(props: Props) {
     handleState('repeatRules', temp);
   };
 
+  const renderDayForm = (item: any, index: number) => (
+    <FormWrapper key={`dayForm-${index}`}>
+      <FormColumn>
+        <FormGroup>
+          <DateContainer>
+            <Datetime
+              inputProps={{ placeholder: __('Start Time') }}
+              closeOnSelect={true}
+              timeFormat={true}
+              dateFormat={false}
+              utc={true}
+              value={item.dayStartValue || null}
+              onChange={(value: any) => {
+                console.log(value);
+                handleChange(index, 'dayStartValue', value);
+              }}
+            />
+          </DateContainer>
+        </FormGroup>
+      </FormColumn>
+      <FormColumn>
+        <FormGroup>
+          <DateContainer>
+            <Datetime
+              inputProps={{ placeholder: __('End Time') }}
+              closeOnSelect={true}
+              timeFormat={true}
+              dateFormat={false}
+              utc={true}
+              value={item.dayEndValue || null}
+              onChange={(value: any) =>
+                handleChange(index, 'dayEndValue', value)
+              }
+            />
+          </DateContainer>
+        </FormGroup>
+      </FormColumn>
+    </FormWrapper>
+  );
+
   const renderWeekForm = (item: any, index: number) => (
-    <FormGroup>
+    <FormGroup key={`weekForm-${index}`}>
       <Select
         name="weekForm"
         value={item.weekValue}
@@ -74,7 +114,7 @@ export default function Repeat(props: Props) {
     }
 
     return (
-      <FormGroup>
+      <FormGroup key={`monthForm-${index}`}>
         <Select
           name="monthForm"
           value={item.monthValue || []}
@@ -88,7 +128,7 @@ export default function Repeat(props: Props) {
   };
 
   const renderYearForm = (item: any, index: number) => (
-    <FormWrapper>
+    <FormWrapper key={`yearForm-${index}`}>
       <FormColumn>
         <FormGroup>
           <DateContainer>
@@ -98,7 +138,7 @@ export default function Repeat(props: Props) {
               closeOnSelect={true}
               timeFormat={false}
               utc={true}
-              value={item.yearStartValue || undefined}
+              value={item.yearStartValue || null}
               onChange={(value: any) =>
                 handleChange(index, 'yearStartValue', value)
               }
@@ -115,7 +155,7 @@ export default function Repeat(props: Props) {
               closeOnSelect={true}
               timeFormat={false}
               utc={true}
-              value={item.yearEndValue || undefined}
+              value={item.yearEndValue || null}
               onChange={(value: any) =>
                 handleChange(index, 'yearEndValue', value)
               }
@@ -128,6 +168,8 @@ export default function Repeat(props: Props) {
 
   const renderInputForm = (item: any, index: number) => {
     switch (item.type) {
+      case 'everyDay':
+        return renderDayForm(item, index);
       case 'everyWeek':
         return renderWeekForm(item, index);
       case 'everyMonth':
@@ -140,7 +182,7 @@ export default function Repeat(props: Props) {
   };
 
   const renderRow = (item: any, index: number) => (
-    <tr key={'repeat' + item}>
+    <tr key={'repeat' + index}>
       <td>
         <FormGroup>
           <FormControl

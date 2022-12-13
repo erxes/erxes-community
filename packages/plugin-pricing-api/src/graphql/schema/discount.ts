@@ -42,6 +42,8 @@ export const types = () => `
 
   type Repeat {
     type: String,
+    dayStartValue: Date,
+    dayEndValue: Date,
     weekValue: [RepeatValue],
     monthValue: [RepeatValue],
     yearStartValue: Date,
@@ -126,6 +128,8 @@ export const types = () => `
 
   input RepeatInput {
     type: String,
+    dayStartValue: Date,
+    dayEndValue: Date,
     weekValue: [RepeatValueInput],
     monthValue: [RepeatValueInput],
     yearStartValue: Date,
