@@ -7,8 +7,6 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import moment from 'moment';
 import React from 'react';
-import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import { __ } from '@erxes/ui/src/utils';
 import {
   DateContainer,
@@ -35,40 +33,87 @@ type Props = {
 };
 
 type State = {
-  type: string;
   count: number;
-  date: Date;
+  startAt: Date;
+  endAt: Date;
   needProducts: IProductsData[];
   resultProducts: IProductsData[];
+  inProducts: IProductsData[];
+  outProducts: IProductsData[];
 };
 
 class Form extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { overallWorkDetail } = this.props;
+    const { overallWorkDetail, perform } = this.props;
+    let startAt = new Date();
+    let endAt = new Date();
+    let count = 1;
+    let inProducts = overallWorkDetail.needProductsData;
+    let outProducts = overallWorkDetail.resultProductsData;
+    if (perform) {
+      startAt = perform.startAt;
+      endAt = perform.endAt;
+      count = perform ? perform.count : 1;
+      inProducts = perform.inProducts;
+      outProducts = perform.outProducts;
+    }
 
     this.state = {
-      date: new Date(),
-      count: 1,
-      type: overallWorkDetail?.key.type || '',
-      needProducts: overallWorkDetail?.needProducts || [],
-      resultProducts: overallWorkDetail?.resultProducts || []
+      startAt,
+      endAt,
+      count,
+      needProducts: overallWorkDetail.needProductsData.map(np => ({
+        ...np,
+        quantity: np.quantity * count
+      })),
+      resultProducts: overallWorkDetail.resultProductsData.map(rp => ({
+        ...rp,
+        quantity: rp.quantity * count
+      })),
+      inProducts,
+      outProducts
     };
   }
 
-  renderView = (name: string, variable: string) => {
-    const defaultName = '-';
+  renderView = (
+    name: string,
+    variable: number,
+    uom: string,
+    isEdit = false
+  ) => {
+    if (isEdit) {
+      return (
+        <li key={Math.random()}>
+          <FieldStyle>
+            {__(name)} /${uom}/
+          </FieldStyle>
+          <SidebarCounter>
+            <FormControl
+              name="count"
+              defaultValue={this.state.count}
+              type="number"
+              autoFocus={true}
+              required={true}
+              onChange={this.onChange}
+            />
+          </SidebarCounter>
+        </li>
+      );
+    }
 
     return (
       <li key={Math.random()}>
         <FieldStyle>{__(name)}</FieldStyle>
-        <SidebarCounter>{variable || defaultName}</SidebarCounter>
+        <SidebarCounter>
+          {variable || 0} /${uom}/
+        </SidebarCounter>
       </li>
     );
   };
 
-  renderProducts = (name: string, products: any[], realDatas: any[]) => {
+  renderProducts = (name: string, products: any[], isEdit = false) => {
     const result: React.ReactNode[] = [];
 
     result.push(
@@ -84,11 +129,9 @@ class Form extends React.Component<Props, State> {
       const { uom } = product;
       const productName = product.product ? product.product.name : 'not name';
       const uomCode = uom ? uom.code : 'not uom';
-      const realData = realDatas.find(rd => rd._id === product._id);
-      const quantity = realData ? realData.quantity : 0;
 
       result.push(
-        this.renderView(productName, quantity * count + '/' + uomCode + '/')
+        this.renderView(productName, product.quantity * count, uomCode, isEdit)
       );
     }
 
@@ -96,33 +139,41 @@ class Form extends React.Component<Props, State> {
   };
 
   renderDetailNeed() {
-    const { overallWorkDetail } = this.props;
     const { needProducts } = this.state;
-    const needProductsDetail = overallWorkDetail?.needProductsData;
 
     return (
       <SidebarList className="no-link">
-        {this.renderProducts(
-          'NeedProducts',
-          needProductsDetail || [],
-          needProducts || []
-        )}
+        {this.renderProducts('NeedProducts', needProducts || [])}
       </SidebarList>
     );
   }
 
   renderDetailResult() {
-    const { overallWorkDetail } = this.props;
     const { resultProducts } = this.state;
-    const resultProductsDetail = overallWorkDetail?.resultProductsData;
 
     return (
       <SidebarList className="no-link">
-        {this.renderProducts(
-          'ResultProducts',
-          resultProductsDetail || [],
-          resultProducts || []
-        )}
+        {this.renderProducts('ResultProducts', resultProducts || [])}
+      </SidebarList>
+    );
+  }
+
+  renderPerformIn() {
+    const { inProducts } = this.state;
+
+    return (
+      <SidebarList className="no-link">
+        {this.renderProducts('InProducts', inProducts || [], true)}
+      </SidebarList>
+    );
+  }
+
+  renderPerformOut() {
+    const { outProducts } = this.state;
+
+    return (
+      <SidebarList className="no-link">
+        {this.renderProducts('OutProducts', outProducts || [], true)}
       </SidebarList>
     );
   }
@@ -143,10 +194,6 @@ class Form extends React.Component<Props, State> {
     this.setState({ [name]: value } as any);
   };
 
-  onChangeSelect = (name, value) => {
-    this.setState({ [name]: value } as any);
-  };
-
   renderLoc(obj) {
     if (!obj) {
       return 'unknown';
@@ -156,31 +203,25 @@ class Form extends React.Component<Props, State> {
   }
 
   renderContent = (formProps: IFormProps) => {
-    const {
-      closeModal,
-      renderButton,
-      max,
-      overallWorkDetail,
-      perform
-    } = this.props;
+    const { closeModal, renderButton, max, overallWorkDetail } = this.props;
 
     const { isSubmitted } = formProps;
-    const { type, count, needProducts, resultProducts, date } = this.state;
+    const { count, needProducts, resultProducts, startAt, endAt } = this.state;
 
     return (
       <>
         <FormWrapper>
           <FormColumn>
             <FormGroup>
-              <ControlLabel required={true}>{__(`Date`)}</ControlLabel>
+              <ControlLabel required={true}>{__(`Start Date`)}</ControlLabel>
               <DateContainer>
                 <DateControl
-                  name="date"
+                  name="startAt"
                   dateFormat="YYYY/MM/DD"
                   timeFormat={true}
                   placeholder="Choose date"
-                  value={date}
-                  onChange={value => this.onSelectDate(value, 'date')}
+                  value={startAt}
+                  onChange={value => this.onSelectDate(value, 'startAt')}
                 />
               </DateContainer>
             </FormGroup>
@@ -203,13 +244,27 @@ class Form extends React.Component<Props, State> {
           </FormColumn>
           <FormColumn>
             <FormGroup>
+              <ControlLabel required={true}>{__(`End Date`)}</ControlLabel>
+              <DateContainer>
+                <DateControl
+                  name="endAt"
+                  dateFormat="YYYY/MM/DD"
+                  timeFormat={true}
+                  placeholder="Choose date"
+                  value={endAt}
+                  onChange={value => this.onSelectDate(value, 'endAt')}
+                />
+              </DateContainer>
+            </FormGroup>
+          </FormColumn>
+          <FormColumn>
+            <FormGroup>
               <ControlLabel>Type</ControlLabel>
               <FormControl
                 name="type"
                 componentClass="select"
-                value={type}
+                value={overallWorkDetail.type}
                 required={false}
-                onChange={this.onChangeSelect.bind(this, 'type')}
               >
                 <option value="">All type</option>
                 {Object.keys(JOB_TYPE_CHOISES).map(jt => (
@@ -252,10 +307,17 @@ class Form extends React.Component<Props, State> {
           </FormColumn>
         </FormWrapper>
 
-        <Box title={'Details:'}>
+        <Box title={'Plan Details:'}>
           <FormWrapper>
             <FormColumn>{this.renderDetailNeed()}</FormColumn>
             <FormColumn>{this.renderDetailResult()}</FormColumn>
+          </FormWrapper>
+        </Box>
+
+        <Box title={'Perform Details:'}>
+          <FormWrapper>
+            <FormColumn>{this.renderPerformIn()}</FormColumn>
+            <FormColumn>{this.renderPerformOut()}</FormColumn>
           </FormWrapper>
         </Box>
 

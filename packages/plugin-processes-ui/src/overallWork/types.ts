@@ -3,6 +3,7 @@ import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { IProduct } from '@erxes/ui-products/src/types';
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IJobRefer } from '../job/types';
+import { IProductsData, IProductsDataPerform } from '../types';
 
 export interface IOverallWorkKey {
   type: string;
@@ -43,13 +44,15 @@ export type IPerform = {
   overallWorkKey: IOverallWorkKey;
   type: string;
   typeId: string;
-  count: string;
+  count: number;
   status: string;
   startAt: Date;
   endAt: Date;
   dueAt: Date;
-  needProducts: any[];
-  resultProducts: any[];
+  needProducts: IProductsData[];
+  resultProducts: IProductsData[];
+  inProducts: IProductsDataPerform[];
+  outProducts: IProductsDataPerform[];
   inDepartmentId?: string;
   inBranchId?: string;
   outDepartmentId?: string;
