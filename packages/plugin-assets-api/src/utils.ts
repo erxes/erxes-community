@@ -13,14 +13,16 @@ export const generateFilter = async (params, type) => {
 
   if (params.parentId) {
     if (params.parentId === '*') {
-      const assets = await models?.Assets.find({ parentId: { $exists: false } });
+      const assets = await models?.Assets.find({
+        parentId: ''
+      });
+      const assetIds = (assets || []).map(asset => asset._id);
+      filter.assetId = { $in: assetIds };
+    } else {
+      const assets = await models?.Assets.find({ parentId: params.parentId });
       const assetIds = (assets || []).map(asset => asset._id);
       filter.assetId = { $in: assetIds };
     }
-    const assets = await models?.Assets.find({ parentId: params.parentId });
-    const assetIds = (assets || []).map(asset => asset._id);
-
-    filter.assetId = { $in: assetIds };
   }
 
   if (params.userId) {
