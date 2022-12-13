@@ -299,7 +299,7 @@ export const checkPricing = async (
       let expiryPassed = false;
 
       let discountType = '';
-      let discountValue = Number.POSITIVE_INFINITY;
+      let discountValue = 0;
       let discountBonusProduct = '';
 
       /**
@@ -313,8 +313,10 @@ export const checkPricing = async (
       )
         for (const rule of discount.priceRules) {
           // Check validity
-          pricePassed = checkRuleValidity(rule, totalAmount);
-          if (!pricePassed) continue;
+          let rulePassed = false;
+          rulePassed = checkRuleValidity(rule, totalAmount);
+          if (rulePassed) pricePassed = true;
+          if (!rulePassed) continue;
 
           if (rule.discountType === 'bonus') {
             discountType = rule.discountType;
@@ -331,9 +333,13 @@ export const checkPricing = async (
           );
 
           // Checks if value is lower than past calculated price, override it
-          discountType =
-            rule.discountType === 'default' ? discount.type : rule.discountType;
-          discountValue = calculatedValue;
+          if (discountType !== 'bonus') {
+            discountType =
+              rule.discountType === 'default'
+                ? discount.type
+                : rule.discountType;
+            discountValue = calculatedValue;
+          }
         }
 
       /**
@@ -347,8 +353,10 @@ export const checkPricing = async (
       )
         for (const rule of discount.quantityRules) {
           // Check validity
-          quantityPassed = checkRuleValidity(rule, item.quantity);
-          if (!quantityPassed) continue;
+          let rulePassed = false;
+          rulePassed = checkRuleValidity(rule, item.quantity);
+          if (rulePassed) quantityPassed = true;
+          if (!rulePassed) continue;
 
           if (rule.discountType === 'bonus') {
             discountType = rule.discountType;
@@ -368,18 +376,14 @@ export const checkPricing = async (
           if (rule.type === 'every') {
             let discountQuantity =
               Math.floor(item.quantity / rule.value) * rule.value;
-            if (discountQuantity >= rule.value) {
-              let undiscountedQuantity = item.quantity - discountQuantity;
-              let totalUndiscountedPrice = item.price * undiscountedQuantity;
-              let totalDiscountedPrice = calculatedValue * discountQuantity;
+            if (discountQuantity >= rule.value)
               calculatedValue = Math.floor(
-                (totalDiscountedPrice + totalUndiscountedPrice) / item.quantity
+                (calculatedValue * discountQuantity) / item.quantity
               );
-            }
           }
 
           // Checks if value is lower than past calculated price, override it
-          if (calculatedValue > discountValue) {
+          if (calculatedValue > discountValue && discountType !== 'bonus') {
             discountType =
               rule.discountType === 'default'
                 ? discount.type
@@ -399,11 +403,13 @@ export const checkPricing = async (
       ) {
         for (const rule of discount.expiryRules) {
           // Check validity
+          let rulePassed = false;
           const expiredDate = dayjs
             .unix(parseInt(item.manufacturedDate) * 1000)
             .add(rule.value, rule.type);
-          if (expiredDate <= dayjs(now)) expiryPassed = true;
-          if (!expiryPassed) continue;
+          if (expiredDate <= dayjs(now)) rulePassed = true;
+          if (rulePassed) expiryPassed = true;
+          if (!rulePassed) continue;
 
           if (rule.discountType === 'bonus') {
             discountType = rule.discountType;
@@ -420,7 +426,7 @@ export const checkPricing = async (
           );
 
           // Checks if value is lower than past calculated price, override it
-          if (calculatedValue > discountValue) {
+          if (calculatedValue > discountValue && discountType !== 'bonus') {
             discountType =
               rule.discountType === 'default'
                 ? discount.type

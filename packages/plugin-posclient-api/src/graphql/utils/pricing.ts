@@ -33,7 +33,7 @@ export const checkPricing = async (
     console.log(e.message);
   }
 
-  console.log('PRICING', pricing);
+  let bonusProductsToAdd: any = {};
 
   for (const item of doc.items || []) {
     const discount = pricing[item.productId];
@@ -41,9 +41,47 @@ export const checkPricing = async (
     if (discount) {
       if (discount.type.length === 0) continue;
 
-      if (discount.type !== 'bonus') item.discountAmount = discount.value;
+      switch (discount.type) {
+        case 'bonus': {
+          if (bonusProductsToAdd[discount.bonusProduct])
+            bonusProductsToAdd[discount.bonusProduct].count += 1;
+          else
+            bonusProductsToAdd[discount.bonusProduct] = {
+              count: 1
+            };
+          break;
+        }
+        case 'percentage':
+          item.discountPercent = parseFloat(
+            Math.floor(item.unitPrice / discount.value).toFixed(2)
+          );
+          break;
+        default:
+          item.discountAmount = discount.value;
+          break;
+      }
+    }
+  }
 
-      // adds bonus product
+  for (const bonusProductId of Object.keys(bonusProductsToAdd)) {
+    const orderIndex = doc.items.findIndex(
+      (docItem: any) => docItem.productId === bonusProductId
+    );
+
+    if (orderIndex === -1) {
+      // doc.items.push({
+      //   productId: bonusProductId,
+      //   unitPrice: 0,
+      //   count: bonusProductsToAdd[bonusProductId].count,
+      // })
+    } else {
+      const item = doc.items[orderIndex];
+      item.bonusCount = bonusProductsToAdd[bonusProductId].count;
+      if ((item.bonusCount || 0) > item.count)
+        item.count = item.bonusCount || 0;
+      item.unitPrice = Math.floor(
+        (item.unitPrice * (item.count - (item.bonusCount || 0))) / item.count
+      );
     }
   }
 
