@@ -94,6 +94,10 @@ export const REPEAT_OPTIONS = [
 
 export const DATE_OPTIONS = [
   {
+    label: 'Hour',
+    value: 'hour'
+  },
+  {
     label: 'Day',
     value: 'day'
   },
