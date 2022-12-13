@@ -3,6 +3,10 @@
 //   moduleCheckPermission
 // } from '@erxes/api-utils/src/permissions';
 import { IContext } from '../../../connectionResolver';
+import {
+  moduleCheckPermission,
+  moduleRequireLogin
+} from '@erxes/api-utils/src/permissions';
 
 const discountQueries = {
   discounts: async (
@@ -25,5 +29,8 @@ const discountQueries = {
     return await models.Discounts.findById(id);
   }
 };
+
+moduleRequireLogin(discountQueries);
+moduleCheckPermission(discountQueries, 'showPricing');
 
 export default discountQueries;

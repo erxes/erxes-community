@@ -1,5 +1,6 @@
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
+import * as permissions from './permissions';
 
 import { initBroker } from './messageBroker';
 import { getSubdomain } from '@erxes/api-utils/src/core';
@@ -12,6 +13,7 @@ export let serviceDiscovery;
 
 export default {
   name: 'pricing',
+  permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
 
