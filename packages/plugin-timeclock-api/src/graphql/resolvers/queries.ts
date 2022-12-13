@@ -1,10 +1,14 @@
 import { IContext } from '../../connectionResolver';
 import { fixDate } from '@erxes/api-utils/src/core';
-import { findBranch, findDepartment } from '../../departments';
-import schedule from './schedule';
-import { title } from 'process';
+import { findBranch, findDepartment, returnReportByUserIds } from './utils';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
+import {
+  IGroup,
+  IReport,
+  IUserReport
+} from '../../models/definitions/timeclock';
 
-const templateQueries = {
+const timeclockQueries = {
   absences(
     _root,
     {
@@ -79,13 +83,13 @@ const templateQueries = {
     if (userIds) {
       for (const userId of userIds) {
         returnModel.push(
-          ...(await models.Templates.find({
+          ...(await models.Timeclocks.find({
             $or: [...timeFields, { userId: `${userId}` }]
           }))
         );
       }
     } else {
-      returnModel = models.Templates.find(selector);
+      returnModel = models.Timeclocks.find(selector);
     }
 
     return returnModel;
@@ -111,7 +115,7 @@ const templateQueries = {
   },
 
   timeclockDetail(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.Templates.findOne({ _id });
+    return models.Timeclocks.findOne({ _id });
   },
 
   absenceDetail(_root, { _id }: { _id: string }, { models }: IContext) {
@@ -122,54 +126,18 @@ const templateQueries = {
     return models.Schedules.findOne({ _id });
   },
 
-  // async returnUserIdsOfBranches(
-  //   _root,
-  //   { branchIds }: { branchIds: string[] },
-  //   { models, subdomain }: IContext
-  // ) {
-  //   const finalUserIds: string[] = [];
-  //   for (const branchId of branchIds) {
-  //     const branch = await findBranch(subdomain, branchId);
-  //     finalUserIds.push(branch.userIds);
-  //   }
-  //   return finalUserIds;
-  // },
-
   async timeclockReportByUser(
     _root,
     { selectedUser },
     { models, user }: IContext
   ) {
-    interface IScheduleReport {
-      date?: string;
-      scheduleStart?: Date;
-      scheduleEnd?: Date;
-      recordedStart?: Date;
-      recordedEnd?: Date;
-      minsLate?: number;
-      minsWorked?: number;
-      include?: boolean;
-    }
-
-    interface IUserReport {
-      userId?: string;
-      scheduleReport: IScheduleReport[];
-      totalMinsWorkedToday?: number;
-      totalMinsScheduledToday?: number;
-      totalMinsWorkedThisMonth?: number;
-      totalMinsScheduledThisMonth?: number;
-      totalMinsLateToday?: number;
-      totalMinsLateThisMonth?: number;
-      totalMinsAbsenceThisMonth?: number;
-    }
-
     const userId = selectedUser || user._id;
     let report: IUserReport = {
       scheduleReport: [],
       userId: `${userId}`,
       totalMinsScheduledThisMonth: 0
     };
-    const shifts_of_schedule: any = [];
+    const shiftsOfSchedule: any = [];
 
     // get 1st of the next Month
     const NOW = new Date();
@@ -178,7 +146,7 @@ const templateQueries = {
     const startOfThisMonth = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
     // get the schedule data of this month
     const schedules = models.Schedules.find({ userId: `${userId}` });
-    const timeclocks = models.Templates.find({
+    const timeclocks = models.Timeclocks.find({
       $or: [
         { userId: `${userId}` },
         {
@@ -205,7 +173,7 @@ const templateQueries = {
     });
 
     for (const { _id } of await schedules) {
-      shifts_of_schedule.push(
+      shiftsOfSchedule.push(
         ...(await models.Shifts.find({
           $or: [
             { scheduleId: _id },
@@ -256,7 +224,7 @@ const templateQueries = {
         };
       }
 
-      for (const scheduleShift of shifts_of_schedule) {
+      for (const scheduleShift of shiftsOfSchedule) {
         let found = false;
         const scheduleDateString = new Date(
           scheduleShift.shiftStart
@@ -316,6 +284,7 @@ const templateQueries = {
 
     //  calculate how many mins late per user
     let totalMinsLatePerUser = 0;
+
     report.scheduleReport.forEach((userSchedule, user_report_idx) => {
       if (
         userSchedule.recordedEnd &&
@@ -360,215 +329,7 @@ const templateQueries = {
     const departmentUsers: IGroup[] = [];
     let branch;
 
-    interface IGroup {
-      userIds: string[];
-      title: string;
-    }
-
-    interface IReport {
-      groupTitle: string;
-      groupReport: IUserReport[];
-      groupTotalMinsWorked?: number;
-      groupTotalMinsLate?: number;
-      groupTotalAbsenceMins?: number;
-      groupTotalMinsScheduled?: number;
-    }
-
-    interface IUserReport {
-      userId?: string;
-      scheduleReport: IScheduleReport[];
-      totalMinsWorked?: number;
-      totalMinsLate?: number;
-      totalAbsenceMins?: number;
-      totalMinsScheduled?: number;
-    }
-
-    interface IScheduleReport {
-      date?: string;
-      scheduleStart?: Date;
-      scheduleEnd?: Date;
-      recordedStart?: Date;
-      recordedEnd?: Date;
-      minsLate?: number;
-      minsWorked?: number;
-    }
-
     const finalReport: IReport[] = [];
-    const returnReportByUserIds = async (
-      selectedUserIds: string[]
-    ): Promise<[IUserReport[], number, number, number, number]> => {
-      let idx = 0;
-      const reports: IUserReport[] = [];
-      let groupTotalAbsence = 0;
-      let groupTotalMinsWorked = 0;
-      let groupTotalMinsScheduled = 0;
-
-      for (const userId of selectedUserIds) {
-        const schedules = models.Schedules.find({ userId: `${userId}` });
-        const timeclocks = models.Templates.find({ userId: `${userId}` });
-        const absences = models.Absences.find({
-          userId: `${userId}`,
-          status: 'Approved'
-        });
-        const shifts_of_schedule: any = [];
-
-        for (const { _id } of await schedules) {
-          shifts_of_schedule.push(
-            ...(await models.Shifts.find({
-              scheduleId: _id,
-              status: 'Approved'
-            }))
-          );
-        }
-
-        // if any of the schemas is not empty
-        if (
-          (await absences).length !== 0 ||
-          (await schedules).length !== 0 ||
-          (await timeclocks).length !== 0
-        ) {
-          reports.push({ userId: `${userId}`, scheduleReport: [] });
-
-          let totalMinsWorkedPerUser = 0;
-          let totalMinsScheduledPerUser = 0;
-
-          for (const timeclock of await timeclocks) {
-            const previousSchedules = reports[idx].scheduleReport;
-
-            const shiftDuration =
-              timeclock.shiftEnd &&
-              timeclock.shiftStart &&
-              Math.round(
-                (timeclock.shiftEnd.getTime() -
-                  timeclock.shiftStart.getTime()) /
-                  60000
-              );
-
-            totalMinsWorkedPerUser += shiftDuration || 0;
-            reports[idx] = {
-              ...reports[idx],
-              scheduleReport: previousSchedules?.concat({
-                date: new Date(timeclock.shiftStart).toDateString(),
-                recordedStart: timeclock.shiftStart,
-                recordedEnd: timeclock.shiftEnd,
-                minsWorked: shiftDuration
-              })
-            };
-          }
-
-          for (const scheduleShift of shifts_of_schedule) {
-            let found = false;
-            const scheduleDateString = new Date(
-              scheduleShift.shiftStart
-            ).toDateString();
-
-            // schedule duration per shift
-            const scheduleDuration =
-              scheduleShift.shiftEnd &&
-              scheduleShift.shiftStart &&
-              Math.round(
-                (scheduleShift.shiftEnd.getTime() -
-                  scheduleShift.shiftStart.getTime()) /
-                  60000
-              );
-
-            totalMinsScheduledPerUser += scheduleDuration;
-            reports[idx].totalMinsScheduled = totalMinsScheduledPerUser;
-
-            reports[idx].scheduleReport.forEach(
-              (recordedShiftOfReport, recorded_shiftIdx) => {
-                if (recordedShiftOfReport.date === scheduleDateString) {
-                  reports[idx].scheduleReport[recorded_shiftIdx] = {
-                    ...recordedShiftOfReport,
-                    scheduleStart: scheduleShift.shiftStart,
-                    scheduleEnd: scheduleShift.shiftEnd
-                  };
-                  found = true;
-                }
-              }
-            );
-
-            // if corresponding shift is not found from recorded shifts
-            if (!found) {
-              reports[idx].scheduleReport?.push({
-                date: scheduleDateString,
-                scheduleStart: scheduleShift.shiftStart,
-                scheduleEnd: scheduleShift.shiftEnd
-              });
-            }
-          }
-
-          // calculate total absent mins per user
-          let totalAbsencePerUser = 0;
-          for (const absence of await absences) {
-            if (absence.startTime && absence.endTime) {
-              totalAbsencePerUser +=
-                (absence.endTime.getTime() - absence.startTime.getTime()) /
-                60000;
-            }
-          }
-          reports[idx] = {
-            ...reports[idx],
-            totalAbsenceMins: Math.trunc(totalAbsencePerUser),
-            totalMinsWorked: totalMinsWorkedPerUser
-          };
-
-          groupTotalMinsScheduled += totalMinsScheduledPerUser;
-          groupTotalMinsWorked += totalMinsWorkedPerUser;
-          groupTotalAbsence += Math.trunc(totalAbsencePerUser);
-          idx += 1;
-        }
-      }
-      let groupTotalMinsLate = 0;
-
-      //  calculate how many mins late per user
-      reports.forEach((userReport, group_report_idx) => {
-        let totalMinsLatePerUser = 0;
-        console.log(userReport);
-        userReport.scheduleReport.forEach((userSchedule, user_report_idx) => {
-          if (
-            userSchedule.recordedEnd &&
-            userSchedule.recordedStart &&
-            userSchedule.scheduleEnd &&
-            userSchedule.scheduleStart
-          ) {
-            const shiftStartDiff =
-              userSchedule.recordedStart.getTime() -
-              userSchedule.scheduleStart.getTime();
-
-            const shiftEndDiff =
-              userSchedule.scheduleEnd.getTime() -
-              userSchedule.recordedEnd.getTime();
-
-            const sumMinsLate = Math.trunc(
-              ((shiftEndDiff > 0 ? shiftEndDiff : 0) +
-                (shiftStartDiff > 0 ? shiftStartDiff : 0)) /
-                60000
-            );
-
-            totalMinsLatePerUser += sumMinsLate;
-            userReport.scheduleReport[user_report_idx] = {
-              ...userSchedule,
-              minsLate: sumMinsLate
-            };
-          }
-        });
-
-        groupTotalMinsLate += totalMinsLatePerUser;
-        reports[group_report_idx] = {
-          ...userReport,
-          totalMinsLate: totalMinsLatePerUser
-        };
-      });
-
-      return [
-        reports,
-        groupTotalMinsLate,
-        groupTotalAbsence,
-        groupTotalMinsWorked,
-        groupTotalMinsScheduled
-      ];
-    };
 
     if (departmentIds || branchIds) {
       if (departmentIds) {
@@ -608,7 +369,7 @@ const templateQueries = {
           totalMinsLatePerGroup,
           totalAbsenceMinsPerGroup,
           totalWorkedMinsPerGroup
-        ] = await returnReportByUserIds(commonUserIds);
+        ] = await returnReportByUserIds(models, commonUserIds);
         finalReport.push({
           groupReport: [...reportsReturned],
           groupTitle: '',
@@ -625,7 +386,7 @@ const templateQueries = {
             totalMinsLatePerGroup,
             totalAbsenceMinsPerGroup,
             totalWorkedMinsPerGroup
-          ] = await returnReportByUserIds(departmentUserIds);
+          ] = await returnReportByUserIds(models, departmentUserIds);
 
           finalReport.push({
             groupReport: departmentReport.slice(),
@@ -645,7 +406,7 @@ const templateQueries = {
             totalAbsenceMinsPerGroup,
             totalWorkedMinsPerGroup,
             totalScheduledMinsPerGroup
-          ] = await returnReportByUserIds(branchUserIds);
+          ] = await returnReportByUserIds(models, branchUserIds);
           finalReport.push({
             groupReport: [...branchReport],
             groupTitle: brnch.title,
@@ -662,4 +423,6 @@ const templateQueries = {
   }
 };
 
-export default templateQueries;
+moduleRequireLogin(timeclockQueries);
+
+export default timeclockQueries;

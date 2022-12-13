@@ -1,4 +1,4 @@
-import { IAbsenceDocument } from '../../models/definitions/template';
+import { IAbsenceDocument } from '../../models/definitions/timeclock';
 
 export default {
   user(absence: IAbsenceDocument) {

@@ -20,7 +20,7 @@ import {
   IAbsenceType,
   IPayDateDocument,
   payDateSchema
-} from './definitions/template';
+} from './definitions/timeclock';
 
 export interface ITimeModel extends Model<ITimeClockDocument> {
   getTimeClock(_id: string): Promise<ITimeClockDocument>;
@@ -33,7 +33,7 @@ export const loadTimeClass = (models: IModels) => {
   class Time {
     // get
     public static async getTimeClock(_id: string) {
-      const timeclock = await models.Templates.findOne({ _id });
+      const timeclock = await models.Timeclocks.findOne({ _id });
       if (!timeclock) {
         throw new Error('Timeclock not found');
       }
@@ -43,21 +43,21 @@ export const loadTimeClass = (models: IModels) => {
 
     // create
     public static async createTimeClock(doc: ITimeClock) {
-      return models.Templates.create({
+      return models.Timeclocks.create({
         ...doc
       });
     }
     // update
     public static async updateTimeClock(_id: string, doc: ITimeClock) {
-      await models.Templates.updateOne(
+      await models.Timeclocks.updateOne(
         { _id },
         { $set: { ...doc } }
       ).then(err => console.error(err));
     }
     // remove
     public static async removeTimeClock(_id: string) {
-      const timeclock = await models.Templates.getTimeClock(_id);
-      return models.Templates.deleteOne({ _id });
+      const timeclock = await models.Timeclocks.getTimeClock(_id);
+      return models.Timeclocks.deleteOne({ _id });
     }
   }
 
