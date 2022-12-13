@@ -22,7 +22,7 @@ export const checkPricing = async (
             productId: i.productId,
             quantity: i.count,
             price: i.unitPrice,
-            manufacturedDate: '1669852' // i.manufacturedDate,
+            manufacturedDate: '1670901' // i.manufacturedDate,
           }))
         ]
       },
@@ -34,8 +34,6 @@ export const checkPricing = async (
   }
 
   let bonusProductsToAdd: any = {};
-
-  console.log(pricing);
 
   for (const item of doc.items || []) {
     const discount = pricing[item.productId];

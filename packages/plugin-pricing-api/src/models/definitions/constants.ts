@@ -29,9 +29,10 @@ export const RULE_TYPES = {
 };
 
 export const EXPIRY_TYPES = {
+  HOUR: 'hour',
   DAY: 'day',
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
-  ALL: ['day', 'week', 'month', 'year']
+  ALL: ['hour', 'day', 'week', 'month', 'year']
 };
