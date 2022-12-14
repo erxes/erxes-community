@@ -51,7 +51,7 @@ const assetDetail = `
     assetDetail(_id: $_id) {
       ${assetFields}
       customFieldsData
-      knowledgeBaseData
+      knowledgeData
     }
   }
 `;

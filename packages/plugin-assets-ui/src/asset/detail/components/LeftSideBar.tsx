@@ -3,22 +3,23 @@ import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import gql from 'graphql-tag';
 import React from 'react';
 import { IAsset } from '../../../common/types';
-import { ContainerBox, KnowledgeBaseCard } from '../../../style';
+import { ContainerBox, KnowledgeCard } from '../../../style';
 import { queries } from '../../graphql';
 import BasicInfo from '../containers/BasicInfo';
 import CustomFieldsSection from '../containers/CustomFieldSection';
-import KnowledgeBase from './KnowledgeBaseForm';
+import Knowledge from './KnowledgeForm';
 
 type Props = {
   asset: IAsset;
   history: any;
+  refetchDetail:() => void
 };
 
 class LeftSidebar extends React.Component<Props> {
   render() {
-    const { asset, history } = this.props;
+    const { asset, history, refetchDetail } = this.props;
 
-    const { knowledgeBaseData } = asset;
+    const { knowledgeData } = asset;
 
     const refetchQueries = [
       {
@@ -29,10 +30,10 @@ class LeftSidebar extends React.Component<Props> {
 
     const editKnowledgeForm = data => {
       const trigger = (
-        <KnowledgeBaseCard>
+        <KnowledgeCard>
           <Icon icon="head-1" size={30} />
           <ControlLabel>{data.name}</ControlLabel>
-        </KnowledgeBaseCard>
+        </KnowledgeCard>
       );
 
       data.contents = data.contents.map(content => ({ ...content, isTitleEntered: true }));
@@ -41,10 +42,11 @@ class LeftSidebar extends React.Component<Props> {
         const updatedProps = {
           ...props,
           assetId: asset._id,
-          knowledgeBaseData: data
+          knowledgeData: data,
+          refetchQueries: refetchDetail
         };
 
-        return <KnowledgeBase {...updatedProps} />;
+        return <Knowledge {...updatedProps} />;
       };
 
       return (
@@ -52,7 +54,7 @@ class LeftSidebar extends React.Component<Props> {
           key={data._id}
           content={content}
           trigger={trigger}
-          title="Edit Knowledge Base"
+          title="Edit Knowledge "
           size="lg"
         />
       );
@@ -63,7 +65,7 @@ class LeftSidebar extends React.Component<Props> {
         <BasicInfo asset={asset} refetchQueries={refetchQueries} history={history} />
         <Sidebar.Section>
           <ContainerBox gap={5} flexWrap={true}>
-            {(knowledgeBaseData || []).map(data => editKnowledgeForm(data))}
+            {(knowledgeData || []).map(data => editKnowledgeForm(data))}
           </ContainerBox>
         </Sidebar.Section>
 

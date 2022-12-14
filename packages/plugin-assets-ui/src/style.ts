@@ -235,7 +235,7 @@ export const MovementItemConfigContainer = styledTS<{ flex?: string }>(styled.di
   }
 `;
 
-export const KnowledgeBaseCard = styled.div`
+export const KnowledgeCard = styled.div`
   display: flex;
   flex-direction: column;
   height: 80px;

@@ -19,7 +19,7 @@ export interface IAsset {
   assetCount?: number;
   vendorId?: string;
   vendorCode?: string;
-  knowledgeBaseData?: any[];
+  knowledgeData?: any[];
 
   mergedIds?: string[];
 }

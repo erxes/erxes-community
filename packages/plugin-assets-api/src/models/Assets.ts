@@ -15,31 +15,32 @@ export interface IAssetModel extends Model<IAssetDocument> {
   updateAsset(_id: string, doc: IAsset): Promise<IAssetDocument>;
   removeAssets(_ids: string[]): Promise<{ n: number; ok: number }>;
   mergeAssets(assetIds: string[], assetFields: IAsset): Promise<IAssetDocument>;
-  addKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
-  updateKnowledgeBase(assetId: string, doc: any): Promise<IAssetDocument>;
-  removeKnowledgeBase(
+  addKnowledge(assetId: string, doc: any): Promise<IAssetDocument>;
+  updateKnowledge(assetId: string, doc: any): Promise<IAssetDocument>;
+  removeKnowledge(
     assetId: string,
-    knowledgeBaseId: any
+    knowledgeId: any
   ): Promise<IAssetDocument>;
 }
 
-const knowledgeBaseDataValidator = (assetId, doc) => {
+const knowledgeDataValidator = (assetId, doc) => {
   if (!assetId) {
-    throw new Error('You cannot add knowledge base in asset without assetId');
+    throw new Error('You cannot add knowledge  in asset without assetId');
   }
   if (!doc.name) {
     throw new Error('You must provide a title');
   }
-  if (!doc.description) {
-    throw new Error('You must provide a description');
+
+  if(!doc.contents.length){
+    throw new Error('You must add at least one content');
   }
 
-  for (const content of doc.content || []) {
+  for (const content of doc.contents || []) {
     if (!content.title) {
-      throw new Error('You must provide a title of knowledge base');
+      throw new Error('You must provide a title of knowledge ');
     }
     if (!content.content) {
-      throw new Error('You must provide a content of knowledge base');
+      throw new Error('You must provide a content of knowledge ');
     }
   }
 };
@@ -285,9 +286,9 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return asset;
     }
 
-    public static async addKnowledgeBase(assetId, doc) {
+    public static async addKnowledge(assetId, doc) {
       try {
-        knowledgeBaseDataValidator(assetId, doc);
+        knowledgeDataValidator(assetId, doc);
       } catch (e) {
         throw new Error(e.message);
       }
@@ -299,12 +300,12 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       }
       return await models.Assets.update(
         { _id: assetId },
-        { $push: { knowledgeBaseData: doc } }
+        { $push: { knowledgeData: doc } }
       );
     }
-    public static async updateKnowledgeBase(assetId, doc) {
+    public static async updateKnowledge(assetId, doc) {
       try {
-        knowledgeBaseDataValidator(assetId, doc);
+        knowledgeDataValidator(assetId, doc);
       } catch (e) {
         throw new Error(e.message);
       }
@@ -317,10 +318,10 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
 
       try {
         await models.Assets.updateOne(
-          { _id: assetId, 'knowledgeBaseData._id': doc._id },
+          { _id: assetId, 'knowledgeData._id': doc._id },
           {
             $set: {
-              'knowledgeBaseData.$': doc
+              'knowledgeData.$': doc
             }
           }
         );
@@ -330,22 +331,22 @@ export const loadAssetClass = (models: IModels, subdomain: string) => {
       return 'updated';
     }
 
-    public static async removeKnowledgeBase(
+    public static async removeKnowledge(
       assetId: string,
-      knowledgeBaseId: any
+      knowledgeId: any
     ) {
       if (!assetId) {
-        throw new Error('You cannot remove a knowledge base without assetId');
+        throw new Error('You cannot remove a knowledge  without assetId');
       }
-      if (!knowledgeBaseId) {
+      if (!knowledgeId) {
         throw new Error(
-          'You cannot remove a knowledge base without knowledgeBaseId'
+          'You cannot remove a knowledge  without knowledgeId'
         );
       }
 
       return await models.Assets.updateOne(
         { _id: assetId },
-        { $pull: { knowledgeBaseData: { _id: knowledgeBaseId } } }
+        { $pull: { knowledgeData: { _id: knowledgeId } } }
       );
     }
 

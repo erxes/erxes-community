@@ -47,7 +47,7 @@ export const types = contactsAvailable => `
     attachmentMore: [Attachment]
     vendorId: String
     assetCount: Int
-    knowledgeBaseData:JSON
+    knowledgeData:JSON
 
     category: AssetCategory
     parent:Asset
@@ -56,17 +56,17 @@ export const types = contactsAvailable => `
     ${contactsAvailable ? 'vendor: Company' : ''}
     }
 
-    input KnowledgeBaseContent {
+    input KnowledgeContent {
       _id: String,
       title: String,
       content: String
     }
 
-    input KnowledgeBaseType {
+    input KnowledgeType {
         _id: String,
         name:String,
         description: String,
-        contents:[KnowledgeBaseContent]
+        contents:[KnowledgeContent]
     }
 
 `;
@@ -105,7 +105,7 @@ export const mutations = `
     assetCategoryAdd(${assetCategoryParams}): AssetCategory
     assetCategoryEdit(_id: String!, ${assetCategoryParams}): AssetCategory
     assetCategoryRemove(_id: String!): JSON,
-    addAssetdKnowledgeBase(assetId:String,knowledgeBaseData:KnowledgeBaseType):JSON
-    updateAssetdKnowledgeBase(assetId:String,knowledgeBaseData:KnowledgeBaseType):JSON
-    removeAssetdKnowledgeBase(assetId:String,knowledgeBaseId:String):JSON
+    addAssetKnowledge(assetId:String,knowledgeData:KnowledgeType):JSON
+    updateAssetKnowledge(assetId:String,knowledgeData:KnowledgeType):JSON
+    removeAssetKnowledge(assetId:String,knowledgeId:String):JSON
 `;

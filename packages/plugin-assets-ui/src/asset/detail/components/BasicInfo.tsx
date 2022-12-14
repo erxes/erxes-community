@@ -24,7 +24,7 @@ import { IAsset } from '../../../common/types';
 import { AssetContent, ContainerBox } from '../../../style';
 import AssetForm from '../../containers/Form';
 import { Tip } from '@erxes/ui/src';
-import KnowledgeBase from './KnowledgeBaseForm';
+import Knowledge from './KnowledgeForm';
 
 type Props = {
   asset: IAsset;
@@ -109,7 +109,7 @@ class BasicInfo extends React.Component<Props> {
     const { asset, history } = this.props;
 
     const editForm = props => <AssetForm {...props} asset={asset} />;
-    const addKnowledgeBase = props => <KnowledgeBase {...props} assetId={asset._id}/>;
+    const addKnowledge = props => <Knowledge {...props} assetId={asset._id}/>;
     const {
       code,
       name,
@@ -149,9 +149,9 @@ class BasicInfo extends React.Component<Props> {
               content={editForm}
             />
             <ModalTrigger
-              title="Add Knowledge Base"
+              title="Add Knowledge "
               trigger={<Icon icon="lightbulb-alt" />}
-              content={addKnowledgeBase}
+              content={addKnowledge}
               size="lg"
             />
           </ContainerBox>

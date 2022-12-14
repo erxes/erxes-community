@@ -92,17 +92,17 @@ const assetMutations = {
     { assetIds, assetFields }: { assetIds: string[]; assetFields: IAsset },
     { models }: IContext
   ) {
-    return models.Assets.mergeAssets(assetIds, { ...assetFields });
+    return await models.Assets.mergeAssets(assetIds, { ...assetFields });
   },
 
-  addAssetdKnowledgeBase(_root, { assetId, knowledgeBaseData }, { models }: IContext) {
-    return models.Assets.addKnowledgeBase(assetId, knowledgeBaseData);
+  async addAssetKnowledge(_root, { assetId, knowledgeData }, { models }: IContext) {
+    return await models.Assets.addKnowledge(assetId, knowledgeData);
   },
-  updateAssetdKnowledgeBase(_root, { assetId, knowledgeBaseData }, { models }: IContext) {
-    return models.Assets.updateKnowledgeBase(assetId, knowledgeBaseData);
+  async updateAssetKnowledge(_root, { assetId, knowledgeData }, { models }: IContext) {
+    return await models.Assets.updateKnowledge(assetId, knowledgeData);
   },
-  removeAssetdKnowledgeBase(_root, { assetId, knowledgeBaseId }, { models }: IContext) {
-    return models.Assets.removeKnowledgeBase(assetId, knowledgeBaseId);
+  async removeAssetKnowledge(_root, { assetId, knowledgeId }, { models }: IContext) {
+    return await models.Assets.removeKnowledge(assetId, knowledgeId);
   }
 };
 
