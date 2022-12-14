@@ -126,7 +126,7 @@ export const loadRiskAssessment = (model: IModels, subdomain: string) => {
         throw new Error('Please select a list of risk assessment IDs');
       }
       try {
-        await model.RiskConfimity.deleteMany({
+        await model.RiskConformity.deleteMany({
           riskAssessmentId: { $in: _ids }
         });
         await model.RiksFormSubmissions.deleteMany({

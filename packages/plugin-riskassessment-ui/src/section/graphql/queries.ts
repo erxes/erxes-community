@@ -1,19 +1,22 @@
 import { riskConformityParams } from '../../common/graphql';
 
 const riskAssessments = `
-  query RiskAssessments($categoryId: String,,$searchValue: String,$perPage: Int,$status: String) {
-    riskAssessments(categoryId: $categoryId ,perPage: $perPage,searchValue: $searchValue,status: $status) {
+  query RiskAssessments($categoryId: String,,$searchValue: String,$perPage: Int) {
+    riskAssessments(categoryId: $categoryId ,perPage: $perPage,searchValue: $searchValue) {
       list{_id,name,description,status,categoryId},totalCount
     }
   }
   `;
-const riskConfirmities = `
-  query RiskConfirmities($cardId: String) {
-    riskConfirmities(cardId: $cardId) {
+const riskConformity = `
+  query riskConformity($cardId: String) {
+    riskConformity(cardId: $cardId) {
       _id
       cardId
       riskAssessmentId
       riskAssessment
+      status
+      statusColor
+      resultScore
     }
   }
 `;
@@ -46,7 +49,7 @@ const riskConformityDetail = `
 
 export default {
   riskAssessments,
-  riskConfirmities,
+  riskConformity,
   riskConformityDetails,
   riskConformitySubmissions,
   riskConformityDetail

@@ -13,6 +13,7 @@ import {
   Sidebar,
   SortHandler,
   Table,
+  confirm,
   __
 } from '@erxes/ui/src';
 import Form from '../containers/Form';
@@ -128,8 +129,10 @@ class List extends React.Component<Props, State> {
     const { selectedItems } = this.state;
 
     const handleRemove = () => {
-      remove(selectedItems);
-      this.setState({ selectedItems: [] });
+      confirm().then(() => {
+        remove(selectedItems);
+        this.setState({ selectedItems: [] });
+      });
     };
 
     const handleFilterParams = (type, value) => {
@@ -156,7 +159,6 @@ class List extends React.Component<Props, State> {
               options={cardTypes}
               multi={false}
               onChange={e => handleFilterParams('cardType', e?.value)}
-              clearValue={e => console.log(e)}
             />
           </FormGroup>
           <BoardSelectContainer

@@ -6,6 +6,9 @@ export interface IRiskConformityDocument extends Document {
   cardId: string;
   cardType: string;
   riskAssessmentId: string;
+  status: string;
+  statusColor: string;
+  resultScore: string;
 }
 
 export interface IRiskFormSubmissionDocument extends Document {

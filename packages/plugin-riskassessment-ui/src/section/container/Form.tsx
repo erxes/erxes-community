@@ -180,8 +180,7 @@ export default withProps<Props>(
       options: ({}) => ({
         variables: {
           perPage: 20,
-          searchValue: '',
-          status: 'In_Progress'
+          searchValue: ''
         },
         fetchPolicy: 'network-only'
       })

@@ -22,6 +22,8 @@ export interface IRiskFormSubmissionModel
     params: IRiskFormSubmissionParams
   ): Promise<IRiskFormSubmissionDocument>;
   formSubmitHistory(
+    cardId: string,
+    cardType: string,
     riskAssessmentId: string
   ): Promise<IRiskFormSubmissionDocument>;
 }
@@ -54,7 +56,7 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
       const filter = generateFields(params);
 
       const formId = await getFormId(model, cardId, cardType);
-      const conformity = await model.RiskConfimity.findOne({
+      const conformity = await model.RiskConformity.findOne({
         cardId,
         cardType
       }).lean();
@@ -63,12 +65,9 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
         throw new Error(`Not selected some risk assessment on ${cardType}`);
       }
 
-      const { riskAssessmentId } = conformity;
+      const { riskAssessmentId, resultScore } = conformity;
 
-      const {
-        resultScore,
-        calculateMethod
-      } = await model.RiskAssessment.findOne({
+      const { calculateMethod } = await model.RiskAssessment.findOne({
         _id: riskAssessmentId
       }).lean();
 
@@ -120,8 +119,8 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
         }
       }
 
-      await model.RiskAssessment.findOneAndUpdate(
-        { _id: riskAssessmentId },
+      await model.RiskConformity.findOneAndUpdate(
+        { riskAssessmentId, cardId, cardType },
         { $set: { resultScore: resultScore + sumNumber } },
         { new: true }
       );
@@ -137,28 +136,22 @@ export const loadRiskFormSubmissions = (model: IModels, subdomain: string) => {
         score: sumNumber
       };
     }
-    public static async formSubmitHistory(riskAssessmentId: string) {
-      const riskAssessment = await model.RiskAssessment.findOne({
-        _id: riskAssessmentId
-      });
-
-      if (!riskAssessment) {
-        throw new Error('Cannot find risk assessment');
-      }
-
-      if (riskAssessment.status === 'In Progress') {
-        throw new Error('This risk assessment in progress');
-      }
-
-      const conformity = await model.RiskConfimity.findOne({
+    public static async formSubmitHistory(
+      cardId: string,
+      cardType: string,
+      riskAssessmentId: string
+    ) {
+      const conformity = await models?.RiskConformity.findOne({
+        cardId,
+        cardType,
         riskAssessmentId
       });
-
       if (!conformity) {
         throw new Error('Cannot find risk assessment');
       }
-
-      const { cardId, cardType } = conformity;
+      if (conformity?.status === 'In Progress') {
+        throw new Error('This risk assessment in progress');
+      }
 
       const formId = await getFormId(model, cardId, cardType);
 

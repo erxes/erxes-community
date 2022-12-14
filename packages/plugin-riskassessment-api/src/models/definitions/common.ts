@@ -34,6 +34,8 @@ export interface IRiskAssessmentCategoryField extends PaginateField {
 export interface IRiskConformityField {
   _id: string;
   cardId: string;
+  boardId: string;
+  pipelineId: string;
   cardType: string;
   riskAssessmentId: string;
 }

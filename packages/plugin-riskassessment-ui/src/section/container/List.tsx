@@ -38,7 +38,7 @@ class RiskAssessmentSection extends React.Component<FinalProps> {
       ...this.props,
       cardId: this.props.mainTypeId,
       cardType: this.props.mainType,
-      list: lists?.riskConfirmities || [],
+      conformity: lists?.riskConformity,
       refetch: lists?.refetch,
       submissions: submissions.riskConformitySubmissions,
       refetchSubmissions: submissions.refetch
@@ -50,7 +50,7 @@ class RiskAssessmentSection extends React.Component<FinalProps> {
 
 export default withProps<Props>(
   compose(
-    graphql<Props>(gql(queries.riskConfirmities), {
+    graphql<Props>(gql(queries.riskConformity), {
       name: 'lists',
       skip: ({ mainTypeId }) => !mainTypeId,
       options: ({ mainTypeId, mainType }) => ({

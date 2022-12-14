@@ -56,7 +56,7 @@ export const loadRiskAssessmentConfig = (models: IModels, subdomain: string) => 
       });
     }
     public static async removeConfigs(ids: string[]) {
-      return await models.RiskAssessmentConfigs.deleteMany(ids);
+      return await models.RiskAssessmentConfigs.deleteMany({ _id: { $in: ids } });
     }
   }
 

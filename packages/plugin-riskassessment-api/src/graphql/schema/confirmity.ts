@@ -1,10 +1,17 @@
+import { commonPaginateTypes, commonTypes } from './common';
+
 export const types = `
     type RiskConformity {
         _id: String,
         cardId: String,
         cardType: String,
+        status: String,
+        statusColor: String,
+        resultScore:String,
         riskAssessmentId: String,
+        createdAt: Date,
         riskAssessment:JSON
+        card:JSON
     }
     type RiskConformityDetail{
         createdAt: String
@@ -22,7 +29,9 @@ export const types = `
 `;
 
 export const queries = `
-    riskConformities(cardId:String,riskAssessmentId:String):[RiskConformity]
+    riskConformity(cardId:String,riskAssessmentId:String):RiskConformity
+    riskConformities(cardId:String,riskAssessmentId:String,status:String,${commonTypes},${commonPaginateTypes}):[RiskConformity]
+    riskConformitiesTotalCount(cardId:String,riskAssessmentId:String,status:String,${commonTypes},${commonPaginateTypes}): Int
     riskConformityDetails(cardId:String) :[RiskConformity]
     riskConformitySubmissions(cardId:String,cardType:String) :JSON
     riskConformityFormDetail(cardId:String,userId: String,riskAssessmentId:String) :RiskConformityFormDetailType

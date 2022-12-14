@@ -176,10 +176,7 @@ export class SelectWithRiskAssessment extends React.Component<
 
     client
       .query({
-        query: gql(riskAssessmentQueries.list),
-        variables: {
-          status: 'In_Progress'
-        }
+        query: gql(riskAssessmentQueries.list)
       })
       .then(({ data }) => {
         let options = data?.riskAssessments?.list.map(riskAssessment => ({

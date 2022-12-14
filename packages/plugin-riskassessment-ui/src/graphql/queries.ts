@@ -27,8 +27,8 @@ query RiskAssessmentDetail($id: String, $fieldsSkip: JSON) {
 `;
 
 const assessmentHistory = `
-query RiskFormSubmitHistory($riskAssessmentId: String) {
-  riskFormSubmitHistory(riskAssessmentId: $riskAssessmentId) {
+query RiskFormSubmitHistory($cardId:String,$cardType:String,$riskAssessmentId: String) {
+  riskFormSubmitHistory(cardId:$cardId,cardType:$cardType,riskAssessmentId: $riskAssessmentId) {
     cardId
     cardType
     card

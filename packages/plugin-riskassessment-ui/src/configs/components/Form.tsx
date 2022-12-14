@@ -114,6 +114,7 @@ class Form extends React.Component<Props, State> {
               onChangeBoard={onChangeBoard}
               onChangePipeline={onChangePipeline}
               onChangeStage={onChangeStage}
+              autoSelectStage={false}
             />
           </Features>
         </Block>

@@ -28,7 +28,7 @@ class List extends React.Component<FinalProps> {
 
     const remove = configIds => {
       this.props
-        .removeConfigs(configIds)
+        .removeConfigs({ variables: { configIds } })
         .then(() => {
           Alert.success('Config removed successfully');
         })

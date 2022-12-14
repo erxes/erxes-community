@@ -95,6 +95,7 @@ export const FormContainer = styledTS<{
   justifyCenter?: boolean;
 }>(styled.div)`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: ${({ row }) => row && 'row'} ${({ column }) => column && 'column'};
   justify-content: ${({ spaceBetween }) => (spaceBetween ? 'space-between' : '')} ${({
   spaceAround
@@ -191,6 +192,7 @@ export const ColorButton = styledTS<{ color?: string }>(styled.div)`
 `;
 export const Box = styled(BoxRoot)`
   flex: 1;
+  min-width: 80px;
   padding: ${dimensions.unitSpacing}px;
   text-align: center;
   background: ${colors.colorWhite};
@@ -354,4 +356,5 @@ export const BoardSelection = styled(BoardSelectContainer)`
 export const SidebarHeader = styled.h5`
   margin-bottom: ${dimensions.coreSpacing}px;
   color: ${colors.colorPrimary};
+  padding-left: 10px;
 `;

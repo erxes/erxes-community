@@ -85,11 +85,14 @@ export interface ICardRiskAssements {
   _id: string;
   cardId: string;
   riskAssessmentId: string;
+  status: string;
+  statusColor: string;
+  resultScore: string;
   riskAssessment: RiskAssessmentsType;
 }
 
 export type ICardRiskConformitiesQueryResponse = {
-  riskConformities: ICardRiskAssements[];
+  riskConformity: ICardRiskAssements;
   loading: boolean;
   refetch: () => void;
 };

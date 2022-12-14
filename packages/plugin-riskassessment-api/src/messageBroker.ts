@@ -14,11 +14,11 @@ export const initBroker = async cl => {
     return;
   });
 
-  consumeRPCQueue('riskassessment:riskConfirmities:find', async ({ subdomain, data }) => {
+  consumeRPCQueue('riskassessment:riskConformity:find', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
     return {
-      data: await models.RiskConfimity.riskConformities(data),
+      data: await models.RiskConformity.riskConformity(data),
       status: 'success'
     };
   });

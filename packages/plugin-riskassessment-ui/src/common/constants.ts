@@ -63,7 +63,8 @@ export const calculateMethods = [
 
 export const subMenu = [
   { title: 'Risk assessments', link: '/settings/risk-assessments' },
-  { title: 'Configs', link: '/settings/risk-assessment-configs' }
+  { title: 'Configs', link: '/settings/risk-assessment-configs' },
+  { title: 'Submissions', link: '/settings/risk-assessment-submissions' }
 ];
 
 export const cardTypes = [

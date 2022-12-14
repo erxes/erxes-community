@@ -11,7 +11,6 @@ export const commonPaginateTypes = `
     searchValue: String,
     sortFromDate: String,
     sortToDate: String
-    status: String
 `;
 
 export const commonRiskAssessmentTypes = `

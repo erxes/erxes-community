@@ -89,7 +89,7 @@ export const types = `
 `;
 
 export const queries = `
-    riskAssessments (categoryId:String,ignoreIds:[String],${commonPaginateTypes},status:String):list
+    riskAssessments (categoryId:String,ignoreIds:[String],${commonPaginateTypes}):list
     riskAssessmentDetail(_id: String,fieldsSkip:JSON): RiskAssessment
     riskAssessmentConfigs (${configParamsDef},${commonPaginateTypes}):[RiskAssessmentConfigs]
     riskAssessmentConfigsTotalCount(${configParamsDef},${commonPaginateTypes}):Int

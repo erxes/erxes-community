@@ -52,18 +52,11 @@ export const riskAssessmentSchema = new Schema({
   description: field({ type: String, label: 'Description' }),
   createdAt: field({ type: Date, default: Date.now, label: 'Created At' }),
   categoryId: field({ type: String, label: 'Risk Assessment Category Id' }),
-  status: field({ type: String, label: 'Status', default: 'In Progress' }),
-  statusColor: field({
-    type: String,
-    label: 'Status Status Color',
-    default: '#3B85F4'
-  }),
   calculateMethod: field({ type: String, label: 'Calculate Method' }),
   calculateLogics: field({
     type: [calculateLogicsSchema],
     label: 'Calculate Logics'
-  }),
-  resultScore: field({ type: Number, label: 'Result Score', default: 0 })
+  })
 });
 
 const riskAssessmentFieldsConfigsSchema = new Schema({

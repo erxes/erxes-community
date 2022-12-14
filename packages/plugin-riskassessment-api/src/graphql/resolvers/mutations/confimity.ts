@@ -4,13 +4,13 @@ import { IRiskConformityField } from '../../../models/definitions/common';
 
 const RiskConfimityMutations = {
   async addRiskConformity(_root, params: IRiskConformityField, { models }: IContext) {
-    return await models.RiskConfimity.riskConformityAdd(params);
+    return await models.RiskConformity.riskConformityAdd(params);
   },
   async updateRiskConformity(_root, params: IRiskConformityField, { models }: IContext) {
-    return await models.RiskConfimity.riskConformityUpdate(params);
+    return await models.RiskConformity.riskConformityUpdate(params);
   },
   async removeRiskConformity(_root, { cardId }: { cardId: string }, { models }: IContext) {
-    return await models.RiskConfimity.riskConformityRemove(cardId);
+    return await models.RiskConformity.riskConformityRemove(cardId);
   }
 };
 

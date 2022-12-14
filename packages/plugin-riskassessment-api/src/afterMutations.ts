@@ -35,15 +35,22 @@ export const afterMutationHandlers = async (subdomain, params) => {
     });
 
     for (const data of customFieldsData) {
-      const config = await models.RiskAssessmentConfigs.findOne({
+      const commonFilter = {
         cardType: type.replace('cards:', ''),
         boardId: pipeline.boardId,
         pipelineId: stage.pipelineId,
-        stageId,
         customFieldId: data.field
+      };
+
+      const config = await models.RiskAssessmentConfigs.findOne({
+        $or: [
+          { ...commonFilter, stageId },
+          { ...commonFilter, stageId: '' }
+        ]
       })
         .sort({ createdAt: -1 })
         .limit(1);
+
       if (config) {
         const customField = config.configs.find(item => item.value === data.value);
         if (customField) {
@@ -52,7 +59,7 @@ export const afterMutationHandlers = async (subdomain, params) => {
             cardType: type.replace('cards:', ''),
             riskAssessmentId: customField.riskAssessmentId
           } as IRiskConformityField;
-          await models.RiskConfimity.riskConformityAdd(conformity);
+          await models.RiskConformity.riskConformityAdd(conformity);
         }
       }
     }
