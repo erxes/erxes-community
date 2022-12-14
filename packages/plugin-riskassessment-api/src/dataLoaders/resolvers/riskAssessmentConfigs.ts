@@ -13,6 +13,7 @@ export default {
   ) {
     return (config.boardId && dataLoaders.board.load(config.boardId)) || null;
   },
+
   async pipeline(
     config: IRiskAssessmentsConfigDocument,
     {},
@@ -23,6 +24,7 @@ export default {
       null
     );
   },
+
   async stage(
     config: IRiskAssessmentsConfigDocument,
     {},
@@ -30,6 +32,7 @@ export default {
   ) {
     return (config.stageId && dataLoaders.stage.load(config.stageId)) || null;
   },
+
   async field(
     config: IRiskAssessmentsConfigDocument,
     {},

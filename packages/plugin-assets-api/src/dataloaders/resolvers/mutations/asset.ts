@@ -102,6 +102,7 @@ const assetMutations = {
   ) {
     return await models.Assets.addKnowledge(assetId, knowledgeData);
   },
+
   async updateAssetKnowledge(
     _root,
     { assetId, knowledgeData },
@@ -109,6 +110,7 @@ const assetMutations = {
   ) {
     return await models.Assets.updateKnowledge(assetId, knowledgeData);
   },
+
   async removeAssetKnowledge(
     _root,
     { assetId, knowledgeId },
