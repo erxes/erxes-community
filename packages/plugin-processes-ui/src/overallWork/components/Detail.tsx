@@ -41,9 +41,9 @@ class OverallWorkDetail extends React.Component<Props, State> {
       return 0;
     }
 
-    let count = overallWork.needProductsData[0].liveRem;
+    let count = (overallWork.needProductsData[0] || {}).liveRem || 0;
 
-    for (const data of overallWork.needProductsData) {
+    for (const data of overallWork.needProductsData || []) {
       if (count > data.liveRem) {
         count = data.liveRem;
       }
@@ -58,9 +58,9 @@ class OverallWorkDetail extends React.Component<Props, State> {
       return 0;
     }
 
-    let count = overallWork.resultProductsData[0].liveRem;
+    let count = (overallWork.resultProductsData[0] || {}).liveRem || 0;
 
-    for (const data of overallWork.resultProductsData) {
+    for (const data of overallWork.resultProductsData || []) {
       const diff = data.quantity + data.reserveRem - data.liveRem;
       if (count < diff) {
         count = diff;
