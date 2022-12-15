@@ -28,6 +28,7 @@ type Props = {
   queryStartDate: Date;
   queryEndDate: Date;
   queryUserId: string;
+  getActionBar: (actionBar: any) => void;
 };
 
 type FinalProps = {

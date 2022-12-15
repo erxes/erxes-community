@@ -1,11 +1,9 @@
 import Button from '@erxes/ui/src/components/Button';
-import { menuTimeClock } from '../../menu';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
-import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import DateRange from '../datepicker/DateRange';
@@ -23,7 +21,6 @@ import { Row } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
-import SideBarList from '../../containers/SideBarList';
 import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {
@@ -31,6 +28,7 @@ type Props = {
   queryParams: any;
   history: any;
   branchesList: IBranch[];
+  getActionBar: (actionBar: any) => void;
   solveSchedule: (scheduleId: string, status: string) => void;
   solveShift: (shiftId: string, status: string) => void;
   submitRequest: (userId: string[], filledShifts: any) => void;
@@ -46,6 +44,7 @@ function ScheduleList(props: Props) {
     scheduleOfMembers,
     solveSchedule,
     solveShift,
+    getActionBar,
     branchesList
   } = props;
 
@@ -681,25 +680,8 @@ function ScheduleList(props: Props) {
     </Table>
   );
 
-  return (
-    <Wrapper
-      header={
-        <Wrapper.Header title={__('Timeclocks')} submenu={menuTimeClock} />
-      }
-      actionBar={actionBar}
-      content={
-        <DataWithLoader
-          data={content}
-          loading={false}
-          emptyText={__('Theres no timeclock')}
-          emptyImage="/images/actions/8.svg"
-        />
-      }
-      transparent={true}
-      hasBorder={true}
-      leftSidebar={<SideBarList queryParams={queryParams} history={history} />}
-    />
-  );
+  getActionBar(actionBar);
+  return content;
 }
 
 export default ScheduleList;

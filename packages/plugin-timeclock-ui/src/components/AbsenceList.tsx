@@ -1,12 +1,10 @@
 import Button from '@erxes/ui/src/components/Button';
-import { menuTimeClock } from '../menu';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import Select from 'react-select-plus';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
-import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import { FormControl } from '@erxes/ui/src/components/form';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateFilter from '@erxes/ui/src/components/DateFilter';
@@ -15,7 +13,6 @@ import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import Uploader from '@erxes/ui/src/components/Uploader';
 import { FlexCenter } from '../styles';
 import { IAttachment } from '@erxes/ui/src/types';
-import SideBarList from '../containers/SideBarList';
 
 type Props = {
   absences: IAbsence[];
@@ -26,6 +23,7 @@ type Props = {
   loading?: boolean;
   solveAbsence: (absenceId: string, status: string) => void;
   submitRequest: (explanation: string, attachment: IAttachment) => void;
+  getActionBar: (actionBar: any) => void;
 };
 
 function AbsenceList(props: Props) {
@@ -35,7 +33,8 @@ function AbsenceList(props: Props) {
     submitRequest,
     absences,
     absenceTypes,
-    solveAbsence
+    solveAbsence,
+    getActionBar
   } = props;
   const [explanation, setTextReason] = useState('');
   const [attachment, setAttachment] = useState<IAttachment>({
@@ -207,25 +206,8 @@ function AbsenceList(props: Props) {
     </Table>
   );
 
-  return (
-    <Wrapper
-      header={
-        <Wrapper.Header title={__('Timeclocks')} submenu={menuTimeClock} />
-      }
-      actionBar={actionBar}
-      content={
-        <DataWithLoader
-          data={content}
-          loading={false}
-          emptyText={__('Theres no timeclock')}
-          emptyImage="/images/actions/8.svg"
-        />
-      }
-      transparent={true}
-      hasBorder={true}
-      leftSidebar={<SideBarList queryParams={queryParams} history={history} />}
-    />
-  );
+  getActionBar(actionBar);
+  return content;
 }
 
 export default AbsenceList;

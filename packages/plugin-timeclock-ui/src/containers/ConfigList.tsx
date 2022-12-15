@@ -17,6 +17,7 @@ import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 
 type Props = {
+  getActionBar: (actionBar: any) => void;
   history: any;
   queryParams: any;
   absenceTypeId: string;
@@ -45,8 +46,6 @@ type FinalProps = {
 const ListContainer = (props: FinalProps) => {
   const {
     removeAbsenceTypeMutation,
-    addPayDateMutation,
-    editPayDateMutation,
     removePayDateMutation,
     removeHolidayMutation,
     listAbsenceTypesQuery,
@@ -100,16 +99,6 @@ const ListContainer = (props: FinalProps) => {
     );
   };
 
-  const submitPayDatesConfig = (payDates: number[]) => {
-    confirm('Are you sure to submit these dates as pay dates ? ').then(() => {
-      addPayDateMutation({ variables: { dateNums: payDates } })
-        .then(() => Alert.success('Successfully submitted pay dates'))
-        .catch(err => {
-          throw new Error(err);
-        });
-    });
-  };
-
   const removeAbsenceType = absenceId => {
     confirm('Are you sure to remove this absence type').then(() => {
       removeAbsenceTypeMutation({ variables: { _id: absenceId } })
@@ -148,8 +137,7 @@ const ListContainer = (props: FinalProps) => {
     removeAbsenceType,
     removeHoliday,
     removePayDate,
-    renderButton,
-    submitPayDatesConfig
+    renderButton
   };
   return <ConfigList {...updatedProps} />;
 };

@@ -1,8 +1,6 @@
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { menuTimeClock } from '../../menu';
 import { router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
-import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import Table from '@erxes/ui/src/components/table';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
@@ -18,16 +16,18 @@ import {
   FilterItem,
   CustomRangeContainer
 } from '../../styles';
+import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
   queryParams: any;
   history: any;
-  branchesList: any;
+  branchesList: IBranch[];
   reports: IReport[];
+  getActionBar: (actionBar: any) => void;
 };
 
 function ReportList(props: Props) {
-  const { history, branchesList, reports } = props;
+  const { history, branchesList, reports, getActionBar } = props;
   const [selectedBranchId, setBranches] = useState(['']);
   const [selectedDeptId, setDepartments] = useState('');
   const [selectedType, setType] = useState('By Employee');
@@ -91,7 +91,7 @@ function ReportList(props: Props) {
               dateFormat={'YYYY-MM-DD'}
             />
             <DateControl
-              // value={new Date()}
+              // value={new Date()}z
               required={false}
               name="startDate"
               // onChange={onSelectDateChange}
@@ -172,22 +172,8 @@ function ReportList(props: Props) {
     />
   );
 
-  return (
-    <Wrapper
-      header={<Wrapper.Header title={__('Reports')} submenu={menuTimeClock} />}
-      actionBar={actionBar}
-      content={
-        <DataWithLoader
-          data={content}
-          loading={false}
-          emptyText={__('Theres no timeclock')}
-          emptyImage="/images/actions/8.svg"
-        />
-      }
-      transparent={false}
-      hasBorder={true}
-    />
-  );
+  getActionBar(actionBar);
+  return <>{content}</>;
 }
 
 export default ReportList;

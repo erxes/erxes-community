@@ -15,7 +15,7 @@ import { Alert } from '@erxes/ui/src/utils';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';
 
 type Props = {
-  searchValue: string;
+  searchValue?: string;
   history: any;
   queryParams: any;
   explanation: string;
@@ -32,6 +32,7 @@ type Props = {
   queryStartDate: Date;
   queryEndDate: Date;
   queryUserId: string;
+  getActionBar: (actionBar: any) => void;
 };
 
 type FinalProps = {
