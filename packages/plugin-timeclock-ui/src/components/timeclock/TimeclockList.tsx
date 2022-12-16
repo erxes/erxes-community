@@ -1,13 +1,13 @@
 import Button from '@erxes/ui/src/components/Button';
-import { ITimeclock } from '../types';
-import Row from './Row';
+import { ITimeclock } from '../../types';
+import Row from './TimeclockRow';
 import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
 import { Title } from '@erxes/ui-settings/src/styles';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
-import TimeForm from '../containers/TimeFormList';
+import TimeForm from '../../containers/timeclock/TimeFormList';
 
 type Props = {
   currentDate?: string;

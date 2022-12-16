@@ -2,17 +2,15 @@ import Button from '@erxes/ui/src/components/Button';
 import { menuTimeClock } from '../menu';
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState, useEffect } from 'react';
-import { Title } from '@erxes/ui-settings/src/styles';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
-import SideBarList from '../containers/SideBarList';
-import TimeForm from '../containers/TimeFormList';
-import ConfigList from '../containers/ConfigList';
-import TimeclockList from '../containers/TimeclockList';
-import AbsenceList from '../containers/AbsenceList';
-import ReportList from '../containers/ReportList';
-import ScheduleList from '../containers/ScheduleList';
+import SideBarList from '../containers/sidebar/SideBarList';
+import TimeForm from '../containers/timeclock/TimeFormList';
+import ConfigList from '../containers/config/ConfigList';
+import TimeclockList from '../containers/timeclock/TimeclockList';
+import AbsenceList from '../containers/absence/AbsenceList';
+import ReportList from '../containers/report/ReportList';
+import ScheduleList from '../containers/schedule/ScheduleList';
 import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
@@ -45,30 +43,6 @@ function List(props: Props) {
     <Button id="btn1" btnStyle={'success'} icon="plus-circle">
       {`Start Shift`}
     </Button>
-  );
-
-  const modalContent = contentProps => (
-    <TimeForm
-      {...contentProps}
-      currentUserId={currentUserId}
-      startClockTime={startClockTime}
-    />
-  );
-
-  const actionBarRight = (
-    <>
-      <ModalTrigger
-        title={__('Start shift')}
-        trigger={trigger}
-        content={modalContent}
-      />
-    </>
-  );
-
-  const title = (
-    <Title capitalize={true}>
-      {__(new Date().toDateString().slice(0, -4))}
-    </Title>
   );
 
   useEffect(() => {

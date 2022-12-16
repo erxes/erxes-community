@@ -3,15 +3,15 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import ConfigList from '../components/config/ConfigList';
+import ConfigList from '../../components/config/ConfigList';
 import {
   AbsenceMutationResponse,
   AbsenceTypeQueryResponse,
   ConfigMutationResponse,
   PayDatesQueryResponse,
   HolidaysQueryResponse
-} from '../types';
-import { mutations, queries } from '../graphql';
+} from '../../types';
+import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import { IButtonMutateProps } from '@erxes/ui/src/types';

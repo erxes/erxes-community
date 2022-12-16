@@ -8,10 +8,10 @@ import Table from '@erxes/ui/src/components/table';
 import { FormControl } from '@erxes/ui/src/components/form';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateFilter from '@erxes/ui/src/components/DateFilter';
-import { IAbsence, IAbsenceType } from '../types';
+import { IAbsence, IAbsenceType } from '../../types';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import Uploader from '@erxes/ui/src/components/Uploader';
-import { FlexCenter } from '../styles';
+import { FlexCenter } from '../../styles';
 import { IAttachment } from '@erxes/ui/src/types';
 
 type Props = {

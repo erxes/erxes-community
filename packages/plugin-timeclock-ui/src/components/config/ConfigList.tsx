@@ -133,7 +133,7 @@ function ConfigList(props: Props) {
       />
       <ModalTrigger
         title={__('Holiday Config')}
-        trigger={holidayConfigTrigger}
+        trigger={holidayConfigTriggersidebarn}
         content={contenProps => holidayConfigContent(contenProps, null)}
       />
     </>

@@ -2,8 +2,8 @@ import { router, __ } from '@erxes/ui/src/utils';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import React, { useState } from 'react';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
-import { SidebarActions, SidebarHeader } from '../styles';
-import { CustomRangeContainer } from '../styles';
+import { SidebarActions, SidebarHeader } from '../../styles';
+import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Button from '@erxes/ui/src/components/Button';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
@@ -13,20 +13,18 @@ import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
   queryParams: any;
-  queryUserIds: string[];
   history: any;
   branchesList: IBranch[];
 };
 
 const LeftSideBar = (props: Props) => {
-  const { history, branchesList, queryParams, queryUserIds } = props;
+  const { history, branchesList, queryParams } = props;
 
-  console.log(branchesList);
-
-  const { userIds } = queryParams;
-  const [currUserIds, setUserIds] = useState(userIds);
-  const [selectedBranchId, setBranches] = useState(['']);
+  const [currUserIds, setUserIds] = useState(['']);
+  const [selectedBranches, setBranches] = useState(['']);
   const [deptIds, setDeptIds] = useState(['']);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
@@ -38,20 +36,14 @@ const LeftSideBar = (props: Props) => {
 
   const onBranchSelect = selectedBranch => {
     setBranches(selectedBranch);
-    const branchUsers: string[] = [];
-
     const branchIds: any[] = [];
     selectedBranch.map(branch => {
       branchIds.push(branch.value);
-      branchUsers.push(...branch.userIds);
     });
 
-    // router.setParams(history, {
-    //   branchIds: `${branchIds}`,
-    //   userIds: branchUsers
-    // });
-
-    setUserIds(branchUsers);
+    router.setParams(history, {
+      branchIds: `${branchIds}`
+    });
   };
 
   const onDepartmentSelect = dept => {
@@ -68,23 +60,38 @@ const LeftSideBar = (props: Props) => {
     });
   };
 
+  const onStartDateChange = date => {
+    setStartDate(date);
+    console.log('11', date.toDateString());
+
+    router.setParams(history, { startDate: date });
+  };
+
+  const onEndDateChange = date => {
+    setEndDate(date);
+    router.setParams(history, { endDate: date });
+  };
+
   const renderSidebarActions = () => {
     return (
       <SidebarHeader>
         <CustomRangeContainer>
           <DateControl
             required={false}
+            value={startDate}
             name="startDate"
             placeholder={'Starting date'}
             dateFormat={'YYYY-MM-DD'}
+            onChange={onStartDateChange}
           />
           <DateControl
             required={false}
+            value={endDate}
             name="startDate"
             placeholder={'Ending date'}
             dateFormat={'YYYY-MM-DD'}
+            onChange={onEndDateChange}
           />
-          <Button btnStyle="primary">Filter</Button>
         </CustomRangeContainer>
       </SidebarHeader>
     );
@@ -119,7 +126,7 @@ const LeftSideBar = (props: Props) => {
         <div>
           <ControlLabel>Branches</ControlLabel>
           <Select
-            value={selectedBranchId}
+            value={selectedBranches}
             onChange={onBranchSelect}
             placeholder="Select branch"
             multi={true}

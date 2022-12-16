@@ -21,8 +21,8 @@ const attachmentFields = `
 `;
 
 const list = `
-  query listTimeclocksQuery($startDate: Date, $endDate: Date, $userIds: [String]) {
-    timeclocks(startDate: $startDate, endDate: $endDate, userIds: $userIds) {
+  query listTimeclocksQuery($startDate: Date, $endDate: Date, $userIds: [String], $branchIds: [String], $departmentIds: [String]) {
+    timeclocks(startDate: $startDate, endDate: $endDate, userIds: $userIds, branchIds: $branchIds, departmentIds: $departmentIds) {
       _id
       shiftStart
       shiftEnd

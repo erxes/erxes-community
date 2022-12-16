@@ -1,4 +1,4 @@
-import SideBar from '../components/SideBar';
+import SideBar from '../../components/sidebar/SideBar';
 import React from 'react';
 import { IBranch } from '@erxes/ui/src/team/types';
 
@@ -14,8 +14,7 @@ const TypesListContainer = (props: Props) => {
     ...props
   };
 
-  const { userIds } = props.queryParams;
-  return <SideBar {...updatedProps} queryUserIds={userIds} />;
+  return <SideBar {...updatedProps} />;
 };
 
 export default TypesListContainer;

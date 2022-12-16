@@ -2,13 +2,13 @@ import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { Alert, withProps } from '@erxes/ui/src/utils';
-import TimeForm from '../components/TimeForm';
-import { TimeClockMutationResponse, BranchesQueryResponse } from '../types';
-import { mutations } from '../graphql';
+import TimeForm from '../../components/timeclock/TimeForm';
+import { TimeClockMutationResponse } from '../../types';
+import { mutations } from '../../graphql';
 import React from 'react';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
-import { ITimeclock } from '../types';
+import { ITimeclock } from '../../types';
 
 type Props = {
   timeclocks: ITimeclock[];

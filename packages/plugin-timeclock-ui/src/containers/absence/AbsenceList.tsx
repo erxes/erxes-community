@@ -3,13 +3,13 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import AbsenceList from '../components/AbsenceList';
+import AbsenceList from '../../components/absence/AbsenceList';
 import {
   AbsenceMutationResponse,
   AbsenceQueryResponse,
   AbsenceTypeQueryResponse
-} from '../types';
-import { mutations, queries } from '../graphql';
+} from '../../types';
+import { mutations, queries } from '../../graphql';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { Alert } from '@erxes/ui/src/utils';
 import { IAttachment } from '@erxes/ui/src/types';

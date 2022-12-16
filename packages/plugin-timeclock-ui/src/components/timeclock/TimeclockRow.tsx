@@ -1,10 +1,10 @@
 import React from 'react';
 import Button from '@erxes/ui/src/components/Button';
-import { ITimeclock } from '../types';
+import { ITimeclock } from '../../types';
 import { __ } from '@erxes/ui/src/utils';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import TimeForm from '../containers/TimeFormList';
+import TimeForm from '../../containers/timeclock/TimeFormList';
 
 type Props = {
   timeclock: ITimeclock;

@@ -3,14 +3,14 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
-import ScheduleList from '../components/schedule/ScheduleList';
+import ScheduleList from '../../components/schedule/ScheduleList';
 import {
   BranchesQueryResponse,
   IShift,
   ScheduleMutationResponse,
   ScheduleQueryResponse
-} from '../types';
-import { mutations, queries } from '../graphql';
+} from '../../types';
+import { mutations, queries } from '../../graphql';
 import { Alert } from '@erxes/ui/src/utils';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';
 

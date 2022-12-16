@@ -7,16 +7,6 @@ const List = asyncComponent(() =>
   import(/* webpackChunkName: "List - Timeclocks" */ './containers/List')
 );
 
-const AbsenceList = asyncComponent(() =>
-  import(/* webpackChunkName: "List - Absence" */ './containers/AbsenceList')
-);
-
-const ReportList = asyncComponent(() => import('./containers/ReportList'));
-
-const ScheduleList = asyncComponent(() => import('./containers/ScheduleList'));
-
-const ConfigList = asyncComponent(() => import('./containers/ConfigList'));
-
 const mainContent = ({ location, history }) => {
   const queryParams = queryString.parse(location.search);
   const { startDate, endDate, userIds } = queryParams;

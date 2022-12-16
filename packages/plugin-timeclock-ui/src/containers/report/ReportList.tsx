@@ -3,9 +3,9 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import React from 'react';
-import ReportList from '../components/report/ReportList';
-import { queries } from '../graphql';
-import { BranchesQueryResponse, ReportsQueryResponse } from '../types';
+import ReportList from '../../components/report/ReportList';
+import { queries } from '../../graphql';
+import { BranchesQueryResponse, ReportsQueryResponse } from '../../types';
 import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
