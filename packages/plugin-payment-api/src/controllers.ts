@@ -1,6 +1,5 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { Router } from 'express';
-import * as QRCode from 'qrcode';
 
 import { PAYMENT_KINDS } from './constants';
 import { generateModels } from './connectionResolver';
@@ -74,6 +73,8 @@ router.post('/gateway', async (req, res) => {
 
   const selectedPaymentId = req.body.selectedPaymentId;
 
+  console.log('selectedPaymentId', selectedPaymentId);
+
   const paymentsModified = payments.map(p => {
     if (p._id === selectedPaymentId) {
       return {
@@ -116,14 +117,6 @@ router.post('/gateway', async (req, res) => {
   }
 
   try {
-    const selectedPayment = paymentsModified.find(p => p.selected);
-
-    if (selectedPayment.kind === PAYMENT_KINDS.SOCIAL_PAY && !invoice.phone) {
-      invoice.apiResponse.socialPayQrCode = await QRCode.toDataURL(
-        invoice.apiResponse.text
-      );
-    }
-
     redisUtils.updateInvoiceStatus(invoice._id, 'pending');
 
     res.render('index', {

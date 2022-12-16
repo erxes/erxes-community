@@ -134,6 +134,9 @@ export const createNewInvoice = async (
       case PAYMENT_KINDS.SOCIAL_PAY:
         // create socialpay invoice
         return socialPayUtils.createInvoice(invoice, payment);
+      case PAYMENT_KINDS.MONPAY:
+        // create monpay invoice
+        return monpayUtils.createInvoice(invoice, payment);
       default:
         break;
     }
@@ -149,12 +152,12 @@ export const checkInvoice = async (
   switch (payment.kind) {
     case PAYMENT_KINDS.QPAY:
       // check qpay invoice
-      const res = await qPayUtils.getInvoice(
+      const qpayRes = await qPayUtils.getInvoice(
         invoice.apiResponse.invoice_id,
         payment
       );
 
-      if (res.invoice_status !== 'CLOSED') {
+      if (qpayRes.invoice_status !== 'CLOSED') {
         return 'pending';
       }
 
@@ -182,6 +185,12 @@ export const checkInvoice = async (
 
     case PAYMENT_KINDS.MONPAY:
       // check monpay invoice
-      const { username, accountId } = payment.config as IMonpayConfig;
+      const monpayRes = await monpayUtils.checkInvoice(invoice, payment);
+
+      if (monpayRes !== 'paid') {
+        return 'pending';
+      }
+
+      return 'paid';
   }
 };
