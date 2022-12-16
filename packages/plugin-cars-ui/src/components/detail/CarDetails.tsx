@@ -1,8 +1,5 @@
-import * as path from 'path';
-
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import { ICar } from '../../types';
-import { IUser } from '@erxes/ui/src/auth/types';
 import LeftSidebar from './LeftSidebar';
 import React from 'react';
 import RightSidebar from './RightSidebar';
@@ -29,7 +26,7 @@ const ActivityLogs = asyncComponent(
 
 type Props = {
   car: ICar;
-  currentUser: IUser;
+  editCar: (values: any) => void;
 };
 
 class CarDetails extends React.Component<Props> {
@@ -74,7 +71,7 @@ class CarDetails extends React.Component<Props> {
       <Wrapper
         header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}
         leftSidebar={<LeftSidebar {...this.props} />}
-        rightSidebar={<RightSidebar car={car} />}
+        rightSidebar={<RightSidebar {...this.props} />}
         content={this.renderContent(content)}
         transparent={true}
       />
