@@ -9,7 +9,6 @@ import {
   moduleRequireLogin
 } from '@erxes/api-utils/src/permissions';
 import { MONTHS } from '../../../constants';
-import { sendProductsMessage } from '../../../messageBroker';
 import { getProducts } from './utils';
 
 const yearPlansMutations = {
