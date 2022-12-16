@@ -10,6 +10,10 @@ export default {
   async inBranch(perform: IPerformDocument, {}, { subdomain }: IContext) {
     const { inBranchId } = perform;
 
+    if (!inBranchId) {
+      return;
+    }
+
     return await sendCoreMessage({
       subdomain,
       action: 'branches.findOne',
@@ -20,6 +24,11 @@ export default {
 
   async outBranch(perform: IPerformDocument, {}, { subdomain }: IContext) {
     const { outBranchId } = perform;
+
+    if (!outBranchId) {
+      return;
+    }
+
     return await sendCoreMessage({
       subdomain,
       action: 'branches.findOne',
@@ -30,6 +39,10 @@ export default {
 
   async inDepartment(perform: IPerformDocument, {}, { subdomain }: IContext) {
     const { inDepartmentId } = perform;
+
+    if (!inDepartmentId) {
+      return;
+    }
 
     return await sendCoreMessage({
       subdomain,
@@ -42,6 +55,10 @@ export default {
   async outDepartment(perform: IPerformDocument, {}, { subdomain }: IContext) {
     const { outDepartmentId } = perform;
 
+    if (!outDepartmentId) {
+      return;
+    }
+
     return await sendCoreMessage({
       subdomain,
       action: 'departments.findOne',
@@ -51,6 +68,10 @@ export default {
   },
 
   async createdUser(perform: IPerformDocument, _, { subdomain }: IContext) {
+    if (!perform.createdBy) {
+      return;
+    }
+
     return sendCoreMessage({
       subdomain,
       action: 'users.findOne',
@@ -62,6 +83,10 @@ export default {
   },
 
   async modifiedUser(perform: IPerformDocument, _, { subdomain }: IContext) {
+    if (!perform.modifiedBy) {
+      return;
+    }
+
     return sendCoreMessage({
       subdomain,
       action: 'users.findOne',

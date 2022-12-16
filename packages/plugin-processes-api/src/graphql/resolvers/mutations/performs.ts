@@ -19,7 +19,11 @@ const performMutations = {
     doc: IPerform,
     { user, docModifier, models, subdomain }: IContext
   ) {
-    const perform = await models.Performs.createPerform(docModifier(doc));
+    const perform = await models.Performs.createPerform({
+      ...docModifier({ ...doc }),
+      createdAt: new Date(),
+      createdBy: user._id
+    });
 
     // processes in or inventories credit
     await sendInventoriesMessage({
@@ -76,10 +80,11 @@ const performMutations = {
     // to update count status, inProducts, outProducts
 
     const perform = await models.Performs.getPerform(doc._id);
-    const updatedPerform = await models.Performs.updatePerform(
-      doc._id,
-      docModifier(doc)
-    );
+    const updatedPerform = await models.Performs.updatePerform(doc._id, {
+      ...docModifier(doc),
+      modifiedAt: new Date(),
+      modifiedBy: user._id
+    });
 
     const inProductsByProductId = {};
     for (const data of perform.inProducts) {

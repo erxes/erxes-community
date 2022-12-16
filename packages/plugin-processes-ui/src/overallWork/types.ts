@@ -4,6 +4,7 @@ import { IProduct } from '@erxes/ui-products/src/types';
 import { QueryResponse } from '@erxes/ui/src/types';
 import { IJobRefer } from '../job/types';
 import { IProductsData, IProductsDataPerform } from '../types';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 export interface IOverallWorkKey {
   type: string;
@@ -67,6 +68,8 @@ export type IPerform = {
   createdBy?: string;
   modifiedAt?: Date;
   modifiedBy?: string;
+  createdUser?: IUser;
+  modifiedUser?: IUser;
 };
 
 export type OverallWorksQueryResponse = {

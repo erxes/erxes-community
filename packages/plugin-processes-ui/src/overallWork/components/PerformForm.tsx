@@ -102,6 +102,8 @@ class Form extends React.Component<Props, State> {
     const finalValues = values;
     const {
       count,
+      startAt,
+      endAt,
       inProducts,
       outProducts,
       needProducts,
@@ -117,6 +119,8 @@ class Form extends React.Component<Props, State> {
       ...finalValues,
       overallWorkId: overallWorkDetail._id,
       overallWorkKey: key,
+      startAt,
+      endAt,
       type,
       typeId,
       inBranchId,

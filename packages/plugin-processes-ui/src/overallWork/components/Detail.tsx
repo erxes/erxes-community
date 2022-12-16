@@ -152,7 +152,11 @@ class OverallWorkDetail extends React.Component<Props, State> {
       <Table whiteSpace="nowrap" bordered={true} hover={true}>
         <thead>
           <tr>
+            <th>{__('Start At')}</th>
             <th>{__('Count')}</th>
+            <th>{__('End At')}</th>
+            <th>{__('Modified by')}</th>
+            <th>{__('Modified At')}</th>
             <th>{__('Status')}</th>
             <th>{__('Actions')}</th>
           </tr>

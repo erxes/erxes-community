@@ -46,7 +46,10 @@ class DetailRightSidebar extends React.Component<Props, State> {
     return (
       <CustomSideContent wide={true} hasBorder={true}>
         <SidebarFilters>
-          <Section.Title>{__('Filters')}</Section.Title>
+          <Section.Title>
+            {__('Filters')}
+            <Section.QuickButtons>.</Section.QuickButtons>
+          </Section.Title>
           <SidebarMainContent>
             <List id="OverallWorkRightSidebar">
               <CollapseContent
