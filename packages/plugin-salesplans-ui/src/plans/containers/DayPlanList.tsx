@@ -19,7 +19,6 @@ import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
 import { queries as timeFrameQueries } from '../../settings/graphql';
 import { TimeframeQueryResponse } from '../../settings/types';
-import {} from '../types';
 
 type Props = {
   queryParams: any;

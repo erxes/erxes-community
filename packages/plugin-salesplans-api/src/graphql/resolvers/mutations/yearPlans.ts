@@ -108,6 +108,7 @@ const yearPlansMutations = {
       user
     );
   },
+
   yearPlansRemove: async (
     _root: any,
     { _ids }: { _ids: string[] },
