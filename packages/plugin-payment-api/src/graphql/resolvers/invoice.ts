@@ -39,10 +39,6 @@ export default {
 
     const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
 
-    if (!meta) {
-      return null;
-    }
-
     data[meta.queryKey] = invoice.contentTypeId;
 
     return sendPluginsMessage(pluginName, {

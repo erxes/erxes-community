@@ -42,21 +42,12 @@ export default {
     method: postHandler
   })),
 
-  apolloServerContext: async (context, req, res) => {
+  apolloServerContext: async (context, req) => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
 
-    const requestInfo = {
-      secure: req.secure,
-      cookies: req.cookies,
-      headers: req.headers
-    };
-
-    context.subdomain = subdomain;
+    context.subdomain = req.hostname;
     context.models = models;
-
-    context.requestInfo = requestInfo;
-    context.res = res;
 
     return context;
   },
