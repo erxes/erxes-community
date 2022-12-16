@@ -49,9 +49,16 @@ class Form extends React.Component<Props, State> {
     const { overallWorkDetail, perform } = this.props;
     let startAt = new Date();
     let endAt = new Date();
+    const overCount = overallWorkDetail.count;
     let count = 1;
-    let inProducts = overallWorkDetail.needProductsData;
-    let outProducts = overallWorkDetail.resultProductsData;
+    let inProducts = overallWorkDetail.needProductsData.map(np => ({
+      ...np,
+      quantity: np.quantity / overCount
+    }));
+    let outProducts = overallWorkDetail.resultProductsData.map(rp => ({
+      ...rp,
+      quantity: rp.quantity / overCount
+    }));
     if (perform) {
       startAt = perform.startAt;
       endAt = perform.endAt;
@@ -66,11 +73,11 @@ class Form extends React.Component<Props, State> {
       count,
       needProducts: overallWorkDetail.needProductsData.map(np => ({
         ...np,
-        quantity: np.quantity * count
+        quantity: np.quantity / overCount
       })),
       resultProducts: overallWorkDetail.resultProductsData.map(rp => ({
         ...rp,
-        quantity: rp.quantity * count
+        quantity: rp.quantity / overCount
       })),
       inProducts,
       outProducts
@@ -139,7 +146,7 @@ class Form extends React.Component<Props, State> {
           <SidebarCounter>
             <FormControl
               name="count"
-              defaultValue={this.state.count}
+              defaultValue={this.state.count * variable}
               type="number"
               autoFocus={true}
               required={true}
@@ -164,7 +171,7 @@ class Form extends React.Component<Props, State> {
     const result: React.ReactNode[] = [];
 
     result.push(
-      <li>
+      <li key={Math.random()}>
         <FieldStyle>{__(name)}</FieldStyle>
         <SidebarCounter>{(products || []).length}</SidebarCounter>
       </li>

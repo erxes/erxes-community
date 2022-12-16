@@ -35,6 +35,7 @@ export const initBroker = async cl => {
       return {
         status: 'success',
         data: await models.Remainders.updateRemainders(
+          subdomain,
           branchId,
           departmentId,
           productsData

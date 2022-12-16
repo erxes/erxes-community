@@ -2,6 +2,7 @@ import { Model } from 'mongoose';
 import * as _ from 'underscore';
 import { IModels } from '../connectionResolver';
 import { sendProductsMessage } from '../messageBroker';
+import { getRatio } from '../utils';
 import {
   IRemainderCount,
   IRemainderParams,
@@ -32,6 +33,7 @@ export interface IRemainderModel extends Model<IRemainderDocument> {
     doc: Partial<IRemainder>
   ): Promise<IRemainderDocument>;
   updateRemainders(
+    subdomain: string,
     branchId: string,
     departmentId: string,
     data: { productId: string; uomId: string; diffCount: number }[]
@@ -252,6 +254,7 @@ export const loadRemainderClass = (models: IModels) => {
     }
 
     public static async updateRemainders(
+      subdomain: string,
       branchId: string,
       departmentId: string,
       productsData: { productId: string; uomId: string; diffCount: number }[]
@@ -264,12 +267,29 @@ export const loadRemainderClass = (models: IModels) => {
         };
       }[] = [];
 
+      const productIds = productsData.map(pd => pd.productId);
+      const products = await sendProductsMessage({
+        subdomain,
+        action: 'find',
+        data: { query: { _id: { $in: productIds } }, limit: productIds.length },
+        isRPC: true,
+        defaultValue: []
+      });
+
+      const productById = {};
+      for (const product of products) {
+        productById[product._id] = product;
+      }
+
       for (const data of productsData) {
+        const product = productById[data.productId];
+        const ratio = getRatio(product, data.uomId);
+
         bulkOps.push({
           updateOne: {
             filter: { productId: data.productId, branchId, departmentId },
             update: {
-              $inc: { count: data.diffCount },
+              $inc: { count: data.diffCount / (ratio || 1) },
               $set: { productId: data.productId, branchId, departmentId }
             },
             upsert: true
@@ -289,7 +309,7 @@ export const loadRemainderClass = (models: IModels) => {
       return await models.Remainders.find({
         branchId,
         departmentId,
-        productId: { $in: productsData.map(p => p.productId) }
+        productId: { $in: productIds }
       }).lean();
     }
 
