@@ -13,6 +13,7 @@ import { IModels } from '../connectionResolver';
 import { IWork } from '../models/definitions/works';
 import { JOB_TYPES } from '../models/definitions/constants';
 import { sendProductsMessage, sendSalesplansMessage } from '../messageBroker';
+import { getRatio } from './utils';
 
 interface IListArgs {
   dayPlans: any[];
@@ -244,19 +245,6 @@ export class consumeSalesPlans {
     return new Date(date.getTime() - diff);
   }
 
-  private getRatio(product: IProductDocument, uomId: string) {
-    if (product.uomId === uomId) {
-      return 1;
-    }
-
-    const subUom = (product.subUoms || []).find(su => su.uomId === uomId);
-    if (!subUom) {
-      return 0;
-    }
-
-    return subUom.ratio;
-  }
-
   private calcUomQuantity(
     product: IProductDocument,
     needData: IProductsData,
@@ -278,8 +266,8 @@ export class consumeSalesPlans {
       return needData.quantity;
     }
 
-    const needRatio = this.getRatio(product, needData.uomId);
-    const resultRatio = this.getRatio(product, resultData.uomId);
+    const needRatio = getRatio(product, needData.uomId);
+    const resultRatio = getRatio(product, resultData.uomId);
 
     if (!needRatio || !resultRatio) {
       return;
@@ -412,8 +400,11 @@ export class consumeSalesPlans {
         inDepartmentId: config.inDepartmentId,
         outBranchId: config.outBranchId,
         outDepartmentId: config.outDepartmentId,
-        needProducts,
-        resultProducts
+        needProducts: calcedNeedDatas,
+        resultProducts: (resultProducts || []).map(rp => ({
+          ...rp,
+          quantity: rp.quantity * calcedCount
+        }))
       });
     }
 
