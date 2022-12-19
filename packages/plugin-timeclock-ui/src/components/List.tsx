@@ -20,20 +20,18 @@ type Props = {
   history: any;
   route?: string;
   startTime?: Date;
-  startClockTime?: (userId: string) => void;
   loading: boolean;
   branchesList: IBranch[];
+
+  queryStartDate: string;
+  queryEndDate: string;
+  queryUserIds: string[];
+  queryBranchIds: string[];
+  queryDepartmentIds: string[];
 };
 
 function List(props: Props) {
-  const {
-    startClockTime,
-    branchesList,
-    currentUserId,
-    queryParams,
-    history,
-    route
-  } = props;
+  const { branchesList, currentUserId, queryParams, history, route } = props;
 
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
@@ -100,6 +98,7 @@ function List(props: Props) {
       default:
         setModalComponent(
           <TimeclockList
+            {...props}
             // queryStartDate={startDate}
             // queryEndDate={endDate}
             // queryUserIds={userIds ? userIds.split(',') : null}

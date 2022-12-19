@@ -25,9 +25,12 @@ type Props = {
   stopTime: Date;
   timeId: string;
   userId: string;
+
   queryStartDate: string;
   queryEndDate: string;
   queryUserIds: string[];
+  queryBranchIds: string[];
+  queryDepartmentIds: string[];
 };
 
 type FinalProps = {

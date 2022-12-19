@@ -34,7 +34,7 @@ type FinalProps = {
   TimeClockMutationResponse;
 
 const ListContainer = (props: FinalProps) => {
-  const { listTimeclocksQuery, currentUser, queryUserIds } = props;
+  const { listTimeclocksQuery, currentUser } = props;
 
   if (listTimeclocksQuery.loading) {
     return <Spinner />;
@@ -45,7 +45,6 @@ const ListContainer = (props: FinalProps) => {
   const updatedProps = {
     ...props,
     currentUserId,
-    queryUserIds,
     timeclocks: listTimeclocksQuery.timeclocks || [],
     loading: listTimeclocksQuery.loading
   };

@@ -20,12 +20,19 @@ type Props = {
 const LeftSideBar = (props: Props) => {
   const { history, branchesList, queryParams } = props;
 
-  const [currUserIds, setUserIds] = useState(['']);
-  const [selectedBranches, setBranches] = useState(['']);
-  const [deptIds, setDeptIds] = useState(['']);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [currUserIds, setUserIds] = useState(queryParams.userIds);
+  const [selectedBranches, setBranches] = useState(queryParams.branchIds);
+  const [deptIds, setDeptIds] = useState(queryParams.departmentIds);
+  const [startDate, setStartDate] = useState(queryParams.startDate);
+  const [endDate, setEndDate] = useState(queryParams.endDate);
 
+  const cleanFilter = () => {
+    onBranchSelect(['']);
+    onDepartmentSelect(['']);
+    onMemberSelect(['']);
+    onStartDateChange(null);
+    onEndDateChange(null);
+  };
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
       value: branch._id,
@@ -36,13 +43,13 @@ const LeftSideBar = (props: Props) => {
 
   const onBranchSelect = selectedBranch => {
     setBranches(selectedBranch);
-    const branchIds: any[] = [];
+    const selectedBranchIds: string[] = [];
     selectedBranch.map(branch => {
-      branchIds.push(branch.value);
+      selectedBranchIds.push(branch.value);
     });
 
     router.setParams(history, {
-      branchIds: `${branchIds}`
+      branchIds: selectedBranchIds
     });
   };
 
@@ -62,8 +69,6 @@ const LeftSideBar = (props: Props) => {
 
   const onStartDateChange = date => {
     setStartDate(date);
-    console.log('11', date.toDateString());
-
     router.setParams(history, { startDate: date });
   };
 
@@ -87,11 +92,14 @@ const LeftSideBar = (props: Props) => {
           <DateControl
             required={false}
             value={endDate}
-            name="startDate"
+            name="endDate"
             placeholder={'Ending date'}
             dateFormat={'YYYY-MM-DD'}
             onChange={onEndDateChange}
           />
+          <Button btnStyle="primary" onClick={cleanFilter}>
+            Clear
+          </Button>
         </CustomRangeContainer>
       </SidebarHeader>
     );

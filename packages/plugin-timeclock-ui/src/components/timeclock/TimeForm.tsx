@@ -10,7 +10,7 @@ import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 type Props = {
   startTime?: Date;
   queryParams: any;
-  currentUserId: string;
+  selectedUserId: string;
   closeModal: () => void;
   startClockTime: (userId: string) => void;
   stopClockTime: (userId: string, timeId: string) => void;
@@ -22,13 +22,13 @@ type Props = {
 const FormComponent = ({
   startClockTime,
   stopClockTime,
-  currentUserId,
+  selectedUserId,
   shiftId,
   shiftStarted,
   closeModal
 }: Props) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [userId, setUserId] = useState(currentUserId);
+  const [userId, setUserId] = useState(selectedUserId);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -83,7 +83,7 @@ const FormComponent = ({
             <SelectTeamMembers
               label="Choose a team member"
               name="userId"
-              initialValue={currentUserId}
+              initialValue={selectedUserId}
               onSelect={onTeamMemberSelect}
               multi={false}
             />

@@ -27,6 +27,7 @@ class Row extends React.Component<Props> {
   modalContent = props => (
     <TimeForm
       {...props}
+      selectedUserId={this.props.timeclock.user._id}
       shiftId={this.props.timeclock._id}
       shiftStarted={this.props.timeclock.shiftActive}
     />

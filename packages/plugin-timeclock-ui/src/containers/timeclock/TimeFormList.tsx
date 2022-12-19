@@ -29,6 +29,7 @@ type Props = {
   branchIds: string[];
   longitude: number;
   latitude: number;
+  selectedUserId: string;
   closeModal: () => void;
 };
 
@@ -39,13 +40,10 @@ const ListContainer = (props: FinalProps) => {
     timeclocks,
     startTimeMutation,
     stopTimeMutation,
-    currentUser,
-    queryUserId,
     shiftId,
     shiftStarted
   } = props;
 
-  const currentUserId = queryUserId || currentUser._id;
   // get current location of an user
   let long = 0;
   let lat = 0;
@@ -85,14 +83,13 @@ const ListContainer = (props: FinalProps) => {
 
   const updatedProps = {
     ...props,
-    currentUserId,
     timeclocks,
     shiftStarted,
     shiftId,
     startClockTime,
     stopClockTime
   };
-  return <TimeForm {...updatedProps} currentUserId={currentUserId} />;
+  return <TimeForm {...updatedProps} />;
 };
 
 export default withProps<Props>(

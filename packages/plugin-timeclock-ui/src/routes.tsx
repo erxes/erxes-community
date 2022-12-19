@@ -9,15 +9,17 @@ const List = asyncComponent(() =>
 
 const mainContent = ({ location, history }) => {
   const queryParams = queryString.parse(location.search);
-  const { startDate, endDate, userIds } = queryParams;
+  const { startDate, endDate, userIds, departmentIds, branchIds } = queryParams;
   const routePath = location.pathname.split('/').slice(-1)[0];
-  console.log('route', userIds);
+  // console.log('route', branchIds, departmentIds);
 
   return (
     <List
-      queryStartDate={startDate}
-      queryEndDate={endDate}
+      queryStartDate={startDate || null}
+      queryEndDate={endDate || null}
       queryUserIds={userIds || null}
+      queryDepartmentIds={departmentIds || null}
+      queryBranchIds={branchIds || null}
       history={history}
       queryParams={queryParams}
       route={routePath}
@@ -29,7 +31,6 @@ const routes = () => {
   return (
     <>
       <Route path="/timeclocks/" component={mainContent} />
-      {/* <Route path="/timeclocks/config" exact={true} component={config} /> */}
     </>
   );
 };
