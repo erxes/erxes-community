@@ -55,46 +55,103 @@ const timeclockQueries = {
 
   async timeclocks(
     _root,
-    {
-      startDate,
-      endDate,
-      userIds
-    }: { startDate: Date; endDate: Date; userIds: string[] },
-    { models, commonQuerySelector }: IContext
+    { startDate, endDate, userIds, branchIds, departmentIds },
+    { subdomain, models }: IContext
   ) {
-    const selector: any = { ...commonQuerySelector };
+    const totalUserIds: string[] = [];
+    let commonUser: boolean = false;
+    let dateGiven: boolean = false;
+
+    if (branchIds) {
+      for (const branchId of branchIds) {
+        const branch = await findBranch(subdomain, branchId);
+        if (userIds) {
+          commonUser = true;
+          for (const userId of userIds) {
+            if (branch.userIds.includes(userId)) {
+              totalUserIds.push(userId);
+            }
+          }
+        } else {
+          totalUserIds.push(...branch.userIds);
+        }
+      }
+    }
+    if (departmentIds) {
+      for (const deptId of departmentIds) {
+        const department = await findDepartment(subdomain, deptId);
+        if (userIds) {
+          commonUser = true;
+          for (const userId of userIds) {
+            if (department.userIds.includes(userId)) {
+              totalUserIds.push(userId);
+            }
+          }
+        } else {
+          totalUserIds.push(...department.userIds);
+        }
+      }
+    }
+
+    if (!commonUser && userIds) {
+      totalUserIds.push(...userIds);
+    }
 
     const timeFields = [
       {
-        shiftStart: {
-          $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
-        }
+        shiftStart:
+          startDate && endDate
+            ? {
+                $gte: fixDate(startDate),
+                $lte: fixDate(endDate)
+              }
+            : startDate
+            ? {
+                $gte: fixDate(startDate)
+              }
+            : { $lte: fixDate(endDate) }
       },
       {
-        shiftEnd: {
-          $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
-        }
+        shiftEnd:
+          startDate && endDate
+            ? {
+                $gte: fixDate(startDate),
+                $lte: fixDate(endDate)
+              }
+            : startDate
+            ? {
+                $gte: fixDate(startDate)
+              }
+            : { $lte: fixDate(endDate) }
       }
     ];
 
-    if (startDate && endDate) {
-      selector.$or = timeFields;
+    if (startDate || endDate) {
+      dateGiven = true;
     }
 
     let returnModel: any = [];
 
-    if (userIds) {
-      for (const userId of userIds) {
+    for (const userId of totalUserIds) {
+      returnModel.push(
+        ...(dateGiven
+          ? await models.Timeclocks.find({
+              $and: [...timeFields, { userId: `${userId}` }]
+            })
+          : await models.Timeclocks.find({ userId: `${userId}` }))
+      );
+    }
+
+    if (!departmentIds && !branchIds && !userIds) {
+      if (dateGiven) {
         returnModel.push(
-          ...(await models.Timeclocks.find({
-            $or: [...timeFields, { userId: `${userId}` }]
-          }))
+          ...(await models.Timeclocks.find({ $or: [...timeFields] }))
         );
       }
-    } else {
-      returnModel = models.Timeclocks.find(selector);
+      // if no filter is given, return everything
+      else {
+        returnModel = models.Timeclocks.find();
+      }
     }
 
     return returnModel;

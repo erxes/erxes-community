@@ -105,7 +105,7 @@ export const types = `
 `;
 
 export const queries = `
-  timeclocks(startDate: Date, endDate: Date, userIds: [String]): [Timeclock]
+  timeclocks(startDate: Date, endDate: Date, userIds: [String], branchIds: [String], departmentIds: [String]): [Timeclock]
   absences(startDate: Date, endDate: Date, userId: String): [Absence]
   absenceTypes:[AbsenceType]
   timeclockReports(departmentIds: [String], branchIds: [String], userIds: [String]): [Report]
