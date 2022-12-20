@@ -12,16 +12,29 @@ export interface ITransactionCreateParams extends ITransaction {
 }
 
 export interface ITransaction {
-  branchId: string;
-  departmentId: string;
+  date: Date;
+  number: string;
+  description: string;
+  journal: string;
+  parentId: string;
+  ptrId: string;
+  childData: any;
+  contactType: string;
+  contactId: string;
   status: string;
   contentType: string;
   contentId: string;
+  taxInfo: any;
+  assignedUserIds: string[];
+  paymentData: any;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
   _id: string;
   createdAt: Date;
+  createdBy: String;
+  modifiedAt: Date;
+  modifiedBy: String;
 }
 
 export const transactionSchema = schemaHooksWrapper(

@@ -5,8 +5,15 @@ export interface ITransactionItem {
   transactionId: string;
   productId: string;
   count: number;
-  uomId: string;
+  branchId: string;
+  departmentId: string;
   isDebit: boolean;
+  amount: number;
+  assignedUserId?: string;
+  discountAmount?: number;
+  discountPercent?: number;
+  bonusCount?: number;
+  bonusVoucherId?: string;
 }
 
 export interface ITransactionItemDocument extends ITransactionItem, Document {

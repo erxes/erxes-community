@@ -77,14 +77,7 @@ export const loadTransactionClass = (models: IModels) => {
      * @returns Created response
      */
     public static async createTransaction(params: ITransactionCreateParams) {
-      const {
-        departmentId,
-        branchId,
-        status,
-        contentType,
-        contentId,
-        products
-      } = params;
+      const { status, contentType, contentId, products } = params;
 
       const transaction = await models.Transactions.create({
         departmentId,
@@ -102,9 +95,14 @@ export const loadTransactionClass = (models: IModels) => {
         if (departmentId) filter.departmentId = departmentId;
         if (branchId) filter.branchId = branchId;
 
-        const remainder: any = await models.Remainders.findOne(filter);
-
-        if (!remainder) return new Error('Remainder not found!');
+        const remainder: any = (await models.Remainders.findOne(
+          filter
+        ).lean()) || {
+          productId: item.productId,
+          branchId,
+          departmentId,
+          count: 0
+        };
 
         const safeRemainderItem: any[] = await models.SafeRemainderItems.find(
           filter
@@ -117,9 +115,13 @@ export const loadTransactionClass = (models: IModels) => {
           $set: { preCount: remainder.count + item.count }
         });
 
-        const result = await models.Remainders.updateRemainder(remainder._id, {
-          count: remainder.count + item.count
-        });
+        const result = await models.Remainders.updateOne(
+          remainder._id,
+          {
+            count: remainder.count + item.count
+          },
+          { upsert: true }
+        );
 
         if (!result) return new Error('Remainder update failed!');
 
