@@ -54,7 +54,6 @@ function List(props: Props) {
           />
         );
         setLoading(false);
-
         break;
       case 'report':
         setModalComponent(
@@ -76,6 +75,7 @@ function List(props: Props) {
       case 'schedule':
         setModalComponent(
           <ScheduleList
+            {...props}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -86,8 +86,7 @@ function List(props: Props) {
       case 'requests':
         setModalComponent(
           <AbsenceList
-            // queryStartDate={startDate}
-            // queryEndDate={endDate}
+            {...props}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}

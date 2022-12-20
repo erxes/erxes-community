@@ -15,7 +15,7 @@ import { Alert } from '@erxes/ui/src/utils';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';
 
 type Props = {
-  searchValue?: string;
+  searchValue: string;
   history: any;
   queryParams: any;
   explanation: string;
@@ -29,9 +29,12 @@ type Props = {
   shiftId: string;
   shiftStatus: string;
   requestedShifts: IShift[];
-  queryStartDate: Date;
-  queryEndDate: Date;
-  queryUserId: string;
+
+  queryStartDate: string;
+  queryEndDate: string;
+  queryUserIds: string[];
+  queryBranchIds: string[];
+  queryDepartmentIds: string[];
   getActionBar: (actionBar: any) => void;
 };
 
@@ -126,30 +129,32 @@ const ListContainer = (props: FinalProps) => {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, ScheduleQueryResponse, { userId: string }>(
-      gql(queries.listSchedule),
-      {
-        name: 'listScheduleQuery',
-        options: ({ queryUserId }) => ({
-          variables: {
-            // startDate: queryStartDate,
-            // endDate: queryEndDate,
-            userId: queryUserId
-          },
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
-    graphql<Props, BranchesQueryResponse, { searchValue: string }>(
-      gql(erxesQuery.branches),
-      {
-        name: 'listBranchesQuery',
-        options: ({ searchValue }) => ({
-          variables: { searchValue },
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
+    graphql<Props, ScheduleQueryResponse>(gql(queries.listSchedule), {
+      name: 'listScheduleQuery',
+      options: ({
+        queryStartDate,
+        queryEndDate,
+        queryUserIds,
+        queryDepartmentIds,
+        queryBranchIds
+      }) => ({
+        variables: {
+          startDate: queryStartDate,
+          endDate: queryEndDate,
+          userIds: queryUserIds,
+          departmentIds: queryDepartmentIds,
+          branchIds: queryBranchIds
+        },
+        fetchPolicy: 'network-only'
+      })
+    }),
+    graphql<Props, BranchesQueryResponse>(gql(erxesQuery.branches), {
+      name: 'listBranchesQuery',
+      options: ({ searchValue }) => ({
+        variables: { searchValue },
+        fetchPolicy: 'network-only'
+      })
+    }),
     graphql<Props, ScheduleMutationResponse>(
       gql(mutations.sendScheduleRequest),
       {

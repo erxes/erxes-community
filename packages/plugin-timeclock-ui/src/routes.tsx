@@ -26,11 +26,10 @@ const mainContent = ({ location, history }) => {
     />
   );
 };
-
 const routes = () => {
   return (
     <>
-      <Route path="/timeclocks/" component={mainContent} />
+      <Route path="/timeclocks" component={mainContent} />
     </>
   );
 };

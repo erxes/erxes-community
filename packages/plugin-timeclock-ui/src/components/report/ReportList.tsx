@@ -80,87 +80,43 @@ function ReportList(props: Props) {
             />
           </FormGroup>
         </FilterItem>
-        <FilterItem>
-          <CustomRangeContainer>
-            <DateControl
-              // value={new Date()}
-              required={false}
-              name="startDate"
-              // onChange={onSelectDateChange}
-              placeholder={'Starting date'}
-              dateFormat={'YYYY-MM-DD'}
-            />
-            <DateControl
-              // value={new Date()}z
-              required={false}
-              name="startDate"
-              // onChange={onSelectDateChange}
-              placeholder={'Ending date'}
-              dateFormat={'YYYY-MM-DD'}
-            />
-            <Button btnStyle="primary">Filter</Button>
-          </CustomRangeContainer>
-        </FilterItem>
       </>
     );
   };
   const renderFilter = () => {
-    const renderBranchOptions = (branches: any[]) => {
-      return branches.map(branch => ({
-        value: branch._id,
-        label: branch.title
-      }));
-    };
+    // const renderBranchOptions = (branches: any[]) => {
+    //   return branches.map(branch => ({
+    //     value: branch._id,
+    //     label: branch.title
+    //   }));
+    // };
 
-    const onBranchSelect = selectedBranch => {
-      setBranches(selectedBranch);
+    // const onBranchSelect = selectedBranch => {
+    //   setBranches(selectedBranch);
 
-      const branchIds: any[] = [];
-      selectedBranch.map(branch => branchIds.push(branch.value));
+    //   const branchIds: any[] = [];
+    //   selectedBranch.map(branch => branchIds.push(branch.value));
 
-      router.setParams(history, {
-        branchIds: `${branchIds}`
-      });
-    };
+    //   router.setParams(history, {
+    //     branchIds: `${branchIds}`
+    //   });
+    // };
 
-    const onDepartmentSelect = dept => {
-      setDepartments(dept);
-      const departmentIds: any[] = [];
+    // const onDepartmentSelect = dept => {
+    //   setDepartments(dept);
+    //   const departmentIds: any[] = [];
 
-      dept.map(department => departmentIds.push(department));
+    //   dept.map(department => departmentIds.push(department));
 
-      router.setParams(history, {
-        departmentIds: `${departmentIds}`
-      });
-    };
+    //   router.setParams(history, {
+    //     departmentIds: `${departmentIds}`
+    //   });
+    // };
 
     return (
-      <FilterWrapper>
-        <FilterItem>
-          <SelectDepartments
-            isRequired={false}
-            defaultValue={selectedDeptId}
-            onChange={onDepartmentSelect}
-          />
-        </FilterItem>
-        <FilterItem>
-          <FormGroup>
-            <ControlLabel>Branches</ControlLabel>
-            <Row>
-              <Select
-                value={selectedBranchId}
-                onChange={onBranchSelect}
-                placeholder="Select branch"
-                multi={true}
-                options={branchesList && renderBranchOptions(branchesList)}
-              />
-            </Row>
-          </FormGroup>
-        </FilterItem>
-        <div style={{ justifySelf: 'end' }}>
-          <Button>Export</Button>
-        </div>
-      </FilterWrapper>
+      <div>
+        <Button>Export</Button>
+      </div>
     );
   };
 

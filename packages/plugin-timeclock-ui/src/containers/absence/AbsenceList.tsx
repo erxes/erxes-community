@@ -25,9 +25,12 @@ type Props = {
   absenceId: string;
   absenceStatus: string;
   attachment: IAttachment;
-  queryStartDate: Date;
-  queryEndDate: Date;
-  queryUserId: string;
+
+  queryStartDate: string;
+  queryEndDate: string;
+  queryUserIds: string[];
+  queryBranchIds: string[];
+  queryDepartmentIds: string[];
   getActionBar: (actionBar: any) => void;
 };
 
@@ -88,19 +91,24 @@ const ListContainer = (props: FinalProps) => {
   };
   return <AbsenceList {...updatedProps} />;
 };
+
 export default withProps<Props>(
   compose(
-    graphql<
-      Props,
-      AbsenceQueryResponse,
-      { startDate: Date; endDate: Date; userId: string }
-    >(gql(queries.listAbsence), {
+    graphql<Props, AbsenceQueryResponse>(gql(queries.listAbsence), {
       name: 'listAbsenceQuery',
-      options: ({ queryStartDate, queryEndDate, queryUserId }) => ({
+      options: ({
+        queryStartDate,
+        queryEndDate,
+        queryUserIds,
+        queryDepartmentIds,
+        queryBranchIds
+      }) => ({
         variables: {
           startDate: queryStartDate,
           endDate: queryEndDate,
-          userId: queryUserId
+          userIds: queryUserIds,
+          departmentIds: queryDepartmentIds,
+          branchIds: queryBranchIds
         },
         fetchPolicy: 'network-only'
       })

@@ -1,4 +1,3 @@
-import { LOG_ACTIONS } from '@erxes/api-utils/src/logUtils';
 import { Sequelize, DataTypes } from 'sequelize';
 import { generateModels } from '../src/connectionResolver';
 

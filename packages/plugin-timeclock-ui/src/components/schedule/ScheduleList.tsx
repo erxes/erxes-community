@@ -622,7 +622,7 @@ function ScheduleList(props: Props) {
     );
   };
   const ListScheduleContent = schedule => {
-    return (
+    return schedule.shifts.length > 0 ? (
       <tr>
         <td>
           <NameCard user={schedule.user} />
@@ -656,6 +656,8 @@ function ScheduleList(props: Props) {
           )
         )}
       </tr>
+    ) : (
+      <></>
     );
   };
 

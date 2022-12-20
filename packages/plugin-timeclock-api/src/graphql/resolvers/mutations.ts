@@ -201,7 +201,7 @@ const timeclockMutations = {
   async solveAbsenceRequest(
     _root,
     { _id, status, ...doc }: IAbsenceEdit,
-    { models, user }: IContext
+    { models }: IContext
   ) {
     const absence = models.Absences.getAbsence(_id);
     let updated = models.Absences.updateAbsence(_id, {
@@ -217,27 +217,33 @@ const timeclockMutations = {
       shiftRequest.reason &&
       shiftRequest.reason.toLocaleLowerCase() === 'shift request'
     ) {
-      updated = models.Absences.updateAbsence(_id, { status: 'Shift', ...doc });
-      const newSchedule = await models.Schedules.createSchedule({
-        userId: user._id,
-        solved: true,
-        status: 'Approved'
+      updated = models.Absences.updateAbsence(_id, {
+        status: `Shift / ${status}`,
+        ...doc
       });
+      // if shift request is approved
+      if (status === 'Approved') {
+        const newSchedule = await models.Schedules.createSchedule({
+          userId: shiftRequest.userId,
+          solved: true,
+          status: 'Approved'
+        });
 
-      await models.Shifts.createShift({
-        scheduleId: newSchedule._id,
-        shiftStart: shiftRequest.startTime,
-        shiftEnd: shiftRequest.endTime,
-        solved: true,
-        status: 'Approved'
-      });
+        await models.Shifts.createShift({
+          scheduleId: newSchedule._id,
+          shiftStart: shiftRequest.startTime,
+          shiftEnd: shiftRequest.endTime,
+          solved: true,
+          status: 'Approved'
+        });
 
-      await models.Timeclocks.createTimeClock({
-        userId: user._id,
-        shiftStart: shiftRequest.startTime,
-        shiftEnd: shiftRequest.endTime,
-        shiftActive: false
-      });
+        await models.Timeclocks.createTimeClock({
+          userId: shiftRequest.userId,
+          shiftStart: shiftRequest.startTime,
+          shiftEnd: shiftRequest.endTime,
+          shiftActive: false
+        });
+      }
     }
 
     return updated;
@@ -335,6 +341,14 @@ const timeclockMutations = {
     return schedule;
   },
 
+  scheduleRemove(_root, { _id }, { models }: IContext) {
+    models.Schedules.removeSchedule(_id);
+    models.Shifts.remove({ scheduleId: _id });
+    return;
+  },
+  scheduleShiftRemove(_root, { shiftId }, { models }: IContext) {
+    return models.Shifts.removeShift(shiftId);
+  },
   payDateAdd(_root, { dateNums }, { models }: IContext) {
     return models.PayDates.createPayDate({ payDates: dateNums });
   },
