@@ -10,8 +10,6 @@ import Table from '@erxes/ui/src/components/table';
 import TimeForm from '../../containers/timeclock/TimeFormList';
 
 type Props = {
-  currentDate?: string;
-  currentUserId: string;
   queryParams: any;
   history: any;
   startTime?: Date;
@@ -21,12 +19,7 @@ type Props = {
   getActionBar: (actionBar: any) => void;
 };
 
-function List({
-  timeclocks,
-  startClockTime,
-  currentUserId,
-  getActionBar
-}: Props) {
+function List({ timeclocks, startClockTime, getActionBar }: Props) {
   const trigger = (
     <Button id="btn1" btnStyle={'success'} icon="plus-circle">
       {`Start Shift`}
@@ -36,7 +29,6 @@ function List({
   const modalContent = props => (
     <TimeForm
       {...props}
-      currentUserId={currentUserId}
       startClockTime={startClockTime}
       timeclocks={timeclocks}
     />

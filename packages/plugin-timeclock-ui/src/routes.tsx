@@ -11,7 +11,7 @@ const mainContent = ({ location, history }) => {
   const queryParams = queryString.parse(location.search);
   const { startDate, endDate, userIds, departmentIds, branchIds } = queryParams;
   const routePath = location.pathname.split('/').slice(-1)[0];
-  // console.log('route', branchIds, departmentIds);
+  console.log('route', location.search, history);
 
   return (
     <List
@@ -20,6 +20,7 @@ const mainContent = ({ location, history }) => {
       queryUserIds={userIds || null}
       queryDepartmentIds={departmentIds || null}
       queryBranchIds={branchIds || null}
+      searchFilter={location.search}
       history={history}
       queryParams={queryParams}
       route={routePath}

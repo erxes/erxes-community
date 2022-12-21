@@ -7,17 +7,10 @@ import { TimeClockMutationResponse, TimeClockQueryResponse } from '../../types';
 import { queries } from '../../graphql';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
-import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
-  currentUser: IUser;
   queryParams: any;
   history: any;
-  startTime: Date;
-  stopTime: Date;
-  timeId: string;
-  userId: string;
 
   queryStartDate: string;
   queryEndDate: string;
@@ -34,17 +27,14 @@ type FinalProps = {
   TimeClockMutationResponse;
 
 const ListContainer = (props: FinalProps) => {
-  const { listTimeclocksQuery, currentUser } = props;
+  const { listTimeclocksQuery } = props;
 
   if (listTimeclocksQuery.loading) {
     return <Spinner />;
   }
 
-  const currentUserId = currentUser._id;
-
   const updatedProps = {
     ...props,
-    currentUserId,
     timeclocks: listTimeclocksQuery.timeclocks || [],
     loading: listTimeclocksQuery.loading
   };
@@ -73,5 +63,5 @@ export default withProps<Props>(
         fetchPolicy: 'network-only'
       })
     })
-  )(withCurrentUser(ListContainer))
+  )(ListContainer)
 );

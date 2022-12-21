@@ -17,14 +17,14 @@ import { IAttachment } from '@erxes/ui/src/types';
 type Props = {
   history: any;
   queryParams: any;
-  explanation: string;
-  userId: string;
-  reason: string;
-  startTime: Date;
-  endTime: Date;
-  absenceId: string;
-  absenceStatus: string;
-  attachment: IAttachment;
+  explanation?: string;
+  userId?: string;
+  reason?: string;
+  startTime?: Date;
+  endTime?: Date;
+  absenceId?: string;
+  absenceStatus?: string;
+  attachment?: IAttachment;
 
   queryStartDate: string;
   queryEndDate: string;
@@ -48,7 +48,7 @@ const ListContainer = (props: FinalProps) => {
     listAbsenceQuery,
     listAbsenceTypesQuery
   } = props;
-  const { startDate, endDate, userId, reason } = queryParams;
+  const { reason } = queryParams;
 
   if (listAbsenceQuery.loading) {
     return <Spinner />;
@@ -62,15 +62,20 @@ const ListContainer = (props: FinalProps) => {
       .catch(err => Alert.error(err.message));
   };
 
-  const submitRequest = (expl: string, attchment: IAttachment) => {
-    if (!reason || !startDate || !endDate) {
+  const submitRequest = (
+    usrId: string,
+    expl: string,
+    attchment: IAttachment,
+    dateRange
+  ) => {
+    if (!reason || !dateRange.startTime || !dateRange.endTime) {
       Alert.error('Please fill all the fields');
     } else {
       sendAbsenceReqMutation({
         variables: {
-          startTime: startDate,
-          endTime: endDate,
-          userId: `${userId}`,
+          userId: usrId,
+          startTime: dateRange.startTime,
+          endTime: dateRange.endTime,
           reason: `${reason}`,
           explanation: expl.length > 0 ? expl : undefined,
           attachment: attchment.url.length > 0 ? attchment : undefined

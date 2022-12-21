@@ -327,7 +327,7 @@ const timeclockQueries = {
     // get the schedule data of this month
     const schedules = models.Schedules.find({ userId: `${userId}` });
     const timeclocks = models.Timeclocks.find({
-      $or: [
+      $and: [
         { userId: `${userId}` },
         {
           shiftStart: {
@@ -338,7 +338,7 @@ const timeclockQueries = {
       ]
     });
     const absences = models.Absences.find({
-      $or: [
+      $and: [
         {
           userId: `${userId}`,
           status: 'Approved'
@@ -485,6 +485,7 @@ const timeclockQueries = {
             (shiftStartDiff > 0 ? shiftStartDiff : 0)) /
             60000
         );
+
         // if report of today is found
         if (userSchedule.date === NOW.toDateString()) {
           report.totalMinsLateToday = sumMinsLate;
@@ -603,6 +604,6 @@ const timeclockQueries = {
   }
 };
 
-moduleRequireLogin(timeclockQueries);
+// moduleRequireLogin(timeclockQueries);
 
 export default timeclockQueries;

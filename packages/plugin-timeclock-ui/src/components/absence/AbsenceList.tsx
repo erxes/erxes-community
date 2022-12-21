@@ -1,18 +1,14 @@
+import { __ } from '@erxes/ui/src/utils';
 import Button from '@erxes/ui/src/components/Button';
-import { router, __ } from '@erxes/ui/src/utils';
-import React, { useState } from 'react';
-import Select from 'react-select-plus';
+import React from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
-import { FormControl } from '@erxes/ui/src/components/form';
-import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
-import DateFilter from '@erxes/ui/src/components/DateFilter';
 import { IAbsence, IAbsenceType } from '../../types';
 import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
-import Uploader from '@erxes/ui/src/components/Uploader';
-import { FlexCenter } from '../../styles';
 import { IAttachment } from '@erxes/ui/src/types';
+import AbsenceForm from './AbsenceForm';
+import Attachment from '@erxes/ui/src/components/Attachment';
 
 type Props = {
   absences: IAbsence[];
@@ -22,113 +18,30 @@ type Props = {
   startTime?: Date;
   loading?: boolean;
   solveAbsence: (absenceId: string, status: string) => void;
-  submitRequest: (explanation: string, attachment: IAttachment) => void;
+  submitRequest: (
+    userId: string,
+    explanation: string,
+    attachment: IAttachment,
+    dateRange: any
+  ) => void;
   getActionBar: (actionBar: any) => void;
 };
 
 function AbsenceList(props: Props) {
-  const {
-    queryParams,
-    history,
-    submitRequest,
-    absences,
-    absenceTypes,
-    solveAbsence,
-    getActionBar
-  } = props;
-  const [explanation, setTextReason] = useState('');
-  const [attachment, setAttachment] = useState<IAttachment>({
-    name: ' ',
-    type: '',
-    url: ''
-  });
-  const [absenceIdx, setArrayIdx] = useState(0);
+  const { absences, solveAbsence, getActionBar } = props;
 
   const trigger = (
     <Button id="timeClockButton2" btnStyle="success" icon="plus-circle">
       Create Request
     </Button>
   );
-  const onChangeAttachment = (files: IAttachment[]) => {
-    setAttachment(files[0]);
-  };
 
-  const modalContent = ({ closeModal }) => {
-    return (
-      <div style={{ flex: 'column', justifyContent: 'space-around' }}>
-        <DateFilter queryParams={queryParams} history={history} />
-
-        <SelectTeamMembers
-          queryParams={queryParams}
-          label={'Team member'}
-          onSelect={onUserSelect}
-          multi={false}
-          name="userId"
-        />
-
-        <Select
-          placeholder={__('Reason')}
-          onChange={onReasonSelect}
-          value={router.getParam(history, 'reason') || ''}
-          options={
-            absenceTypes &&
-            absenceTypes.map((absenceType, idx) => ({
-              value: absenceType.name,
-              label: absenceType.name,
-              arrayIdx: idx
-            }))
-          }
-        />
-        {absenceTypes.length > 0 && absenceTypes[absenceIdx].explRequired ? (
-          <FormControl
-            type="text"
-            name="reason"
-            placeholder="Please write short explanation"
-            onChange={setInputValue}
-            required={true}
-          />
-        ) : (
-          <></>
-        )}
-
-        {absenceTypes.length > 0 && absenceTypes[absenceIdx].attachRequired ? (
-          <Uploader
-            text={`Choose a file to upload`}
-            warningText={'Only .jpg or jpeg file is supported.'}
-            single={true}
-            defaultFileList={[]}
-            onChange={onChangeAttachment}
-          />
-        ) : (
-          <></>
-        )}
-        <FlexCenter>
-          <Button
-            style={{ marginTop: 10 }}
-            onClick={() => onSubmitClick(closeModal)}
-          >
-            {'Submit'}
-          </Button>
-        </FlexCenter>
-      </div>
-    );
-  };
-
-  const onSubmitClick = closeModal => {
-    submitRequest(explanation, attachment);
-    closeModal();
-  };
-
-  const setInputValue = e => {
-    setTextReason(e.target.value);
-  };
-
-  const onUserSelect = userId => {
-    router.setParams(history, { userId: `${userId}` });
-  };
-  const onReasonSelect = reason => {
-    setArrayIdx(reason.arrayIdx);
-    router.setParams(history, { reason: `${reason.value}` });
+  const modalContent = contentProps => {
+    const updatedProps = {
+      ...props,
+      contentProps
+    };
+    return <AbsenceForm {...updatedProps} />;
   };
 
   const actionBarRight = (
@@ -163,6 +76,13 @@ function AbsenceList(props: Props) {
         <td>{absence.reason || '-'}</td>
         <td>{absence.explanation || '-'}</td>
         <td>
+          {absence.attachment ? (
+            <Attachment attachment={absence.attachment} />
+          ) : (
+            '-'
+          )}
+        </td>
+        <td>
           {absence.solved ? (
             __(absence.status)
           ) : (
@@ -195,6 +115,7 @@ function AbsenceList(props: Props) {
           <th>{__('To')}</th>
           <th>{__('Reason')}</th>
           <th>{__('Explanation')}</th>
+          <th>{__('Attachment')}</th>
           <th>{__('Status')}</th>
         </tr>
       </thead>

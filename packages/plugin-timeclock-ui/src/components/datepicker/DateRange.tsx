@@ -25,11 +25,11 @@ const DateRange = (props: Props) => {
     onSaveButton
   } = props;
 
-  const onDateEndChange = (date: Date) => {
+  const onDateEndChange = date => {
     onChangeEnd(date);
   };
 
-  const onDateStartChange = (date: Date) => {
+  const onDateStartChange = date => {
     onChangeStart(date);
   };
   const onSaveDateButton = () => {

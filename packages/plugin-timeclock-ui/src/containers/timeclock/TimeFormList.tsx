@@ -6,27 +6,17 @@ import TimeForm from '../../components/timeclock/TimeForm';
 import { TimeClockMutationResponse } from '../../types';
 import { mutations } from '../../graphql';
 import React from 'react';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
-import { IUser } from '@erxes/ui/src/auth/types';
 import { ITimeclock } from '../../types';
 
 type Props = {
   timeclocks: ITimeclock[];
   searchValue: string;
-  currentUser: IUser;
   queryParams: any;
   history: any;
-  startTime: Date;
-  stopTime: Date;
   timeId: string;
   userId: string;
-  queryStartDate: string;
-  queryEndDate: string;
-  queryUserId: string;
   shiftId: string;
   shiftStarted: boolean;
-  departmendIds: string[];
-  branchIds: string[];
   longitude: number;
   latitude: number;
   selectedUserId: string;
@@ -36,13 +26,7 @@ type Props = {
 type FinalProps = {} & Props & TimeClockMutationResponse;
 
 const ListContainer = (props: FinalProps) => {
-  const {
-    timeclocks,
-    startTimeMutation,
-    stopTimeMutation,
-    shiftId,
-    shiftStarted
-  } = props;
+  const { timeclocks, startTimeMutation, stopTimeMutation } = props;
 
   // get current location of an user
   let long = 0;
@@ -84,8 +68,6 @@ const ListContainer = (props: FinalProps) => {
   const updatedProps = {
     ...props,
     timeclocks,
-    shiftStarted,
-    shiftId,
     startClockTime,
     stopClockTime
   };
@@ -96,9 +78,8 @@ export default withProps<Props>(
   compose(
     graphql<Props, TimeClockMutationResponse>(gql(mutations.clockStart), {
       name: 'startTimeMutation',
-      options: ({ startTime, userId, longitude, latitude }) => ({
+      options: ({ userId, longitude, latitude }) => ({
         variables: {
-          time: startTime,
           userId: `${userId}`,
           longitude: `${longitude}`,
           latitude: `${latitude}`
@@ -109,9 +90,8 @@ export default withProps<Props>(
 
     graphql<Props, TimeClockMutationResponse>(gql(mutations.clockStop), {
       name: 'stopTimeMutation',
-      options: ({ stopTime, userId, timeId, longitude, latitude }) => ({
+      options: ({ userId, timeId, longitude, latitude }) => ({
         variables: {
-          time: stopTime,
           userId: `${userId}`,
           _id: timeId,
           longitude: `${longitude}`,
@@ -120,5 +100,5 @@ export default withProps<Props>(
         refetchQueries: ['listTimeclocksQuery']
       })
     })
-  )(withCurrentUser(ListContainer))
+  )(ListContainer)
 );

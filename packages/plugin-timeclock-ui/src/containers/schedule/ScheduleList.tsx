@@ -12,23 +12,20 @@ import {
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import { Alert } from '@erxes/ui/src/utils';
-import erxesQuery from '@erxes/ui/src/team/graphql/queries';
+import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
-  searchValue: string;
   history: any;
   queryParams: any;
-  explanation: string;
-  userId: string;
-  userIds: string[];
-  reason: string;
-  startTime: Date;
-  endTime: Date;
-  scheduleId: string;
-  scheduleStatus: string;
-  shiftId: string;
-  shiftStatus: string;
-  requestedShifts: IShift[];
+  userId?: string;
+  userIds?: string[];
+  scheduleId?: string;
+  scheduleStatus?: string;
+  shiftId?: string;
+  shiftStatus?: string;
+  requestedShifts?: IShift[];
+
+  branchesList: IBranch[];
 
   queryStartDate: string;
   queryEndDate: string;
@@ -46,20 +43,12 @@ type FinalProps = {
 
 const ListContainer = (props: FinalProps) => {
   const {
-    queryParams,
     sendScheduleReqMutation,
     submitShiftMutation,
     solveScheduleMutation,
     solveShiftMutation,
-    listScheduleQuery,
-    listBranchesQuery
+    listScheduleQuery
   } = props;
-
-  const { userId } = queryParams;
-
-  // if (listScheduleQuery.loading) {
-  //   return <Spinner />;
-  // }
 
   const solveSchedule = (scheduleId: string, status: string) => {
     solveScheduleMutation({
@@ -122,9 +111,7 @@ const ListContainer = (props: FinalProps) => {
     submitRequest,
     submitShift
   };
-  return (
-    <ScheduleList {...updatedProps} branchesList={listBranchesQuery.branches} />
-  );
+  return <ScheduleList {...updatedProps} />;
 };
 
 export default withProps<Props>(
@@ -145,13 +132,6 @@ export default withProps<Props>(
           departmentIds: queryDepartmentIds,
           branchIds: queryBranchIds
         },
-        fetchPolicy: 'network-only'
-      })
-    }),
-    graphql<Props, BranchesQueryResponse>(gql(erxesQuery.branches), {
-      name: 'listBranchesQuery',
-      options: ({ searchValue }) => ({
-        variables: { searchValue },
         fetchPolicy: 'network-only'
       })
     }),

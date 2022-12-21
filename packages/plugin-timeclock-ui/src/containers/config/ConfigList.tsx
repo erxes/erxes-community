@@ -20,20 +20,17 @@ type Props = {
   getActionBar: (actionBar: any) => void;
   history: any;
   queryParams: any;
-  absenceTypeId: string;
-  absenceName: string;
-  attachment: boolean;
-  explanation: boolean;
-  userId: string;
-  reason: string;
-  startTime: Date;
-  endTime: Date;
-  absenceId: string;
-  absenceStatus: string;
-  payDates: number[];
-  queryStartDate: Date;
-  queryEndDate: Date;
-  queryUserId: string;
+  absenceTypeId?: string;
+  absenceName?: string;
+  attachment?: boolean;
+  explanation?: boolean;
+  userId?: string;
+  reason?: string;
+  startTime?: Date;
+  endTime?: Date;
+  absenceId?: string;
+  absenceStatus?: string;
+  payDates?: number[];
 };
 
 type FinalProps = {

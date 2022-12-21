@@ -8,7 +8,6 @@ import { ControlLabel, FormGroup } from '@erxes/ui/src/components/form';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 
 type Props = {
-  startTime?: Date;
   queryParams: any;
   selectedUserId: string;
   closeModal: () => void;

@@ -15,12 +15,12 @@ import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
   currentDate?: string;
-  currentUserId: string;
   queryParams: any;
   history: any;
   route?: string;
   startTime?: Date;
   loading: boolean;
+
   branchesList: IBranch[];
 
   queryStartDate: string;
@@ -28,10 +28,11 @@ type Props = {
   queryUserIds: string[];
   queryBranchIds: string[];
   queryDepartmentIds: string[];
+  searchFilter: string;
 };
 
 function List(props: Props) {
-  const { branchesList, currentUserId, queryParams, history, route } = props;
+  const { branchesList, queryParams, history, route, searchFilter } = props;
 
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
@@ -48,6 +49,7 @@ function List(props: Props) {
       case 'config':
         setModalComponent(
           <ConfigList
+            {...props}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -110,10 +112,14 @@ function List(props: Props) {
     }
   }, [queryParams]);
 
+  console.log('1111111111111111111', queryParams);
   return (
     <Wrapper
       header={
-        <Wrapper.Header title={__('Timeclocks')} submenu={menuTimeClock} />
+        <Wrapper.Header
+          title={__('Timeclocks')}
+          submenu={menuTimeClock(searchFilter)}
+        />
       }
       actionBar={rightActionBar}
       content={

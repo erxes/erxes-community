@@ -31,6 +31,7 @@ type Props = {
   queryUserIds: string[];
   queryBranchIds: string[];
   queryDepartmentIds: string[];
+  searchFilter: string;
 };
 
 type FinalProps = {
