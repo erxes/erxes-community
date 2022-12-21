@@ -47,8 +47,13 @@ export const connectToMysql = async (req, res) => {
     }
   });
 
+  extractAllData(Timeclock);
+  res.json('success');
+};
+
+const extractAllData = (db: any) => {
   let data;
-  Timeclock.findAll({
+  db.findAll({
     raw: true
   })
     .then(resss => {
@@ -59,6 +64,4 @@ export const connectToMysql = async (req, res) => {
     });
 
   console.log(data);
-
-  res.json('success');
 };
