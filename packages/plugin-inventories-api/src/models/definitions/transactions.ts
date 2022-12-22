@@ -40,13 +40,22 @@ export interface ITransactionDocument extends ITransaction, Document {
 export const transactionSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-
+    number: field({ type: String, default: '', label: 'number' }),
+    description: field({ type: String, label: 'description' }),
+    journal: field({ type: String, label: 'journal' }),
+    parentId: field({ type: String, label: 'parentId' }),
+    ptrId: field({ type: String, label: 'ptrId' }),
+    childData: field({ type: Object, label: 'childData' }),
+    contactType: field({ type: String, label: 'contactType' }),
+    contactId: field({ type: String, label: 'contactId' }),
+    status: field({ type: String, label: 'status' }),
+    contentType: field({ type: String, label: 'contentType' }),
+    contentId: field({ type: String, label: 'contentId' }),
+    taxInfo: field({ type: Object, label: 'taxInfo' }),
+    assignedUserIds: field({ type: [String], label: 'assignedUserIds' }),
+    paymentData: field({ type: Object, label: 'paymentData' }),
     branchId: field({ type: String, default: '', label: 'Branch' }),
     departmentId: field({ type: String, default: '', label: 'Department' }),
-
-    status: field({ type: String, label: 'Status' }),
-    contentType: field({ type: String, label: 'Content Type' }),
-    contentId: field({ type: String, label: 'Content ID' }),
 
     createdAt: { type: Date, default: new Date(), label: 'Created date' }
   }),
