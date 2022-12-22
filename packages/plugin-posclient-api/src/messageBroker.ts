@@ -166,7 +166,11 @@ const sendMessageWrapper = async (
 ): Promise<any> => {
   const { SKIP_REDIS } = process.env;
   if (SKIP_REDIS) {
-    const { action, isRPC } = args;
+    const { action, isRPC, defaultValue } = args;
+
+    if (!client) {
+      return defaultValue;
+    }
 
     if (!client) {
       return args.defaultValue;
@@ -188,7 +192,7 @@ const sendMessageWrapper = async (
       );
 
       if (!response) {
-        return args.defaultValue;
+        return defaultValue;
       }
     }
 
