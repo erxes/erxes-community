@@ -172,10 +172,6 @@ const sendMessageWrapper = async (
       return defaultValue;
     }
 
-    if (!client) {
-      return args.defaultValue;
-    }
-
     // check connected gateway on server and check some plugins isAvailable
     if (isRPC) {
       const longTask = async () =>
