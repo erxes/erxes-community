@@ -399,7 +399,6 @@ function ScheduleList(props: Props) {
           type="number"
           name="cycleNumber"
           placeholder="Please input number"
-          // onChange={setInputValue}
         />
         <Select
           value={contentType}
@@ -433,7 +432,6 @@ function ScheduleList(props: Props) {
     <>
       <CustomRangeContainer>
         <DateControl
-          // value={new Date()}
           required={false}
           name="startDate"
           onChange={onSelectDateChange}

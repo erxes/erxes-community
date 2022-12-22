@@ -82,13 +82,9 @@ export default (props: Props) => {
   };
 
   const onSaveDateRange = () => {
-    // console.log(dateRange.startTime.toISOString());
-    // console.log(new Date(dateRange.startTime.toISOString()));
-
     localStorage.setItem('dateRangeStart', dateRange.startTime.toISOString());
     localStorage.setItem('dateRangeEnd', dateRange.endTime.toISOString());
     Alert.success('succesfully saved');
-    // contentProps.closeModal();
   };
 
   return (

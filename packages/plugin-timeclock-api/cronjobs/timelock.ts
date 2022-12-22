@@ -1,9 +1,20 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes, Op } from 'sequelize';
 import { generateModels } from '../src/connectionResolver';
 
 /**
  * Connects to mysql server and extracts
  */
+
+export interface ITimeClock {
+  userId?: string;
+  solved?: boolean;
+  status?: string;
+  shiftStart: Date;
+  shiftEnd?: Date;
+  shiftActive?: boolean;
+  branchName?: number;
+  latitude?: number;
+}
 
 export const connectToMysql = async (req, res) => {
   const sequelize = new Sequelize('test_db', 'nandi', 'password', {
@@ -21,6 +32,9 @@ export const connectToMysql = async (req, res) => {
     });
 
   const Timeclock = sequelize.define('attlog', {
+    _ID: {
+      type: DataTypes.DATE
+    },
     authDateTime: {
       type: DataTypes.DATE
     },
@@ -47,7 +61,8 @@ export const connectToMysql = async (req, res) => {
     }
   });
 
-  extractAllData(Timeclock);
+  const data = extractAllData(Timeclock);
+  extractNewData(Timeclock);
   res.json('success');
 };
 
@@ -63,5 +78,21 @@ const extractAllData = (db: any) => {
       console.error('Failed to retrieve data : ', error);
     });
 
-  console.log(data);
+  return data;
+};
+
+const extractNewData = (db: any) => {
+  // find all time clock of today
+  const time = new Date('2022-12-22');
+
+  const arr = db
+    .findAll({
+      raw: true,
+      authDateTime: {
+        where: { [Op.gte]: time }
+      }
+    })
+    .then(res => {
+      // console.log('22222222222222', res);
+    });
 };

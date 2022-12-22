@@ -60,11 +60,6 @@ function List(props: Props) {
       case 'report':
         setModalComponent(
           <ReportList
-            // departmentIds={departmentIds ? departmentIds.split(',') : null}
-            // branchIds={branchIds ? branchIds.split(',') : null}
-            // queryStartDate={startDate}
-            // queryEndDate={endDate}
-            // queryUserId={userId}
             {...props}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
@@ -100,9 +95,6 @@ function List(props: Props) {
         setModalComponent(
           <TimeclockList
             {...props}
-            // queryStartDate={startDate}
-            // queryEndDate={endDate}
-            // queryUserIds={userIds ? userIds.split(',') : null}
             getActionBar={setRightActionBar}
             history={history}
             queryParams={queryParams}
@@ -112,7 +104,6 @@ function List(props: Props) {
     }
   }, [queryParams]);
 
-  console.log('1111111111111111111', queryParams);
   return (
     <Wrapper
       header={

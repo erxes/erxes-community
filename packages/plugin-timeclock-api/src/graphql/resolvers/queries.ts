@@ -115,7 +115,6 @@ const timeclockQueries = {
         returnModel = models.Absences.find(absenceSelector);
       }
     }
-    // console.log(timeFields);
 
     return returnModel;
   },

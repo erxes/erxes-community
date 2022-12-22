@@ -83,36 +83,7 @@ function ReportList(props: Props) {
       </>
     );
   };
-  const renderFilter = () => {
-    // const renderBranchOptions = (branches: any[]) => {
-    //   return branches.map(branch => ({
-    //     value: branch._id,
-    //     label: branch.title
-    //   }));
-    // };
-
-    // const onBranchSelect = selectedBranch => {
-    //   setBranches(selectedBranch);
-
-    //   const branchIds: any[] = [];
-    //   selectedBranch.map(branch => branchIds.push(branch.value));
-
-    //   router.setParams(history, {
-    //     branchIds: `${branchIds}`
-    //   });
-    // };
-
-    // const onDepartmentSelect = dept => {
-    //   setDepartments(dept);
-    //   const departmentIds: any[] = [];
-
-    //   dept.map(department => departmentIds.push(department));
-
-    //   router.setParams(history, {
-    //     departmentIds: `${departmentIds}`
-    //   });
-    // };
-
+  const renderExportBtn = () => {
     return (
       <div>
         <Button>Export</Button>
@@ -123,7 +94,7 @@ function ReportList(props: Props) {
   const actionBar = (
     <Wrapper.ActionBar
       left={renderSelectionBar()}
-      right={renderFilter()}
+      right={renderExportBtn()}
       hasFlex={true}
     />
   );
