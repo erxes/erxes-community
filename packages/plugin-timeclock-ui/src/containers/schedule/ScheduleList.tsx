@@ -11,7 +11,7 @@ import {
   ScheduleQueryResponse
 } from '../../types';
 import { mutations, queries } from '../../graphql';
-import { Alert } from '@erxes/ui/src/utils';
+import { Alert, confirm } from '@erxes/ui/src/utils';
 import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
@@ -47,6 +47,8 @@ const ListContainer = (props: FinalProps) => {
     submitShiftMutation,
     solveScheduleMutation,
     solveShiftMutation,
+    removeScheduleMutation,
+    removeScheduleShiftMutation,
     listScheduleQuery
   } = props;
 
@@ -102,6 +104,14 @@ const ListContainer = (props: FinalProps) => {
     }
   };
 
+  const removeScheduleShifts = (scheduleId, type) => {
+    confirm(`Are you sure to remove schedele ${type}`).then(() => {
+      (type === 'shift'
+        ? removeScheduleShiftMutation({ variables: { _id: scheduleId } })
+        : removeScheduleMutation({ variables: { _id: scheduleId } })
+      ).then(() => Alert.success(`Successfully removed schedule ${type}`));
+    });
+  };
   const updatedProps = {
     ...props,
     scheduleOfMembers: listScheduleQuery.schedules,
@@ -109,7 +119,8 @@ const ListContainer = (props: FinalProps) => {
     solveSchedule,
     solveShift,
     submitRequest,
-    submitShift
+    submitShift,
+    removeScheduleShifts
   };
   return <ScheduleList {...updatedProps} />;
 };
@@ -178,6 +189,28 @@ export default withProps<Props>(
         },
         refetchQueries: ['listScheduleQuery']
       })
-    })
+    }),
+    graphql<Props, ScheduleMutationResponse>(gql(mutations.scheduleRemove), {
+      name: 'removeScheduleMutation',
+      options: ({ scheduleId }) => ({
+        variables: {
+          _id: scheduleId
+        },
+        refetchQueries: ['listScheduleQuery']
+      })
+    }),
+
+    graphql<Props, ScheduleMutationResponse>(
+      gql(mutations.scheduleShiftRemove),
+      {
+        name: 'removeScheduleShiftMutation',
+        options: ({ shiftId }) => ({
+          variables: {
+            _id: shiftId
+          },
+          refetchQueries: ['listScheduleQuery']
+        })
+      }
+    )
   )(ListContainer)
 );

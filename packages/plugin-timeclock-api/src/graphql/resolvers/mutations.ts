@@ -8,7 +8,6 @@ import {
   IAbsenceType
 } from '../../models/definitions/timeclock';
 import { findBranches } from './utils';
-import { loadShiftClass } from '../../models/Timeclock';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -346,8 +345,17 @@ const timeclockMutations = {
     models.Shifts.remove({ scheduleId: _id });
     return;
   },
-  scheduleShiftRemove(_root, { shiftId }, { models }: IContext) {
-    return models.Shifts.removeShift(shiftId);
+  async scheduleShiftRemove(_root, { _id }, { models }: IContext) {
+    const getShift = await models.Shifts.getShift(_id);
+    const getShiftsCount = await models.Shifts.count({
+      scheduleId: getShift.scheduleId
+    });
+    // if it's the only one shift in schedule, remove schedule
+    if (getShiftsCount === 1 && getShift.scheduleId) {
+      await models.Schedules.removeSchedule(getShift.scheduleId);
+    }
+
+    return models.Shifts.removeShift(_id);
   },
   payDateAdd(_root, { dateNums }, { models }: IContext) {
     return models.PayDates.createPayDate({ payDates: dateNums });

@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Op } from 'sequelize';
-import { generateModels } from '../src/connectionResolver';
+import { generateModels, models } from '../src/connectionResolver';
 
 /**
  * Connects to mysql server and extracts
@@ -7,8 +7,7 @@ import { generateModels } from '../src/connectionResolver';
 
 export interface ITimeClock {
   userId?: string;
-  solved?: boolean;
-  status?: string;
+  employeeId?: string;
   shiftStart: Date;
   shiftEnd?: Date;
   shiftActive?: boolean;
@@ -17,9 +16,10 @@ export interface ITimeClock {
 }
 
 export const connectToMysql = async (req, res) => {
-  const sequelize = new Sequelize('test_db', 'nandi', 'password', {
+  const sequelize = new Sequelize('testt', 'nandi', 'password', {
     host: 'localhost',
-    dialect: 'mysql'
+    dialect: 'mysql',
+    define: { freezeTableName: true }
   });
 
   sequelize
@@ -31,48 +31,79 @@ export const connectToMysql = async (req, res) => {
       console.error('Unable to connect to the database: ', error);
     });
 
-  const Timeclock = sequelize.define('attlog', {
-    _ID: {
-      type: DataTypes.DATE
+  const Timeclock = sequelize.define(
+    '`dbo.attLog`',
+    {
+      ID: {
+        type: DataTypes.STRING
+      },
+      authDateTime: {
+        type: DataTypes.DATE
+      },
+      authDate: {
+        type: DataTypes.DATEONLY
+      },
+      authTime: {
+        type: DataTypes.TIME
+      },
+      direction: {
+        type: DataTypes.STRING
+      },
+      deviceName: {
+        type: DataTypes.STRING
+      },
+      deviceSerialNo: {
+        type: DataTypes.STRING
+      },
+      employeeName: {
+        type: DataTypes.STRING
+      },
+      cardNo: {
+        type: DataTypes.STRING
+      }
     },
-    authDateTime: {
-      type: DataTypes.DATE
-    },
-    authDate: {
-      type: DataTypes.DATEONLY
-    },
-    authTime: {
-      type: DataTypes.TIME
-    },
-    direction: {
-      type: DataTypes.STRING
-    },
-    deviceName: {
-      type: DataTypes.STRING
-    },
-    deviceSerialNo: {
-      type: DataTypes.STRING
-    },
-    employeeName: {
-      type: DataTypes.STRING
-    },
-    cardNo: {
-      type: DataTypes.STRING
-    }
-  });
+    { timestamps: false }
+  );
 
   const data = extractAllData(Timeclock);
-  extractNewData(Timeclock);
+  // console.log('111111', data);
+
+  // for (const timeRow of data) {
+
+  // }
+
+  // extractNewData(Timeclock);
   res.json('success');
 };
 
 const extractAllData = (db: any) => {
   let data;
+  const timeclockData: ITimeClock[] = [];
+
   db.findAll({
-    raw: true
+    raw: true,
+    order: [
+      ['ID', 'ASC'],
+      ['authDateTime', 'ASC']
+    ],
+    limit: 10
   })
-    .then(resss => {
-      data = resss;
+    .then(response => {
+      data = JSON.parse(JSON.stringify(response));
+      for (const row of data) {
+        // console.log('heheh', row);
+        //   const empId = row._ID;
+        //   const branch = row.deviceName;
+        //   const empName = row.employeeName;
+        //   const getEarliestTime = row.authDateTime;
+        //   const getLatestTime = row.authDateTime;
+        //   console.log('hjehhehehhe', empId, branch, empName);
+        //   const time = models?.Timeclocks.createTimeClock({
+        //     shiftStart: getEarliestTime,
+        //     shiftEnd: getLatestTime,
+        //     shiftActive: false
+        //   });
+      }
     })
     .catch(error => {
       console.error('Failed to retrieve data : ', error);

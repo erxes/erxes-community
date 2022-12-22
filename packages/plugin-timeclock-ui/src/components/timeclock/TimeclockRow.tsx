@@ -27,7 +27,9 @@ class Row extends React.Component<Props> {
   modalContent = props => (
     <TimeForm
       {...props}
-      selectedUserId={this.props.timeclock.user._id}
+      selectedUserId={
+        this.props.timeclock.user ? this.props.timeclock.user._id : null
+      }
       shiftId={this.props.timeclock._id}
       shiftStarted={this.props.timeclock.shiftActive}
     />
@@ -51,7 +53,7 @@ class Row extends React.Component<Props> {
 
     return (
       <tr>
-        <td>{<NameCard user={timeclock.user} />}</td>
+        <td>{timeclock.user ? <NameCard user={timeclock.user} /> : '-'}</td>
         <td>{shiftDate}</td>
         <td>{shiftStartTime}</td>
         <td>{shiftEndTime}</td>

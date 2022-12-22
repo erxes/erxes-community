@@ -22,6 +22,7 @@ import { IBranch } from '@erxes/ui/src/team/types';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Datetime from '@nateradebaugh/react-datetime';
+import Tip from '@erxes/ui/src/components/Tip';
 
 type Props = {
   scheduleOfMembers: any;
@@ -33,6 +34,7 @@ type Props = {
   solveShift: (shiftId: string, status: string) => void;
   submitRequest: (userId: string[], filledShifts: any) => void;
   submitShift: (userIds: string[], filledShifts: any) => void;
+  removeScheduleShifts: (_id: string, type: string) => void;
 };
 
 function ScheduleList(props: Props) {
@@ -45,6 +47,7 @@ function ScheduleList(props: Props) {
     solveSchedule,
     solveShift,
     getActionBar,
+    removeScheduleShifts,
     branchesList
   } = props;
 
@@ -461,6 +464,9 @@ function ScheduleList(props: Props) {
     }
   };
 
+  const removeSchedule = (_id: string, type: string) => {
+    removeScheduleShifts(_id, type);
+  };
   const adminConfigDefaultContent = ({ closeModal }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -616,6 +622,20 @@ function ScheduleList(props: Props) {
             );
           })}
         </td>
+        <td>
+          {shifts.map(shift => {
+            return (
+              <CustomRow marginNum={4} key={shift._id}>
+                <Button
+                  size="small"
+                  btnStyle="link"
+                  onClick={() => removeSchedule(shift._id, 'shift')}
+                  icon="times-circle"
+                />
+              </CustomRow>
+            );
+          })}
+        </td>
       </>
     );
   };
@@ -646,6 +666,15 @@ function ScheduleList(props: Props) {
             </>
           )}
         </td>
+        <td>
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removeSchedule(schedule._id, '')}
+              icon="times-circle"
+            />
+          </Tip>
+        </td>
         {ListShiftContent(
           schedule.shifts.sort(
             (a, b) =>
@@ -665,10 +694,11 @@ function ScheduleList(props: Props) {
         <tr>
           <th>{__('Team member')}</th>
           <th>{__('Schedule status')}</th>
+          <th>&nbsp;</th>
           <th>{__('Shift date')}</th>
           <th>{__('Shift start')}</th>
           <th>{__('Shift end')}</th>
-          <th>{__('Action')}</th>
+          <th colSpan={2}>{__('Action')}</th>
         </tr>
       </thead>
       <tbody>
