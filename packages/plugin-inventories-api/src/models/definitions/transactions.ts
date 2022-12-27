@@ -1,5 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
+import { ITransactionItem, ITransactionItemDocument } from './transactionItems';
 
 export interface ITransactionCreateParams extends ITransaction {
   products: {
@@ -27,6 +28,14 @@ export interface ITransaction {
   taxInfo: any;
   assignedUserIds: string[];
   paymentData: any;
+  createdAt?: Date;
+  createdBy?: String;
+  modifiedAt?: Date;
+  modifiedBy?: String;
+}
+
+export interface ITransactionInput extends ITransaction {
+  items: ITransactionItem[] | ITransactionItemDocument[];
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -40,6 +49,7 @@ export interface ITransactionDocument extends ITransaction, Document {
 export const transactionSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
+    date: field({ type: Date, label: 'date' }),
     number: field({ type: String, default: '', label: 'number' }),
     description: field({ type: String, label: 'description' }),
     journal: field({ type: String, label: 'journal' }),
@@ -54,18 +64,17 @@ export const transactionSchema = schemaHooksWrapper(
     taxInfo: field({ type: Object, label: 'taxInfo' }),
     assignedUserIds: field({ type: [String], label: 'assignedUserIds' }),
     paymentData: field({ type: Object, label: 'paymentData' }),
-    branchId: field({ type: String, default: '', label: 'Branch' }),
-    departmentId: field({ type: String, default: '', label: 'Department' }),
 
-    createdAt: { type: Date, default: new Date(), label: 'Created date' }
+    createdAt: { type: Date, default: new Date(), label: 'Created date' },
+    createdBy: { type: String, label: 'Created by' },
+    modifiedAt: { type: Date, default: new Date(), label: 'Modified date' },
+    modifiedBy: { type: String, label: 'Modified by' }
   }),
   'erxes_transactions'
 );
 
 // for transactionSchema query. increases search speed, avoids in-memory sorting
 transactionSchema.index({
-  branchId: 1,
-  departmentId: 1,
   contentType: 1,
   contentId: 1
 });
