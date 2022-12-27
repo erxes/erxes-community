@@ -193,6 +193,16 @@ export const initBroker = cl => {
     }
   );
 
+  consumeQueue(
+    'inbox:removeConversation',
+    async ({ subdomain, data: { _id } }) => {
+      const models = await generateModels(subdomain);
+
+      await models.ConversationMessages.deleteMany({ conversationId: _id });
+      return models.Conversations.deleteOne({ _id });
+    }
+  );
+
   consumeRPCQueue(
     'inbox:getConversations',
     async ({ subdomain, data: { query } }) => {
@@ -268,9 +278,14 @@ export const initBroker = cl => {
       let filter;
 
       if (module.includes('contacts')) {
-        filter = {
-          _id: target[module.includes('company') ? 'companyId' : 'customerId']
-        };
+        const queryField =
+          target[module.includes('company') ? 'companyId' : 'customerId'];
+
+        if (queryField) {
+          filter = {
+            _id: queryField
+          };
+        }
       }
 
       return {

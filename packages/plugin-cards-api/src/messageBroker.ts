@@ -440,10 +440,13 @@ export const initBroker = async cl => {
             mainTypeId: target._id,
             relTypes: [module.split(':')[1]]
           },
-          isRPC: true
+          isRPC: true,
+          defaultValue: []
         });
 
-        filter = { _id: { $in: relTypeIds } };
+        if (relTypeIds.length) {
+          filter = { _id: { $in: relTypeIds } };
+        }
       }
 
       return {
@@ -596,6 +599,15 @@ export const fetchSegment = (
 
 export const sendToWebhook = ({ subdomain, data }) => {
   return sendWebhook(client, { subdomain, data });
+};
+
+export const sendTagsMessage = async (args: ISendMessageArgs): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'tags',
+    ...args
+  });
 };
 
 export default function() {

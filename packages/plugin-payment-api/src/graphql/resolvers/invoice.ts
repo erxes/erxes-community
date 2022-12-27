@@ -24,7 +24,7 @@ export default {
   async payment(invoice: IInvoice, {}, { models }: IContext) {
     return (
       invoice.selectedPaymentId &&
-      models.Payments.findOne({ _id: invoice.selectedPaymentId })
+      (await models.Payments.findOne({ _id: invoice.selectedPaymentId }).lean())
     );
   },
 
@@ -38,6 +38,10 @@ export default {
     const data: any = {};
 
     const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
+
+    if (!meta) {
+      return null;
+    }
 
     data[meta.queryKey] = invoice.contentTypeId;
 

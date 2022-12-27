@@ -70,7 +70,7 @@ class Row extends React.Component<Props> {
             {childAssetCount > 0 && (
               <MoreContainer>
                 <Button btnStyle="link" onClick={handleParent}>
-                  <Tip text="See Child Assets">
+                  <Tip text="See sub assets">
                     <Icon icon="sitemap-1" />
                   </Tip>
                 </Button>
@@ -80,6 +80,7 @@ class Row extends React.Component<Props> {
             <ModalTrigger
               title="Edit basic info"
               trigger={<Icon icon="edit" />}
+              enforceFocus={false}
               size="lg"
               content={content}
             />
