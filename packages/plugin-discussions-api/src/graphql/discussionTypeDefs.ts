@@ -27,6 +27,8 @@ export const types = `
 
     currentUserVote: DiscussionCurrentUserVote
     questionsWithAnswer: [DiscussionQuestionWithAnswer]
+
+    comments: [DiscussionComment]
   }
 
   type DiscussionVote {
@@ -38,6 +40,17 @@ export const types = `
     discussionId: String
     isUp: Boolean
     answer: String
+  }
+
+  type DiscussionComment {
+    _id: String!
+
+    createdAt: Date
+    createdUserId: String
+
+    discussionId: String
+    parentId: String
+    content: String
   }
 `;
 
@@ -56,4 +69,5 @@ export const mutations = `
   discussionsSave(_id: String, title: String!, content: String!, attachments: [JSON], tags: [String], questions: [String]): Discussion
   discussionsRemove(_id: String!): JSON
   discussionsVote(discussionId: String!, isUp: Boolean, answer: String): DiscussionVote
+  discussionsComment(discussionId: String!, content: String!, parentId: String): DiscussionComment
 `;

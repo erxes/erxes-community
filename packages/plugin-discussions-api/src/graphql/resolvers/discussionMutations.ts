@@ -40,6 +40,21 @@ const discussionMutations = {
       ...doc,
       createdUserId: cpUser.userId
     });
+  },
+
+  discussionsComment(_root, args, { cpUser, models }) {
+    const { _id, ...doc } = args;
+
+    if (!cpUser) {
+      throw new Error('Login required');
+    }
+
+    return models.Comments.saveComment({
+      doc: {
+        ...doc,
+        createdUserId: cpUser.userId
+      }
+    });
   }
 };
 

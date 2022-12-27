@@ -32,7 +32,7 @@ const Discussion = {
     return results;
   },
 
-  async currentUserVote(discussion, _args, { cpUser, subdomain, models }) {
+  async currentUserVote(discussion, _args, { cpUser, models }) {
     const answer = await models.Votes.findOne({
       discussionId: discussion._id,
       answer: { $exists: true },
@@ -49,6 +49,12 @@ const Discussion = {
       isUp: upDown ? upDown.isUp : false,
       answer: answer && answer.answer
     };
+  },
+
+  async comments(discussion, _args, { models }) {
+    return models.Comments.find({
+      discussionId: discussion._id
+    });
   }
 };
 
