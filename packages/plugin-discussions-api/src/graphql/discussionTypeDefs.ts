@@ -51,6 +51,7 @@ export const types = `
 
     discussionId: String
     parentId: String
+    order: String
     content: String
   }
 `;

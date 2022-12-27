@@ -54,7 +54,7 @@ const Discussion = {
   async comments(discussion, _args, { models }) {
     return models.Comments.find({
       discussionId: discussion._id
-    });
+    }).sort({ order: 1 });
   }
 };
 

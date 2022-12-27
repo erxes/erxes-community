@@ -8,6 +8,8 @@ interface IComment {
 
   discussionId: string;
   parentId: string;
+  order: string;
+  code: string;
   content: string;
 }
 
@@ -21,6 +23,8 @@ const commentSchema = new Schema({
 
   discussionId: { type: String },
   parentId: { type: String },
+  order: { type: String },
+  code: { type: String },
   content: { type: String }
 });
 
@@ -30,14 +34,14 @@ export interface ICommentModel extends Model<ICommentDocument> {
 
 export const loadCommentClass = models => {
   class Comment {
-    /**
-     * Marks comments as read
-     */
-    public static async saveComment({ _id, doc }) {
-      if (_id) {
-        await models.Comments.update({ _id }, { $set: doc });
-        return models.Comments.findOne({ _id });
-      }
+    public static async saveComment({ doc }) {
+      const parentComment = await models.Comments.findOne({
+        _id: doc.parentId
+      }).lean();
+
+      doc.order = parentComment
+        ? `${parentComment.order}${doc.code}/`
+        : `${doc.code}/`;
 
       doc.createdAt = new Date();
 

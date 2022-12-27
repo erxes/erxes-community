@@ -52,6 +52,7 @@ const discussionMutations = {
     return models.Comments.saveComment({
       doc: {
         ...doc,
+        code: Math.random(),
         createdUserId: cpUser.userId
       }
     });
