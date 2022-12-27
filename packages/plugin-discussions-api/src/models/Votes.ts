@@ -8,6 +8,7 @@ interface IVote {
 
   discussionId: string;
   isUp: boolean;
+  answer: string;
 }
 
 export interface IVoteDocument extends IVote, Document {
@@ -19,7 +20,8 @@ const voteSchema = new Schema({
   createdUserId: { type: String },
 
   discussionId: { type: String },
-  isUp: { type: Boolean }
+  isUp: { type: Boolean },
+  answer: { type: String }
 });
 
 export interface IVoteModel extends Model<IVoteDocument> {
@@ -32,6 +34,18 @@ export const loadVoteClass = models => {
      * Marks votes as read
      */
     public static async vote(doc) {
+      await models.Votes.remove({
+        discussionId: doc.discussionId,
+        createdUserId: doc.createdUserId,
+        isUp: { $exists: true }
+      });
+
+      await models.Votes.remove({
+        discussionId: doc.discussionId,
+        createdUserId: doc.createdUserId,
+        answer: { $exists: true }
+      });
+
       return models.Votes.create(doc);
     }
   }

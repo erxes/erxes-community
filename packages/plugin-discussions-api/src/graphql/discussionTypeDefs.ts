@@ -1,4 +1,18 @@
 export const types = `
+  extend type ClientPortalUser @key(fields: "_id") {
+    _id: String! @external
+  }
+
+  type DiscussionQuestionWithAnswer {
+    question: String
+    answeredUsers: [ClientPortalUser]
+  }
+
+  type DiscussionCurrentUserVote {
+    isUp: Boolean
+    answer: String
+  }
+
   type Discussion {
     _id: String!
 
@@ -10,6 +24,9 @@ export const types = `
     attachments: [JSON]
     tags: [String]
     questions: [String]
+
+    currentUserVote: DiscussionCurrentUserVote
+    questionsWithAnswer: [DiscussionQuestionWithAnswer]
   }
 
   type DiscussionVote {
@@ -20,6 +37,7 @@ export const types = `
 
     discussionId: String
     isUp: Boolean
+    answer: String
   }
 `;
 
@@ -37,5 +55,5 @@ export const queries = `
 export const mutations = `
   discussionsSave(_id: String, title: String!, content: String!, attachments: [JSON], tags: [String], questions: [String]): Discussion
   discussionsRemove(_id: String!): JSON
-  discussionsVote(discussionId: String!, isUp: Boolean): DiscussionVote
+  discussionsVote(discussionId: String!, isUp: Boolean, answer: String): DiscussionVote
 `;
