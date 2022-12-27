@@ -6,6 +6,7 @@ interface IVote {
   createdAt: Date;
   createdUserId: string;
 
+  source: string;
   discussionId: string;
   isUp: boolean;
   answer: string;
@@ -19,6 +20,7 @@ const voteSchema = new Schema({
   createdAt: { type: Date },
   createdUserId: { type: String },
 
+  source: { type: String },
   discussionId: { type: String },
   isUp: { type: Boolean },
   answer: { type: String }

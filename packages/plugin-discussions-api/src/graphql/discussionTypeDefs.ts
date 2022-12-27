@@ -37,6 +37,7 @@ export const types = `
     createdAt: Date
     createdUserId: String
 
+    source: String
     discussionId: String
     isUp: Boolean
     answer: String
@@ -68,6 +69,6 @@ export const queries = `
 export const mutations = `
   discussionsSave(_id: String, title: String!, content: String!, attachments: [JSON], tags: [String], questions: [String]): Discussion
   discussionsRemove(_id: String!): JSON
-  discussionsVote(discussionId: String!, isUp: Boolean, answer: String): DiscussionVote
+  discussionsVote(discussionId: String!, source: String, isUp: Boolean, answer: String): DiscussionVote
   discussionsComment(discussionId: String!, content: String!, parentId: String): DiscussionComment
 `;
