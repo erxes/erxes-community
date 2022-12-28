@@ -131,6 +131,11 @@ const scheduleShiftRemove = `
     scheduleShiftRemove(_id: $_id)
   }`;
 
+const extractAllDataFromMySQL = `
+mutation extractAllDataFromMySQL{
+  extractAllDataFromMySQL
+}`;
+
 export default {
   sendScheduleRequest,
   submitShift,
@@ -151,5 +156,6 @@ export default {
   holidayEdit,
   holidayRemove,
   scheduleRemove,
-  scheduleShiftRemove
+  scheduleShiftRemove,
+  extractAllDataFromMySQL
 };

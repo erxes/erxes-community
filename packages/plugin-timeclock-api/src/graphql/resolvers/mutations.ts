@@ -7,7 +7,7 @@ import {
   ITimeClock,
   IAbsenceType
 } from '../../models/definitions/timeclock';
-import { findBranches } from './utils';
+import { connectAndImportFromMysql, findBranches } from './utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -48,7 +48,7 @@ const timeclockMutations = {
     const latRad = (latitude * Math.PI) / 180;
 
     let insideCoordinate = false;
-
+    let getBranchName;
     const EARTH_RADIUS = 6378.14;
     const branches = await findBranches(subdomain, user._id);
 
@@ -76,16 +76,20 @@ const timeclockMutations = {
       // if user's coordinate is within the radius
       if (dist * 1000 <= branch.radius) {
         insideCoordinate = true;
+        getBranchName = branch.title;
       }
     }
 
     let timeclock;
 
+    console.log(user);
+
     if (insideCoordinate) {
       timeclock = await models.Timeclocks.createTimeClock({
         shiftStart: new Date(),
         shiftActive: true,
-        userId: userId ? `${userId}` : user._id
+        userId: userId ? `${userId}` : user._id,
+        branchName: getBranchName
       });
     } else {
       throw new Error('User not in the coordinate');
@@ -402,6 +406,10 @@ const timeclockMutations = {
 
   holidayRemove(_root, { _id }, { models }: IContext) {
     return models.Absences.removeAbsence(_id);
+  },
+
+  async extractAllDataFromMySQL(_root, {}, { subdomain, models }: IContext) {
+    connectAndImportFromMysql(subdomain, models);
   }
 };
 

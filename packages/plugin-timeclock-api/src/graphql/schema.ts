@@ -16,6 +16,10 @@ export const types = `
     shiftStart: Date
     shiftEnd: Date
     shiftActive: Boolean
+    employeeUserName: String
+    branchName: String
+    deviceName: String
+    employeeId: Int
   }
 
   type Absence {
@@ -166,4 +170,5 @@ export const mutations = `
   holidayRemove(_id: String): JSON
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
+  extractAllDataFromMySQL: JSON
 `;

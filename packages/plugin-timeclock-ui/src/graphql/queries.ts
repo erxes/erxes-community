@@ -30,6 +30,10 @@ const list = `
       user {
         ${userFields}
       }
+      employeeUserName
+      branchName
+      employeeId
+        
   }
 }
 `;
