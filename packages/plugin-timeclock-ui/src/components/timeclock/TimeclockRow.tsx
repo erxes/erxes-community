@@ -68,8 +68,10 @@ class Row extends React.Component<Props> {
         <td>{shiftStartTime}</td>
         <td>{shiftEndTime}</td>
         <td>{overNightShift ? 'O' : ''}</td>
-        <td>{timeclock.branchName}</td>
-        <td>{''}</td>
+        <td>
+          {timeclock.branchName ? timeclock.branchName : timeclock.deviceName}
+        </td>
+        <td>{timeclock.deviceType && timeclock.deviceType}</td>
         <td>{this.shiftBtnTrigger(timeclock.shiftActive)}</td>
       </tr>
     );

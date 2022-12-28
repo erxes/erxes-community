@@ -5,16 +5,16 @@ const clockRemove = `
   `;
 
 const clockStart = `
-  mutation timeclockStart($userId: String, $longitude: Float, $latitude: Float){
-    timeclockStart(userId: $userId, longitude: $longitude, latitude: $latitude){
+  mutation timeclockStart($userId: String, $longitude: Float, $latitude: Float, $deviceType: String){
+    timeclockStart(userId: $userId, longitude: $longitude, latitude: $latitude, deviceType: $deviceType){
       _id
     }
   }
 `;
 
 const clockStop = `
-  mutation timeclockStop( $userId: String, $_id: String, $longitude: Float, $latitude: Float){
-    timeclockStop(userId: $userId, _id: $_id, longitude: $longitude, latitude: $latitude){
+  mutation timeclockStop( $userId: String, $_id: String, $longitude: Float, $latitude: Float,$deviceType: String){
+    timeclockStop(userId: $userId, _id: $_id, longitude: $longitude, latitude: $latitude, deviceType : $deviceType){
       _id
     }
   }
@@ -133,7 +133,9 @@ const scheduleShiftRemove = `
 
 const extractAllDataFromMySQL = `
 mutation extractAllDataFromMySQL{
-  extractAllDataFromMySQL
+  extractAllDataFromMySQL{
+    _id
+  }
 }`;
 
 export default {

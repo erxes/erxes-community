@@ -1,6 +1,6 @@
-import { IModels } from '../src/connectionResolver';
-import { sendCoreMessage, sendFormsMessage } from '../src/messageBroker';
-import { ITimeClock } from '../src/models/definitions/timeclock';
+import { generateModels, IModels } from '../connectionResolver';
+import { sendCoreMessage, sendFormsMessage } from '../messageBroker';
+import { ITimeClock } from '../models/definitions/timeclock';
 import * as mysql from 'mysql2';
 import { IUserDocument } from '@erxes/api-utils/src/types';
 import * as dayjs from 'dayjs';
@@ -35,10 +35,13 @@ const findUserByEmployeeId = async (subdomain: string, empId: number) => {
   }
 };
 
-export const connectAndImportFromMysql = async (
-  subdomain: string,
-  models: IModels
-) => {
+const connectAndImportFromMysql = async (subdomain: string) => {
+  const mysqlHost = process.env.MYSQL_HOST;
+  const mysqlDB = process.env.MYSQL_DB;
+  const mysqlUser = process.env.MYSQL_USERNAME;
+  const mysqlPassword = process.env.MYSQL_PASSWORD;
+  const mysqlTable = process.env.MYSQL_TABLE;
+
   // create the connection to database
   const connection = mysql.createConnection({
     host: 'localhost',
@@ -47,6 +50,7 @@ export const connectAndImportFromMysql = async (
     database: 'testt'
   });
 
+  let returnTimeclock;
   connection.connect(err => {
     if (err) {
       console.error('error connecting: ' + err.stack);
@@ -54,23 +58,34 @@ export const connectAndImportFromMysql = async (
     }
   });
 
+  // get time data from yesterday till now
+  const format = 'YYYY-MM-DD HH:mm:ss';
+  const NOW = dayjs(Date.now());
+  const YESTERDAY = NOW.add(-1, 'day');
+
   connection.query(
-    'select * from `dbo.attLog` order by ID, authDateTime limit 200',
-    (error, results, fields) => {
+    'SELECT * FROM `dbo.attLog` WHERE authDateTime >= "' +
+      YESTERDAY.format(format) +
+      '" AND authDateTime <= "' +
+      NOW.format(format) +
+      '" ORDER by ID, authDateTime',
+    async (error, results) => {
       if (error) {
         throw new Error(`error: ${error}`);
       }
 
-      importDataAndCreateTimeclock(subdomain, models, results);
+      returnTimeclock = await importDataAndCreateTimeclock(subdomain, results);
     }
   );
+
+  return returnTimeclock;
 };
 
 const importDataAndCreateTimeclock = async (
   subdomain: string,
-  models: IModels,
   queryData: any
 ) => {
+  const models = await generateModels(subdomain);
   const returnData: ITimeClock[] = [];
 
   let currentEmpId = -9999999999;
@@ -101,9 +116,9 @@ const importDataAndCreateTimeclock = async (
     }
   }
 
-  for (const timeclock of returnData) {
-    await models.Timeclocks.createTimeClock({ ...timeclock });
-  }
+  await models.Timeclocks.insertMany(returnData);
+
+  return models.Timeclocks.find();
 };
 
 const createUserTimeclock = async (
@@ -114,39 +129,49 @@ const createUserTimeclock = async (
   empData: any
 ) => {
   const returnUserData: ITimeClock[] = [];
-
   const user = await findUserByEmployeeId(subdomain, empId);
 
-  // // find if there's any unfinished shift from timeclock data
-  // const unfinishedShifts = await models?.Timeclocks.find({
-  //   shiftActive: true,
-  //   userId: user && user._id,
-  //   deviceType: { $ne: 'faceTerminal' }
-  // });
+  // find if there's any unfinished shift from previous timeclock data
+  const unfinishedShifts = await models?.Timeclocks.find({
+    shiftActive: true,
+    $or: [{ userId: user && user._id }, { employeeId: empId }]
+  });
 
-  // // if there's an unfinished shift clocked in on XOS
-  // for (const unfinishedShift of unfinishedShifts) {
-  //   const getShiftStart = dayjs(unfinishedShift.shiftStart);
+  for (const unfinishedShift of unfinishedShifts) {
+    const getShiftStart = dayjs(unfinishedShift.shiftStart);
 
-  //   const getShiftIdx = empData.findIndex(
-  //     row =>
-  //       dayjs(row.authDateTime) > getShiftStart &&
-  //       dayjs(row.authDateTime) < getShiftStart.add(10, 'hour')
-  //   );
+    // find the potential shift end, which must be 30 mins later and within 16 hrs from shift start
+    const getShiftIdx = empData.findIndex(
+      row =>
+        dayjs(row.authDateTime) > getShiftStart.add(30, 'minute') &&
+        dayjs(row.authDateTime) < getShiftStart.add(16, 'hour')
+    );
 
-  //   if (getShiftIdx !== -1) {
-  //     await models.Timeclocks.updateTimeClock(unfinishedShift._id, {
-  //       userId: user?._id,
-  //       shiftStart: unfinishedShift.shiftStart,
-  //       shiftEnd: new Date(empData[getShiftIdx].authDateTime),
-  //       shiftActive: false
-  //     });
+    const potentialShiftEnd = empData[getShiftIdx].authDateTime;
 
-  //     // remove that shift from emp Data
-  //     empData.splice(getShiftIdx, 1);
-  //   }
-  // }
+    // get reverse array
+    const reverseEmpData = empData.slice().reverse();
 
+    // find the latest time for shift end
+    const findLatestShiftEndIdx = reverseEmpData.findIndex(
+      row =>
+        dayjs(row.authDateTime) < dayjs(potentialShiftEnd).add(30, 'minute')
+    );
+
+    const latestShiftIdx = empData.length - 1 - findLatestShiftEndIdx;
+
+    await models.Timeclocks.updateTimeClock(unfinishedShift._id, {
+      userId: user?._id,
+      shiftStart: unfinishedShift.shiftStart,
+      shiftEnd: new Date(empData[latestShiftIdx].authDateTime),
+      shiftActive: false
+    });
+
+    // remove those shift(s) from emp Data
+    empData.splice(getShiftIdx, latestShiftIdx - getShiftIdx + 1);
+  }
+
+  // filter emp data, get First In, Last Out time
   for (let i = 0; i < empData.length; i++) {
     const currShiftStart = empData[i].authDateTime;
     // consider shift end as 10 mins after shift start
@@ -233,9 +258,14 @@ const checkTimeClockAlreadyExists = async (
   );
 
   if (findExistingTimeclock) {
-    console.log(findExistingTimeclock);
     alreadyExists = true;
   }
 
   return alreadyExists;
+};
+
+export default {
+  handleDailyJob: async ({ subdomain }) => {
+    await connectAndImportFromMysql(subdomain);
+  }
 };

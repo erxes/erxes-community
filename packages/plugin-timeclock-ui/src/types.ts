@@ -11,6 +11,7 @@ export interface ITimeclock {
   employeeUserName: string;
   employeeId: number;
   deviceName: string;
+  deviceType: string;
   branchName: string;
 }
 export interface IAbsence {
@@ -133,6 +134,7 @@ export type MutationVariables = {
   userId: string;
   longitude: number;
   latitude: number;
+  deviceType?: string;
 };
 export type AbsenceMutationVariables = {
   _id?: string;

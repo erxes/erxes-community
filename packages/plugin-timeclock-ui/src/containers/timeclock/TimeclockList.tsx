@@ -34,7 +34,9 @@ const ListContainer = (props: FinalProps) => {
   }
 
   const extractAllMySqlData = () => {
-    extractAllMySqlDataMutation();
+    extractAllMySqlDataMutation().then(() => {
+      listTimeclocksQuery.refetch();
+    });
   };
 
   const updatedProps = {
@@ -71,10 +73,7 @@ export default withProps<Props>(
     graphql<Props, TimeClockMutationResponse>(
       gql(mutations.extractAllDataFromMySQL),
       {
-        name: 'extractAllMySqlDataMutation',
-        options: () => ({
-          refetchQueries: ['listTimeclocksQuery']
-        })
+        name: 'extractAllMySqlDataMutation'
       }
     )
   )(ListContainer)

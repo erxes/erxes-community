@@ -40,7 +40,7 @@ const timeclockMutations = {
    */
   async timeclockStart(
     _root,
-    { userId, longitude, latitude },
+    { userId, longitude, latitude, deviceType },
     { models, user, subdomain }: IContext
   ) {
     // convert long, lat into radians
@@ -82,14 +82,13 @@ const timeclockMutations = {
 
     let timeclock;
 
-    console.log(user);
-
     if (insideCoordinate) {
       timeclock = await models.Timeclocks.createTimeClock({
         shiftStart: new Date(),
         shiftActive: true,
         userId: userId ? `${userId}` : user._id,
-        branchName: getBranchName
+        branchName: getBranchName,
+        deviceType: `${deviceType}`
       });
     } else {
       throw new Error('User not in the coordinate');
@@ -100,7 +99,7 @@ const timeclockMutations = {
 
   async timeclockStop(
     _root,
-    { _id, userId, longitude, latitude, ...doc }: ITimeClockEdit,
+    { _id, userId, longitude, latitude, deviceType, ...doc }: ITimeClockEdit,
     { models, subdomain, user }: IContext
   ) {
     const timeclock = await models.Timeclocks.findOne({
@@ -148,9 +147,14 @@ const timeclockMutations = {
     let updated;
 
     if (insideCoordinate) {
+      const getShiftStartDeviceType = (
+        await models.Timeclocks.getTimeClock(_id)
+      ).deviceType;
+
       updated = await models.Timeclocks.updateTimeClock(_id, {
         shiftEnd: new Date(),
         shiftActive: false,
+        deviceType: getShiftStartDeviceType + ' + ' + deviceType,
         ...doc
       });
     } else {
@@ -388,13 +392,6 @@ const timeclockMutations = {
     { _id, name, startDate, endDate, doc },
     { models }: IContext
   ) {
-    // const updated = models.Absences.updateAbsence(_id, {
-    //   holidayName: name,
-    //   startTime: startDate,
-    //   endTime: endDate,
-    //   status: 'Holiday',
-    //   ...doc
-    // });
     return models.Absences.updateAbsence(_id, {
       holidayName: name,
       startTime: startDate,
@@ -408,8 +405,9 @@ const timeclockMutations = {
     return models.Absences.removeAbsence(_id);
   },
 
-  async extractAllDataFromMySQL(_root, {}, { subdomain, models }: IContext) {
-    connectAndImportFromMysql(subdomain, models);
+  async extractAllDataFromMySQL(_root, {}, { subdomain }: IContext) {
+    const ret = await connectAndImportFromMysql(subdomain);
+    return ret;
   }
 };
 

@@ -1,4 +1,4 @@
-import { IModels } from '../../connectionResolver';
+import { generateModels, IModels } from '../../connectionResolver';
 import { sendCoreMessage, sendFormsMessage } from '../../messageBroker';
 import { ITimeClock, IUserReport } from '../../models/definitions/timeclock';
 import * as mysql from 'mysql2';
@@ -250,10 +250,13 @@ const findUserByEmployeeId = async (subdomain: string, empId: number) => {
   }
 };
 
-export const connectAndImportFromMysql = async (
-  subdomain: string,
-  models: IModels
-) => {
+export const connectAndImportFromMysql = async (subdomain: string) => {
+  const mysqlHost = process.env.MYSQL_HOST;
+  const mysqlDB = process.env.MYSQL_DB;
+  const mysqlUser = process.env.MYSQL_USERNAME;
+  const mysqlPassword = process.env.MYSQL_PASSWORD;
+  const mysqlTable = process.env.MYSQL_TABLE;
+
   // create the connection to database
   const connection = mysql.createConnection({
     host: 'localhost',
@@ -262,6 +265,7 @@ export const connectAndImportFromMysql = async (
     database: 'testt'
   });
 
+  let returnTimeclock;
   connection.connect(err => {
     if (err) {
       console.error('error connecting: ' + err.stack);
@@ -270,24 +274,25 @@ export const connectAndImportFromMysql = async (
   });
 
   connection.query(
-    'select * from `dbo.attLog` order by ID, authDateTime limit 200',
-    (error, results, fields) => {
+    'select * from `dbo.attLog` order by ID, authDateTime',
+    async (error, results) => {
       if (error) {
         throw new Error(`error: ${error}`);
       }
 
-      importDataAndCreateTimeclock(subdomain, models, results);
+      returnTimeclock = await importDataAndCreateTimeclock(subdomain, results);
     }
   );
+
+  return returnTimeclock;
 };
 
 const importDataAndCreateTimeclock = async (
   subdomain: string,
-  models: IModels,
   queryData: any
 ) => {
   const returnData: ITimeClock[] = [];
-
+  const models: IModels = await generateModels(subdomain);
   let currentEmpId = -9999999999;
   let currentEmpData: any;
 
@@ -316,9 +321,9 @@ const importDataAndCreateTimeclock = async (
     }
   }
 
-  for (const timeclock of returnData) {
-    await models.Timeclocks.createTimeClock({ ...timeclock });
-  }
+  await models.Timeclocks.insertMany(returnData);
+
+  return models.Timeclocks.find();
 };
 
 const createUserTimeclock = async (
@@ -331,36 +336,6 @@ const createUserTimeclock = async (
   const returnUserData: ITimeClock[] = [];
 
   const user = await findUserByEmployeeId(subdomain, empId);
-
-  // // find if there's any unfinished shift from timeclock data
-  // const unfinishedShifts = await models?.Timeclocks.find({
-  //   shiftActive: true,
-  //   userId: user && user._id,
-  //   deviceType: { $ne: 'faceTerminal' }
-  // });
-
-  // // if there's an unfinished shift clocked in on XOS
-  // for (const unfinishedShift of unfinishedShifts) {
-  //   const getShiftStart = dayjs(unfinishedShift.shiftStart);
-
-  //   const getShiftIdx = empData.findIndex(
-  //     row =>
-  //       dayjs(row.authDateTime) > getShiftStart &&
-  //       dayjs(row.authDateTime) < getShiftStart.add(10, 'hour')
-  //   );
-
-  //   if (getShiftIdx !== -1) {
-  //     await models.Timeclocks.updateTimeClock(unfinishedShift._id, {
-  //       userId: user?._id,
-  //       shiftStart: unfinishedShift.shiftStart,
-  //       shiftEnd: new Date(empData[getShiftIdx].authDateTime),
-  //       shiftActive: false
-  //     });
-
-  //     // remove that shift from emp Data
-  //     empData.splice(getShiftIdx, 1);
-  //   }
-  // }
 
   for (let i = 0; i < empData.length; i++) {
     const currShiftStart = empData[i].authDateTime;
@@ -448,7 +423,6 @@ const checkTimeClockAlreadyExists = async (
   );
 
   if (findExistingTimeclock) {
-    console.log(findExistingTimeclock);
     alreadyExists = true;
   }
 

@@ -33,7 +33,8 @@ const list = `
       employeeUserName
       branchName
       employeeId
-        
+      deviceName
+      deviceType
   }
 }
 `;

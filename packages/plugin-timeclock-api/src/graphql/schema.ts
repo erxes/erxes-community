@@ -20,6 +20,7 @@ export const types = `
     branchName: String
     deviceName: String
     employeeId: Int
+    deviceType: String
   }
 
   type Absence {
@@ -127,6 +128,7 @@ const params = `
   _id: String
   longitude: Float
   latitude: Float
+  deviceType: String
 `;
 
 const absence_params = `
@@ -170,5 +172,5 @@ export const mutations = `
   holidayRemove(_id: String): JSON
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
-  extractAllDataFromMySQL: JSON
+  extractAllDataFromMySQL: [Timeclock]
 `;
