@@ -37,17 +37,17 @@ const findUserByEmployeeId = async (subdomain: string, empId: number) => {
 };
 
 const connectAndQueryFromMySql = async (subdomain: string, query: string) => {
-  const mysqlHost = getEnv({ name: 'MYSQL_HOST ' });
-  const mysqlDB = getEnv({ name: 'MYSQL_DB' });
-  const mysqlUser = getEnv({ name: 'MYSQL_USERNAME' });
-  const mysqlPassword = getEnv({ name: 'MYSQL_PASSWORD' });
+  const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST ' });
+  const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
+  const MYSQL_USERNAME = getEnv({ name: 'MYSQL_USERNAME' });
+  const MYSQL_PASSWORD = getEnv({ name: 'MYSQL_PASSWORD' });
 
   // create the connection to mySQL database
   const connection = mysql.createConnection({
-    host: mysqlHost,
-    user: mysqlUser,
-    password: mysqlPassword,
-    database: mysqlDB
+    host: MYSQL_HOST,
+    user: MYSQL_USERNAME,
+    password: MYSQL_PASSWORD,
+    database: MYSQL_DB
   });
 
   connection.connect(err => {
