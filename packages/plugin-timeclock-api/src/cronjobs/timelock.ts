@@ -3,7 +3,7 @@ import { getEnv } from '@erxes/api-utils/src';
 import { connectAndQueryFromMySql } from '../utils';
 
 const connectAndImportFromMysql = async (subdomain: string) => {
-  const mysqlTable = getEnv({ name: 'MYSQL_TABLE' });
+  const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
 
   // get time data from yesterday till now
   const format = 'YYYY-MM-DD HH:mm:ss';
@@ -12,7 +12,7 @@ const connectAndImportFromMysql = async (subdomain: string) => {
 
   const query =
     'SELECT * FROM `' +
-    mysqlTable +
+    MYSQL_TABLE +
     '` WHERE authDateTime >= "' +
     YESTERDAY.format(format) +
     '" AND authDateTime <= "' +
