@@ -109,7 +109,7 @@ const posOrderItemSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     createdAt: field({ type: Date, label: 'Created at' }),
-    productId: field({ type: String, label: 'Product' }),
+    productId: field({ type: String, label: 'Product', esType: 'keyword' }),
     count: field({ type: Number, label: 'Count' }),
     unitPrice: field({ type: Number, label: 'Unit price' }),
     discountAmount: field({
