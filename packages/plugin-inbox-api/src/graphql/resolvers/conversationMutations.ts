@@ -132,7 +132,8 @@ const sendConversationToIntegrations = async (
             conversationId,
             content: content.replace(/&amp;/g, '&'),
             attachments: doc.attachments || []
-          })
+          }),
+          createdAt: new Date().getTime()
         },
         isRPC: true
       });

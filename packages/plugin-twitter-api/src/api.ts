@@ -373,7 +373,7 @@ interface IMessage {
 }
 
 export const reply = async (
-  receiverId: string,
+  recipientUserId: string,
   content: string
 ): Promise<IMessage> => {
   const twitterConfig = await getTwitterConfig();
@@ -390,7 +390,7 @@ export const reply = async (
           type: 'message_create',
           message_create: {
             target: {
-              recipient_id: receiverId
+              recipient_id: recipientUserId
             },
             message_data: {
               text: content
