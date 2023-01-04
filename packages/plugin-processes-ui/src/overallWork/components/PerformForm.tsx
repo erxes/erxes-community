@@ -24,11 +24,13 @@ import { IProductsData } from '../../types';
 import { JOB_TYPE_CHOISES } from '../../constants';
 
 type Props = {
-  renderButton: (props: IButtonMutateProps) => JSX.Element;
+  renderButton: (
+    props: IButtonMutateProps & { disabled: boolean }
+  ) => JSX.Element;
   closeModal: () => void;
   perform?: IPerform;
   overallWorkDetail: IOverallWorkDet;
-  max?: number;
+  max: number;
 };
 
 type State = {
@@ -359,7 +361,7 @@ class Form extends React.Component<Props, State> {
                 name="count"
                 defaultValue={count}
                 type="number"
-                max={max}
+                max={overallWorkDetail.type !== 'income' ? max : undefined}
                 autoFocus={true}
                 required={true}
                 onChange={this.onChangeCount}
@@ -460,7 +462,9 @@ class Form extends React.Component<Props, State> {
             values: this.generateDoc(values),
             isSubmitted,
             callback: closeModal,
-            object: perform
+            object: perform,
+            disabled:
+              overallWorkDetail.type !== 'income' && max < this.state.count
           })}
         </ModalFooter>
       </>
