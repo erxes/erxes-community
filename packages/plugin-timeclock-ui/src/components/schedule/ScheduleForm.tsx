@@ -106,9 +106,6 @@ function ScheduleForm(props: Props) {
     let overnightShift = false;
     let correctShiftEnd;
 
-    console.log('time', dayjs(currShiftStart).format(timeFormat));
-    console.log('time', dayjs(currShiftEnd).format(timeFormat));
-
     if (
       dayjs(currShiftEnd).format(timeFormat) <
       dayjs(currShiftStart).format(timeFormat)
