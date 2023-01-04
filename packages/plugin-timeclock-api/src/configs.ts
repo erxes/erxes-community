@@ -22,9 +22,9 @@ export default {
     };
   },
 
-  meta: {
-    cronjobs
-  },
+  // meta: {
+  //   cronjobs
+  // },
 
   apolloServerContext: async (context, req) => {
     const subdomain = getSubdomain(req);
