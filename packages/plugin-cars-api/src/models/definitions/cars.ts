@@ -1,3 +1,4 @@
+import { ICustomField } from '@erxes/api-utils/src/definitions/common';
 import { Schema, Document } from 'mongoose';
 import { CAR_SELECT_OPTIONS } from './constants';
 import { field, schemaHooksWrapper } from './utils';
@@ -16,6 +17,31 @@ const attachmentSchema = new Schema(
   { _id: false }
 );
 
+const customFieldSchema = new Schema(
+  {
+    field: { type: String },
+    value: { type: Schema.Types.Mixed },
+    stringValue: { type: String, optional: true },
+    numberValue: { type: Number, optional: true },
+    dateValue: { type: Date, optional: true },
+    locationValue: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        optional: true
+      },
+      coordinates: {
+        type: [Number],
+        optional: true
+      },
+      required: false
+    }
+  },
+  { _id: false }
+);
+
+customFieldSchema.index({ locationValue: '2dsphere' });
+
 export interface ICar {
   plateNumber: string;
   vinNumber: string;
@@ -33,6 +59,7 @@ export interface ICar {
   attachment?: any;
   customerIds?: string[];
   companyIds?: string[];
+  customFieldsData?: ICustomField[];
 }
 
 export interface ICarDocument extends ICar, Document {
@@ -173,7 +200,12 @@ export const carSchema = schemaHooksWrapper(
 
     attachment: field({ type: attachmentSchema }),
     customerIds: field({ type: [String], optional: true }),
-    companyIds: field({ type: [String], optional: true })
+    companyIds: field({ type: [String], optional: true }),
+    customFieldsData: field({
+      type: [customFieldSchema],
+      optional: true,
+      label: 'Custom fields data'
+    })
   }),
   'erxes_cars'
 );

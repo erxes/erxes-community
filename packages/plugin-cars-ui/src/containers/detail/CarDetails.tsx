@@ -1,13 +1,16 @@
+import { queries as fieldQueries } from '@erxes/ui-forms/src/settings/properties/graphql';
+import { FieldsGroupsQueryResponse } from '@erxes/ui-forms/src/settings/properties/types';
 import { EmptyState, Spinner, withProps } from '@erxes/ui/src';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { Alert } from '@erxes/ui/src/utils';
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
+
 import CarDetails from '../../components/detail/CarDetails';
 import { mutations, queries } from '../../graphql';
 import { DetailQueryResponse } from '../../types';
-import { Alert } from '@erxes/ui/src/utils';
 
 type Props = {
   id: string;
@@ -17,10 +20,17 @@ type FinalProps = {
   carDetailQuery: DetailQueryResponse;
   currentUser: IUser;
   carEditMutation: any;
+  fieldsGroupsQuery: FieldsGroupsQueryResponse;
 } & Props;
 
 const CarDetailsContainer = (props: FinalProps) => {
-  const { id, carDetailQuery, currentUser, carEditMutation } = props;
+  const {
+    id,
+    carDetailQuery,
+    currentUser,
+    carEditMutation,
+    fieldsGroupsQuery
+  } = props;
 
   if (carDetailQuery.loading) {
     return <Spinner objective={true} />;
@@ -51,6 +61,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     loading: carDetailQuery.loading,
     car: carDetail,
     currentUser,
+    fieldsGroups: fieldsGroupsQuery ? fieldsGroupsQuery.fieldsGroups : [],
     editCar
   };
 
@@ -66,6 +77,18 @@ export default withProps<Props>(
         options: ({ id }) => ({
           variables: {
             _id: id
+          }
+        })
+      }
+    ),
+    graphql<Props, FieldsGroupsQueryResponse, { contentType: string }>(
+      gql(fieldQueries.fieldsGroups),
+      {
+        name: 'fieldsGroupsQuery',
+        options: () => ({
+          variables: {
+            contentType: 'cars:car',
+            isDefinedByErxes: false
           }
         })
       }

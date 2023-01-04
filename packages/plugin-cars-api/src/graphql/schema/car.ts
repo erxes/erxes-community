@@ -67,6 +67,7 @@ export const types = ({ contacts }) => `
     attachment: Attachment
     customerIds: [String]
     companyIds: [String]
+    customFieldsData: JSON
   }
   type CarsListResponse {
     list: [Car],
@@ -129,7 +130,7 @@ const carCategoryParams = `
 
 export const mutations = `
   carsAdd(${commonFields}): Car
-  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}): Car
+  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}, customFieldsData: JSON): Car
   carsRemove(carIds: [String]): [String]
   carsMerge(carIds: [String], carFields: JSON) : Car
   carCategoriesAdd(${carCategoryParams}): CarCategory

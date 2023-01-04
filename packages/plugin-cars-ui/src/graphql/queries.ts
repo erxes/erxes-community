@@ -149,6 +149,7 @@ export const carDetail = `
         size
         type
       }
+      customFieldsData
     }
   }
 `;
