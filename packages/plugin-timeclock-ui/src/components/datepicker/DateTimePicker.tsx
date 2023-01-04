@@ -53,7 +53,7 @@ const DatePicker = (props: Props) => {
 
     if (
       input instanceof Date &&
-      startDate?.toLocaleDateString() === input.toLocaleDateString()
+      startDate?.getUTCFullYear() === input.getUTCFullYear()
     ) {
       if (type === 'start') {
         onStartTimeChange(input);
