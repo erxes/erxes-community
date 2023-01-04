@@ -24,7 +24,7 @@ import {
 } from './subscription/subscriptionOrder';
 import { generatePageModel, IPageModel } from './page';
 import { generateFollowTagModel, IFollowTagModel } from './followTag';
-import { generateSavedPostModel, SavedPostModel } from './savepost';
+import { generatePollOptionModel, PollOptionModel } from './postPollOption';
 
 export interface IModels {
   Category: ICategoryModel;
@@ -43,7 +43,7 @@ export interface IModels {
   SubscriptionOrder: ISubscriptionOrderModel;
   Page: IPageModel;
   FollowTag: IFollowTagModel;
-  SavedPost: SavedPostModel;
+  PollOption: PollOptionModel;
 }
 
 export let models: IModels | null = null;
@@ -63,7 +63,7 @@ export const generateModels = createGenerateModels<IModels>(
     generateSubscriptionOrderModel(subdomain, connection, models);
     generatePageModel(subdomain, connection, models);
     generateFollowTagModel(subdomain, connection, models);
-    generateSavedPostModel(subdomain, connection, models);
+    generatePollOptionModel(subdomain, connection, models);
     return models;
   }
 );
