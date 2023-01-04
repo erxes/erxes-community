@@ -14,8 +14,6 @@ import { graphql } from 'react-apollo';
 import { mutations, queries } from '../../graphql';
 import { DetailQueryResponse } from '../../types';
 
-// import { mutations } from "../graphql";
-
 type Props = {
   isDetail: boolean;
   id: string;
