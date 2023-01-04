@@ -1,6 +1,5 @@
 import { IItemParams, SaveMutation } from '@erxes/ui-cards/src/boards/types';
 import GenerateCustomFields from '@erxes/ui-forms/src/settings/properties/components/GenerateCustomFields';
-import { FIELDS_GROUPS_CONTENT_TYPES } from '@erxes/ui-forms/src/settings/properties/constants';
 import { queries as fieldQueries } from '@erxes/ui-forms/src/settings/properties/graphql';
 import { FieldsGroupsQueryResponse } from '@erxes/ui-forms/src/settings/properties/types';
 import Spinner from '@erxes/ui/src/components/Spinner';
@@ -11,6 +10,7 @@ import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
+
 import { mutations, queries } from '../../graphql';
 import { DetailQueryResponse } from '../../types';
 
@@ -80,7 +80,7 @@ export default withProps<Props>(
         name: 'fieldsGroupsQuery',
         options: () => ({
           variables: {
-            contentType: FIELDS_GROUPS_CONTENT_TYPES.CAR,
+            contentType: 'cars:car',
             isDefinedByErxes: false
           }
         }),
