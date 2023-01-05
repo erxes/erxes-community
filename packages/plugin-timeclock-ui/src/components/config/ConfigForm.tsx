@@ -11,7 +11,6 @@ import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import { IAbsence, IAbsenceType, IPayDates, ISchedule } from '../../types';
-import { IAbsence, IAbsenceType, IPayDates, ISchedule } from '../../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import ScheduleConfig from './ScheduleDayToggleConfig';
 import Datetime from '@nateradebaugh/react-datetime';
@@ -264,7 +263,6 @@ function ConfigForm(props: Props) {
                 value={payDates.date1}
                 required={false}
                 onChange={(val: any) => onConfigDateChange('date1', val)}
-                onChange={(val: any) => onConfigDateChange('date1', val)}
                 placeholder={'Enter date'}
                 dateFormat={'YYYY-MM-DD'}
               />
@@ -272,7 +270,6 @@ function ConfigForm(props: Props) {
                 <DateControl
                   value={payDates.date2}
                   required={false}
-                  onChange={(val: any) => onConfigDateChange('date2', val)}
                   onChange={(val: any) => onConfigDateChange('date2', val)}
                   placeholder={'Enter date'}
                   dateFormat={'YYYY-MM-DD'}
@@ -336,40 +333,6 @@ function ConfigForm(props: Props) {
       </>
     );
   };
-  // const compareStartAndEndTime = (day_key, newShiftStart, newShiftEnd) => {
-  //   const currShift = scheduleDates[day_key];
-  //   const currShiftDate = currShift.shiftDate?.toLocaleDateString();
-  //   const currShiftEnd = newShiftEnd ? newShiftEnd : currShift.shiftEnd;
-  //   const currShiftStart = newShiftStart ? newShiftStart : currShift.shiftStart;
-
-  //   let overnightShift = false;
-  //   let correctShiftEnd;
-
-  //   if (
-  //     dayjs(currShiftEnd).format(timeFormat) <
-  //     dayjs(currShiftStart).format(timeFormat)
-  //   ) {
-  //     correctShiftEnd =
-  //       dayjs(currShiftDate)
-  //         .add(1, 'day')
-  //         .toDate()
-  //         .toLocaleDateString() +
-  //       ' ' +
-  //       dayjs(currShiftEnd).format(timeFormat);
-
-  //     overnightShift = true;
-  //   } else {
-  //     correctShiftEnd = dayjs(
-  //       currShiftDate + ' ' + dayjs(currShiftEnd).format(timeFormat)
-  //     ).toDate();
-  //   }
-
-  //   const correctShiftStart = dayjs(
-  //     currShiftDate + ' ' + dayjs(currShiftStart).format(timeFormat)
-  //   ).toDate();
-
-  //   return [correctShiftStart, correctShiftEnd, overnightShift];
-  // };
 
   const onEndTimeChange = () => {
     console.log();
