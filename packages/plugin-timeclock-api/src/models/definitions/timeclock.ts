@@ -74,6 +74,27 @@ export interface IPayDate {
 export interface IPayDateDocument extends IPayDate, Document {
   _id: string;
 }
+export interface IScheduleConfig {
+  weekDays: IScheduleDay[];
+}
+export interface IScheduleConfigDocument extends IScheduleConfig, Document {
+  _id: string;
+}
+
+export interface IScheduleDay {
+  name: string;
+  scheduleConfigId: string;
+  shiftStart: string;
+  shiftEnd: string;
+  validCheckInStart?: string;
+  validCheckInEnd?: string;
+  overNightStart?: string;
+  overNightEnd?: string;
+}
+
+export interface IScheduleDayDocument extends IScheduleDay, Document {
+  _id: string;
+}
 
 export const attachmentSchema = new Schema(
   {

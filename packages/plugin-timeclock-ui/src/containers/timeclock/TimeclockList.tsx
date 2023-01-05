@@ -43,7 +43,10 @@ const ListContainer = (props: FinalProps) => {
         listTimeclocksQuery.refetch();
         Alert.success('Successfully extracted data');
       })
-      .catch(e => Alert.error(e.message));
+      .catch(e => {
+        setLoading(false);
+        Alert.error(e.message);
+      });
   };
 
   const updatedProps = {

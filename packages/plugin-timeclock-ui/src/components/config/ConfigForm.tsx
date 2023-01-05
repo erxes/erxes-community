@@ -14,8 +14,7 @@ import { IAbsence, IAbsenceType, IPayDates, ISchedule } from '../../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import ScheduleConfig from './ScheduleDayToggleConfig';
 import Datetime from '@nateradebaugh/react-datetime';
-import Select from 'react-select-plus';
-import { Input } from '../../styles';
+import DatePicker from '../datepicker/DateTimePicker';
 
 type Props = {
   history?: any;
@@ -38,15 +37,51 @@ function ConfigForm(props: Props) {
   const [payPeriod, setPayPeriod] = useState('');
 
   const [contentType, setContentType] = useState('');
+
+  const defaultStartTime = new Date(
+    new Date().toLocaleDateString() + ' 08:30:00'
+  );
+  const defaultEndTime = new Date(
+    new Date().toLocaleDateString() + ' 17:00:00'
+  );
   const [configDays, setConfigDays] = useState<ISchedule>({
-    Monday: { display: true, shiftStart: undefined, shiftEnd: undefined },
-    Tuesday: { display: true },
-    Wednesday: { display: true },
-    Thursday: { display: true },
-    Friday: { display: true },
-    Saturday: { display: true },
-    Sunday: { display: true }
+    Monday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Tuesday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Wednesday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Thursday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Friday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Saturday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    },
+    Sunday: {
+      display: true,
+      shiftStart: defaultStartTime,
+      shiftEnd: defaultEndTime
+    }
   });
+
   const [holidayDates, setHolidayDates] = useState({
     startingDate: (holiday && holiday.startTime) || null,
     endingDate: (holiday && holiday.endTime) || null
@@ -297,6 +332,46 @@ function ConfigForm(props: Props) {
       </>
     );
   };
+  const compareStartAndEndTime = (day_key, newShiftStart, newShiftEnd) => {
+    const currShift = scheduleDates[day_key];
+    const currShiftDate = currShift.shiftDate?.toLocaleDateString();
+    const currShiftEnd = newShiftEnd ? newShiftEnd : currShift.shiftEnd;
+    const currShiftStart = newShiftStart ? newShiftStart : currShift.shiftStart;
+
+    let overnightShift = false;
+    let correctShiftEnd;
+
+    if (
+      dayjs(currShiftEnd).format(timeFormat) <
+      dayjs(currShiftStart).format(timeFormat)
+    ) {
+      correctShiftEnd =
+        dayjs(currShiftDate)
+          .add(1, 'day')
+          .toDate()
+          .toLocaleDateString() +
+        ' ' +
+        dayjs(currShiftEnd).format(timeFormat);
+
+      overnightShift = true;
+    } else {
+      correctShiftEnd = dayjs(
+        currShiftDate + ' ' + dayjs(currShiftEnd).format(timeFormat)
+      ).toDate();
+    }
+
+    const correctShiftStart = dayjs(
+      currShiftDate + ' ' + dayjs(currShiftStart).format(timeFormat)
+    ).toDate();
+
+    return [correctShiftStart, correctShiftEnd, overnightShift];
+  };
+
+  const onEndTimeChange = () => {
+    console.log();
+  };
+
+  const onStartTimeChange = () => {};
 
   const renderConfigDays = () => {
     return Object.keys(configDays).map(configDay => {
@@ -312,8 +387,15 @@ function ConfigForm(props: Props) {
           {configDays[configDay].display && (
             <>
               {configDay}
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <Datetime
+              <DatePicker
+                curr_day_key={configDay}
+                startTime_value={configDays[configDay].shiftStart}
+                endTime_value={configDays[configDay].shiftEnd}
+                changeEndTime={onEndTimeChange}
+                changeStartTime={onStartTimeChange}
+                timeOnly={true}
+              />
+              {/* <Datetime
                   defaultValue={new Date()}
                   dateFormat={false}
                   timeFormat="hh:mm a"
@@ -328,8 +410,7 @@ function ConfigForm(props: Props) {
                   onChange={(val: any) =>
                     onConfigDayEndTimeChange(val, configDay)
                   }
-                />
-              </div>
+                /> */}
             </>
           )}
         </div>

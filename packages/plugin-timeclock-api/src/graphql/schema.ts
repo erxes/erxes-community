@@ -107,6 +107,24 @@ export const types = `
     payDates: [Int]
   }
 
+  type ScheduleConfig {
+    _id: String!
+    weekDays: [WeekDay]
+    validCheckInStart: String
+    validCheckInEnd: String
+    overNightStart: String
+    overNightEnd: String
+  }
+
+  type WeekDay {
+    _id: String!
+    name: String
+    scheduleConfigId: String
+    shiftStart: String
+    shiftEnd: String
+  }
+
+
 `;
 
 export const queries = `
