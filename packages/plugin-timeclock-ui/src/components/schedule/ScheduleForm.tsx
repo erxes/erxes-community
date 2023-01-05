@@ -16,7 +16,6 @@ import { IBranch } from '@erxes/ui/src/team/types';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import { __ } from '@erxes/ui/src/utils';
-import { compareStartAndEndTime } from '../../utils';
 
 type Props = {
   scheduleOfMembers: any;
@@ -98,40 +97,40 @@ function ScheduleForm(props: Props) {
     setScheduleDates(newScheduleDates);
   };
 
-  // const compareStartAndEndTime = (day_key, newShiftStart, newShiftEnd) => {
-  //   const currShift = scheduleDates[day_key];
-  //   const currShiftDate = currShift.shiftDate?.toLocaleDateString();
-  //   const currShiftEnd = newShiftEnd ? newShiftEnd : currShift.shiftEnd;
-  //   const currShiftStart = newShiftStart ? newShiftStart : currShift.shiftStart;
+  const compareStartAndEndTime = (day_key, newShiftStart, newShiftEnd) => {
+    const currShift = scheduleDates[day_key];
+    const currShiftDate = currShift.shiftDate?.toLocaleDateString();
+    const currShiftEnd = newShiftEnd ? newShiftEnd : currShift.shiftEnd;
+    const currShiftStart = newShiftStart ? newShiftStart : currShift.shiftStart;
 
-  //   let overnightShift = false;
-  //   let correctShiftEnd;
+    let overnightShift = false;
+    let correctShiftEnd;
 
-  //   if (
-  //     dayjs(currShiftEnd).format(timeFormat) <
-  //     dayjs(currShiftStart).format(timeFormat)
-  //   ) {
-  //     correctShiftEnd =
-  //       dayjs(currShiftDate)
-  //         .add(1, 'day')
-  //         .toDate()
-  //         .toLocaleDateString() +
-  //       ' ' +
-  //       dayjs(currShiftEnd).format(timeFormat);
+    if (
+      dayjs(currShiftEnd).format(timeFormat) <
+      dayjs(currShiftStart).format(timeFormat)
+    ) {
+      correctShiftEnd =
+        dayjs(currShiftDate)
+          .add(1, 'day')
+          .toDate()
+          .toLocaleDateString() +
+        ' ' +
+        dayjs(currShiftEnd).format(timeFormat);
 
-  //     overnightShift = true;
-  //   } else {
-  //     correctShiftEnd = dayjs(
-  //       currShiftDate + ' ' + dayjs(currShiftEnd).format(timeFormat)
-  //     ).toDate();
-  //   }
+      overnightShift = true;
+    } else {
+      correctShiftEnd = dayjs(
+        currShiftDate + ' ' + dayjs(currShiftEnd).format(timeFormat)
+      ).toDate();
+    }
 
-  //   const correctShiftStart = dayjs(
-  //     currShiftDate + ' ' + dayjs(currShiftStart).format(timeFormat)
-  //   ).toDate();
+    const correctShiftStart = dayjs(
+      currShiftDate + ' ' + dayjs(currShiftStart).format(timeFormat)
+    ).toDate();
 
-  //   return [correctShiftStart, correctShiftEnd, overnightShift];
-  // };
+    return [correctShiftStart, correctShiftEnd, overnightShift];
+  };
 
   const onStartTimeChange = (day_key, time) => {
     const newShift = scheduleDates[day_key];
@@ -139,7 +138,7 @@ function ScheduleForm(props: Props) {
       getCorrectStartTime,
       getCorrectEndTime,
       overnight
-    ] = compareStartAndEndTime(scheduleDates, day_key, time, null);
+    ] = compareStartAndEndTime(day_key, time, null);
 
     newShift.shiftStart = getCorrectStartTime;
     newShift.overnightShift = overnight;
@@ -155,7 +154,7 @@ function ScheduleForm(props: Props) {
       getCorrectStartTime,
       getCorrectEndTime,
       overnight
-    ] = compareStartAndEndTime(scheduleDates, day_key, null, time);
+    ] = compareStartAndEndTime(day_key, null, time);
 
     newShift.shiftStart = getCorrectStartTime;
     newShift.overnightShift = overnight;
