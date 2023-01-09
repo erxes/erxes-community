@@ -48,6 +48,7 @@ class RightSidebar extends React.Component<Props, State> {
 
   render() {
     const { car, editCar } = this.props;
+
     const customerContent = (
       <div>
         {car.customerIds?.map(customer => (
@@ -62,6 +63,7 @@ class RightSidebar extends React.Component<Props, State> {
         )}
       </div>
     );
+
     const companyContent = (
       <div>
         {car.companyIds?.map(company => (
@@ -129,6 +131,7 @@ class RightSidebar extends React.Component<Props, State> {
         </>
       );
     };
+
     const companyChooser = props => {
       const { closeModal } = props;
       return (
@@ -157,6 +160,7 @@ class RightSidebar extends React.Component<Props, State> {
         </>
       );
     };
+
     const extraCustomerButtons = (
       <ModalTrigger
         title="Associate"
@@ -168,6 +172,7 @@ class RightSidebar extends React.Component<Props, State> {
         content={customerChooser}
       />
     );
+
     const extraCompanyButtons = (
       <ModalTrigger
         title="Associate"
