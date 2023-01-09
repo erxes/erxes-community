@@ -32,16 +32,20 @@ export const checkPricing = async (
       {
         $or: [
           {
-            branchIds: { $in: [branchId] },
+            branchIds: { $in: [branchId && branchId] },
             departmentIds: { $size: 0 }
           },
           {
-            branchIds: { $size: 0 },
-            departmentIds: { $in: [departmentId] }
+            departmentIds: { $in: [departmentId && departmentId] },
+            branchIds: { $size: 0 }
           },
           {
             branchIds: { $size: 0 },
             departmentIds: { $size: 0 }
+          },
+          {
+            departmentIds: { $in: [departmentId && departmentId] },
+            branchIds: { $in: [branchId && branchId] }
           }
         ]
       },
@@ -86,11 +90,12 @@ export const checkPricing = async (
   };
 
   const plans: any = await models.PricingPlans.find(conditions).sort(sortArgs);
-  let priorityApplied: any = false;
 
   if (plans.length === 0) {
     return;
   }
+
+  let priorityApplied: any = false;
 
   // Calculating discount
   for (const plan of plans) {
@@ -136,6 +141,7 @@ export const checkPricing = async (
       let type: string = '';
       let value: number = 0;
       let bonusProduct: string = '';
+
       const defaultValue: number = calculateDiscountValue(
         plan.type,
         plan.value,
@@ -207,15 +213,16 @@ export const checkPricing = async (
           (!plan.isPriority &&
             !priorityApplied &&
             result[item.productId].value < value)
-        )
+        ) {
           if (plan.isPriority) {
             priorityApplied = true;
           }
-        planApplied = true;
-        appliedBundleItems.push(item);
-        result[item.productId].type = type;
-        result[item.productId].value = value;
-        result[item.productId].bonusProduct = bonusProduct;
+          planApplied = true;
+          appliedBundleItems.push(item);
+          result[item.productId].type = type;
+          result[item.productId].value = value;
+          result[item.productId].bonusProduct = bonusProduct;
+        }
       }
     }
 
