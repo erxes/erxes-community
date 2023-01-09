@@ -14,7 +14,9 @@ const pricingPlanQueries = {
 
     if (status && status.length !== 0) filter.status = status;
 
-    return await models.PricingPlans.find(filter).lean();
+    return await models.PricingPlans.find(filter)
+      .sort({ updatedAt: -1 })
+      .lean();
   },
 
   pricingPlanDetail: async (
