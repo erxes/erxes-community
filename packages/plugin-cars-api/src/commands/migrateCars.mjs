@@ -35,7 +35,18 @@ var command = async () => {
   console.log('Successfully deleted with car conformities');
 
   for (var conformity of conformities) {
-    await Car.updateOne({}, { $push: { customerIds: conformity.mainTypeId } });
+    if (
+      conformity.mainType === 'customer' ||
+      conformity.relType === 'customer'
+    ) {
+      await Car.updateOne(
+        {},
+        { $push: { customerIds: conformity.mainTypeId } }
+      );
+    }
+    if (conformity.mainType === 'company' || conformity.relType === 'company') {
+      await Car.updateOne({}, { $push: { companyIds: conformity.mainTypeId } });
+    }
   }
 
   console.log(`Process finished at: ${new Date()}`);
