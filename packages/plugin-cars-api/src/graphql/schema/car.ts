@@ -2,23 +2,18 @@ import {
   attachmentType,
   attachmentInput
 } from '@erxes/api-utils/src/commonTypeDefs';
-
 export const types = ({ contacts }) => `
-
   ${attachmentType}
   ${attachmentInput}
-
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
-
   ${
     contacts
       ? `
         extend type Customer @key(fields: "_id") {
           _id: String! @external
         }
-
         extend type Company @key(fields: "_id") {
           _id: String! @external
         }
@@ -26,7 +21,6 @@ export const types = ({ contacts }) => `
       : ''
   }
   
-
   type CarCategory {
     _id: String!
     name: String
@@ -65,13 +59,15 @@ export const types = ({ contacts }) => `
     vintageYear: Float
     importYear: Float
     attachment: Attachment
+    customerIds: [String]
+    companyIds: [String]
+    customFieldsData: JSON
   }
   type CarsListResponse {
     list: [Car],
     totalCount: Float,
   }
 `;
-
 const queryParams = `
   page: Int
   perPage: Int
@@ -88,7 +84,6 @@ const queryParams = `
   conformityIsRelated: Boolean
   conformityIsSaved: Boolean
 `;
-
 export const queries = `
   carsMain(${queryParams}): CarsListResponse
   cars(${queryParams}): [Car]
@@ -102,7 +97,6 @@ export const queries = `
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
 `;
-
 const commonFields = `
   ownerId: String,
   description: String
@@ -116,6 +110,7 @@ const commonFields = `
   vintageYear: Float
   importYear: Float
   attachment: AttachmentInput
+  customFieldsData: JSON
 `;
 
 const carCategoryParams = `
@@ -127,7 +122,7 @@ const carCategoryParams = `
 
 export const mutations = `
   carsAdd(${commonFields}): Car
-  carsEdit(_id: String!, ${commonFields}): Car
+  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}, customFieldsData: JSON): Car
   carsRemove(carIds: [String]): [String]
   carsMerge(carIds: [String], carFields: JSON) : Car
   carCategoriesAdd(${carCategoryParams}): CarCategory

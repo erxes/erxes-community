@@ -1,8 +1,5 @@
-import * as path from 'path';
-
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import { ICar } from '../../types';
-import { IUser } from '@erxes/ui/src/auth/types';
 import LeftSidebar from './LeftSidebar';
 import React from 'react';
 import RightSidebar from './RightSidebar';
@@ -10,7 +7,6 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from 'coreui/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
-
 const ActivityInputs = asyncComponent(
   () =>
     isEnabled('logs') &&
@@ -18,7 +14,6 @@ const ActivityInputs = asyncComponent(
       /* webpackChunkName: "ActivityInputs" */ '@erxes/ui-log/src/activityLogs/components/ActivityInputs'
     )
 );
-
 const ActivityLogs = asyncComponent(
   () =>
     isEnabled('logs') &&
@@ -29,7 +24,7 @@ const ActivityLogs = asyncComponent(
 
 type Props = {
   car: ICar;
-  currentUser: IUser;
+  editCar: (values: any) => void;
 };
 
 class CarDetails extends React.Component<Props> {
@@ -37,7 +32,6 @@ class CarDetails extends React.Component<Props> {
     if (isEnabled('logs')) {
       return content;
     }
-
     return (
       <EmptyState
         image="/images/actions/5.svg"
@@ -46,14 +40,10 @@ class CarDetails extends React.Component<Props> {
       />
     );
   }
-
   render() {
     const { car } = this.props;
-
     const title = car.plateNumber || 'Unknown';
-
     const breadcrumb = [{ title: __('Cars'), link: '/cars' }, { title }];
-
     const content = (
       <>
         <ActivityInputs
@@ -69,17 +59,15 @@ class CarDetails extends React.Component<Props> {
         />
       </>
     );
-
     return (
       <Wrapper
         header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}
         leftSidebar={<LeftSidebar {...this.props} />}
-        rightSidebar={<RightSidebar car={car} />}
+        rightSidebar={<RightSidebar {...this.props} />}
         content={this.renderContent(content)}
         transparent={true}
       />
     );
   }
 }
-
 export default CarDetails;
