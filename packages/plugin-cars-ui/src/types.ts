@@ -36,6 +36,9 @@ export interface ICarDoc {
   importYear?: number;
 
   attachment?: IAttachment;
+  customers?: string[];
+  customerIds?: string[];
+  companyIds?: string[];
 }
 
 export interface ICarCategory {
