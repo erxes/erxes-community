@@ -15,7 +15,6 @@ import { DetailQueryResponse } from '../../types';
 type Props = {
   id: string;
 };
-
 type FinalProps = {
   carDetailQuery: DetailQueryResponse;
   currentUser: IUser;
@@ -35,7 +34,6 @@ const CarDetailsContainer = (props: FinalProps) => {
   if (carDetailQuery.loading) {
     return <Spinner objective={true} />;
   }
-
   if (!carDetailQuery.carDetail) {
     return <EmptyState text="Car not found" image="/images/actions/24.svg" />;
   }
@@ -67,7 +65,6 @@ const CarDetailsContainer = (props: FinalProps) => {
 
   return <CarDetails {...updatedProps} />;
 };
-
 export default withProps<Props>(
   compose(
     graphql<Props, DetailQueryResponse, { _id: string }>(

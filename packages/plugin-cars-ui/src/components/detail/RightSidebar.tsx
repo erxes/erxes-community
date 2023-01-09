@@ -38,7 +38,6 @@ class RightSidebar extends React.Component<Props, State> {
     if (!car.plan) {
       return null;
     }
-
     return (
       <li>
         <div>{__('Plan')}: </div>
