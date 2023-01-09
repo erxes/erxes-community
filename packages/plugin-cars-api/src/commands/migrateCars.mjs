@@ -24,7 +24,15 @@ var command = async () => {
   Conformity = db.collection('conformities');
   Car = db.collection('cars');
 
-  var conformities = await Conformity.find({}).toArray();
+  var conformities = await Conformity.find({
+    $or: [{ mainType: 'car' }, { relType: 'car' }]
+  }).toArray();
+
+  await Conformity.deleteMany({
+    $or: [{ mainType: 'car' }, { relType: 'car' }]
+  });
+
+  console.log('Successfully deleted with car conformities');
 
   for (var conformity of conformities) {
     await Car.updateOne({}, { $push: { customerIds: conformity.mainTypeId } });

@@ -59,7 +59,7 @@ class RightSidebar extends React.Component<Props, State> {
           </SectionBodyItem>
         ))}
         {car.customerIds?.length === 0 && (
-          <EmptyState icon="building" text="No company" />
+          <EmptyState icon="user-6" text="No customer" />
         )}
       </div>
     );
