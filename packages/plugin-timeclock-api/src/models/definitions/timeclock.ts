@@ -59,9 +59,12 @@ export interface IShift {
   status?: string;
   shiftStart?: Date;
   shiftEnd?: Date;
-  absentWholeShift?: boolean;
-  absenceStart?: Date;
-  absenceEnd?: Date;
+  overnightShift?: boolean;
+  weekDay?: boolean;
+  configName?: string;
+  configShiftStart?: string;
+  configShiftEnd?: string;
+  scheduleConfigId?: string;
 }
 
 export interface IShiftDocument extends IShift, Document {
@@ -75,27 +78,12 @@ export interface IPayDateDocument extends IPayDate, Document {
   _id: string;
 }
 export interface IScheduleConfig {
-  configDays: IScheduleDay[];
-  validCheckInStart?: string;
-  validCheckInEnd?: string;
-  validCheckOutStart?: string;
-  validCheckOutEnd?: string;
-  overNightStart?: string;
-  overNightEnd?: string;
+  scheduleName?: string;
+  shiftStart?: string;
+  shiftEnd?: string;
 }
 
 export interface IScheduleConfigDocument extends IScheduleConfig, Document {
-  _id: string;
-}
-
-export interface IScheduleDay {
-  configDay: string;
-  scheduleConfigId: string;
-  shiftStart: string;
-  shiftEnd: string;
-}
-
-export interface IScheduleDayDocument extends IScheduleDay, Document {
   _id: string;
 }
 
@@ -192,6 +180,27 @@ export const scheduleSchema = new Schema({
 export const scheduleShiftSchema = new Schema({
   _id: field({ pkey: true }),
   scheduleId: field({ type: String, label: 'id of an according schedule' }),
+  scheduleConfigId: field({
+    type: String,
+    label: 'id of an according schedule config'
+  }),
+  configName: field({
+    type: String,
+    label: 'name of schedule config'
+  }),
+  configShiftStart: field({
+    type: String,
+    label: 'starting time of config day shift'
+  }),
+  configShiftEnd: field({
+    type: String,
+    label: 'ending time of config day shift'
+  }),
+  overnightShift: field({
+    type: Boolean,
+    label: 'to be sure of whether shift occurs overnight'
+  }),
+
   solved: field({
     type: Boolean,
     default: false,
@@ -216,49 +225,15 @@ export const payDateSchema = new Schema({
 export const scheduleConfigSchema = new Schema({
   _id: field({ pkey: true }),
   scheduleName: field({ type: String, label: 'Name of the schedule' }),
-  validCheckInStart: field({
+  shiftStart: field({
     type: String,
-    label: 'Start of valid check in time'
+    label: 'starting time of shift'
   }),
-  validCheckInEnd: field({
+  shiftEnd: field({
     type: String,
-    label: 'End of valid check in time'
-  }),
-  validCheckOutStart: field({
-    type: String,
-    label: 'Start of valid check out time'
-  }),
-  validCheckOutEnd: field({
-    type: String,
-    label: 'End of valid check out time '
-  }),
-  overNightStart: field({
-    type: String,
-    label: 'Overnight shift starting time'
-  }),
-  overNightEnd: field({
-    type: String,
-    label: 'Overnight shift ending time'
+    label: 'ending time of shift'
   })
 });
-
-export const scheduleConfigDaysSchema = new Schema({
-  _id: field({ pkey: true }),
-  configName: field({ type: String, label: 'Week day name' }),
-  scheduleConfigId: field({ type: String, label: 'Schedule config id' }),
-  shiftStart: field({ type: String, label: 'Shift starting time ' }),
-  shitEnd: field({ type: String, label: 'Shift ending time ' })
-});
-
-export interface IScheduleConfig {
-  configDays: IScheduleDay[];
-  validCheckInStart?: string;
-  validCheckInEnd?: string;
-  validCheckOutStart?: string;
-  validCheckOutEnd?: string;
-  overNightStart?: string;
-  overNightEnd?: string;
-}
 
 // common types
 export interface IScheduleReport {

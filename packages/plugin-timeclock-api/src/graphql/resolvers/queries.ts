@@ -49,6 +49,10 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
+  async scheduleConfigs(_root, {}, { models, subdomain }: IContext) {
+    return models.ScheduleConfigs.find();
+  },
+
   async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
     const selector = await generateFilter(queryParams, subdomain, 'absence');
     const totalCount = models.Absences.find(selector).countDocuments();

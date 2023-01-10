@@ -10,12 +10,14 @@ import { CustomRow } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import Tip from '@erxes/ui/src/components/Tip';
 import ScheduleForm from './ScheduleForm';
+import { IScheduleConfig } from '../../types';
 
 type Props = {
   scheduleOfMembers: any;
   queryParams: any;
   history: any;
   branchesList: IBranch[];
+  scheduleConfigs: IScheduleConfig[];
   getActionBar: (actionBar: any) => void;
   solveSchedule: (scheduleId: string, status: string) => void;
   solveShift: (shiftId: string, status: string) => void;

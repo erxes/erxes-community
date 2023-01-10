@@ -111,9 +111,11 @@ const DatePicker = (props: Props) => {
         onChange={val => onTimeChange(val, 'end')}
       />
       {overnightShift ? 'Overnight' : ''}
-      <Tip text="Delete" placement="top">
-        <Button btnStyle="link" onClick={onDeleteDate} icon="times-circle" />
-      </Tip>
+      {!timeOnly && (
+        <Tip text="Delete" placement="top">
+          <Button btnStyle="link" onClick={onDeleteDate} icon="times-circle" />
+        </Tip>
+      )}
     </div>
   );
 };

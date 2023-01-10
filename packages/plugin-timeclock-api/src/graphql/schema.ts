@@ -45,8 +45,9 @@ export const types = `
 
   
   input ShiftsRequestInput {
-    dayName: String
+    _id: String
     overnightShift: Boolean
+    configName: String
     shiftStart: Date
     shiftEnd: Date
   }
@@ -109,27 +110,22 @@ export const types = `
     payDates: [Int]
   }
 
-  input ScheduleConfigInput {
-    configDays: ShiftsRequestInput
-    configDayName: String
-  }
   
   type ScheduleConfig {
     _id: String!
     scheduleName: String
-    weekDays: [WeekDay]
-    validCheckInStart: String
-    validCheckInEnd: String
-    overNightStart: String
-    overNightEnd: String
-  }
-
-  type WeekDay {
-    _id: String!
-    name: String
-    scheduleConfigId: String
     shiftStart: String
     shiftEnd: String
+    configDays: [ConfigDay]
+  }
+
+  type ConfigDay {
+    _id: String!
+    configName: String
+    overnightShift: Boolean
+    scheduleConfigId: String
+    configShiftStart: String
+    configShiftEnd: String
   }
 
   type TimeClocksListResponse {
@@ -199,6 +195,7 @@ export const queries = `
   timeclockDetail(_id: String!): Timeclock
   absenceDetail(_id: String!): Absence
   scheduleDetail(_id: String!): Schedule
+  scheduleConfigs: [ScheduleConfig]
   payDates: [PayDate]
   holidays: [Absence]
 `;
@@ -216,8 +213,8 @@ export const mutations = `
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule
   solveShiftRequest(_id: String, status: String): ShiftsRequest
-  scheduleConfigAdd(scheduleName: String, scheduleConfig: [ScheduleConfigInput]): ScheduleConfig
-  scheduleConfigEdit(_id : String ,scheduleName: String, scheduleConfig: [ScheduleConfigInput]): ScheduleConfig
+  scheduleConfigAdd(scheduleName: String, scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
+  scheduleConfigEdit(_id : String ,scheduleName: String, scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
   payDateAdd(dateNums: [Int]): PayDate
   payDateEdit(_id: String, dateNums: [Int]): PayDate
   payDateRemove(_id: String): JSON

@@ -26,13 +26,14 @@ export const compareStartAndEndTime = (
     dayjs(currShiftEnd).format(timeFormat) <
     dayjs(currShiftStart).format(timeFormat)
   ) {
-    correctShiftEnd =
+    correctShiftEnd = dayjs(
       dayjs(currShiftDate)
         .add(1, 'day')
         .toDate()
         .toLocaleDateString() +
-      ' ' +
-      dayjs(currShiftEnd).format(timeFormat);
+        ' ' +
+        dayjs(currShiftEnd).format(timeFormat)
+    ).toDate();
 
     overnightShift = true;
   } else {

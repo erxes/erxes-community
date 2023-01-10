@@ -77,13 +77,20 @@ export interface IShiftSchedule {
 
 export interface IScheduleConfig {
   _id: string;
-  scheduleName: string;
-  scheduleConfigs: ISchedule[];
+  scheduleName?: string;
+  shiftStart: string;
+  shiftEnd: string;
+  configDays: IScheduleConfigDays[];
+}
+
+export interface IScheduleConfigDays {
+  configName?: string;
+  configShiftStart?: string;
+  configShiftEnd?: string;
+  overnightShift?: boolean;
 }
 export interface ISchedule {
   [key: string]: {
-    weekDay?: boolean;
-    display?: boolean;
     overnightShift?: boolean;
     shiftDate?: Date;
     shiftStart?: Date;

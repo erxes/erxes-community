@@ -10,6 +10,7 @@ import AbsenceList from '../containers/absence/AbsenceList';
 import ReportList from '../containers/report/ReportList';
 import ScheduleList from '../containers/schedule/ScheduleList';
 import { IBranch } from '@erxes/ui/src/team/types';
+import { IScheduleConfig } from '../types';
 
 type Props = {
   currentDate?: string;
@@ -19,6 +20,7 @@ type Props = {
   startTime?: Date;
   loading: boolean;
   branchesList: IBranch[];
+  scheduleConfigs?: IScheduleConfig[];
 
   queryStartDate: string;
   queryEndDate: string;

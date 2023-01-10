@@ -11,19 +11,25 @@ import {
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
-import { IAbsence, IAbsenceType, IPayDates, ISchedule } from '../../types';
+import {
+  IAbsence,
+  IAbsenceType,
+  IPayDates,
+  ISchedule,
+  IScheduleConfig
+} from '../../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import ScheduleConfig from './ScheduleDayToggleConfig';
 import DatePicker from '../datepicker/DateTimePicker';
 import { compareStartAndEndTime } from '../../utils';
+import dayjs from 'dayjs';
 
 type Props = {
   history?: any;
   configType: string;
   absenceType?: IAbsenceType;
+  scheduleConfig?: IScheduleConfig;
   holiday?: IAbsence;
   payDate?: IPayDates;
-  absenceTypes?: IAbsenceType[];
   loading?: boolean;
   afterSave?: () => void;
   closeModal: () => void;
@@ -31,12 +37,11 @@ type Props = {
 };
 
 function ConfigForm(props: Props) {
-  const { renderButton, history } = props;
+  const { renderButton, history, scheduleConfig } = props;
   const { absenceType, holiday, payDate } = props;
   const [explanationRequired, setExplRequired] = useState(false);
   const [attachmentRequired, setAttachRequired] = useState(false);
   const [payPeriod, setPayPeriod] = useState('');
-  const timeFormat = 'HH:mm';
 
   const defaultStartTime = new Date(
     new Date().toLocaleDateString() + ' 08:30:00'
@@ -45,56 +50,19 @@ function ConfigForm(props: Props) {
     new Date().toLocaleDateString() + ' 17:00:00'
   );
   const [configDays, setConfigDays] = useState<ISchedule>({
-    Monday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Tuesday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Wednesday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Thursday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Friday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Saturday: {
-      display: true,
-      shiftStart: defaultStartTime,
-      shiftEnd: defaultEndTime
-    },
-    Sunday: {
-      display: true,
+    configTime: {
       shiftStart: defaultStartTime,
       shiftEnd: defaultEndTime
     },
     validCheckIn: {
-      display: true,
-      weekDay: false,
       shiftStart: defaultStartTime,
       shiftEnd: defaultEndTime
     },
     validCheckout: {
-      display: true,
-      weekDay: false,
       shiftStart: defaultStartTime,
       shiftEnd: defaultEndTime
     },
-    overnight: {
-      display: true,
-      weekDay: false,
+    overtime: {
       shiftStart: defaultStartTime,
       shiftEnd: defaultEndTime
     }
@@ -187,19 +155,31 @@ function ConfigForm(props: Props) {
       case 'schedule':
         const returnVariables: {
           scheduleName?: string;
+          configShiftStart?: string;
+          configShiftEnd?: string;
           scheduleConfig: any[];
-        } = { scheduleName: values.scheduleName, scheduleConfig: [] };
+        } = {
+          scheduleName: values.scheduleName,
+          scheduleConfig: []
+        };
+
+        const timeFormat = 'HH:mm';
 
         Object.keys(configDays).forEach(day_key => {
-          if (configDays[day_key].display) {
+          if (day_key.toLocaleLowerCase() !== 'configtime') {
             returnVariables.scheduleConfig.push({
-              configDayName: day_key,
-              configDays: {
-                shiftStart: configDays[day_key].shiftStart,
-                shiftEnd: configDays[day_key].shiftEnd,
-                overnightShift: configDays[day_key].overnightShift
-              }
+              configName: day_key,
+              shiftStart: configDays[day_key].shiftStart,
+              shiftEnd: configDays[day_key].shiftEnd,
+              overnightShift: configDays[day_key].overnightShift
             });
+          } else {
+            returnVariables.configShiftStart = dayjs(
+              configDays[day_key].shiftStart
+            ).format(timeFormat);
+            returnVariables.configShiftEnd = dayjs(
+              configDays[day_key].shiftEnd
+            ).format(timeFormat);
           }
         });
         return returnVariables;
@@ -331,32 +311,6 @@ function ConfigForm(props: Props) {
     );
   };
 
-  const toggleWeekDays = dayKey => {
-    const oldConfigBoolean = {
-      ...configDays[dayKey],
-      display: !configDays[dayKey].display
-    };
-    const newConfigDays = { ...configDays, [dayKey]: oldConfigBoolean };
-    setConfigDays(newConfigDays);
-  };
-
-  const renderWeekendSettings = () => {
-    return (
-      <>
-        {Object.keys(configDays).map(
-          weekDay =>
-            configDays[weekDay].weekDay !== false && (
-              <ScheduleConfig
-                key={weekDay}
-                weekDay={weekDay}
-                toggleWeekDays={toggleWeekDays}
-              />
-            )
-        )}
-      </>
-    );
-  };
-
   const onStartTimeChange = (day_key, time_val) => {
     const newShift = configDays[day_key];
     const [
@@ -389,51 +343,22 @@ function ConfigForm(props: Props) {
     setConfigDays(newconfigDays);
   };
 
-  const renderConfigDays = () => {
-    return Object.keys(configDays).map(configDay => {
-      return (
-        <FlexRow key={configDay}>
-          {configDays[configDay].display &&
-            configDays[configDay].weekDay !== false && (
-              <>
-                {configDay}
-                <DatePicker
-                  curr_day_key={configDay}
-                  startDate={configDays[configDay].shiftStart}
-                  startTime_value={configDays[configDay].shiftStart}
-                  endTime_value={configDays[configDay].shiftEnd}
-                  overnightShift={configDays[configDay].overnightShift}
-                  changeEndTime={onEndTimeChange}
-                  changeStartTime={onStartTimeChange}
-                  timeOnly={true}
-                />
-              </>
-            )}
-        </FlexRow>
-      );
-    });
-  };
-
-  const renderScheduleContent = (formProps: IFormProps) => {
-    const { values, isSubmitted } = formProps;
+  const renderConfigTime = () => {
     return (
-      <FlexColumn marginNum={10}>
-        <ControlLabel required={true}>
-          <strong>Name</strong>
-        </ControlLabel>
-        <FormControl
-          {...formProps}
-          name="scheduleName"
-          required={true}
-          autoFocus={true}
-        />
-        <ControlLabel>
-          <strong>Set as Weekend</strong>
-        </ControlLabel>
-        <FlexRow>{renderWeekendSettings()}</FlexRow>
-        <FlexColumnMargined marginNum={10}>
-          {renderConfigDays()}
-        </FlexColumnMargined>
+      <>
+        <FlexRow>
+          <ControlLabel>Check in / Check out</ControlLabel>
+          <DatePicker
+            curr_day_key={'configTime'}
+            startDate={configDays.configTime.shiftStart}
+            startTime_value={configDays.configTime.shiftStart}
+            endTime_value={configDays.configTime.shiftEnd}
+            overnightShift={configDays.configTime.overnightShift}
+            changeEndTime={onEndTimeChange}
+            changeStartTime={onStartTimeChange}
+            timeOnly={true}
+          />
+        </FlexRow>
         <FlexRow>
           <ControlLabel>Valid Check-In</ControlLabel>
           <DatePicker
@@ -461,17 +386,39 @@ function ConfigForm(props: Props) {
           />
         </FlexRow>
         <FlexRow>
-          <ControlLabel>Overnight</ControlLabel>
+          <ControlLabel>Overtime</ControlLabel>
           <DatePicker
-            curr_day_key={'overnight'}
-            startDate={configDays.overnight.shiftStart}
-            startTime_value={configDays.overnight.shiftStart}
-            endTime_value={configDays.overnight.shiftEnd}
+            curr_day_key={'overtime'}
+            startDate={configDays.overtime.shiftStart}
+            startTime_value={configDays.overtime.shiftStart}
+            endTime_value={configDays.overtime.shiftEnd}
             changeEndTime={onEndTimeChange}
             changeStartTime={onStartTimeChange}
             timeOnly={true}
           />
         </FlexRow>
+      </>
+    );
+  };
+
+  const renderScheduleContent = (formProps: IFormProps) => {
+    const { values, isSubmitted } = formProps;
+    return (
+      <FlexColumn marginNum={20}>
+        <ControlLabel required={true}>
+          <strong>Name</strong>
+        </ControlLabel>
+        <FormControl
+          {...formProps}
+          name="scheduleName"
+          required={true}
+          autoFocus={true}
+        />
+
+        <FlexColumnMargined marginNum={10}>
+          {renderConfigTime()}
+        </FlexColumnMargined>
+
         <FlexCenter style={{ marginTop: '10px' }}>
           {renderButton({
             name: 'schedule',

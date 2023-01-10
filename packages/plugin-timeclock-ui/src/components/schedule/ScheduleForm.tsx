@@ -4,7 +4,7 @@ import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateRange from '../datepicker/DateRange';
 import dayjs from 'dayjs';
 import DatePicker from '../datepicker/DateTimePicker';
-import { ISchedule } from '../../types';
+import { ISchedule, IScheduleConfig } from '../../types';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { FlexCenter } from '../../styles';
@@ -24,6 +24,7 @@ type Props = {
   history: any;
   branchesList: IBranch[];
   modalContentType: string;
+  scheduleConfigs: IScheduleConfig[];
   submitRequest: (userId: string[], filledShifts: any) => void;
   submitShift: (userIds: string[], filledShifts: any) => void;
   closeModal: any;
@@ -36,9 +37,11 @@ function ScheduleForm(props: Props) {
     submitShift,
     closeModal,
     branchesList,
-    modalContentType
+    modalContentType,
+    scheduleConfigs
   } = props;
 
+  const [selectedScheduleConfig, setScheduleConfig] = useState('');
   const [dateKeyCounter, setKeyCounter] = useState('');
   const [userIds, setUserIds] = useState(['']);
 
@@ -55,6 +58,17 @@ function ScheduleForm(props: Props) {
       value: branch._id,
       label: branch.title
     }));
+  };
+
+  const renderScheduleConfigOptions = () => {
+    return scheduleConfigs.map(scheduleConfig => ({
+      value: scheduleConfig._id,
+      label: `${scheduleConfig.scheduleName}\xa0\xa0\xa0\xa0\xa0\xa0\xa0(${scheduleConfig.shiftStart} ~ ${scheduleConfig.shiftEnd})`
+    }));
+  };
+
+  const onScheduleConfigSelect = scheduleConfig => {
+    setScheduleConfig(scheduleConfig);
   };
 
   const onBranchSelect = selectedBranch => {
@@ -242,6 +256,13 @@ function ScheduleForm(props: Props) {
           label={'Team member'}
           onSelect={onUserSelect}
           name="userId"
+        />
+        <Select
+          value={selectedScheduleConfig}
+          onChange={onScheduleConfigSelect}
+          placeholder="Select Schedule"
+          multi={false}
+          options={renderScheduleConfigOptions()}
         />
         {renderWeekDays()}
         {actionButtons('admin')}

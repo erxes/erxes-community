@@ -6,6 +6,7 @@ import React from 'react';
 import ScheduleList from '../../components/schedule/ScheduleList';
 import {
   BranchesQueryResponse,
+  IScheduleConfig,
   IShift,
   ScheduleMutationResponse,
   ScheduleQueryResponse
@@ -25,6 +26,7 @@ type Props = {
   shiftId?: string;
   shiftStatus?: string;
   requestedShifts?: IShift[];
+  scheduleConfigs: IScheduleConfig[];
 
   branchesList: IBranch[];
 

@@ -8,6 +8,7 @@ import {
   IAbsenceType
 } from '../../models/definitions/timeclock';
 import { connectAndImportFromMysql, findBranches } from './utils';
+import dayjs = require('dayjs');
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -327,14 +328,14 @@ const timeclockMutations = {
   async submitShift(_root, { userIds, shifts }, { models }: IContext) {
     let schedule;
 
-    userIds.map(async userId => {
+    userIds.forEach(async userId => {
       schedule = await models.Schedules.createSchedule({
         userId: `${userId}`,
         solved: true,
         status: 'Approved'
       });
 
-      shifts.map(shift => {
+      shifts.forEach(shift => {
         models.Shifts.createShift({
           scheduleId: schedule._id,
           shiftStart: shift.shiftStart,
@@ -403,6 +404,66 @@ const timeclockMutations = {
 
   holidayRemove(_root, { _id }, { models }: IContext) {
     return models.Absences.removeAbsence(_id);
+  },
+
+  async scheduleConfigAdd(
+    _root,
+    { scheduleName, scheduleConfig, configShiftStart, configShiftEnd },
+    { models }: IContext
+  ) {
+    console.log(configShiftEnd);
+    console.log(configShiftStart);
+
+    const newScheduleConfig = await models.ScheduleConfigs.createScheduleConfig(
+      {
+        scheduleName: `${scheduleName}`,
+        shiftStart: configShiftStart,
+        shiftEnd: configShiftEnd
+      }
+    );
+
+    const timeFormat = 'HH:mm';
+
+    scheduleConfig.forEach(async scheduleShift => {
+      await models.Shifts.createShift({
+        scheduleConfigId: newScheduleConfig._id,
+        configShiftStart: dayjs(scheduleShift.shiftStart).format(timeFormat),
+        configShiftEnd: dayjs(scheduleShift.shiftEnd).format(timeFormat),
+        configName: scheduleShift.configName,
+        overnightShift: scheduleShift.overnightShift
+      });
+    });
+
+    return newScheduleConfig;
+  },
+
+  async scheduleConfigEdit(
+    _root,
+    { _id, scheduleName, scheduleConfig },
+    { models }: IContext
+  ) {
+    const newScheduleConfig = await models.ScheduleConfigs.updateScheduleConfig(
+      _id,
+      {
+        scheduleName: `${scheduleName}`
+      }
+    );
+
+    const timeFormat = 'HH:mm';
+
+    scheduleConfig.forEach(async scheduleShift => {
+      await models.Shifts.updateOne(
+        { scheduleConfigId: newScheduleConfig._id, _id: scheduleShift._id },
+        {
+          configShiftStart: dayjs(scheduleShift.shiftStart).format(timeFormat),
+          configShiftEnd: dayjs(scheduleShift.shiftEnd).format(timeFormat),
+          configName: scheduleShift.configName,
+          overnightShift: scheduleShift.overnightShift
+        }
+      );
+    });
+
+    return newScheduleConfig;
   },
 
   async extractAllDataFromMySQL(_root, {}, { subdomain }: IContext) {

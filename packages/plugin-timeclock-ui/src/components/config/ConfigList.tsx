@@ -7,7 +7,12 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row, FilterItem } from '../../styles';
-import { IAbsence, IAbsenceType, IPayDates } from '../../types';
+import {
+  IAbsence,
+  IAbsenceType,
+  IPayDates,
+  IScheduleConfig
+} from '../../types';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import Table from '@erxes/ui/src/components/table';
 import Icon from '@erxes/ui/src/components/Icon';
@@ -20,6 +25,7 @@ type Props = {
   absenceTypes?: IAbsenceType[];
   holidays?: IAbsence[];
   payDates: IPayDates[];
+  scheduleConfigs?: IScheduleConfig[];
   loading?: boolean;
   renderButton: (props: IButtonMutateProps) => void;
   removeAbsenceType: (absenceTypeId: string) => void;
@@ -32,12 +38,13 @@ function ConfigList(props: Props) {
     absenceTypes,
     payDates,
     holidays,
+    scheduleConfigs,
     removeAbsenceType,
     removeHoliday,
     removePayDate,
     getActionBar
   } = props;
-  const [selectedType, setType] = useState('Absence types');
+  const [selectedType, setType] = useState('Schedule Configs');
 
   const renderSelectionBar = () => {
     const onTypeSelect = type => {
@@ -54,7 +61,12 @@ function ConfigList(props: Props) {
               onChange={onTypeSelect}
               placeholder="Select type"
               multi={false}
-              options={['Absence types', 'Pay period', 'Holidays'].map(ipt => ({
+              options={[
+                'Schedule Configs',
+                'Absence types',
+                'Pay period',
+                'Holidays'
+              ].map(ipt => ({
                 value: ipt,
                 label: __(ipt)
               }))}
@@ -92,11 +104,11 @@ function ConfigList(props: Props) {
     </Button>
   );
 
-  const scheduleConfigContent = ({ closeModal }, absenceType) => {
+  const scheduleConfigContent = ({ closeModal }, scheduleConfig) => {
     return (
       <ConfigForm
         {...props}
-        absenceType={absenceType}
+        scheduleConfig={scheduleConfig}
         configType="Schedule"
         closeModal={closeModal}
       />
@@ -217,9 +229,81 @@ function ConfigList(props: Props) {
         return renderHolidaysContent();
       case 'Pay period':
         return renderpayPeriodConfigContent();
+      case 'Schedule Configs':
+        return renderScheduleConfigContent();
       default:
         return renderAbsenceTypesContent();
     }
+  };
+
+  const renderScheduleConfigContent = () => {
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Schedule Name</th>
+            <th>check in</th>
+            <th>check out</th>
+            <th>Valid check in</th>
+            <th>Valid check out</th>
+            <th>Overtime shift</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scheduleConfigs &&
+            scheduleConfigs.map(scheduleConfig => {
+              return (
+                <tr key={scheduleConfig.scheduleName}>
+                  <td>{scheduleConfig.scheduleName}</td>
+                  <td>{scheduleConfig.shiftStart}</td>
+                  <td>{scheduleConfig.shiftEnd}</td>
+                  {scheduleConfig.configDays.map(configDay => {
+                    if (
+                      configDay.configName?.toLocaleLowerCase() ===
+                      'validcheckin'
+                    ) {
+                      return (
+                        <td>
+                          {configDay.configShiftStart +
+                            '\t~\t' +
+                            configDay.configShiftEnd}
+                        </td>
+                      );
+                    }
+                  })}
+                  {scheduleConfig.configDays.map(configDay => {
+                    if (
+                      configDay.configName?.toLocaleLowerCase() ===
+                      'validcheckout'
+                    ) {
+                      return (
+                        <td>
+                          {configDay.configShiftStart +
+                            '\t~\t' +
+                            configDay.configShiftEnd}
+                        </td>
+                      );
+                    }
+                  })}
+                  {scheduleConfig.configDays.map(configDay => {
+                    if (
+                      configDay.configName?.toLocaleLowerCase() === 'overtime'
+                    ) {
+                      return (
+                        <td>
+                          {configDay.configShiftStart +
+                            '\t~\t' +
+                            configDay.configShiftEnd}
+                        </td>
+                      );
+                    }
+                  })}
+                </tr>
+              );
+            })}
+        </tbody>
+      </Table>
+    );
   };
 
   const renderpayPeriodConfigContent = () => {

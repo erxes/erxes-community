@@ -200,9 +200,13 @@ const listScheduleConfig = `
     scheduleConfigs{
       _id
       scheduleName
-      scheduleConfig{
-        shiftStart
-        shiftEnd
+      shiftStart
+      shiftEnd
+      configDays{
+        _id
+        configName
+        configShiftStart
+        configShiftEnd
         overnightShift
       }
     }

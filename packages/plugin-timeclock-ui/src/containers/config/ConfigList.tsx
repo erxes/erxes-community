@@ -10,7 +10,8 @@ import {
   ConfigMutationResponse,
   PayDatesQueryResponse,
   HolidaysQueryResponse,
-  ScheduleConfigQueryResponse
+  ScheduleConfigQueryResponse,
+  IScheduleConfig
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
@@ -32,13 +33,13 @@ type Props = {
   absenceId?: string;
   absenceStatus?: string;
   payDates?: number[];
+  scheduleConfigs?: IScheduleConfig[];
 };
 
 type FinalProps = {
   listAbsenceTypesQuery: AbsenceTypeQueryResponse;
   listPayDatesQuery: PayDatesQueryResponse;
   listHolidaysQuery: HolidaysQueryResponse;
-  listScheduleConfigsQuery: ScheduleConfigQueryResponse;
 } & Props &
   ConfigMutationResponse;
 
@@ -50,7 +51,7 @@ const ListContainer = (props: FinalProps) => {
     listAbsenceTypesQuery,
     listPayDatesQuery,
     listHolidaysQuery,
-    listScheduleConfigsQuery
+    scheduleConfigs
   } = props;
 
   const renderButton = ({
@@ -140,7 +141,6 @@ const ListContainer = (props: FinalProps) => {
 
   const updatedProps = {
     ...props,
-    scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs,
     holidays: listHolidaysQuery.holidays,
     absenceTypes: listAbsenceTypesQuery.absenceTypes,
     payDates: listPayDatesQuery.payDates || [],
@@ -168,12 +168,6 @@ export default withProps<Props>(
     }),
     graphql<Props, PayDatesQueryResponse>(gql(queries.listHolidays), {
       name: 'listHolidaysQuery',
-      options: () => ({
-        fetchPolicy: 'network-only'
-      })
-    }),
-    graphql<Props, PayDatesQueryResponse>(gql(queries.listScheduleConfig), {
-      name: 'listScheduleConfigsQuery',
       options: () => ({
         fetchPolicy: 'network-only'
       })
