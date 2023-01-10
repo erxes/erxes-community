@@ -2,23 +2,18 @@ import {
   attachmentType,
   attachmentInput
 } from '@erxes/api-utils/src/commonTypeDefs';
-
 export const types = ({ contacts }) => `
-
   ${attachmentType}
   ${attachmentInput}
-
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
-
   ${
     contacts
       ? `
         extend type Customer @key(fields: "_id") {
           _id: String! @external
         }
-
         extend type Company @key(fields: "_id") {
           _id: String! @external
         }
@@ -26,7 +21,6 @@ export const types = ({ contacts }) => `
       : ''
   }
   
-
   type CarCategory {
     _id: String!
     name: String
@@ -65,6 +59,8 @@ export const types = ({ contacts }) => `
     vintageYear: Float
     importYear: Float
     attachment: Attachment
+    customerIds: [String]
+    companyIds: [String]
     customFieldsData: JSON
   }
   type CarsListResponse {
@@ -129,7 +125,7 @@ const carCategoryParams = `
 
 export const mutations = `
   carsAdd(${commonFields}): Car
-  carsEdit(_id: String!, ${commonFields}, customFieldsData: JSON): Car
+  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}, customFieldsData: JSON): Car
   carsRemove(carIds: [String]): [String]
   carsMerge(carIds: [String], carFields: JSON) : Car
   carCategoriesAdd(${carCategoryParams}): CarCategory
