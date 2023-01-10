@@ -9,7 +9,8 @@ import {
   AbsenceTypeQueryResponse,
   ConfigMutationResponse,
   PayDatesQueryResponse,
-  HolidaysQueryResponse
+  HolidaysQueryResponse,
+  ScheduleConfigQueryResponse
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
@@ -37,6 +38,7 @@ type FinalProps = {
   listAbsenceTypesQuery: AbsenceTypeQueryResponse;
   listPayDatesQuery: PayDatesQueryResponse;
   listHolidaysQuery: HolidaysQueryResponse;
+  listScheduleConfigsQuery: ScheduleConfigQueryResponse;
 } & Props &
   ConfigMutationResponse;
 
@@ -47,7 +49,8 @@ const ListContainer = (props: FinalProps) => {
     removeHolidayMutation,
     listAbsenceTypesQuery,
     listPayDatesQuery,
-    listHolidaysQuery
+    listHolidaysQuery,
+    listScheduleConfigsQuery
   } = props;
 
   const renderButton = ({
@@ -70,6 +73,12 @@ const ListContainer = (props: FinalProps) => {
       mutation = object ? mutations.payDateEdit : mutations.payDateAdd;
     }
 
+    if (name === 'schedule') {
+      mutation = object
+        ? mutations.scheduleConfigEdit
+        : mutations.scheduleConfigAdd;
+    }
+
     return (
       <ButtonMutate
         mutation={mutation}
@@ -84,6 +93,9 @@ const ListContainer = (props: FinalProps) => {
           },
           {
             query: gql(queries.listPayDates)
+          },
+          {
+            query: gql(queries.listScheduleConfig)
           }
         ]}
         isSubmitted={isSubmitted}
@@ -128,6 +140,7 @@ const ListContainer = (props: FinalProps) => {
 
   const updatedProps = {
     ...props,
+    scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs,
     holidays: listHolidaysQuery.holidays,
     absenceTypes: listAbsenceTypesQuery.absenceTypes,
     payDates: listPayDatesQuery.payDates || [],
@@ -155,6 +168,12 @@ export default withProps<Props>(
     }),
     graphql<Props, PayDatesQueryResponse>(gql(queries.listHolidays), {
       name: 'listHolidaysQuery',
+      options: () => ({
+        fetchPolicy: 'network-only'
+      })
+    }),
+    graphql<Props, PayDatesQueryResponse>(gql(queries.listScheduleConfig), {
+      name: 'listScheduleConfigsQuery',
       options: () => ({
         fetchPolicy: 'network-only'
       })

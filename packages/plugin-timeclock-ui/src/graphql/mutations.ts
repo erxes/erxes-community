@@ -131,6 +131,13 @@ const scheduleShiftRemove = `
     scheduleShiftRemove(_id: $_id)
   }`;
 
+const scheduleConfigAdd = `mutation scheduleConfigAdd($scheduleName: String, $scheduleConfig: [ScheduleConfigInput]){
+  scheduleConfigAdd(scheduleName: $scheduleName, scheduleConfig : $scheduleConfig)
+}`;
+const scheduleConfigEdit = `mutation scheduleConfigEdit($_id: String, $scheduleName: String, $scheduleConfig: [ScheduleConfigInput]){
+  scheduleConfigEdit(_id: $_id, scheduleName: $scheduleName, scheduleConfig : $scheduleConfig)
+}`;
+
 const extractAllDataFromMySQL = `
 mutation extractAllDataFromMySQL{
   extractAllDataFromMySQL{
@@ -159,5 +166,7 @@ export default {
   holidayRemove,
   scheduleRemove,
   scheduleShiftRemove,
+  scheduleConfigAdd,
+  scheduleConfigEdit,
   extractAllDataFromMySQL
 };

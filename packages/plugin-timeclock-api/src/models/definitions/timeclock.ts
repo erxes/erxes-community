@@ -75,21 +75,24 @@ export interface IPayDateDocument extends IPayDate, Document {
   _id: string;
 }
 export interface IScheduleConfig {
-  weekDays: IScheduleDay[];
+  configDays: IScheduleDay[];
+  validCheckInStart?: string;
+  validCheckInEnd?: string;
+  validCheckOutStart?: string;
+  validCheckOutEnd?: string;
+  overNightStart?: string;
+  overNightEnd?: string;
 }
+
 export interface IScheduleConfigDocument extends IScheduleConfig, Document {
   _id: string;
 }
 
 export interface IScheduleDay {
-  name: string;
+  configDay: string;
   scheduleConfigId: string;
   shiftStart: string;
   shiftEnd: string;
-  validCheckInStart?: string;
-  validCheckInEnd?: string;
-  overNightStart?: string;
-  overNightEnd?: string;
 }
 
 export interface IScheduleDayDocument extends IScheduleDay, Document {
@@ -209,6 +212,53 @@ export const payDateSchema = new Schema({
   _id: field({ pkey: true }),
   payDates: field({ type: [Number], label: 'pay dates' })
 });
+
+export const scheduleConfigSchema = new Schema({
+  _id: field({ pkey: true }),
+  scheduleName: field({ type: String, label: 'Name of the schedule' }),
+  validCheckInStart: field({
+    type: String,
+    label: 'Start of valid check in time'
+  }),
+  validCheckInEnd: field({
+    type: String,
+    label: 'End of valid check in time'
+  }),
+  validCheckOutStart: field({
+    type: String,
+    label: 'Start of valid check out time'
+  }),
+  validCheckOutEnd: field({
+    type: String,
+    label: 'End of valid check out time '
+  }),
+  overNightStart: field({
+    type: String,
+    label: 'Overnight shift starting time'
+  }),
+  overNightEnd: field({
+    type: String,
+    label: 'Overnight shift ending time'
+  })
+});
+
+export const scheduleConfigDaysSchema = new Schema({
+  _id: field({ pkey: true }),
+  configName: field({ type: String, label: 'Week day name' }),
+  scheduleConfigId: field({ type: String, label: 'Schedule config id' }),
+  shiftStart: field({ type: String, label: 'Shift starting time ' }),
+  shitEnd: field({ type: String, label: 'Shift ending time ' })
+});
+
+export interface IScheduleConfig {
+  configDays: IScheduleDay[];
+  validCheckInStart?: string;
+  validCheckInEnd?: string;
+  validCheckOutStart?: string;
+  validCheckOutEnd?: string;
+  overNightStart?: string;
+  overNightEnd?: string;
+}
 
 // common types
 export interface IScheduleReport {

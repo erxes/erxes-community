@@ -165,6 +165,21 @@ query holidays {
     endTime
   }
 }`;
+
+const listScheduleConfig = `
+  query scheduleConfigs {
+    scheduleConfigs{
+      _id
+      scheduleName
+      scheduleConfig{
+        shiftStart
+        shiftEnd
+        overnightShift
+      }
+    }
+  }
+
+`;
 export default {
   listReports,
   listReportByUser,
@@ -174,5 +189,6 @@ export default {
   listAbsence,
   listAbsenceTypes,
   listPayDates,
-  listHolidays
+  listHolidays,
+  listScheduleConfig
 };

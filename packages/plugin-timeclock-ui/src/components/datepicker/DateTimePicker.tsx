@@ -56,6 +56,7 @@ const DatePicker = (props: Props) => {
       ? startDate.toLocaleDateString()
       : new Date().toLocaleDateString();
     const validateInput = dayjs(getDate + ' ' + input).toDate();
+    console.log('hahah', input);
 
     if (
       input instanceof Date &&

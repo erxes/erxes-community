@@ -1,5 +1,5 @@
 import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import { IBranch } from '@erxes/ui/src/team/types';
 import { IAttachment } from '@erxes/ui/src/types';
 
 export interface ITimeclock {
@@ -75,8 +75,14 @@ export interface IShiftSchedule {
   user: IUser;
 }
 
+export interface IScheduleConfig {
+  _id: string;
+  scheduleName: string;
+  scheduleConfigs: ISchedule[];
+}
 export interface ISchedule {
   [key: string]: {
+    weekDay?: boolean;
     display?: boolean;
     overnightShift?: boolean;
     shiftDate?: Date;
@@ -113,6 +119,13 @@ export type HolidaysQueryResponse = {
   refetch: () => void;
   loading: boolean;
 };
+
+export type ScheduleConfigQueryResponse = {
+  scheduleConfigs: IScheduleConfig[];
+  refetch: () => void;
+  loading: boolean;
+};
+
 export type ScheduleQueryResponse = {
   schedules: IShiftSchedule[];
   refetch: () => void;

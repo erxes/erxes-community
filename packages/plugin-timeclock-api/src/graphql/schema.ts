@@ -45,6 +45,8 @@ export const types = `
 
   
   input ShiftsRequestInput {
+    dayName: String
+    overnightShift: Boolean
     shiftStart: Date
     shiftEnd: Date
   }
@@ -107,8 +109,14 @@ export const types = `
     payDates: [Int]
   }
 
+  input ScheduleConfigInput {
+    configDays: ShiftsRequestInput
+    configDayName: String
+  }
+  
   type ScheduleConfig {
     _id: String!
+    scheduleName: String
     weekDays: [WeekDay]
     validCheckInStart: String
     validCheckInEnd: String
@@ -182,6 +190,8 @@ export const mutations = `
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule
   solveShiftRequest(_id: String, status: String): ShiftsRequest
+  scheduleConfigAdd(scheduleName: String, scheduleConfig: [ScheduleConfigInput]): ScheduleConfig
+  scheduleConfigEdit(_id : String ,scheduleName: String, scheduleConfig: [ScheduleConfigInput]): ScheduleConfig
   payDateAdd(dateNums: [Int]): PayDate
   payDateEdit(_id: String, dateNums: [Int]): PayDate
   payDateRemove(_id: String): JSON
