@@ -32,8 +32,6 @@ var command = async () => {
     $or: [{ mainType: 'car' }, { relType: 'car' }]
   });
 
-  console.log('Successfully deleted with car conformities');
-
   for (var conformity of conformities) {
     if (
       conformity.mainType === 'customer' ||
