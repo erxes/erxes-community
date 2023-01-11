@@ -33,17 +33,17 @@ var command = async () => {
   });
 
   for (var conformity of conformities) {
-    if (
-      conformity.mainType === 'customer' ||
-      conformity.relType === 'customer'
-    ) {
+    if (conformity.mainType === 'customer') {
       await Car.updateOne(
-        {},
+        { _id: conformity.relTypeId },
         { $push: { customerIds: conformity.mainTypeId } }
       );
     }
     if (conformity.mainType === 'company' || conformity.relType === 'company') {
-      await Car.updateOne({}, { $push: { companyIds: conformity.mainTypeId } });
+      await Car.updateOne(
+        { _id: conformity.relTypeId },
+        { $push: { companyIds: conformity.mainTypeId } }
+      );
     }
   }
 
