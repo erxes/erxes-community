@@ -32,7 +32,13 @@ const LeftSideBar = (props: Props) => {
     onMemberSelect(['']);
     onStartDateChange(null);
     onEndDateChange(null);
+    removePageParams();
   };
+
+  const removePageParams = () => {
+    router.removeParams(history, 'page');
+  };
+
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
       value: branch._id,
@@ -51,6 +57,7 @@ const LeftSideBar = (props: Props) => {
     router.setParams(history, {
       branchIds: selectedBranchIds
     });
+    removePageParams();
   };
 
   const onDepartmentSelect = dept => {
@@ -58,6 +65,7 @@ const LeftSideBar = (props: Props) => {
     router.setParams(history, {
       departmentIds: dept
     });
+    removePageParams();
   };
 
   const onMemberSelect = selectedUsers => {
@@ -65,16 +73,19 @@ const LeftSideBar = (props: Props) => {
     router.setParams(history, {
       userIds: selectedUsers
     });
+    removePageParams();
   };
 
   const onStartDateChange = date => {
     setStartDate(date);
     router.setParams(history, { startDate: date });
+    removePageParams();
   };
 
   const onEndDateChange = date => {
     setEndDate(date);
     router.setParams(history, { endDate: date });
+    removePageParams();
   };
 
   const renderSidebarActions = () => {

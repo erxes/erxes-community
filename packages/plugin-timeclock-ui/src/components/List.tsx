@@ -1,17 +1,16 @@
-import Button from '@erxes/ui/src/components/Button';
 import { menuTimeClock } from '../menu';
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState, useEffect } from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import SideBarList from '../containers/sidebar/SideBarList';
-import TimeForm from '../containers/timeclock/TimeFormList';
 import ConfigList from '../containers/config/ConfigList';
 import TimeclockList from '../containers/timeclock/TimeclockList';
 import AbsenceList from '../containers/absence/AbsenceList';
 import ReportList from '../containers/report/ReportList';
 import ScheduleList from '../containers/schedule/ScheduleList';
 import { IBranch } from '@erxes/ui/src/team/types';
+import { IScheduleConfig } from '../types';
 
 type Props = {
   currentDate?: string;
@@ -20,14 +19,16 @@ type Props = {
   route?: string;
   startTime?: Date;
   loading: boolean;
-
   branchesList: IBranch[];
+  scheduleConfigs: IScheduleConfig[];
 
   queryStartDate: string;
   queryEndDate: string;
   queryUserIds: string[];
   queryBranchIds: string[];
   queryDepartmentIds: string[];
+  queryPage: number;
+  queryPerPage: number;
   searchFilter: string;
 };
 
@@ -36,13 +37,8 @@ function List(props: Props) {
 
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
+  const [PaginationFooter, setPagination] = useState(<div />);
   const [loading, setLoading] = useState(true);
-
-  const trigger = (
-    <Button id="btn1" btnStyle={'success'} icon="plus-circle">
-      {`Start Shift`}
-    </Button>
-  );
 
   useEffect(() => {
     switch (route) {
@@ -68,11 +64,11 @@ function List(props: Props) {
         );
         setLoading(false);
         break;
-
       case 'schedule':
         setModalComponent(
           <ScheduleList
             {...props}
+            getPagination={setPagination}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -84,6 +80,7 @@ function List(props: Props) {
         setModalComponent(
           <AbsenceList
             {...props}
+            getPagination={setPagination}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -96,6 +93,7 @@ function List(props: Props) {
           <TimeclockList
             {...props}
             getActionBar={setRightActionBar}
+            getPagination={setPagination}
             history={history}
             queryParams={queryParams}
           />
@@ -113,6 +111,7 @@ function List(props: Props) {
         />
       }
       actionBar={rightActionBar}
+      footer={PaginationFooter}
       content={
         <DataWithLoader
           data={Component}

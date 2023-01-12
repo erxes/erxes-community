@@ -9,7 +9,9 @@ import {
   AbsenceTypeQueryResponse,
   ConfigMutationResponse,
   PayDatesQueryResponse,
-  HolidaysQueryResponse
+  HolidaysQueryResponse,
+  ScheduleConfigQueryResponse,
+  IScheduleConfig
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
@@ -31,6 +33,8 @@ type Props = {
   absenceId?: string;
   absenceStatus?: string;
   payDates?: number[];
+  scheduleConfigs?: IScheduleConfig[];
+  scheduleConfigId?: string;
 };
 
 type FinalProps = {
@@ -45,9 +49,11 @@ const ListContainer = (props: FinalProps) => {
     removeAbsenceTypeMutation,
     removePayDateMutation,
     removeHolidayMutation,
+    removeScheduleConfigMutation,
     listAbsenceTypesQuery,
     listPayDatesQuery,
-    listHolidaysQuery
+    listHolidaysQuery,
+    scheduleConfigs
   } = props;
 
   const renderButton = ({
@@ -70,6 +76,12 @@ const ListContainer = (props: FinalProps) => {
       mutation = object ? mutations.payDateEdit : mutations.payDateAdd;
     }
 
+    if (name === 'schedule') {
+      mutation = object
+        ? mutations.scheduleConfigEdit
+        : mutations.scheduleConfigAdd;
+    }
+
     return (
       <ButtonMutate
         mutation={mutation}
@@ -84,6 +96,9 @@ const ListContainer = (props: FinalProps) => {
           },
           {
             query: gql(queries.listPayDates)
+          },
+          {
+            query: gql(queries.listScheduleConfig)
           }
         ]}
         isSubmitted={isSubmitted}
@@ -101,7 +116,7 @@ const ListContainer = (props: FinalProps) => {
       removeAbsenceTypeMutation({ variables: { _id: absenceId } })
         .then(() => Alert.success('Successfully removed an absence type'))
         .catch(err => {
-          throw new Error(err);
+          Alert.error(err);
         });
     });
   };
@@ -111,7 +126,7 @@ const ListContainer = (props: FinalProps) => {
       removeHolidayMutation({ variables: { _id: `${_id}` } })
         .then(() => Alert.success('Successfully removed holiday'))
         .catch(err => {
-          throw new Error(err);
+          Alert.error(err);
         });
     });
   };
@@ -121,7 +136,17 @@ const ListContainer = (props: FinalProps) => {
       removePayDateMutation({ variables: { _id: `${_id}` } })
         .then(() => Alert.success('Successfully removed payDate'))
         .catch(err => {
-          throw new Error(err);
+          Alert.error(err);
+        });
+    });
+  };
+
+  const removeScheduleConfig = (_id: string) => {
+    confirm('Are you sure to remove this schedule config').then(() => {
+      removeScheduleConfigMutation({ variables: { _id: `${_id}` } })
+        .then(() => Alert.success('Successfully removed schedule config'))
+        .catch(err => {
+          Alert.error(err);
         });
     });
   };
@@ -134,6 +159,7 @@ const ListContainer = (props: FinalProps) => {
     removeAbsenceType,
     removeHoliday,
     removePayDate,
+    removeScheduleConfig,
     renderButton
   };
   return <ConfigList {...updatedProps} />;
@@ -188,6 +214,19 @@ export default withProps<Props>(
         },
         refetchQueries: ['payDates']
       })
-    })
+    }),
+
+    graphql<Props, ConfigMutationResponse>(
+      gql(mutations.scheduleConfigRemove),
+      {
+        name: 'removeScheduleConfigMutation',
+        options: ({ scheduleConfigId }) => ({
+          variables: {
+            _id: scheduleConfigId
+          },
+          refetchQueries: ['scheduleConfigs']
+        })
+      }
+    )
   )(ListContainer)
 );
