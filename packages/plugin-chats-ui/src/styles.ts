@@ -116,31 +116,33 @@ export const OptionsWrapper = styled.div`
 /**
  * Chat Contacts
  */
-export const ContactsList = styled.ul`
+export const ContactsList = styled.div`
   max-height: 100%;
   list-style: none;
   margin: 0;
   padding-left: 0;
+  margin-bottom: 10px;
+`;
 
-  li {
-    position: relative;
-  }
-
-  li a {
-    display: flex;
-    align-items: center;
-    padding: ${dimensions.unitSpacing}px;
-    border-radius: ${dimensions.unitSpacing}px;
-    transition: 0.2s;
-  }
-
-  li a:hover {
+export const ContactsItem = styledTS<{ active?: boolean }>(styled.div)`
+  position: relative;
+  background-color: ${props => (props.active ? colors.bgGray : 'initial')};
+  border-radius: ${dimensions.unitSpacing}px;
+  padding: ${dimensions.unitSpacing}px;
+  transition: 0.2s;
+  
+  &:hover {
     background-color: ${colors.bgGray};
     transition: 0.2s;
   }
+  
+  a {
+    display: flex;
+    align-items: center;
+  }
 `;
 
-export const ContactsItem = styledTS<{ isSeen?: boolean }>(styled.div)`
+export const ContactsItemContent = styledTS<{ isSeen?: boolean }>(styled.div)`
   width: 100%;
   padding: 0 ${dimensions.unitSpacing}px;
   margin: 0;
@@ -177,7 +179,7 @@ export const ContactsItemPreview = styled.div`
   font-size: 12px;
 `;
 
-export const ContactsItemContent = styled.div`
+export const ContactsItemContext = styled.div`
   max-width: 150px;
   max-height: 1rem;
   overflow: hidden;
