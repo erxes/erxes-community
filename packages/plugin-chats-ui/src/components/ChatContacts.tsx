@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 // erxes
@@ -22,6 +23,7 @@ import {
   ContactsItem,
   ContactsItemPreview,
   ContactsItemContent,
+  ContactsItemContext,
   ContactsItemDate,
   OptionsWrapper,
   OptionsButton,
@@ -42,18 +44,16 @@ const ChatContacts = (props: FinalProps) => {
   dayjs.extend(relativeTime);
   const { chats, currentUser } = props;
   const wrapperRef = useRef<any>(null);
+  const { search } = useLocation();
+  const { _id } = queryString.parse(search);
   const [selectedChat, setSelectedChat] = useState<string>('');
   const [seenChat, setSeenChat] = useState<boolean>(false);
-  const sortedChats = chats.sort((a, b) =>
-    !a.lastMessage || !b.lastMessage
-      ? 0
-      : a.lastMessage.createdAt < b.lastMessage.createdAt
-      ? 1
-      : -1
+  const [pinnedChats, setPinnedChats] = useState<any[]>(
+    JSON.parse(localStorage.getItem('erxes_pinned_chats') || '[]')
   );
 
   useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event: any) => {
       if (
         wrapperRef &&
         wrapperRef.current &&
@@ -107,6 +107,24 @@ const ChatContacts = (props: FinalProps) => {
     }
   };
 
+  const handlePin = (chatId: string) => {
+    if (checkPinned(chatId)) {
+      updatePinned(pinnedChats.filter(c => c !== chatId));
+    } else {
+      updatePinned([...pinnedChats, chatId]);
+    }
+  };
+
+  const updatePinned = (chats: any[]) => {
+    setPinnedChats(chats);
+
+    localStorage.setItem('erxes_pinned_chats', JSON.stringify(chats));
+  };
+
+  const checkPinned = (chatId: string) => {
+    return pinnedChats.indexOf(chatId) !== -1;
+  };
+
   const renderActions = () => {
     return (
       <div>
@@ -145,8 +163,9 @@ const ChatContacts = (props: FinalProps) => {
         : users[0];
 
     return (
-      <li
+      <ContactsItem
         key={chat._id}
+        active={_id === chat._id}
         onMouseOver={() => handleMouseOver(chat._id)}
         onMouseLeave={() => handleMouseLeave(chat._id)}
       >
@@ -159,7 +178,7 @@ const ChatContacts = (props: FinalProps) => {
               <Avatar user={users[2]} size={24} />
             </ContactsGroupAvatar>
           )}
-          <ContactsItem
+          <ContactsItemContent
             isSeen={
               (chat.lastMessage && chat.lastMessage.createdUser._id) ===
               currentUser._id
@@ -172,7 +191,7 @@ const ChatContacts = (props: FinalProps) => {
               : chat.name}
             <br />
             <ContactsItemPreview>
-              <ContactsItemContent
+              <ContactsItemContext
                 dangerouslySetInnerHTML={{
                   __html: (chat.lastMessage && chat.lastMessage.content) || ''
                 }}
@@ -183,7 +202,7 @@ const ChatContacts = (props: FinalProps) => {
                   dayjs(chat.lastMessage.createdAt).fromNow()}
               </ContactsItemDate>
             </ContactsItemPreview>
-          </ContactsItem>
+          </ContactsItemContent>
         </Link>
         <OptionsWrapper
           id={'option-' + chat._id}
@@ -193,7 +212,7 @@ const ChatContacts = (props: FinalProps) => {
             <Icon icon="ellipsis-h" size={14} />
           </OptionsButton>
         </OptionsWrapper>
-      </li>
+      </ContactsItem>
     );
   };
 
@@ -205,14 +224,29 @@ const ChatContacts = (props: FinalProps) => {
             <h3>Chats</h3>
             {renderActions()}
           </SidebarHeader>
+          {pinnedChats.length !== 0 && (
+            <>
+              <Subtitle>Pinned</Subtitle>
+              <ContactsList>
+                {chats.map(chat => checkPinned(chat._id) && renderChat(chat))}
+              </ContactsList>
+            </>
+          )}
           <Subtitle>Recent</Subtitle>
           <ContactsList>
-            {sortedChats.map(chat => renderChat(chat))}
+            {chats.map(chat => !checkPinned(chat._id) && renderChat(chat))}
           </ContactsList>
         </SidebarWrapper>
       </CommonSidebar>
       <OptionsMenuWrapper id="options-menu" innerRef={wrapperRef}>
         <OptionsMenuList>
+          <OptionsMenuItem
+            onClick={() => {
+              handlePin(selectedChat), handleHideOptions();
+            }}
+          >
+            {checkPinned(selectedChat) ? 'Unpin' : 'Pin'}
+          </OptionsMenuItem>
           <OptionsMenuItem
             onClick={() => {
               props.markChatAsRead(selectedChat), handleHideOptions();
