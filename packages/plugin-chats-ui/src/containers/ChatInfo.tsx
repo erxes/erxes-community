@@ -3,7 +3,6 @@ import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 // erxes
 import Alert from '@erxes/ui/src/utils/Alert';
-import Spinner from '@erxes/ui/src/components/Spinner';
 import confirm from '@erxes/ui/src/utils/confirmation/confirm';
 // local
 import ChatInfo from '../components/ChatInfo';
