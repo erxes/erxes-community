@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // erxes
 import Icon from '@erxes/ui/src/components/Icon';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
@@ -14,17 +14,36 @@ type Props = {
 const ChatInput = (props: Props) => {
   const { reply } = props;
   const [message, setMessage] = useState<string>('');
+  const [editor, setEditor] = useState<any>(null);
 
-  const handleSendMessage = () => {
-    props.sendMessage(message);
-    props.setReply(null);
+  const handleSendMessage = event => {
+    if (event.data.keyCode === 13 && !event.data.domEvent.$.shiftKey) {
+      props.sendMessage(event.editor.getData());
+      props.setReply(null);
 
-    setMessage('');
+      setMessage('');
+    }
   };
 
   const handleChange = (e: any) => {
     setMessage(e.editor.getData());
   };
+
+  const handleInstanceReady = ({ editor }) => {
+    setEditor(editor);
+  };
+
+  useEffect(() => {
+    if (editor) {
+      editor.on('key', handleSendMessage);
+    }
+
+    return () => {
+      if (editor) {
+        editor.removeListener('key', handleSendMessage);
+      }
+    };
+  }, [props, editor]);
 
   return (
     <ChatForm>
@@ -51,6 +70,7 @@ const ChatInput = (props: Props) => {
         content={message}
         onChange={handleChange}
         onCtrlEnter={handleSendMessage}
+        onInstanceReady={handleInstanceReady}
         toolbar={[
           {
             name: 'basicstyles',
@@ -72,7 +92,7 @@ const ChatInput = (props: Props) => {
         autoFocus
       />
 
-      <span>Ctrl + Enter to send a message</span>
+      <span>Shift + Enter to add a new line</span>
     </ChatForm>
   );
 };

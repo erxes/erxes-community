@@ -373,6 +373,24 @@ export const ChatForm = styled.div`
   & > p {
     margin: 0;
   }
+
+  .cke {
+    border: 0;
+  }
+
+  .cke_toolgroup {
+    border: 0;
+  }
+
+  .cke_top {
+    border: 0;
+    background-color: white;
+    background-image: none !important;
+  }
+
+  .cke_bottom {
+    display: none;
+  }
 `;
 
 export const ChatReplyInfo = styled.div`
