@@ -69,7 +69,7 @@ export interface IPost extends CommonPostFields {
   requiredLevel?: string | null;
   isPermissionRequired?: boolean | null;
 
-  wordCount?: number | null;
+  isPollMultiChoice?: boolean | null;
 }
 
 export type PostDocument = IPost & Document;
@@ -227,7 +227,8 @@ export const postSchema = new Schema<PostDocument>({
   customIndexed: Schema.Types.Mixed,
 
   tagIds: [String],
-  wordCount: Number
+
+  isPollMultiChoice: Boolean
 });
 // used by client portal front-end
 postSchema.index({ state: 1, categoryApprovalState: 1, categoryId: 1 });
