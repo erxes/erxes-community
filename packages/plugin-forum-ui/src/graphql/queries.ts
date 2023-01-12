@@ -199,12 +199,10 @@ export const FORUM_POST_DETAIL = gql`
 
       lastPublishedAt
 
-      tagIds
-
-      tags {
+      pollOptions {
         _id
-        colorCode
-        name
+        title
+        order
       }
     }
   }
