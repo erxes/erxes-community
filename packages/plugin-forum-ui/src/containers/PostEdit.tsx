@@ -13,7 +13,7 @@ const PATCH_POST = gql`
     $thumbnail: String
     $title: String
     $description: String
-    $tagIds: [ID!]
+    $pollOptions: [ForumPollOptionInput!]
   ) {
     forumPatchPost(
       _id: $id
@@ -22,7 +22,7 @@ const PATCH_POST = gql`
       thumbnail: $thumbnail
       title: $title
       description: $description
-      tagIds: $tagIds
+      $pollOptions: [ForumPollOptionInput!]
     ) {
       _id
     }

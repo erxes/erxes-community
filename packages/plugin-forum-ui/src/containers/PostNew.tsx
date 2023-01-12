@@ -12,7 +12,7 @@ const MUTATION = gql`
     $title: String!
     $thumbnail: String
     $description: String
-    $tagIds: [ID!]
+    $pollOptions: [ForumPollOptionInput!]
   ) {
     forumCreatePost(
       categoryId: $categoryId
@@ -20,7 +20,7 @@ const MUTATION = gql`
       title: $title
       thumbnail: $thumbnail
       description: $description
-      tagIds: $tagIds
+      pollOptions: $pollOptions
     ) {
       _id
     }
