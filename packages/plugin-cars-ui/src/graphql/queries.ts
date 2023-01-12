@@ -137,7 +137,7 @@ export const carDetail = `
             }
             companies {
               _id
-              primaryName
+              names
               website
             }
             `

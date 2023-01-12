@@ -32,7 +32,7 @@ const cars = {
       car.companyIds &&
       sendContactsMessage({
         subdomain,
-        action: 'customers.find',
+        action: 'companies.find',
         data: {
           _id: { $in: car.companyIds }
         },

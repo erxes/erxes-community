@@ -21,7 +21,7 @@ export interface ICarCustomer {
 
 export interface ICompanyCustomer {
   _id?: string;
-  primaryName?: string;
+  names?: string;
 }
 
 export interface ICarDoc {

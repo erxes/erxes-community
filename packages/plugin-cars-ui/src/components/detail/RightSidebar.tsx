@@ -58,7 +58,7 @@ class RightSidebar extends React.Component<Props, State> {
             </Link>
           </SectionBodyItem>
         ))}
-        {car.customerIds?.length === 0 && (
+        {!car.customerIds?.length && (
           <EmptyState icon="user-6" text="No customer" />
         )}
       </div>
@@ -68,18 +68,18 @@ class RightSidebar extends React.Component<Props, State> {
       <div>
         {car.companies?.map(company => (
           <SectionBodyItem>
-            <Link to={`/companies/details/${company}`}>
-              {company || 'Unknown'}
+            <Link to={`/companies/details/${company._id}`}>
+              {company.names || 'Unknown'}
             </Link>
           </SectionBodyItem>
         ))}
-        {car.companies?.length === 0 && (
+        {!car.companyIds?.length && (
           <EmptyState icon="building" text="No company" />
         )}
       </div>
     );
 
-    const handleGeneralOptions = value => {
+    const onSelectCustomers = value => {
       this.setState({
         customerIds: value
       });
@@ -110,7 +110,7 @@ class RightSidebar extends React.Component<Props, State> {
           <SelectCustomers
             label="Choose Customer"
             name="customerId"
-            onSelect={handleGeneralOptions}
+            onSelect={onSelectCustomers}
             multi={true}
             initialValue={car.customerIds}
           ></SelectCustomers>
