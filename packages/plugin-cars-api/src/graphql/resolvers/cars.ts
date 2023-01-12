@@ -27,6 +27,21 @@ const cars = {
     );
   },
 
+  async companies(car: ICarDocument, {}, { subdomain }: IContext) {
+    return (
+      car.companyIds &&
+      sendContactsMessage({
+        subdomain,
+        action: 'customers.find',
+        data: {
+          _id: { $in: car.companyIds }
+        },
+        isRPC: true,
+        defaultValue: []
+      })
+    );
+  },
+
   category(car: ICarDocument, {}, { models }) {
     return models.CarCategories.findOne({ _id: car.categoryId });
   }

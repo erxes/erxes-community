@@ -51,10 +51,10 @@ class RightSidebar extends React.Component<Props, State> {
 
     const customerContent = (
       <div>
-        {car.customerIds?.map(customer => (
+        {car.customers?.map(customer => (
           <SectionBodyItem>
-            <Link to={`/contacts/details/${customer}`}>
-              {customer || 'Unknown'}
+            <Link to={`/contacts/details/${customer._id}`}>
+              {customer.firstName || 'Unknown'}
             </Link>
           </SectionBodyItem>
         ))}
@@ -66,14 +66,14 @@ class RightSidebar extends React.Component<Props, State> {
 
     const companyContent = (
       <div>
-        {car.companyIds?.map(company => (
+        {car.companies?.map(company => (
           <SectionBodyItem>
             <Link to={`/companies/details/${company}`}>
               {company || 'Unknown'}
             </Link>
           </SectionBodyItem>
         ))}
-        {car.companyIds?.length === 0 && (
+        {car.companies?.length === 0 && (
           <EmptyState icon="building" text="No company" />
         )}
       </div>
@@ -141,7 +141,7 @@ class RightSidebar extends React.Component<Props, State> {
             name="chooseCompany"
             initialValue={car.companyIds}
             onSelect={onSelectCompanies}
-            multi={false}
+            multi={true}
           />
 
           <ModalFooter>

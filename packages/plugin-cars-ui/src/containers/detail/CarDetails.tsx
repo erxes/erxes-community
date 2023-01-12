@@ -49,6 +49,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     })
       .then(() => {
         Alert.success('You successfully updated a car');
+        carDetailQuery.refetch();
       })
       .catch(error => {
         alert(error.message);

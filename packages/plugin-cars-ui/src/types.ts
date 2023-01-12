@@ -13,6 +13,17 @@ export interface ICarCategoryDoc {
   parentId?: string;
 }
 
+export interface ICarCustomer {
+  _id?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface ICompanyCustomer {
+  _id?: string;
+  primaryName?: string;
+}
+
 export interface ICarDoc {
   createdAt?: Date;
   modifiedAt?: Date;
@@ -36,7 +47,8 @@ export interface ICarDoc {
   importYear?: number;
 
   attachment?: IAttachment;
-  customers?: string[];
+  customers?: ICarCustomer[];
+  companies?: ICompanyCustomer[];
   customerIds?: string[];
   companyIds?: string[];
 }
@@ -158,6 +170,7 @@ export type ListConfigQueryResponse = {
 export type DetailQueryResponse = {
   carDetail: ICar;
   loading: boolean;
+  refetch: () => void;
 };
 
 export type ActivityLogQueryResponse = {
