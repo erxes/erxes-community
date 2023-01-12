@@ -1,4 +1,4 @@
-import { IUserDocument } from '@erxes/api-utils/src/types';
+import { IUser, IUserDocument } from '@erxes/api-utils/src/types';
 import { Document, Schema, Model, Connection, Types } from 'mongoose';
 import {
   USER_TYPES,
@@ -98,7 +98,15 @@ const OMIT_FROM_INPUT = [
   'isPermissionRequired'
 ] as const;
 
-export type PostCreateInput = Omit<IPost, typeof OMIT_FROM_INPUT[number]>;
+interface PollOptionInput {
+  _id?: string;
+  title: string;
+}
+
+export type PostCreateInput = Omit<IPost, typeof OMIT_FROM_INPUT[number]> & {
+  pollOptions?: PollOptionInput[] | null;
+};
+
 export type PostPatchInput = Partial<PostCreateInput>;
 
 export interface IPostModel extends Model<PostDocument> {
@@ -110,7 +118,7 @@ export interface IPostModel extends Model<PostDocument> {
     c: PostPatchInput,
     user: IUserDocument
   ): Promise<PostDocument>;
-  deletePost(_id: string): Promise<PostDocument>;
+  deletePost(_id: string, user: IUserDocument): Promise<PostDocument>;
 
   changeState(
     _id: string,
@@ -235,11 +243,17 @@ postSchema.index({
   'translations.title': 'text'
 });
 
-const wordCountHtml = (html?: string | null): number => {
-  if (!html) return 0;
-  const text = strip(html || '');
-  return text.trim().split(/\s+/).length;
-};
+async function cleanupAfterDelete(
+  models: IModels,
+  _id: string,
+  userType: UserTypes,
+  userId: string
+) {
+  await models.Comment.deleteMany({ postId: _id });
+  await models.PostUpVote.deleteMany({ contentId: _id });
+  await models.PostDownVote.deleteMany({ contentId: _id });
+  await models.PollOption.handleChanges(_id, [], userType, userId);
+}
 
 export const generatePostModel = (
   subdomain: string,
@@ -261,10 +275,12 @@ export const generatePostModel = (
       // admin posts are always approved
       const categoryApprovalState: AdminApprovalStates = 'APPROVED';
 
-      let lastPublishedAt = input.state === 'PUBLISHED' ? new Date() : null;
+      const { pollOptions, ...doc } = input;
+
+      let lastPublishedAt = doc.state === 'PUBLISHED' ? new Date() : null;
 
       const res = await models.Post.create({
-        ...input,
+        ...doc,
 
         categoryApprovalState,
 
@@ -277,6 +293,16 @@ export const generatePostModel = (
         lastPublishedAt,
         wordCount: wordCountHtml(input.content)
       });
+
+      if (pollOptions?.length) {
+        await models.PollOption.handleChanges(
+          res._id,
+          pollOptions,
+          'CP',
+          user._id
+        );
+      }
+
       if (res.state === 'PUBLISHED') {
         await notifyUsersPublishedPost(subdomain, models, res);
       }
@@ -284,10 +310,12 @@ export const generatePostModel = (
     }
     public static async patchPost(
       _id: string,
-      patch: PostPatchInput,
+      input: PostPatchInput,
       user: IUserDocument
     ): Promise<PostDocument> {
       const post = await models.Post.findByIdOrThrow(_id);
+
+      const { pollOptions, ...patch } = input;
 
       const originalState = post.state;
 
@@ -311,6 +339,15 @@ export const generatePostModel = (
 
       await post.save();
 
+      if (pollOptions !== undefined) {
+        await models.PollOption.handleChanges(
+          post._id,
+          pollOptions || [],
+          'CP',
+          user._id
+        );
+      }
+
       if (originalState === 'DRAFT' && patch.state === 'PUBLISHED') {
         await notifyUsersPublishedPost(subdomain, models, post);
       }
@@ -318,11 +355,13 @@ export const generatePostModel = (
       return post;
     }
 
-    public static async deletePost(_id: string): Promise<PostDocument> {
+    public static async deletePost(
+      _id: string,
+      user: IUserDocument
+    ): Promise<PostDocument> {
       const post = await models.Post.findByIdOrThrow(_id);
       await post.remove();
-      await models.Comment.deleteMany({ postId: _id });
-      await models.SavedPost.deleteMany({ postId: _id });
+      cleanupAfterDelete(models, _id, 'CRM', user._id);
       return post;
     }
 
@@ -463,7 +502,9 @@ export const generatePostModel = (
     ): Promise<PostDocument> {
       if (!cpUser) throw new LoginRequiredError();
 
-      const category = await models.Category.findById(input.categoryId);
+      const { pollOptions, ...post } = input;
+
+      const category = await models.Category.findById(post.categoryId);
 
       await models.Category.ensureUserIsAllowed('WRITE_POST', category, cpUser);
 
@@ -471,10 +512,10 @@ export const generatePostModel = (
         ? 'PENDING'
         : 'APPROVED';
 
-      const lastPublishedAt = input.state === 'PUBLISHED' ? new Date() : null;
+      const lastPublishedAt = post.state === 'PUBLISHED' ? new Date() : null;
 
       const res = await models.Post.create({
-        ...input,
+        ...post,
         categoryApprovalState,
 
         createdUserType: USER_TYPES[1],
@@ -488,6 +529,15 @@ export const generatePostModel = (
         wordCount: wordCountHtml(input.content)
       });
 
+      if (pollOptions?.length) {
+        await models.PollOption.handleChanges(
+          res._id,
+          pollOptions,
+          'CP',
+          cpUser.userId
+        );
+      }
+
       if (res.state === 'PUBLISHED') {
         await notifyUsersPublishedPost(subdomain, models, res);
       }
@@ -495,7 +545,7 @@ export const generatePostModel = (
     }
     public static async patchPostCp(
       _id: string,
-      patch: PostPatchInput,
+      input: PostPatchInput,
       cpUser?: ICpUser
     ): Promise<PostDocument> {
       if (!cpUser) throw new LoginRequiredError();
@@ -503,6 +553,8 @@ export const generatePostModel = (
       const post = await models.Post.findByIdOrThrowCp(_id, cpUser);
 
       const originalState = post.state;
+
+      const { pollOptions, ...patch } = input;
 
       const resultingCategoryId =
         patch.categoryId === undefined ? post.categoryId : patch.categoryId;
@@ -533,11 +585,20 @@ export const generatePostModel = (
       }
 
       _.assign(post, update);
+      await post.save();
+
+      if (pollOptions !== undefined) {
+        await models.PollOption.handleChanges(
+          post._id,
+          pollOptions || [],
+          'CP',
+          cpUser.userId
+        );
+      }
 
       if (originalState === 'DRAFT' && post.state === 'PUBLISHED') {
         await notifyUsersPublishedPost(subdomain, models, post);
       }
-      await post.save();
       return post;
     }
 
@@ -548,8 +609,7 @@ export const generatePostModel = (
       if (!cpUser) throw new LoginRequiredError();
       const post = await models.Post.findByIdOrThrowCp(_id, cpUser);
       await post.remove();
-      await models.Comment.deleteMany({ postId: _id });
-      await models.SavedPost.deleteMany({ postId: _id });
+      await cleanupAfterDelete(models, post._id, 'CP', cpUser.userId);
       return post;
     }
 
