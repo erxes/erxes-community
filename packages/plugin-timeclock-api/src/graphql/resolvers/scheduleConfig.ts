@@ -4,11 +4,11 @@ import { fixDate } from '@erxes/api-utils/src';
 
 export default {
   async configDays(
-    { _id }: IScheduleConfigDocument,
+    scheduleConfig: IScheduleConfigDocument,
     {},
     { models }: IContext,
-    { variableValues }
+    {}
   ) {
-    return models.Shifts.find({ scheduleConfigId: _id });
+    return models.Shifts.find({ scheduleConfigId: scheduleConfig._id });
   }
 };

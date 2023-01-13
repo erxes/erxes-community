@@ -336,36 +336,32 @@ const timeclockMutations = {
     { branchIds, departmentIds, userIds, shifts },
     { subdomain, models }: IContext
   ) {
-    let schedule;
-
-    if (userIds.includes('')) {
-      const concatBranchDept: string[] = [];
-
-      if (!branchIds.includes('')) {
-        for (const branchId of branchIds) {
-          const branch = await findBranch(subdomain, branchId);
-          concatBranchDept.push(...branch.userIds);
-        }
-      }
-      if (!departmentIds.includes('')) {
-        for (const deptId of departmentIds) {
-          const department = await findDepartment(subdomain, deptId);
-          concatBranchDept.push(...department.userIds);
-        }
-      }
-
-      // prevent creating double schedule for common users
-      const sorted = concatBranchDept.sort();
-      const unionOfUserIds = sorted.filter((value, pos) => {
-        return concatBranchDept.indexOf(value) === pos;
-      });
-
-      createScheduleShiftsByUserIds(unionOfUserIds, shifts, models);
-    } else {
-      schedule = createScheduleShiftsByUserIds(userIds, shifts, models);
+    if (userIds.length) {
+      return createScheduleShiftsByUserIds(userIds, shifts, models);
     }
 
-    return schedule;
+    const concatBranchDept: string[] = [];
+
+    if (branchIds) {
+      for (const branchId of branchIds) {
+        const branch = await findBranch(subdomain, branchId);
+        concatBranchDept.push(...branch.userIds);
+      }
+    }
+    if (departmentIds) {
+      for (const deptId of departmentIds) {
+        const department = await findDepartment(subdomain, deptId);
+        concatBranchDept.push(...department.userIds);
+      }
+    }
+
+    // prevent creating double schedule for common users
+    const sorted = concatBranchDept.sort();
+    const unionOfUserIds = sorted.filter((value, pos) => {
+      return concatBranchDept.indexOf(value) === pos;
+    });
+
+    return createScheduleShiftsByUserIds(unionOfUserIds, shifts, models);
   },
 
   scheduleRemove(_root, { _id }, { models }: IContext) {
