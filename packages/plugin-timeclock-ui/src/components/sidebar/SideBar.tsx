@@ -27,11 +27,19 @@ const LeftSideBar = (props: Props) => {
   const [endDate, setEndDate] = useState(queryParams.endDate);
 
   const cleanFilter = () => {
-    onBranchSelect(['']);
-    onDepartmentSelect(['']);
-    onMemberSelect(['']);
+    onBranchSelect([]);
+    onDepartmentSelect([]);
+    onMemberSelect([]);
     onStartDateChange(null);
     onEndDateChange(null);
+    router.removeParams(
+      history,
+      'userIds',
+      'branchIds',
+      'startDate',
+      'endDate',
+      'departmentIds'
+    );
     removePageParams();
   };
 

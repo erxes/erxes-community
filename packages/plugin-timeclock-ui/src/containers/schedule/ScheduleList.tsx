@@ -38,6 +38,7 @@ type Props = {
   queryPage: number;
   queryPerPage: number;
   getActionBar: (actionBar: any) => void;
+  showSideBar: (sideBar: boolean) => void;
   getPagination: (pagination: any) => void;
 };
 
@@ -56,6 +57,7 @@ const ListContainer = (props: FinalProps) => {
     removeScheduleMutation,
     removeScheduleShiftMutation,
     getPagination,
+    showSideBar,
     listSchedulesMain
   } = props;
 
@@ -125,6 +127,7 @@ const ListContainer = (props: FinalProps) => {
     removeScheduleShifts
   };
 
+  showSideBar(true);
   getPagination(<Pagination count={totalCount} />);
   return <ScheduleList {...updatedProps} />;
 };

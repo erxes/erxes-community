@@ -34,7 +34,7 @@ type Props = {
 
 function List(props: Props) {
   const { branchesList, queryParams, history, route, searchFilter } = props;
-
+  const [showSideBar, setShowSideBar] = useState(true);
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
   const [PaginationFooter, setPagination] = useState(<div />);
@@ -46,6 +46,7 @@ function List(props: Props) {
         setModalComponent(
           <ConfigList
             {...props}
+            showSideBar={setShowSideBar}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -57,6 +58,7 @@ function List(props: Props) {
         setModalComponent(
           <ReportList
             {...props}
+            showSideBar={setShowSideBar}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
             history={history}
@@ -68,6 +70,7 @@ function List(props: Props) {
         setModalComponent(
           <ScheduleList
             {...props}
+            showSideBar={setShowSideBar}
             getPagination={setPagination}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
@@ -80,6 +83,7 @@ function List(props: Props) {
         setModalComponent(
           <AbsenceList
             {...props}
+            showSideBar={setShowSideBar}
             getPagination={setPagination}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
@@ -92,6 +96,7 @@ function List(props: Props) {
         setModalComponent(
           <TimeclockList
             {...props}
+            showSideBar={setShowSideBar}
             getActionBar={setRightActionBar}
             getPagination={setPagination}
             history={history}
@@ -121,11 +126,13 @@ function List(props: Props) {
         />
       }
       leftSidebar={
-        <SideBarList
-          branchesList={branchesList}
-          queryParams={queryParams}
-          history={history}
-        />
+        showSideBar && (
+          <SideBarList
+            branchesList={branchesList}
+            queryParams={queryParams}
+            history={history}
+          />
+        )
       }
       transparent={true}
       hasBorder={true}

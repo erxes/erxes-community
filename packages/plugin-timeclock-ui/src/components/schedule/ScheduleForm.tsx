@@ -25,11 +25,11 @@ type Props = {
   branchesList: IBranch[];
   modalContentType: string;
   scheduleConfigs: IScheduleConfig[];
-  submitRequest: (userId: string[], filledShifts: any) => void;
+  submitRequest: (userId: any, filledShifts: any) => void;
   submitSchedule: (
-    branchIds: string[],
-    departmentIds: string[],
-    userIds: string[],
+    branchIds: any,
+    departmentIds: any,
+    userIds: any,
     filledShifts: any
   ) => void;
   closeModal: any;
@@ -48,7 +48,6 @@ function ScheduleForm(props: Props) {
 
   const [selectedScheduleConfig, setScheduleConfig] = useState('');
   const [dateKeyCounter, setKeyCounter] = useState('');
-  const [userIds, setUserIds] = useState(['']);
 
   const timeFormat = 'HH:mm';
   const [defaultStartTime, setDefaultStartTime] = useState('08:30:00');
@@ -57,8 +56,9 @@ function ScheduleForm(props: Props) {
   const [dateRangeEnd, setDateEnd] = useState(new Date());
   const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
   const [contentType, setContentType] = useState('By Date Range');
-  const [selectedDeptIds, setDepartments] = useState(['']);
-  const [selectedBranchIds, setBranches] = useState(['']);
+  const [userIds, setUserIds] = useState([]);
+  const [selectedDeptIds, setDepartments] = useState([]);
+  const [selectedBranchIds, setBranches] = useState([]);
 
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
@@ -180,10 +180,9 @@ function ScheduleForm(props: Props) {
 
   const checkInput = (selectedUsers, shifts, branchIds?, departmentIds?) => {
     if (
-      !branchIds &&
-      !departmentIds &&
-      selectedUsers.length === 1 &&
-      selectedUsers[0] === ''
+      branchIds.length === 0 &&
+      departmentIds.length === 0 &&
+      selectedUsers.length === 0
     ) {
       Alert.error('No users were given');
     } else if (shifts.length === 0) {
