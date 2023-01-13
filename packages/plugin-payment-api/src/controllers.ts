@@ -1,6 +1,7 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { debugInfo } from '@erxes/api-utils/src/debuggers';
 import { Router } from 'express';
+import { debugInfo } from '@erxes/api-utils/src/debuggers';
 
 import { PAYMENT_KINDS } from './constants';
 import { generateModels } from './connectionResolver';
