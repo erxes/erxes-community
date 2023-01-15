@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { convertFromHTML } from 'draft-js';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import calendar from 'dayjs/plugin/calendar';
@@ -16,7 +17,7 @@ import {
   MessageBody,
   MessageContent,
   MessageReply,
-  MessageAction
+  MessageOption
 } from '../styles';
 
 type Props = {
@@ -28,7 +29,7 @@ type Props = {
   loadEarlierMessage: () => void;
 };
 
-const ChatHistory = (props: Props) => {
+const History = (props: Props) => {
   dayjs.extend(relativeTime);
   dayjs.extend(calendar);
   const { messages, latestMessages, isAllMessages, currentUser } = props;
@@ -69,7 +70,9 @@ const ChatHistory = (props: Props) => {
   };
 
   const renderRow = (message: any) => {
-    const isMe = message.createdUser._id === currentUser._id;
+    const isMe = currentUser._id === message.createdUser._id;
+    const draftContent =
+      message.relatedMessage && convertFromHTML(message.relatedMessage.content);
 
     return (
       <MessageItem
@@ -80,7 +83,7 @@ const ChatHistory = (props: Props) => {
       >
         <div style={{ flex: 1 }} />
         <MessageWrapper me={isMe}>
-          {message.relatedMessage && (
+          {draftContent && (
             <MessageReply>
               <b>
                 {message.relatedMessage.createdUser &&
@@ -88,21 +91,17 @@ const ChatHistory = (props: Props) => {
                     message.relatedMessage.createdUser.email)}
                 :&nbsp;
               </b>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: message.relatedMessage.content
-                }}
-              />
+              <p>{draftContent.contentBlocks[0].text}</p>
             </MessageReply>
           )}
           <MessageBody me={isMe}>
             <Tip placement="top" text="Reply">
-              <MessageAction
+              <MessageOption
                 onClick={() => props.setReply(message)}
                 id={`action-${message._id}`}
               >
                 <Icon icon="reply" color="secondary" />
-              </MessageAction>
+              </MessageOption>
             </Tip>
             <Tip
               placement={isMe ? 'left' : 'right'}
@@ -110,12 +109,12 @@ const ChatHistory = (props: Props) => {
             >
               <MessageContent
                 dangerouslySetInnerHTML={{ __html: message.content || '' }}
+                me={isMe}
               />
             </Tip>
           </MessageBody>
         </MessageWrapper>
         <Avatar user={isMe ? currentUser : message.createdUser} size={36} />
-        <br />
       </MessageItem>
     );
   };
@@ -135,4 +134,4 @@ const ChatHistory = (props: Props) => {
   );
 };
 
-export default ChatHistory;
+export default History;

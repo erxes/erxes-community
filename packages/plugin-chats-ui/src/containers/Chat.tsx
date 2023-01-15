@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useQuery } from 'react-apollo';
 import queryString from 'query-string';
@@ -11,13 +11,13 @@ import { queries } from '../graphql';
 
 const ChatContainer = () => {
   const location = useLocation();
-  const { _id, userIds, userId } = queryString.parse(location.search);
+  const { id, userIds, userId } = queryString.parse(location.search);
 
-  if (!_id) {
+  if (!id && (userIds || userId)) {
     return <GetChatId userIds={userId ? [userId] : userIds} />;
   }
 
-  return <Chat chatId={_id} />;
+  return <Chat chatId={id || ''} />;
 };
 
 const GetChatId = (props: { userIds: string[] }) => {

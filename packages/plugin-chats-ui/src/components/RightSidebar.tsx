@@ -6,16 +6,16 @@ import Icon from '@erxes/ui/src/components/Icon';
 import Tip from '@erxes/ui/src/components/Tip';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import CommonSidebar from '@erxes/ui/src/layout/components/Sidebar';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
-import AddMember from '../containers/AddMember';
+import AddMember from '../containers/modals/AddMember';
 import {
   SidebarWrapper,
   SidebarHeader,
   ParticipantList,
   ParticipantItem,
-  ParticipantItemPreview,
+  ParticipantDetails,
+  ParticipantSubDetails,
   Subtitle,
   DirectWrapper,
   DirectDetailItem,
@@ -25,13 +25,12 @@ import {
 
 type Props = {
   chatDetail: any;
+  currentUser: IUser;
   makeOrRemoveAdmin: (id: string) => void;
   addOrRemoveMember: (type: string, userIds: string[]) => void;
 };
 
-type FinalProps = {} & Props & { currentUser: IUser };
-
-const ChatInfo = (props: FinalProps) => {
+const RightSidebar = (props: Props) => {
   const { chatDetail, currentUser } = props;
 
   const handleMouseOver = (id: string) => {
@@ -60,21 +59,21 @@ const ChatInfo = (props: FinalProps) => {
 
   const renderParticipants = (user: any) => {
     return (
-      <li
+      <ParticipantItem
         key={user._id}
         onMouseOver={() => handleMouseOver(user._id)}
         onMouseLeave={() => handleMouseLeave(user._id)}
       >
         <Link to={`/erxes-plugin-chat?userId=${user._id}`}>
           <Avatar user={user} size={36} />
-          <ParticipantItem>
+          <ParticipantDetails>
             {user.details.fullName || user.email}
             <br />
-            <ParticipantItemPreview>
+            <ParticipantSubDetails>
               {user.isAdmin ? 'Admin ' : ''}
               {(user.details.position && '- ' + user.details.position) || ''}
-            </ParticipantItemPreview>
-          </ParticipantItem>
+            </ParticipantSubDetails>
+          </ParticipantDetails>
         </Link>
         <OptionsWrapper id={'option-' + user._id}>
           {user.isAdmin ? (
@@ -96,7 +95,7 @@ const ChatInfo = (props: FinalProps) => {
             </OptionsButton>
           </Tip>
         </OptionsWrapper>
-      </li>
+      </ParticipantItem>
     );
   };
 
@@ -144,7 +143,7 @@ const ChatInfo = (props: FinalProps) => {
           <ModalTrigger
             title="Add people"
             trigger={
-              <li>
+              <ParticipantItem>
                 <a href="#">
                   <Icon
                     icon="plus"
@@ -152,9 +151,9 @@ const ChatInfo = (props: FinalProps) => {
                     color="black"
                     style={{ margin: '0 0.6em' }}
                   />
-                  <ParticipantItem>Add people</ParticipantItem>
+                  <ParticipantDetails>Add people</ParticipantDetails>
                 </a>
-              </li>
+              </ParticipantItem>
             }
             content={props => <AddMember {...props} chatId={chatDetail._id} />}
             hideHeader
@@ -174,8 +173,4 @@ const ChatInfo = (props: FinalProps) => {
   );
 };
 
-const WithCurrentUser = withCurrentUser(ChatInfo);
-
-export default function(props: Props) {
-  return <WithCurrentUser {...props} />;
-}
+export default RightSidebar;

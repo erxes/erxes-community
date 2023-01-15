@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
+import { convertFromHTML } from 'draft-js';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 // erxes
@@ -11,20 +12,20 @@ import CommonSidebar from '@erxes/ui/src/layout/components/Sidebar';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
-import CreateGroupChat from '../containers/CreateGroupChat';
-import CreateDirectChat from '../components/CreateDirectChat';
+import CreateGroupChat from '../containers/modals/CreateGroupChat';
+import CreateDirectChat from './modals/CreateDirectChat';
 import {
   IconButton,
   Subtitle,
   SidebarWrapper,
   SidebarHeader,
-  ContactsList,
-  ContactsGroupAvatar,
-  ContactsItem,
-  ContactsItemPreview,
-  ContactsItemContent,
-  ContactsItemContext,
-  ContactsItemDate,
+  ContactList,
+  ContactGroupAvatar,
+  ContactItem,
+  ContactWrapper,
+  ContactBody,
+  ContactContent,
+  ContactTimestamp,
   OptionsWrapper,
   OptionsButton,
   OptionsMenuList,
@@ -40,7 +41,7 @@ type Props = {
 
 type FinalProps = {} & Props & { currentUser: IUser };
 
-const ChatContacts = (props: FinalProps) => {
+const LeftSidebar = (props: FinalProps) => {
   dayjs.extend(relativeTime);
   const { chats, currentUser } = props;
   const wrapperRef = useRef<any>(null);
@@ -156,6 +157,8 @@ const ChatContacts = (props: FinalProps) => {
 
   const renderChat = (chat: any) => {
     const users = chat.participantUsers || [];
+    const draftContent =
+      chat.lastMessage && convertFromHTML(chat.lastMessage.content);
 
     const user =
       users.length > 1
@@ -163,22 +166,22 @@ const ChatContacts = (props: FinalProps) => {
         : users[0];
 
     return (
-      <ContactsItem
+      <ContactItem
         key={chat._id}
         active={_id === chat._id}
         onMouseOver={() => handleMouseOver(chat._id)}
         onMouseLeave={() => handleMouseLeave(chat._id)}
       >
-        <Link to={`/erxes-plugin-chat?_id=${chat._id}`}>
+        <Link to={`/erxes-plugin-chat?id=${chat._id}`}>
           {chat.type === 'direct' ? (
             <Avatar user={user} size={36} />
           ) : (
-            <ContactsGroupAvatar>
+            <ContactGroupAvatar>
               <Avatar user={users[1]} size={24} />
               <Avatar user={users[2]} size={24} />
-            </ContactsGroupAvatar>
+            </ContactGroupAvatar>
           )}
-          <ContactsItemContent
+          <ContactWrapper
             isSeen={
               (chat.lastMessage && chat.lastMessage.createdUser._id) ===
               currentUser._id
@@ -186,23 +189,22 @@ const ChatContacts = (props: FinalProps) => {
                 : chat.isSeen
             }
           >
-            {chat.type === 'direct'
-              ? user.details.fullName || user.email
-              : chat.name}
-            <br />
-            <ContactsItemPreview>
-              <ContactsItemContext
-                dangerouslySetInnerHTML={{
-                  __html: (chat.lastMessage && chat.lastMessage.content) || ''
-                }}
-              />
-              <ContactsItemDate>
+            <p>
+              {chat.type === 'direct'
+                ? user.details.fullName || user.email
+                : chat.name}
+            </p>
+            <ContactBody>
+              <ContactContent>
+                {draftContent && draftContent.contentBlocks[0].text}
+              </ContactContent>
+              <ContactTimestamp>
                 {chat.lastMessage &&
                   chat.lastMessage.createdAt &&
                   dayjs(chat.lastMessage.createdAt).fromNow()}
-              </ContactsItemDate>
-            </ContactsItemPreview>
-          </ContactsItemContent>
+              </ContactTimestamp>
+            </ContactBody>
+          </ContactWrapper>
         </Link>
         <OptionsWrapper
           id={'option-' + chat._id}
@@ -212,7 +214,7 @@ const ChatContacts = (props: FinalProps) => {
             <Icon icon="ellipsis-h" size={14} />
           </OptionsButton>
         </OptionsWrapper>
-      </ContactsItem>
+      </ContactItem>
     );
   };
 
@@ -227,15 +229,15 @@ const ChatContacts = (props: FinalProps) => {
           {pinnedChats.length !== 0 && (
             <>
               <Subtitle>Pinned</Subtitle>
-              <ContactsList>
+              <ContactList>
                 {chats.map(chat => checkPinned(chat._id) && renderChat(chat))}
-              </ContactsList>
+              </ContactList>
             </>
           )}
           <Subtitle>Recent</Subtitle>
-          <ContactsList>
+          <ContactList>
             {chats.map(chat => !checkPinned(chat._id) && renderChat(chat))}
-          </ContactsList>
+          </ContactList>
         </SidebarWrapper>
       </CommonSidebar>
       <OptionsMenuWrapper id="options-menu" innerRef={wrapperRef}>
@@ -268,7 +270,7 @@ const ChatContacts = (props: FinalProps) => {
   );
 };
 
-const WithCurrentUser = withCurrentUser(ChatContacts);
+const WithCurrentUser = withCurrentUser(LeftSidebar);
 
 export default function(props: Props) {
   return <WithCurrentUser {...props} />;

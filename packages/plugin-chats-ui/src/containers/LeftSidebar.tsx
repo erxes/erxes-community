@@ -7,14 +7,14 @@ import confirm from '@erxes/ui/src/utils/confirmation/confirm';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
-import ChatContacts from '../components/ChatContacts';
+import LeftSidebarComponent from '../components/LeftSidebar';
 import { queries, mutations, subscriptions } from '../graphql';
 
 type Props = {
   currentUser: IUser;
 };
 
-const ChatContactsContainer = (props: Props) => {
+const LeftSidebarContainer = (props: Props) => {
   const { currentUser } = props;
 
   const [removeMutation] = useMutation(gql(mutations.removeChat));
@@ -65,8 +65,9 @@ const ChatContactsContainer = (props: Props) => {
   if (chats.error) {
     return <p>{chats.error.message}</p>;
   }
+
   return (
-    <ChatContacts
+    <LeftSidebarComponent
       chats={chats.data.chats.list}
       removeChat={removeChat}
       markChatAsRead={markChatAsRead}
@@ -74,4 +75,4 @@ const ChatContactsContainer = (props: Props) => {
   );
 };
 
-export default withCurrentUser(ChatContactsContainer);
+export default withCurrentUser(LeftSidebarContainer);

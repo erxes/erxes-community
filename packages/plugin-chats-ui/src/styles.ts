@@ -116,7 +116,7 @@ export const OptionsWrapper = styled.div`
 /**
  * Chat Contacts
  */
-export const ContactsList = styled.div`
+export const ContactList = styled.div`
   max-height: 100%;
   list-style: none;
   margin: 0;
@@ -124,7 +124,7 @@ export const ContactsList = styled.div`
   margin-bottom: 10px;
 `;
 
-export const ContactsItem = styledTS<{ active?: boolean }>(styled.div)`
+export const ContactItem = styledTS<{ active?: boolean }>(styled.div)`
   position: relative;
   background-color: ${props => (props.active ? colors.bgGray : 'initial')};
   border-radius: ${dimensions.unitSpacing}px;
@@ -142,17 +142,19 @@ export const ContactsItem = styledTS<{ active?: boolean }>(styled.div)`
   }
 `;
 
-export const ContactsItemContent = styledTS<{ isSeen?: boolean }>(styled.div)`
+export const ContactWrapper = styledTS<{ isSeen?: boolean }>(styled.div)`
   width: 100%;
   padding: 0 ${dimensions.unitSpacing}px;
   margin: 0;
   color: ${colors.textPrimary};
-  font-size: 14px;
-  font-weight: ${props => (props.isSeen ? 'initial' : 'bold')}
+  font-size: 14px !important;
+  font-weight: ${props => (props.isSeen ? 'normal !important' : 'bold')};
   text-decoration: none;
+
+  p { margin: 0 };
 `;
 
-export const ContactsGroupAvatar = styled.div`
+export const ContactGroupAvatar = styled.div`
   position: relative;
   min-width: 36px;
   max-width: 36px;
@@ -172,29 +174,26 @@ export const ContactsGroupAvatar = styled.div`
   }
 `;
 
-export const ContactsItemPreview = styled.div`
+export const ContactBody = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   font-size: 12px;
 `;
 
-export const ContactsItemContext = styled.div`
+export const ContactContent = styled.p`
   max-width: 150px;
   max-height: 1rem;
   overflow: hidden;
 
-  p {
-    margin: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    word-wrap: break-word;
-    word-break: break-word;
-  }
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  word-break: break-word;
 `;
 
-export const ContactsItemDate = styled.span`
+export const ContactTimestamp = styled.span`
   flex-shrink: 0;
   text-align: right;
 `;
@@ -202,17 +201,17 @@ export const ContactsItemDate = styled.span`
 /**
  * Participants
  */
-export const ParticipantList = styled.ul`
+export const ParticipantList = styled.div`
   max-height: 100%;
   list-style: none;
   margin: 0;
   padding-left: 0;
+`;
 
-  li {
-    position: relative;
-  }
+export const ParticipantItem = styled.div`
+  position: relative;
 
-  li a {
+  a {
     display: flex;
     align-items: center;
     padding: ${dimensions.unitSpacing}px;
@@ -220,13 +219,13 @@ export const ParticipantList = styled.ul`
     transition: 0.2s;
   }
 
-  li a:hover {
+  a:hover {
     background-color: ${colors.bgGray};
     transition: 0.2s;
   }
 `;
 
-export const ParticipantItem = styled.div`
+export const ParticipantDetails = styled.div`
   width: 100%;
   padding: 0 ${dimensions.unitSpacing}px;
   margin: 0;
@@ -235,7 +234,7 @@ export const ParticipantItem = styled.div`
   text-decoration: none;
 `;
 
-export const ParticipantItemPreview = styled.div`
+export const ParticipantSubDetails = styled.div`
   font-size: 12px;
   display: flex;
   justify-content: space-between;
@@ -305,18 +304,13 @@ export const MessageReply = styled.div`
   padding: 2px ${dimensions.unitSpacing}px 2px;
   margin: 0;
 
-  div {
-    max-height: 1rem;
+  p {
+    margin: 0;
     overflow: hidden;
-
-    p {
-      margin: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      word-wrap: break-word;
-      word-break: break-word;
-    }
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 `;
 
@@ -327,7 +321,7 @@ export const MessageBody = styledTS<{ me?: boolean }>(styled.div)`
   flex-direction: ${props => (props.me ? 'row' : 'row-reverse')};
 `;
 
-export const MessageContent = styled.div`
+export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
   max-width: 100% !important;
   display: inline-block;
   overflow: hidden;
@@ -335,7 +329,9 @@ export const MessageContent = styled.div`
   word-break: break-word;
 
   border-radius: ${dimensions.unitSpacing}px;
-  background-color: ${colors.bgGray};
+  background-color: ${props =>
+    props.me ? colors.colorPrimary : colors.bgGray};
+  color: ${props => (props.me ? 'white' : 'initial')};
   padding: 8px;
   margin: 0;
 
@@ -344,7 +340,7 @@ export const MessageContent = styled.div`
   }
 `;
 
-export const MessageAction = styled.button`
+export const MessageOption = styled.button`
   background: none;
   display: inline-block;
   visibility: hidden;
@@ -359,7 +355,7 @@ export const MessageAction = styled.button`
   }
 `;
 
-export const ChatForm = styled.div`
+export const ChatEditor = styled.div`
   height: auto;
   width: 100%;
   bottom: 0;
@@ -394,25 +390,23 @@ export const ChatForm = styled.div`
 `;
 
 export const ChatReplyInfo = styled.div`
-  width: 100%;
+  max-width: 100%;
+  height: auto;
   display: block;
   overflow: hidden;
   font-size: ${dimensions.unitSpacing}px;
   color: ${colors.textSecondary};
-  margin: 1em 0;
+  margin: 0;
+  padding 1em 0;
 
-  div {
+  p {
     max-width: 560px;
-    max-height: 1rem;
-
-    p {
-      margin: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      word-wrap: break-word;
-      word-break: break-word;
-    }
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    word-break: break-word;
   }
 `;
 

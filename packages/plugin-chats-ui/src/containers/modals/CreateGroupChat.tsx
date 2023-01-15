@@ -4,8 +4,8 @@ import gql from 'graphql-tag';
 // erxes
 import { Alert } from '@erxes/ui/src/utils';
 // local
-import CreateGroupChat from '../components/CreateGroupChat';
-import { mutations, queries } from '../graphql';
+import CreateGroupChat from '../../components/modals/CreateGroupChat';
+import { mutations, queries } from '../../graphql';
 
 type Props = {
   closeModal: () => void;

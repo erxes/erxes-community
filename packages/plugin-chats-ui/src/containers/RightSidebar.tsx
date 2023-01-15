@@ -3,18 +3,25 @@ import { useQuery, useMutation } from 'react-apollo';
 import gql from 'graphql-tag';
 // erxes
 import Alert from '@erxes/ui/src/utils/Alert';
+import CommonSidebar from '@erxes/ui/src/layout/components/Sidebar';
+import Spinner from '@erxes/ui/src/components/Spinner';
 import confirm from '@erxes/ui/src/utils/confirmation/confirm';
+import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
+import { IUser } from '@erxes/ui/src/auth/types';
 // local
-import ChatInfo from '../components/ChatInfo';
+import RightSidebar from '../components/RightSidebar';
 import { queries, mutations } from '../graphql';
 
 type Props = {
   chatId: string;
 };
 
-const ChatInfoContainer = (props: Props) => {
-  const { chatId } = props;
+type FinalProps = {
+  currentUser: IUser;
+} & Props;
 
+const RightSidebarContainer = (props: FinalProps) => {
+  const { chatId, currentUser } = props;
   const [adminMutation] = useMutation(gql(mutations.makeOrRemoveAdminChat));
   const [memberMutation] = useMutation(gql(mutations.addOrRemoveMemberChat));
 
@@ -26,7 +33,7 @@ const ChatInfoContainer = (props: Props) => {
     confirm()
       .then(() => {
         adminMutation({
-          variables: { id: chatId, userId: id }
+          variables: { id, userId: id }
         })
           .then(() => {
             chatDetail.refetch();
@@ -60,7 +67,11 @@ const ChatInfoContainer = (props: Props) => {
   };
 
   if (chatDetail.loading) {
-    return <p>...</p>;
+    return (
+      <CommonSidebar wide={true}>
+        <Spinner />
+      </CommonSidebar>
+    );
   }
 
   if (chatDetail.error) {
@@ -69,8 +80,9 @@ const ChatInfoContainer = (props: Props) => {
 
   if (chatDetail.data.chatDetail) {
     return (
-      <ChatInfo
+      <RightSidebar
         chatDetail={chatDetail.data.chatDetail}
+        currentUser={currentUser}
         makeOrRemoveAdmin={makeOrRemoveAdmin}
         addOrRemoveMember={addOrRemoveMember}
       />
@@ -80,4 +92,8 @@ const ChatInfoContainer = (props: Props) => {
   return <></>;
 };
 
-export default ChatInfoContainer;
+const WithCurrentUser = withCurrentUser(RightSidebarContainer);
+
+export default (props: Props) => {
+  return <WithCurrentUser {...props} />;
+};

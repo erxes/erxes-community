@@ -18,7 +18,7 @@ const CreateDirectChat = (props: Props) => {
   const [userId, setUserId] = useState(queryParams.userId || '');
 
   const handleSubmit = () => {
-    router.removeParams(history, '_id', 'userIds');
+    router.removeParams(history, 'id', 'userIds');
     router.setParams(history, { userId: userId });
 
     setUserId('');

@@ -6,23 +6,23 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
+import HistoryComponent from '../components/History';
 import { queries, subscriptions } from '../graphql';
-import ChatHistory from '../components/ChatHistory';
 
-type IProps = {
+type Props = {
   chatId: string;
   setReply: (message: any) => void;
 };
 
 type FinalProps = {
   currentUser: IUser;
-} & IProps;
+} & Props;
 
 const ChatHistoryContainer = (props: FinalProps) => {
-  const { chatId, setReply, currentUser } = props;
+  const { chatId, currentUser } = props;
+
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
-
   const chatMessagesQuery = useQuery(gql(queries.chatMessages), {
     variables: { chatId, skip: 0 }
   });
@@ -44,17 +44,6 @@ const ChatHistoryContainer = (props: FinalProps) => {
       ]);
     }
   });
-
-  if (chatMessagesQuery.loading) {
-    return <p>...</p>;
-  }
-
-  if (chatMessagesQuery.error) {
-    return <p>{chatMessagesQuery.error.message}</p>;
-  }
-
-  const chatMessages =
-    (chatMessagesQuery.data && chatMessagesQuery.data.chatMessages.list) || [];
 
   const loadEarlierMessage = () => {
     const nextPage = page + 1;
@@ -91,13 +80,24 @@ const ChatHistoryContainer = (props: FinalProps) => {
     });
   };
 
+  if (chatMessagesQuery.loading) {
+    return <Spinner />;
+  }
+
+  if (chatMessagesQuery.error) {
+    return <p>{chatMessagesQuery.error.message}</p>;
+  }
+
+  const chatMessages =
+    (chatMessagesQuery.data && chatMessagesQuery.data.chatMessages.list) || [];
+
   return (
-    <ChatHistory
+    <HistoryComponent
       messages={chatMessages}
       latestMessages={latestMessages}
       isAllMessages={chatMessages.length < (page + 1) * 20}
       currentUser={currentUser}
-      setReply={setReply}
+      setReply={props.setReply}
       loadEarlierMessage={loadEarlierMessage}
     />
   );
@@ -105,6 +105,6 @@ const ChatHistoryContainer = (props: FinalProps) => {
 
 const WithCurrentUser = withCurrentUser(ChatHistoryContainer);
 
-export default function(props: IProps) {
+export default (props: Props) => {
   return <WithCurrentUser {...props} />;
-}
+};

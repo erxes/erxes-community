@@ -4,8 +4,8 @@ import gql from 'graphql-tag';
 // erxes
 import { Alert } from '@erxes/ui/src/utils';
 // local
-import AddMember from '../components/AddMember';
-import { queries, mutations } from '../graphql';
+import AddMember from '../../components/modals/AddMember';
+import { queries, mutations } from '../../graphql';
 
 type Props = {
   chatId: string;

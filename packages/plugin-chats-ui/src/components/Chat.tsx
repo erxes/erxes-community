@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // erxes
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import PageContent from '@erxes/ui/src/layout/components/PageContent';
 // local
-import ChatContent from '../components/ChatContent';
-import ChatInfo from '../containers/ChatInfo';
-import ChatContacts from '../containers/ChatContacts';
+import LeftSidebar from '../containers/LeftSidebar';
+import RightSidebar from '../containers/RightSidebar';
+import History from '../containers/History';
+import Editor from '../containers/Editor';
+import ReplyInfo from '../components/ReplyInfo';
+
+import { ChatContentBody } from '../styles';
 
 type Props = {
   chatId: string;
@@ -12,6 +17,36 @@ type Props = {
 
 const Chat = (props: Props) => {
   const { chatId } = props;
+  const [reply, setReply] = useState<any>(null);
+
+  useEffect(() => setReply(null), [chatId]);
+
+  const renderContent = () => {
+    if (chatId) {
+      return (
+        <PageContent transparent={false} center={true}>
+          <ChatContentBody>
+            <History chatId={chatId} setReply={setReply} />
+            <ReplyInfo reply={reply} setReply={setReply} />
+            <Editor chatId={chatId} reply={reply} setReply={setReply} />
+          </ChatContentBody>
+        </PageContent>
+      );
+    } else {
+      return (
+        <div
+          style={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <h3>Select a chat or start a new conversation</h3>
+        </div>
+      );
+    }
+  };
 
   return (
     <Wrapper
@@ -19,24 +54,9 @@ const Chat = (props: Props) => {
       header={
         <Wrapper.Header title={'Chat'} breadcrumb={[{ title: 'Chat' }]} />
       }
-      leftSidebar={<ChatContacts />}
-      rightSidebar={chatId && <ChatInfo chatId={chatId} />}
-      content={
-        chatId ? (
-          <ChatContent chatId={chatId} />
-        ) : (
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <h3>Select a chat or start a new conversation</h3>
-          </div>
-        )
-      }
+      leftSidebar={<LeftSidebar />}
+      rightSidebar={<RightSidebar chatId={chatId} />}
+      content={renderContent()}
     />
   );
 };
