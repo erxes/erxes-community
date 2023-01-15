@@ -84,6 +84,7 @@ const queryParams = `
   conformityRelType: String
   conformityIsRelated: Boolean
   conformityIsSaved: Boolean
+  isSelect: Boolean
 `;
 
 export const queries = `

@@ -54,6 +54,7 @@ const listParamsDef = `
   $sortField: String
   $sortDirection: Int
   ${conformityQueryFields}
+  $isSelect: Boolean
 `;
 
 const listParamsValue = `
@@ -67,6 +68,7 @@ const listParamsValue = `
   sortField: $sortField
   sortDirection: $sortDirection
   ${conformityQueryFieldDefs}
+  isSelect: $isSelect
 `;
 
 export const cars = `

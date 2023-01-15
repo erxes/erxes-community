@@ -87,6 +87,12 @@ const carQueries = {
     params,
     { subdomain, commonQuerySelector, models }: IContext
   ) => {
+    const { isSelect } = params;
+
+    if (isSelect) {
+      return models.Cars.find();
+    }
+
     return paginate(
       models.Cars.find(
         await generateFilter(subdomain, params, commonQuerySelector)

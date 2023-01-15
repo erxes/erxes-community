@@ -1,5 +1,5 @@
 import React from 'react';
-import CarSection from '../components/common/CarSection';
+import CarSection from '../containers/CarSection';
 
 type Props = {
   id: string;

@@ -7,129 +7,115 @@ import {
   __,
   SectionBodyItem
 } from '@erxes/ui/src';
-import GetConformity from '@erxes/ui-cards/src/conformity/containers/GetConformity';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CarChooser from '../../containers/CarChooser';
-import { queries } from '../../graphql';
 import { ICar } from '../../types';
+import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
+import Select from 'react-select-plus';
 
 type Props = {
-  name: string;
-  items?: ICar[];
-  mainType?: string;
-  mainTypeId?: string;
-  onSelect?: (cars: ICar[]) => void;
+  cars: ICar[];
   collapseCallback?: () => void;
+  // editCustomer: (values: any) => void;
 };
 
-function Component(
-  this: any,
-  {
-    name,
-    items = [],
-    mainType = '',
-    mainTypeId = '',
-    onSelect,
-    collapseCallback
-  }: Props
-) {
-  const renderCarChooser = props => {
-    return (
-      <CarChooser
-        {...props}
-        data={{ name, cars: items, mainType, mainTypeId }}
-        onSelect={onSelect}
+type State = {
+  carIds: string[];
+};
+
+class CarSection extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      carIds: []
+    };
+  }
+
+  render() {
+    const { cars, collapseCallback } = this.props;
+
+    const options = cars.map(g => ({ value: g._id, label: g.plateNumber }));
+
+    const onChange = values => {
+      this.setState({
+        carIds: values.map(v => v.value)
+      });
+    };
+
+    // const saveCustomer = closeModal => {
+    //   editCustomer({
+    //     id: this.state.carIds
+    //   });
+    //   closeModal();
+    // };
+
+    const renderCarChooser = props => {
+      const { closeModal } = props;
+
+      return (
+        <>
+          <Select
+            placeholder="Choose Cars"
+            name="carId"
+            options={options}
+            onChange={onChange}
+            value={this.state.carIds}
+            multi={true}
+          />
+          <ModalFooter>
+            <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
+              Close
+            </Button>
+
+            <Button
+              btnStyle="success"
+              onClick={() => closeModal()}
+              icon="check-circle"
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </>
+      );
+    };
+
+    const quickButtons = (
+      <ModalTrigger
+        title="Associate"
+        trigger={
+          <button>
+            <Icon icon="plus-circle" />
+          </button>
+        }
+        content={renderCarChooser}
       />
     );
-  };
-
-  const renderRelatedCarChooser = props => {
-    return (
-      <CarChooser
-        {...props}
-        data={{ name, cars: items, mainTypeId, mainType, isRelated: true }}
-        onSelect={onSelect}
-      />
+    const content = (
+      <>
+        {cars.map(car => (
+          <SectionBodyItem>
+            <Link to={`/erxes-plugin-car/details/${car._id}`}>
+              <Icon icon="arrow-to-right" />
+            </Link>
+            <span>{car.plateNumber || 'Unknown'}</span>
+          </SectionBodyItem>
+        ))}
+        {!cars?.length && <EmptyState icon="car" text="No car" />}
+      </>
     );
-  };
 
-  const carTrigger = (
-    <button>
-      <Icon icon="plus-circle" />
-    </button>
-  );
-
-  const relCarTrigger = (
-    <ButtonRelated>
-      <span>{__('See related cars..')}</span>
-    </ButtonRelated>
-  );
-
-  const quickButtons = (
-    <ModalTrigger
-      title="Associate"
-      trigger={carTrigger}
-      size="lg"
-      content={renderCarChooser}
-    />
-  );
-
-  const relQuickButtons = (
-    <ModalTrigger
-      title="Related Associate"
-      trigger={relCarTrigger}
-      size="lg"
-      content={renderRelatedCarChooser}
-    />
-  );
-
-  const content = (
-    <>
-      {items.map((car, index) => (
-        <SectionBodyItem key={index}>
-          <Link to={`/erxes-plugin-car/details/${car._id}`}>
-            <Icon icon="arrow-to-right" />
-          </Link>
-          <span>{car.plateNumber || 'Unknown'}</span>
-        </SectionBodyItem>
-      ))}
-      {items.length === 0 && <EmptyState icon="building" text="No car" />}
-      {mainTypeId && mainType && relQuickButtons}
-    </>
-  );
-
-  return (
-    <Box
-      title={__('Cars')}
-      name="showCars"
-      extraButtons={quickButtons}
-      isOpen={true}
-      callback={collapseCallback}
-    >
-      {content}
-    </Box>
-  );
+    return (
+      <Box
+        title={__('Cars')}
+        name="showCars"
+        extraButtons={quickButtons}
+        isOpen={true}
+        callback={collapseCallback}
+      >
+        {content}
+      </Box>
+    );
+  }
 }
-
-type IProps = {
-  mainType?: string;
-  mainTypeId?: string;
-  isOpen?: boolean;
-  cars?: ICar[];
-  onSelect?: (datas: ICar[]) => void;
-  collapseCallback?: () => void;
-};
-
-export default (props: IProps) => {
-  return (
-    <GetConformity
-      {...props}
-      relType="car"
-      component={Component}
-      queryName="cars"
-      itemsQuery={queries.cars}
-      alreadyItems={props.cars}
-    />
-  );
-};
+export default CarSection;
