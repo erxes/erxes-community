@@ -74,6 +74,12 @@ const chatDetail = `
         _id
         email
         isAdmin
+        departments {
+          title
+        },
+        branches {
+          title
+        },
         details {
           avatar
           description

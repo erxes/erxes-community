@@ -125,6 +125,32 @@ const RightSidebar = (props: Props) => {
           <p>Phone</p>
           <p>{user.details.operatorPhone || '-'}</p>
         </DirectDetailItem>
+        <DirectDetailItem>
+          <p>Departments</p>
+          <p>
+            {user.departments
+              ? user.departments.map(i => (
+                  <span key={i.title}>
+                    {i.title}
+                    <br />
+                  </span>
+                ))
+              : '-'}
+          </p>
+        </DirectDetailItem>
+        <DirectDetailItem>
+          <p>Branches</p>
+          <p>
+            {user.branches
+              ? user.branches.map(i => (
+                  <span>
+                    {i.title}
+                    <br />
+                  </span>
+                ))
+              : '-'}
+          </p>
+        </DirectDetailItem>
       </DirectWrapper>
     );
   };

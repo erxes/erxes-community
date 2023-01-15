@@ -26,7 +26,8 @@ const RightSidebarContainer = (props: FinalProps) => {
   const [memberMutation] = useMutation(gql(mutations.addOrRemoveMemberChat));
 
   const chatDetail = useQuery(gql(queries.chatDetail), {
-    variables: { id: chatId }
+    variables: { id: chatId },
+    fetchPolicy: 'cache-first'
   });
 
   const makeOrRemoveAdmin = (id: string) => {
