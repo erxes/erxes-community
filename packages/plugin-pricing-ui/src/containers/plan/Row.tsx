@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 // erxes
 import { Alert, confirm } from '@erxes/ui/src/utils';
 // local
-import { mutations } from '../../graphql';
+import { queries, mutations } from '../../graphql';
 import RowComponent from '../../components/plan/Row';
 
 type Props = {
@@ -14,15 +14,18 @@ type Props = {
 const RowContainer = (props: Props) => {
   const { data } = props;
   // Hooks
-  const [remove] = useMutation(gql(mutations.pricingPlanRemove));
-  const [edit] = useMutation(gql(mutations.pricingPlanEdit));
+  const [remove] = useMutation(gql(mutations.pricingPlanRemove), {
+    refetchQueries: [{ query: gql(queries.pricingPlans) }]
+  });
+  const [edit] = useMutation(gql(mutations.pricingPlanEdit), {
+    refetchQueries: [{ query: gql(queries.pricingPlans) }]
+  });
 
   const planRemove = () => {
     confirm()
       .then(() => {
         remove({
-          variables: { id: props.data._id },
-          refetchQueries: ['pricingPlans']
+          variables: { id: props.data._id }
         })
           .then(() => {
             Alert.success('Request successful!');
@@ -36,8 +39,7 @@ const RowContainer = (props: Props) => {
     confirm()
       .then(() => {
         edit({
-          variables: { doc: { _id: data._id, status } },
-          refetchQueries: ['plans']
+          variables: { doc: { _id: data._id, status } }
         })
           .then(() => {
             Alert.success('Request successful!');
