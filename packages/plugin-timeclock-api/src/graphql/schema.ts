@@ -143,7 +143,6 @@ export const types = `
     totalCount: Float
   }
   
-
 `;
 
 const params = `

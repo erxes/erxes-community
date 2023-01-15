@@ -127,7 +127,11 @@ const PostDetail: React.FC = () => {
           </tr>
           <tr>
             <th>Thumbnail: </th>
-            <td>{forumPost.thumbnail && <img src={forumPost.thumbnail} />}</td>
+            <td>
+              {forumPost.thumbnail && (
+                <img src={forumPost.thumbnail} style={{ maxHeight: 200 }} />
+              )}
+            </td>
             <th>Thumbnail url:</th>
             <td>{forumPost.thumbnail}</td>
           </tr>
@@ -165,9 +169,57 @@ const PostDetail: React.FC = () => {
             <th>Content: </th>
             <td>
               <div
-                style={{ border: '1px solid black', padding: 10 }}
+                style={{ border: '1px solid gray', padding: 10 }}
                 dangerouslySetInnerHTML={{ __html: forumPost.content }}
               ></div>
+            </td>
+          </tr>
+          <tr>
+            <th>Description: </th>
+            <td>
+              <p
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  border: '1px solid gray',
+                  padding: 10
+                }}
+              >
+                {forumPost.description}
+              </p>
+            </td>
+          </tr>
+          {forumPost.pollOptions?.length && (
+            <>
+              <tr>
+                <th>Poll options</th>
+                <td>
+                  <ul>
+                    {forumPost.pollOptions?.map((option, index) => (
+                      <li key={option._id}>{option.title}</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <th>Poll type</th>
+                <td>
+                  {forumPost.isPollMultiChoice
+                    ? 'Multiple choice'
+                    : 'Single choice'}
+                </td>
+              </tr>
+            </>
+          )}
+          <tr>
+            <th>Tags: </th>
+            <td>
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                {forumPost.tags?.map(tag => (
+                  <div style={{ margin: 2 }} key={tag._id}>
+                    {tag.name}
+                  </div>
+                ))}
+              </div>
             </td>
           </tr>
           <tr>
