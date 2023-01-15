@@ -16,11 +16,11 @@ export const checkPricing = async (
   totalAmount: number,
   departmentId: string,
   branchId: string,
-  orders: any
+  orderItems: any
 ) => {
   const now = dayjs(new Date());
   const nowISO = now.toISOString();
-  const productIds = orders.map(p => p.productId);
+  const productIds = orderItems.map(p => p.productId);
   const result: any = {};
 
   let allowedProductIds: any = [];
@@ -85,9 +85,20 @@ export const checkPricing = async (
   };
 
   const sortArgs: any = {
-    isPriority: -1,
+    isPriority: 1,
     value: 1
   };
+
+  // Prepare object to save calculated data
+  for (const productId of productIds) {
+    if (!Object.keys(result).includes(productId)) {
+      result[productId] = {
+        type: '',
+        value: 0,
+        bonusProducts: []
+      };
+    }
+  }
 
   const plans: any = await models.PricingPlans.find(conditions).sort(sortArgs);
 
@@ -95,29 +106,10 @@ export const checkPricing = async (
     return;
   }
 
-  let priorityApplied: any = false;
-
   // Calculating discount
   for (const plan of plans) {
     // Take all products that can be discounted
     allowedProductIds = await getAllowedProducts(subdomain, plan, productIds);
-
-    // Prepare object to save calculated data
-    for (const productId of allowedProductIds) {
-      if (!Object.keys(result).includes(productId)) {
-        result[productId] = {
-          type: '',
-          value: 0,
-          bonusProduct: ''
-        };
-      }
-    }
-
-    result.default = {
-      type: plan.type || '',
-      value: plan.value || 0,
-      bonusProduct: plan.bonusProduct || ''
-    };
 
     // Check repeat rule first
     const repeatPassed: boolean = checkRepeatRule(plan);
@@ -125,12 +117,11 @@ export const checkPricing = async (
       continue;
     }
 
-    let planApplied: boolean = false;
     let appliedBundleCounts: number = Number.POSITIVE_INFINITY;
     let appliedBundleItems: any[] = [];
 
     // Check rest of the rules
-    for (const item of orders) {
+    for (const item of orderItems) {
       if (!allowedProductIds.includes(item.productId)) {
         continue;
       }
@@ -140,7 +131,7 @@ export const checkPricing = async (
 
       let type: string = '';
       let value: number = 0;
-      let bonusProduct: string = '';
+      let bonusProducts: any = [];
 
       const defaultValue: number = calculateDiscountValue(
         plan.type,
@@ -159,41 +150,33 @@ export const checkPricing = async (
 
       // Checks if all rules are passed!
       if (priceRule.passed && quantityRule.passed && expiryRule.passed) {
-        if (!plan.isPriority && priorityApplied === true) {
-          continue;
-        }
-
         // Bonus product will always be prioritized
-        if (priceRule.type === 'bonus') {
-          bonusProduct = priceRule.bonusProduct;
+        if (priceRule.type === 'bonus' && priceRule.bonusProduct) {
+          bonusProducts = [priceRule.bonusProduct];
         }
-        if (quantityRule.type === 'bonus') {
-          bonusProduct = quantityRule.bonusProduct;
+        if (quantityRule.type === 'bonus' && quantityRule.bonusProduct) {
+          bonusProducts = [quantityRule.bonusProduct];
         }
-        if (expiryRule.type === 'bonus') {
-          bonusProduct = expiryRule.bonusProduct;
-        }
-        if (bonusProduct.length !== 0) {
-          type = 'bonus';
-          value = 0;
-          bonusProduct = bonusProduct;
-          continue;
+        if (expiryRule.type === 'bonus' && expiryRule.bonusProduct) {
+          bonusProducts = [expiryRule.bonusProduct];
         }
 
         // Prioritize highest value between rules
         if (
           priceRule.value > quantityRule.value &&
-          priceRule.value > expiryRule.value
+          priceRule.value > expiryRule.value &&
+          priceRule.type !== 'bonus'
         ) {
           type = priceRule.type;
           value = priceRule.value;
         } else if (
           quantityRule.value > priceRule.value &&
-          quantityRule.value > expiryRule.value
+          quantityRule.value > expiryRule.value &&
+          quantityRule.type !== 'bonus'
         ) {
           type = quantityRule.type;
           value = quantityRule.value;
-        } else {
+        } else if (expiryRule.type !== 'bonus') {
           type = expiryRule.type;
           value = expiryRule.value;
         }
@@ -201,33 +184,36 @@ export const checkPricing = async (
         if (type.length === 0) {
           type = plan.type;
           value = defaultValue;
-          bonusProduct = plan.bonusProduct;
+
+          if (bonusProducts.length === 0) {
+            bonusProducts = plan.bonusProduct ? [plan.bonusProduct] : [];
+          }
+        }
+
+        // Finalize values
+        if (type !== 'bonus') {
+          result[item.productId].type = type;
         }
 
         // Priority calculation
-        if (
-          (plan.isPriority && !priorityApplied) ||
-          (plan.isPriority &&
-            priorityApplied &&
-            result[item.productId].value < value) ||
-          (!plan.isPriority &&
-            !priorityApplied &&
-            result[item.productId].value < value)
-        ) {
-          if (plan.isPriority) {
-            priorityApplied = true;
+        if (plan.isPriority) {
+          result[item.productId].value += value;
+        } else {
+          if (result[item.productId].value < value) {
+            result[item.productId].value = value;
           }
-          planApplied = true;
-          appliedBundleItems.push(item);
-          result[item.productId].type = type;
-          result[item.productId].value = value;
-          result[item.productId].bonusProduct = bonusProduct;
         }
+
+        result[item.productId].bonusProducts = result[
+          item.productId
+        ].bonusProducts.concat(bonusProducts || []);
+
+        appliedBundleItems.push(item);
       }
     }
 
     // Calculate bundle
-    if (planApplied && plan.applyType === 'bundle') {
+    if (plan.applyType === 'bundle') {
       appliedBundleItems.map((item: any) => {
         if (result[item.productId].type !== 'bonus') {
           result[item.productId].value = Math.floor(
