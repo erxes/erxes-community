@@ -1,9 +1,12 @@
 import React from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useSubscription } from 'react-apollo';
+import queryString from 'query-string';
 import gql from 'graphql-tag';
 // erxes
 import Alert from '@erxes/ui/src/utils/Alert';
 import confirm from '@erxes/ui/src/utils/confirmation/confirm';
+import * as router from '@erxes/ui/src/utils/router';
 import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
@@ -16,6 +19,9 @@ type Props = {
 
 const LeftSidebarContainer = (props: Props) => {
   const { currentUser } = props;
+  const history = useHistory();
+  const { search } = useLocation();
+  const { id } = queryString.parse(search);
 
   const [removeMutation] = useMutation(gql(mutations.removeChat));
   const [markAsReadMutation] = useMutation(gql(mutations.markAsReadChat));
@@ -28,14 +34,17 @@ const LeftSidebarContainer = (props: Props) => {
     }
   });
 
-  const removeChat = (id: string) => {
+  const removeChat = (selectedId: string) => {
     confirm()
       .then(() => {
         removeMutation({
-          variables: { id }
+          variables: { id: selectedId },
+          refetchQueries: [{ query: gql(queries.chats) }]
         })
           .then(() => {
-            chats.refetch();
+            if (selectedId === id) {
+              router.removeParams(history, 'id', 'userId', 'userIds');
+            }
           })
           .catch(error => {
             Alert.error(error.message);
@@ -46,9 +55,9 @@ const LeftSidebarContainer = (props: Props) => {
       });
   };
 
-  const markChatAsRead = (id: string) => {
+  const markChatAsRead = (selectedId: string) => {
     markAsReadMutation({
-      variables: { id }
+      variables: { id: selectedId }
     })
       .then(() => {
         chats.refetch();
@@ -69,6 +78,7 @@ const LeftSidebarContainer = (props: Props) => {
   return (
     <LeftSidebarComponent
       chats={chats.data.chats.list}
+      id={id}
       removeChat={removeChat}
       markChatAsRead={markChatAsRead}
     />

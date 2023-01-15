@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { colors, dimensions } from '@erxes/ui/src/styles';
+import { darken, rgba } from '@erxes/ui/src/styles/ecolor';
 
 export const SidebarWrapper = styled.div`
   height: calc(100% - 10px);
@@ -389,6 +390,35 @@ export const ChatEditor = styled.div`
   }
 `;
 
+export const ChatEditorActions = styled.div`
+  float: right;
+  padding: 0 20px 10px;
+  text-align: right;
+  position: relative;
+  color: ${colors.colorCoreGray};
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  label {
+    margin: 0 10px 0 0;
+    display: block;
+
+    &:hover {
+      cursor: pointer;
+      color: ${darken(colors.colorCoreGray, 30)};
+    }
+  }
+
+  i {
+    margin: 0;
+  }
+
+  input[type='file'] {
+    display: none;
+  }
+`;
+
 export const ChatReplyInfo = styled.div`
   max-width: 100%;
   height: auto;
@@ -408,6 +438,60 @@ export const ChatReplyInfo = styled.div`
     word-wrap: break-word;
     word-break: break-word;
   }
+`;
+
+export const AttachmentIndicator = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 15px 10px 15px;
+  color: ${rgba(colors.colorWhite, 0.7)};
+`;
+
+export const Attachment = styled.div`
+  display: flex;
+  max-width: 250px;
+  padding: 5px;
+  margin: 0 0 5px 5px;
+  font-size: 12px;
+  background-color: ${colors.colorSecondary};
+  align-items: center;
+
+  > div {
+    margin-right: 8px;
+  }
+
+  i {
+    color: ${colors.colorWhite};
+    opacity: 0.7;
+    margin: 0 3px;
+    font-size: 13px;
+    transition: all ease 0.3s;
+
+    &:hover {
+      cursor: pointer;
+      opacity: 1;
+    }
+  }
+`;
+
+export const AttachmentThumb = styled.div`
+  margin-right: 5px;
+`;
+
+export const PreviewImg = styled.div`
+  width: 26px;
+  height: 26px;
+  background-size: cover;
+  background-position: 50%;
+`;
+
+export const FileName = styled.div`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-right: 5px;
+  color: ${colors.colorWhite};
 `;
 
 /**

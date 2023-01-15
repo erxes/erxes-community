@@ -17,15 +17,16 @@ const EditorContainer = (props: Props) => {
   const { chatId, reply } = props;
   const [addMutation] = useMutation(gql(mutations.addChatMessage));
 
-  const sendMessage = (content: string) => {
+  const sendMessage = (content: string, _attachments: any[]) => {
     if (!content) {
       return;
     }
 
     const relatedId = (reply && reply._id) || null;
+    const attachments = _attachments || null;
 
     addMutation({
-      variables: { content, chatId, relatedId },
+      variables: { content, chatId, relatedId, attachments },
       refetchQueries: [{ query: gql(queries.chats) }]
     }).catch(error => {
       Alert.error(error.message);

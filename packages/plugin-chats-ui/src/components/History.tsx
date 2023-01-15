@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import calendar from 'dayjs/plugin/calendar';
 // erxes
+import Attachment from '@erxes/ui/src/components/Attachment';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import Tip from '@erxes/ui/src/components/Tip';
 import Icon from '@erxes/ui/src/components/Icon';
@@ -95,6 +96,7 @@ const History = (props: Props) => {
             </MessageReply>
           )}
           <MessageBody me={isMe}>
+            {/* {attachment && <Attachment attachment={attachment} />} */}
             <Tip placement="top" text="Reply">
               <MessageOption
                 onClick={() => props.setReply(message)}
@@ -107,10 +109,12 @@ const History = (props: Props) => {
               placement={isMe ? 'left' : 'right'}
               text={message.createdAt && dayjs(message.createdAt).calendar()}
             >
-              <MessageContent
-                dangerouslySetInnerHTML={{ __html: message.content || '' }}
-                me={isMe}
-              />
+              <>
+                <MessageContent
+                  dangerouslySetInnerHTML={{ __html: message.content || '' }}
+                  me={isMe}
+                />
+              </>
             </Tip>
           </MessageBody>
         </MessageWrapper>

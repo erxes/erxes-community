@@ -92,6 +92,7 @@ const chatMessages = `
       list {
         _id
         content
+        attachments
         createdUser {
           _id
           email

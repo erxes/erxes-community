@@ -21,10 +21,9 @@ const CreateGroupChat = (props: Props) => {
 
   const handleSubmit = () => {
     props.startGroupChat(name, userIds);
-
     router.removeParams(history, 'userIds');
-
     props.closeModal();
+
     setUserIds([]);
     setName('');
   };

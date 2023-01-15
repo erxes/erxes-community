@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import queryString from 'query-string';
 import { convertFromHTML } from 'draft-js';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -35,6 +34,7 @@ import {
 
 type Props = {
   chats: any[];
+  id: string;
   removeChat: (id: string) => void;
   markChatAsRead: (id: string) => void;
 };
@@ -43,10 +43,8 @@ type FinalProps = {} & Props & { currentUser: IUser };
 
 const LeftSidebar = (props: FinalProps) => {
   dayjs.extend(relativeTime);
-  const { chats, currentUser } = props;
+  const { chats, id, currentUser } = props;
   const wrapperRef = useRef<any>(null);
-  const { search } = useLocation();
-  const { _id } = queryString.parse(search);
   const [selectedChat, setSelectedChat] = useState<string>('');
   const [seenChat, setSeenChat] = useState<boolean>(false);
   const [pinnedChats, setPinnedChats] = useState<any[]>(
@@ -157,18 +155,18 @@ const LeftSidebar = (props: FinalProps) => {
 
   const renderChat = (chat: any) => {
     const users = chat.participantUsers || [];
-    const draftContent =
-      chat.lastMessage && convertFromHTML(chat.lastMessage.content);
-
     const user =
       users.length > 1
         ? users.filter(u => u._id !== currentUser._id)[0]
         : users[0];
 
+    const draftContent =
+      chat.lastMessage && convertFromHTML(chat.lastMessage.content);
+
     return (
       <ContactItem
         key={chat._id}
-        active={_id === chat._id}
+        active={id === chat._id}
         onMouseOver={() => handleMouseOver(chat._id)}
         onMouseLeave={() => handleMouseLeave(chat._id)}
       >
