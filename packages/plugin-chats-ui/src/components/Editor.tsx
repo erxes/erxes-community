@@ -112,13 +112,13 @@ const Editor = (props: Props) => {
         // if (setAttachmentPreview) {
         //   setAttachmentPreview(null);
         // }
-      }
+      },
 
-      // afterRead: ({ result, fileInfo }) => {
-      //   if (setAttachmentPreview) {
-      //     setAttachmentPreview(Object.assign({ data: result }, fileInfo));
-      //   }
-      // }
+      afterRead: ({ result, fileInfo }) => {
+        // if (setAttachmentPreview) {
+        //   setAttachmentPreview(Object.assign({ data: result }, fileInfo));
+        // }
+      }
     });
   };
 
