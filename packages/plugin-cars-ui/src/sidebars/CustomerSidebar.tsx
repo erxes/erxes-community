@@ -7,7 +7,7 @@ type Props = {
 
 class CustomerSection extends React.Component<Props> {
   render() {
-    return <CarSection mainType={'customer'} mainTypeId={this.props.id} />;
+    return <CarSection id={this.props.id} />;
   }
 }
 

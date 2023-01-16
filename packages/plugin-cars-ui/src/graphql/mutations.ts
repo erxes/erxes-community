@@ -45,8 +45,25 @@ const carsAdd = `
 `;
 
 const carsEdit = `
-  mutation carsEdit($_id: String!, $customerIds: [String], $companyIds: [String] ${commonFields}) {
-    carsEdit(_id: $_id, customerIds: $customerIds, companyIds: $companyIds, ${commonVariables}) {
+  mutation carsEdit($_id: String!, $customerIds: [String], $companyIds: [String], $cusId: String!, $carIds: [String], ${commonFields}) {
+    carsEdit(_id: $_id, customerIds: $customerIds, companyIds: $companyIds, cusId: $cusId, carIds: $carIds, ${commonVariables}) {
+      ownerId,
+      description,
+      plateNumber,
+      vinNumber,
+      colorCode,
+      bodyType,
+      fuelType,
+      gearBox,
+      vintageYear,
+      importYear
+    }
+  }
+`;
+
+const customerOfCarEdit = `
+  mutation customerOfCarEdit($_id: String!, $customerIds: [String], $companyIds: [String], $cusId: String!, $carIds: [String], ${commonFields}) {
+    customerOfCarEdit(_id: $_id, customerIds: $customerIds, companyIds: $companyIds, cusId: $cusId, carIds: $carIds, ${commonVariables}) {
       ownerId,
       description,
       plateNumber,
@@ -110,5 +127,6 @@ export default {
   carsMerge,
   carCategoryAdd,
   carCategoryEdit,
-  carCategoryRemove
+  carCategoryRemove,
+  customerOfCarEdit
 };

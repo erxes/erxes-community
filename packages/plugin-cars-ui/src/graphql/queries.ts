@@ -156,6 +156,14 @@ export const carDetail = `
   }
 `;
 
+export const customersCar = `
+  query customersCar($_id: String!) {
+    customersCar(_id: $_id) {
+      ${carFields}
+    }
+  }
+`;
+
 const carsExport = `
   query carsExport(${listParamsDef}) {
     carsExport(${listParamsValue})
@@ -170,5 +178,6 @@ export default {
   carsExport,
   carCategories,
   carCategoriesCount,
-  carCategoryDetail
+  carCategoryDetail,
+  customersCar
 };

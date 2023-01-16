@@ -99,6 +99,7 @@ export const queries = `
   cpCarCategories(parentId: String, searchValue: String): [CarCategory]
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
+  customersCar(_id: String!): [Car]
 `;
 
 const commonFields = `
@@ -135,4 +136,6 @@ export const mutations = `
   cpCarsAdd(${commonFields}, customerId: String, companyId: String): Car
   cpCarsEdit(_id: String!, ${commonFields}, customerId: String, companyId: String): Car
   cpCarsRemove(carIds: [String]): [String]
+  customerOfCarEdit(_id: String!, customerIds: [String], companyIds: [String], cusId: String!, carIds: [String], ${commonFields}, customFieldsData: JSON): Car
+  carIds: [String], ${commonFields}, customFieldsData: JSON): Car
 `;

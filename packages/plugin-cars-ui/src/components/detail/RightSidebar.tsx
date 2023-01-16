@@ -5,14 +5,12 @@ import React from 'react';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import { __ } from 'coreui/utils';
 import dayjs from 'dayjs';
-import EmptyState from '@erxes/ui/src/components/EmptyState';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Icon from '@erxes/ui/src/components/Icon';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
-import { SectionBodyItem } from '@erxes/ui/src/layout/styles';
-import { Link } from 'react-router-dom';
+import CustomerCompany from '../common/CustomerCompany';
 
 type Props = {
   car: ICar;
@@ -48,36 +46,6 @@ class RightSidebar extends React.Component<Props, State> {
 
   render() {
     const { car, editCar } = this.props;
-
-    const customerContent = (
-      <div>
-        {car.customers?.map(customer => (
-          <SectionBodyItem>
-            <Link to={`/contacts/details/${customer._id}`}>
-              {customer.firstName || 'Unknown'}
-            </Link>
-          </SectionBodyItem>
-        ))}
-        {!car.customerIds?.length && (
-          <EmptyState icon="user-6" text="No customer" />
-        )}
-      </div>
-    );
-
-    const companyContent = (
-      <div>
-        {car.companies?.map(company => (
-          <SectionBodyItem>
-            <Link to={`/companies/details/${company._id}`}>
-              {company.names || 'Unknown'}
-            </Link>
-          </SectionBodyItem>
-        ))}
-        {!car.companyIds?.length && (
-          <EmptyState icon="building" text="No company" />
-        )}
-      </div>
-    );
 
     const onSelectCustomers = value => {
       this.setState({
@@ -194,7 +162,7 @@ class RightSidebar extends React.Component<Props, State> {
             extraButtons={extraCustomerButtons}
             isOpen={true}
           >
-            {customerContent}
+            <CustomerCompany name={'customers'} car={car} />
           </Box>
           <Box
             title={__('Companies')}
@@ -202,7 +170,7 @@ class RightSidebar extends React.Component<Props, State> {
             extraButtons={extraCompanyButtons}
             isOpen={true}
           >
-            {companyContent}
+            <CustomerCompany name={'companies'} car={car} />
           </Box>
         </>
 

@@ -17,6 +17,7 @@ export interface ICarCustomer {
   _id?: string;
   firstName?: string;
   lastName?: string;
+  plateNumber?: string;
 }
 
 export interface ICompanyCustomer {
@@ -109,6 +110,10 @@ export type EditMutationResponse = {
   carsEdit: (params: { variables: ICar }) => Promise<any>;
 };
 
+export type EditCarMutationResponse = {
+  customerOfCarEdit: (params: { variables: ICar }) => Promise<any>;
+};
+
 export type RemoveMutationVariables = {
   carIds: string[];
 };
@@ -158,6 +163,12 @@ export type MainQueryResponse = {
 
 export type CarsQueryResponse = {
   cars: ICar[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type CustomersCarQueryResponse = {
+  customersCar: ICar[];
   loading: boolean;
   refetch: () => void;
 };

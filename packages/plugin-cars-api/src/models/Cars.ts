@@ -17,6 +17,7 @@ export interface ICarModel extends Model<ICarDocument> {
   updateCar(_id: string, doc: ICar): Promise<ICarDocument>;
   removeCars(carIds: string[]): Promise<ICarDocument>;
   mergeCars(carIds: string, carFields: any): Promise<ICarDocument>;
+  getCarByCustomerId(customerId: string): Promise<ICarDocument>;
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
@@ -106,6 +107,17 @@ export const loadCarClass = models => {
       return car;
     }
 
+    public static async getCarByCustomerId(customerId: string) {
+      const car = await models.Cars.find({
+        customerIds: customerId
+      });
+
+      if (!car) {
+        throw new Error('Car not found');
+      }
+
+      return car;
+    }
     /**
      * Create a car
      */

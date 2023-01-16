@@ -1,13 +1,16 @@
 import queryString from 'query-string';
 import React from 'react';
 import { Route } from 'react-router-dom';
-
 import CarList from './containers/CarsList';
 import CarDetails from './containers/detail/CarDetails';
-import CarSection from './components/common/CarSection';
+import CarSection from './containers/CarSection';
 
 const details = ({ match }) => {
   const id = match.params.id;
+
+  if (match.path === '/contacts/details/:id') {
+    <CarSection id={id} />;
+  }
 
   return <CarDetails id={id} />;
 };
@@ -31,6 +34,12 @@ const routes = () => {
         component={details}
       />
       <Route path="/cars" exact={true} key="/cars" component={list} />
+      <Route
+        key="/contacts/details/:id"
+        exact={true}
+        path="/contacts/details/:id"
+        component={details}
+      />
     </>
   );
 };
