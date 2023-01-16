@@ -127,7 +127,7 @@ const carCategoryParams = `
 
 export const mutations = `
   carsAdd(${commonFields}): Car
-  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}, customFieldsData: JSON): Car
+  carsEdit(_id: String!, customerIds: [String], companyIds: [String], carIds:[String], ${commonFields}, customFieldsData: JSON): Car
   carsRemove(carIds: [String]): [String]
   carsMerge(carIds: [String], carFields: JSON) : Car
   carCategoriesAdd(${carCategoryParams}): CarCategory
@@ -137,5 +137,4 @@ export const mutations = `
   cpCarsEdit(_id: String!, ${commonFields}, customerId: String, companyId: String): Car
   cpCarsRemove(carIds: [String]): [String]
   customerOfCarEdit(_id: String!, customerIds: [String], companyIds: [String], cusId: String!, carIds: [String], ${commonFields}, customFieldsData: JSON): Car
-  carIds: [String], ${commonFields}, customFieldsData: JSON): Car
 `;
