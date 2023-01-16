@@ -84,7 +84,6 @@ export const checkPricing = async (
       }
     ]
   };
-
   const sortArgs: object = {
     isPriority: 1,
     value: 1

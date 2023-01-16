@@ -50,7 +50,6 @@ export const checkPricing = async (
           }
         }
       }
-
       if (discount.type === 'percentage') {
         item.discountPercent = parseFloat(
           ((discount.value / item.unitPrice) * 100).toFixed(2)
