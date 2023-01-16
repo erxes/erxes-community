@@ -70,6 +70,7 @@ export default function ForumPost({ isTagsEnabled }) {
     tagIds: [ID!]
 
     pollOptions: [ForumPollOption!]
+    pollVoteCount: Int @cacheControl(maxAge: 5)
 
     isPollMultiChoice: Boolean
 
