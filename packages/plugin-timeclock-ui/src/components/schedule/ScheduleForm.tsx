@@ -25,12 +25,17 @@ type Props = {
   branchesList: IBranch[];
   modalContentType: string;
   scheduleConfigs: IScheduleConfig[];
-  submitRequest: (userId: any, filledShifts: any) => void;
+  submitRequest: (
+    userId: any,
+    filledShifts: any,
+    selectedScheduleConfigId?: string
+  ) => void;
   submitSchedule: (
     branchIds: any,
     departmentIds: any,
     userIds: any,
-    filledShifts: any
+    filledShifts: any,
+    selectedScheduleConfigId?: string
   ) => void;
   closeModal: any;
 };
@@ -76,7 +81,7 @@ function ScheduleForm(props: Props) {
   };
 
   const onScheduleConfigSelect = scheduleConfig => {
-    setScheduleConfig(scheduleConfig);
+    setScheduleConfig(scheduleConfig.value);
 
     const getScheduleConfig =
       scheduleConfigs &&
@@ -87,13 +92,28 @@ function ScheduleForm(props: Props) {
 
     Object.keys(scheduleDates).forEach(day_key => {
       const shiftDay = scheduleDates[day_key].shiftDate;
-      scheduleDates[day_key].shiftStart = dayjs(
+
+      const getShiftStart = dayjs(
         shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftStart
       ).toDate();
 
-      scheduleDates[day_key].shiftEnd = dayjs(
+      const getShiftEnd = dayjs(
         shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftEnd
       ).toDate();
+
+      const [
+        getCorrectShiftStart,
+        getCorrectShiftEnd,
+        overNightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        day_key,
+        getShiftStart,
+        getShiftEnd
+      );
+      scheduleDates[day_key].shiftStart = getCorrectShiftStart;
+      scheduleDates[day_key].shiftEnd = getCorrectShiftEnd;
+      scheduleDates[day_key].overnightShift = overNightShift;
     });
 
     setScheduleDates({ ...scheduleDates });
@@ -180,9 +200,9 @@ function ScheduleForm(props: Props) {
 
   const checkInput = (selectedUsers, shifts, branchIds?, departmentIds?) => {
     if (
-      branchIds.length === 0 &&
-      departmentIds.length === 0 &&
-      selectedUsers.length === 0
+      (!branchIds || !branchIds.length) &&
+      (!departmentIds || !departmentIds.length) &&
+      !selectedUsers.length
     ) {
       Alert.error('No users were given');
     } else if (shifts.length === 0) {
@@ -195,7 +215,11 @@ function ScheduleForm(props: Props) {
   const onSubmitClick = () => {
     const validInput = checkInput(userIds, pickSubset);
     if (validInput) {
-      submitRequest(userIds, pickSubset);
+      submitRequest(
+        userIds,
+        pickSubset,
+        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
+      );
       closeModal();
     }
   };
@@ -207,7 +231,13 @@ function ScheduleForm(props: Props) {
       selectedDeptIds
     );
     if (validInput) {
-      submitSchedule(selectedBranchIds, selectedDeptIds, userIds, pickSubset);
+      submitSchedule(
+        selectedBranchIds,
+        selectedDeptIds,
+        userIds,
+        pickSubset,
+        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
+      );
       closeModal();
     }
   };
@@ -232,10 +262,27 @@ function ScheduleForm(props: Props) {
           .toLocaleDateString()
       : new Date().toLocaleDateString();
 
+    const [
+      getCorrectShiftStart,
+      getCorrectShiftEnd,
+      overnight
+    ] = compareStartAndEndTime(
+      scheduleDates,
+      Object.keys(scheduleDates).length
+        ? dates_arr[0]?.toLocaleDateString()
+        : getLatestDayKey,
+      new Date(getLatestDayKey + ' ' + defaultStartTime),
+      new Date(getLatestDayKey + ' ' + defaultEndTime)
+    );
+    // : [
+    //     new Date(getLatestDayKey + ' ' + defaultStartTime),
+    //     new Date(getLatestDayKey + ' ' + defaultEndTime)
+    //   ];
     dates[getLatestDayKey] = {
       shiftDate: new Date(getLatestDayKey),
-      shiftStart: new Date(getLatestDayKey + ' ' + defaultStartTime),
-      shiftEnd: new Date(getLatestDayKey + ' ' + defaultEndTime)
+      shiftStart: getCorrectShiftStart,
+      shiftEnd: getCorrectShiftEnd,
+      overnightShift: overnight
     };
 
     setScheduleDates({

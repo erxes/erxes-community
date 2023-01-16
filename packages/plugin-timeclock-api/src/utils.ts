@@ -7,26 +7,15 @@ import { IUserDocument } from '@erxes/api-utils/src/types';
 import { Sequelize, QueryTypes } from 'sequelize';
 import { findBranch, findDepartment } from './graphql/resolvers/utils';
 
-const findUserByEmployeeId = async (subdomain: string, empId: number) => {
-  const field = await sendFormsMessage({
-    subdomain,
-    action: 'fields.findOne',
-    data: {
-      query: {
-        code: 'employeeId'
-      }
-    },
-    isRPC: true
-  });
-
+const findUserByEmployeeId = async (subdomain: string, empId: string) => {
   let user: IUserDocument;
 
-  if (field) {
+  if (empId) {
     user = await sendCoreMessage({
       subdomain,
       action: 'users.findOne',
       data: {
-        customFieldsData: { $elemMatch: { field: field._id, value: empId } }
+        employeeId: empId
       },
       isRPC: true
     });
@@ -37,12 +26,28 @@ const findUserByEmployeeId = async (subdomain: string, empId: number) => {
   }
 };
 
-const connectAndQueryFromMySql = async (subdomain: string, query: string) => {
+const findAllTeamMembersWithEmpId = async (subdomain: string) => {
+  const users = await sendCoreMessage({
+    subdomain,
+    action: 'users.find',
+    data: {
+      query: {}
+    },
+    isRPC: true,
+    defaultValue: []
+  });
+
+  return users.filter(user => user.employeeId);
+};
+
+const connectAndQueryFromMySql = async (subdomain: string) => {
   const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST' });
   const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
   const MYSQL_USERNAME = getEnv({ name: 'MYSQL_USERNAME' });
   const MYSQL_PASSWORD = getEnv({ name: 'MYSQL_PASSWORD' });
+  const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
 
+  // create connection
   const sequelize = new Sequelize(MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, {
     host: MYSQL_HOST,
     port: 1433,
@@ -56,6 +61,10 @@ const connectAndQueryFromMySql = async (subdomain: string, query: string) => {
       }
     }
   });
+
+  // find team members with employee Id
+  const teamMembers = await findAllTeamMembersWithEmpId(subdomain);
+
   let returnData;
 
   sequelize
@@ -67,12 +76,20 @@ const connectAndQueryFromMySql = async (subdomain: string, query: string) => {
       console.error(err);
       return err;
     });
-  try {
-    const queryData = await sequelize.query(query, {
-      type: QueryTypes.SELECT
-    });
 
-    returnData = await importDataAndCreateTimeclock(subdomain, queryData);
+  // query by employee Id
+  try {
+    for (const teamMember of teamMembers) {
+      const query = `SELECT * FROM ${MYSQL_TABLE} WHERE ISNUMERIC(ID)=1 AND ID = ${teamMember.employeeId} ORDER BY authDateTime`;
+      const queryData = await sequelize.query(query, {
+        type: QueryTypes.SELECT
+      });
+      returnData = await importDataAndCreateTimeclock(
+        subdomain,
+        queryData,
+        teamMember
+      );
+    }
   } catch (err) {
     console.error(err);
     return err;
@@ -83,52 +100,28 @@ const connectAndQueryFromMySql = async (subdomain: string, query: string) => {
 
 const importDataAndCreateTimeclock = async (
   subdomain: string,
-  queryData: any
+  queryData: any,
+  teamMember: IUserDocument
 ) => {
   const returnData: ITimeClock[] = [];
   const models: IModels = await generateModels(subdomain);
-  let currentEmpId = -9999999999;
-  let currentEmpData: any;
 
-  for (const queryRow of queryData) {
-    const empId = queryRow.ID;
-    if (empId === currentEmpId) {
-      continue;
-    } else {
-      currentEmpId = empId;
+  returnData.push(
+    ...(await createUserTimeclock(subdomain, models, queryData, teamMember))
+  );
 
-      // if given employee id is number, extract all employee timeclock data
-      const empIdNumber = parseInt(empId, 10);
-      if (empIdNumber) {
-        currentEmpData = queryData.filter(row => row.ID === currentEmpId);
-
-        returnData.push(
-          ...(await createUserTimeclock(
-            subdomain,
-            models,
-            empIdNumber,
-            queryRow.employeeName,
-            currentEmpData
-          ))
-        );
-      }
-    }
-  }
-
-  await models.Timeclocks.insertMany(returnData);
-
-  return models.Timeclocks.find();
+  return await models.Timeclocks.insertMany(returnData);
 };
 
 const createUserTimeclock = async (
   subdomain: string,
   models: IModels,
-  empId: number,
-  empName: string,
-  empData: any
+  empData: any,
+  teamMember: IUserDocument
 ) => {
+  const empId = teamMember._id;
+  const empName = teamMember.details?.fullName;
   const returnUserData: ITimeClock[] = [];
-  const user = await findUserByEmployeeId(subdomain, empId);
 
   // find if there's any unfinished shift from previous timeclock data
   const unfinishedShifts = await models?.Timeclocks.find({
@@ -161,7 +154,7 @@ const createUserTimeclock = async (
       const latestShiftIdx = empData.length - 1 - findLatestShiftEndIdx;
 
       await models.Timeclocks.updateTimeClock(unfinishedShift._id, {
-        userId: user?._id,
+        userId: teamMember?._id,
         employeeId: empId,
         shiftStart: unfinishedShift.shiftStart,
         shiftEnd: dayjs(empData[latestShiftIdx].authDateTime).toDate(),
@@ -187,7 +180,7 @@ const createUserTimeclock = async (
     if (getShiftEndIdx === -1) {
       const newTimeclock = {
         shiftStart: dayjs(currShiftStart).toDate(),
-        userId: user?._id,
+        userId: teamMember?._id,
         deviceName: empData[i].deviceName,
         employeeUserName: empName || undefined,
         employeeId: empId,
@@ -217,7 +210,7 @@ const createUserTimeclock = async (
     const newTimeclockData = {
       shiftStart: dayjs(currShiftStart).toDate(),
       shiftEnd: dayjs(currShiftEnd).toDate(),
-      userId: user?._id,
+      userId: teamMember?._id,
       deviceName: empData[getShiftEndIdx].deviceName || undefined,
       employeeUserName: empName || undefined,
       employeeId: empId,
@@ -402,4 +395,8 @@ const generateFilter = async (params, subdomain, type) => {
   return returnFilter;
 };
 
-export { connectAndQueryFromMySql, generateFilter };
+export {
+  connectAndQueryFromMySql,
+  generateFilter,
+  findAllTeamMembersWithEmpId
+};

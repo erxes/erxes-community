@@ -1,6 +1,9 @@
 import { IModels } from '../../connectionResolver';
 import { sendCoreMessage } from '../../messageBroker';
-import { connectAndQueryFromMySql } from '../../utils';
+import {
+  connectAndQueryFromMySql,
+  findAllTeamMembersWithEmpId
+} from '../../utils';
 import { IUserReport } from '../../models/definitions/timeclock';
 import { getEnv } from '@erxes/api-utils/src';
 
@@ -40,14 +43,16 @@ export const findBranches = async (subdomain: string, userId: string) => {
 export const createScheduleShiftsByUserIds = async (
   userIds: string[],
   shifts,
-  models: IModels
+  models: IModels,
+  scheduleConfigId?: string
 ) => {
   let schedule;
   userIds.forEach(async userId => {
     schedule = await models.Schedules.createSchedule({
       userId: `${userId}`,
       solved: true,
-      status: 'Approved'
+      status: 'Approved',
+      scheduleConfigId: `${scheduleConfigId}`
     });
 
     shifts.forEach(shift => {
@@ -247,7 +252,5 @@ export const returnReportByUserIds = async (
 };
 
 export const connectAndImportFromMysql = async (subdomain: string) => {
-  const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
-  const query = 'select * from ' + MYSQL_TABLE + ' order by ID, authDateTime';
-  return await connectAndQueryFromMySql(subdomain, query);
+  return await connectAndQueryFromMySql(subdomain);
 };

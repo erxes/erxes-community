@@ -73,6 +73,7 @@ const listSchedulesMain = `
             solved
             status
           }
+          scheduleConfigId
           solved
           status
           user {

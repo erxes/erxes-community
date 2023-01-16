@@ -3,7 +3,7 @@ import { field } from './utils';
 
 export interface ITimeClock {
   userId?: string;
-  employeeId?: number;
+  employeeId?: string;
   employeeUserName?: string;
   shiftStart: Date;
   shiftEnd?: Date;
@@ -47,6 +47,7 @@ export interface ISchedule {
   userId?: string;
   status?: string;
   solved?: boolean;
+  scheduleConfigId?: string;
 }
 
 export interface IScheduleDocument extends ISchedule, Document {
@@ -121,7 +122,7 @@ export const timeSchema = new Schema({
     label: 'Employee user name, as saved on companys terminal'
   }),
   employeeId: field({
-    type: Number,
+    type: String,
     label: 'Employee id, custom field'
   }),
   deviceType: field({
@@ -174,6 +175,10 @@ export const scheduleSchema = new Schema({
   status: field({
     type: String,
     label: 'Status of schedule request, whether approved or rejected'
+  }),
+  scheduleConfigId: field({
+    type: String,
+    label: 'Schedule Config id used for reports'
   })
 });
 

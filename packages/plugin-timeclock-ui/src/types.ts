@@ -169,8 +169,12 @@ export type AbsenceMutationVariables = {
 
 export type ScheduleMutationVariables = {
   _id?: string;
-  userId: string;
+  userId?: string;
   shifts: IShift[];
+  branchIds?: string[];
+  departmentIds?: string[];
+  userIds?: string[];
+  scheduleConfigId?: string;
 };
 
 export type TimeClockMutationResponse = {
@@ -261,12 +265,7 @@ export type ScheduleMutationResponse = {
   }) => Promise<any>;
 
   submitScheduleMutation: (params: {
-    variables: {
-      branchIds: string[];
-      departmentIds: string[];
-      userIds: string[];
-      shifts: IShift[];
-    };
+    variables: ScheduleMutationVariables;
   }) => Promise<any>;
 
   solveScheduleMutation: (params: {

@@ -315,10 +315,8 @@ const timeclockMutations = {
     return updated;
   },
 
-  async sendScheduleRequest(_root, { userId, shifts }, { models }: IContext) {
-    const schedule = await models.Schedules.createSchedule({
-      userId: `${userId}`
-    });
+  async sendScheduleRequest(_root, { shifts, ...doc }, { models }: IContext) {
+    const schedule = await models.Schedules.createSchedule(doc);
 
     shifts.map(shift => {
       models.Shifts.createShift({
@@ -333,11 +331,16 @@ const timeclockMutations = {
 
   async submitSchedule(
     _root,
-    { branchIds, departmentIds, userIds, shifts },
+    { branchIds, departmentIds, userIds, shifts, scheduleConfigId },
     { subdomain, models }: IContext
   ) {
     if (userIds.length) {
-      return createScheduleShiftsByUserIds(userIds, shifts, models);
+      return createScheduleShiftsByUserIds(
+        userIds,
+        shifts,
+        models,
+        scheduleConfigId
+      );
     }
 
     const concatBranchDept: string[] = [];

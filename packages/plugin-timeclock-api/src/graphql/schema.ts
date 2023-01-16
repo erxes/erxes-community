@@ -19,7 +19,7 @@ export const types = `
     employeeUserName: String
     branchName: String
     deviceName: String
-    employeeId: Int
+    employeeId: String
     deviceType: String
   }
 
@@ -67,6 +67,7 @@ export const types = `
     shifts: [ShiftsRequest]
     solved: Boolean
     status: String
+    scheduleConfigId: String
   }
 
   type ScheduleReport{
@@ -202,8 +203,8 @@ export const mutations = `
   absenceTypeAdd(${absenceType_params}): AbsenceType
   absenceTypeEdit(_id: String, ${absenceType_params}): AbsenceType
   sendAbsenceRequest(${absence_params}): Absence
-  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput]): Schedule
-  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput]): Schedule
+  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String): Schedule
+  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String): Schedule
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule
   solveShiftRequest(_id: String, status: String): ShiftsRequest
