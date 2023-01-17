@@ -445,17 +445,30 @@ function ScheduleForm(props: Props) {
     const endRange = dayjs(dateRangeEnd);
 
     while (temp <= endRange) {
-      totalDatesArray.push(temp.toDate().toDateString());
+      totalDatesArray.push(temp.toDate().toLocaleDateString());
       temp = temp.add(1, 'day');
     }
 
     const newDatesByRange: ISchedule = scheduleDates;
 
     for (const eachDay of totalDatesArray) {
+      const [
+        correctShiftStart,
+        correctShiftEnd,
+        isOvernightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        eachDay,
+        new Date(eachDay + ' ' + defaultStartTime),
+        new Date(eachDay + ' ' + defaultEndTime),
+        eachDay
+      );
+
       newDatesByRange[eachDay] = {
         shiftDate: new Date(eachDay),
-        shiftStart: new Date(eachDay + ' ' + defaultStartTime),
-        shiftEnd: new Date(eachDay + ' ' + defaultEndTime)
+        shiftStart: correctShiftStart,
+        shiftEnd: correctShiftEnd,
+        overnightShift: isOvernightShift
       };
 
       setKeyCounter(eachDay);
@@ -476,6 +489,7 @@ function ScheduleForm(props: Props) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <DateRange
+          showTime={false}
           startDate={dateRangeStart}
           endDate={dateRangeEnd}
           onChangeEnd={onDateRangeEndChange}
@@ -493,10 +507,23 @@ function ScheduleForm(props: Props) {
 
       const newDates = scheduleDates;
 
+      const [
+        correctShiftStart,
+        correctShiftEnd,
+        isOvernightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        getDate,
+        new Date(getDate + ' ' + defaultStartTime),
+        new Date(getDate + ' ' + defaultEndTime),
+        getDate
+      );
+
       newDates[getDate] = {
         shiftDate: new Date(getDate),
-        shiftStart: new Date(getDate + ' ' + defaultStartTime),
-        shiftEnd: new Date(getDate + ' ' + defaultEndTime)
+        shiftStart: correctShiftStart,
+        shiftEnd: correctShiftEnd,
+        overnightShift: isOvernightShift
       };
 
       setScheduleDates(newDates);
