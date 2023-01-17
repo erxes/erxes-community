@@ -54,24 +54,28 @@ const carMutations = {
     { _id, ...doc },
     { models, user, subdomain }
   ) => {
-    const car = await models.Cars.getCar(_id);
-    const updatedCar = car.customerIds.push(doc.cusId);
-    const updated = await models.Cars.updateCar(car._id, updatedCar);
+    for (const carId of doc.carIds) {
+      const car = await models.Cars.getCar(carId);
+      const updated = await models.Cars.updateCar(carId, {
+        customerIds: doc.cusId
+      });
 
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        type: 'car',
-        object: car,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
-      },
-      user
-    );
+      await putUpdateLog(
+        subdomain,
+        messageBroker(),
+        {
+          type: 'car',
+          object: car,
+          newData: { ...doc },
+          updatedDocument: updated,
+          extraParams: { models }
+        },
+        user
+      );
+    }
+    const updatedCar = await models.Cars.getAllCar(doc.carIds);
 
-    return updated;
+    return updatedCar;
   },
 
   carsRemove: async (

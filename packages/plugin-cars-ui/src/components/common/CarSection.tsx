@@ -73,6 +73,7 @@ class CarSection extends React.Component<Props, State> {
             onChange={onChange}
             value={this.state.carIds}
             multi={true}
+            initialValue={this.state.carIds}
           />
           <ModalFooter>
             <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">

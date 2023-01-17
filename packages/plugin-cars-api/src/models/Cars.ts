@@ -107,6 +107,19 @@ export const loadCarClass = models => {
       return car;
     }
 
+    public static async getAllCar(carIds: string) {
+      for (const carId of carIds) {
+        await models.Cars.find({ _id: carId });
+      }
+      const car = await models.Cars.find({ _id: carIds });
+
+      if (!car) {
+        throw new Error('Car not found');
+      }
+
+      return car;
+    }
+
     public static async getCarByCustomerId(customerId: string) {
       const car = await models.Cars.find({
         customerIds: customerId

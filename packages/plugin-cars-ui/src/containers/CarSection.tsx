@@ -21,7 +21,7 @@ type FinalProps = {
 } & Props;
 
 const CarDetailsContainer = (props: FinalProps) => {
-  const { carsQuery, carEdit, id, carDetailQuery, customersCarQuery } = props;
+  const { carsQuery, carEdit, id, customersCarQuery } = props;
 
   if (carsQuery.loading) {
     return <Spinner objective={true} />;
@@ -36,14 +36,14 @@ const CarDetailsContainer = (props: FinalProps) => {
   const customerOfCarEdit = variables => {
     carEdit({
       variables: {
-        _id: id,
+        _id: '',
         cusId: id,
         ...variables
       }
     })
       .then(() => {
         Alert.success('You successfully updated a car');
-        carDetailQuery.refetch();
+        customersCarQuery.refetch();
       })
       .catch(error => {
         alert(error.message);
@@ -92,7 +92,8 @@ export default withProps<Props>(
       options: () => ({
         variables: {
           isSelect: true
-        }
+        },
+        fetchPolicy: 'network-only'
       })
     }),
     graphql<Props, { _id: string }>(gql(mutations.customerOfCarEdit), {
