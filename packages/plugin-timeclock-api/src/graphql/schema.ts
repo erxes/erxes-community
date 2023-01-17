@@ -219,5 +219,5 @@ export const mutations = `
   holidayRemove(_id: String): JSON
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
-  extractAllDataFromMySQL: [Timeclock]
+  extractAllDataFromMySQL(startDate: String, endDate: String): [Timeclock]
 `;

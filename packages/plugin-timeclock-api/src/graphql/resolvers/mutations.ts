@@ -8,13 +8,13 @@ import {
   IAbsenceType
 } from '../../models/definitions/timeclock';
 import {
-  connectAndImportFromMysql,
   createScheduleShiftsByUserIds,
   findBranch,
   findBranches,
   findDepartment
 } from './utils';
 import dayjs = require('dayjs');
+import { connectAndQueryFromMySql } from '../../utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -505,9 +505,12 @@ const timeclockMutations = {
     return newScheduleConfig;
   },
 
-  async extractAllDataFromMySQL(_root, {}, { subdomain }: IContext) {
-    const ret = await connectAndImportFromMysql(subdomain);
-    return ret;
+  async extractAllDataFromMySQL(
+    _root,
+    { startDate, endDate },
+    { subdomain }: IContext
+  ) {
+    return await connectAndQueryFromMySql(subdomain, startDate, endDate);
   }
 };
 

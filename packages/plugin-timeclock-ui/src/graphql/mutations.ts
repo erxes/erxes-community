@@ -147,8 +147,8 @@ const scheduleConfigRemove = `mutation scheduleConfigRemove($_id: String){
 }`;
 
 const extractAllDataFromMySQL = `
-mutation extractAllDataFromMySQL{
-  extractAllDataFromMySQL{
+mutation extractAllDataFromMySQL($startDate: String, $endDate: String){
+  extractAllDataFromMySQL(startDate: $startDate, endDate: $endDate){
     _id
   }
 }`;

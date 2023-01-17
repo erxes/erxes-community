@@ -1,11 +1,6 @@
 import { IModels } from '../../connectionResolver';
 import { sendCoreMessage } from '../../messageBroker';
-import {
-  connectAndQueryFromMySql,
-  findAllTeamMembersWithEmpId
-} from '../../utils';
 import { IUserReport } from '../../models/definitions/timeclock';
-import { getEnv } from '@erxes/api-utils/src';
 
 export const findDepartment = async (subdomain: string, target) => {
   const department = await sendCoreMessage({
@@ -249,8 +244,4 @@ export const returnReportByUserIds = async (
     groupTotalMinsWorked,
     groupTotalMinsScheduled
   ];
-};
-
-export const connectAndImportFromMysql = async (subdomain: string) => {
-  return await connectAndQueryFromMySql(subdomain);
 };

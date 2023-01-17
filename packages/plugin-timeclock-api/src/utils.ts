@@ -1,46 +1,30 @@
 import { generateModels, IModels } from './connectionResolver';
-import { sendCoreMessage, sendFormsMessage } from './messageBroker';
-import { ITimeClock, IUserReport } from './models/definitions/timeclock';
+import { sendCoreMessage } from './messageBroker';
+import { ITimeClock } from './models/definitions/timeclock';
 import * as dayjs from 'dayjs';
 import { fixDate, getEnv } from '@erxes/api-utils/src';
-import { IUserDocument } from '@erxes/api-utils/src/types';
 import { Sequelize, QueryTypes } from 'sequelize';
 import { findBranch, findDepartment } from './graphql/resolvers/utils';
-
-const findUserByEmployeeId = async (subdomain: string, empId: string) => {
-  let user: IUserDocument;
-
-  if (empId) {
-    user = await sendCoreMessage({
-      subdomain,
-      action: 'users.findOne',
-      data: {
-        employeeId: empId
-      },
-      isRPC: true
-    });
-
-    return user;
-  } else {
-    return null;
-  }
-};
 
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
     subdomain,
     action: 'users.find',
     data: {
-      query: {}
+      query: { employeeId: { $exists: true } }
     },
     isRPC: true,
     defaultValue: []
   });
 
-  return users.filter(user => user.employeeId);
+  return users;
 };
 
-const connectAndQueryFromMySql = async (subdomain: string) => {
+const connectAndQueryFromMySql = async (
+  subdomain: string,
+  startDate: string,
+  endDate: string
+) => {
   const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST' });
   const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
   const MYSQL_USERNAME = getEnv({ name: 'MYSQL_USERNAME' });
@@ -79,17 +63,24 @@ const connectAndQueryFromMySql = async (subdomain: string) => {
 
   // query by employee Id
   try {
-    for (const teamMember of teamMembers) {
-      const query = `SELECT * FROM ${MYSQL_TABLE} WHERE ISNUMERIC(ID)=1 AND ID = ${teamMember.employeeId} ORDER BY authDateTime`;
-      const queryData = await sequelize.query(query, {
-        type: QueryTypes.SELECT
-      });
-      returnData = await importDataAndCreateTimeclock(
-        subdomain,
-        queryData,
-        teamMember
-      );
-    }
+    const teamMembersObject = {};
+    teamMembers.forEach(teamMember => {
+      teamMembersObject[teamMember.employeeId] = teamMember._id;
+    });
+
+    const teamEmployeeIds = Object.keys(teamMembersObject).join(',');
+
+    const query = `SELECT * FROM ${MYSQL_TABLE} WHERE authDateTime >= '${startDate}' AND authDateTime <= '${endDate}' AND ISNUMERIC(ID)=1 AND ID IN (${teamEmployeeIds}) ORDER BY ID, authDateTime`;
+
+    const queryData = await sequelize.query(query, {
+      type: QueryTypes.SELECT
+    });
+
+    returnData = await importDataAndCreateTimeclock(
+      subdomain,
+      queryData,
+      teamMembersObject
+    );
   } catch (err) {
     console.error(err);
     return err;
@@ -101,26 +92,45 @@ const connectAndQueryFromMySql = async (subdomain: string) => {
 const importDataAndCreateTimeclock = async (
   subdomain: string,
   queryData: any,
-  teamMember: IUserDocument
+  teamMembersObj: any
 ) => {
   const returnData: ITimeClock[] = [];
   const models: IModels = await generateModels(subdomain);
+  let currentEmpId = -9999999999;
+  let currentEmpData: any;
 
-  returnData.push(
-    ...(await createUserTimeclock(subdomain, models, queryData, teamMember))
-  );
+  for (const queryRow of queryData) {
+    const empId = queryRow.ID;
+    if (empId === currentEmpId) {
+      continue;
+    } else {
+      currentEmpId = empId;
+
+      // if given employee id is number, extract all timeclock data of an employee
+      const empIdNumber = parseInt(empId, 10);
+      if (empIdNumber) {
+        currentEmpData = queryData.filter(row => row.ID === currentEmpId);
+        returnData.push(
+          ...(await createUserTimeclock(
+            models,
+            currentEmpData,
+            empIdNumber,
+            teamMembersObj
+          ))
+        );
+      }
+    }
+  }
 
   return await models.Timeclocks.insertMany(returnData);
 };
 
 const createUserTimeclock = async (
-  subdomain: string,
   models: IModels,
   empData: any,
-  teamMember: IUserDocument
+  empId: number,
+  teamMembersObj: any
 ) => {
-  const empId = teamMember._id;
-  const empName = teamMember.details?.fullName;
   const returnUserData: ITimeClock[] = [];
 
   // find if there's any unfinished shift from previous timeclock data
@@ -154,7 +164,7 @@ const createUserTimeclock = async (
       const latestShiftIdx = empData.length - 1 - findLatestShiftEndIdx;
 
       await models.Timeclocks.updateTimeClock(unfinishedShift._id, {
-        userId: teamMember?._id,
+        userId: teamMembersObj[empId],
         employeeId: empId,
         shiftStart: unfinishedShift.shiftStart,
         shiftEnd: dayjs(empData[latestShiftIdx].authDateTime).toDate(),
@@ -180,10 +190,9 @@ const createUserTimeclock = async (
     if (getShiftEndIdx === -1) {
       const newTimeclock = {
         shiftStart: dayjs(currShiftStart).toDate(),
-        userId: teamMember?._id,
-        deviceName: empData[i].deviceName,
-        employeeUserName: empName || undefined,
+        userId: teamMembersObj[empId],
         employeeId: empId,
+        deviceName: empData[i].deviceName,
         shiftActive: true,
         deviceType: 'faceTerminal'
       };
@@ -210,9 +219,8 @@ const createUserTimeclock = async (
     const newTimeclockData = {
       shiftStart: dayjs(currShiftStart).toDate(),
       shiftEnd: dayjs(currShiftEnd).toDate(),
-      userId: teamMember?._id,
       deviceName: empData[getShiftEndIdx].deviceName || undefined,
-      employeeUserName: empName || undefined,
+      userId: teamMembersObj[empId],
       employeeId: empId,
       shiftActive: false,
       deviceType: 'faceTerminal'

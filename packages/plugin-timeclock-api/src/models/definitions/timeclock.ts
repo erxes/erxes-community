@@ -3,7 +3,7 @@ import { field } from './utils';
 
 export interface ITimeClock {
   userId?: string;
-  employeeId?: string;
+  employeeId?: number;
   employeeUserName?: string;
   shiftStart: Date;
   shiftEnd?: Date;
