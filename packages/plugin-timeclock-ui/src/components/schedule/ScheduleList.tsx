@@ -205,7 +205,7 @@ function ScheduleList(props: Props) {
     return schedule.shifts.length > 0 ? (
       <tr>
         <td>
-          {schedule.user && schedule.user.details.fullName.length > 1
+          {schedule.user && schedule.user.details.fullName
             ? schedule.user.details.fullName
             : schedule.user.email}
         </td>
@@ -263,7 +263,8 @@ function ScheduleList(props: Props) {
           <th>{__('Shift start')}</th>
           <th>{__('Shift end')}</th>
           <th>{__('Overnight')}</th>
-          <th colSpan={2}>{__('Action')}</th>
+          <th>{__('Shift Status')}</th>
+          <th>{__('Action')}</th>
         </tr>
       </thead>
       <tbody>

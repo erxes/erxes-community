@@ -44,9 +44,19 @@ export interface IReport {
 export interface IUserReport {
   user: IUser;
   scheduleReport: IScheduleReport[];
-  totalMinsLate?: number;
-  totalAbsenceMins?: number;
   totalMinsWorked?: number;
+  totalMinsWorkedToday?: number;
+  totalMinsWorkedThisMonth?: number;
+  totalDaysWorkedThisMonth?: number;
+  totalMinsScheduled?: number;
+  totalMinsScheduledToday?: number;
+  totalMinsScheduledThisMonth?: number;
+  totalDaysScheduledThisMonth?: number;
+  totalMinsLate?: number;
+  totalMinsLateToday?: number;
+  totalMinsLateThisMonth?: number;
+  totalAbsenceMins?: number;
+  totalMinsAbsenceThisMonth?: number;
 }
 
 export interface IScheduleReport {

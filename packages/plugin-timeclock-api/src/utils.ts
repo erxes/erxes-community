@@ -5,6 +5,7 @@ import * as dayjs from 'dayjs';
 import { fixDate, getEnv } from '@erxes/api-utils/src';
 import { Sequelize, QueryTypes } from 'sequelize';
 import { findBranch, findDepartment } from './graphql/resolvers/utils';
+import report from './graphql/resolvers/report';
 
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
@@ -273,46 +274,15 @@ const generateFilter = async (params, subdomain, type) => {
   const startDate = params.startDate;
   const endDate = params.endDate;
 
-  const totalUserIds: string[] = [];
-  let commonUser: boolean = false;
-  let dateGiven: boolean = false;
+  const totalUserIds: string[] = await generateCommonUserIds(
+    subdomain,
+    userIds,
+    branchIds,
+    departmentIds
+  );
 
   let returnFilter = {};
-
-  if (branchIds) {
-    for (const branchId of branchIds) {
-      const branch = await findBranch(subdomain, branchId);
-      if (userIds) {
-        commonUser = true;
-        for (const userId of userIds) {
-          if (branch.userIds.includes(userId)) {
-            totalUserIds.push(userId);
-          }
-        }
-      } else {
-        totalUserIds.push(...branch.userIds);
-      }
-    }
-  }
-  if (departmentIds) {
-    for (const deptId of departmentIds) {
-      const department = await findDepartment(subdomain, deptId);
-      if (userIds) {
-        commonUser = true;
-        for (const userId of userIds) {
-          if (department.userIds.includes(userId)) {
-            totalUserIds.push(userId);
-          }
-        }
-      } else {
-        totalUserIds.push(...department.userIds);
-      }
-    }
-  }
-
-  if (!commonUser && userIds) {
-    totalUserIds.push(...userIds);
-  }
+  let dateGiven: boolean = false;
 
   const timeFields =
     type === 'schedule'
@@ -403,8 +373,56 @@ const generateFilter = async (params, subdomain, type) => {
   return returnFilter;
 };
 
+const generateCommonUserIds = async (
+  subdomain: string,
+  userIds: string[],
+  branchIds?: string[],
+  departmentIds?: string[]
+) => {
+  const totalUserIds: string[] = [];
+  let commonUser: boolean = false;
+
+  if (branchIds) {
+    for (const branchId of branchIds) {
+      const branch = await findBranch(subdomain, branchId);
+      if (userIds) {
+        commonUser = true;
+        for (const userId of userIds) {
+          if (branch.userIds.includes(userId)) {
+            totalUserIds.push(userId);
+          }
+        }
+      } else {
+        totalUserIds.push(...branch.userIds);
+      }
+    }
+  }
+  if (departmentIds) {
+    for (const deptId of departmentIds) {
+      const department = await findDepartment(subdomain, deptId);
+      if (userIds) {
+        commonUser = true;
+        for (const userId of userIds) {
+          if (department.userIds.includes(userId)) {
+            totalUserIds.push(userId);
+          }
+        }
+      } else {
+        totalUserIds.push(...department.userIds);
+      }
+    }
+  }
+
+  if (!commonUser && userIds) {
+    totalUserIds.push(...userIds);
+  }
+
+  return totalUserIds;
+};
+
 export {
   connectAndQueryFromMySql,
   generateFilter,
+  generateCommonUserIds,
   findAllTeamMembersWithEmpId
 };

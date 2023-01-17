@@ -89,9 +89,11 @@ export const types = `
     totalMinsWorked: Int
     totalMinsWorkedToday: Int
     totalMinsWorkedThisMonth: Int
+    totalDaysWorkedThisMonth:Int
     totalMinsScheduled: Int
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
+    totalDaysScheduledThisMonth: Int
     totalMinsLateToday: Int
     totalMinsLateThisMonth: Int
     totalMinsAbsenceThisMonth: Int
@@ -185,7 +187,7 @@ export const queries = `
   requestsMain(${queryParams}): RequestsListResponse
 
   absenceTypes:[AbsenceType]
-  timeclockReports(departmentIds: [String], branchIds: [String], userIds: [String]): [Report]
+  timeclockReports(${queryParams}): [Report]
   timeclockReportByUser(selectedUser: String): UserReport
   timeclockDetail(_id: String!): Timeclock
   absenceDetail(_id: String!): Absence

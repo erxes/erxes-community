@@ -255,7 +255,7 @@ function ScheduleForm(props: Props) {
     dates_arr = dates_arr.sort((a, b) => b.getTime() - a.getTime());
 
     const dates = scheduleDates;
-    const getLatestDayKey = dates_arr
+    const getLatestDayKey = dates_arr.length
       ? dayjs(dates_arr[0])
           .add(1, 'day')
           .toDate()
@@ -268,9 +268,7 @@ function ScheduleForm(props: Props) {
       overnight
     ] = compareStartAndEndTime(
       scheduleDates,
-      Object.keys(scheduleDates).length
-        ? dates_arr[0]?.toLocaleDateString()
-        : getLatestDayKey,
+      getLatestDayKey,
       new Date(getLatestDayKey + ' ' + defaultStartTime),
       new Date(getLatestDayKey + ' ' + defaultEndTime)
     );

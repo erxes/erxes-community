@@ -255,12 +255,18 @@ export interface IScheduleReport {
 export interface IUserReport {
   userId?: string;
   scheduleReport: IScheduleReport[];
+  totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
-  totalMinsScheduledToday?: number;
   totalMinsWorkedThisMonth?: number;
+  totalDaysWorkedThisMonth?: number;
+  totalMinsScheduled?: number;
+  totalMinsScheduledToday?: number;
   totalMinsScheduledThisMonth?: number;
+  totalDaysScheduledThisMonth?: number;
+  totalMinsLate?: number;
   totalMinsLateToday?: number;
   totalMinsLateThisMonth?: number;
+  totalAbsenceMins?: number;
   totalMinsAbsenceThisMonth?: number;
 }
 
@@ -276,13 +282,4 @@ export interface IReport {
   groupTotalMinsLate?: number;
   groupTotalAbsenceMins?: number;
   groupTotalMinsScheduled?: number;
-}
-
-export interface IUserReport {
-  userId?: string;
-  scheduleReport: IScheduleReport[];
-  totalMinsWorked?: number;
-  totalMinsLate?: number;
-  totalAbsenceMins?: number;
-  totalMinsScheduled?: number;
 }
