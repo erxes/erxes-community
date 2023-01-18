@@ -50,6 +50,20 @@ const ForumPost: IObjectTypeResolver<IPost, IContext> = {
 
   async tags({ tagIds }) {
     return tagIds && tagIds.map(_id => ({ __typename: 'Tag', _id }));
+  },
+
+  async pollOptions({ _id }, _, { models: { PollOption } }) {
+    return PollOption.find({ postId: _id })
+      .sort({ order: 1 })
+      .lean();
+  },
+
+  async pollVoteCount({ _id }, _, { models: { PollVote, PollOption } }) {
+    const pollOptions = await PollOption.find({ postId: _id })
+      .select('_id')
+      .lean();
+    const pollOptionIds = pollOptions.map(o => o._id);
+    return PollVote.countDocuments({ pollOptionId: { $in: pollOptionIds } });
   }
 };
 

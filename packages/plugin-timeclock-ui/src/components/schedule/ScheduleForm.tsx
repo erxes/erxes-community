@@ -4,7 +4,7 @@ import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateRange from '../datepicker/DateRange';
 import dayjs from 'dayjs';
 import DatePicker from '../datepicker/DateTimePicker';
-import { ISchedule } from '../../types';
+import { ISchedule, IScheduleConfig } from '../../types';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { FlexCenter } from '../../styles';
@@ -15,7 +15,8 @@ import { Row } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
-import { __ } from '@erxes/ui/src/utils';
+import { Alert, __ } from '@erxes/ui/src/utils';
+import { compareStartAndEndTime } from '../../utils';
 
 type Props = {
   scheduleOfMembers: any;
@@ -23,8 +24,19 @@ type Props = {
   history: any;
   branchesList: IBranch[];
   modalContentType: string;
-  submitRequest: (userId: string[], filledShifts: any) => void;
-  submitShift: (userIds: string[], filledShifts: any) => void;
+  scheduleConfigs: IScheduleConfig[];
+  submitRequest: (
+    userId: any,
+    filledShifts: any,
+    selectedScheduleConfigId?: string
+  ) => void;
+  submitSchedule: (
+    branchIds: any,
+    departmentIds: any,
+    userIds: any,
+    filledShifts: any,
+    selectedScheduleConfigId?: string
+  ) => void;
   closeModal: any;
 };
 
@@ -32,32 +44,85 @@ function ScheduleForm(props: Props) {
   const {
     queryParams,
     submitRequest,
-    submitShift,
+    submitSchedule,
     closeModal,
     branchesList,
-    modalContentType
+    modalContentType,
+    scheduleConfigs
   } = props;
 
+  const [selectedScheduleConfig, setScheduleConfig] = useState('');
   const [dateKeyCounter, setKeyCounter] = useState('');
-  const [userIds, setUserIds] = useState(['']);
 
   const timeFormat = 'HH:mm';
+  const [defaultStartTime, setDefaultStartTime] = useState('08:30:00');
+  const [defaultEndTime, setDefaultEndTime] = useState('17:00:00');
   const [dateRangeStart, setDateStart] = useState(new Date());
   const [dateRangeEnd, setDateEnd] = useState(new Date());
   const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
   const [contentType, setContentType] = useState('By Date Range');
-  const [selectedDeptIds, setDepartments] = useState(['']);
-  const [selectedBranchIds, setBranches] = useState(['']);
+  const [userIds, setUserIds] = useState([]);
+  const [selectedDeptIds, setDepartments] = useState([]);
+  const [selectedBranchIds, setBranches] = useState([]);
 
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
       value: branch._id,
-      label: branch.title
+      label: branch.title,
+      userIds: branch.userIds
     }));
   };
 
+  const renderScheduleConfigOptions = () => {
+    return scheduleConfigs.map(scheduleConfig => ({
+      value: scheduleConfig._id,
+      label: `${scheduleConfig.scheduleName}\xa0\xa0\xa0(${scheduleConfig.shiftStart} ~ ${scheduleConfig.shiftEnd})`
+    }));
+  };
+
+  const onScheduleConfigSelect = scheduleConfig => {
+    setScheduleConfig(scheduleConfig.value);
+
+    const getScheduleConfig =
+      scheduleConfigs &&
+      scheduleConfigs.filter(config => config._id === scheduleConfig.value);
+
+    setDefaultStartTime(getScheduleConfig[0].shiftStart);
+    setDefaultEndTime(getScheduleConfig[0].shiftEnd);
+
+    Object.keys(scheduleDates).forEach(day_key => {
+      const shiftDay = scheduleDates[day_key].shiftDate;
+
+      const getShiftStart = dayjs(
+        shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftStart
+      ).toDate();
+
+      const getShiftEnd = dayjs(
+        shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftEnd
+      ).toDate();
+
+      const [
+        getCorrectShiftStart,
+        getCorrectShiftEnd,
+        overNightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        day_key,
+        getShiftStart,
+        getShiftEnd
+      );
+      scheduleDates[day_key].shiftStart = getCorrectShiftStart;
+      scheduleDates[day_key].shiftEnd = getCorrectShiftEnd;
+      scheduleDates[day_key].overnightShift = overNightShift;
+    });
+
+    setScheduleDates({ ...scheduleDates });
+  };
+
   const onBranchSelect = selectedBranch => {
-    setBranches(selectedBranch);
+    const branchIds: any = [];
+    branchIds.push(...selectedBranch.map(branch => branch.value));
+    setBranches(branchIds);
   };
 
   const onDepartmentSelect = dept => {
@@ -97,48 +162,13 @@ function ScheduleForm(props: Props) {
     setScheduleDates(newScheduleDates);
   };
 
-  const compareStartAndEndTime = (day_key, newShiftStart, newShiftEnd) => {
-    const currShift = scheduleDates[day_key];
-    const currShiftDate = currShift.shiftDate?.toLocaleDateString();
-    const currShiftEnd = newShiftEnd ? newShiftEnd : currShift.shiftEnd;
-    const currShiftStart = newShiftStart ? newShiftStart : currShift.shiftStart;
-
-    let overnightShift = false;
-    let correctShiftEnd;
-
-    if (
-      dayjs(currShiftEnd).format(timeFormat) <
-      dayjs(currShiftStart).format(timeFormat)
-    ) {
-      correctShiftEnd =
-        dayjs(currShiftDate)
-          .add(1, 'day')
-          .toDate()
-          .toLocaleDateString() +
-        ' ' +
-        dayjs(currShiftEnd).format(timeFormat);
-
-      overnightShift = true;
-    } else {
-      correctShiftEnd = dayjs(
-        currShiftDate + ' ' + dayjs(currShiftEnd).format(timeFormat)
-      ).toDate();
-    }
-
-    const correctShiftStart = dayjs(
-      currShiftDate + ' ' + dayjs(currShiftStart).format(timeFormat)
-    ).toDate();
-
-    return [correctShiftStart, correctShiftEnd, overnightShift];
-  };
-
   const onStartTimeChange = (day_key, time) => {
     const newShift = scheduleDates[day_key];
     const [
       getCorrectStartTime,
       getCorrectEndTime,
       overnight
-    ] = compareStartAndEndTime(day_key, time, null);
+    ] = compareStartAndEndTime(scheduleDates, day_key, time, null);
 
     newShift.shiftStart = getCorrectStartTime;
     newShift.overnightShift = overnight;
@@ -154,7 +184,7 @@ function ScheduleForm(props: Props) {
       getCorrectStartTime,
       getCorrectEndTime,
       overnight
-    ] = compareStartAndEndTime(day_key, null, time);
+    ] = compareStartAndEndTime(scheduleDates, day_key, null, time);
 
     newShift.shiftStart = getCorrectStartTime;
     newShift.overnightShift = overnight;
@@ -168,13 +198,48 @@ function ScheduleForm(props: Props) {
     return { shiftStart: shift.shiftStart, shiftEnd: shift.shiftEnd };
   });
 
+  const checkInput = (selectedUsers, shifts, branchIds?, departmentIds?) => {
+    if (
+      (!branchIds || !branchIds.length) &&
+      (!departmentIds || !departmentIds.length) &&
+      !selectedUsers.length
+    ) {
+      Alert.error('No users were given');
+    } else if (shifts.length === 0) {
+      Alert.error('No shifts were given');
+    } else {
+      return true;
+    }
+  };
+
   const onSubmitClick = () => {
-    submitRequest(userIds, pickSubset);
-    closeModal();
+    const validInput = checkInput(userIds, pickSubset);
+    if (validInput) {
+      submitRequest(
+        userIds,
+        pickSubset,
+        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
+      );
+      closeModal();
+    }
   };
   const onAdminSubmitClick = () => {
-    submitShift(userIds, pickSubset);
-    closeModal();
+    const validInput = checkInput(
+      userIds,
+      pickSubset,
+      selectedBranchIds,
+      selectedDeptIds
+    );
+    if (validInput) {
+      submitSchedule(
+        selectedBranchIds,
+        selectedDeptIds,
+        userIds,
+        pickSubset,
+        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
+      );
+      closeModal();
+    }
   };
   const onUserSelect = users => {
     setUserIds(users);
@@ -190,17 +255,32 @@ function ScheduleForm(props: Props) {
     dates_arr = dates_arr.sort((a, b) => b.getTime() - a.getTime());
 
     const dates = scheduleDates;
-    const getLatestDayKey = dates_arr
+    const getLatestDayKey = dates_arr.length
       ? dayjs(dates_arr[0])
           .add(1, 'day')
           .toDate()
           .toLocaleDateString()
       : new Date().toLocaleDateString();
 
+    const [
+      getCorrectShiftStart,
+      getCorrectShiftEnd,
+      overnight
+    ] = compareStartAndEndTime(
+      scheduleDates,
+      getLatestDayKey,
+      new Date(getLatestDayKey + ' ' + defaultStartTime),
+      new Date(getLatestDayKey + ' ' + defaultEndTime)
+    );
+    // : [
+    //     new Date(getLatestDayKey + ' ' + defaultStartTime),
+    //     new Date(getLatestDayKey + ' ' + defaultEndTime)
+    //   ];
     dates[getLatestDayKey] = {
       shiftDate: new Date(getLatestDayKey),
-      shiftStart: new Date(getLatestDayKey + ' 08:30:00'),
-      shiftEnd: new Date(getLatestDayKey + ' 17:00:00')
+      shiftStart: getCorrectShiftStart,
+      shiftEnd: getCorrectShiftEnd,
+      overnightShift: overnight
     };
 
     setScheduleDates({
@@ -263,6 +343,13 @@ function ScheduleForm(props: Props) {
         multi={false}
         name="userId"
       />
+      <Select
+        value={selectedScheduleConfig}
+        onChange={onScheduleConfigSelect}
+        placeholder="Select Schedule"
+        multi={false}
+        options={renderScheduleConfigOptions()}
+      />
       {renderWeekDays()}
       {actionButtons('employee')}
     </div>
@@ -277,6 +364,13 @@ function ScheduleForm(props: Props) {
           onSelect={onUserSelect}
           name="userId"
         />
+        <Select
+          value={selectedScheduleConfig}
+          onChange={onScheduleConfigSelect}
+          placeholder="Select Schedule"
+          multi={false}
+          options={renderScheduleConfigOptions()}
+        />
         {renderWeekDays()}
         {actionButtons('admin')}
       </div>
@@ -286,17 +380,6 @@ function ScheduleForm(props: Props) {
   const adminConfigDefaultContent = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <SelectTeamMembers
-          queryParams={queryParams}
-          label={'Team member'}
-          onSelect={onUserSelect}
-          name="userId"
-        />
-        <SelectDepartments
-          isRequired={false}
-          defaultValue={selectedDeptIds}
-          onChange={onDepartmentSelect}
-        />
         <FormGroup>
           <ControlLabel>Branches</ControlLabel>
           <Row>
@@ -309,6 +392,24 @@ function ScheduleForm(props: Props) {
             />
           </Row>
         </FormGroup>
+        <SelectDepartments
+          isRequired={false}
+          defaultValue={selectedDeptIds}
+          onChange={onDepartmentSelect}
+        />
+        <SelectTeamMembers
+          queryParams={queryParams}
+          label={'Team member'}
+          onSelect={onUserSelect}
+          name="userId"
+        />
+        <Select
+          value={selectedScheduleConfig}
+          onChange={onScheduleConfigSelect}
+          placeholder="Select Schedule"
+          multi={false}
+          options={renderScheduleConfigOptions()}
+        />
         <Select
           value={contentType}
           onChange={onContentTypeSelect}
@@ -344,17 +445,30 @@ function ScheduleForm(props: Props) {
     const endRange = dayjs(dateRangeEnd);
 
     while (temp <= endRange) {
-      totalDatesArray.push(temp.toDate().toDateString());
+      totalDatesArray.push(temp.toDate().toLocaleDateString());
       temp = temp.add(1, 'day');
     }
 
     const newDatesByRange: ISchedule = scheduleDates;
 
     for (const eachDay of totalDatesArray) {
+      const [
+        correctShiftStart,
+        correctShiftEnd,
+        isOvernightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        eachDay,
+        new Date(eachDay + ' ' + defaultStartTime),
+        new Date(eachDay + ' ' + defaultEndTime),
+        eachDay
+      );
+
       newDatesByRange[eachDay] = {
         shiftDate: new Date(eachDay),
-        shiftStart: new Date(eachDay + ' 08:30:00'),
-        shiftEnd: new Date(eachDay + ' 17:00:00')
+        shiftStart: correctShiftStart,
+        shiftEnd: correctShiftEnd,
+        overnightShift: isOvernightShift
       };
 
       setKeyCounter(eachDay);
@@ -375,6 +489,7 @@ function ScheduleForm(props: Props) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <DateRange
+          showTime={false}
           startDate={dateRangeStart}
           endDate={dateRangeEnd}
           onChangeEnd={onDateRangeEndChange}
@@ -388,14 +503,27 @@ function ScheduleForm(props: Props) {
 
   const onDateSelectChange = dateString => {
     if (dateString) {
-      const getDate = new Date(dateString).toDateString();
+      const getDate = new Date(dateString).toLocaleDateString();
 
       const newDates = scheduleDates;
 
+      const [
+        correctShiftStart,
+        correctShiftEnd,
+        isOvernightShift
+      ] = compareStartAndEndTime(
+        scheduleDates,
+        getDate,
+        new Date(getDate + ' ' + defaultStartTime),
+        new Date(getDate + ' ' + defaultEndTime),
+        getDate
+      );
+
       newDates[getDate] = {
         shiftDate: new Date(getDate),
-        shiftStart: new Date(getDate + ' 08:30:00'),
-        shiftEnd: new Date(getDate + ' 17:00:00')
+        shiftStart: correctShiftStart,
+        shiftEnd: correctShiftEnd,
+        overnightShift: isOvernightShift
       };
 
       setScheduleDates(newDates);
