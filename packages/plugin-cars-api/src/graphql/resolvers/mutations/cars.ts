@@ -49,33 +49,49 @@ const carMutations = {
     return updated;
   },
 
-  customerOfCarEdit: async (
-    _root,
-    { _id, ...doc },
-    { models, user, subdomain }
-  ) => {
-    for (const carId of doc.carIds) {
-      const car = await models.Cars.getCar(carId);
-      const updated = await models.Cars.updateCar(carId, {
-        customerIds: doc.cusId
-      });
+  customerOfCarEdit: async (_root, { _id, ...doc }, { models }) => {
+    const cars = await models.Cars.getCarByCustomerId(doc.cusId);
+    const oldCarIds = cars.map(car => car._id);
 
-      await putUpdateLog(
-        subdomain,
-        messageBroker(),
-        {
-          type: 'car',
-          object: car,
-          newData: { ...doc },
-          updatedDocument: updated,
-          extraParams: { models }
-        },
-        user
-      );
+    if (doc.carIds.length === 0) {
+      return await models.Cars.deleteCars(doc.cusId, oldCarIds);
+    } else if (oldCarIds.length === doc.carIds.length) {
+      const ignoreOrderCompare = (a, b) => {
+        if (a.length !== b.length) return false;
+        const elements = new Set([...a, ...b]);
+        for (const x of elements) {
+          const count1 = a.filter(e => e === x).length;
+          const count2 = b.filter(e => e === x).length;
+          if (count1 !== count2) return false;
+        }
+        return true;
+      };
+
+      if (ignoreOrderCompare(oldCarIds, doc.carIds)) return;
+      else await models.Cars.deleteCars(oldCarIds);
+      for (const carId of doc.carIds) {
+        const car = await models.Cars.getCar(carId);
+        const updated = await models.Cars.updateOne(
+          { _id: car._id },
+          {
+            $push: { customerIds: doc.cusId }
+          }
+        );
+        return updated;
+      }
+    } else if (oldCarIds.length !== doc.carIds.length) {
+      await models.Cars.deleteCars(doc.cusId, oldCarIds);
+
+      for (const carId of doc.carIds) {
+        const car = await models.Cars.getCar(carId);
+        const updated = await models.Cars.updateOne(
+          { _id: car._id },
+          {
+            $push: { customerIds: doc.cusId }
+          }
+        );
+      }
     }
-    const updatedCar = await models.Cars.getAllCar(doc.carIds);
-
-    return updatedCar;
   },
 
   carsRemove: async (

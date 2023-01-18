@@ -18,6 +18,8 @@ export interface ICarModel extends Model<ICarDocument> {
   removeCars(carIds: string[]): Promise<ICarDocument>;
   mergeCars(carIds: string, carFields: any): Promise<ICarDocument>;
   getCarByCustomerId(customerId: string): Promise<ICarDocument>;
+  deleteCars(cusId: string, carIds: string[]): Promise<ICarDocument>;
+  updateCars(carId: string, customerIds: string[]): Promise<ICarDocument>;
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
@@ -197,6 +199,19 @@ export const loadCarClass = models => {
       }
 
       return models.Cars.deleteMany({ _id: { $in: carIds } });
+    }
+
+    public static async deleteCars(cusId, carIds) {
+      for (const carId of carIds) {
+        await models.Cars.updateMany(
+          { _id: carId },
+          { $pull: { customerIds: cusId } }
+        );
+      }
+    }
+
+    public static async updateCars(carId, doc) {
+      return models.Cars.updateMany({ _id: { $in: carId } }, doc);
     }
 
     /**
