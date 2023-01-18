@@ -49,43 +49,29 @@ const carMutations = {
     return updated;
   },
 
-  customerOfCarEdit: async (_root, { _id, ...doc }, { models }) => {
-    const cars = await models.Cars.getCarByCustomerId(doc.cusId);
+  carsEditOnCustomer: async (_root, { _id, ...doc }, { models }: IContext) => {
+    const cars = await models.Cars.getCarsByCustomerId(doc.cusId);
     const oldCarIds = cars.map(car => car._id);
 
     if (doc.carIds.length === 0) {
-      return await models.Cars.deleteCars(doc.cusId, oldCarIds);
-    } else if (oldCarIds.length === doc.carIds.length) {
-      const ignoreOrderCompare = (a, b) => {
-        if (a.length !== b.length) return false;
-        const elements = new Set([...a, ...b]);
-        for (const x of elements) {
-          const count1 = a.filter(e => e === x).length;
-          const count2 = b.filter(e => e === x).length;
-          if (count1 !== count2) return false;
-        }
-        return true;
-      };
+      return models.Cars.removeCustomerFromCars(doc.cusId);
+    }
 
-      if (ignoreOrderCompare(oldCarIds, doc.carIds)) return;
-      else await models.Cars.deleteCars(oldCarIds);
-      for (const carId of doc.carIds) {
-        const car = await models.Cars.getCar(carId);
-        const updated = await models.Cars.updateOne(
-          { _id: car._id },
+    for (const carId of oldCarIds) {
+      if (!doc.carIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
           {
-            $push: { customerIds: doc.cusId }
+            $pull: { customerIds: doc.cusId }
           }
         );
-        return updated;
       }
-    } else if (oldCarIds.length !== doc.carIds.length) {
-      await models.Cars.deleteCars(doc.cusId, oldCarIds);
+    }
 
-      for (const carId of doc.carIds) {
-        const car = await models.Cars.getCar(carId);
-        const updated = await models.Cars.updateOne(
-          { _id: car._id },
+    for (const carId of doc.carIds) {
+      if (!oldCarIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
           {
             $push: { customerIds: doc.cusId }
           }
@@ -97,11 +83,11 @@ const carMutations = {
   carsRemove: async (
     _root,
     { carIds }: { carIds: string[] },
-    { models, user }: IContext
+    { models, user, subdomain }: IContext
   ) => {
     const cars = await models.Cars.find({ _id: { $in: carIds } }).lean();
 
-    await models.Cars.removeCars(carIds);
+    await models.Cars.removeCars(subdomain, carIds);
 
     // for (const car of cars) {
     //   messageBroker().sendMessage("putActivityLog", {
@@ -120,8 +106,12 @@ const carMutations = {
     return carIds;
   },
 
-  carsMerge: async (_root, { carIds, carFields }, { models, user }) => {
-    return models.Cars.mergeCars(carIds, carFields);
+  carsMerge: async (
+    _root,
+    { carIds, carFields },
+    { models, subdomain, user }: IContext
+  ) => {
+    return models.Cars.mergeCars(subdomain, carIds, carFields, user);
   },
 
   carCategoriesAdd: async (
@@ -194,12 +184,16 @@ const carMutations = {
     return removed;
   },
 
-  cpCarsAdd: async (_root, doc, { docModifier, models }) => {
-    const car = await models.Cars.createCar(docModifier(doc));
+  cpCarsAdd: async (
+    _root,
+    doc,
+    { docModifier, models, subdomain, user }: IContext
+  ) => {
+    const car = await models.Cars.createCar(docModifier(doc), user);
 
     if (doc.customerId) {
       await sendCoreMessage({
-        subdomain: models.subdomain,
+        subdomain,
         action: 'conformities.addConformities',
         data: {
           mainType: 'customer',
@@ -212,7 +206,7 @@ const carMutations = {
 
     if (doc.companyId) {
       await sendCoreMessage({
-        subdomain: models.subdomain,
+        subdomain,
         action: 'conformities.addConformities',
         data: {
           mainType: 'company',

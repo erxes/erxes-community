@@ -105,7 +105,7 @@ const carQueries = {
   },
 
   customersCar: async (_root, { _id }, { models }: IContext) => {
-    return await models.Cars.getCarByCustomerId(_id);
+    return models.Cars.getCarsByCustomerId(_id);
   },
 
   carsMain: async (

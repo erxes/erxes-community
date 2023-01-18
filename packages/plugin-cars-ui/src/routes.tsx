@@ -8,7 +8,10 @@ import CarSection from './containers/CarSection';
 const details = ({ match }) => {
   const id = match.params.id;
 
-  if (match.path === '/contacts/details/:id') {
+  if (
+    match.path === '/contacts/details/:id' ||
+    match.path === '/companies/details/:id'
+  ) {
     <CarSection id={id} />;
   }
 
@@ -38,6 +41,12 @@ const routes = () => {
         key="/contacts/details/:id"
         exact={true}
         path="/contacts/details/:id"
+        component={details}
+      />
+      <Route
+        key="/companies/details/:id"
+        exact={true}
+        path="/companies/details/:id"
         component={details}
       />
     </>
