@@ -47,6 +47,7 @@ export interface ISchedule {
   userId?: string;
   status?: string;
   solved?: boolean;
+  scheduleConfigId?: string;
 }
 
 export interface IScheduleDocument extends ISchedule, Document {
@@ -59,9 +60,12 @@ export interface IShift {
   status?: string;
   shiftStart?: Date;
   shiftEnd?: Date;
-  absentWholeShift?: boolean;
-  absenceStart?: Date;
-  absenceEnd?: Date;
+  overnightShift?: boolean;
+  weekDay?: boolean;
+  configName?: string;
+  configShiftStart?: string;
+  configShiftEnd?: string;
+  scheduleConfigId?: string;
 }
 
 export interface IShiftDocument extends IShift, Document {
@@ -72,6 +76,15 @@ export interface IPayDate {
   payDates: number[];
 }
 export interface IPayDateDocument extends IPayDate, Document {
+  _id: string;
+}
+export interface IScheduleConfig {
+  scheduleName?: string;
+  shiftStart?: string;
+  shiftEnd?: string;
+}
+
+export interface IScheduleConfigDocument extends IScheduleConfig, Document {
   _id: string;
 }
 
@@ -109,7 +122,7 @@ export const timeSchema = new Schema({
     label: 'Employee user name, as saved on companys terminal'
   }),
   employeeId: field({
-    type: Number,
+    type: String,
     label: 'Employee id, custom field'
   }),
   deviceType: field({
@@ -162,12 +175,37 @@ export const scheduleSchema = new Schema({
   status: field({
     type: String,
     label: 'Status of schedule request, whether approved or rejected'
+  }),
+  scheduleConfigId: field({
+    type: String,
+    label: 'Schedule Config id used for reports'
   })
 });
 
 export const scheduleShiftSchema = new Schema({
   _id: field({ pkey: true }),
   scheduleId: field({ type: String, label: 'id of an according schedule' }),
+  scheduleConfigId: field({
+    type: String,
+    label: 'id of an according schedule config'
+  }),
+  configName: field({
+    type: String,
+    label: 'name of schedule config'
+  }),
+  configShiftStart: field({
+    type: String,
+    label: 'starting time of config day shift'
+  }),
+  configShiftEnd: field({
+    type: String,
+    label: 'ending time of config day shift'
+  }),
+  overnightShift: field({
+    type: Boolean,
+    label: 'to be sure of whether shift occurs overnight'
+  }),
+
   solved: field({
     type: Boolean,
     default: false,
@@ -189,6 +227,19 @@ export const payDateSchema = new Schema({
   payDates: field({ type: [Number], label: 'pay dates' })
 });
 
+export const scheduleConfigSchema = new Schema({
+  _id: field({ pkey: true }),
+  scheduleName: field({ type: String, label: 'Name of the schedule' }),
+  shiftStart: field({
+    type: String,
+    label: 'starting time of shift'
+  }),
+  shiftEnd: field({
+    type: String,
+    label: 'ending time of shift'
+  })
+});
+
 // common types
 export interface IScheduleReport {
   date?: string;
@@ -204,12 +255,18 @@ export interface IScheduleReport {
 export interface IUserReport {
   userId?: string;
   scheduleReport: IScheduleReport[];
+  totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
-  totalMinsScheduledToday?: number;
   totalMinsWorkedThisMonth?: number;
+  totalDaysWorkedThisMonth?: number;
+  totalMinsScheduled?: number;
+  totalMinsScheduledToday?: number;
   totalMinsScheduledThisMonth?: number;
+  totalDaysScheduledThisMonth?: number;
+  totalMinsLate?: number;
   totalMinsLateToday?: number;
   totalMinsLateThisMonth?: number;
+  totalAbsenceMins?: number;
   totalMinsAbsenceThisMonth?: number;
 }
 
@@ -225,13 +282,4 @@ export interface IReport {
   groupTotalMinsLate?: number;
   groupTotalAbsenceMins?: number;
   groupTotalMinsScheduled?: number;
-}
-
-export interface IUserReport {
-  userId?: string;
-  scheduleReport: IScheduleReport[];
-  totalMinsWorked?: number;
-  totalMinsLate?: number;
-  totalAbsenceMins?: number;
-  totalMinsScheduled?: number;
 }

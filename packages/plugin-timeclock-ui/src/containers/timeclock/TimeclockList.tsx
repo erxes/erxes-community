@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { mutations } from '../../graphql';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import dayjs from 'dayjs';
 
 type Props = {
   queryParams: any;
@@ -26,6 +27,7 @@ type Props = {
   queryPage: number;
   queryPerPage: number;
 
+  showSideBar: (sideBar: boolean) => void;
   getActionBar: (actionBar: any) => void;
   getPagination: (pagination: any) => void;
 };
@@ -39,17 +41,25 @@ const ListContainer = (props: FinalProps) => {
   const {
     timeclocksMainQuery,
     getPagination,
-    extractAllMySqlDataMutation
+    extractAllMySqlDataMutation,
+    showSideBar
   } = props;
+
+  const dateFormat = 'YYYY-MM-DD';
   const [loading, setLoading] = useState(false);
 
   if (timeclocksMainQuery.loading || loading) {
     return <Spinner />;
   }
 
-  const extractAllMySqlData = () => {
+  const extractAllMySqlData = (start: Date, end: Date) => {
     setLoading(true);
-    extractAllMySqlDataMutation()
+    extractAllMySqlDataMutation({
+      variables: {
+        startDate: dayjs(start).format(dateFormat),
+        endDate: dayjs(end).format(dateFormat)
+      }
+    })
       .then(() => {
         setLoading(false);
         timeclocksMainQuery.refetch();
@@ -71,7 +81,7 @@ const ListContainer = (props: FinalProps) => {
     loading: timeclocksMainQuery.loading || loading,
     extractAllMySqlData
   };
-
+  showSideBar(true);
   getPagination(<Pagination count={totalCount} />);
   return <List {...updatedProps} />;
 };
