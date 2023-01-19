@@ -27,46 +27,6 @@ const generateFilter = async (
     filter._id = { $in: params.ids };
   }
 
-  if (
-    params.conformityMainTypeId &&
-    params.conformityMainType &&
-    params.conformityIsSaved
-  ) {
-    filter._id = {
-      $in: await sendCoreMessage({
-        subdomain,
-        action: 'conformities.savedConformity',
-        data: {
-          mainType: params.conformityMainType,
-          mainTypeId: params.conformityMainTypeId,
-          relTypes: ['car']
-        },
-        isRPC: true,
-        defaultValue: []
-      })
-    };
-  }
-
-  if (
-    params.conformityMainTypeId &&
-    params.conformityMainType &&
-    params.conformityIsRelated
-  ) {
-    filter._id = {
-      $in: await sendCoreMessage({
-        subdomain,
-        action: 'conformities.relatedConformity',
-        data: {
-          mainType: params.conformityMainType,
-          mainTypeId: params.conformityMainTypeId,
-          relType: 'car'
-        },
-        isRPC: true,
-        defaultValue: []
-      })
-    };
-  }
-
   return filter;
 };
 
@@ -104,8 +64,8 @@ const carQueries = {
     );
   },
 
-  customersCar: async (_root, { _id }, { models }: IContext) => {
-    return models.Cars.getCarsByCustomerId(_id);
+  carsFromCustomer: async (_root, { customerId }, { models }: IContext) => {
+    return models.Cars.getCarsByCustomerId(customerId);
   },
 
   carsMain: async (

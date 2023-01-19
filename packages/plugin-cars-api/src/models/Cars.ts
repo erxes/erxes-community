@@ -204,16 +204,6 @@ export const loadCarClass = (models: IModels) => {
           },
           defaultValue: {}
         });
-
-        await sendCoreMessage({
-          subdomain,
-          action: 'conformities.removeConformity',
-          data: {
-            mainType: 'car',
-            mainTypeId: carId
-          },
-          defaultValue: []
-        });
       }
 
       return models.Cars.deleteMany({ _id: { $in: carIds } });
@@ -256,19 +246,6 @@ export const loadCarClass = (models: IModels) => {
         },
         user
       );
-
-      // Updating customer cars, deals, tasks, tickets
-      await sendCoreMessage({
-        subdomain,
-        action: 'conformities.changeConformity',
-        data: {
-          type: 'car',
-          newTypeId: car._id,
-          oldTypeIds: carIds
-        },
-        isRPC: true,
-        defaultValue: []
-      });
 
       // Removing modules associated with current cars
       // await models.InternalNotes.changeCar(car._id, carIds);

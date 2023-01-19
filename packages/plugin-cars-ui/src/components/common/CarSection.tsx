@@ -14,12 +14,12 @@ import { Link } from 'react-router-dom';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 
 type Props = {
+  id: string;
   cars: ICar[];
+  carsOnCustomer: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
   carsEditOnCompany: (values: any) => void;
-  id: string;
-  customerCar: ICar[];
 };
 
 type State = {
@@ -31,17 +31,18 @@ class CarSection extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      carIds: props.customerCar.map(e => e._id) || []
+      carIds: props.carsOnCustomer.map(e => e._id) || []
     };
   }
 
   render() {
     const {
-      customerCar,
+      id,
+      cars,
+      carsOnCustomer,
       collapseCallback,
       carsEditOnCustomer,
-      carsEditOnCompany,
-      cars
+      carsEditOnCompany
     } = this.props;
 
     const options = cars.map(g => ({
@@ -55,10 +56,10 @@ class CarSection extends React.Component<Props, State> {
       });
     };
 
-    const saveCustomer = closeModal => {
+    const saveCustomerOrCompany = closeModal => {
       carsEditOnCustomer({
         carIds: this.state.carIds,
-        customerId: this.props.id
+        customerId: id
       });
       closeModal();
     };
@@ -66,7 +67,7 @@ class CarSection extends React.Component<Props, State> {
     const saveCompany = closeModal => {
       carsEditOnCompany({
         carIds: this.state.carIds,
-        companyId: this.props.id
+        companyId: id
       });
       closeModal();
     };
@@ -91,7 +92,7 @@ class CarSection extends React.Component<Props, State> {
 
             <Button
               btnStyle="success"
-              onClick={() => saveCustomer(closeModal())}
+              onClick={() => saveCustomerOrCompany(closeModal())}
               icon="check-circle"
             >
               Save
@@ -114,7 +115,7 @@ class CarSection extends React.Component<Props, State> {
     );
     const content = (
       <>
-        {customerCar.map(car => (
+        {carsOnCustomer.map(car => (
           <SectionBodyItem>
             <Link to={`/erxes-plugin-car/details/${car._id}`}>
               <Icon icon="arrow-to-right" />
@@ -122,7 +123,7 @@ class CarSection extends React.Component<Props, State> {
             <span>{car.plateNumber || 'Unknown'}</span>
           </SectionBodyItem>
         ))}
-        {!customerCar?.length && <EmptyState icon="car" text="No car" />}
+        {!carsOnCustomer?.length && <EmptyState icon="car" text="No car" />}
       </>
     );
 

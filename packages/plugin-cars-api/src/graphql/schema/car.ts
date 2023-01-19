@@ -79,11 +79,6 @@ const queryParams = `
   sortField: String
   sortDirection: Int
   brand: String
-  conformityMainType: String
-  conformityMainTypeId: String
-  conformityRelType: String
-  conformityIsRelated: Boolean
-  conformityIsSaved: Boolean
   isSelect: Boolean
 `;
 
@@ -99,7 +94,7 @@ export const queries = `
   cpCarCategories(parentId: String, searchValue: String): [CarCategory]
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
-  customersCar(_id: String!): [Car]
+  carsFromCustomer(customerId: String!): [Car]
 `;
 
 const commonFields = `

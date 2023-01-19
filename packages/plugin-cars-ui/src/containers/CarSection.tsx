@@ -35,7 +35,7 @@ const CarDetailsContainer = (props: FinalProps) => {
   }
 
   const cars = carsQuery.cars || [];
-  const customerCar = customersCarQuery.customersCar || [];
+  const carsOnCustomer = customersCarQuery.carsFromCustomer || [];
 
   const carsEditOnCustomer = variables => {
     carsEditCustomer({
@@ -75,7 +75,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     ...props,
     id,
     cars,
-    customerCar,
+    carsOnCustomer,
     loading: carsQuery.loading,
     carsEditOnCustomer,
     carsEditOnCompany
@@ -101,11 +101,11 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<Props, { _id: string }>(gql(queries.customersCar), {
+    graphql<Props, { _id: string }>(gql(queries.carsFromCustomer), {
       name: 'customersCarQuery',
       options: ({ id }) => ({
         variables: {
-          _id: id
+          customerId: id
         }
       })
     }),
