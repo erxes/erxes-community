@@ -136,5 +136,6 @@ export const mutations = `
   cpCarsAdd(${commonFields}, customerId: String, companyId: String): Car
   cpCarsEdit(_id: String!, ${commonFields}, customerId: String, companyId: String): Car
   cpCarsRemove(carIds: [String]): [String]
-  carsEditOnCustomer(_id: String!, customerIds: [String], companyIds: [String], cusId: String!, carIds: [String], ${commonFields}, customFieldsData: JSON): Car
+  carsEditOnCustomer(_id: String!, customerIds: [String], companyIds: [String], customerId: String!, carIds: [String], ${commonFields}, customFieldsData: JSON): Car
+  carsEditOnCompany(_id: String!, customerIds: [String], companyIds: [String], companyId: String!, carIds: [String], ${commonFields}, customFieldsData: JSON): Car
 `;

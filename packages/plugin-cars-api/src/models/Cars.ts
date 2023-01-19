@@ -29,10 +29,11 @@ export interface ICarModel extends Model<ICarDocument> {
     user: IUser
   ): Promise<ICarDocument>;
   getCarsByCustomerId(customerId: string): Promise<ICarDocument[]>;
+  getCarsByCompanyId(companyId: string): Promise<ICarDocument[]>;
   deleteCars(cusId: string, carIds: string[]): Promise<ICarDocument>;
-  updateCars(carId: string, customerIds: string[]): Promise<ICarDocument>;
   fillSearchText(doc: ICar): string;
   removeCustomerFromCars(customerId: string): Promise<ICarDocument>;
+  removeCompanyFromCars(companyId: string): Promise<ICarDocument>;
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
@@ -142,6 +143,14 @@ export const loadCarClass = (models: IModels) => {
 
       return cars;
     }
+
+    public static async getCarsByCompanyId(companyId: string) {
+      const cars = await models.Cars.find({
+        companyIds: companyId
+      }).lean();
+
+      return cars;
+    }
     /**
      * Create a car
      */
@@ -210,17 +219,18 @@ export const loadCarClass = (models: IModels) => {
       return models.Cars.deleteMany({ _id: { $in: carIds } });
     }
 
-    public static async removeCustomerFromCar(cusId, carIds) {
-      for (const carId of carIds) {
-        await models.Cars.updateOne(
-          { _id: carId },
-          { $pull: { customerIds: cusId } }
-        );
-      }
+    public static async removeCustomerFromCars(customerId: string) {
+      return models.Cars.updateMany(
+        { customerIds: customerId },
+        { $pull: { customerIds: customerId } }
+      );
     }
 
-    public static async updateCars(carId, doc) {
-      return models.Cars.updateMany({ _id: { $in: carId } }, doc);
+    public static async removeCompanyFromCars(companyId: string) {
+      return models.Cars.updateMany(
+        { companyIds: companyId },
+        { $pull: { companyIds: companyId } }
+      );
     }
 
     /**
@@ -264,13 +274,6 @@ export const loadCarClass = (models: IModels) => {
       // await models.InternalNotes.changeCar(car._id, carIds);
 
       return car;
-    }
-
-    public static async removeCustomerFromCars(customerId: string) {
-      return models.Cars.updateMany(
-        { customerIds: customerId },
-        { $pull: { customerIds: customerId } }
-      );
     }
   }
 

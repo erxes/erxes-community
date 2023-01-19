@@ -17,6 +17,7 @@ type Props = {
   cars: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
+  carsEditOnCompany: (values: any) => void;
   id: string;
   customerCar: ICar[];
 };
@@ -39,6 +40,7 @@ class CarSection extends React.Component<Props, State> {
       customerCar,
       collapseCallback,
       carsEditOnCustomer,
+      carsEditOnCompany,
       cars
     } = this.props;
 
@@ -56,7 +58,15 @@ class CarSection extends React.Component<Props, State> {
     const saveCustomer = closeModal => {
       carsEditOnCustomer({
         carIds: this.state.carIds,
-        cusId: this.props.id
+        customerId: this.props.id
+      });
+      closeModal();
+    };
+
+    const saveCompany = closeModal => {
+      carsEditOnCompany({
+        carIds: this.state.carIds,
+        companyId: this.props.id
       });
       closeModal();
     };

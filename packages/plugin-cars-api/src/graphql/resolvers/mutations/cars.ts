@@ -50,11 +50,11 @@ const carMutations = {
   },
 
   carsEditOnCustomer: async (_root, { _id, ...doc }, { models }: IContext) => {
-    const cars = await models.Cars.getCarsByCustomerId(doc.cusId);
+    const cars = await models.Cars.getCarsByCustomerId(doc.customerId);
     const oldCarIds = cars.map(car => car._id);
 
     if (doc.carIds.length === 0) {
-      return models.Cars.removeCustomerFromCars(doc.cusId);
+      return models.Cars.removeCustomerFromCars(doc.customerId);
     }
 
     for (const carId of oldCarIds) {
@@ -62,7 +62,7 @@ const carMutations = {
         await models.Cars.updateOne(
           { _id: carId },
           {
-            $pull: { customerIds: doc.cusId }
+            $pull: { customerIds: doc.customerId }
           }
         );
       }
@@ -73,7 +73,38 @@ const carMutations = {
         await models.Cars.updateOne(
           { _id: carId },
           {
-            $push: { customerIds: doc.cusId }
+            $push: { customerIds: doc.customerId }
+          }
+        );
+      }
+    }
+  },
+
+  carsEditOnCompany: async (_root, { _id, ...doc }, { models }: IContext) => {
+    const cars = await models.Cars.getCarsByCompanyId(doc.companyId);
+    const oldCarIds = cars.map(car => car._id);
+
+    if (doc.carIds.length === 0) {
+      return models.Cars.removeCustomerFromCars(doc.companyId);
+    }
+
+    for (const carId of oldCarIds) {
+      if (!doc.carIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $pull: { companyIds: doc.companyId }
+          }
+        );
+      }
+    }
+
+    for (const carId of doc.carIds) {
+      if (!oldCarIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $push: { companyIds: doc.companyId }
           }
         );
       }

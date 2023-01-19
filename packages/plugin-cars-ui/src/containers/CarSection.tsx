@@ -14,14 +14,21 @@ type Props = {
 };
 
 type FinalProps = {
-  carEdit: any;
+  carsEditCustomer: any;
+  carsEditCompany: any;
   carDetailQuery: DetailQueryResponse;
   carsQuery: CarsQueryResponse;
   customersCarQuery: CustomersCarQueryResponse;
 } & Props;
 
 const CarDetailsContainer = (props: FinalProps) => {
-  const { carsQuery, carEdit, id, customersCarQuery } = props;
+  const {
+    id,
+    carsQuery,
+    carsEditCustomer,
+    carsEditCompany,
+    customersCarQuery
+  } = props;
 
   if (carsQuery.loading || customersCarQuery.loading) {
     return <Spinner objective={true} />;
@@ -31,10 +38,10 @@ const CarDetailsContainer = (props: FinalProps) => {
   const customerCar = customersCarQuery.customersCar || [];
 
   const carsEditOnCustomer = variables => {
-    carEdit({
+    carsEditCustomer({
       variables: {
         _id: '',
-        cusId: id,
+        customerId: id,
         ...variables
       }
     })
@@ -47,13 +54,31 @@ const CarDetailsContainer = (props: FinalProps) => {
       });
   };
 
+  const carsEditOnCompany = variables => {
+    carsEditCompany({
+      variables: {
+        _id: '',
+        companyId: id,
+        ...variables
+      }
+    })
+      .then(() => {
+        Alert.success('You successfully updated a company');
+        // customersCarQuery.refetch();
+      })
+      .catch(error => {
+        alert(error.message);
+      });
+  };
+
   const updatedProps = {
     ...props,
-    loading: carsQuery.loading,
-    cars,
-    carsEditOnCustomer,
     id,
-    customerCar
+    cars,
+    customerCar,
+    loading: carsQuery.loading,
+    carsEditOnCustomer,
+    carsEditOnCompany
   };
 
   return (
@@ -94,9 +119,15 @@ export default withProps<Props>(
       })
     }),
     graphql<Props, { _id: string }>(gql(mutations.carsEditOnCustomer), {
-      name: 'carEdit',
+      name: 'carsEditCustomer',
       options: () => ({
         refetchQueries: ['carsMain', 'carsTotalCount']
+      })
+    }),
+    graphql<Props, { _id: string }>(gql(mutations.carsEditOnCompany), {
+      name: 'carsEditCompany',
+      options: () => ({
+        // refetchQueries: ['carsMain', 'carsTotalCount']
       })
     })
   )(CarDetailsContainer)
