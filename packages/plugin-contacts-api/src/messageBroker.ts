@@ -62,8 +62,6 @@ export const initBroker = cl => {
   });
 
   consumeRPCQueue('contacts:companies.find', async ({ subdomain, data }) => {
-    console.log('data', data);
-
     const models = await generateModels(subdomain);
 
     return {

@@ -16,7 +16,7 @@ import EmptyState from '@erxes/ui/src/components/EmptyState';
 type Props = {
   cars: ICar[];
   collapseCallback?: () => void;
-  customerOfCarEdit: (values: any) => void;
+  carsEditOnCustomer: (values: any) => void;
   id: string;
   customerCar: ICar[];
 };
@@ -30,7 +30,7 @@ class CarSection extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      carIds: []
+      carIds: props.customerCar.map(e => e._id) || []
     };
   }
 
@@ -38,7 +38,7 @@ class CarSection extends React.Component<Props, State> {
     const {
       customerCar,
       collapseCallback,
-      customerOfCarEdit,
+      carsEditOnCustomer,
       cars
     } = this.props;
 
@@ -54,7 +54,7 @@ class CarSection extends React.Component<Props, State> {
     };
 
     const saveCustomer = closeModal => {
-      customerOfCarEdit({
+      carsEditOnCustomer({
         carIds: this.state.carIds,
         cusId: this.props.id
       });
@@ -73,7 +73,6 @@ class CarSection extends React.Component<Props, State> {
             onChange={onChange}
             value={this.state.carIds}
             multi={true}
-            initialValue={this.state.carIds}
           />
           <ModalFooter>
             <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">

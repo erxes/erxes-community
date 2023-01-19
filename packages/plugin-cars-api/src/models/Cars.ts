@@ -10,16 +10,29 @@ import { sendCoreMessage, sendInternalNotesMessage } from '../messageBroker';
 
 import { Model } from 'mongoose';
 import { validSearchText } from '@erxes/api-utils/src';
+import { IModels } from '../connectionResolver';
+import { IUser } from '@erxes/api-utils/src/types';
 
 export interface ICarModel extends Model<ICarDocument> {
+  checkDuplication(
+    carFields: { plateNumber?: string; vinNumber?: string },
+    idsToExclude?: string[]
+  ): unknown;
   createCar(doc: ICar, user: any): Promise<ICarDocument>;
   getCar(_id: string): Promise<ICarDocument>;
   updateCar(_id: string, doc: ICar): Promise<ICarDocument>;
-  removeCars(carIds: string[]): Promise<ICarDocument>;
-  mergeCars(carIds: string, carFields: any): Promise<ICarDocument>;
-  getCarByCustomerId(customerId: string): Promise<ICarDocument>;
+  removeCars(subdomain: string, carIds: string[]): Promise<ICarDocument>;
+  mergeCars(
+    subdomain: string,
+    carIds: string,
+    carFields: any,
+    user: IUser
+  ): Promise<ICarDocument>;
+  getCarsByCustomerId(customerId: string): Promise<ICarDocument[]>;
   deleteCars(cusId: string, carIds: string[]): Promise<ICarDocument>;
   updateCars(carId: string, customerIds: string[]): Promise<ICarDocument>;
+  fillSearchText(doc: ICar): string;
+  removeCustomerFromCars(customerId: string): Promise<ICarDocument>;
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
@@ -36,7 +49,7 @@ export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
   ): Promise<ICarCategoryDocument>;
 }
 
-export const loadCarClass = models => {
+export const loadCarClass = (models: IModels) => {
   class Car {
     /**
      * Checking if car has duplicated unique properties
@@ -122,16 +135,12 @@ export const loadCarClass = models => {
       return car;
     }
 
-    public static async getCarByCustomerId(customerId: string) {
-      const car = await models.Cars.find({
+    public static async getCarsByCustomerId(customerId: string) {
+      const cars = await models.Cars.find({
         customerIds: customerId
-      });
+      }).lean();
 
-      if (!car) {
-        throw new Error('Car not found');
-      }
-
-      return car;
+      return cars;
     }
     /**
      * Create a car
@@ -175,10 +184,10 @@ export const loadCarClass = models => {
     /**
      * Remove car
      */
-    public static async removeCars(carIds) {
+    public static async removeCars(subdomain, carIds) {
       for (const carId of carIds) {
         await sendInternalNotesMessage({
-          subdomain: models.subdomain,
+          subdomain,
           action: 'removeInternalNotes',
           data: {
             contentType: 'car',
@@ -188,7 +197,7 @@ export const loadCarClass = models => {
         });
 
         await sendCoreMessage({
-          subdomain: models.subdomain,
+          subdomain,
           action: 'conformities.removeConformity',
           data: {
             mainType: 'car',
@@ -201,9 +210,9 @@ export const loadCarClass = models => {
       return models.Cars.deleteMany({ _id: { $in: carIds } });
     }
 
-    public static async deleteCars(cusId, carIds) {
+    public static async removeCustomerFromCar(cusId, carIds) {
       for (const carId of carIds) {
-        await models.Cars.updateMany(
+        await models.Cars.updateOne(
           { _id: carId },
           { $pull: { customerIds: cusId } }
         );
@@ -217,7 +226,7 @@ export const loadCarClass = models => {
     /**
      * Merge cars
      */
-    public static async mergeCars(carIds, carFields) {
+    public static async mergeCars(subdomain, carIds, carFields, user) {
       // Checking duplicated fields of car
       await this.checkDuplication(carFields, carIds);
 
@@ -230,14 +239,17 @@ export const loadCarClass = models => {
       }
 
       // Creating car with properties
-      const car = await models.Cars.createCar({
-        ...carFields,
-        mergedIds: carIds
-      });
+      const car = await models.Cars.createCar(
+        {
+          ...carFields,
+          mergedIds: carIds
+        },
+        user
+      );
 
       // Updating customer cars, deals, tasks, tickets
       await sendCoreMessage({
-        subdomain: models.subdomain,
+        subdomain,
         action: 'conformities.changeConformity',
         data: {
           type: 'car',
@@ -252,6 +264,13 @@ export const loadCarClass = models => {
       // await models.InternalNotes.changeCar(car._id, carIds);
 
       return car;
+    }
+
+    public static async removeCustomerFromCars(customerId: string) {
+      return models.Cars.updateMany(
+        { customerIds: customerId },
+        { $pull: { customerIds: customerId } }
+      );
     }
   }
 

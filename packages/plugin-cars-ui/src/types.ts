@@ -110,10 +110,6 @@ export type EditMutationResponse = {
   carsEdit: (params: { variables: ICar }) => Promise<any>;
 };
 
-export type EditCarMutationResponse = {
-  customerOfCarEdit: (params: { variables: ICar }) => Promise<any>;
-};
-
 export type RemoveMutationVariables = {
   carIds: string[];
 };
