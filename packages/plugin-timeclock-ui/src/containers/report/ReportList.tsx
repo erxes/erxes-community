@@ -6,6 +6,7 @@ import React from 'react';
 import ReportList from '../../components/report/ReportList';
 import { queries } from '../../graphql';
 import { BranchesQueryResponse, ReportsQueryResponse } from '../../types';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   history: any;
@@ -34,6 +35,9 @@ const ListContainer = (props: FinalProps) => {
   const { listReportsQuery, queryParams, getActionBar, showSideBar } = props;
   const { branchId, deptId } = queryParams;
 
+  if (listReportsQuery.loading) {
+    return <Spinner />;
+  }
   const updatedProps = {
     ...props,
     getActionBar,
