@@ -1,4 +1,5 @@
-import { withProps } from '@erxes/ui/src/utils/core';
+import { getEnv, withProps } from '@erxes/ui/src/utils/core';
+import queryString from 'query-string';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -32,9 +33,21 @@ const ListContainer = (props: FinalProps) => {
   if (listReportsQuery.loading) {
     return <Spinner />;
   }
+  const exportReport = () => {
+    const stringified = queryString.stringify({
+      ...queryParams
+    });
+
+    const { REACT_APP_API_URL } = getEnv();
+    window.open(
+      `${REACT_APP_API_URL}/pl:timeclock/report-export?${stringified}`
+    );
+  };
+
   const updatedProps = {
     ...props,
     getActionBar,
+    exportReport,
     reports: listReportsQuery.timeclockReports || [],
     branchId,
     deptId
