@@ -1,5 +1,5 @@
 import React from 'react';
-import CarSection from '../containers/CarSection';
+import CarSection from '../containers/detail/CarSection';
 
 type Props = {
   id: string;
@@ -7,7 +7,7 @@ type Props = {
 
 class CustomerSection extends React.Component<Props> {
   render() {
-    return <CarSection mainType={'deal'} mainTypeId={this.props.id} />;
+    return <CarSection id={this.props.id} type={'deal'} />;
   }
 }
 

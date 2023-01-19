@@ -11,7 +11,11 @@ import {
 } from '@erxes/api-utils/src/logUtils';
 
 const carMutations = {
-  carsAdd: async (_root, doc, { user, docModifier, models, subdomain }) => {
+  carsAdd: async (
+    _root,
+    doc,
+    { user, docModifier, models, subdomain }: IContext
+  ) => {
     const car = models.Cars.createCar(docModifier(doc), user);
 
     await putCreateLog(
@@ -174,7 +178,7 @@ const carMutations = {
     { _id, ...doc },
     { models, subdomain, user }
   ) => {
-    const carCategory = await models.CarCategories.getCarCatogery({
+    const carCategory = await models.CarCategories.getCarCategory({
       _id
     });
     const updated = await models.CarCategories.updateCarCategory(_id, doc);
@@ -200,7 +204,7 @@ const carMutations = {
     { _id }: { _id: string },
     { models, subdomain, user }: IContext
   ) => {
-    const carCategory = await models.CarCategories.getCarCatogery({
+    const carCategory = await models.CarCategories.getCarCategory({
       _id
     });
     const removed = await models.CarCategories.removeCarCategory(_id);

@@ -10,7 +10,7 @@ import Icon from '@erxes/ui/src/components/Icon';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
-import CustomerCompany from '../common/CustomerCompany';
+import CarSelectOptions from '../common/CarSelectOptions';
 
 type Props = {
   car: ICar;
@@ -162,7 +162,7 @@ class RightSidebar extends React.Component<Props, State> {
             extraButtons={extraCustomerButtons}
             isOpen={true}
           >
-            <CustomerCompany name={'customers'} car={car} />
+            <CarSelectOptions name={'customers'} car={car} />
           </Box>
           <Box
             title={__('Companies')}
@@ -170,7 +170,7 @@ class RightSidebar extends React.Component<Props, State> {
             extraButtons={extraCompanyButtons}
             isOpen={true}
           >
-            <CustomerCompany name={'companies'} car={car} />
+            <CarSelectOptions name={'companies'} car={car} />
           </Box>
         </>
 

@@ -4,7 +4,6 @@ import {
   requireLogin
 } from '@erxes/api-utils/src/permissions';
 import { IContext, IModels } from '../../../connectionResolver';
-import { sendCoreMessage } from '../../../messageBroker';
 
 const generateFilter = async (
   subdomain: string,
@@ -66,6 +65,10 @@ const carQueries = {
 
   carsFromCustomer: async (_root, { customerId }, { models }: IContext) => {
     return models.Cars.getCarsByCustomerId(customerId);
+  },
+
+  carsFromCompany: async (_root, { customerId }, { models }: IContext) => {
+    return models.Cars.getCarsByCompanyId(customerId);
   },
 
   carsMain: async (

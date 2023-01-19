@@ -6,7 +6,7 @@ import {
   ICar,
   ICarCategory
 } from './definitions/cars';
-import { sendCoreMessage, sendInternalNotesMessage } from '../messageBroker';
+import { sendInternalNotesMessage } from '../messageBroker';
 
 import { Model } from 'mongoose';
 import { validSearchText } from '@erxes/api-utils/src';
@@ -37,7 +37,7 @@ export interface ICarModel extends Model<ICarDocument> {
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
-  getCarCatogery(selector: any): Promise<ICarCategoryDocument>;
+  getCarCategory(selector: any): Promise<ICarCategoryDocument>;
   createCarCategory(doc: ICarCategory): Promise<ICarCategoryDocument>;
   updateCarCategory(
     _id: string,
@@ -284,7 +284,7 @@ export const loadCarCategoryClass = models => {
         ? await models.CarCategories.findOne({ _id: doc.parentId }).lean()
         : undefined;
 
-      // Generatingg order
+      // Generating order
       doc.order = await this.generateOrder(parentCategory, doc);
 
       return models.CarCategories.create(doc);

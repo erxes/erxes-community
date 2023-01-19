@@ -3,14 +3,19 @@ import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import CarSection from '../components/common/CarSection';
-import { mutations, queries } from '../graphql';
-import { CarsQueryResponse, CustomersCarQueryResponse } from '../types';
+import CarSection from '../../components/detail/CarSection';
+import { mutations, queries } from '../../graphql';
+import {
+  CarsQueryResponse,
+  CustomersCarQueryResponse,
+  CompaniesCarQueryResponse
+} from '../../types';
 import { Alert } from '@erxes/ui/src/utils';
-import { DetailQueryResponse } from '../types';
+import { DetailQueryResponse } from '../../types';
 
 type Props = {
   id: string;
+  type: string;
 };
 
 type FinalProps = {
@@ -18,24 +23,32 @@ type FinalProps = {
   carsEditCompany: any;
   carDetailQuery: DetailQueryResponse;
   carsQuery: CarsQueryResponse;
-  customersCarQuery: CustomersCarQueryResponse;
+  carsFromCustomerQuery: CustomersCarQueryResponse;
+  carsFromCompanyQuery: CompaniesCarQueryResponse;
 } & Props;
 
 const CarDetailsContainer = (props: FinalProps) => {
   const {
     id,
+    type,
     carsQuery,
     carsEditCustomer,
     carsEditCompany,
-    customersCarQuery
+    carsFromCustomerQuery,
+    carsFromCompanyQuery
   } = props;
 
-  if (carsQuery.loading || customersCarQuery.loading) {
+  if (carsQuery.loading || carsFromCustomerQuery.loading) {
+    return <Spinner objective={true} />;
+  }
+
+  if (carsQuery.loading || carsFromCompanyQuery.loading) {
     return <Spinner objective={true} />;
   }
 
   const cars = carsQuery.cars || [];
-  const carsOnCustomer = customersCarQuery.carsFromCustomer || [];
+  const carsOnCustomer = carsFromCustomerQuery.carsFromCustomer || [];
+  const carsOnCompany = carsFromCompanyQuery.carsFromCompany || [];
 
   const carsEditOnCustomer = variables => {
     carsEditCustomer({
@@ -47,7 +60,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     })
       .then(() => {
         Alert.success('You successfully updated a car');
-        customersCarQuery.refetch();
+        carsFromCustomerQuery.refetch();
       })
       .catch(error => {
         alert(error.message);
@@ -64,7 +77,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     })
       .then(() => {
         Alert.success('You successfully updated a company');
-        // customersCarQuery.refetch();
+        carsFromCompanyQuery.refetch();
       })
       .catch(error => {
         alert(error.message);
@@ -74,8 +87,10 @@ const CarDetailsContainer = (props: FinalProps) => {
   const updatedProps = {
     ...props,
     id,
+    type,
     cars,
     carsOnCustomer,
+    carsOnCompany,
     loading: carsQuery.loading,
     carsEditOnCustomer,
     carsEditOnCompany
@@ -102,7 +117,15 @@ export default withProps<Props>(
       }
     ),
     graphql<Props, { _id: string }>(gql(queries.carsFromCustomer), {
-      name: 'customersCarQuery',
+      name: 'carsFromCustomerQuery',
+      options: ({ id }) => ({
+        variables: {
+          customerId: id
+        }
+      })
+    }),
+    graphql<Props, { _id: string }>(gql(queries.carsFromCompany), {
+      name: 'carsFromCompanyQuery',
       options: ({ id }) => ({
         variables: {
           customerId: id

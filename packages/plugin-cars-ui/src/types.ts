@@ -169,6 +169,12 @@ export type CustomersCarQueryResponse = {
   refetch: () => void;
 };
 
+export type CompaniesCarQueryResponse = {
+  carsFromCompany: ICar[];
+  loading: boolean;
+  refetch: () => void;
+};
+
 export type ListConfigQueryResponse = {
   fieldsDefaultColumnsConfig: ListConfig[];
   loading: boolean;
