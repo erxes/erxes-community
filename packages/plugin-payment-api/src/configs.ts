@@ -94,8 +94,6 @@ export default {
     app.use((req, _res, next) => {
       const locale = req.query.lang || 'en';
 
-      console.log('locale', locale);
-
       i18n.setLocale(locale);
 
       next();
