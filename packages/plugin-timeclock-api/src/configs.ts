@@ -46,7 +46,6 @@ export default {
       '/report-export',
       routeErrorHandling(async (req: any, res) => {
         const { query } = req;
-        const { segment } = query;
         const subdomain = getSubdomain(req);
         const models = await generateModels(subdomain);
 
