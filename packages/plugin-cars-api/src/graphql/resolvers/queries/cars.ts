@@ -67,8 +67,8 @@ const carQueries = {
     return models.Cars.getCarsByCustomerId(customerId);
   },
 
-  carsFromCompany: async (_root, { customerId }, { models }: IContext) => {
-    return models.Cars.getCarsByCompanyId(customerId);
+  carsFromCompany: async (_root, { companyId }, { models }: IContext) => {
+    return models.Cars.getCarsByCompanyId(companyId);
   },
 
   carsMain: async (

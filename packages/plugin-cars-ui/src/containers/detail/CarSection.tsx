@@ -134,7 +134,7 @@ export default withProps<Props>(
       name: 'carsFromCompanyQuery',
       options: ({ id }) => ({
         variables: {
-          customerId: id
+          companyId: id
         }
       })
     }),

@@ -95,7 +95,7 @@ export const queries = `
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
   carsFromCustomer(customerId: String!): [Car]
-  carsFromCompany(customerId: String!): [Car]
+  carsFromCompany(companyId: String!): [Car]
 `;
 
 const commonFields = `

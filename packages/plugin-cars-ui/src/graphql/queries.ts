@@ -160,8 +160,8 @@ export const carsFromCustomer = `
 `;
 
 export const carsFromCompany = `
-  query carsFromCompany($customerId: String!) {
-    carsFromCompany(customerId: $customerId) {
+  query carsFromCompany($companyId: String!) {
+    carsFromCompany(companyId: $companyId) {
       _id
       plateNumber
     }
