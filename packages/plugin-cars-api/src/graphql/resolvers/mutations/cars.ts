@@ -53,7 +53,7 @@ const carMutations = {
     return updated;
   },
 
-  carsEditOnCustomer: async (_root, { _id, ...doc }, { models }: IContext) => {
+  carsEditOnCustomer: async (_root, { ...doc }, { models }: IContext) => {
     const cars = await models.Cars.getCarsByCustomerId(doc.customerId);
     const oldCarIds = cars.map(car => car._id);
 
@@ -84,7 +84,7 @@ const carMutations = {
     }
   },
 
-  carsEditOnCompany: async (_root, { _id, ...doc }, { models }: IContext) => {
+  carsEditOnCompany: async (_root, { ...doc }, { models }: IContext) => {
     const cars = await models.Cars.getCarsByCompanyId(doc.companyId);
     const oldCarIds = cars.map(car => car._id);
 

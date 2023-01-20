@@ -60,7 +60,6 @@ const CarDetailsContainer = (props: FinalProps) => {
   const carsEditOnCustomer = variables => {
     carsEditCustomer({
       variables: {
-        _id: '',
         customerId: id,
         ...variables
       }
@@ -77,7 +76,6 @@ const CarDetailsContainer = (props: FinalProps) => {
   const carsEditOnCompany = variables => {
     carsEditCompany({
       variables: {
-        _id: '',
         companyId: id,
         ...variables
       }
@@ -156,7 +154,7 @@ export default withProps<Props>(
     graphql<Props, { _id: string }>(gql(mutations.carsEditOnCompany), {
       name: 'carsEditCompany',
       options: () => ({
-        // refetchQueries: ['carsMain', 'carsTotalCount']
+        refetchQueries: ['carsMain', 'carsTotalCount']
       })
     })
   )(CarDetailsContainer)
