@@ -17,8 +17,7 @@ type Props = {
   id: string;
   type: string;
   cars: ICar[];
-  carsOnCustomer: ICar[];
-  carsOnCompany: ICar[];
+  carsOnCustomerOrCompany: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
   carsEditOnCompany: (values: any) => void;
@@ -33,7 +32,7 @@ class CarSection extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      carIds: props.carsOnCustomer.map(e => e._id) || []
+      carIds: props.carsOnCustomerOrCompany.map(e => e._id) || []
     };
   }
 
@@ -42,8 +41,7 @@ class CarSection extends React.Component<Props, State> {
       id,
       type,
       cars,
-      carsOnCustomer,
-      carsOnCompany,
+      carsOnCustomerOrCompany,
       collapseCallback,
       carsEditOnCustomer,
       carsEditOnCompany
@@ -66,6 +64,7 @@ class CarSection extends React.Component<Props, State> {
           carIds: this.state.carIds,
           customerId: id
         });
+        closeModal();
       } else {
         carsEditOnCompany({
           carIds: this.state.carIds,
@@ -118,7 +117,7 @@ class CarSection extends React.Component<Props, State> {
     );
     const content = (
       <>
-        {carsOnCustomer.map(car => (
+        {carsOnCustomerOrCompany.map(car => (
           <SectionBodyItem>
             <Link to={`/erxes-plugin-car/details/${car._id}`}>
               <Icon icon="arrow-to-right" />
@@ -126,7 +125,9 @@ class CarSection extends React.Component<Props, State> {
             <span>{car.plateNumber || 'Unknown'}</span>
           </SectionBodyItem>
         ))}
-        {!carsOnCustomer?.length && <EmptyState icon="car" text="No car" />}
+        {!carsOnCustomerOrCompany?.length && (
+          <EmptyState icon="car" text="No car" />
+        )}
       </>
     );
 

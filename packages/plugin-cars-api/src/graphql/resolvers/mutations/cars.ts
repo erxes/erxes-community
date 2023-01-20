@@ -89,7 +89,7 @@ const carMutations = {
     const oldCarIds = cars.map(car => car._id);
 
     if (doc.carIds.length === 0) {
-      return models.Cars.removeCustomerFromCars(doc.companyId);
+      return models.Cars.removeCompanyFromCars(doc.companyId);
     }
 
     for (const carId of oldCarIds) {

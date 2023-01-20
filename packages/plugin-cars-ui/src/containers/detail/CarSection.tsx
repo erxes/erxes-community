@@ -47,8 +47,15 @@ const CarDetailsContainer = (props: FinalProps) => {
   }
 
   const cars = carsQuery.cars || [];
-  const carsOnCustomer = carsFromCustomerQuery.carsFromCustomer || [];
-  const carsOnCompany = carsFromCompanyQuery.carsFromCompany || [];
+
+  const carsInfo = () => {
+    if (type === 'contact') {
+      return carsFromCustomerQuery.carsFromCustomer || [];
+    } else {
+      return carsFromCompanyQuery.carsFromCompany || [];
+    }
+  };
+  const carsOnCustomerOrCompany = carsInfo();
 
   const carsEditOnCustomer = variables => {
     carsEditCustomer({
@@ -89,8 +96,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     id,
     type,
     cars,
-    carsOnCustomer,
-    carsOnCompany,
+    carsOnCustomerOrCompany,
     loading: carsQuery.loading,
     carsEditOnCustomer,
     carsEditOnCompany
