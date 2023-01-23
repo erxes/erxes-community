@@ -178,7 +178,7 @@ export default function Price(props: Props) {
                 <th>{__('Discount type')}</th>
                 <th>{__('Discount value')}</th>
                 <th>{__('Price adjust type')}</th>
-                <th>{__('Price adjust position')}</th>
+                <th>{__('Price adjust factor')}</th>
                 <th>{__('Actions')}</th>
               </tr>
             </thead>

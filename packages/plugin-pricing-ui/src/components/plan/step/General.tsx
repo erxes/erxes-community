@@ -176,7 +176,7 @@ export default function General(props: Props) {
             />
           </FormGroup>
           <FormGroup>
-            <FormLabel>{__('Price adjust position')}</FormLabel>
+            <FormLabel>{__('Price adjust factor')}</FormLabel>
             <FormControl
               type="number"
               name="value"
