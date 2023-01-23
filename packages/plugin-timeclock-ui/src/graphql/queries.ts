@@ -10,8 +10,10 @@ const userFields = `
     lastName
     position
   }
-  department{
-    _id
+  departments {
+    title
+  }
+  branches {
     title
   }
 `;
@@ -123,36 +125,39 @@ const listBranches = `
 const listReports = `
   query listReportsQuery(${listParamsDef}){
     timeclockReports(${listParamsValue}){
-      groupTitle
-      groupReport{
-        user {
-          ${userFields}
-        }
-        scheduleReport {
-          date
-          scheduleStart
-          scheduleEnd
-          recordedStart
-          recordedEnd
-          minsLate
-          minsWorked
-        }
-        totalMinsLate
-        totalAbsenceMins
-        totalMinsWorked
-        totalMinsScheduled
+      list {
+              groupTitle
+            groupReport{
+              user {
+                ${userFields}
+              }
+              scheduleReport {
+                date
+                scheduleStart
+                scheduleEnd
+                recordedStart
+                recordedEnd
+                minsLate
+                minsWorked
+              }
+              totalMinsLate
+              totalAbsenceMins
+              totalMinsWorked
+              totalMinsScheduled
 
-        totalMinsWorkedThisMonth
-        totalDaysWorkedThisMonth
+              totalMinsWorkedThisMonth
+              totalDaysWorkedThisMonth
 
-        totalMinsScheduledThisMonth
-        totalDaysScheduledThisMonth
-    
-      }
-      groupTotalMinsLate
-      groupTotalAbsenceMins
-      groupTotalMinsWorked
-      groupTotalMinsScheduled
+              totalMinsScheduledThisMonth
+              totalDaysScheduledThisMonth
+          
+            }
+            groupTotalMinsLate
+            groupTotalAbsenceMins
+            groupTotalMinsWorked
+            groupTotalMinsScheduled
+          }
+          totalCount  
     }
   }`;
 

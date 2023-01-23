@@ -1,4 +1,5 @@
-import { withProps } from '@erxes/ui/src/utils/core';
+import { getEnv, withProps } from '@erxes/ui/src/utils/core';
+import queryString from 'query-string';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -7,23 +8,19 @@ import ReportList from '../../components/report/ReportList';
 import { queries } from '../../graphql';
 import { BranchesQueryResponse, ReportsQueryResponse } from '../../types';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import { generateParams } from '../../utils';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 
 type Props = {
   history: any;
   queryParams: any;
   searchValue?: string;
 
-  queryStartDate: string;
-  queryEndDate: string;
-  queryUserIds: string[];
-  queryDepartmentIds: string[];
-  queryBranchIds: string[];
-  queryPage: number;
-  queryPerPage: number;
   reportType?: string;
 
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
+  getPagination: (pagination: any) => void;
 };
 
 type FinalProps = {
@@ -32,16 +29,39 @@ type FinalProps = {
 } & Props;
 
 const ListContainer = (props: FinalProps) => {
-  const { listReportsQuery, queryParams, getActionBar, showSideBar } = props;
+  const {
+    listReportsQuery,
+    queryParams,
+    getActionBar,
+    showSideBar,
+    getPagination
+  } = props;
   const { branchId, deptId } = queryParams;
 
   if (listReportsQuery.loading) {
     return <Spinner />;
   }
+  const exportReport = () => {
+    const stringified = queryString.stringify({
+      ...queryParams
+    });
+
+    const { REACT_APP_API_URL } = getEnv();
+    window.open(
+      `${REACT_APP_API_URL}/pl:timeclock/report-export?${stringified}`
+    );
+  };
+
+  const { list = [], totalCount = 0 } = listReportsQuery.timeclockReports;
+
+  getPagination(<Pagination count={totalCount} />);
+
   const updatedProps = {
     ...props,
     getActionBar,
-    reports: listReportsQuery.timeclockReports || [],
+    exportReport,
+    reports: list,
+    totalCount,
     branchId,
     deptId
   };
@@ -53,24 +73,9 @@ export default withProps<Props>(
   compose(
     graphql<Props, ReportsQueryResponse>(gql(queries.listReports), {
       name: 'listReportsQuery',
-      options: ({
-        queryStartDate,
-        queryEndDate,
-        queryUserIds,
-        queryDepartmentIds,
-        queryBranchIds,
-        queryPage,
-        queryPerPage,
-        reportType
-      }) => ({
+      options: ({ queryParams, reportType }) => ({
         variables: {
-          startDate: queryStartDate,
-          endDate: queryEndDate,
-          userIds: queryUserIds,
-          departmentIds: queryDepartmentIds,
-          branchIds: queryBranchIds,
-          page: queryPage,
-          perPage: queryPerPage,
+          ...generateParams(queryParams),
           reportType
         },
         fetchPolicy: 'network-only'

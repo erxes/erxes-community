@@ -4,10 +4,14 @@ import { ITimeClock, ITimeClockDocument } from './models/definitions/timeclock';
 import * as dayjs from 'dayjs';
 import { fixDate, getEnv } from '@erxes/api-utils/src';
 import { Sequelize, QueryTypes } from 'sequelize';
-import { findBranch, findDepartment } from './graphql/resolvers/utils';
 
 const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
+import {
+  findBranch,
+  findBranches,
+  findDepartment
+} from './graphql/resolvers/utils';
 
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
@@ -67,16 +71,15 @@ const connectAndQueryFromMySql = async (
   // query by employee Id
   try {
     const teamMembersObject = {};
-    const teamMemberIdsArr: any = [];
+    const teamEmployeeIds: string[] = [];
+
     for (const teamMember of teamMembers) {
       if (!teamMember.employeeId) {
         continue;
       }
       teamMembersObject[teamMember.employeeId] = teamMember._id;
-      teamMemberIdsArr.push(teamMember.employeeId);
+      teamEmployeeIds.push(teamMember.employeeId);
     }
-
-    const teamEmployeeIds = teamMemberIdsArr.join(',');
 
     const query = `SELECT * FROM ${MYSQL_TABLE} WHERE authDateTime >= '${startDate}' AND authDateTime <= '${endDate}' AND ISNUMERIC(ID)=1 AND ID IN (${teamEmployeeIds}) ORDER BY ID, authDateTime`;
 
@@ -527,6 +530,7 @@ const generateCommonUserIds = async (
       }
     }
   }
+
   if (departmentIds) {
     for (const deptId of departmentIds) {
       const department = await findDepartment(subdomain, deptId);
@@ -550,9 +554,31 @@ const generateCommonUserIds = async (
   return totalUserIds;
 };
 
+const createTeamMembersObject = async (subdomain: string) => {
+  const teamMembersWithEmpId = await findAllTeamMembersWithEmpId(subdomain);
+
+  const teamMembersObject = {};
+
+  for (const teamMember of teamMembersWithEmpId) {
+    if (!teamMember.employeeId) {
+      continue;
+    }
+
+    teamMembersObject[teamMember._id] = {
+      employeeId: teamMember.employeeId,
+      firstName: teamMember.details.firstName,
+      lastName: teamMember.details.lastName,
+      position: teamMember.details.position
+    };
+  }
+
+  return teamMembersObject;
+};
+
 export {
   connectAndQueryFromMySql,
   generateFilter,
   generateCommonUserIds,
-  findAllTeamMembersWithEmpId
+  findAllTeamMembersWithEmpId,
+  createTeamMembersObject
 };

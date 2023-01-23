@@ -51,8 +51,6 @@ export const generateAttachmentUrl = (urlOrName: string) => {
     defaultValue: 'http://localhost:4000'
   });
 
-  // console.log('DOMAIN from generateAttachmentUrl', process.env)
-
   if (urlOrName.startsWith('http')) {
     return urlOrName;
   }
@@ -65,6 +63,13 @@ export const isOASend = (eventName: string = '') => {
     eventName.startsWith('oa') ||
     eventName.startsWith('user_received') ||
     eventName.startsWith('user_seen')
+  );
+};
+
+export const isAnonymousUser = (eventName: string = '') => {
+  return (
+    eventName.startsWith('anonymous_') ||
+    eventName.startsWith('oa_send_anonymous')
   );
 };
 

@@ -23,17 +23,13 @@ export const createOrUpdateCustomer = async (
     userId: data.userId
   });
 
-  debug.error(`Customers.findOne: ${customer}`);
+  let firstName = data?.isAnonymous ? 'Ẩn danh' : '';
 
-  if (oa_id) {
-    // console.log('Check isFollowedUser', checkFollower, !customer?.isFollower)
-
+  if (oa_id && !data?.isAnonymous) {
     const mayBeFollower =
       checkFollower && !customer?.isFollower
         ? await isFollowedUser(data.userId, { models, oa_id })
         : false;
-
-    // console.log('mayBeFollower', mayBeFollower)
 
     const zaloUser: any = await zaloGet(
       `conversation?data=${JSON.stringify({
@@ -55,19 +51,22 @@ export const createOrUpdateCustomer = async (
     } = zaloUser?.data?.[0];
 
     const userId = src ? from_id : to_id;
-    const firstName = src ? from_display_name : to_display_name;
+    firstName = src ? from_display_name : to_display_name;
     const avatar = src ? from_avatar : to_avatar;
 
     data = {
       ...data,
-      firstName: firstName,
+      firstName,
       integrationId,
       profilePic: avatar,
       isFollower: mayBeFollower
     };
-    // debug.error(`zaloUser: ${JSON.stringify(zaloUser)}`)
-    // debug.error(`zaloUser data: ${JSON.stringify(data)}`)
   }
+
+  data = {
+    ...data,
+    firstName
+  };
 
   if (customer) {
     customer.isFollower = data.isFollower;
@@ -85,8 +84,6 @@ export const createOrUpdateCustomer = async (
     );
   }
 
-  // debug.error(`before apiCustomerResponse`)
-
   // save on api
   try {
     const apiCustomerResponse = await sendInboxMessage({
@@ -96,20 +93,18 @@ export const createOrUpdateCustomer = async (
         action: 'get-create-update-customer',
         payload: JSON.stringify({
           ...data,
-          avatar: data.profilePic,
+          avatar: data?.profilePic,
           isUser: true
         })
       },
       isRPC: true
     });
 
-    // debug.error(`apiCustomerResponse: ${JSON.stringify(apiCustomerResponse)}`);
-
     customer.erxesApiId = apiCustomerResponse._id;
     await customer.save();
   } catch (e) {
-    // await models.Customers.deleteOne({ _id: customer._id });
-    // debug.error(`apiCustomerResponse error: ${e.message}`);
+    await models.Customers.deleteOne({ _id: customer._id });
+    debug.error(`apiCustomerResponse error: ${e.message}`);
   }
 
   return customer;
@@ -120,6 +115,5 @@ export const isFollowedUser = async (user_id, config) => {
     `getprofile?data=${JSON.stringify({ user_id })}`,
     config
   );
-  // console.log(mayBeFollower)
   return mayBeFollower.error === 0;
 };

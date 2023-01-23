@@ -6,6 +6,7 @@ import {
   convertAttachment,
   getMessageOAID,
   getMessageUserID,
+  isAnonymousUser,
   isOASend
 } from '../../utils';
 import { createOrUpdateCustomer } from './customers';
@@ -80,11 +81,12 @@ export const createOrUpdateConversation = async (
     });
     throw new Error(e);
   }
-  await createConversationMessage(models, conversation, data);
+  await createConversationMessage(models, subdomain, conversation, data);
 };
 
 export const createConversationMessage = async (
   models: IModels,
+  subdomain,
   conversation,
   data
 ) => {
@@ -93,30 +95,54 @@ export const createConversationMessage = async (
     mid: data.message.msg_id
   });
 
+  let userId: any = false;
+
+  if (data?.isOASend) {
+    const conversationMessageHasUser = await models.ConversationMessages.find({
+      $and: [
+        {
+          userId: { $exists: true, $ne: '' }
+        },
+        {
+          conversationId: conversation._id
+        }
+      ]
+    }).limit(1);
+
+    userId = conversationMessageHasUser?.[0]?.userId;
+
+    if (conversationMessageHasUser?.length < 1) {
+      const getUserIds = await sendInboxMessage({
+        subdomain,
+        action: 'integrations.receive',
+        data: {
+          action: 'getUserIds'
+        },
+        isRPC: true
+      });
+
+      userId = getUserIds?.userIds?.[0];
+    }
+  }
+
   if (!conversationMessage) {
     try {
-      // let dt = {
-      //     conversationId: conversation._id,
-      //     mid: data?.message?.msg_id,
-      //     createdAt: data?.timestamp,
-      //     content: data?.message?.text,
-      //     customerId: data?.customerId,
-      //     userId: data?.userId,
-      //     attachments: data?.message?.attachments
-      // }
-      // debug.error(`start create conversationMessage: ${JSON.stringify(dt)}`);
-      // debug.error(`customerId: ${data?.customerId}`);
-      // debug.error(`data: ${JSON.stringify(data)}`);
-
-      const created = await models.ConversationMessages.create({
+      let messageData: { [key: string]: any } = {
         conversationId: conversation._id,
-        mid: data.message.msg_id,
-        createdAt: data.message.timestamp,
-        content: data.message.text,
-        customerId: data.customerId,
-        // userId: data?.userId || '',
-        attachments: data.message.attachments
-      });
+        mid: data?.message?.msg_id,
+        createdAt: data?.message?.timestamp,
+        content: data?.message?.text,
+        customerId: data?.customerId,
+        // userId: data?.userId,
+        attachments: data?.message?.attachments
+      };
+
+      if (userId && data?.isOASend) {
+        messageData.userId = userId;
+        delete messageData.customerId;
+      }
+
+      const created = await models.ConversationMessages.create(messageData);
 
       console.log('models.ConversationMessages.create', created.toObject());
 
@@ -149,8 +175,6 @@ export const receiveMessage = async req => {
 
   const data = req.body;
 
-  debug.error('Receive From Zalo:', JSON.stringify(data));
-
   const oa_id = getMessageOAID(data);
   const userId = getMessageUserID(data);
 
@@ -163,30 +187,13 @@ export const receiveMessage = async req => {
     return;
   }
 
-  // debug.error(`integration: ${JSON.stringify(integration)}`);
-
   const customer = await createOrUpdateCustomer(models, subdomain, {
     userId,
     oa_id,
     integrationId: integration?.erxesApiId,
-    checkFollower: true
+    checkFollower: true,
+    isAnonymous: isAnonymousUser(data?.event_name)
   });
-
-  // debug.error(
-  //   `after createOrUpdateCustomer: ${userId} ${JSON.stringify(customer)}`
-  // );
-
-  // debug.error(`data before createOrUpdateConversation: ${customer.erxesApiId}, ${JSON.stringify({
-  //     integrationId: integration._id,
-  //     userId,
-  //     oa_id,
-  //     customerId: customer.erxesApiId,
-  //     integrationErxesApiId: integration.erxesApiId,
-  //     message: {
-  //         ...data.message,
-  //         timestamp: data.timestamp,
-  //     },
-  // })}`);
 
   await createOrUpdateConversation(models, subdomain, {
     integrationId: integration?._id,
@@ -194,6 +201,7 @@ export const receiveMessage = async req => {
     oa_id,
     customerId: customer?.erxesApiId,
     integrationErxesApiId: integration?.erxesApiId,
+    isOASend: isOASend(data?.event_name),
     message: {
       ...data.message,
       attachments: convertAttachment(data?.message?.attachments),
