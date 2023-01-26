@@ -205,7 +205,9 @@ function ScheduleList(props: Props) {
     return schedule.shifts.length > 0 ? (
       <tr>
         <td>
-          {schedule.user && schedule.user.details.fullName
+          {schedule.user &&
+          schedule.user.details &&
+          schedule.user.details.fullName
             ? schedule.user.details.fullName
             : schedule.user.email}
         </td>
