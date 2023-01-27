@@ -139,7 +139,7 @@ export default (props: Props) => {
       <Select
         placeholder={__('Reason')}
         onChange={onReasonSelect}
-        value={absenceTypes[absenceIdx].name}
+        value={absenceTypes.length > 0 && absenceTypes[absenceIdx].name}
         options={
           absenceTypes &&
           absenceTypes.map((absenceType, idx) => ({

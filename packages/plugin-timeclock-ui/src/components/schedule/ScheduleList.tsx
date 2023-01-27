@@ -1,10 +1,9 @@
 import Button from '@erxes/ui/src/components/Button';
 import { __ } from '@erxes/ui/src/utils';
-import React, { useState } from 'react';
+import React from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
-import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import { CustomRow } from '../../styles';
 
 import { IBranch } from '@erxes/ui/src/team/types';

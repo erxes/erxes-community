@@ -39,9 +39,15 @@ type Props = {
 function ConfigForm(props: Props) {
   const { renderButton, history, scheduleConfig } = props;
   const { absenceType, holiday, payDate } = props;
-  const [isShiftRequest, setShiftRequest] = useState(false);
-  const [explanationRequired, setExplRequired] = useState(false);
-  const [attachmentRequired, setAttachRequired] = useState(false);
+  const [isShiftRequest, setShiftRequest] = useState(
+    (absenceType && absenceType.shiftRequest) || false
+  );
+  const [explanationRequired, setExplRequired] = useState(
+    (absenceType && absenceType.explRequired) || false
+  );
+  const [attachmentRequired, setAttachRequired] = useState(
+    (absenceType && absenceType.attachRequired) || false
+  );
   const [payPeriod, setPayPeriod] = useState('');
 
   const defaultStartTime = new Date(

@@ -5,7 +5,6 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
 import { IAbsence, IAbsenceType } from '../../types';
-import NameCard from '@erxes/ui/src/components/nameCard/NameCard';
 import { IAttachment } from '@erxes/ui/src/types';
 import AbsenceForm from './AbsenceForm';
 import Attachment from '@erxes/ui/src/components/Attachment';
@@ -22,7 +21,8 @@ type Props = {
     userId: string,
     explanation: string,
     attachment: IAttachment,
-    dateRange: any
+    dateRange: any,
+    absenceTypeId: string
   ) => void;
   getActionBar: (actionBar: any) => void;
 };
