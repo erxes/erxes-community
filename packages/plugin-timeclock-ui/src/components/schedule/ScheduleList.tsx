@@ -240,13 +240,7 @@ function ScheduleList(props: Props) {
             />
           </Tip>
         </td>
-        {ListShiftContent(
-          schedule.shifts.sort(
-            (a, b) =>
-              new Date(a.shiftStart).getTime() -
-              new Date(b.shiftStart).getTime()
-          )
-        )}
+        {ListShiftContent(schedule.shifts)}
       </tr>
     ) : (
       <></>
