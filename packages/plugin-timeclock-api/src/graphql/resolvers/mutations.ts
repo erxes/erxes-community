@@ -172,16 +172,18 @@ const timeclockMutations = {
   },
   absenceTypeAdd(
     _root,
-    { name, explRequired, attachRequired },
+    { name, explRequired, attachRequired, shiftRequest },
     { models }: IContext
   ) {
     const explanationReqd: boolean = explRequired;
     const attachReqd: boolean = attachRequired;
+    const isShiftRequest: boolean = shiftRequest;
 
     return models.AbsenceTypes.createAbsenceType({
       name: `${name}`,
       explRequired: explanationReqd,
-      attachRequired: attachReqd
+      attachRequired: attachReqd,
+      shiftRequest: isShiftRequest
     });
   },
 
@@ -217,22 +219,21 @@ const timeclockMutations = {
     { _id, status, ...doc }: IAbsenceEdit,
     { models }: IContext
   ) {
-    const absence = models.Absences.getAbsence(_id);
+    const shiftRequest = await models.Absences.getAbsence(_id);
     let updated = models.Absences.updateAbsence(_id, {
       status: `${status}`,
       solved: true,
       ...doc
     });
 
-    const shiftRequest = await absence;
+    const findAbsenceType = await models.AbsenceTypes.getAbsenceType(
+      shiftRequest.absenceTypeId || ''
+    );
 
     // if request is shift request
-    if (
-      shiftRequest.reason &&
-      shiftRequest.reason.toLocaleLowerCase() === 'shift request'
-    ) {
+    if (findAbsenceType && findAbsenceType.shiftRequest) {
       updated = models.Absences.updateAbsence(_id, {
-        status: `Shift / ${status}`,
+        status: `Shift request / ${status}`,
         ...doc
       });
       // if shift request is approved
@@ -255,7 +256,8 @@ const timeclockMutations = {
           userId: shiftRequest.userId,
           shiftStart: shiftRequest.startTime,
           shiftEnd: shiftRequest.endTime,
-          shiftActive: false
+          shiftActive: false,
+          deviceType: 'Shift request'
         });
       }
     }
