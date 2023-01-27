@@ -12,6 +12,10 @@ export const CATEGORIES_ALL = gql`
     forumCategories {
       _id
       name
+
+      parent {
+        name
+      }
     }
   }
 `;
@@ -94,7 +98,6 @@ export const FORUM_POSTS_QUERY = gql`
     forumPosts(${forumPostsArg}) {
       
       _id
-      content
       title
       state
       thumbnail
