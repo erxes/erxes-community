@@ -170,21 +170,8 @@ const timeclockMutations = {
 
     return updated;
   },
-  absenceTypeAdd(
-    _root,
-    { name, explRequired, attachRequired, shiftRequest },
-    { models }: IContext
-  ) {
-    const explanationReqd: boolean = explRequired;
-    const attachReqd: boolean = attachRequired;
-    const isShiftRequest: boolean = shiftRequest;
-
-    return models.AbsenceTypes.createAbsenceType({
-      name: `${name}`,
-      explRequired: explanationReqd,
-      attachRequired: attachReqd,
-      shiftRequest: isShiftRequest
-    });
+  absenceTypeAdd(_root, doc, { models }: IContext) {
+    return models.AbsenceTypes.createAbsenceType(doc);
   },
 
   absenceTypeRemove(_root, { _id }, { models }: IContext) {

@@ -10,6 +10,8 @@ import { IBranch } from '@erxes/ui/src/team/types';
 import Tip from '@erxes/ui/src/components/Tip';
 import ScheduleForm from './ScheduleForm';
 import { IScheduleConfig } from '../../types';
+import dayjs from 'dayjs';
+import { dateFormat } from '../../constants';
 
 type Props = {
   scheduleOfMembers: any;
@@ -124,7 +126,9 @@ function ScheduleList(props: Props) {
           {shifts.map(shift => {
             return (
               <CustomRow key={shift.shiftEnd} marginNum={10}>
-                {new Date(shift.shiftStart).toDateString()}
+                {new Date(shift.shiftStart).toDateString().split(' ')[0] +
+                  '\t' +
+                  dayjs(shift.shiftStart).format(dateFormat)}
               </CustomRow>
             );
           })}
