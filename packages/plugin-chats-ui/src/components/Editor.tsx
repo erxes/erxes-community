@@ -11,6 +11,7 @@ import {
   uploadHandler,
   uploadDeleteHandler
 } from '@erxes/ui/src/utils';
+// import { IAttachmentPreview } from '@erxes/ui/src/types';
 // local
 import {
   ChatEditor,
@@ -36,7 +37,13 @@ const Editor = (props: Props) => {
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
-    if (editorRef && editorRef.current) {
+    if (type === 'widget') {
+      const element = document.getElementById('chat-widget-form-control');
+
+      if (element) {
+        element.focus();
+      }
+    } else if (editorRef && editorRef.current) {
       editorRef.current.focus();
     }
   }, [reply]);
