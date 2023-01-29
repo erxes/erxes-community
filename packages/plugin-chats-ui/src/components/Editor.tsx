@@ -36,13 +36,7 @@ const Editor = (props: Props) => {
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
-    if (type === 'widget') {
-      const element = document.getElementById('chat-widget-form-control');
-
-      if (element) {
-        element.focus();
-      }
-    } else if (editorRef && editorRef.current) {
+    if (editorRef && editorRef.current) {
       editorRef.current.focus();
     }
   }, [reply]);
