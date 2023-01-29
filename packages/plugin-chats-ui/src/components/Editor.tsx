@@ -44,7 +44,9 @@ const Editor = (props: Props) => {
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
-    editorRef.current.focus();
+    if (editorRef && editorRef.current) {
+      editorRef.current.focus();
+    }
   }, [reply]);
 
   const handleSendMessage = () => {
