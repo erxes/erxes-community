@@ -9,9 +9,10 @@ import {
 import React from 'react';
 import { ICar } from '../../types';
 import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
-import Select from 'react-select-plus';
 import { Link } from 'react-router-dom';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
+import SelectWithSearch from '@erxes/ui/src/components/SelectWithSearch';
+import { queries } from '../../graphql';
 
 type Props = {
   id: string;
@@ -46,22 +47,24 @@ class CarSection extends React.Component<Props, State> {
       carsEditOnCustomer,
       carsEditOnCompany
     } = this.props;
+    const { carIds } = this.state;
 
-    const options = cars.map(g => ({
-      value: g._id,
-      label: g.plateNumber
-    }));
-
-    const onChange = values => {
+    const onSelect = carIds => {
       this.setState({
-        carIds: values.map(v => v.value)
+        carIds
+      });
+    };
+
+    const options = () => {
+      return cars.map((car: ICar) => {
+        return { value: car._id, label: car.plateNumber || '' };
       });
     };
 
     const saveCustomerOrCompany = closeModal => {
       if (type === 'contact') {
         carsEditOnCustomer({
-          carIds: this.state.carIds,
+          carIds: carIds,
           customerId: id
         });
         closeModal();
@@ -79,14 +82,17 @@ class CarSection extends React.Component<Props, State> {
 
       return (
         <>
-          <Select
-            placeholder="Choose Cars"
+          <SelectWithSearch
+            label="Choose Cars"
+            queryName="cars"
             name="carId"
-            options={options}
-            onChange={onChange}
-            value={this.state.carIds}
+            customQuery={queries.cars}
+            onSelect={onSelect}
+            generateOptions={options}
+            initialValue={this.state.carIds}
             multi={true}
           />
+
           <ModalFooter>
             <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
               Close
