@@ -11,7 +11,6 @@ import {
   uploadHandler,
   uploadDeleteHandler
 } from '@erxes/ui/src/utils';
-// import { IAttachmentPreview } from '@erxes/ui/src/types';
 // local
 import {
   ChatEditor,
