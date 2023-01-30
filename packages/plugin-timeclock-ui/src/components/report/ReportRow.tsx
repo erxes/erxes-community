@@ -15,8 +15,8 @@ const ReportRow = (userReport: IUserReport) => {
       <td>{userReport.user.details?.firstName || '-'}</td>
       <td>{'-'}</td>
       <td>{userReport.user.details?.position || '-'}</td>
-      <td>{userReport.totalDaysScheduledThisMonth}</td>
-      <td>{userReport.totalDaysWorkedThisMonth}</td>
+      <td>{userReport.totalDaysScheduled}</td>
+      <td>{userReport.totalDaysWorked}</td>
       <td>{'-'}</td>
     </tr>
   );

@@ -285,8 +285,8 @@ export interface IUserExportReport {
   lastName?: string;
   branchName?: string;
   position?: string;
-  totalDaysWorkedThisMonth?: number;
-  totalDaysScheduledThisMonth?: number;
+  totalDaysWorked?: number;
+  totalDaysScheduled?: number;
 }
 export interface IUsersReport {
   [userId: string]: IUserExportReport;

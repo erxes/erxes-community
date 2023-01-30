@@ -48,11 +48,11 @@ export interface IUserReport {
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
   totalMinsWorkedThisMonth?: number;
-  totalDaysWorkedThisMonth?: number;
+  totalDaysWorked?: number;
   totalMinsScheduled?: number;
   totalMinsScheduledToday?: number;
   totalMinsScheduledThisMonth?: number;
-  totalDaysScheduledThisMonth?: number;
+  totalDaysScheduled?: number;
   totalMinsLate?: number;
   totalMinsLateToday?: number;
   totalMinsLateThisMonth?: number;

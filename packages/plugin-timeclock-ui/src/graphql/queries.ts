@@ -34,6 +34,7 @@ const listParamsDef = `
   $userIds: [String]
   $branchIds: [String]
   $departmentIds: [String]
+  $reportType: String
 `;
 
 const listParamsValue = `
@@ -44,6 +45,7 @@ const listParamsValue = `
   userIds: $userIds
   branchIds: $branchIds
   departmentIds: $departmentIds
+  reportType: $reportType
 `;
 
 const listTimeclocksMain = `
@@ -146,10 +148,10 @@ const listReports = `
               totalMinsScheduled
 
               totalMinsWorkedThisMonth
-              totalDaysWorkedThisMonth
+              totalDaysWorked
 
               totalMinsScheduledThisMonth
-              totalDaysScheduledThisMonth
+              totalDaysScheduled
           
             }
             groupTotalMinsLate

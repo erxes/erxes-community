@@ -90,11 +90,11 @@ export const types = `
     totalMinsWorked: Int
     totalMinsWorkedToday: Int
     totalMinsWorkedThisMonth: Int
-    totalDaysWorkedThisMonth:Int
+    totalDaysWorked:Int
     totalMinsScheduled: Int
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
-    totalDaysScheduledThisMonth: Int
+    totalDaysScheduled: Int
     totalMinsLateToday: Int
     totalMinsLateThisMonth: Int
     totalMinsAbsenceThisMonth: Int
@@ -170,6 +170,7 @@ const queryParams = `
   userIds: [String]
   branchIds: [String]
   departmentIds: [String]
+  reportType: String
 `;
 
 const absence_params = `

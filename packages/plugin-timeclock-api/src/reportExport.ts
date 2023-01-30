@@ -84,7 +84,7 @@ export const buildFile = async (
     startDate,
     endDate,
     teamMembersObject,
-    'xlsx'
+    true
   );
 
   const extractValuesFromEmpReportObjects = (empReports: IUserReport[]) => {

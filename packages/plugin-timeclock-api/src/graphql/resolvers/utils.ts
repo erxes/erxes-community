@@ -470,24 +470,15 @@ export const timeclockReportByUser = async (
 export const timeclockReportPreliminary = async (
   subdomain: string,
   userIds: string[],
-  startDate?: string,
-  endDate?: string,
+  startDate: string,
+  endDate: string,
   teamMembersObj?: any,
-  reportType?: string
+  exportToXlsx?: boolean
 ) => {
   const models = await generateModels(subdomain);
 
   const usersReport: IUsersReport = {};
   const shiftsOfSchedule: any = [];
-
-  const NOW = new Date();
-  // get 1st of this month
-  const startOfThisMonth = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
-  // get 1st of the next Month
-  const startOfNextMonth = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 1);
-
-  const startTime = startDate ? startDate : startOfThisMonth;
-  const endTime = endDate ? endDate : startOfNextMonth;
 
   // get the schedule data of this month
   const schedules = await models.Schedules.find({
@@ -496,45 +487,45 @@ export const timeclockReportPreliminary = async (
     userId: 1
   });
 
+  const scheduleIds = schedules.map(schedule => schedule._id);
+
   const timeclocks = await models.Timeclocks.find({
     $and: [
       { userId: { $in: userIds } },
       {
         shiftStart: {
-          $gte: fixDate(startTime),
-          $lte: fixDate(endTime)
+          $gte: fixDate(startDate),
+          $lte: fixDate(endDate)
         }
       },
       {
         shiftEnd: {
-          $gte: fixDate(startTime),
-          $lte: fixDate(endTime)
+          $gte: fixDate(startDate),
+          $lte: fixDate(endDate)
         }
       }
     ]
   }).sort({ userId: 1 });
 
-  for (const { _id } of schedules) {
-    shiftsOfSchedule.push(
-      ...(await models.Shifts.find({
-        $and: [
-          { scheduleId: _id },
-          { status: 'Approved' },
-          {
-            shiftStart: {
-              $gte: fixDate(startTime),
-              $lte: fixDate(endTime)
-            }
+  shiftsOfSchedule.push(
+    ...(await models.Shifts.find({
+      $and: [
+        { scheduleId: { $in: scheduleIds } },
+        { status: 'Approved' },
+        {
+          shiftStart: {
+            $gte: fixDate(startDate),
+            $lte: fixDate(endDate)
           }
-        ]
-      }))
-    );
-  }
+        }
+      ]
+    }))
+  );
 
   userIds.forEach(async currUserId => {
     // assign team member info from teamMembersObj
 
-    if (reportType === 'xlsx') {
+    if (exportToXlsx) {
       usersReport[currUserId] = { ...teamMembersObj[currUserId] };
     }
 
@@ -556,35 +547,171 @@ export const timeclockReportPreliminary = async (
       );
     });
 
-    let totalDaysWorkedThisMonthPerUser = 0;
-    let totalDaysScheduledThisMonthPerUser = 0;
+    let totalDaysWorkedPerUser = 0;
+    let totalDaysScheduledPerUser = 0;
 
     if (currUserTimeclocks) {
-      totalDaysWorkedThisMonthPerUser = new Set(
+      totalDaysWorkedPerUser = new Set(
         currUserTimeclocks.map(shift =>
           new Date(shift.shiftStart).toLocaleDateString()
         )
       ).size;
     }
     if (currUserScheduleShifts) {
-      totalDaysScheduledThisMonthPerUser += new Set(
+      totalDaysScheduledPerUser += new Set(
         currUserScheduleShifts.map(shiftOfSchedule =>
           new Date(shiftOfSchedule.shiftStart).toLocaleDateString()
         )
       ).size;
     }
 
-    if (reportType === 'xlsx') {
-      usersReport[
-        currUserId
-      ].totalDaysScheduledThisMonth = totalDaysScheduledThisMonthPerUser;
-      usersReport[
-        currUserId
-      ].totalDaysWorkedThisMonth = totalDaysWorkedThisMonthPerUser;
+    if (exportToXlsx) {
+      usersReport[currUserId].totalDaysScheduled = totalDaysScheduledPerUser;
+      usersReport[currUserId].totalDaysWorked = totalDaysWorkedPerUser;
     } else {
       usersReport[currUserId] = {
-        totalDaysScheduledThisMonth: totalDaysScheduledThisMonthPerUser,
-        totalDaysWorkedThisMonth: totalDaysWorkedThisMonthPerUser
+        totalDaysScheduled: totalDaysScheduledPerUser,
+        totalDaysWorked: totalDaysWorkedPerUser
+      };
+    }
+  });
+
+  return usersReport;
+};
+
+export const timeclockReportFinal = async (
+  subdomain: string,
+  userIds: string[],
+  startDate?: string,
+  endDate?: string,
+  teamMembersObj?: any,
+  exportToXlsx?: boolean
+) => {
+  const models = await generateModels(subdomain);
+
+  const usersReport: IUsersReport = {};
+  const shiftsOfSchedule: any = [];
+
+  // get the schedule data of this month
+  const schedules = await models.Schedules.find({
+    userId: { $in: userIds }
+  }).sort({
+    userId: 1
+  });
+
+  const scheduleIds = schedules.map(schedule => schedule._id);
+
+  const timeclocks = await models.Timeclocks.find({
+    $and: [
+      { userId: { $in: userIds } },
+      {
+        shiftStart: {
+          $gte: fixDate(startDate),
+          $lte: fixDate(endDate)
+        }
+      },
+      {
+        shiftEnd: {
+          $gte: fixDate(startDate),
+          $lte: fixDate(endDate)
+        }
+      }
+    ]
+  }).sort({ userId: 1 });
+
+  shiftsOfSchedule.push(
+    ...(await models.Shifts.find({
+      $and: [
+        { scheduleId: { $in: scheduleIds } },
+        { status: 'Approved' },
+        {
+          shiftStart: {
+            $gte: fixDate(startDate),
+            $lte: fixDate(endDate)
+          }
+        }
+      ]
+    }))
+  );
+
+  userIds.forEach(async currUserId => {
+    // assign team member info from teamMembersObj
+
+    if (exportToXlsx) {
+      usersReport[currUserId] = { ...teamMembersObj[currUserId] };
+    }
+
+    const currUserTimeclocks = timeclocks.filter(
+      timeclock => timeclock.userId === currUserId
+    );
+
+    const currUserSchedules = schedules.filter(
+      schedule => schedule.userId === currUserId
+    );
+
+    // get shifts of schedule
+    const currUserScheduleShifts: any = [];
+    currUserSchedules.forEach(async userSchedule => {
+      currUserScheduleShifts.push(
+        ...shiftsOfSchedule.filter(
+          scheduleShift => scheduleShift.scheduleId === userSchedule._id
+        )
+      );
+    });
+
+    let totalDaysWorkedPerUser = 0;
+    let totalHoursWorkedPerUser = 0;
+    let totalDaysScheduledPerUser = 0;
+    let totalHoursScheduledPerUser = 0;
+
+    if (currUserTimeclocks) {
+      totalDaysWorkedPerUser = new Set(
+        currUserTimeclocks.map(shift =>
+          new Date(shift.shiftStart).toLocaleDateString()
+        )
+      ).size;
+
+      currUserTimeclocks.forEach(currUserTimeclock => {
+        const shiftStart = currUserTimeclock.shiftStart;
+        const shiftEnd = currUserTimeclock.shiftEnd;
+        if (shiftStart && shiftEnd) {
+          // get time in hours
+          const totalHoursWorkedPerShift =
+            (shiftEnd.getTime() || 0 - shiftStart.getTime()) / 3600000;
+          // make sure shift end is later than shift start
+          if (totalHoursWorkedPerShift > 0) {
+            totalHoursWorkedPerUser += totalHoursWorkedPerShift;
+          }
+        }
+      });
+    }
+    if (currUserScheduleShifts) {
+      totalDaysScheduledPerUser += new Set(
+        currUserScheduleShifts.map(shiftOfSchedule =>
+          new Date(shiftOfSchedule.shiftStart).toLocaleDateString()
+        )
+      ).size;
+
+      currUserScheduleShifts.forEach(scheduledDay => {
+        const shiftStart = scheduledDay.shiftStart;
+        const shiftEnd = scheduledDay.shiftEnd;
+        // get time in hours
+        const totalHoursScheduledPerShift =
+          (shiftEnd.getTime() || 0 - shiftStart.getTime()) / 3600000;
+        // make sure shift end is later than shift start
+        if (totalHoursScheduledPerShift > 0) {
+          totalHoursScheduledPerUser += totalHoursScheduledPerShift;
+        }
+      });
+    }
+
+    if (exportToXlsx) {
+      usersReport[currUserId].totalDaysScheduled = totalDaysScheduledPerUser;
+      usersReport[currUserId].totalDaysWorked = totalDaysWorkedPerUser;
+    } else {
+      usersReport[currUserId] = {
+        totalDaysScheduled: totalDaysScheduledPerUser,
+        totalDaysWorked: totalDaysWorkedPerUser
       };
     }
   });

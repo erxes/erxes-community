@@ -48,7 +48,6 @@ function ReportList(props: Props) {
 
   const renderSelectionBar = () => {
     const onTypeSelect = type => {
-      localStorage.setItem('displayType', type.value);
       router.setParams(history, { reportType: type.value });
       setType(type.value);
     };
@@ -63,7 +62,7 @@ function ReportList(props: Props) {
               onChange={onTypeSelect}
               placeholder="Select type"
               multi={false}
-              options={['Урьдчилсан', 'Сүүлд'].map(ipt => ({
+              options={['Урьдчилсан', 'Сүүлд', 'Pivot'].map(ipt => ({
                 value: ipt,
                 label: __(ipt)
               }))}
