@@ -53,11 +53,13 @@ class RightSidebar extends React.Component<Props, State> {
         customerIds: value
       });
     };
+
     const onSelectCompanies = value => {
       this.setState({
         companyIds: value
       });
     };
+
     const saveCustomer = closeModal => {
       editCar({
         customerIds: this.state.customerIds
@@ -74,6 +76,7 @@ class RightSidebar extends React.Component<Props, State> {
 
     const customerChooser = props => {
       const { closeModal } = props;
+
       return (
         <>
           <SelectCustomers
@@ -103,6 +106,7 @@ class RightSidebar extends React.Component<Props, State> {
 
     const companyChooser = props => {
       const { closeModal } = props;
+
       return (
         <>
           <SelectCompanies

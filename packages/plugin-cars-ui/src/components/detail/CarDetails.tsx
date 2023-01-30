@@ -65,6 +65,7 @@ class CarDetails extends React.Component<Props> {
         />
       </>
     );
+
     return (
       <Wrapper
         header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}

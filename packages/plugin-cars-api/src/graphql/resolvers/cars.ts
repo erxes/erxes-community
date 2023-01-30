@@ -46,4 +46,5 @@ const cars = {
     return models.CarCategories.findOne({ _id: car.categoryId });
   }
 };
+
 export default cars;

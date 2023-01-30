@@ -45,9 +45,8 @@ class CarSection extends React.Component<Props, State> {
       carsEditOnCustomer,
       carsEditOnCompany
     } = this.props;
-    const { carIds } = this.state;
 
-    console.log('carIds', carIds);
+    const { carIds } = this.state;
 
     const onSelect = carIds => {
       this.setState({
