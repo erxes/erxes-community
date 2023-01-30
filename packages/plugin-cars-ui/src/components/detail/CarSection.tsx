@@ -17,7 +17,6 @@ import { queries } from '../../graphql';
 type Props = {
   id: string;
   type: string;
-  cars: ICar[];
   carsOnCustomerOrCompany: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
@@ -41,7 +40,6 @@ class CarSection extends React.Component<Props, State> {
     const {
       id,
       type,
-      cars,
       carsOnCustomerOrCompany,
       collapseCallback,
       carsEditOnCustomer,
@@ -49,14 +47,16 @@ class CarSection extends React.Component<Props, State> {
     } = this.props;
     const { carIds } = this.state;
 
+    console.log('carIds', carIds);
+
     const onSelect = carIds => {
       this.setState({
         carIds
       });
     };
 
-    const options = () => {
-      return cars.map((car: ICar) => {
+    const options = array => {
+      return array.map((car: ICar) => {
         return { value: car._id, label: car.plateNumber || '' };
       });
     };
@@ -91,6 +91,7 @@ class CarSection extends React.Component<Props, State> {
             generateOptions={options}
             initialValue={this.state.carIds}
             multi={true}
+            filterParams={{ isSelect: true }}
           />
 
           <ModalFooter>
@@ -121,6 +122,7 @@ class CarSection extends React.Component<Props, State> {
         content={renderCarChooser}
       />
     );
+
     const content = (
       <>
         {carsOnCustomerOrCompany.map(car => (

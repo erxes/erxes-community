@@ -123,7 +123,7 @@ export const loadCarClass = (models: IModels) => {
       return car;
     }
 
-    public static async getAllCar(carIds: string) {
+    public static async getAllCars(carIds: string) {
       for (const carId of carIds) {
         await models.Cars.find({ _id: carId });
       }

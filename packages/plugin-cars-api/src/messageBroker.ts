@@ -1,10 +1,13 @@
 import { generateModels } from './connectionResolver';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
+
 let client;
+
 export const initBroker = async cl => {
   client = cl;
 };
+
 export const sendInboxMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
@@ -15,6 +18,7 @@ export const sendInboxMessage = async (
     ...args
   });
 };
+
 export const sendTagsMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessage({
     client,
@@ -23,6 +27,7 @@ export const sendTagsMessage = async (args: ISendMessageArgs): Promise<any> => {
     ...args
   });
 };
+
 export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessage({
     client,
@@ -31,6 +36,7 @@ export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
     ...args
   });
 };
+
 export const sendInternalNotesMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
@@ -41,6 +47,7 @@ export const sendInternalNotesMessage = async (
     ...args
   });
 };
+
 export const sendCommonMessage = async (
   args: ISendMessageArgs & { serviceName: string }
 ): Promise<any> => {

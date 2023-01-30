@@ -150,18 +150,18 @@ export const carDetail = `
   }
 `;
 
-export const carsFromCustomer = `
-  query carsFromCustomer($customerId: String!) {
-    carsFromCustomer(customerId: $customerId) {
+export const carsOfCustomer = `
+  query carsOfCustomer($customerId: String!) {
+    carsOfCustomer(customerId: $customerId) {
       _id
       plateNumber
     }
   }
 `;
 
-export const carsFromCompany = `
-  query carsFromCompany($companyId: String!) {
-    carsFromCompany(companyId: $companyId) {
+export const carsOfCompany = `
+  query carsOfCompany($companyId: String!) {
+    carsOfCompany(companyId: $companyId) {
       _id
       plateNumber
     }
@@ -183,6 +183,6 @@ export default {
   carCategories,
   carCategoriesCount,
   carCategoryDetail,
-  carsFromCustomer,
-  carsFromCompany
+  carsOfCustomer,
+  carsOfCompany
 };

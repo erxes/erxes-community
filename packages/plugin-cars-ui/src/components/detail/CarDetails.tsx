@@ -7,6 +7,7 @@ import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from 'coreui/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
+
 const ActivityInputs = asyncComponent(
   () =>
     isEnabled('logs') &&
@@ -32,6 +33,7 @@ class CarDetails extends React.Component<Props> {
     if (isEnabled('logs')) {
       return content;
     }
+
     return (
       <EmptyState
         image="/images/actions/5.svg"
@@ -40,10 +42,14 @@ class CarDetails extends React.Component<Props> {
       />
     );
   }
+
   render() {
     const { car } = this.props;
+
     const title = car.plateNumber || 'Unknown';
+
     const breadcrumb = [{ title: __('Cars'), link: '/cars' }, { title }];
+
     const content = (
       <>
         <ActivityInputs
@@ -70,4 +76,5 @@ class CarDetails extends React.Component<Props> {
     );
   }
 }
+
 export default CarDetails;

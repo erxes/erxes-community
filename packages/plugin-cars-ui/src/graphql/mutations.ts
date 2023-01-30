@@ -1,33 +1,43 @@
 const commonFields = `
   $ownerId: String,
   $description: String,
+  
   $plateNumber: String,
   $vinNumber: String,
   $colorCode: String,
   $categoryId: String,
+  
   $bodyType: String,
   $fuelType: String,
   $gearBox: String,
+  
   $vintageYear: Float,
   $importYear: Float,
   $attachment: AttachmentInput
+  
   $customFieldsData: JSON
 `;
+
 const commonVariables = `
   ownerId: $ownerId,
   description: $description,
+  
   plateNumber: $plateNumber,
   vinNumber: $vinNumber,
   colorCode: $colorCode,
   categoryId: $categoryId
+  
   bodyType: $bodyType,
   fuelType: $fuelType,
   gearBox: $gearBox,
+  
   vintageYear: $vintageYear,
   importYear: $importYear,
   attachment: $attachment,
+  
   customFieldsData: $customFieldsData,
 `;
+
 const carsAdd = `
   mutation carsAdd(${commonFields}) {
     carsAdd(${commonVariables}) {
@@ -81,6 +91,7 @@ const carsRemove = `
     carsRemove(carIds: $carIds)
   }
 `;
+
 const carsMerge = `
   mutation carsMerge($carIds: [String], $carFields: JSON) {
     carsMerge(carIds: $carIds, carFields: $carFields) {
@@ -88,18 +99,21 @@ const carsMerge = `
     }
   }
 `;
+
 const carCategoryParamsDef = `
   $name: String!,
   $code: String!,
   $parentId: String,
   $description: String,
 `;
+
 const carCategoryParams = `
   name: $name,
   code: $code,
   parentId: $parentId,
   description: $description,
 `;
+
 const carCategoryAdd = `
   mutation carCategoriesAdd(${carCategoryParamsDef}) {
     carCategoriesAdd(${carCategoryParams}) {
@@ -107,6 +121,7 @@ const carCategoryAdd = `
     }
   }
 `;
+
 const carCategoryEdit = `
   mutation carCategoriesEdit($_id: String!, ${carCategoryParamsDef}) {
     carCategoriesEdit(_id: $_id, ${carCategoryParams}) {
@@ -114,11 +129,13 @@ const carCategoryEdit = `
     }
   }
 `;
+
 const carCategoryRemove = `
   mutation carCategoriesRemove($_id: String!) {
     carCategoriesRemove(_id: $_id)
   }
 `;
+
 export default {
   carsAdd,
   carsEdit,

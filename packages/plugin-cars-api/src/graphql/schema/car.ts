@@ -2,24 +2,30 @@ import {
   attachmentType,
   attachmentInput
 } from '@erxes/api-utils/src/commonTypeDefs';
+
 export const types = ({ contacts }) => `
+
   ${attachmentType}
   ${attachmentInput}
+  
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
+  
   ${
     contacts
       ? `
         extend type Customer @key(fields: "_id") {
           _id: String! @external
         }
+        
         extend type Company @key(fields: "_id") {
           _id: String! @external
         }
         `
       : ''
   }
+  
   
   type CarCategory {
     _id: String!
@@ -94,8 +100,8 @@ export const queries = `
   cpCarCategories(parentId: String, searchValue: String): [CarCategory]
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
-  carsFromCustomer(customerId: String!): [Car]
-  carsFromCompany(companyId: String!): [Car]
+  carsOfCustomer(customerId: String!): [Car]
+  carsOfCompany(companyId: String!): [Car]
 `;
 
 const commonFields = `

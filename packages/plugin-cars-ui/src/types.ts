@@ -164,13 +164,13 @@ export type CarsQueryResponse = {
 };
 
 export type CustomersCarQueryResponse = {
-  carsFromCustomer: ICar[];
+  carsOfCustomer: ICar[];
   loading: boolean;
   refetch: () => void;
 };
 
 export type CompaniesCarQueryResponse = {
-  carsFromCompany: ICar[];
+  carsOfCompany: ICar[];
   loading: boolean;
   refetch: () => void;
 };

@@ -22,37 +22,25 @@ type FinalProps = {
   carsEditCustomer: any;
   carsEditCompany: any;
   carDetailQuery: DetailQueryResponse;
-  carsQuery: CarsQueryResponse;
-  carsFromCustomerQuery: CustomersCarQueryResponse;
-  carsFromCompanyQuery: CompaniesCarQueryResponse;
+  carsOfCustomerQuery: CustomersCarQueryResponse;
+  carsOfCompanyQuery: CompaniesCarQueryResponse;
 } & Props;
 
 const CarDetailsContainer = (props: FinalProps) => {
   const {
     id,
     type,
-    carsQuery,
     carsEditCustomer,
     carsEditCompany,
-    carsFromCustomerQuery,
-    carsFromCompanyQuery
+    carsOfCustomerQuery,
+    carsOfCompanyQuery
   } = props;
-
-  if (carsQuery.loading || carsFromCustomerQuery.loading) {
-    return <Spinner objective={true} />;
-  }
-
-  if (carsQuery.loading || carsFromCompanyQuery.loading) {
-    return <Spinner objective={true} />;
-  }
-
-  const cars = carsQuery.cars || [];
 
   const carsInfo = () => {
     if (type === 'contact') {
-      return carsFromCustomerQuery.carsFromCustomer || [];
+      return carsOfCustomerQuery.carsOfCustomer || [];
     } else {
-      return carsFromCompanyQuery.carsFromCompany || [];
+      return carsOfCompanyQuery.carsOfCompany || [];
     }
   };
   const carsOnCustomerOrCompany = carsInfo();
@@ -66,7 +54,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     })
       .then(() => {
         Alert.success('You successfully updated a car');
-        carsFromCustomerQuery.refetch();
+        carsOfCustomerQuery.refetch();
       })
       .catch(error => {
         alert(error.message);
@@ -82,7 +70,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     })
       .then(() => {
         Alert.success('You successfully updated a company');
-        carsFromCompanyQuery.refetch();
+        carsOfCompanyQuery.refetch();
       })
       .catch(error => {
         alert(error.message);
@@ -93,9 +81,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     ...props,
     id,
     type,
-    cars,
     carsOnCustomerOrCompany,
-    loading: carsQuery.loading,
     carsEditOnCustomer,
     carsEditOnCompany
   };
@@ -120,29 +106,20 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<Props, { _id: string }>(gql(queries.carsFromCustomer), {
-      name: 'carsFromCustomerQuery',
+    graphql<Props, { _id: string }>(gql(queries.carsOfCustomer), {
+      name: 'carsOfCustomerQuery',
       options: ({ id }) => ({
         variables: {
           customerId: id
         }
       })
     }),
-    graphql<Props, { _id: string }>(gql(queries.carsFromCompany), {
-      name: 'carsFromCompanyQuery',
+    graphql<Props, { _id: string }>(gql(queries.carsOfCompany), {
+      name: 'carsOfCompanyQuery',
       options: ({ id }) => ({
         variables: {
           companyId: id
         }
-      })
-    }),
-    graphql<Props>(gql(queries.cars), {
-      name: 'carsQuery',
-      options: () => ({
-        variables: {
-          isSelect: true
-        },
-        fetchPolicy: 'network-only'
       })
     }),
     graphql<Props, { _id: string }>(gql(mutations.carsEditOnCustomer), {

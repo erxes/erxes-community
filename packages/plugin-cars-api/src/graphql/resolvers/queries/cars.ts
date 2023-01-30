@@ -5,11 +5,7 @@ import {
 } from '@erxes/api-utils/src/permissions';
 import { IContext, IModels } from '../../../connectionResolver';
 
-const generateFilter = async (
-  subdomain: string,
-  params,
-  commonQuerySelector
-) => {
+const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
 
   // filter.status = { $ne: "Deleted" };
@@ -53,9 +49,7 @@ const carQueries = {
     }
 
     return paginate(
-      models.Cars.find(
-        await generateFilter(subdomain, params, commonQuerySelector)
-      ),
+      models.Cars.find(await generateFilter(params, commonQuerySelector)),
       {
         page: params.page,
         perPage: params.perPage
@@ -63,20 +57,20 @@ const carQueries = {
     );
   },
 
-  carsFromCustomer: async (_root, { customerId }, { models }: IContext) => {
+  carsOfCustomer: async (_root, { customerId }, { models }: IContext) => {
     return models.Cars.getCarsByCustomerId(customerId);
   },
 
-  carsFromCompany: async (_root, { companyId }, { models }: IContext) => {
+  carsOfCompany: async (_root, { companyId }, { models }: IContext) => {
     return models.Cars.getCarsByCompanyId(companyId);
   },
 
   carsMain: async (
     _root,
     params,
-    { subdomain, commonQuerySelector, models }: IContext
+    { commonQuerySelector, models }: IContext
   ) => {
-    const filter = await generateFilter(subdomain, params, commonQuerySelector);
+    const filter = await generateFilter(params, commonQuerySelector);
 
     return {
       list: paginate(models.Cars.find(filter).sort(sortBuilder(params)), {
