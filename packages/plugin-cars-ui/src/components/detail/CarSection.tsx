@@ -4,19 +4,19 @@ import {
   ModalTrigger,
   MainStyleButtonRelated as ButtonRelated,
   __,
-  SectionBodyItem
+  SectionBodyItem,
+  Chooser
 } from '@erxes/ui/src';
 import React from 'react';
 import { ICar } from '../../types';
-import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
 import { Link } from 'react-router-dom';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
-import SelectWithSearch from '@erxes/ui/src/components/SelectWithSearch';
-import { queries } from '../../graphql';
+import CarForm from '../../containers/CarForm';
 
 type Props = {
   id: string;
   type: string;
+  cars: ICar[];
   carsOnCustomerOrCompany: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
@@ -25,6 +25,8 @@ type Props = {
 
 type State = {
   carIds: string[];
+  perPage: number;
+  searchValue: string;
 };
 
 class CarSection extends React.Component<Props, State> {
@@ -32,14 +34,23 @@ class CarSection extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      carIds: props.carsOnCustomerOrCompany.map(e => e._id) || []
+      carIds: props.carsOnCustomerOrCompany.map(e => e._id) || [],
+      perPage: 20,
+      searchValue: ''
     };
+  }
+
+  search = (value: string, reload?: boolean) => {};
+
+  carAddForm(props) {
+    return <CarForm {...props} />;
   }
 
   render() {
     const {
       id,
       type,
+      cars,
       carsOnCustomerOrCompany,
       collapseCallback,
       carsEditOnCustomer,
@@ -48,64 +59,46 @@ class CarSection extends React.Component<Props, State> {
 
     const { carIds } = this.state;
 
-    const onSelect = carIds => {
-      this.setState({
-        carIds
+    const onSelect = (datas: any) => {
+      this.setState({ carIds: datas.map(data => data._id) }, () => {
+        saveCustomerOrCompany();
       });
     };
 
-    const options = array => {
-      return array.map((car: ICar) => {
-        return { value: car._id, label: car.plateNumber || '' };
-      });
-    };
-
-    const saveCustomerOrCompany = closeModal => {
+    const saveCustomerOrCompany = () => {
       if (type === 'contact') {
         carsEditOnCustomer({
-          carIds: carIds,
+          carIds: this.state.carIds,
           customerId: id
         });
-        closeModal();
       } else {
         carsEditOnCompany({
           carIds: this.state.carIds,
           companyId: id
         });
       }
-      closeModal();
     };
+
+    const selected = cars.filter(car => carIds.includes(car._id));
 
     const renderCarChooser = props => {
       const { closeModal } = props;
 
       return (
         <>
-          <SelectWithSearch
-            label="Choose Cars"
-            queryName="cars"
-            name="carId"
-            customQuery={queries.cars}
+          <Chooser
+            title="car"
+            datas={cars}
+            data={{ name: 'car', datas: selected }}
+            search={this.search}
+            clearState={() => this.search('', true)}
+            renderForm={this.carAddForm}
             onSelect={onSelect}
-            generateOptions={options}
-            initialValue={this.state.carIds}
-            multi={true}
-            filterParams={{ isSelect: true }}
+            closeModal={() => closeModal()}
+            renderName={car => car.plateNumber}
+            perPage={5}
+            limit={10}
           />
-
-          <ModalFooter>
-            <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
-              Close
-            </Button>
-
-            <Button
-              btnStyle="success"
-              onClick={() => saveCustomerOrCompany(closeModal())}
-              icon="check-circle"
-            >
-              Save
-            </Button>
-          </ModalFooter>
         </>
       );
     };
@@ -118,6 +111,7 @@ class CarSection extends React.Component<Props, State> {
             <Icon icon="plus-circle" />
           </button>
         }
+        size="lg"
         content={renderCarChooser}
       />
     );

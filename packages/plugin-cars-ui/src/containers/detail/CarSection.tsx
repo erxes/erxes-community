@@ -22,6 +22,7 @@ type FinalProps = {
   carsEditCustomer: any;
   carsEditCompany: any;
   carDetailQuery: DetailQueryResponse;
+  carsQuery: CarsQueryResponse;
   carsOfCustomerQuery: CustomersCarQueryResponse;
   carsOfCompanyQuery: CompaniesCarQueryResponse;
 } & Props;
@@ -30,11 +31,14 @@ const CarDetailsContainer = (props: FinalProps) => {
   const {
     id,
     type,
+    carsQuery,
     carsEditCustomer,
     carsEditCompany,
     carsOfCustomerQuery,
     carsOfCompanyQuery
   } = props;
+
+  const cars = carsQuery.cars || [];
 
   const carsInfo = () => {
     if (type === 'contact') {
@@ -81,6 +85,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     ...props,
     id,
     type,
+    cars,
     carsOnCustomerOrCompany,
     carsEditOnCustomer,
     carsEditOnCompany
@@ -120,6 +125,15 @@ export default withProps<Props>(
         variables: {
           companyId: id
         }
+      })
+    }),
+    graphql<Props>(gql(queries.cars), {
+      name: 'carsQuery',
+      options: () => ({
+        variables: {
+          isSelect: true
+        },
+        fetchPolicy: 'network-only'
       })
     }),
     graphql<Props, { _id: string }>(gql(mutations.carsEditOnCustomer), {

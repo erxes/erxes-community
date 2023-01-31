@@ -46,9 +46,7 @@ var command = async () => {
     if (conformity.mainType === 'car' && conformity.relType === 'customer') {
       await Car.updateOne(
         { _id: conformity.mainTypeId },
-        {
-          $push: { customerIds: conformity.relTypeId }
-        }
+        { $push: { customerIds: conformity.relTypeId } }
       );
     }
     if (conformity.mainType === 'company' && conformity.relType === 'car') {
@@ -66,6 +64,13 @@ var command = async () => {
         {
           $push: { companyIds: conformity.relTypeId }
         }
+      );
+    }
+
+    if (conformity.mainType === 'car' && conformity.relType === 'company') {
+      await Car.updateOne(
+        { _id: conformity.mainTypeId },
+        { $push: { companyIds: conformity.relTypeId } }
       );
     }
   }
