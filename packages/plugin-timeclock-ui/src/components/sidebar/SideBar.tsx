@@ -16,22 +16,30 @@ type Props = {
   history: any;
   branchesList: IBranch[];
 };
+// get 1st of the next Month
+const NOW = new Date();
+const startOfNextMonth = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 1);
+// get 1st of this month
+const startOfThisMonth = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
 
 const LeftSideBar = (props: Props) => {
   const { history, branchesList, queryParams } = props;
-
   const [currUserIds, setUserIds] = useState(queryParams.userIds);
   const [selectedBranches, setBranches] = useState(queryParams.branchIds);
   const [deptIds, setDeptIds] = useState(queryParams.departmentIds);
-  const [startDate, setStartDate] = useState(queryParams.startDate);
-  const [endDate, setEndDate] = useState(queryParams.endDate);
+  const [startDate, setStartDate] = useState(
+    queryParams.startDate || startOfThisMonth
+  );
+  const [endDate, setEndDate] = useState(
+    queryParams.endDate || startOfNextMonth
+  );
 
   const cleanFilter = () => {
     onBranchSelect([]);
     onDepartmentSelect([]);
     onMemberSelect([]);
-    onStartDateChange(null);
-    onEndDateChange(null);
+    onStartDateChange(startOfThisMonth);
+    onEndDateChange(startOfNextMonth);
     router.removeParams(
       history,
       'userIds',
@@ -47,6 +55,23 @@ const LeftSideBar = (props: Props) => {
     router.removeParams(history, 'page', 'perPage');
   };
 
+  const setParams = (key: string, value: any) => {
+    if (value) {
+      router.setParams(history, {
+        [key]: value
+      });
+
+      removePageParams();
+    }
+  };
+
+  if (!queryParams.startDate) {
+    setParams('startDate', startOfThisMonth);
+  }
+  if (!queryParams.endDate) {
+    setParams('endDate', startOfNextMonth);
+  }
+
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
       value: branch._id,
@@ -57,43 +82,37 @@ const LeftSideBar = (props: Props) => {
 
   const onBranchSelect = selectedBranch => {
     setBranches(selectedBranch);
+
     const selectedBranchIds: string[] = [];
+
     selectedBranch.map(branch => {
       selectedBranchIds.push(branch.value);
     });
 
-    router.setParams(history, {
-      branchIds: selectedBranchIds
-    });
-    removePageParams();
+    setParams('branchIds', selectedBranchIds);
   };
 
   const onDepartmentSelect = dept => {
     setDeptIds(dept);
-    router.setParams(history, {
-      departmentIds: dept
-    });
-    removePageParams();
+
+    setParams('departmentIds', dept);
   };
 
   const onMemberSelect = selectedUsers => {
     setUserIds(selectedUsers);
-    router.setParams(history, {
-      userIds: selectedUsers
-    });
-    removePageParams();
+
+    setParams('userIds', selectedUsers);
   };
 
   const onStartDateChange = date => {
     setStartDate(date);
-    router.setParams(history, { startDate: date });
-    removePageParams();
+    setParams('startDate', date);
   };
 
   const onEndDateChange = date => {
     setEndDate(date);
-    router.setParams(history, { endDate: date });
-    removePageParams();
+
+    setParams('endDate', date);
   };
 
   const renderSidebarActions = () => {
@@ -116,9 +135,6 @@ const LeftSideBar = (props: Props) => {
             dateFormat={'YYYY-MM-DD'}
             onChange={onEndDateChange}
           />
-          <Button btnStyle="primary" onClick={cleanFilter}>
-            Clear
-          </Button>
         </CustomRangeContainer>
       </SidebarHeader>
     );
@@ -138,9 +154,10 @@ const LeftSideBar = (props: Props) => {
           gap: '10px'
         }}
       >
+        <ControlLabel>Team members</ControlLabel>
         <SelectTeamMembers
           initialValue={currUserIds}
-          label="Team member"
+          label="Select team member"
           name="userIds"
           queryParams={queryParams}
           onSelect={onMemberSelect}
@@ -160,6 +177,9 @@ const LeftSideBar = (props: Props) => {
             options={branchesList && renderBranchOptions(branchesList)}
           />
         </div>
+        <Button btnStyle="warning" onClick={cleanFilter}>
+          Clear filter
+        </Button>
       </div>
     </Sidebar>
   );

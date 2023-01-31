@@ -1,4 +1,4 @@
-import { menuTimeClock } from '../menu';
+import { menuTimeClock } from '../constants';
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState, useEffect } from 'react';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
@@ -21,14 +21,6 @@ type Props = {
   loading: boolean;
   branchesList: IBranch[];
   scheduleConfigs: IScheduleConfig[];
-
-  queryStartDate: string;
-  queryEndDate: string;
-  queryUserIds: string[];
-  queryBranchIds: string[];
-  queryDepartmentIds: string[];
-  queryPage: number;
-  queryPerPage: number;
   searchFilter: string;
 };
 
@@ -62,6 +54,7 @@ function List(props: Props) {
             showSideBar={setShowSideBar}
             getActionBar={setRightActionBar}
             queryParams={queryParams}
+            getPagination={setPagination}
             history={history}
           />
         );

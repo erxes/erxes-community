@@ -46,6 +46,12 @@ const MUT_DENY = gql`
   }
 `;
 
+const MUT_FEATURED_TOGGLE = gql`
+  mutation ForumPostSetFeatured($id: ID!, $featured: Boolean!) {
+    forumPostSetFeatured(_id: $id, featured: $featured)
+  }
+`;
+
 const PostDetail: React.FC = () => {
   const history = useHistory();
   const { postId } = useParams();
@@ -82,6 +88,10 @@ const PostDetail: React.FC = () => {
   const [mutDeny] = useMutation(MUT_DENY, {
     variables: { _id: postId },
     refetchQueries: POST_REFETCH_AFTER_EDIT
+  });
+
+  const [mutSetFeatured] = useMutation(MUT_FEATURED_TOGGLE, {
+    refetchQueries: ['ForumPostDetail']
   });
 
   if (loading) return null;
@@ -208,6 +218,12 @@ const PostDetail: React.FC = () => {
                     : 'Single choice'}
                 </td>
               </tr>
+              {forumPost.pollEndDate && (
+                <tr>
+                  <th>Poll end date:</th>
+                  <td>{forumPost.pollEndDate}</td>
+                </tr>
+              )}
             </>
           )}
           <tr>
@@ -228,6 +244,31 @@ const PostDetail: React.FC = () => {
             <th>Down vote count:</th>
             <td>{forumPost.downVoteCount}</td>
           </tr>
+
+          <tr>
+            <th>Featured by admin: </th>
+            <td>
+              {forumPost.isFeaturedByAdmin ? 'Yes' : 'No'}&nbsp;{' '}
+              <button
+                type="button"
+                onClick={async () => {
+                  console.log('before');
+                  await mutSetFeatured({
+                    variables: {
+                      id: postId,
+                      featured: !forumPost.isFeaturedByAdmin
+                    }
+                  });
+
+                  console.log('after');
+                }}
+              >
+                {forumPost.isFeaturedByAdmin ? 'Unfeature' : 'Feature'}
+              </button>
+            </td>
+            <th>Featured by user: </th>
+            <td>{forumPost.isFeaturedByUser ? 'Yes' : 'No'}</td>
+          </tr>
         </tbody>
       </table>
       <hr />
@@ -242,20 +283,16 @@ const PostDetail: React.FC = () => {
         <button onClick={onClickDelete}>Delete</button>
       </div>
       <hr />
-      {forumPost.category?.postsReqCrmApproval && (
-        <>
-          <div>
-            <h5>Category approval: {forumPost.categoryApprovalState}</h5>
-            <button type="button" onClick={onApproveClick}>
-              Approve
-            </button>
-            <button type="button" onClick={onDenyClick}>
-              Deny
-            </button>
-          </div>
-          <hr />
-        </>
-      )}
+      <div>
+        <h5>Category approval: {forumPost.categoryApprovalState}</h5>
+        <button type="button" onClick={onApproveClick}>
+          Approve
+        </button>
+        <button type="button" onClick={onDenyClick}>
+          Deny
+        </button>
+      </div>
+      <hr />
 
       <h1>View count: {forumPost.viewCount}</h1>
       <h1>Comments: {forumPost.commentCount}</h1>

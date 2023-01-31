@@ -21,8 +21,6 @@ export const conversationMessagesBroker = ({
     async ({ subdomain, data }) => {
       const models = await generateModels(subdomain);
 
-      debug.error(`zalo:conversationMessages.find: ${JSON.stringify(data)}`);
-
       return {
         status: 'success',
         data: await models.ConversationMessages.find(data).lean()
@@ -40,8 +38,6 @@ export const conversationMessagesBroker = ({
       const doc = JSON.parse(payload || '{}');
 
       let response: any = null;
-
-      console.log('data from response form:', data);
 
       if (type !== 'zalo') {
         return {
@@ -62,13 +58,17 @@ export const conversationMessagesBroker = ({
           erxesApiId: conversationId
         });
 
-        const { recipientId, senderId } = conversation;
+        const { recipientId, senderId, zaloConversationId } = conversation;
 
         const conversationMessage = await models.ConversationMessages.findOne({
           conversationId: conversation?._id
         });
 
-        console.log('on try: ');
+        console.log(
+          'conversationMessage:',
+          conversation?._id,
+          conversationMessage
+        );
 
         let recipient: { [key: string]: any } = {
           message_id: conversationMessage?.mid
@@ -77,20 +77,19 @@ export const conversationMessagesBroker = ({
           text: strip(content)
         };
 
+        // anonymous user id has a-f character. user has number only
+        let isAnonymousUser = !Number(senderId);
+
         // check if user isFollower
         // const isFollower = await isFollowedUser(senderId, { models, oa_id: recipientId })
         // console.log('isFollower', isFollower);
 
-        // if( isFollower ) {
-        //     recipient = {
-        //         user_id: senderId,
-        //     }
-        // } else {
-
-        //     recipient = {
-        //         message_id: conversationMessage?.mid
-        //     }
-        // }
+        if (isAnonymousUser) {
+          recipient = {
+            anonymous_id: senderId,
+            conversation_id: zaloConversationId
+          };
+        }
 
         if (attachments?.length) {
           console.log('attachments: ', attachments?.[0]);
@@ -139,7 +138,7 @@ export const conversationMessagesBroker = ({
           }
         }
 
-        console.log('start messageSent:');
+        console.log('start messageSent:', message, recipient);
 
         const messageSent = await zaloSend(
           'message',
@@ -150,9 +149,7 @@ export const conversationMessagesBroker = ({
           { models, oa_id: recipientId }
         );
 
-        console.log('recipient', recipient);
-        console.log('message', message);
-        console.log('messageSent', messageSent);
+        console.log(messageSent);
 
         const localMessage = await models.ConversationMessages.addMessage(
           {
@@ -185,8 +182,6 @@ export const conversationMessagesBroker = ({
     const models = await generateModels(subdomain);
 
     const { payload, type } = data;
-
-    console.log('zalo:notification', data);
 
     switch (type) {
       case 'addUserId':
