@@ -33,19 +33,39 @@ var command = async () => {
   });
 
   for (var conformity of conformities) {
-    if (
-      conformity.mainType === 'customer' ||
-      conformity.relType === 'customer'
-    ) {
+    if (conformity.mainType === 'customer' && conformity.relType === 'car') {
       await Car.updateOne(
         { _id: conformity.relTypeId },
-        { $push: { customerIds: conformity.mainTypeId } }
+        {
+          $push: {
+            customerIds: conformity.mainTypeId
+          }
+        }
       );
     }
-    if (conformity.mainType === 'company' || conformity.relType === 'company') {
+    if (conformity.mainType === 'car' && conformity.relType === 'customer') {
+      await Car.updateOne(
+        { _id: conformity.mainTypeId },
+        {
+          $push: { customerIds: conformity.relTypeId }
+        }
+      );
+    }
+    if (conformity.mainType === 'company' && conformity.relType === 'car') {
       await Car.updateOne(
         { _id: conformity.relTypeId },
-        { $push: { companyIds: conformity.mainTypeId } }
+        {
+          $push: { companyIds: conformity.mainTypeId }
+        }
+      );
+    }
+
+    if (conformity.mainType === 'car' && conformity.relType === 'company') {
+      await Car.updateOne(
+        { _id: conformity.mainTypeId },
+        {
+          $push: { companyIds: conformity.relTypeId }
+        }
       );
     }
   }
