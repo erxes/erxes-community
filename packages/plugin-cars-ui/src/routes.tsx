@@ -13,7 +13,7 @@ const details = ({ match }) => {
     match.path === '/contacts/details/:id' ||
     match.path === '/companies/details/:id'
   ) {
-    <CarSection id={id} type={type} />;
+    return <CarSection id={id} type={type} />;
   }
 
   return <CarDetails id={id} />;
@@ -38,18 +38,6 @@ const routes = () => {
         component={details}
       />
       <Route path="/cars" exact={true} key="/cars" component={list} />
-      <Route
-        key="/contacts/details/:id"
-        exact={true}
-        path="/contacts/details/:id"
-        component={details}
-      />
-      <Route
-        key="/companies/details/:id"
-        exact={true}
-        path="/companies/details/:id"
-        component={details}
-      />
     </>
   );
 };
