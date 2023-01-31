@@ -33,7 +33,10 @@ var command = async () => {
   });
 
   for (var conformity of conformities) {
-    if (conformity.mainType === 'customer') {
+    if (
+      conformity.mainType === 'customer' ||
+      conformity.relType === 'customer'
+    ) {
       await Car.updateOne(
         { _id: conformity.relTypeId },
         { $push: { customerIds: conformity.mainTypeId } }
