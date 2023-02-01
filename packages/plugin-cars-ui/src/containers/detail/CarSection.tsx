@@ -86,6 +86,7 @@ const CarDetailsContainer = (props: FinalProps) => {
     id,
     type,
     cars,
+    carsQuery,
     carsOnCustomerOrCompany,
     carsEditOnCustomer,
     carsEditOnCompany
@@ -130,9 +131,6 @@ export default withProps<Props>(
     graphql<Props>(gql(queries.cars), {
       name: 'carsQuery',
       options: () => ({
-        variables: {
-          isSelect: true
-        },
         fetchPolicy: 'network-only'
       })
     }),

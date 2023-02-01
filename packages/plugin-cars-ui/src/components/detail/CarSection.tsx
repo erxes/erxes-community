@@ -17,6 +17,7 @@ type Props = {
   id: string;
   type: string;
   cars: ICar[];
+  carsQuery: any;
   carsOnCustomerOrCompany: ICar[];
   collapseCallback?: () => void;
   carsEditOnCustomer: (values: any) => void;
@@ -40,7 +41,18 @@ class CarSection extends React.Component<Props, State> {
     };
   }
 
-  search = (value: string, reload?: boolean) => {};
+  search = (value: string, reload?: boolean) => {
+    if (!reload) {
+      this.setState({ perPage: 0 });
+    }
+
+    this.setState({ perPage: this.state.perPage + 20 }, () =>
+      this.props.carsQuery.refetch({
+        searchValue: value,
+        perPage: this.state.perPage
+      })
+    );
+  };
 
   carAddForm(props) {
     return <CarForm {...props} />;
@@ -79,7 +91,7 @@ class CarSection extends React.Component<Props, State> {
       }
     };
 
-    const selected = cars.filter(car => carIds.includes(car._id));
+    const selected = this.props.carsOnCustomerOrCompany;
 
     const renderCarChooser = props => {
       const { closeModal } = props;
