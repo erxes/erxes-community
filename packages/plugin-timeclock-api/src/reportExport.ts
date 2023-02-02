@@ -1,3 +1,4 @@
+import dayjs = require('dayjs');
 import * as moment from 'moment';
 import * as xlsxPopulate from 'xlsx-populate';
 import { IModels } from './connectionResolver';
@@ -5,6 +6,8 @@ import { PRELIMINARY_REPORT_COLUMNS } from './constants';
 import { timeclockReportPreliminary } from './graphql/resolvers/utils';
 import { IUserReport } from './models/definitions/timeclock';
 import { createTeamMembersObject, generateCommonUserIds } from './utils';
+
+const dateFormat = 'YYYY-MM-DD';
 /**
  * Creates blank workbook
  */
@@ -22,6 +25,36 @@ export const generateXlsx = async (workbook: any): Promise<string> => {
   return workbook.outputAsync();
 };
 
+const addIntoSheet = async (
+  values: string[][],
+  startRowIdx: number,
+  endRowIdx: number,
+  sheet: any,
+  reportType: string
+) => {
+  let r;
+  switch (reportType) {
+    case 'Урьдчилсан' || 'Preliminary':
+      // A to I
+      r = sheet.range(`A${startRowIdx}:I${endRowIdx}`);
+      break;
+    case 'Сүүлд' || 'Final':
+    case 'Pivot':
+  }
+  r.value(values);
+};
+
+const prepareHeader = async (sheet: any, reportType: string) => {
+  switch (reportType) {
+    case 'Урьдчилсан' || 'Preliminary':
+      const table_headers = PRELIMINARY_REPORT_COLUMNS;
+      // A to I
+      addIntoSheet([table_headers], 1, 1, sheet, reportType);
+
+    case 'Сүүлд' || 'Final':
+    case 'Pivot':
+  }
+};
 export const buildFile = async (
   models: IModels,
   subdomain: string,
@@ -45,18 +78,10 @@ export const buildFile = async (
   const startDate = query.startDate;
   const endDate = query.endDate;
 
+  const startDateFormatted = dayjs(startDate).format(dateFormat);
+  const endDateFormatted = dayjs(endDate).format(dateFormat);
+
   const { workbook, sheet } = await createXlsFile();
-
-  const addIntoSheet = async (
-    values: string[][],
-    rowStartIdx: number,
-    rowEndIdx: number
-  ) => {
-    const r = sheet.range(`A${rowStartIdx}:I${rowEndIdx}`);
-    r.value(values);
-  };
-
-  const table_headers = PRELIMINARY_REPORT_COLUMNS;
 
   const teamMembersObject = await createTeamMembersObject(subdomain);
 
@@ -73,19 +98,28 @@ export const buildFile = async (
     ? teamMemberIdsFromFilter
     : teamMemberIds;
 
-  addIntoSheet([table_headers], 1, 1);
-
   const startRowIdx = 2;
   const endRowIdx = teamMemberIds.length + 1;
 
-  const reportPreliminary: any = await timeclockReportPreliminary(
-    subdomain,
-    totalTeamMemberIds,
-    startDate,
-    endDate,
-    teamMembersObject,
-    true
-  );
+  let report;
+
+  prepareHeader(sheet, reportType);
+
+  switch (reportType) {
+    case 'Урьдчилсан' || 'Preliminary':
+      report = await timeclockReportPreliminary(
+        subdomain,
+        totalTeamMemberIds,
+        startDate,
+        endDate,
+        teamMembersObject,
+        true
+      );
+      break;
+
+    case 'Сүүлд' || 'Final':
+    case 'Pivot':
+  }
 
   const extractValuesFromEmpReportObjects = (empReports: IUserReport[]) => {
     const extractValuesIntoArr: any[][] = [];
@@ -100,13 +134,13 @@ export const buildFile = async (
   };
 
   const extractAllData = extractValuesFromEmpReportObjects(
-    Object.values(reportPreliminary)
+    Object.values(report)
   );
 
-  addIntoSheet(extractAllData, startRowIdx, endRowIdx);
+  addIntoSheet(extractAllData, startRowIdx, endRowIdx, sheet, reportType);
 
   return {
-    name: `report-${moment().format('YYYY-MM-DD')}`,
+    name: `${reportType}-${startDateFormatted}-${endDateFormatted}`,
     response: await generateXlsx(workbook)
   };
 };

@@ -72,14 +72,21 @@ export const types = `
   }
 
   type ScheduleReport{
-    date: String
-    scheduleStart: Date
-    scheduleEnd: Date
-    recordedStart: Date
-    recordedEnd: Date
-    minsLate: Int
-    minsWorked: Int
-    minsScheduled: Int
+    timeclockDate: String
+    timeclockStart: Date
+    timeclockEnd: Date
+    timeclockDuration: Float
+
+    deviceName: String
+    deviceType: String
+
+    scheduledStart: Date
+    scheduledEnd: Date
+    scheduledDuration:Float
+    
+    totalMinsLate: Float
+    totalHoursOvertime: Float
+    totalHoursOvernight: Float
   }
 
   type UserReport{
@@ -90,16 +97,26 @@ export const types = `
     totalMinsWorked: Int
     totalMinsWorkedToday: Int
     totalMinsWorkedThisMonth: Int
+    totalRegularHoursWorked: Float
+    totalHoursWorked: Float
     totalDaysWorked:Int
+    
     totalMinsScheduled: Int
+    totalHoursScheduled: Float
+    totalDaysScheduled: Int
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
-    totalDaysScheduled: Int
+    
+    totalHoursOvertime: Float
+    totalHoursOvernight: Float
+
     totalMinsLateToday: Int
     totalMinsLateThisMonth: Int
     totalMinsAbsenceThisMonth: Int
+
   }
 
+  
   type Report {
     groupTitle: String
     groupReport: [UserReport]

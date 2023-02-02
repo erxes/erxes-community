@@ -134,25 +134,38 @@ const listReports = `
                 ${userFields}
               }
               scheduleReport {
-                date
-                scheduleStart
-                scheduleEnd
-                recordedStart
-                recordedEnd
-                minsLate
-                minsWorked
+                timeclockDate
+                timeclockStart
+                timeclockEnd
+                timeclockDuration
+            
+                deviceName
+                deviceType
+            
+                scheduledStart
+                scheduledEnd
+                scheduledDuration
+                
+                totalMinsLate
+                totalHoursOvertime
+                totalHoursOvernight
               }
               totalMinsLate
               totalAbsenceMins
               totalMinsWorked
               totalMinsScheduled
 
+              totalRegularHoursWorked
+              totalHoursWorked
               totalMinsWorkedThisMonth
               totalDaysWorked
 
+              totalHoursOvertime
+              totalHoursOvernight
+            
               totalMinsScheduledThisMonth
               totalDaysScheduled
-          
+              totalHoursScheduled
             }
             groupTotalMinsLate
             groupTotalAbsenceMins

@@ -286,8 +286,19 @@ export interface IUserExportReport {
   branchName?: string;
   position?: string;
   totalDaysWorked?: number;
+  totalHoursWorked?: number;
+  totalRegularHoursWorked?: number;
+
   totalDaysScheduled?: number;
+  totalHoursScheduled?: number;
+
+  totalHoursOvertime?: number;
+  totalHoursOvernight?: number;
+  totalMinsLate?: number;
+
+  scheduleReport?: IScheduleReport[];
 }
+
 export interface IUsersReport {
   [userId: string]: IUserExportReport;
 }

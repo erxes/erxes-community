@@ -2,6 +2,7 @@ import { IContext } from '../../connectionResolver';
 import {
   timeclockReportByUser,
   timeclockReportFinal,
+  timeclockReportPivot,
   timeclockReportPreliminary
 } from './utils';
 import {
@@ -157,7 +158,7 @@ const timeclockQueries = {
         }
 
         break;
-      case 'Сүүлд':
+      case 'Сүүлд' || 'Final':
         const reportFinal: any = await timeclockReportFinal(
           subdomain,
           paginateArray(totalTeamMemberIds, perPage, page),
@@ -165,8 +166,27 @@ const timeclockQueries = {
           endDate,
           false
         );
-
+        for (const userId of Object.keys(reportFinal)) {
+          returnReport.push({
+            groupReport: [{ userId: `${userId}`, ...reportFinal[userId] }]
+          });
+        }
       case 'Pivot':
+        const reportPivot: any = await timeclockReportPivot(
+          subdomain,
+          paginateArray(totalTeamMemberIds, perPage, page),
+          startDate,
+          endDate,
+          false
+        );
+
+        for (const userId of Object.keys(reportPivot)) {
+          if (userId !== 'scheduleReport') {
+            returnReport.push({
+              groupReport: [{ userId: `${userId}`, ...reportPivot[userId] }]
+            });
+          }
+        }
     }
 
     return {
