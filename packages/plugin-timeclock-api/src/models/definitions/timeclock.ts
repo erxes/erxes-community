@@ -260,10 +260,27 @@ export interface IScheduleReport {
   minsLate?: number;
   minsWorked?: number;
   include?: boolean;
+
+  timeclockDate?: string;
+  timeclockStart?: Date;
+  timeclockEnd?: Date;
+  timeclockDuration?: string;
+  deviceType?: string;
+  deviceName?: string;
+  scheduledStart?: Date;
+  scheduledEnd?: Date;
+  scheduledDuration?: string;
+  totalMinsLate?: string;
+  totalHoursOvertime?: string;
+  totalHoursOvernight?: string;
 }
 
 export interface IUserReport {
   userId?: string;
+  employeeId?: string;
+  firstName?: string;
+  lastName?: string;
+  position?: string;
   scheduleReport: IScheduleReport[];
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
@@ -286,15 +303,15 @@ export interface IUserExportReport {
   branchName?: string;
   position?: string;
   totalDaysWorked?: number;
-  totalHoursWorked?: number;
-  totalRegularHoursWorked?: number;
+  totalHoursWorked?: string;
+  totalRegularHoursWorked?: string;
 
   totalDaysScheduled?: number;
-  totalHoursScheduled?: number;
+  totalHoursScheduled?: string;
 
-  totalHoursOvertime?: number;
-  totalHoursOvernight?: number;
-  totalMinsLate?: number;
+  totalHoursOvertime?: string;
+  totalHoursOvernight?: string;
+  totalMinsLate?: string;
 
   scheduleReport?: IScheduleReport[];
 }

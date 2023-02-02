@@ -28,14 +28,15 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
           <td>{userReport.user.employeeId}</td>
           <td>{userReport.user.details?.lastName || '-'}</td>
           <td>{userReport.user.details?.firstName || '-'}</td>
+          <td>{userReport.user.details?.position || '-'}</td>
           <td>{userReport.totalDaysScheduled}</td>
           <td>{userReport.totalHoursScheduled}</td>
           <td>{userReport.totalDaysWorked}</td>
-          <td>{userReport.totalRegularHoursWorked?.toFixed(2)}</td>
-          <td>{userReport.totalHoursOvertime?.toFixed(2)}</td>
-          <td>{userReport.totalHoursOvernight?.toFixed(2)}</td>
-          <td>{userReport.totalHoursWorked?.toFixed(2)}</td>
-          <td>{userReport.totalMinsLate?.toFixed(2)}</td>
+          <td>{userReport.totalRegularHoursWorked}</td>
+          <td>{userReport.totalHoursOvertime}</td>
+          <td>{userReport.totalHoursOvernight}</td>
+          <td>{userReport.totalHoursWorked}</td>
+          <td>{userReport.totalMinsLate}</td>
           <td>{'-'}</td>
 
           <td>{'-'}</td>
@@ -52,13 +53,14 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
           <td>{userReport.user.details?.firstName || '-'}</td>
           <td>{userReport.user.details?.position || '-'}</td>
 
-          {renderScheduleShiftsOfReport(
-            userReport.scheduleReport.sort(
-              (a, b) =>
-                new Date(a.timeclockStart).getTime() -
-                new Date(b.timeclockEnd).getTime()
-            )
-          )}
+          {userReport.scheduleReport &&
+            renderScheduleShiftsOfReport(
+              userReport.scheduleReport.sort(
+                (a, b) =>
+                  new Date(a.timeclockStart).getTime() -
+                  new Date(b.timeclockEnd).getTime()
+              )
+            )}
         </tr>
       );
   }
@@ -103,7 +105,7 @@ const renderScheduleShiftsOfReport = scheduleReport => {
           {scheduleReport.map(schedule => {
             return (
               <div key={schedule.timeclockDate}>
-                {schedule.scheduledDuration.toFixed(2)}
+                {schedule.scheduledDuration}
               </div>
             );
           })}
@@ -144,7 +146,7 @@ const renderScheduleShiftsOfReport = scheduleReport => {
           {scheduleReport.map(schedule => {
             return (
               <div key={schedule.timeclockDate}>
-                {schedule.timeclockDuration.toFixed(2)}
+                {schedule.timeclockDuration}
               </div>
             );
           })}
@@ -153,7 +155,7 @@ const renderScheduleShiftsOfReport = scheduleReport => {
           {scheduleReport.map(schedule => {
             return (
               <div key={schedule.timeclockDate}>
-                {schedule.totalHoursOvertime.toFixed(2)}
+                {schedule.totalHoursOvertime}
               </div>
             );
           })}
@@ -162,7 +164,7 @@ const renderScheduleShiftsOfReport = scheduleReport => {
           {scheduleReport.map(schedule => {
             return (
               <div key={schedule.timeclockDate}>
-                {schedule.totalHoursOvernight.toFixed(2)}
+                {schedule.totalHoursOvernight}
               </div>
             );
           })}
@@ -170,9 +172,7 @@ const renderScheduleShiftsOfReport = scheduleReport => {
         <td>
           {scheduleReport.map(schedule => {
             return (
-              <div key={schedule.timeclockDate}>
-                {schedule.totalMinsLate.toFixed(2)}
-              </div>
+              <div key={schedule.timeclockDate}>{schedule.totalMinsLate}</div>
             );
           })}
         </td>

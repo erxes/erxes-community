@@ -171,6 +171,7 @@ const timeclockQueries = {
             groupReport: [{ userId: `${userId}`, ...reportFinal[userId] }]
           });
         }
+        break;
       case 'Pivot':
         const reportPivot: any = await timeclockReportPivot(
           subdomain,
@@ -187,6 +188,7 @@ const timeclockQueries = {
             });
           }
         }
+        break;
     }
 
     return {

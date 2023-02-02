@@ -75,24 +75,24 @@ export const types = `
     timeclockDate: String
     timeclockStart: Date
     timeclockEnd: Date
-    timeclockDuration: Float
+    timeclockDuration: String
 
     deviceName: String
     deviceType: String
 
     scheduledStart: Date
     scheduledEnd: Date
-    scheduledDuration:Float
+    scheduledDuration:String
     
-    totalMinsLate: Float
-    totalHoursOvertime: Float
-    totalHoursOvernight: Float
+    totalMinsLate: String
+    totalHoursOvertime: String
+    totalHoursOvernight: String
   }
 
   type UserReport{
     user: User
     scheduleReport: [ScheduleReport]
-    totalMinsLate: Int
+    totalMinsLate: Float
     totalAbsenceMins: Int
     totalMinsWorked: Int
     totalMinsWorkedToday: Int
