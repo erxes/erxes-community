@@ -731,7 +731,8 @@ export const timeclockReportFinal = async (
             if (getShiftDurationDiff > 0) {
               totalHoursOvertimePerUser += getShiftDurationDiff / MMSTOHRS;
             } else {
-              totalMinsLatePerUser += getShiftDurationDiff / MMSTOMINS;
+              totalMinsLatePerUser +=
+                Math.abs(getShiftDurationDiff) / MMSTOMINS;
             }
           }
         }
@@ -766,32 +767,14 @@ export const timeclockReportFinal = async (
     usersReport[currUserId] = {
       ...usersReport[currUserId],
       totalDaysScheduled: totalDaysScheduledPerUser,
-      totalHoursScheduled: totalHoursScheduledPerUser,
+      totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
       totalDaysWorked: totalDaysWorkedPerUser,
-      totalRegularHoursWorked: totalRegularHoursWorkedPerUser,
-      totalHoursWorked: totalHoursWorkedPerUser,
-      totalHoursOvertime: totalHoursOvertimePerUser,
-      totalHoursOvernight: totalHoursOvernightPerUser,
-      totalMinsLate: totalMinsLatePerUser
+      totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
+      totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
+      totalHoursOvernight: totalHoursOvernightPerUser.toFixed(2),
+      totalHoursWorked: totalHoursWorkedPerUser.toFixed(2),
+      totalMinsLate: totalMinsLatePerUser.toFixed(2)
     };
-    // if (exportToXlsx) {
-    //   usersReport[currUserId].totalDaysScheduled = totalDaysScheduledPerUser;
-    //   usersReport[currUserId].totalDaysWorked = totalDaysWorkedPerUser;
-    //   usersReport[currUserId].totalHoursScheduled = totalHoursScheduledPerUser;
-    //   usersReport[currUserId].totalHoursWorked = totalHoursWorkedPerUser;
-    //   usersReport[currUserId].totalHoursOvertime = totalHoursOvertimePerUser;
-    //   usersReport[currUserId].totalMinsLate = totalMinsLatePerUser;
-    // } else {
-    //   usersReport[currUserId] = {
-    //     totalDaysScheduled: totalDaysScheduledPerUser,
-    //     totalHoursScheduled: totalHoursScheduledPerUser,
-    //     totalDaysWorked: totalDaysWorkedPerUser,
-    //     totalHoursWorked: totalHoursWorkedPerUser,
-    //     totalHoursOvertime: totalHoursOvertimePerUser,
-    //     totalHoursOvernight: totalHoursOvernightPerUser,
-    //     totalMinsLate: totalMinsLatePerUser
-    //   };
-    // }
   });
 
   return usersReport;
@@ -930,15 +913,15 @@ export const timeclockReportPivot = async (
             timeclockDate: scheduledDay,
             timeclockStart: shiftStart,
             timeclockEnd: shiftEnd,
-            timeclockDuration: getTimeClockDuration / MMSTOHRS,
+            timeclockDuration: (getTimeClockDuration / MMSTOHRS).toFixed(2),
             deviceType: currUserTimeclock.deviceType,
             deviceName: currUserTimeclock.deviceName,
             scheduledStart: scheduleShiftStart,
             scheduledEnd: scheduleShiftEnd,
-            scheduledDuration: getScheduleDuration / MMSTOHRS,
-            totalMinsLate: totalMinsLatePerShift,
-            totalHoursOvertime: totalHoursOvertimePerShift,
-            totalHoursOvernight: totalHoursOvernightPerShift
+            scheduledDuration: (getScheduleDuration / MMSTOHRS).toFixed(2),
+            totalMinsLate: totalMinsLatePerShift.toFixed(2),
+            totalHoursOvertime: totalHoursOvertimePerShift.toFixed(2),
+            totalHoursOvernight: totalHoursOvernightPerShift.toFixed(2)
           });
         }
       });
@@ -946,7 +929,11 @@ export const timeclockReportPivot = async (
 
     usersReport[currUserId] = {
       ...usersReport[currUserId],
-      scheduleReport: totalShiftsOfUser
+      scheduleReport: totalShiftsOfUser.sort(
+        (a, b) =>
+          new Date(a.timeclockStart).getTime() -
+          new Date(b.timeclockStart).getTime()
+      )
     };
   });
 

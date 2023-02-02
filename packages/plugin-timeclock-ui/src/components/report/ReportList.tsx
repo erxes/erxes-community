@@ -43,6 +43,7 @@ function ReportList(props: Props) {
               <th rowSpan={2}>{__('Team member Id')}</th>
               <th rowSpan={2}>{__('Last Name')}</th>
               <th rowSpan={2}>{__('First Name')}</th>
+              <th rowSpan={2}>{__('Position')}</th>
               <th colSpan={2}>{__('Scheduled time')}</th>
               <th colSpan={6} style={{ textAlign: 'center' }}>
                 {__('Timeclock info')}
