@@ -1,4 +1,5 @@
-import { sendCoreMessage } from '../../messageBroker';
+import { IContext } from '../../connectionResolver';
+import { sendContactsMessage } from '../../messageBroker';
 import { ICarDocument } from '../../models/definitions/cars';
 
 const cars = {
@@ -11,20 +12,34 @@ const cars = {
     );
   },
 
-  async customer(car: ICarDocument, {}, { models, subdomain }) {
-    const customerIds = await sendCoreMessage({
-      subdomain,
-      action: 'conformities.savedConformity',
-      data: {
-        mainType: 'car',
-        mainTypeId: car._id.toString(),
-        relTypes: ['customer']
-      },
-      isRPC: true,
-      defaultValue: []
-    });
+  async customers(car: ICarDocument, {}, { subdomain }: IContext) {
+    return (
+      car.customerIds &&
+      sendContactsMessage({
+        subdomain,
+        action: 'customers.find',
+        data: {
+          _id: { $in: car.customerIds }
+        },
+        isRPC: true,
+        defaultValue: []
+      })
+    );
+  },
 
-    return models.Customers.find({ _id: { $in: customerIds || [] } });
+  async companies(car: ICarDocument, {}, { subdomain }: IContext) {
+    return (
+      car.companyIds &&
+      sendContactsMessage({
+        subdomain,
+        action: 'companies.find',
+        data: {
+          _id: { $in: car.companyIds }
+        },
+        isRPC: true,
+        defaultValue: []
+      })
+    );
   },
 
   category(car: ICarDocument, {}, { models }) {

@@ -7,18 +7,18 @@ export const types = ({ contacts }) => `
 
   ${attachmentType}
   ${attachmentInput}
-
+  
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
-
+  
   ${
     contacts
       ? `
         extend type Customer @key(fields: "_id") {
           _id: String! @external
         }
-
+        
         extend type Company @key(fields: "_id") {
           _id: String! @external
         }
@@ -26,7 +26,7 @@ export const types = ({ contacts }) => `
       : ''
   }
   
-
+  
   type CarCategory {
     _id: String!
     name: String
@@ -65,6 +65,8 @@ export const types = ({ contacts }) => `
     vintageYear: Float
     importYear: Float
     attachment: Attachment
+    customerIds: [String]
+    companyIds: [String]
     customFieldsData: JSON
   }
   type CarsListResponse {
@@ -83,11 +85,7 @@ const queryParams = `
   sortField: String
   sortDirection: Int
   brand: String
-  conformityMainType: String
-  conformityMainTypeId: String
-  conformityRelType: String
-  conformityIsRelated: Boolean
-  conformityIsSaved: Boolean
+  isSelect: Boolean
 `;
 
 export const queries = `
@@ -102,6 +100,8 @@ export const queries = `
   cpCarCategories(parentId: String, searchValue: String): [CarCategory]
   cpCarCategoriesTotalCount: Int
   cpCarCategoryDetail(_id: String): CarCategory
+  carsOfCustomer(customerId: String!): [Car]
+  carsOfCompany(companyId: String!): [Car]
 `;
 
 const commonFields = `
@@ -129,7 +129,7 @@ const carCategoryParams = `
 
 export const mutations = `
   carsAdd(${commonFields}): Car
-  carsEdit(_id: String!, ${commonFields}, customFieldsData: JSON): Car
+  carsEdit(_id: String!, customerIds: [String], companyIds: [String], ${commonFields}, customFieldsData: JSON): Car
   carsRemove(carIds: [String]): [String]
   carsMerge(carIds: [String], carFields: JSON) : Car
   carCategoriesAdd(${carCategoryParams}): CarCategory
@@ -138,4 +138,6 @@ export const mutations = `
   cpCarsAdd(${commonFields}, customerId: String, companyId: String): Car
   cpCarsEdit(_id: String!, ${commonFields}, customerId: String, companyId: String): Car
   cpCarsRemove(carIds: [String]): [String]
+  carsEditOnCustomer(customerId: String!, carIds: [String]): Car
+  carsEditOnCompany(companyId: String!, carIds: [String]): Car
 `;

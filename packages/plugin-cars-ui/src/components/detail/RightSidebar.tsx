@@ -1,36 +1,37 @@
-import * as path from 'path';
-
 import Box from '@erxes/ui/src/components/Box';
 import { ICar } from '../../types';
 import { List } from '../../styles';
 import React from 'react';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import { __ } from 'coreui/utils';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import dayjs from 'dayjs';
-import { isEnabled } from '@erxes/ui/src/utils/core';
-
-const CompanySection = asyncComponent(
-  () =>
-    isEnabled('contacts') &&
-    import(
-      /* webpackChunkName: "CompanySection" */ '@erxes/ui-contacts/src/companies/components/CompanySection'
-    )
-);
-
-const CustomerSection = asyncComponent(
-  () =>
-    isEnabled('contacts') &&
-    import(
-      /* webpackChunkName: "CustomerSection" */ '@erxes/ui-contacts/src/customers/components/CustomerSection'
-    )
-);
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import Icon from '@erxes/ui/src/components/Icon';
+import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
+import { MainStyleModalFooter as ModalFooter, Button } from '@erxes/ui/src';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
+import CarSelectOptions from '../common/CarSelectOptions';
 
 type Props = {
   car: ICar;
+  editCar: (values: any) => void;
 };
 
-export default class RightSidebar extends React.Component<Props> {
+type State = {
+  customerIds: string[];
+  companyIds: string[];
+};
+
+class RightSidebar extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      customerIds: [],
+      companyIds: []
+    };
+  }
+
   renderPlan(car) {
     if (!car.plan) {
       return null;
@@ -45,16 +46,138 @@ export default class RightSidebar extends React.Component<Props> {
   }
 
   render() {
-    const { car } = this.props;
+    const { car, editCar } = this.props;
+
+    const onSelectCustomers = value => {
+      this.setState({
+        customerIds: value
+      });
+    };
+
+    const onSelectCompanies = value => {
+      this.setState({
+        companyIds: value
+      });
+    };
+
+    const saveCustomer = closeModal => {
+      editCar({
+        customerIds: this.state.customerIds
+      });
+      closeModal();
+    };
+
+    const saveCompany = closeModal => {
+      editCar({
+        companyIds: this.state.companyIds
+      });
+      closeModal();
+    };
+
+    const customerChooser = props => {
+      const { closeModal } = props;
+
+      return (
+        <>
+          <SelectCustomers
+            label="Choose Customer"
+            name="customerId"
+            onSelect={onSelectCustomers}
+            multi={true}
+            initialValue={car.customerIds}
+          ></SelectCustomers>
+
+          <ModalFooter>
+            <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
+              Close
+            </Button>
+
+            <Button
+              btnStyle="success"
+              onClick={() => saveCustomer(closeModal())}
+              icon="check-circle"
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </>
+      );
+    };
+
+    const companyChooser = props => {
+      const { closeModal } = props;
+
+      return (
+        <>
+          <SelectCompanies
+            label="Choose Company"
+            name="chooseCompany"
+            initialValue={car.companyIds}
+            onSelect={onSelectCompanies}
+            multi={true}
+          />
+
+          <ModalFooter>
+            <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
+              Close
+            </Button>
+
+            <Button
+              btnStyle="success"
+              onClick={() => saveCompany(closeModal())}
+              icon="check-circle"
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </>
+      );
+    };
+
+    const extraCustomerButtons = (
+      <ModalTrigger
+        title="Associate"
+        trigger={
+          <button>
+            <Icon icon="plus-circle" />
+          </button>
+        }
+        content={customerChooser}
+      />
+    );
+
+    const extraCompanyButtons = (
+      <ModalTrigger
+        title="Associate"
+        trigger={
+          <button>
+            <Icon icon="plus-circle" />
+          </button>
+        }
+        content={companyChooser}
+      />
+    );
 
     return (
       <Sidebar>
-        {isEnabled('contacts') && (
-          <>
-            <CustomerSection mainType="car" mainTypeId={car._id} />
-            <CompanySection mainType="car" mainTypeId={car._id} />
-          </>
-        )}
+        <>
+          <Box
+            title={__('Customers')}
+            name="showCustomers "
+            extraButtons={extraCustomerButtons}
+            isOpen={true}
+          >
+            <CarSelectOptions name={'customers'} car={car} />
+          </Box>
+          <Box
+            title={__('Companies')}
+            name="showCompanies "
+            extraButtons={extraCompanyButtons}
+            isOpen={true}
+          >
+            <CarSelectOptions name={'companies'} car={car} />
+          </Box>
+        </>
 
         <Box title={__('Other')} name="showOthers">
           <List>
@@ -73,3 +196,5 @@ export default class RightSidebar extends React.Component<Props> {
     );
   }
 }
+
+export default RightSidebar;

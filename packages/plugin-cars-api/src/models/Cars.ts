@@ -6,21 +6,38 @@ import {
   ICar,
   ICarCategory
 } from './definitions/cars';
-import { sendCoreMessage, sendInternalNotesMessage } from '../messageBroker';
+import { sendInternalNotesMessage } from '../messageBroker';
 
 import { Model } from 'mongoose';
 import { validSearchText } from '@erxes/api-utils/src';
+import { IModels } from '../connectionResolver';
+import { IUser } from '@erxes/api-utils/src/types';
 
 export interface ICarModel extends Model<ICarDocument> {
+  checkDuplication(
+    carFields: { plateNumber?: string; vinNumber?: string },
+    idsToExclude?: string[]
+  ): unknown;
   createCar(doc: ICar, user: any): Promise<ICarDocument>;
   getCar(_id: string): Promise<ICarDocument>;
   updateCar(_id: string, doc: ICar): Promise<ICarDocument>;
-  removeCars(carIds: string[]): Promise<ICarDocument>;
-  mergeCars(carIds: string, carFields: any): Promise<ICarDocument>;
+  removeCars(subdomain: string, carIds: string[]): Promise<ICarDocument>;
+  mergeCars(
+    subdomain: string,
+    carIds: string,
+    carFields: any,
+    user: IUser
+  ): Promise<ICarDocument>;
+  getCarsByCustomerId(customerId: string): Promise<ICarDocument[]>;
+  getCarsByCompanyId(companyId: string): Promise<ICarDocument[]>;
+  deleteCars(cusId: string, carIds: string[]): Promise<ICarDocument>;
+  fillSearchText(doc: ICar): string;
+  removeCustomerFromCars(customerId: string): Promise<ICarDocument>;
+  removeCompanyFromCars(companyId: string): Promise<ICarDocument>;
 }
 
 export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
-  getCarCatogery(selector: any): Promise<ICarCategoryDocument>;
+  getCarCategory(selector: any): Promise<ICarCategoryDocument>;
   createCarCategory(doc: ICarCategory): Promise<ICarCategoryDocument>;
   updateCarCategory(
     _id: string,
@@ -33,7 +50,7 @@ export interface ICarCategoryModel extends Model<ICarCategoryDocument> {
   ): Promise<ICarCategoryDocument>;
 }
 
-export const loadCarClass = models => {
+export const loadCarClass = (models: IModels) => {
   class Car {
     /**
      * Checking if car has duplicated unique properties
@@ -106,6 +123,34 @@ export const loadCarClass = models => {
       return car;
     }
 
+    public static async getAllCars(carIds: string) {
+      for (const carId of carIds) {
+        await models.Cars.find({ _id: carId });
+      }
+      const car = await models.Cars.find({ _id: carIds });
+
+      if (!car) {
+        throw new Error('Car not found');
+      }
+
+      return car;
+    }
+
+    public static async getCarsByCustomerId(customerId: string) {
+      const cars = await models.Cars.find({
+        customerIds: customerId
+      }).lean();
+
+      return cars;
+    }
+
+    public static async getCarsByCompanyId(companyId: string) {
+      const cars = await models.Cars.find({
+        companyIds: companyId
+      }).lean();
+
+      return cars;
+    }
     /**
      * Create a car
      */
@@ -148,10 +193,10 @@ export const loadCarClass = models => {
     /**
      * Remove car
      */
-    public static async removeCars(carIds) {
+    public static async removeCars(subdomain, carIds) {
       for (const carId of carIds) {
         await sendInternalNotesMessage({
-          subdomain: models.subdomain,
+          subdomain,
           action: 'removeInternalNotes',
           data: {
             contentType: 'car',
@@ -159,25 +204,29 @@ export const loadCarClass = models => {
           },
           defaultValue: {}
         });
-
-        await sendCoreMessage({
-          subdomain: models.subdomain,
-          action: 'conformities.removeConformity',
-          data: {
-            mainType: 'car',
-            mainTypeId: carId
-          },
-          defaultValue: []
-        });
       }
 
       return models.Cars.deleteMany({ _id: { $in: carIds } });
     }
 
+    public static async removeCustomerFromCars(customerId: string) {
+      return models.Cars.updateMany(
+        { customerIds: customerId },
+        { $pull: { customerIds: customerId } }
+      );
+    }
+
+    public static async removeCompanyFromCars(companyId: string) {
+      return models.Cars.updateMany(
+        { companyIds: companyId },
+        { $pull: { companyIds: companyId } }
+      );
+    }
+
     /**
      * Merge cars
      */
-    public static async mergeCars(carIds, carFields) {
+    public static async mergeCars(subdomain, carIds, carFields, user) {
       // Checking duplicated fields of car
       await this.checkDuplication(carFields, carIds);
 
@@ -190,23 +239,13 @@ export const loadCarClass = models => {
       }
 
       // Creating car with properties
-      const car = await models.Cars.createCar({
-        ...carFields,
-        mergedIds: carIds
-      });
-
-      // Updating customer cars, deals, tasks, tickets
-      await sendCoreMessage({
-        subdomain: models.subdomain,
-        action: 'conformities.changeConformity',
-        data: {
-          type: 'car',
-          newTypeId: car._id,
-          oldTypeIds: carIds
+      const car = await models.Cars.createCar(
+        {
+          ...carFields,
+          mergedIds: carIds
         },
-        isRPC: true,
-        defaultValue: []
-      });
+        user
+      );
 
       // Removing modules associated with current cars
       // await models.InternalNotes.changeCar(car._id, carIds);
@@ -245,7 +284,7 @@ export const loadCarCategoryClass = models => {
         ? await models.CarCategories.findOne({ _id: doc.parentId }).lean()
         : undefined;
 
-      // Generatingg order
+      // Generating order
       doc.order = await this.generateOrder(parentCategory, doc);
 
       return models.CarCategories.create(doc);

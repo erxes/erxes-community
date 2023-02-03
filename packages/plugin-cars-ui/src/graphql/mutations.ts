@@ -1,40 +1,40 @@
 const commonFields = `
   $ownerId: String,
   $description: String,
-
+  
   $plateNumber: String,
   $vinNumber: String,
   $colorCode: String,
   $categoryId: String,
-
+  
   $bodyType: String,
   $fuelType: String,
   $gearBox: String,
-
+  
   $vintageYear: Float,
   $importYear: Float,
   $attachment: AttachmentInput
-
+  
   $customFieldsData: JSON
 `;
 
 const commonVariables = `
   ownerId: $ownerId,
   description: $description,
-
+  
   plateNumber: $plateNumber,
   vinNumber: $vinNumber,
   colorCode: $colorCode,
   categoryId: $categoryId
-
+  
   bodyType: $bodyType,
   fuelType: $fuelType,
   gearBox: $gearBox,
-
+  
   vintageYear: $vintageYear,
   importYear: $importYear,
   attachment: $attachment,
-
+  
   customFieldsData: $customFieldsData,
 `;
 
@@ -55,8 +55,8 @@ const carsAdd = `
 `;
 
 const carsEdit = `
-  mutation carsEdit($_id: String!, ${commonFields}) {
-    carsEdit(_id: $_id, ${commonVariables}) {
+  mutation carsEdit($_id: String!, $customerIds: [String], $companyIds: [String], ${commonFields}) {
+    carsEdit(_id: $_id, customerIds: $customerIds, companyIds: $companyIds, ${commonVariables}) {
       ownerId,
       description,
       plateNumber,
@@ -71,6 +71,21 @@ const carsEdit = `
   }
 `;
 
+const carsEditOnCustomer = `
+  mutation carsEditOnCustomer($customerId: String!, $carIds: [String]) {
+    carsEditOnCustomer(customerId: $customerId, carIds: $carIds) {
+      plateNumber
+    }
+  }
+`;
+
+const carsEditOnCompany = `
+  mutation carsEditOnCompany($companyId: String!, $carIds: [String]) {
+    carsEditOnCompany(companyId: $companyId, carIds: $carIds) {
+      plateNumber
+    }
+  }
+`;
 const carsRemove = `
   mutation carsRemove($carIds: [String]) {
     carsRemove(carIds: $carIds)
@@ -128,5 +143,7 @@ export default {
   carsMerge,
   carCategoryAdd,
   carCategoryEdit,
-  carCategoryRemove
+  carCategoryRemove,
+  carsEditOnCustomer,
+  carsEditOnCompany
 };

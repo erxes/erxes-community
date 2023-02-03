@@ -1,13 +1,20 @@
 import queryString from 'query-string';
 import React from 'react';
 import { Route } from 'react-router-dom';
-
 import CarList from './containers/CarsList';
 import CarDetails from './containers/detail/CarDetails';
-import CarSection from './components/common/CarSection';
+import CarSection from './containers/detail/CarSection';
 
 const details = ({ match }) => {
   const id = match.params.id;
+  const type = match.path.split('/')[1];
+
+  if (
+    match.path === '/contacts/details/:id' ||
+    match.path === '/companies/details/:id'
+  ) {
+    return <CarSection id={id} type={type} />;
+  }
 
   return <CarDetails id={id} />;
 };

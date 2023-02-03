@@ -57,6 +57,8 @@ export interface ICar {
   tagIds: string[];
   mergedIds: string[];
   attachment?: any;
+  customerIds?: string[];
+  companyIds?: string[];
   customFieldsData?: ICustomField[];
 }
 
@@ -180,7 +182,6 @@ export const carSchema = schemaHooksWrapper(
     }),
 
     description: field({ type: String, optional: true, label: 'Description' }),
-
     tagIds: field({
       type: [String],
       optional: true,
@@ -195,9 +196,9 @@ export const carSchema = schemaHooksWrapper(
     }),
 
     searchText: field({ type: String, optional: true, index: true }),
-
     attachment: field({ type: attachmentSchema }),
-
+    customerIds: field({ type: [String], optional: true }),
+    companyIds: field({ type: [String], optional: true }),
     customFieldsData: field({
       type: [customFieldSchema],
       optional: true,

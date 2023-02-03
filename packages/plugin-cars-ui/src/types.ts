@@ -13,6 +13,18 @@ export interface ICarCategoryDoc {
   parentId?: string;
 }
 
+export interface ICarCustomer {
+  _id?: string;
+  firstName?: string;
+  lastName?: string;
+  plateNumber?: string;
+}
+
+export interface ICompanyCustomer {
+  _id?: string;
+  names?: string;
+}
+
 export interface ICarDoc {
   createdAt?: Date;
   modifiedAt?: Date;
@@ -36,6 +48,10 @@ export interface ICarDoc {
   importYear?: number;
 
   attachment?: IAttachment;
+  customers?: ICarCustomer[];
+  companies?: ICompanyCustomer[];
+  customerIds?: string[];
+  companyIds?: string[];
 }
 
 export interface ICarCategory {
@@ -147,6 +163,18 @@ export type CarsQueryResponse = {
   refetch: () => void;
 };
 
+export type CustomersCarQueryResponse = {
+  carsOfCustomer: ICar[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type CompaniesCarQueryResponse = {
+  carsOfCompany: ICar[];
+  loading: boolean;
+  refetch: () => void;
+};
+
 export type ListConfigQueryResponse = {
   fieldsDefaultColumnsConfig: ListConfig[];
   loading: boolean;
@@ -155,6 +183,7 @@ export type ListConfigQueryResponse = {
 export type DetailQueryResponse = {
   carDetail: ICar;
   loading: boolean;
+  refetch: () => void;
 };
 
 export type ActivityLogQueryResponse = {

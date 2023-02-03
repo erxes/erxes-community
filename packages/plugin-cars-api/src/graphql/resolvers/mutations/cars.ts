@@ -11,7 +11,11 @@ import {
 } from '@erxes/api-utils/src/logUtils';
 
 const carMutations = {
-  carsAdd: async (_root, doc, { user, docModifier, models, subdomain }) => {
+  carsAdd: async (
+    _root,
+    doc,
+    { user, docModifier, models, subdomain }: IContext
+  ) => {
     const car = models.Cars.createCar(docModifier(doc), user);
 
     await putCreateLog(
@@ -49,14 +53,76 @@ const carMutations = {
     return updated;
   },
 
+  carsEditOnCustomer: async (_root, { ...doc }, { models }: IContext) => {
+    const cars = await models.Cars.getCarsByCustomerId(doc.customerId);
+    const oldCarIds = cars.map(car => car._id);
+
+    if (doc.carIds.length === 0) {
+      return models.Cars.removeCustomerFromCars(doc.customerId);
+    }
+
+    for (const carId of oldCarIds) {
+      if (!doc.carIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $pull: { customerIds: doc.customerId }
+          }
+        );
+      }
+    }
+
+    for (const carId of doc.carIds) {
+      if (!oldCarIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $push: { customerIds: doc.customerId }
+          }
+        );
+      }
+    }
+  },
+
+  carsEditOnCompany: async (_root, { ...doc }, { models }: IContext) => {
+    const cars = await models.Cars.getCarsByCompanyId(doc.companyId);
+    const oldCarIds = cars.map(car => car._id);
+
+    if (doc.carIds.length === 0) {
+      return models.Cars.removeCompanyFromCars(doc.companyId);
+    }
+
+    for (const carId of oldCarIds) {
+      if (!doc.carIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $pull: { companyIds: doc.companyId }
+          }
+        );
+      }
+    }
+
+    for (const carId of doc.carIds) {
+      if (!oldCarIds.includes(carId)) {
+        await models.Cars.updateOne(
+          { _id: carId },
+          {
+            $push: { companyIds: doc.companyId }
+          }
+        );
+      }
+    }
+  },
+
   carsRemove: async (
     _root,
     { carIds }: { carIds: string[] },
-    { models, user }: IContext
+    { models, user, subdomain }: IContext
   ) => {
     const cars = await models.Cars.find({ _id: { $in: carIds } }).lean();
 
-    await models.Cars.removeCars(carIds);
+    await models.Cars.removeCars(subdomain, carIds);
 
     // for (const car of cars) {
     //   messageBroker().sendMessage("putActivityLog", {
@@ -75,8 +141,12 @@ const carMutations = {
     return carIds;
   },
 
-  carsMerge: async (_root, { carIds, carFields }, { models, user }) => {
-    return models.Cars.mergeCars(carIds, carFields);
+  carsMerge: async (
+    _root,
+    { carIds, carFields },
+    { models, subdomain, user }: IContext
+  ) => {
+    return models.Cars.mergeCars(subdomain, carIds, carFields, user);
   },
 
   carCategoriesAdd: async (
@@ -108,7 +178,7 @@ const carMutations = {
     { _id, ...doc },
     { models, subdomain, user }
   ) => {
-    const carCategory = await models.CarCategories.getCarCatogery({
+    const carCategory = await models.CarCategories.getCarCategory({
       _id
     });
     const updated = await models.CarCategories.updateCarCategory(_id, doc);
@@ -134,7 +204,7 @@ const carMutations = {
     { _id }: { _id: string },
     { models, subdomain, user }: IContext
   ) => {
-    const carCategory = await models.CarCategories.getCarCatogery({
+    const carCategory = await models.CarCategories.getCarCategory({
       _id
     });
     const removed = await models.CarCategories.removeCarCategory(_id);
@@ -149,12 +219,16 @@ const carMutations = {
     return removed;
   },
 
-  cpCarsAdd: async (_root, doc, { docModifier, models }) => {
-    const car = await models.Cars.createCar(docModifier(doc));
+  cpCarsAdd: async (
+    _root,
+    doc,
+    { docModifier, models, subdomain, user }: IContext
+  ) => {
+    const car = await models.Cars.createCar(docModifier(doc), user);
 
     if (doc.customerId) {
       await sendCoreMessage({
-        subdomain: models.subdomain,
+        subdomain,
         action: 'conformities.addConformities',
         data: {
           mainType: 'customer',
@@ -167,7 +241,7 @@ const carMutations = {
 
     if (doc.companyId) {
       await sendCoreMessage({
-        subdomain: models.subdomain,
+        subdomain,
         action: 'conformities.addConformities',
         data: {
           mainType: 'company',

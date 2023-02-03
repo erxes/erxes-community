@@ -1,7 +1,3 @@
-import {
-  conformityQueryFieldDefs,
-  conformityQueryFields
-} from '@erxes/ui-cards/src/conformity/graphql/queries';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 
 const carCategoryFields = `
@@ -53,7 +49,7 @@ const listParamsDef = `
   $brand: String
   $sortField: String
   $sortDirection: Int
-  ${conformityQueryFields}
+  $isSelect: Boolean
 `;
 
 const listParamsValue = `
@@ -66,7 +62,7 @@ const listParamsValue = `
   brand: $brand
   sortField: $sortField
   sortDirection: $sortDirection
-  ${conformityQueryFieldDefs}
+  isSelect: $isSelect
 `;
 
 export const cars = `
@@ -123,6 +119,8 @@ export const carDetail = `
   query carDetail($_id: String!) {
     carDetail(_id: $_id) {
       ${carFields}
+      customerIds
+      companyIds
       ${
         isEnabled('contacts')
           ? `
@@ -135,7 +133,7 @@ export const carDetail = `
             }
             companies {
               _id
-              primaryName
+              names
               website
             }
             `
@@ -148,6 +146,24 @@ export const carDetail = `
         type
       }
       customFieldsData
+    }
+  }
+`;
+
+export const carsOfCustomer = `
+  query carsOfCustomer($customerId: String!) {
+    carsOfCustomer(customerId: $customerId) {
+      _id
+      plateNumber
+    }
+  }
+`;
+
+export const carsOfCompany = `
+  query carsOfCompany($companyId: String!) {
+    carsOfCompany(companyId: $companyId) {
+      _id
+      plateNumber
     }
   }
 `;
@@ -166,5 +182,7 @@ export default {
   carsExport,
   carCategories,
   carCategoriesCount,
-  carCategoryDetail
+  carCategoryDetail,
+  carsOfCustomer,
+  carsOfCompany
 };
