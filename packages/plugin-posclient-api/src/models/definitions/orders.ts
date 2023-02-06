@@ -19,6 +19,7 @@ export interface IOrder {
   status?: string;
   createdAt?: Date;
   modifiedAt?: Date;
+  userId?: string;
   paidDate?: Date;
   number?: string;
   customerId?: string;
@@ -50,7 +51,6 @@ const commonAttributes = { positive: true, default: 0 };
 export interface IOrderDocument extends Document, IOrder {
   _id: string;
   items: IOrderItemDocument[];
-  userId?: string;
 }
 
 const paidAmountSchema = new Schema({
