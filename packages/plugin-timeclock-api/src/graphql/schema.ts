@@ -226,7 +226,7 @@ export const queries = `
 export const mutations = `
   timeclockStart(${params}): Timeclock
   timeclockStop(${params}): Timeclock
-  timeclockRemove(_id : String): Timeclock
+  timeclockRemove(_id : String): JSON
   absenceTypeRemove(_id: String): JSON
   absenceTypeAdd(${absenceType_params}): AbsenceType
   absenceTypeEdit(_id: String, ${absenceType_params}): AbsenceType

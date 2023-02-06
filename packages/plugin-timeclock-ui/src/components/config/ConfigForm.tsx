@@ -148,6 +148,9 @@ function ConfigForm(props: Props) {
       explRequired?: boolean;
       attachRequired?: boolean;
       shiftRequest?: boolean;
+      deviceName?: string;
+      serialNo?: string;
+      extractRequired?: boolean;
     },
     name: string
   ) => {
@@ -224,6 +227,12 @@ function ConfigForm(props: Props) {
           }
         });
         return returnVariables;
+
+      case 'devicesConfig':
+        return {
+          deviceName: values.deviceName,
+          serialNo: values.serialNo
+        };
     }
   };
 
@@ -236,10 +245,57 @@ function ConfigForm(props: Props) {
         return <Form renderContent={renderHolidayContent} />;
       case 'Schedule':
         return <Form renderContent={renderScheduleContent} />;
+      case 'Devices':
+        return <Form renderContent={renderDevicesContent} />;
       // Absence
       default:
         return <Form renderContent={renderAbsenceContent} />;
     }
+  };
+
+  const renderDevicesContent = (formProps: IFormProps) => {
+    const { values, isSubmitted } = formProps;
+
+    return (
+      <FlexColumn marginNum={20}>
+        <ControlLabel required={true}>Device Name</ControlLabel>
+        <FormControl
+          {...formProps}
+          name="deviceName"
+          // defaultValue={absenceType && absenceType.name}
+          required={true}
+          autoFocus={true}
+        />
+
+        <ControlLabel required={true}>Serial No.</ControlLabel>
+        <FormControl
+          {...formProps}
+          name="serialNumber"
+          // defaultValue={absenceType && absenceType.name}
+          required={true}
+        />
+
+        <FlexRow>
+          <ControlLabel>Extract from device</ControlLabel>
+          <FormControl
+            name="extractRequired"
+            componentClass="checkbox"
+            defaultChecked={absenceType?.explRequired}
+            onChange={toggleExplRequired}
+          />
+        </FlexRow>
+
+        <FlexCenter style={{ marginTop: '10px' }}>
+          {renderButton({
+            name: 'devicesConfig',
+            values: generateDoc(values, 'devicesConfig'),
+            isSubmitted,
+            callback: closeModal || afterSave,
+            object: absenceType || null
+          })}
+        </FlexCenter>
+      </FlexColumn>
+    );
   };
 
   const renderAbsenceContent = (formProps: IFormProps) => {
@@ -361,6 +417,79 @@ function ConfigForm(props: Props) {
     );
   };
 
+  const renderScheduleContent = (formProps: IFormProps) => {
+    const { values, isSubmitted } = formProps;
+    return (
+      <FlexColumn marginNum={20}>
+        <ControlLabel required={true}>
+          <strong>Name</strong>
+        </ControlLabel>
+        <FormControl
+          {...formProps}
+          defaultValue={scheduleConfig?.scheduleName}
+          name="scheduleName"
+          required={true}
+          autoFocus={true}
+        />
+
+        <FlexColumnMargined marginNum={10}>
+          {renderConfigTime()}
+        </FlexColumnMargined>
+
+        <FlexCenter style={{ marginTop: '10px' }}>
+          {renderButton({
+            name: 'schedule',
+            values: generateDoc(values, 'schedule'),
+            isSubmitted,
+            callback: closeModal || afterSave,
+            object: scheduleConfig || null
+          })}
+        </FlexCenter>
+      </FlexColumn>
+    );
+  };
+
+  const renderHolidayContent = (formProps: IFormProps) => {
+    const { values, isSubmitted } = formProps;
+    return (
+      <FlexColumn marginNum={20}>
+        <ControlLabel required={true}>Holiday Name</ControlLabel>
+        <FormControl
+          {...formProps}
+          name="holidayName"
+          defaultValue={holiday && holiday.holidayName}
+          required={true}
+          autoFocus={true}
+        />
+        <CustomRangeContainer>
+          <DateControl
+            value={holidayDates.startingDate}
+            required={false}
+            onChange={onHolidayStartDateChange}
+            placeholder={'Starting date'}
+            dateFormat={'YYYY-MM-DD'}
+          />
+          <DateControl
+            value={holidayDates.endingDate}
+            required={false}
+            onChange={onHolidayEndDateChange}
+            placeholder={'Ending date'}
+            dateFormat={'YYYY-MM-DD'}
+          />
+        </CustomRangeContainer>
+        <FlexCenter style={{ marginTop: '10px' }}>
+          {renderButton({
+            name: 'holiday',
+            values: generateDoc(values, 'holiday'),
+            isSubmitted,
+            callback: closeModal || afterSave,
+            object: holiday || null
+          })}
+        </FlexCenter>
+      </FlexColumn>
+    );
+  };
+
   const onStartTimeChange = (day_key, time_val) => {
     const newShift = configDays[day_key];
     const [
@@ -451,78 +580,6 @@ function ConfigForm(props: Props) {
     );
   };
 
-  const renderScheduleContent = (formProps: IFormProps) => {
-    const { values, isSubmitted } = formProps;
-    return (
-      <FlexColumn marginNum={20}>
-        <ControlLabel required={true}>
-          <strong>Name</strong>
-        </ControlLabel>
-        <FormControl
-          {...formProps}
-          defaultValue={scheduleConfig?.scheduleName}
-          name="scheduleName"
-          required={true}
-          autoFocus={true}
-        />
-
-        <FlexColumnMargined marginNum={10}>
-          {renderConfigTime()}
-        </FlexColumnMargined>
-
-        <FlexCenter style={{ marginTop: '10px' }}>
-          {renderButton({
-            name: 'schedule',
-            values: generateDoc(values, 'schedule'),
-            isSubmitted,
-            callback: closeModal || afterSave,
-            object: scheduleConfig || null
-          })}
-        </FlexCenter>
-      </FlexColumn>
-    );
-  };
-
-  const renderHolidayContent = (formProps: IFormProps) => {
-    const { values, isSubmitted } = formProps;
-    return (
-      <FlexColumn marginNum={20}>
-        <ControlLabel required={true}>Holiday Name</ControlLabel>
-        <FormControl
-          {...formProps}
-          name="holidayName"
-          defaultValue={holiday && holiday.holidayName}
-          required={true}
-          autoFocus={true}
-        />
-        <CustomRangeContainer>
-          <DateControl
-            value={holidayDates.startingDate}
-            required={false}
-            onChange={onHolidayStartDateChange}
-            placeholder={'Starting date'}
-            dateFormat={'YYYY-MM-DD'}
-          />
-          <DateControl
-            value={holidayDates.endingDate}
-            required={false}
-            onChange={onHolidayEndDateChange}
-            placeholder={'Ending date'}
-            dateFormat={'YYYY-MM-DD'}
-          />
-        </CustomRangeContainer>
-        <FlexCenter style={{ marginTop: '10px' }}>
-          {renderButton({
-            name: 'holiday',
-            values: generateDoc(values, 'holiday'),
-            isSubmitted,
-            callback: closeModal || afterSave,
-            object: holiday || null
-          })}
-        </FlexCenter>
-      </FlexColumn>
-    );
-  };
   return renderConfigContent();
 }
 

@@ -6,9 +6,11 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import TimeForm from '../../containers/timeclock/TimeFormList';
 import dayjs from 'dayjs';
 import { dateFormat } from '../../constants';
+import Tip from '@erxes/ui/src/components/Tip';
 
 type Props = {
   timeclock: ITimeclock;
+  removeTimeclock: (_id: string) => void;
 };
 
 class Row extends React.Component<Props> {
@@ -45,7 +47,7 @@ class Row extends React.Component<Props> {
   );
 
   render() {
-    const { timeclock } = this.props;
+    const { timeclock, removeTimeclock } = this.props;
     const shiftStartTime = new Date(timeclock.shiftStart).toLocaleTimeString();
     const shiftDate =
       new Date(timeclock.shiftStart).toDateString().split(' ')[0] +
@@ -77,6 +79,15 @@ class Row extends React.Component<Props> {
         </td>
         <td>{timeclock.deviceType && timeclock.deviceType}</td>
         <td>{this.shiftBtnTrigger(timeclock.shiftActive)}</td>
+        <td>
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removeTimeclock(timeclock._id)}
+              icon="times-circle"
+            />
+          </Tip>
+        </td>
       </tr>
     );
   }

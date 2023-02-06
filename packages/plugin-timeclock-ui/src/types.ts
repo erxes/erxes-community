@@ -209,6 +209,7 @@ export type ScheduleMutationVariables = {
 export type TimeClockMutationResponse = {
   startTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
+  timeclockRemove: (params: { variables: { _id: string } }) => Promise<any>;
   extractAllMySqlDataMutation: (params: {
     variables: { startDate: string; endDate: string };
   }) => Promise<any>;

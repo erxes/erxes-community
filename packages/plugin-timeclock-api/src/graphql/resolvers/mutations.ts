@@ -5,7 +5,9 @@ import {
   ISchedule,
   IShift,
   ITimeClock,
-  IAbsenceType
+  IAbsenceType,
+  IDeviceConfig,
+  IDeviceConfigDocument
 } from '../../models/definitions/timeclock';
 import {
   createScheduleShiftsByUserIds,
@@ -497,6 +499,26 @@ const timeclockMutations = {
     });
 
     return newScheduleConfig;
+  },
+
+  async deviceConfigAdd(_root, doc: IDeviceConfig, { models }: IContext) {
+    return await models.DeviceConfigs.createDeviceConfig(doc);
+  },
+
+  async deviceConfigEdit(
+    _root,
+    { _id, ...doc }: IDeviceConfigDocument,
+    { models }: IContext
+  ) {
+    return await models.DeviceConfigs.updateDeviceConfig(_id, doc);
+  },
+
+  async deviceConfigRemove(
+    _root,
+    { _id }: IDeviceConfigDocument,
+    { models }: IContext
+  ) {
+    return models.DeviceConfigs.removeDeviceConfig(_id);
   },
 
   async extractAllDataFromMySQL(

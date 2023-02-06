@@ -1,10 +1,10 @@
-const clockRemove = `
+const timeclockRemove = `
   mutation timeclockRemove($_id: String!){
     timeclockRemove(_id: $_id)
   }
   `;
 
-const clockStart = `
+const timeclockStart = `
   mutation timeclockStart($userId: String, $longitude: Float, $latitude: Float, $deviceType: String){
     timeclockStart(userId: $userId, longitude: $longitude, latitude: $latitude, deviceType: $deviceType){
       _id
@@ -12,7 +12,7 @@ const clockStart = `
   }
 `;
 
-const clockStop = `
+const timeclockStop = `
   mutation timeclockStop( $userId: String, $_id: String, $longitude: Float, $latitude: Float,$deviceType: String){
     timeclockStop(userId: $userId, _id: $_id, longitude: $longitude, latitude: $latitude, deviceType : $deviceType){
       _id
@@ -163,9 +163,9 @@ export default {
   solveAbsence,
   solveSchedule,
   solveShift,
-  clockRemove,
-  clockStart,
-  clockStop,
+  timeclockRemove,
+  timeclockStart,
+  timeclockStop,
   payDateAdd,
   payDateEdit,
   payDateRemove,

@@ -106,6 +106,12 @@ function ConfigList(props: Props) {
     </Button>
   );
 
+  const devicesConfigTrigger = (
+    <Button id="configBtn" btnStyle="primary" icon="plus-circle">
+      Terminal devices
+    </Button>
+  );
+
   const scheduleConfigContent = ({ closeModal }, scheduleConfig) => {
     return (
       <ConfigForm
@@ -150,6 +156,17 @@ function ConfigList(props: Props) {
     );
   };
 
+  const devicesConfigContent = ({ closeModal }, holiday) => {
+    return (
+      <ConfigForm
+        {...props}
+        closeModal={closeModal}
+        holiday={holiday}
+        configType="Devices"
+      />
+    );
+  };
+
   const actionBarRight = (
     <>
       <ModalTrigger
@@ -172,6 +189,11 @@ function ConfigList(props: Props) {
         title={__('Holiday Config')}
         trigger={holidayConfigTrigger}
         content={contentProps => holidayConfigContent(contentProps, null)}
+      />
+      <ModalTrigger
+        title={__('Terminal Devices Config')}
+        trigger={devicesConfigTrigger}
+        content={contentProps => devicesConfigContent(contentProps, null)}
       />
     </>
   );
