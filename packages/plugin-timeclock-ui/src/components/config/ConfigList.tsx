@@ -10,6 +10,7 @@ import { Row, FilterItem } from '../../styles';
 import {
   IAbsence,
   IAbsenceType,
+  IDeviceConfigs,
   IPayDates,
   IScheduleConfig
 } from '../../types';
@@ -26,12 +27,14 @@ type Props = {
   holidays?: IAbsence[];
   payDates: IPayDates[];
   scheduleConfigs?: IScheduleConfig[];
+  deviceConfigs?: IDeviceConfigs[];
   loading?: boolean;
   renderButton: (props: IButtonMutateProps) => void;
   removeAbsenceType: (absenceTypeId: string) => void;
   removeHoliday: (holidayId: string) => void;
   removePayDate: (payDateId: string) => void;
   removeScheduleConfig: (scheduleConfigId: string) => void;
+  removeDeviceConfig: (deviceConfig: string) => void;
 };
 
 function ConfigList(props: Props) {
@@ -40,17 +43,23 @@ function ConfigList(props: Props) {
     payDates,
     holidays,
     scheduleConfigs,
+    deviceConfigs,
     removeAbsenceType,
     removeHoliday,
     removePayDate,
     getActionBar,
-    removeScheduleConfig
+    removeScheduleConfig,
+    removeDeviceConfig
   } = props;
-  const [selectedType, setType] = useState('Schedule Configs');
+
+  const [selectedType, setType] = useState(
+    localStorage.getItem('contentType') || 'Schedule Configs'
+  );
 
   const renderSelectionBar = () => {
     const onTypeSelect = type => {
       setType(type.value);
+      localStorage.setItem('contentType', type.value);
     };
 
     return (
@@ -67,7 +76,8 @@ function ConfigList(props: Props) {
                 'Schedule Configs',
                 'Absence types',
                 'Pay period',
-                'Holidays'
+                'Holidays',
+                'Terminal Devices'
               ].map(ipt => ({
                 value: ipt,
                 label: __(ipt)
@@ -156,7 +166,7 @@ function ConfigList(props: Props) {
     );
   };
 
-  const devicesConfigContent = ({ closeModal }, holiday) => {
+  const deviceConfigContent = ({ closeModal }, holiday) => {
     return (
       <ConfigForm
         {...props}
@@ -191,9 +201,9 @@ function ConfigList(props: Props) {
         content={contentProps => holidayConfigContent(contentProps, null)}
       />
       <ModalTrigger
-        title={__('Terminal Devices Config')}
+        title={__('Terminal Device Config')}
         trigger={devicesConfigTrigger}
-        content={contentProps => devicesConfigContent(contentProps, null)}
+        content={contentProps => deviceConfigContent(contentProps, null)}
       />
     </>
   );
@@ -220,6 +230,8 @@ function ConfigList(props: Props) {
         return removeHoliday;
       case 'payDate':
         return removePayDate;
+      case 'deviceConfig':
+        return removeDeviceConfig;
       default:
         return removeScheduleConfig;
     }
@@ -245,6 +257,8 @@ function ConfigList(props: Props) {
         return renderpayPeriodConfigContent();
       case 'Schedule Configs':
         return renderScheduleConfigContent();
+      case 'Terminal Devices':
+        return renderDevicesConfigContent();
       default:
         return renderAbsenceTypesContent();
     }
@@ -449,6 +463,40 @@ function ConfigList(props: Props) {
                 </tr>
               );
             })}
+        </tbody>
+      </Table>
+    );
+  };
+
+  const renderDevicesConfigContent = () => {
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>Serial Number</th>
+            <th>Extract from the device</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {deviceConfigs?.map(deviceConfig => (
+            <tr key={deviceConfig.serialNo}>
+              <td>{deviceConfig.deviceName}</td>
+              <td>{deviceConfig.serialNo}</td>
+              <td>{deviceConfig.extractRequired ? 'True' : 'False'}</td>
+              <td>
+                <ModalTrigger
+                  title="Edit holiday"
+                  trigger={editTrigger}
+                  content={contentProps =>
+                    deviceConfigContent(contentProps, deviceConfig)
+                  }
+                />
+                {removeTrigger(deviceConfig._id, 'deviceConfig')}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     );

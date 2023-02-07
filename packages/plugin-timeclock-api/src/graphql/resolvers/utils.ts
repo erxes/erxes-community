@@ -47,6 +47,32 @@ export const findBranches = async (subdomain: string, userId: string) => {
   return branches;
 };
 
+export const findBranchUsers = async (
+  subdomain: string,
+  branchIds: string[]
+) => {
+  const branchUsers = await sendCoreMessage({
+    subdomain,
+    action: 'users.find',
+    data: { query: { branchIds: { $in: branchIds } } },
+    isRPC: true
+  });
+  return branchUsers;
+};
+
+export const findDepartmentUsers = async (
+  subdomain: string,
+  departmentIds: string[]
+) => {
+  const deptUsers = await sendCoreMessage({
+    subdomain,
+    action: 'users.find',
+    data: { query: { departmentIds: { $in: departmentIds } } },
+    isRPC: true
+  });
+  return deptUsers;
+};
+
 export const createScheduleShiftsByUserIds = async (
   userIds: string[],
   shifts,

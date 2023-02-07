@@ -11,7 +11,11 @@ import { Sequelize, QueryTypes } from 'sequelize';
 
 const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
-import { findBranch, findDepartment } from './graphql/resolvers/utils';
+import {
+  findBranchUsers,
+  findDepartmentUsers,
+  findDepartment
+} from './graphql/resolvers/utils';
 
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
@@ -754,32 +758,42 @@ const generateCommonUserIds = async (
 
   if (branchIds) {
     for (const branchId of branchIds) {
-      const branch = await findBranch(subdomain, branchId);
+      const branchUsers = await findBranchUsers(subdomain, branchIds);
+      const branchUserIds = branchUsers.map(branchUser => branchUser._id);
+
       if (userIds) {
         commonUser = true;
         for (const userId of userIds) {
-          if (branch.userIds.includes(userId)) {
+          if (branchUserIds.includes(userId)) {
             totalUserIds.push(userId);
           }
         }
       } else {
-        totalUserIds.push(...branch.userIds);
+        totalUserIds.push(...branchUserIds);
       }
     }
   }
 
   if (departmentIds) {
     for (const deptId of departmentIds) {
-      const department = await findDepartment(subdomain, deptId);
+      const departmentUsers = await findDepartmentUsers(
+        subdomain,
+        departmentIds
+      );
+
+      const departmentUserIds = departmentUsers.map(
+        departmentUser => departmentUser._id
+      );
+
       if (userIds) {
         commonUser = true;
         for (const userId of userIds) {
-          if (department.userIds.includes(userId)) {
+          if (departmentUserIds.includes(userId)) {
             totalUserIds.push(userId);
           }
         }
       } else {
-        totalUserIds.push(...department.userIds);
+        totalUserIds.push(...departmentUserIds);
       }
     }
   }

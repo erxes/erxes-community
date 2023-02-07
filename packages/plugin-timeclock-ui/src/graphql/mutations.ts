@@ -146,6 +146,22 @@ const scheduleConfigRemove = `mutation scheduleConfigRemove($_id: String){
   scheduleConfigRemove(_id: $_id)
 }`;
 
+const deviceConfigAdd = `mutation deviceConfigAdd($_id: String, $deviceName: String, $serialNo: String, $extractRequired: Boolean){
+  deviceConfigAdd(_id: $_id, deviceName: $deviceName, serialNo: $serialNo, extractRequired: $extractRequired ){
+    _id
+  }
+}`;
+
+const deviceConfigEdit = `mutation deviceConfigEdit($_id: String, $deviceName: String, $serialNo: String, $extractRequired: Boolean){
+  deviceConfigEdit(_id: $_id, deviceName: $deviceName, serialNo: $serialNo, extractRequired: $extractRequired ){
+    _id
+  }
+}`;
+
+const deviceConfigRemove = `mutation deviceConfigRemove($_id: String){
+  deviceConfigRemove(_id: $_id)
+}`;
+
 const extractAllDataFromMySQL = `
 mutation extractAllDataFromMySQL($startDate: String, $endDate: String){
   extractAllDataFromMySQL(startDate: $startDate, endDate: $endDate){
@@ -177,5 +193,8 @@ export default {
   scheduleConfigAdd,
   scheduleConfigEdit,
   scheduleConfigRemove,
+  deviceConfigAdd,
+  deviceConfigEdit,
+  deviceConfigRemove,
   extractAllDataFromMySQL
 };

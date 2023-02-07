@@ -48,6 +48,9 @@ function ConfigForm(props: Props) {
   const [attachmentRequired, setAttachRequired] = useState(
     (absenceType && absenceType.attachRequired) || false
   );
+
+  const [deviceExtractRequired, setDeviceExtractRequired] = useState(false);
+
   const [payPeriod, setPayPeriod] = useState('');
 
   const defaultStartTime = new Date(
@@ -123,6 +126,9 @@ function ConfigForm(props: Props) {
   };
   const toggleAttachRequired = e => {
     setAttachRequired(e.target.checked);
+  };
+  const toggleDeviceExtractRequired = e => {
+    setDeviceExtractRequired(e.target.checked);
   };
 
   const onConfigDateChange = (dateNum: string, newDate: Date) => {
@@ -231,7 +237,8 @@ function ConfigForm(props: Props) {
       case 'devicesConfig':
         return {
           deviceName: values.deviceName,
-          serialNo: values.serialNo
+          serialNo: values.serialNo,
+          extractRequired: deviceExtractRequired
         };
     }
   };
@@ -270,7 +277,7 @@ function ConfigForm(props: Props) {
         <ControlLabel required={true}>Serial No.</ControlLabel>
         <FormControl
           {...formProps}
-          name="serialNumber"
+          name="serialNo"
           // defaultValue={absenceType && absenceType.name}
           required={true}
         />
@@ -280,8 +287,7 @@ function ConfigForm(props: Props) {
           <FormControl
             name="extractRequired"
             componentClass="checkbox"
-            defaultChecked={absenceType?.explRequired}
-            onChange={toggleExplRequired}
+            onChange={toggleDeviceExtractRequired}
           />
         </FlexRow>
 

@@ -149,6 +149,13 @@ export const types = `
     configShiftEnd: String
   }
 
+  type DeviceConfig{
+    _id: String!
+    deviceName: String
+    serialNo: String
+    extractRequired: Boolean
+  }
+
   type TimeClocksListResponse {
     list: [Timeclock]
     totalCount: Float
@@ -213,12 +220,16 @@ export const queries = `
   requestsMain(${queryParams}): RequestsListResponse
 
   absenceTypes:[AbsenceType]
+  
   timeclockReports(${queryParams}): ReportsListResponse
   timeclockReportByUser(selectedUser: String): UserReport
   timeclockDetail(_id: String!): Timeclock
+  
   absenceDetail(_id: String!): Absence
   scheduleDetail(_id: String!): Schedule
   scheduleConfigs: [ScheduleConfig]
+  
+  deviceConfigs:[DeviceConfig]
   payDates: [PayDate]
   holidays: [Absence]
 `;
@@ -247,5 +258,8 @@ export const mutations = `
   holidayRemove(_id: String): JSON
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
+  deviceConfigAdd(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
+  deviceConfigEdit(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
+  deviceConfigRemove(_id: String): JSON
   extractAllDataFromMySQL(startDate: String, endDate: String): [Timeclock]
 `;

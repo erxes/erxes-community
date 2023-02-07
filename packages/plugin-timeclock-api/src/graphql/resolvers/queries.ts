@@ -60,8 +60,12 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
-  async scheduleConfigs(_root, {}, { models, subdomain }: IContext) {
+  scheduleConfigs(_root, {}, { models }: IContext) {
     return models.ScheduleConfigs.find();
+  },
+
+  deviceConfigs(_root, {}, { models }: IContext) {
+    return models.DeviceConfigs.find();
   },
 
   async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
