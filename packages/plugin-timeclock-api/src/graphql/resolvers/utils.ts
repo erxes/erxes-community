@@ -14,28 +14,6 @@ const MMSTOHRS = 3600000;
 // milliseconds to mins
 const MMSTOMINS = 60000;
 
-export const findDepartment = async (subdomain: string, target) => {
-  const department = await sendCoreMessage({
-    subdomain,
-    action: 'departments.findOne',
-    data: { _id: target },
-    isRPC: true
-  });
-
-  return department;
-};
-
-export const findBranch = async (subdomain: string, target) => {
-  const branch = await sendCoreMessage({
-    subdomain,
-    action: 'branches.findOne',
-    data: { _id: target },
-    isRPC: true
-  });
-
-  return branch;
-};
-
 export const findBranches = async (subdomain: string, userId: string) => {
   const branches = await sendCoreMessage({
     subdomain,

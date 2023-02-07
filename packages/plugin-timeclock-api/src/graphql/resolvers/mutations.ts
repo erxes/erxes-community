@@ -11,9 +11,9 @@ import {
 } from '../../models/definitions/timeclock';
 import {
   createScheduleShiftsByUserIds,
-  findBranch,
   findBranches,
-  findDepartment
+  findBranchUsers,
+  findDepartmentUsers
 } from './utils';
 import dayjs = require('dayjs');
 import { connectAndQueryFromMySql } from '../../utils';
@@ -337,16 +337,19 @@ const timeclockMutations = {
     const concatBranchDept: string[] = [];
 
     if (branchIds) {
-      for (const branchId of branchIds) {
-        const branch = await findBranch(subdomain, branchId);
-        concatBranchDept.push(...branch.userIds);
-      }
+      const branchUsers = await findBranchUsers(subdomain, branchIds);
+      const branchUserIds = branchUsers.map(branchUser => branchUser._id);
+      concatBranchDept.push(...branchUserIds);
     }
     if (departmentIds) {
-      for (const deptId of departmentIds) {
-        const department = await findDepartment(subdomain, deptId);
-        concatBranchDept.push(...department.userIds);
-      }
+      const departmentUsers = await findDepartmentUsers(
+        subdomain,
+        departmentIds
+      );
+      const departmentUserIds = departmentUsers.map(
+        departmentUser => departmentUser._id
+      );
+      concatBranchDept.push(...departmentUserIds);
     }
 
     // prevent creating double schedule for common users

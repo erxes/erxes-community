@@ -13,8 +13,7 @@ const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
 import {
   findBranchUsers,
-  findDepartmentUsers,
-  findDepartment
+  findDepartmentUsers
 } from './graphql/resolvers/utils';
 
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
@@ -757,44 +756,37 @@ const generateCommonUserIds = async (
   let commonUser: boolean = false;
 
   if (branchIds) {
-    for (const branchId of branchIds) {
-      const branchUsers = await findBranchUsers(subdomain, branchIds);
-      const branchUserIds = branchUsers.map(branchUser => branchUser._id);
+    const branchUsers = await findBranchUsers(subdomain, branchIds);
+    const branchUserIds = branchUsers.map(branchUser => branchUser._id);
 
-      if (userIds) {
-        commonUser = true;
-        for (const userId of userIds) {
-          if (branchUserIds.includes(userId)) {
-            totalUserIds.push(userId);
-          }
+    if (userIds) {
+      commonUser = true;
+      for (const userId of userIds) {
+        if (branchUserIds.includes(userId)) {
+          totalUserIds.push(userId);
         }
-      } else {
-        totalUserIds.push(...branchUserIds);
       }
+    } else {
+      totalUserIds.push(...branchUserIds);
     }
   }
 
   if (departmentIds) {
-    for (const deptId of departmentIds) {
-      const departmentUsers = await findDepartmentUsers(
-        subdomain,
-        departmentIds
-      );
+    const departmentUsers = await findDepartmentUsers(subdomain, departmentIds);
 
-      const departmentUserIds = departmentUsers.map(
-        departmentUser => departmentUser._id
-      );
+    const departmentUserIds = departmentUsers.map(
+      departmentUser => departmentUser._id
+    );
 
-      if (userIds) {
-        commonUser = true;
-        for (const userId of userIds) {
-          if (departmentUserIds.includes(userId)) {
-            totalUserIds.push(userId);
-          }
+    if (userIds) {
+      commonUser = true;
+      for (const userId of userIds) {
+        if (departmentUserIds.includes(userId)) {
+          totalUserIds.push(userId);
         }
-      } else {
-        totalUserIds.push(...departmentUserIds);
       }
+    } else {
+      totalUserIds.push(...departmentUserIds);
     }
   }
 
