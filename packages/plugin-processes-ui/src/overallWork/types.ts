@@ -161,3 +161,23 @@ export type PerformChangeMutationResponse = {
 export type PerformRemoveMutationResponse = {
   performRemove: (mutation: { variables: { _id: string } }) => Promise<any>;
 };
+
+export type SeriesPrintConfig = {
+  row: number;
+  column: number;
+  width: number;
+  height: number;
+  margin: number;
+  isProductName: boolean;
+  productNameFontSize: number;
+  priceFontSize: number;
+
+  isBarcode: boolean;
+  barWidth: number;
+  barHeight: number;
+  barcodeFontSize: number;
+  barcodeDescriptionFontSize: number;
+
+  isQrcode: boolean;
+  qrSize: number;
+};

@@ -207,3 +207,15 @@ export const AddTrigger = styled.div`
     padding-bottom: 7px;
   }
 `;
+
+export const PrintableWrapper = styled.div`
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  display: none;
+  pointer-events: none;
+`;
+
+export const SidebarContent = styled.div`
+  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+`;

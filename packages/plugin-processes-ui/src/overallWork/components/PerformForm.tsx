@@ -191,9 +191,9 @@ class Form extends React.Component<Props, State> {
       customerId,
       companyId,
       inProducts,
-      outProducts,
+      outProducts: type === 'move' ? inProducts : outProducts,
       needProducts,
-      resultProducts
+      resultProducts: type === 'move' ? needProducts : resultProducts
     };
   };
 
@@ -337,6 +337,7 @@ class Form extends React.Component<Props, State> {
               </th>
               <th>{__('UOM')}</th>
               <th>{__('Quantity')}</th>
+              <th>{__('Actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -349,6 +350,7 @@ class Form extends React.Component<Props, State> {
                   productsData={productsData}
                   stateName={stateName}
                   onChangeState={this.onChangePerView}
+                  isReadSeries={stateName === 'inProducts'}
                 />
               );
             })}
@@ -439,19 +441,11 @@ class Form extends React.Component<Props, State> {
         </>
       );
     }
-    if (type === 'outlet') {
-      return (
-        <>
-          <FormColumn>{this.renderPerformIn()}</FormColumn>
-        </>
-      );
-    }
 
-    if (type === 'outlet') {
+    if (type === 'outlet' || type === 'move') {
       return (
         <>
           <FormColumn>{this.renderPerformIn()}</FormColumn>
-          <FormColumn>{this.renderPerformOut()}</FormColumn>
         </>
       );
     }
@@ -755,6 +749,15 @@ class Form extends React.Component<Props, State> {
     return;
   }
 
+  printSeries = () => {
+    const { perform } = this.props;
+
+    if (!perform || !perform._id) {
+      return;
+    }
+    window.open(`/processes/seriesNumberPrint/${perform._id}`);
+  };
+
   renderContent = (formProps: IFormProps) => {
     const { closeModal, renderButton, max, perform } = this.props;
     const { overallWorkDet } = this.state;
@@ -904,6 +907,16 @@ class Form extends React.Component<Props, State> {
         </Box>
 
         <ModalFooter>
+          {perform && perform._id && (
+            <Button
+              btnStyle="simple"
+              onClick={this.printSeries}
+              icon="times-circle"
+              uppercase={false}
+            >
+              Print
+            </Button>
+          )}
           <Button
             btnStyle="simple"
             onClick={closeModal}
@@ -917,9 +930,9 @@ class Form extends React.Component<Props, State> {
             name: 'Performance',
             values: this.generateDoc(values),
             isSubmitted,
-            callback: closeModal,
-            object: perform,
-            disabled: overallWorkDet.type !== 'income' && max < this.state.count
+            // callback: closeModal,
+            object: perform
+            // disabled: overallWorkDet.type !== 'income' && max < this.state.count
           })}
         </ModalFooter>
       </>

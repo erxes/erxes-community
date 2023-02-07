@@ -2,6 +2,10 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import React from 'react';
 import { __ } from '@erxes/ui/src/utils';
 import { IUom } from '@erxes/ui-products/src/types';
+import ActionButtons from '@erxes/ui/src/components/ActionButtons';
+import Tip from '@erxes/ui/src/components/Tip';
+import Button from '@erxes/ui/src/components/Button';
+import Icon from '@erxes/ui/src/components/Icon';
 
 type Props = {
   allUoms: IUom[];
@@ -9,6 +13,7 @@ type Props = {
   productData: any;
   productsData: any[];
   hasCost?: boolean;
+  isReadSeries?: boolean;
   onChangeState: (value: any) => void;
 };
 
@@ -54,7 +59,7 @@ class PerformDetail extends React.Component<Props, State> {
   };
 
   render() {
-    const { productData, hasCost, allUoms } = this.props;
+    const { productData, hasCost, allUoms, isReadSeries } = this.props;
     const { product } = productData;
     const productName = product
       ? `${product.code} - ${product.name}`
@@ -102,6 +107,17 @@ class PerformDetail extends React.Component<Props, State> {
             />
           </td>
         )}
+        <td>
+          <ActionButtons>
+            {isReadSeries && (
+              <Tip text="Print" placement="top">
+                <Button btnStyle="link">
+                  <Icon icon="focus-target" />
+                </Button>
+              </Tip>
+            )}
+          </ActionButtons>
+        </td>
       </tr>
     );
   }
