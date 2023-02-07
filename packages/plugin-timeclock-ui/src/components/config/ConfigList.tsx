@@ -10,7 +10,7 @@ import { Row, FilterItem } from '../../styles';
 import {
   IAbsence,
   IAbsenceType,
-  IDeviceConfigs,
+  IDeviceConfig,
   IPayDates,
   IScheduleConfig
 } from '../../types';
@@ -27,7 +27,7 @@ type Props = {
   holidays?: IAbsence[];
   payDates: IPayDates[];
   scheduleConfigs?: IScheduleConfig[];
-  deviceConfigs?: IDeviceConfigs[];
+  deviceConfigs?: IDeviceConfig[];
   loading?: boolean;
   renderButton: (props: IButtonMutateProps) => void;
   removeAbsenceType: (absenceTypeId: string) => void;
@@ -166,12 +166,12 @@ function ConfigList(props: Props) {
     );
   };
 
-  const deviceConfigContent = ({ closeModal }, holiday) => {
+  const deviceConfigContent = ({ closeModal }, deviceConfig) => {
     return (
       <ConfigForm
         {...props}
         closeModal={closeModal}
-        holiday={holiday}
+        deviceConfig={deviceConfig}
         configType="Devices"
       />
     );

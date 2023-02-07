@@ -513,7 +513,9 @@ const timeclockMutations = {
     { _id, ...doc }: IDeviceConfigDocument,
     { models }: IContext
   ) {
-    return await models.DeviceConfigs.updateDeviceConfig(_id, doc);
+    console.log(_id);
+
+    await models.DeviceConfigs.updateDeviceConfig(_id, doc);
   },
 
   async deviceConfigRemove(

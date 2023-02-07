@@ -258,7 +258,7 @@ export const mutations = `
   holidayRemove(_id: String): JSON
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
-  deviceConfigAdd(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
+  deviceConfigAdd(deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
   deviceConfigEdit(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
   deviceConfigRemove(_id: String): JSON
   extractAllDataFromMySQL(startDate: String, endDate: String): [Timeclock]

@@ -126,7 +126,7 @@ export interface ISchedule {
   };
 }
 
-export interface IDeviceConfigs {
+export interface IDeviceConfig {
   _id: string;
   deviceName: string;
   serialNo: string;
@@ -162,7 +162,7 @@ export type ScheduleConfigQueryResponse = {
 } & QueryResponse;
 
 export type DeviceConfigsQueryResponse = {
-  deviceConfigs: IDeviceConfigs[];
+  deviceConfigs: IDeviceConfig[];
 } & QueryResponse;
 
 export type ScheduleQueryResponse = {

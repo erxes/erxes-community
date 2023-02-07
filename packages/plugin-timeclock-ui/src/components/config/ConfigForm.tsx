@@ -14,6 +14,7 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import {
   IAbsence,
   IAbsenceType,
+  IDeviceConfig,
   IPayDates,
   ISchedule,
   IScheduleConfig
@@ -28,6 +29,7 @@ type Props = {
   configType: string;
   absenceType?: IAbsenceType;
   scheduleConfig?: IScheduleConfig;
+  deviceConfig?: IDeviceConfig;
   holiday?: IAbsence;
   payDate?: IPayDates;
   loading?: boolean;
@@ -37,7 +39,7 @@ type Props = {
 };
 
 function ConfigForm(props: Props) {
-  const { renderButton, history, scheduleConfig } = props;
+  const { renderButton, history, scheduleConfig, deviceConfig } = props;
   const { absenceType, holiday, payDate } = props;
   const [isShiftRequest, setShiftRequest] = useState(
     (absenceType && absenceType.shiftRequest) || false
@@ -49,7 +51,9 @@ function ConfigForm(props: Props) {
     (absenceType && absenceType.attachRequired) || false
   );
 
-  const [deviceExtractRequired, setDeviceExtractRequired] = useState(false);
+  const [deviceExtractRequired, setDeviceExtractRequired] = useState(
+    (deviceConfig && deviceConfig.extractRequired) || false
+  );
 
   const [payPeriod, setPayPeriod] = useState('');
 
@@ -234,8 +238,12 @@ function ConfigForm(props: Props) {
         });
         return returnVariables;
 
-      case 'devicesConfig':
+      case 'deviceConfig':
+        if (deviceConfig) {
+          values._id = deviceConfig._id;
+        }
         return {
+          _id: values._id,
           deviceName: values.deviceName,
           serialNo: values.serialNo,
           extractRequired: deviceExtractRequired
@@ -269,7 +277,7 @@ function ConfigForm(props: Props) {
         <FormControl
           {...formProps}
           name="deviceName"
-          // defaultValue={absenceType && absenceType.name}
+          defaultValue={deviceConfig && deviceConfig.deviceName}
           required={true}
           autoFocus={true}
         />
@@ -278,7 +286,7 @@ function ConfigForm(props: Props) {
         <FormControl
           {...formProps}
           name="serialNo"
-          // defaultValue={absenceType && absenceType.name}
+          defaultValue={deviceConfig && deviceConfig.serialNo}
           required={true}
         />
 
@@ -286,6 +294,7 @@ function ConfigForm(props: Props) {
           <ControlLabel>Extract from device</ControlLabel>
           <FormControl
             name="extractRequired"
+            defaultChecked={deviceExtractRequired}
             componentClass="checkbox"
             onChange={toggleDeviceExtractRequired}
           />
@@ -293,11 +302,11 @@ function ConfigForm(props: Props) {
 
         <FlexCenter style={{ marginTop: '10px' }}>
           {renderButton({
-            name: 'devicesConfig',
-            values: generateDoc(values, 'devicesConfig'),
+            name: 'deviceConfig',
+            values: generateDoc(values, 'deviceConfig'),
             isSubmitted,
             callback: closeModal || afterSave,
-            object: absenceType || null
+            object: deviceConfig || null
           })}
         </FlexCenter>
       </FlexColumn>
@@ -322,7 +331,7 @@ function ConfigForm(props: Props) {
           <FormControl
             name="shiftRequest"
             componentClass="checkbox"
-            defaultChecked={absenceType?.shiftRequest}
+            defaultChecked={isShiftRequest}
             onChange={toggleShiftRequest}
           />
         </FlexRow>
@@ -331,7 +340,7 @@ function ConfigForm(props: Props) {
           <FormControl
             name="explRequired"
             componentClass="checkbox"
-            defaultChecked={absenceType?.explRequired}
+            defaultChecked={explanationRequired}
             onChange={toggleExplRequired}
           />
         </FlexRow>
@@ -340,7 +349,7 @@ function ConfigForm(props: Props) {
           <FormControl
             name="attachRequired"
             componentClass="checkbox"
-            defaultChecked={absenceType?.attachRequired}
+            defaultChecked={attachmentRequired}
             onChange={toggleAttachRequired}
           />
         </FlexRow>

@@ -146,8 +146,8 @@ const scheduleConfigRemove = `mutation scheduleConfigRemove($_id: String){
   scheduleConfigRemove(_id: $_id)
 }`;
 
-const deviceConfigAdd = `mutation deviceConfigAdd($_id: String, $deviceName: String, $serialNo: String, $extractRequired: Boolean){
-  deviceConfigAdd(_id: $_id, deviceName: $deviceName, serialNo: $serialNo, extractRequired: $extractRequired ){
+const deviceConfigAdd = `mutation deviceConfigAdd($deviceName: String, $serialNo: String, $extractRequired: Boolean){
+  deviceConfigAdd(deviceName: $deviceName, serialNo: $serialNo, extractRequired: $extractRequired ){
     _id
   }
 }`;

@@ -88,7 +88,7 @@ const ListContainer = (props: FinalProps) => {
         : mutations.scheduleConfigAdd;
     }
 
-    if (name === 'devicesConfig') {
+    if (name === 'deviceConfig') {
       mutation = object
         ? mutations.deviceConfigEdit
         : mutations.deviceConfigAdd;
