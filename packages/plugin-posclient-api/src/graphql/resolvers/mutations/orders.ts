@@ -354,17 +354,17 @@ const orderMutations = {
     {
       _id,
       cashAmount,
-      paidParams
+      paidAmounts
     }: {
       _id: string;
       cashAmount?: number;
-      paidParams?: IPaidAmount[];
+      paidAmounts?: IPaidAmount[];
     },
     { models }: IContext
   ) {
     const order = await models.Orders.getOrder(_id);
 
-    const amount = (paidParams || []).reduce(
+    const amount = (paidAmounts || []).reduce(
       (sum, i) => Number(sum) + Number(i.amount),
       0
     );
@@ -377,7 +377,7 @@ const orderMutations = {
         cashAmount: cashAmount
           ? (order.cashAmount || 0) + Number(cashAmount.toFixed(2))
           : order.cashAmount || 0,
-        paidAmounts: (order.paidAmounts || []).concat(paidParams || [])
+        paidAmounts: (order.paidAmounts || []).concat(paidAmounts || [])
       }
     };
 
