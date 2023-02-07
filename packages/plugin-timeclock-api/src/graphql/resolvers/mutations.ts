@@ -16,7 +16,7 @@ import {
   findDepartmentUsers
 } from './utils';
 import dayjs = require('dayjs');
-import { connectAndQueryFromMySql } from '../../utils';
+import { connectAndQueryFromMsSql } from '../../utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -531,7 +531,7 @@ const timeclockMutations = {
     { startDate, endDate },
     { subdomain }: IContext
   ) {
-    return await connectAndQueryFromMySql(subdomain, startDate, endDate);
+    return await connectAndQueryFromMsSql(subdomain, startDate, endDate);
   }
 };
 

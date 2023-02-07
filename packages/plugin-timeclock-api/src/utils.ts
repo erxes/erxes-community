@@ -30,7 +30,7 @@ const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   return users;
 };
 
-const connectAndQueryFromMySql = async (
+const connectAndQueryFromMsSql = async (
   subdomain: string,
   startDate: string,
   endDate: string
@@ -819,7 +819,7 @@ const createTeamMembersObject = async (subdomain: string) => {
 };
 
 export {
-  connectAndQueryFromMySql,
+  connectAndQueryFromMsSql,
   generateFilter,
   generateCommonUserIds,
   findAllTeamMembersWithEmpId,
