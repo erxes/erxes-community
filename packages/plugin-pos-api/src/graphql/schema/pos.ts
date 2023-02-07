@@ -19,6 +19,7 @@ const posCommonFields = `
   adminIds: [String]
   cashierIds: [String]
   paymentIds: [String]
+  paymentTypes: [JSON]
   isOnline: Boolean
   onServer: Boolean
   branchId: String

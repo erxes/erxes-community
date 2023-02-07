@@ -31,11 +31,6 @@ interface IUIOptions {
   texts: IConfigColors;
 }
 
-interface ISyncInfo {
-  id: string;
-  date: Date;
-}
-
 interface ICatProd {
   _id: string;
   categoryId: string;
@@ -48,6 +43,8 @@ export interface IConfig {
   productDetails?: string[];
   adminIds: string[];
   cashierIds: string[];
+  paymentIds: string[];
+  paymentTypes: any[];
   beginNumber?: string;
   maxSkipNumber?: number;
   kitchenScreen?: any;
@@ -112,6 +109,7 @@ export const configSchema = new Schema({
   adminIds: field({ type: [String] }),
   cashierIds: field({ type: [String] }),
   paymentIds: field({ type: [String] }),
+  paymentTypes: field({ type: [Object] }),
   beginNumber: field({ type: String, optional: true }),
   maxSkipNumber: field({ type: Number }),
   waitingScreen: field({ type: Object }),

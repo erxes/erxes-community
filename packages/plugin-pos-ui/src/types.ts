@@ -39,7 +39,8 @@ export type IPos = {
   erxesAppToken: string;
   adminIds: [string];
   cashierIds: [string];
-  paymentIds: [string];
+  paymentIds: string[];
+  paymentTypes: any[];
   user: IUser;
   isOnline: boolean;
   onServer: boolean;

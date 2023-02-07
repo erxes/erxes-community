@@ -56,6 +56,9 @@ export interface IPos {
   productDetails?: string;
   adminIds?: string[];
   cashierIds?: string[];
+  paymentIds?: string[];
+  paymentTypes?: any[];
+  erxesAppToken: string;
   isOnline?: Boolean;
   onServer?: Boolean;
   branchId?: string;
@@ -208,6 +211,7 @@ export const posSchema = schemaHooksWrapper(
     cashierIds: field({ type: [String], label: 'Cashier ids' }),
     isOnline: field({ type: Boolean, label: 'Is online pos' }),
     paymentIds: field({ type: [String], label: 'Online Payments' }),
+    paymentTypes: field({ type: [Object], label: 'Other Payments' }),
     onServer: field({
       type: Boolean,
       optional: true,

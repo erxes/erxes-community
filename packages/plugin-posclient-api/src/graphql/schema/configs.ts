@@ -47,6 +47,7 @@ export const types = `
     adminIds: [String]
     cashierIds: [String]
     paymentIds: [String]
+    paymentTypes: [JSON]
     beginNumber: String
     maxSkipNumber: Int
     waitingScreen: JSON
