@@ -92,12 +92,17 @@ export const validateOrderPayment = (order: IOrder, doc: IPayment) => {
   if (order.paidDate) {
     throw new Error('Order has already been paid');
   }
-  const { cashAmount: paidCash = 0, paidAmounts } = order;
+  const {
+    cashAmount: paidCash = 0,
+    mobileAmount: paidMobile = 0,
+    paidAmounts
+  } = order;
   const { cashAmount = 0 } = doc;
 
   const paidTotal = Number(
     (
       paidCash +
+      paidMobile +
       (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0)
     ).toFixed(2)
   );
@@ -374,10 +379,11 @@ export const checkOrderStatus = (order: IOrderDocument) => {
 };
 
 export const checkOrderAmount = (order: IOrderDocument, amount: number) => {
-  const { cashAmount = 0, paidAmounts } = order;
+  const { cashAmount = 0, mobileAmount = 0, paidAmounts } = order;
 
   const paidAmount =
     cashAmount +
+    mobileAmount +
     (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
 
   if (paidAmount + amount > order.totalAmount) {

@@ -18,6 +18,7 @@ const PaidAmountDefs = `
 
 const paymentInputDefs = `
   cashAmount: Float
+  mobileAmount: Float
   billType: String
   registerNumber: String
 `;
@@ -151,7 +152,7 @@ export const mutations = `
   ordersEdit(_id: String!, ${addEditParams}): Order
   ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse
   orderChangeStatus(_id: String!, status: String): Order
-  ordersAddPayment(_id: String!, cashAmount: Float, paidAmounts: [PaidAmountInput] ): Order
+  ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput] ): Order
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
   orderItemChangeStatus(_id: String!, status: String): PosOrderItem

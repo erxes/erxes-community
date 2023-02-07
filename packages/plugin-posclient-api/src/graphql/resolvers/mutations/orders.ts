@@ -39,6 +39,7 @@ interface ISettlePaymentParams extends IPaymentBase {
 
 export interface IPayment extends IPaymentBase {
   cashAmount?: number;
+  mobileAmount?: number;
   paidAmounts?: IPaidAmount[];
 }
 
@@ -354,10 +355,12 @@ const orderMutations = {
     {
       _id,
       cashAmount,
+      mobileAmount,
       paidAmounts
     }: {
       _id: string;
       cashAmount?: number;
+      mobileAmount?: number;
       paidAmounts?: IPaidAmount[];
     },
     { models }: IContext
@@ -377,6 +380,9 @@ const orderMutations = {
         cashAmount: cashAmount
           ? (order.cashAmount || 0) + Number(cashAmount.toFixed(2))
           : order.cashAmount || 0,
+        mobileAmount: mobileAmount
+          ? (order.mobileAmount || 0) + Number(mobileAmount.toFixed(2))
+          : order.mobileAmount || 0,
         paidAmounts: (order.paidAmounts || []).concat(paidAmounts || [])
       }
     };
