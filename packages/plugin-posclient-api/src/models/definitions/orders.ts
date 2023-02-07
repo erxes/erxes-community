@@ -86,7 +86,7 @@ export const orderSchema = schemaHooksWrapper(
       ...commonAttributes,
       label: 'Cash amount'
     }),
-    paidAmounts: field({ type: paidAmountSchema }),
+    paidAmounts: field({ type: [paidAmountSchema], label: 'Paid amounts' }),
     totalAmount: getNumberFieldDefinition({
       ...commonAttributes,
       label: 'Total amount before tax'
