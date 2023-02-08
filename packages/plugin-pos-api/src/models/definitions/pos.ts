@@ -16,16 +16,22 @@ export interface IPosOrderItem {
 export interface IPosOrderItemDocument extends IPosOrderItem, Document {
   _id: string;
 }
+export interface IPaidAmount {
+  _id?: string;
+  type: string;
+  amount: number;
+  info?: any;
+}
+
 export interface IPosOrder {
   createdAt: Date;
   status: string;
   paidDate?: Date;
   number: string;
   customerId?: string;
-  cardAmount?: number;
   cashAmount?: number;
-  receivableAmount?: number;
   mobileAmount?: number;
+  paidAmounts?: IPaidAmount[];
   totalAmount?: number;
   finalAmount?: number;
   shouldPrintEbarimt?: Boolean;
@@ -138,6 +144,13 @@ const posOrderItemSchema = schemaHooksWrapper(
   'erxes_posOrderItem'
 );
 
+const paidAmountSchema = new Schema({
+  _id: field({ pkey: true }),
+  type: field({ type: String }),
+  amount: field({ type: Number }),
+  info: field({ type: Object })
+});
+
 export const posOrderSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
@@ -146,10 +159,9 @@ export const posOrderSchema = schemaHooksWrapper(
     paidDate: field({ type: Date, label: 'Paid date' }),
     number: field({ type: String, label: 'Order number', index: true }),
     customerId: field({ type: String, label: 'Customer' }),
-    cardAmount: field({ type: Number, label: 'Card amount' }),
     cashAmount: field({ type: Number, label: 'Cash amount' }),
-    receivableAmount: field({ type: Number, label: 'Receivable amount' }),
     mobileAmount: field({ type: Number, label: 'Mobile amount' }),
+    paidAmounts: field({ type: [paidAmountSchema], label: 'Paid amounts' }),
     totalAmount: field({ type: Number, label: 'Total amount' }),
     finalAmount: field({ type: Number, label: 'finalAmount' }),
     shouldPrintEbarimt: field({

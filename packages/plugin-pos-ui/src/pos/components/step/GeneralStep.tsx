@@ -537,7 +537,7 @@ class GeneralStep extends React.Component<Props, State> {
             <FormGroup>
               <FormControl
                 name="type"
-                maxLength={8}
+                maxLength={10}
                 defaultValue={paymentType.type || ''}
                 onChange={onChangeInput}
               />
