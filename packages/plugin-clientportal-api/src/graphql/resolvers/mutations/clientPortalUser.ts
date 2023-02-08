@@ -1,6 +1,6 @@
 import { authCookieOptions, getEnv } from '@erxes/api-utils/src/core';
-import { debugInfo } from '@erxes/api-utils/src/debuggers';
 
+import { createJwtToken } from '../../../auth/authUtils';
 import { IContext } from '../../../connectionResolver';
 import { sendCoreMessage } from '../../../messageBroker';
 import { ILoginParams } from '../../../models/ClientPortalUser';
@@ -32,9 +32,9 @@ const clientPortalUserMutations = {
       passwordConfirmation?: string;
       username?: string;
     },
-    { models }: IContext
+    { models, subdomain }: IContext
   ) {
-    const user = await models.ClientPortalUsers.confirmInvitation({
+    const user = await models.ClientPortalUsers.confirmInvitation(subdomain, {
       token,
       password,
       passwordConfirmation,
@@ -47,9 +47,13 @@ const clientPortalUserMutations = {
   async clientPortalUsersEdit(
     _root,
     { _id, ...doc }: IClientPortalUserEdit,
-    { models }: IContext
+    { models, subdomain }: IContext
   ) {
-    const updated = await models.ClientPortalUsers.updateUser(_id, doc);
+    const updated = await models.ClientPortalUsers.updateUser(
+      subdomain,
+      _id,
+      doc
+    );
 
     return updated;
   },
@@ -61,9 +65,10 @@ const clientPortalUserMutations = {
   async clientPortalUsersRemove(
     _root,
     { clientPortalUserIds }: { clientPortalUserIds: string[] },
-    { models }: IContext
+    { models, subdomain }: IContext
   ) {
     const response = await models.ClientPortalUsers.removeUser(
+      subdomain,
       clientPortalUserIds
     );
 
@@ -85,9 +90,38 @@ const clientPortalUserMutations = {
     args: IVerificationParams,
     context: IContext
   ) => {
-    const { models } = context;
+    const { models, res } = context;
 
-    return models.ClientPortalUsers.verifyUser(args);
+    const user = await models.ClientPortalUsers.verifyUser(args);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const clientPortal = await models.ClientPortals.getConfig(
+      user.clientPortalId
+    );
+
+    const optConfig = clientPortal.otpConfig;
+
+    if (args.phoneOtp && optConfig && optConfig.loginWithOTP) {
+      const cookieOptions: any = {};
+
+      const NODE_ENV = getEnv({ name: 'NODE_ENV' });
+
+      if (!['test', 'development'].includes(NODE_ENV)) {
+        cookieOptions.sameSite = 'none';
+      }
+
+      const options = authCookieOptions(cookieOptions);
+      const { token } = createJwtToken({ userId: user._id });
+
+      res.cookie('client-auth-token', token, options);
+
+      return 'loggedin';
+    }
+
+    return 'verified';
   },
 
   clientPortalUsersVerify: async (
@@ -95,9 +129,9 @@ const clientPortalUserMutations = {
     { userIds, type }: { userIds: string[]; type: string },
     context: IContext
   ) => {
-    const { models } = context;
+    const { models, subdomain } = context;
 
-    return models.ClientPortalUsers.verifyUsers(userIds, type);
+    return models.ClientPortalUsers.verifyUsers(subdomain, userIds, type);
   },
 
   /*
@@ -256,6 +290,44 @@ const clientPortalUserMutations = {
     });
 
     return user;
+  },
+
+  clientPortalLoginWithPhone: async (
+    _root,
+    args: { phone: string; clientPortalId: string; deviceToken },
+    { models, subdomain, res }: IContext
+  ) => {
+    const { phone, clientPortalId, deviceToken } = args;
+
+    const clientPortal = await models.ClientPortals.getConfig(clientPortalId);
+
+    const config = clientPortal.otpConfig || {
+      content: '',
+      smsTransporterType: '',
+      codeLength: 4,
+      loginWithOTP: false
+    };
+
+    if (!config.loginWithOTP) {
+      throw new Error('Login with OTP is not enabled');
+    }
+
+    const { userId, phoneCode } = await models.ClientPortalUsers.loginWithPhone(
+      subdomain,
+      clientPortal,
+      phone,
+      deviceToken
+    );
+
+    if (phoneCode) {
+      const body =
+        config.content.replace(/{.*}/, phoneCode) ||
+        `Your verification code is ${phoneCode}`;
+
+      await sendSms(subdomain, config.smsTransporterType, phone, body);
+    }
+
+    return { userId, message: 'Sms sent' };
   }
 };
 

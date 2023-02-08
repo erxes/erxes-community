@@ -33,6 +33,7 @@ const listQueryParams = `
     _ids: [String]
     pipelineId: String
     pipelineIds: [String]
+    parentId:String
     stageId: String
     customerIds: [String]
     companyIds: [String]
@@ -48,10 +49,16 @@ const listQueryParams = `
     sortDirection: Int
     userIds: [String]
     segment: String
+    segmentData: String
     assignedToMe: String
     startDate: String
     endDate: String
     hasStartAndCloseDate: Boolean
+    tagIds: [String]
+    noSkipArchive: Boolean
+    number: String
+    branchIds: [String]
+    departmentIds: [String]
     ${conformityQueryFields}
 `;
 

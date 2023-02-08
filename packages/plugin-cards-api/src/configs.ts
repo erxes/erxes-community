@@ -3,10 +3,10 @@ import * as serverTiming from 'server-timing';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 
-import { initBroker, sendSegmentsMessage } from './messageBroker';
+import { initBroker } from './messageBroker';
 import * as permissions from './permissions';
 import { routeErrorHandling } from '@erxes/api-utils/src/requests';
-import { buildFile } from './exporter';
+import { buildFile } from './exporterByUrl';
 import segments from './segments';
 import forms from './forms';
 import logs from './logUtils';
@@ -17,7 +17,10 @@ import automations from './automations';
 import search from './search';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import webhooks from './webhooks';
+import documents from './documents';
 import tags from './tags';
+import exporter from './exporter';
+import cronjobs from './cronjobs/common';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -39,16 +42,19 @@ export default {
   hasSubscriptions: true,
 
   meta: {
+    cronjobs,
     forms,
     logs: { providesActivityLog: true, consumers: logs },
     segments,
     automations,
     imports,
+    exporter,
     internalNotes,
     search,
     webhooks,
     tags,
-    permissions
+    permissions,
+    documents
   },
 
   apolloServerContext: async (context, req, res) => {
@@ -75,7 +81,6 @@ export default {
       '/file-export',
       routeErrorHandling(async (req: any, res) => {
         const { query } = req;
-        const { segment } = query;
 
         const subdomain = getSubdomain(req);
         const models = await generateModels(subdomain);
@@ -83,18 +88,6 @@ export default {
         const result = await buildFile(models, subdomain, query);
 
         res.attachment(`${result.name}.xlsx`);
-
-        if (segment) {
-          try {
-            sendSegmentsMessage({
-              subdomain,
-              action: 'removeSegment',
-              data: { segmentId: segment }
-            });
-          } catch (e) {
-            console.log((e as Error).message);
-          }
-        }
 
         return res.send(result.response);
       })

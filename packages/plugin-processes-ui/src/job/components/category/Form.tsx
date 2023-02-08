@@ -18,8 +18,8 @@ import {
 } from '@erxes/ui/src/types';
 import { extractAttachment } from '@erxes/ui/src/utils';
 import { IJobCategory } from '../../types';
-import { PRODUCT_CATEGORY_STATUSES } from '../../../constants';
 import { ICategory } from '@erxes/ui/src/utils/categories';
+import { PRODUCT_CATEGORY_STATUSES } from '@erxes/ui-products/src/constants';
 
 type Props = {
   categories: IJobCategory[];
@@ -38,8 +38,6 @@ class CategoryForm extends React.Component<Props, State> {
 
     const category = props.category || ({} as ICategory);
     const attachment = category.attachment ? category.attachment : undefined;
-
-    console.log('constructor ...');
 
     this.state = {
       attachment
@@ -74,8 +72,6 @@ class CategoryForm extends React.Component<Props, State> {
 
     const attachments =
       (object.attachment && extractAttachment([object.attachment])) || [];
-
-    console.log('attachments here', attachments);
 
     return (
       <>

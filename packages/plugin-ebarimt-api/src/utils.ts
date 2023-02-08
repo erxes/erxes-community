@@ -38,12 +38,21 @@ export const validCompanyCode = async (config, companyCode) => {
   return result;
 };
 
-export const companyCheckCode = async (user, params, subdomain) => {
+export const companyCheckCode = async (params, subdomain) => {
   if (!params.code) {
     return;
   }
 
   const config = await getConfig(subdomain, 'EBARIMT', {});
+
+  if (
+    !config ||
+    !config.checkCompanyUrl ||
+    !config.checkCompanyUrl.includes('http')
+  ) {
+    return;
+  }
+
   const companyName = await validCompanyCode(config, params.code);
 
   if (!companyName) {
@@ -139,7 +148,7 @@ export const getPostData = async (subdomain, config, deal) => {
   const products = await sendProductsMessage({
     subdomain,
     action: 'find',
-    data: { query: { _id: { $in: productsIds } } },
+    data: { query: { _id: { $in: productsIds } }, limit: productsIds.length },
     isRPC: true,
     defaultValue: []
   });

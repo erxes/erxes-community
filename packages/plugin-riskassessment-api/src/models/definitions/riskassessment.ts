@@ -1,50 +1,98 @@
 import { Document, Schema } from 'mongoose';
+import { calculateMethodsSchema } from './indicator';
 import { field } from './utils';
-export interface IRiskAssessmentDocument extends Document {
-  _id: string;
-  createdAt: Date;
-  name: String;
-  description: String;
-  categoryId: String;
-  status: String;
-}
 
 export interface IRiskAssessmentCategoryDocument extends Document {
   _id: String;
   name: String;
-  formId: String;
   parentId: String;
   order: String;
   code: String;
 }
 
+interface AssessmentCommonTypes {
+  status: string;
+  statusColor: string;
+  resultScore: number;
+  createdAt: string;
+  cloesedAt: string;
+}
+
+export interface IRiskAssessmentsDocument
+  extends AssessmentCommonTypes,
+    Document {
+  _id: string;
+  indicatorId: string[];
+  groupId: string;
+  branchIds: string[];
+  departmentIds: string[];
+  operationIds: string[];
+  indicatorGroups: any[];
+  cardId: string;
+  cardType: string;
+}
+
+export interface IRiskAssessmentIndicator
+  extends AssessmentCommonTypes,
+    Document {
+  assetId: string;
+  indicatorId: string;
+  status: string;
+  statusColor: string;
+  resultScore: number;
+  totalScore: number;
+}
+
+export interface IRiskAssessmentIndicatorsDocument
+  extends IRiskAssessmentIndicator {
+  _id: string;
+}
+
+export const commonAssessmentSchema = {
+  _id: field({ pkey: true }),
+  status: field({ type: String, label: 'Status', default: 'In Progress' }),
+  statusColor: field({
+    type: String,
+    label: 'Status Status Color',
+    default: '#3B85F4'
+  }),
+  resultScore: field({ type: Number, label: 'Result Score', default: 0 }),
+  totalScore: field({ type: Number, label: 'Total Score', default: 0 }),
+  createdAt: field({ type: Date, label: 'Created At', default: Date.now }),
+  closedAt: field({ type: Date, optional: true, label: 'Closed At' })
+};
+
 export const riskAssessmentCategorySchema = new Schema({
   _id: field({ pkey: true }),
   name: field({ type: String, label: 'Category Name' }),
-  formId: field({ type: String, label: 'Category Form Id' }),
   parentId: field({ type: String, label: 'Category Parent Name' }),
   order: field({ type: String, label: 'Category Order' }),
-  code: field({ type: String, label: 'Category Code' })
+  code: field({ type: String, label: 'Category Code' }),
+  type: field({ type: String, label: 'Category Type' })
 });
 
-const calculateLogicsSchema = new Schema({
-  _id: field({ pkey: true }),
-  name: field({ type: String, label: 'Logic Name' }),
-  value: field({ type: Number, label: 'Logic Value' }),
-  value2: field({ type: Number, label: 'Logic Value When Between Logic' }),
-  logic: field({ type: String, label: 'Logic Logic' }),
-  color: field({ type: String, label: 'Logic Status Color' })
+export const riskAssessmentIndicatorsSchema = new Schema({
+  assessmentId: field({ type: String, label: 'Risk assessment Id' }),
+  indicatorId: field({ type: String, label: 'Risk indicator Id' }),
+  ...commonAssessmentSchema
 });
 
-export const riskAssessmentSchema = new Schema({
-  _id: field({ pkey: true }),
-  name: field({ type: String, label: 'Name' }),
-  description: field({ type: String, label: 'Description' }),
-  createdAt: field({ type: Date, default: new Date(), label: 'Created At' }),
-  categoryId: field({ type: String, label: 'Risk Assessment Category Id' }),
-  status: field({ type: String, label: 'Status', default: 'In Progress' }),
-  statusColor: field({ type: String, label: 'Status Status Color', default: '#3B85F4' }),
-  calculateMethod: field({ type: String, label: 'Calculate Method' }),
-  calculateLogics: field({ type: [calculateLogicsSchema], label: 'Calculate Logics' }),
-  resultScore: field({ type: Number, label: 'Result Score', default: 0 })
+export const riskAssessmentIndicatorsGroupsSchema = new Schema({
+  assessmentId: field({ type: String, label: 'Risk assessment Id' }),
+  groupId: field({ type: String, label: 'Risk indicator Id' }),
+  ...commonAssessmentSchema
+});
+
+export const riskAssessmentsSchema = new Schema({
+  cardId: field({ type: String, label: 'Card Id' }),
+  cardType: field({ type: String, label: 'Card Type' }),
+  indicatorId: field({
+    type: String,
+    label: 'Risk indicator Id'
+  }),
+  groupId: field({ type: String, label: 'Indicator Group Id' }),
+  branchIds: field({ type: [String], label: 'Branch ids ' }),
+  departmentIds: field({ type: [String], label: 'Department ids ' }),
+  operationIds: field({ type: [String], label: 'Operation Ids' }),
+  ...commonAssessmentSchema
 });

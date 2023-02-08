@@ -19,6 +19,7 @@ export interface IOrder {
   status?: string;
   createdAt?: Date;
   modifiedAt?: Date;
+  userId?: string;
   paidDate?: Date;
   number?: string;
   customerId?: string;
@@ -70,7 +71,6 @@ const cardPaymentSchema = schemaHooksWrapper(
 export interface IOrderDocument extends Document, IOrder {
   _id: string;
   items: IOrderItemDocument[];
-  userId?: string;
   qpayInvoices?: IQpayInvoiceDocument[];
 }
 
@@ -90,7 +90,6 @@ export const orderSchema = schemaHooksWrapper(
     number: field({
       type: String,
       label: 'Order number',
-      unique: true,
       index: true
     }),
     customerId: field({ type: String, optional: true, label: 'Customer' }),
@@ -212,3 +211,5 @@ export const orderSchema = schemaHooksWrapper(
   }),
   'erxes_orders'
 );
+
+orderSchema.index({ posToken: 1, number: 1 }, { unique: true });

@@ -4,6 +4,8 @@ import { rgba } from '@erxes/ui/src/styles/ecolor';
 import { BoxRoot } from '@erxes/ui/src/styles/main';
 import styled, { css } from 'styled-components';
 import styledTS from 'styled-components-ts';
+import BoardSelectContainer from '@erxes/ui-cards/src/boards/containers/BoardSelect';
+import { highlight } from '@erxes/ui/src/utils/animations';
 
 export const GridContainer = styledTS<{
   horizontal?: boolean;
@@ -72,11 +74,17 @@ export const ContentWrapper = styled.div`
   }
 `;
 
-export const Padding = styledTS<{ horizontal?: boolean; vertical?: boolean }>(styled.div)`
-  padding: ${({ horizontal, vertical }) =>
+export const Padding = styledTS<{
+  horizontal?: boolean;
+  vertical?: boolean;
+  padding?: string;
+}>(styled.div)`
+  padding: ${({ horizontal, vertical, padding }) =>
     !horizontal && !vertical
       ? '10px'
-      : `${horizontal ? '10px' : '0px'} ${vertical ? '10px' : '0px'}`}
+      : `${vertical ? (padding ? `${padding}px` : '10px') : '0px'} ${
+          horizontal ? (padding ? `${padding}px` : '10px') : '0px'
+        }`}
 `;
 
 export const FormContainer = styledTS<{
@@ -88,16 +96,31 @@ export const FormContainer = styledTS<{
   gapBetween?: number;
   align?: string;
   justifyCenter?: boolean;
+  flex?: boolean;
+  justify?: string;
+  padding?: string;
+  placeContent?: string;
 }>(styled.div)`
   display: flex;
-  flex-direction: ${({ row }) => row && 'row'} ${({ column }) => column && 'column'};
-  justify-content: ${({ spaceBetween }) => (spaceBetween ? 'space-between' : '')} ${({
-  spaceAround
-}) => (spaceAround ? 'space-around' : '')};
+  flex-wrap: wrap;
+  padding:${({ padding }) => (padding ? padding : '')};
+  flex-direction: ${({ row }) => row && 'row'} ${({ column }) =>
+  column && 'column'};
+  justify-content: ${({ spaceBetween }) =>
+    spaceBetween ? 'space-between' : ''} ${({ spaceAround }) =>
+  spaceAround ? 'space-around' : ''};
   gap: ${({ gap }) => (gap ? '25px' : '')};
   gap: ${({ gapBetween }) => (gapBetween ? `${gapBetween}px` : '')};
   place-items:${({ align }) => (align ? align : '')};
   justify-content:${({ justifyCenter }) => (justifyCenter ? 'center' : '')}; 
+  justify-content:${({ justify }) => (justify ? justify : '')}; 
+  place-content:${({ placeContent }) => (placeContent ? placeContent : '')};
+  ${({ flex }) =>
+    flex
+      ? `div {
+    flex:1
+  }`
+      : ''}
 `;
 
 export const BoxItem = styled.div`
@@ -134,7 +157,9 @@ export const ClearableBtn = styled.a`
   cursor: pointer;
 `;
 
-export const ProductName = styledTS<{ pointer?: boolean; underline?: boolean }>(styled.a)`
+export const ProductName = styledTS<{ pointer?: boolean; underline?: boolean }>(
+  styled.a
+)`
   cursor: pointer;
   color: ${colors.textSecondary};
   display: flex;
@@ -186,6 +211,7 @@ export const ColorButton = styledTS<{ color?: string }>(styled.div)`
 `;
 export const Box = styled(BoxRoot)`
   flex: 1;
+  min-width: 80px;
   padding: ${dimensions.unitSpacing}px;
   text-align: center;
   background: ${colors.colorWhite};
@@ -209,10 +235,186 @@ export const Box = styled(BoxRoot)`
   }
 `;
 
-export const Typography = styledTS<{ color?: string; bold?: boolean; fontSize: number }>(
-  styled.div
-)`
+export const Typography = styledTS<{
+  color?: string;
+  bold?: boolean;
+  fontSize: number;
+}>(styled.div)`
   font-size: ${({ fontSize }) => `${fontSize}px`};
   font-weight: ${({ bold }) => (bold ? 'bold' : 'inheri')}}
   color: ${({ color }) => (color ? `${color}` : 'inherit')}
+`;
+
+export const CustomRangeContainer = styled.div`
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  > div {
+    flex: 1;
+    margin-right: 8px;
+    input[type='text'] {
+      border: none;
+      width: 100%;
+      height: 34px;
+      padding: 5px 0;
+      color: #444;
+      border-bottom: 1px solid;
+      border-color: #ddd;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      font-size: 13px;
+    }
+  }
+`;
+
+export const EndDateContainer = styled.div`
+  .rdtPicker {
+    left: -98px !important;
+  }
+`;
+
+export const TriggerTabs = styled.div`
+  .hxZkUW {
+    border: 1px solid ${colors.borderPrimary};
+    border-radius: 5px;
+    padding: 2px;
+
+    > span {
+      flex: 1;
+      flex-shrink: 0;
+      text-align: center;
+      font-weight: 500;
+      padding: ${dimensions.unitSpacing - 4}px ${dimensions.coreSpacing}px
+      border-radius: ${dimensions.unitSpacing - 5}px;
+
+      &.active {
+        background: ${colors.colorSecondary};
+        color: ${colors.colorWhite};
+
+        &:before {
+          display: none;
+        }
+      }
+    }
+  }
+`;
+
+export const Divider = styled.div`
+  &:before,
+  &:after {
+    content: '';
+    flex: 1;
+    height: 0;
+    align-self: center;
+    border-bottom: 1px solid ${colors.borderPrimary};
+  }
+`;
+export const Features = styledTS<{ isToggled: boolean }>(styled.span)`
+  transition: all ease .3s;
+  filter: ${props => !props.isToggled && `blur(4px)`};
+  pointer-events: ${props => !props.isToggled && `none`};
+`;
+
+export const ListItem = styledTS<{
+  column?: number;
+}>(styled.div)`
+  background: ${colors.colorWhite};
+  padding: 5px;
+  margin-bottom: 10px;
+  border-left: 2px solid transparent; 
+  border-top: none;
+  border-radius: 4px;
+  box-shadow: none;
+  left: auto;
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  &:hover {
+    box-shadow: 0 2px 8px ${colors.shadowPrimary};
+    border-color: ${colors.colorSecondary};
+    border-top: none;
+  }
+  ${props =>
+    props.column &&
+    css`
+      width: ${100 / props.column}%;
+      display: inline-block;
+    `}
+`;
+
+export const Block = styled.div`
+  border-bottom: 1px dashed ${colors.borderPrimary};
+  margin-bottom: ${dimensions.coreSpacing + dimensions.unitSpacing}px;
+  padding-bottom: ${dimensions.unitSpacing}px;
+
+  .Select {
+    min-width: 300px;
+  }
+
+  > h4 {
+    margin-bottom: ${dimensions.coreSpacing}px;
+    color: ${colors.colorPrimary};
+  }
+
+  > h5 {
+    margin-bottom: ${dimensions.coreSpacing}px;
+    color: ${colors.colorPrimary};
+  }
+`;
+
+export const Header = styled.h4`
+  margin-bottom: ${dimensions.coreSpacing}px;
+  color: ${colors.colorPrimary};
+`;
+
+export const BoardSelection = styled(BoardSelectContainer)`
+  display: flex;
+  gap: 15px;
+  max-width: 300px;
+  padding-right: 100px;
+`;
+
+export const SidebarHeader = styled.h5`
+  margin-bottom: ${dimensions.coreSpacing}px;
+  color: ${colors.colorPrimary};
+  padding-left: 10px;
+`;
+
+export const FormContent = styled.div`
+  animation: ${highlight} 0.9s ease;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(221, 221, 221, 0.7);
+`;
+
+export const RemoveRow = styled.div`
+  color: ${colors.colorCoreRed};
+  text-align: end;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const CardBox = styled.div`
+  text-align: center;
+`;
+
+export const TableRow = styled.tr`
+  th,
+  td {
+    text-align: center;
+  }
+
+  th:last-child {
+    border-right: none;
+    text-align: center;
+  }
+  ,
+  td:last-child {
+    text-align: -webkit-center;
+  }
 `;

@@ -21,12 +21,14 @@ import {
   SaveMutation,
   StagesQueryResponse
 } from '../../types';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type IProps = {
   options: IOptions;
   boardId?: string;
   pipelineId?: string;
   stageId?: string;
+  parentId?: string;
   showSelect?: boolean;
   relType?: string;
   mailSubject?: string;
@@ -44,6 +46,7 @@ type IProps = {
   tagIds?: string[];
   startDate?: Date;
   closeDate?: Date;
+  showStageSelect?: boolean;
 };
 
 type FinalProps = {
@@ -68,7 +71,8 @@ class AddFormContainer extends React.Component<FinalProps> {
       relType,
       relTypeIds,
       editConformity,
-      bookingProductId
+      bookingProductId,
+      parentId
     } = this.props;
 
     doc.assignedUserIds = doc.assignedUserIds || assignedUserIds;
@@ -80,6 +84,7 @@ class AddFormContainer extends React.Component<FinalProps> {
     doc.proccessId = proccessId;
     doc.description = doc.description || description;
     doc.attachments = doc.attachments || attachments;
+    doc.parentId = parentId;
 
     if (sourceConversationId) {
       doc.sourceConversationIds = [sourceConversationId];
@@ -241,6 +246,7 @@ export default (props: IProps) =>
       ),
       graphql<FinalProps>(gql(formQueries.fields), {
         name: 'fieldsQuery',
+        skip: !isEnabled('forms'),
         options: ({ options, pipelineId }) => ({
           variables: {
             contentType: `cards:${options.type}`,

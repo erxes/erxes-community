@@ -9,7 +9,7 @@ export const initBroker = async cl => {
 
   const { consumeRPCQueue, consumeQueue } = client;
 
-  consumeRPCQueue('products:findOneUom', async ({ subdomain, data }) => {
+  consumeRPCQueue('products:uoms.findOne', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
     return {
       data: await models.Uoms.findOne(data).lean(),
@@ -17,7 +17,24 @@ export const initBroker = async cl => {
     };
   });
 
-  consumeRPCQueue('products:findUom', async ({ subdomain, data }) => {
+  consumeRPCQueue(
+    'products:uoms.findByProductId',
+    async ({ subdomain, data: { productId } }) => {
+      const models = await generateModels(subdomain);
+      const product = await models.Products.getProduct({ _id: productId });
+
+      if (!product.uomId) {
+        throw new Error('has not uom');
+      }
+
+      return {
+        data: await models.Uoms.findOne({ _id: product.uomId }).lean(),
+        status: 'success'
+      };
+    }
+  );
+
+  consumeRPCQueue('products:uoms.find', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
     return {
       data: await models.Uoms.find(data).lean(),
@@ -58,6 +75,13 @@ export const initBroker = async cl => {
     async ({ subdomain, data: { _id } }) => {
       const models = await generateModels(subdomain);
       const category = await models.ProductCategories.findOne({ _id }).lean();
+
+      if (!category) {
+        return {
+          data: [],
+          status: 'success'
+        };
+      }
 
       return {
         data: await models.ProductCategories.find({
@@ -120,8 +144,15 @@ export const initBroker = async cl => {
 
   consumeRPCQueue(
     'products:find',
-    async ({ subdomain, data: { query, sort, skip, limit, categoryId } }) => {
+    async ({
+      subdomain,
+      data: { query, sort, skip, limit, categoryId, fields }
+    }) => {
       const models = await generateModels(subdomain);
+
+      if (!query) {
+        query = {};
+      }
 
       if (categoryId) {
         const category = await models.ProductCategories.findOne({
@@ -135,7 +166,7 @@ export const initBroker = async cl => {
       }
 
       return {
-        data: await models.Products.find(query)
+        data: await models.Products.find(query, fields || {})
           .sort(sort)
           .skip(skip || 0)
           .limit(limit || 100)
@@ -145,14 +176,29 @@ export const initBroker = async cl => {
     }
   );
 
-  consumeRPCQueue('products:count', async ({ subdomain, data: { query } }) => {
-    const models = await generateModels(subdomain);
+  consumeRPCQueue(
+    'products:count',
+    async ({ subdomain, data: { query, categoryId } }) => {
+      const models = await generateModels(subdomain);
 
-    return {
-      data: await models.Products.find(query).countDocuments(),
-      status: 'success'
-    };
-  });
+      const filter = { ...(query || {}) };
+      if (categoryId) {
+        const category = await models.ProductCategories.findOne({
+          _id: categoryId
+        }).lean();
+        const categories = await models.ProductCategories.find({
+          order: { $regex: new RegExp(category.order) }
+        }).lean();
+
+        filter.categoryId = { $in: categories.map(c => c._id) };
+      }
+
+      return {
+        data: await models.Products.find(filter).count(),
+        status: 'success'
+      };
+    }
+  );
 
   consumeRPCQueue(
     'products:categories.count',
@@ -309,6 +355,49 @@ export const sendTagsMessage = (args: ISendMessageArgs): Promise<any> => {
     ...args
   });
 };
+
+export const sendSegmentsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'segments',
+    ...args
+  });
+};
+
+export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'core',
+    ...args
+  });
+};
+
+export const sendCommonMessage = async (
+  args: ISendMessageArgs & { serviceName: string }
+): Promise<any> => {
+  return sendMessage({
+    serviceDiscovery,
+    client,
+    ...args
+  });
+};
+
+export const fetchSegment = (
+  subdomain: string,
+  segmentId: string,
+  options?,
+  segmentData?: any
+) =>
+  sendSegmentsMessage({
+    subdomain,
+    action: 'fetchSegment',
+    data: { segmentId, options, segmentData },
+    isRPC: true
+  });
 
 export default function() {
   return client;

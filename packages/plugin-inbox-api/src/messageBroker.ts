@@ -12,6 +12,8 @@ import {
 import { receiveVisitorDetail } from './widgetUtils';
 import { sendToWebhook as sendWebhook } from '@erxes/api-utils/src';
 import { getIntegrationsKinds } from './utils';
+import { sendNotifications } from './graphql/resolvers/conversationMutations';
+import { pConversationClientMessageInserted } from './graphql/resolvers/widgetMutations';
 
 export let client;
 
@@ -85,9 +87,12 @@ export const initBroker = cl => {
     async ({ subdomain, data }) => await receiveRpcMessage(subdomain, data)
   );
 
-  consumeQueue('inbox:integrationsNotification', async ({ data }) => {
-    await receiveIntegrationsNotification(data);
-  });
+  consumeQueue(
+    'inbox:integrationsNotification',
+    async ({ subdomain, data }) => {
+      await receiveIntegrationsNotification(subdomain, data);
+    }
+  );
 
   consumeRPCQueue(
     'inbox:integrations.find',
@@ -100,6 +105,17 @@ export const initBroker = cl => {
       );
 
       return { data: integrations, status: 'success' };
+    }
+  );
+
+  consumeRPCQueue(
+    'inbox:integrations.count',
+    async ({ subdomain, data: { selector } }) => {
+      const models = await generateModels(subdomain);
+
+      const count = await models.Integrations.count(selector);
+
+      return { data: count, status: 'success' };
     }
   );
 
@@ -182,6 +198,16 @@ export const initBroker = cl => {
     }
   );
 
+  consumeQueue(
+    'inbox:removeConversation',
+    async ({ subdomain, data: { _id } }) => {
+      const models = await generateModels(subdomain);
+
+      await models.ConversationMessages.deleteMany({ conversationId: _id });
+      return models.Conversations.deleteOne({ _id });
+    }
+  );
+
   consumeRPCQueue(
     'inbox:getConversations',
     async ({ subdomain, data: { query } }) => {
@@ -250,6 +276,42 @@ export const initBroker = cl => {
       data: await getIntegrationsKinds()
     };
   });
+
+  consumeRPCQueue(
+    'inbox:getModuleRelation',
+    async ({ data: { module, target } }) => {
+      let filter;
+
+      if (module.includes('contacts')) {
+        const queryField =
+          target[module.includes('company') ? 'companyId' : 'customerId'];
+
+        if (queryField) {
+          filter = {
+            _id: queryField
+          };
+        }
+      }
+
+      return {
+        status: 'success',
+        data: filter
+      };
+    }
+  );
+
+  consumeQueue('inbox:sendNotifications', async ({ data, subdomain }) => {
+    await sendNotifications(subdomain, data);
+  });
+
+  consumeQueue(
+    'inbox:conversationClientMessageInserted',
+    async ({ subdomain, data }) => {
+      const models = await generateModels(subdomain);
+
+      await pConversationClientMessageInserted(models, data);
+    }
+  );
 };
 
 export const sendCommonMessage = async (

@@ -9,6 +9,7 @@ import resolvers from './graphql/resolvers';
 import typeDefs from './graphql/typeDefs';
 import { initBroker } from './messageBroker';
 import { getHandler, postHandler } from './utils';
+import i18n = require('i18n');
 
 export let mainDb;
 export let debug;
@@ -42,12 +43,21 @@ export default {
     method: postHandler
   })),
 
-  apolloServerContext: async (context, req) => {
+  apolloServerContext: async (context, req, res) => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
 
-    context.subdomain = req.hostname;
+    const requestInfo = {
+      secure: req.secure,
+      cookies: req.cookies,
+      headers: req.headers
+    };
+
+    context.subdomain = subdomain;
     context.models = models;
+
+    context.requestInfo = requestInfo;
+    context.res = res;
 
     return context;
   },
@@ -71,6 +81,23 @@ export default {
 
     // generated scripts
     app.use('/build', express.static(path.join(__dirname, '../static')));
+
+    i18n.configure({
+      locales: ['en', 'mn'],
+      queryParameter: 'lang',
+      directory: __dirname + '/locales',
+      defaultLocale: 'en'
+    });
+
+    app.use(i18n.init);
+
+    app.use((req, _res, next) => {
+      const locale = req.query.lang || 'en';
+
+      i18n.setLocale(locale);
+
+      next();
+    });
 
     app.use(controllers);
   }

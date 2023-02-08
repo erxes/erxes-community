@@ -1,3 +1,4 @@
+import * as serverTiming from 'server-timing';
 import * as cors from 'cors';
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
@@ -21,6 +22,7 @@ import search from './search';
 import widgetsMiddleware from './middlewares/widgetsMiddleware';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import webhooks from './webhooks';
+import automations from './automations';
 import cronjobs from './cronjobs/conversations';
 
 export let mainDb;
@@ -48,11 +50,12 @@ export default {
     search,
     logs: { providesActivityLog: true, consumers: logs },
     webhooks,
+    automations,
     cronjobs,
     // for fixing permissions
     permissions
   },
-  apolloServerContext: async (context, req) => {
+  apolloServerContext: async (context, req, res) => {
     const subdomain = getSubdomain(req);
 
     const models = await generateModels(subdomain);
@@ -61,8 +64,15 @@ export default {
     context.dataLoaders = generateAllDataLoaders(models);
     context.subdomain = subdomain;
 
+    context.serverTiming = {
+      startTime: res.startTime,
+      endTime: res.endTime,
+      setMetric: res.setMetric
+    };
+
     return context;
   },
+  middlewares: [(serverTiming as any)()],
   onServerInit: async options => {
     mainDb = options.db;
 
@@ -73,7 +83,7 @@ export default {
       '/events-receive',
       routeErrorHandling(
         async (req, res) => {
-          const { name, customerId, attributes } = req.body;
+          const { name, triggerAutomation, customerId, attributes } = req.body;
           const subdomain = getSubdomain(req);
 
           const response =
@@ -81,6 +91,7 @@ export default {
               ? await trackViewPageEvent(subdomain, { customerId, attributes })
               : await trackCustomEvent(subdomain, {
                   name,
+                  triggerAutomation,
                   customerId,
                   attributes
                 });

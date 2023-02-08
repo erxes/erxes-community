@@ -20,6 +20,8 @@ import {
   ISafeRemainderItemModel,
   loadSafeRemainderItemClass
 } from './models/SafeRemainderItems';
+import { IReserveRemModel, loadReserveRemClass } from './models/ReserveRems';
+import { IReserveRemDocument } from './models/definitions/reserveRems';
 
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
@@ -30,6 +32,7 @@ export interface IModels {
   Remainders: IRemainderModel;
   SafeRemainders: ISafeRemainderModel;
   SafeRemainderItems: ISafeRemainderItemModel;
+  ReserveRems: IReserveRemModel;
 }
 export interface IContext extends IMainContext {
   subdomain: string;
@@ -42,13 +45,13 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
 
   models.Transactions = db.model<ITransactionDocument, ITransactionModel>(
-    'transactions',
+    'inv_transactions',
     loadTransactionClass(models)
   );
   models.TransactionItems = db.model<
     ITransactionItemDocument,
     ITransactionItemModel
-  >('transaction_items', loadTransactionItemClass(models));
+  >('inv_transaction_items', loadTransactionItemClass(models));
   models.Remainders = db.model<IRemainderDocument, IRemainderModel>(
     'remainders',
     loadRemainderClass(models)
@@ -62,6 +65,10 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     ISafeRemainderItemModel
   >('safe_remainder_items', loadSafeRemainderItemClass(models));
 
+  models.ReserveRems = db.model<IReserveRemDocument, IReserveRemModel>(
+    'inventories_reserverems',
+    loadReserveRemClass(models)
+  );
   return models;
 };
 

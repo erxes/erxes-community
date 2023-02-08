@@ -23,12 +23,13 @@ export default {
 
   async payment(invoice: IInvoice, {}, { models }: IContext) {
     return (
-      invoice.paymentId && models.Payments.findOne({ _id: invoice.paymentId })
+      invoice.selectedPaymentId &&
+      (await models.Payments.findOne({ _id: invoice.selectedPaymentId }).lean())
     );
   },
 
   async pluginData(invoice: IInvoice, {}, { subdomain }: IContext) {
-    const pluginName = invoice.contentType.split(':')[0];
+    const [pluginName, collectionName] = invoice.contentType.split(':');
 
     if (!(await serviceDiscovery.isEnabled(pluginName))) {
       return null;
@@ -37,6 +38,18 @@ export default {
     const data: any = {};
 
     const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
+
+    if (!meta) {
+      const data = await sendPluginsMessage(pluginName, {
+        subdomain,
+        action: `${collectionName}.findOne`,
+        data: { _id: invoice.contentTypeId },
+        isRPC: true,
+        defaultValue: null
+      });
+
+      return data;
+    }
 
     data[meta.queryKey] = invoice.contentTypeId;
 

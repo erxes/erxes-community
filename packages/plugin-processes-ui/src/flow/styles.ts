@@ -291,6 +291,11 @@ export const BackIcon = styled.div`
   }
 `;
 
+export const CloseIcon = styled.div`
+  cursor: pointer;
+  font-weight: 500;
+`;
+
 export const TypeBoxContainer = styled.div`
   position: relative;
 
@@ -452,16 +457,18 @@ export const FlowJobTabs = styled.div`
   }
 `;
 
-export const Description = styled.div`
-  margin: ${dimensions.coreSpacing}px ${dimensions.unitSpacing}px
-    ${dimensions.unitSpacing}px;
+export const Description = styledTS<{ noMargin?: boolean }>(styled.div)`
+  margin: ${props => !props.noMargin && '20px 10px 10px'};
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   h4 {
     margin: 0;
     font-size: 16px;
   }
 
-  > p {
+  p {
     margin: ${dimensions.unitSpacing - 5}px 0 0 0;
     color: ${colors.colorCoreGray};
   }
@@ -740,4 +747,8 @@ export const MainInfo = styled.div`
   > span {
     margin-right: ${dimensions.unitSpacing}px;
   }
+`;
+
+export const DisabledSpan = styled.div`
+  color: gray;
 `;

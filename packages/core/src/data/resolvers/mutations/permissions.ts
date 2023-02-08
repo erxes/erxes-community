@@ -8,10 +8,10 @@ import {
 import { IUserDocument } from '../../../db/models/definitions/users';
 import { putCreateLog, putDeleteLog, putUpdateLog } from '../../logUtils';
 import { fixPermissions, resetPermissionsCache } from '../../permissions/utils';
-import { moduleCheckPermission } from '../../permissions/wrappers';
 import { MODULE_NAMES } from '../../constants';
 import { IContext, IModels } from '../../../connectionResolver';
 import { getService, getServices } from '../../../serviceDiscovery';
+import { checkPermission } from '@erxes/api-utils/src/permissions';
 
 interface IParams {
   memberIds?: string[];
@@ -347,7 +347,13 @@ const usersGroupMutations = {
   }
 };
 
-moduleCheckPermission(permissionMutations, 'managePermissions');
-moduleCheckPermission(usersGroupMutations, 'manageUsersGroups');
+checkPermission(permissionMutations, 'permissionsAdd', 'managePermissions');
+checkPermission(permissionMutations, 'permissionsRemove', 'managePermissions');
+checkPermission(usersGroupMutations, 'permissionsFix', 'managePermissions');
+
+checkPermission(usersGroupMutations, 'usersGroupsAdd', 'manageUsersGroups');
+checkPermission(usersGroupMutations, 'usersGroupsEdit', 'manageUsersGroups');
+checkPermission(usersGroupMutations, 'usersGroupsRemove', 'manageUsersGroups');
+checkPermission(usersGroupMutations, 'usersGroupsCopy', 'manageUsersGroups');
 
 export { permissionMutations, usersGroupMutations };

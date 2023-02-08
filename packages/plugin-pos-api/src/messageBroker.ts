@@ -164,6 +164,18 @@ export const initBroker = async cl => {
     );
 
     const newOrder = await models.PosOrders.findOne({ _id: order._id }).lean();
+
+    if (newOrder.customerId) {
+      sendAutomationsMessage({
+        subdomain,
+        action: 'trigger',
+        data: {
+          type: 'pos:posOrder',
+          targets: [newOrder]
+        }
+      });
+    }
+
     await confirmLoyalties(subdomain, newOrder);
 
     // ===> sync cards config then
@@ -262,19 +274,51 @@ export const initBroker = async cl => {
       }
     }
 
-    await sendSyncerkhetMessage({
+    const resp = await sendSyncerkhetMessage({
       subdomain,
       action: 'toOrder',
       data: {
         pos,
         order: newOrder
-      }
+      },
+      isRPC: true,
+      defaultValue: {},
+      timeout: 50000
     });
+
+    if (resp.message || resp.error) {
+      const txt = JSON.stringify({ message: resp.message, error: resp.error });
+
+      await models.PosOrders.updateOne(
+        { _id: order._id },
+        { $set: { syncErkhetInfo: txt } }
+      );
+    }
 
     return {
       status: 'success'
     };
   });
+
+  consumeRPCQueue(
+    'pos:getModuleRelation',
+    async ({ data: { module, target } }) => {
+      // need to check pos-order or pos
+
+      let filter;
+
+      if (module.includes('contacts')) {
+        if (target.customerId) {
+          filter = { _id: target.customerId };
+        }
+      }
+
+      return {
+        status: 'success',
+        data: filter
+      };
+    }
+  );
 
   consumeRPCQueue('pos:findSlots', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
@@ -284,6 +328,18 @@ export const initBroker = async cl => {
       data: await models.PosSlots.find({ posId: data.posId }).lean()
     };
   });
+
+  consumeRPCQueue(
+    'pos:orders.updateOne',
+    async ({ subdomain, data: { selector, modifier } }) => {
+      const models = await generateModels(subdomain);
+
+      return {
+        status: 'success',
+        data: await models.PosOrders.updateOne(selector, modifier)
+      };
+    }
+  );
 
   consumeRPCQueue('pos:ecommerceGetBranches', async ({ subdomain, data }) => {
     const { posToken } = data;
@@ -364,6 +420,14 @@ export const initBroker = async cl => {
     };
   });
 
+  consumeRPCQueue('pos:orders.findOne', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+    return {
+      status: 'success',
+      data: await models.PosOrders.findOne(data).lean()
+    };
+  });
+
   consumeRPCQueue('pos:configs.find', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
     return {
@@ -410,6 +474,17 @@ export const sendLoyaltiesMessage = async (
     client,
     serviceDiscovery,
     serviceName: 'loyalties',
+    ...args
+  });
+};
+
+export const sendPricingMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'pricing',
     ...args
   });
 };
@@ -484,6 +559,27 @@ export const sendPosclientMessage = async (
     serviceName,
     ...args,
     action: lastAction
+  });
+};
+
+export const sendAutomationsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'automations',
+    ...args
+  });
+};
+
+export const sendCommonMessage = async (
+  args: ISendMessageArgs & { serviceName: string }
+): Promise<any> => {
+  return sendMessage({
+    serviceDiscovery,
+    client,
+    ...args
   });
 };
 

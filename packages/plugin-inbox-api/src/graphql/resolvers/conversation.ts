@@ -23,12 +23,14 @@ export default {
     );
   },
 
-  integration(
+  async integration(
     conversation: IConversationDocument,
     _args,
     { models }: IContext
   ) {
-    return models.Integrations.findOne({ _id: conversation.integrationId });
+    return models.Integrations.findOne({
+      _id: conversation.integrationId
+    });
   },
 
   user(conversation: IConversationDocument) {
@@ -62,36 +64,6 @@ export default {
       conv._id
     );
     return messages.filter(message => message);
-  },
-
-  async facebookPost(
-    conv: IConversationDocument,
-    _args,
-    { models, subdomain }: IContext
-  ) {
-    const integration =
-      (await models.Integrations.findOne({ _id: conv.integrationId })) ||
-      ({} as any);
-
-    if (integration && integration.kind !== 'facebook-post') {
-      return null;
-    }
-
-    try {
-      const response = await sendIntegrationsMessage({
-        subdomain,
-        action: 'getFacebookPost',
-        data: {
-          erxesApiId: conv._id
-        },
-        isRPC: true
-      });
-
-      return response;
-    } catch (e) {
-      debug.error(e);
-      return null;
-    }
   },
 
   async callProAudio(
@@ -163,34 +135,5 @@ export default {
       debug.error(e);
       return null;
     }
-  },
-
-  async isFacebookTaggedMessage(
-    conversation: IConversationDocument,
-    _args,
-    { models }: IContext
-  ) {
-    const integration =
-      (await models.Integrations.findOne({
-        _id: conversation.integrationId
-      })) || ({} as any);
-
-    if (integration && integration.kind !== 'facebook-messenger') {
-      return false;
-    }
-
-    const message = await models.ConversationMessages.find({
-      conversationId: conversation._id,
-      customerId: { $exists: true },
-      createdAt: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-    })
-      .limit(1)
-      .lean();
-
-    if (message.length && message.length >= 1) {
-      return false;
-    }
-
-    return true;
   }
 };

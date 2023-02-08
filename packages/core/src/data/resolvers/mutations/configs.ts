@@ -1,37 +1,33 @@
 import { sendCommonMessage } from '../../../messageBroker';
-import {
-  moduleCheckPermission,
-  requireLogin
-} from '../../permissions/wrappers';
 import { IContext } from '../../../connectionResolver';
 import {
-  checkPremiumService,
   getCoreDomain,
   initFirebase,
   registerOnboardHistory,
   resetConfigsCache,
   sendRequest
 } from '../../utils';
+import { checkPermission } from '@erxes/api-utils/src/permissions';
+import { putCreateLog, putUpdateLog } from '../../logUtils';
 
 const configMutations = {
   /**
    * Create or update config object
    */
-  async configsUpdate(_root, { configsMap }, { user, models }: IContext) {
+  async configsUpdate(
+    _root,
+    { configsMap },
+    { user, models, subdomain }: IContext
+  ) {
     const codes = Object.keys(configsMap);
-
-    const isThemeEnabled = await checkPremiumService('isThemeServiceEnabled');
 
     for (const code of codes) {
       if (!code) {
         continue;
       }
 
-      if (code.includes('THEME_') && !isThemeEnabled) {
-        continue;
-      }
-
       const prevConfig = (await models.Configs.findOne({ code })) || {
+        code: '',
         value: []
       };
 
@@ -86,6 +82,33 @@ const configMutations = {
           user
         });
       }
+
+      if (prevConfig.code) {
+        await putUpdateLog(
+          models,
+          subdomain,
+          {
+            type: 'config',
+            object: prevConfig,
+            newData: updatedConfig,
+            updatedDocument: updatedConfig,
+            description: updatedConfig.code
+          },
+          user
+        );
+      } else {
+        await putCreateLog(
+          models,
+          subdomain,
+          {
+            type: 'config',
+            description: updatedConfig.code,
+            object: updatedConfig,
+            newData: updatedConfig
+          },
+          user
+        );
+      }
     }
   },
 
@@ -104,21 +127,43 @@ const configMutations = {
     }
   },
 
-  async configsManagePluginInstall(_root, args, { subdomain }: IContext) {
+  async configsManagePluginInstall(
+    _root,
+    args,
+    { models, subdomain }: IContext
+  ) {
+    const prevAction = await models.InstallationLogs.findOne({
+      message: { $ne: 'done' }
+    });
+
+    if (prevAction) {
+      throw new Error('Installer is busy. Please wait ...');
+    }
+
     await sendCommonMessage({
       subdomain,
       serviceName: '',
       action: 'managePluginInstall',
-      data: args,
-      isRPC: true
+      data: {
+        ...args,
+        subdomain
+      }
     });
 
     return { status: 'success' };
   }
 };
 
-moduleCheckPermission(configMutations, 'manageGeneralSettings');
-requireLogin(configMutations, 'configsActivateInstallation');
-requireLogin(configMutations, 'configsManagePluginInstall');
+checkPermission(configMutations, 'configsUpdate', 'manageGeneralSettings');
+checkPermission(
+  configMutations,
+  'configsActivateInstallation',
+  'manageGeneralSettings'
+);
+checkPermission(
+  configMutations,
+  'configsManagePluginInstall',
+  'manageGeneralSettings'
+);
 
 export default configMutations;

@@ -2,10 +2,12 @@ import { ICustomerDocument } from '../../models/definitions/customers';
 import { sendCoreMessage, sendInboxMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
 import { fetchEs } from '@erxes/api-utils/src/elasticsearch';
+import { customFieldsDataByFieldCode } from '../../coc/utils';
 
 export default {
-  __resolveReference({ _id }, { models }: IContext) {
-    return models.Customers.findOne({ _id });
+  async __resolveReference({ _id }, { models }: IContext) {
+    const customer = await models.Customers.findOne({ _id });
+    return customer;
   },
 
   integration(customer: ICustomerDocument) {
@@ -97,5 +99,13 @@ export default {
     }
 
     return { __typename: 'User', _id: customer.ownerId };
+  },
+
+  customFieldsDataByFieldCode(
+    company: ICustomerDocument,
+    _,
+    { subdomain }: IContext
+  ) {
+    return customFieldsDataByFieldCode(company, subdomain);
   }
 };

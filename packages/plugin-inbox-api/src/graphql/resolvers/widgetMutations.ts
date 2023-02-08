@@ -1,4 +1,5 @@
 import * as strip from 'strip';
+import { Db, MongoClient } from 'mongodb';
 
 import {
   CONVERSATION_OPERATOR_STATUS,
@@ -22,7 +23,7 @@ import {
   BOT_MESSAGE_TYPES
 } from '../../models/definitions/constants';
 
-import { sendRequest } from '@erxes/api-utils/src';
+import { getEnv, sendRequest } from '@erxes/api-utils/src';
 
 import { solveSubmissions } from '../../widgetUtils';
 import { conversationNotifReceivers } from './conversationMutations';
@@ -53,7 +54,7 @@ interface IWidgetEmailParams {
   attachments?: IAttachment[];
 }
 
-const pConversationClientMessageInserted = async (models, message) => {
+export const pConversationClientMessageInserted = async (models, message) => {
   const conversation = await models.Conversations.findOne(
     {
       _id: message.conversationId
@@ -307,7 +308,7 @@ const createFormConversation = async (
     const submissionValues = {};
 
     for (const submit of submissions) {
-      submissionValues[submit.formFieldId] = submit.value;
+      submissionValues[submit._id] = submit.value;
     }
 
     sendAutomationsMessage({
@@ -326,6 +327,31 @@ const createFormConversation = async (
         ]
       }
     });
+  }
+
+  if (formId === 'j2maRsaS2J5uJGxgy') {
+    const MONGO_URL = getEnv({ name: 'MONGO_URL' });
+
+    const client = new MongoClient(MONGO_URL);
+
+    await client.connect();
+    const db = client.db() as Db;
+
+    const Blocks = db.collection('blocks');
+
+    const block = await Blocks.findOne({ erxesCustomerId: cachedCustomer._id });
+
+    if (block) {
+      await Blocks.updateOne(
+        { erxesCustomerId: cachedCustomer._id },
+        { $set: { isVerified: 'loading' } }
+      );
+    } else {
+      await Blocks.insert({
+        erxesCustomerId: cachedCustomer._id,
+        isVerified: 'loading'
+      });
+    }
   }
 
   return {
@@ -581,18 +607,6 @@ const widgetMutations = {
       });
     }
 
-    // customer automation trigger =========
-    if (customer) {
-      sendAutomationsMessage({
-        subdomain,
-        action: 'trigger',
-        data: {
-          type: `contacts:${customer.state}`,
-          targets: [customer]
-        }
-      });
-    }
-
     // get or create company
     if (companyData && companyData.name) {
       let company = await sendContactsMessage({
@@ -637,18 +651,6 @@ const widgetMutations = {
             scopeBrandIds: [brand._id]
           },
           isRPC: true
-        });
-      }
-
-      // company automation trigger =========
-      if (company) {
-        sendAutomationsMessage({
-          subdomain,
-          action: 'trigger',
-          data: {
-            type: `contacts:company`,
-            targets: [company]
-          }
         });
       }
 

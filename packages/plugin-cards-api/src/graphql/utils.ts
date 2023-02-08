@@ -240,6 +240,8 @@ const PERMISSION_MAP = {
 };
 
 export const checkPermission = async (
+  _models: IModels,
+  subdomain: string,
   type: string,
   user: IUserDocument,
   mutationName: string
@@ -248,7 +250,7 @@ export const checkPermission = async (
 
   const actionName = PERMISSION_MAP[type][mutationName];
 
-  let allowed = await can(actionName, user);
+  let allowed = await can(subdomain, actionName, user);
 
   if (user.isOwner) {
     allowed = true;

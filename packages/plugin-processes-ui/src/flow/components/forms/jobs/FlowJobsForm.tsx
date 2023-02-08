@@ -1,13 +1,18 @@
+import { CloseIcon, Description, ScrolledContent } from '../../../styles';
+import { FLOWJOBS, FLOWJOB_TYPES } from '../../../constants';
+
+import { FlowJobBox } from './styles';
+import { IJob } from '../../../types';
 import Icon from '@erxes/ui/src/components/Icon';
 import React from 'react';
+import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from '@erxes/ui/src/utils';
-import { FlowJobBox } from './styles';
-import { FLOWJOBS } from '../../../constants';
-import { IJob } from '../../../types';
-import { ScrolledContent } from '../../../styles';
 
 type Props = {
+  flowJobsOfEnd?: IJob;
+  isSub?: boolean;
   onClickFlowJob: (flowJob: IJob) => void;
+  setMainState: (param: any) => void;
 };
 
 type State = {
@@ -25,34 +30,15 @@ class FlowJobsForm extends React.Component<Props, State> {
     };
   }
 
-  tabOnClick = (currentTab: string) => {
-    this.setState({ currentTab });
-  };
-
-  onFavourite = (flowJob, e) => {
-    e.stopPropagation();
-
-    this.setState({ isFavourite: !this.state.isFavourite });
-
-    const flowJobsLocalStorage =
-      localStorage.getItem('automations_favourite_flowJobs') || '[]';
-
-    let flowJobs = JSON.parse(flowJobsLocalStorage);
-
-    if (flowJobs.find(item => item.type === flowJob.type)) {
-      flowJobs = flowJobs.filter(item => item.type !== flowJob.type);
-    } else {
-      flowJobs.push(flowJob);
+  renderBox(flowJob, index) {
+    const { flowJobsOfEnd, isSub, onClickFlowJob } = this.props;
+    if (flowJobsOfEnd && flowJob.type === FLOWJOB_TYPES.ENDPOINT) {
+      return <></>;
     }
 
-    localStorage.setItem(
-      'automations_favourite_flowJobs',
-      JSON.stringify(flowJobs)
-    );
-  };
-
-  renderBox(flowJob, index) {
-    const { onClickFlowJob } = this.props;
+    if (isSub && flowJob.type === FLOWJOB_TYPES.FLOW) {
+      return <></>;
+    }
 
     return (
       <FlowJobBox
@@ -85,6 +71,25 @@ class FlowJobsForm extends React.Component<Props, State> {
   render() {
     return (
       <>
+        <Description>
+          <div>
+            <h4>{__('Choose your flow type')}</h4>
+            <p>{__('Start with a flow type that enrolls your job')}</p>
+          </div>
+
+          <CloseIcon
+            onClick={() => {
+              this.props.setMainState({
+                usedPopup: false,
+                showDrawer: false
+              });
+            }}
+          >
+            <Tip text={__('Close')} placement="bottom">
+              <Icon icon="cancel" size={18} />
+            </Tip>
+          </CloseIcon>
+        </Description>
         <ScrolledContent>{this.renderContent()}</ScrolledContent>
       </>
     );

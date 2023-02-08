@@ -47,7 +47,11 @@ const checkSyncedMutations = {
 
   async toSyncDeals(
     _root,
-    { dealIds }: { dealIds: string[] },
+    {
+      dealIds,
+      configStageId,
+      dateType
+    }: { dealIds: string[]; configStageId: string; dateType: string },
     { subdomain }: IContext
   ) {
     const result: { skipped: string[]; error: string[]; success: string[] } = {
@@ -67,16 +71,18 @@ const checkSyncedMutations = {
     });
 
     for (const deal of deals) {
-      if (!Object.keys(configs).includes(deal.stageId)) {
+      const syncedStageId = configStageId || deal.stageId;
+      if (!Object.keys(configs).includes(syncedStageId)) {
         result.skipped.push(deal._id);
         continue;
       }
 
       const config = {
-        ...configs[deal.stageId],
+        ...configs[syncedStageId],
         ...mainConfig
       };
-      const postData = await getPostData(subdomain, config, deal, false);
+
+      const postData = await getPostData(subdomain, config, deal, dateType);
 
       const response = await sendRPCMessage(
         'rpc_queue:erxes-automation-erkhet',
@@ -84,9 +90,43 @@ const checkSyncedMutations = {
           action: 'get-response-send-order-info',
           isEbarimt: false,
           payload: JSON.stringify(postData),
-          thirdService: true
+          thirdService: true,
+          isJson: true
         }
       );
+
+      if (response.message || response.error) {
+        const txt = JSON.stringify({
+          message: response.message,
+          error: response.error
+        });
+        if (config.responseField) {
+          await sendCardsMessage({
+            subdomain,
+            action: 'deals.updateOne',
+            data: {
+              selector: { _id: deal._id },
+              modifier: {
+                $push: {
+                  customFieldsData: [
+                    {
+                      field: config.responseField.replace(
+                        'customFieldsData.',
+                        ''
+                      ),
+                      value: txt,
+                      stringValue: txt
+                    }
+                  ]
+                }
+              }
+            },
+            isRPC: true
+          });
+        } else {
+          console.log(txt);
+        }
+      }
 
       if (response.error) {
         result.error.push(deal._id);
@@ -135,15 +175,6 @@ const checkSyncedMutations = {
 
     for (const order of orders) {
       const pos = posByToken[order.posToken];
-      const putRes = await sendEbarimtMessage({
-        subdomain,
-        action: 'putresponses.putHistories',
-        data: {
-          contentType: 'pos',
-          contentId: order._id
-        },
-        isRPC: true
-      });
 
       const postData = await getPostDataOrders(subdomain, pos, order);
 
@@ -153,9 +184,29 @@ const checkSyncedMutations = {
           action: 'get-response-send-order-info',
           isEbarimt: false,
           payload: JSON.stringify(postData),
-          thirdService: true
+          thirdService: true,
+          isJson: true
         }
       );
+
+      if (response.message || response.error) {
+        const txt = JSON.stringify({
+          message: response.message,
+          error: response.error
+        });
+
+        await sendPosMessage({
+          subdomain,
+          action: 'orders.updateOne',
+          data: {
+            selector: { _id: order._id },
+            modifier: {
+              $set: { syncErkhetInfo: txt }
+            }
+          },
+          isRPC: true
+        });
+      }
 
       if (response.error) {
         result.error.push(order._id);

@@ -9,6 +9,7 @@ import { ConfigsQueryResponse, IConfigsMap } from '../types';
 
 type Props = {
   component: any;
+  configCode: string;
 };
 
 type FinalProps = {
@@ -32,21 +33,16 @@ class SettingsContainer extends React.Component<FinalProps> {
         .then(() => {
           configsQuery.refetch();
 
-          Alert.success('You successfully updated loyalty settings');
+          Alert.success('You successfully updated ebarimt settings');
         })
         .catch(error => {
           Alert.error(error.message);
         });
     };
 
-    const configs = configsQuery.configs || [];
+    const config = configsQuery.configsGetValue || [];
 
-    const configsMap = {};
-
-    for (const config of configs) {
-      configsMap[config.code] = config.value;
-    }
-
+    const configsMap = { [config.code]: config.value };
     const Component = this.props.component;
     return <Component {...this.props} configsMap={configsMap} save={save} />;
   }
@@ -54,8 +50,14 @@ class SettingsContainer extends React.Component<FinalProps> {
 
 export default withProps<Props>(
   compose(
-    graphql<{}, ConfigsQueryResponse>(gql(queries.configs), {
-      name: 'configsQuery'
+    graphql<Props, ConfigsQueryResponse>(gql(queries.configs), {
+      name: 'configsQuery',
+      options: props => ({
+        variables: {
+          code: props.configCode
+        },
+        fetchPolicy: 'network-only'
+      })
     }),
     graphql<{}>(gql(mutations.updateConfigs), {
       name: 'updateConfigs'

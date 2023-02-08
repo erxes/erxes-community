@@ -1,6 +1,7 @@
+import { colors, typography } from './';
+
 import { injectGlobal } from 'styled-components';
 import { robotAnimation } from '../utils/animations';
-import { colors, typography } from './';
 
 const style = `
 html {
@@ -57,6 +58,11 @@ a:hover {
 
 .modal-backdrop.in {
   opacity: 0.8;
+}
+
+.modal.show {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .modal.in .modal-dialog {
@@ -146,6 +152,10 @@ a:hover {
 
 .wide-modal {
   width: 90%;
+}
+
+.extra-wide-modal {
+  max-width: 100%;
 }
 
 .close {
@@ -311,6 +321,10 @@ a:hover {
   background: ${colors.bgActive};
   outline: 0;
   cursor: pointer;
+}
+
+.gjs-four-color, .gjs-four-color-h:hover {
+  color: #6569df !important;
 }
 
 /* tooltip */

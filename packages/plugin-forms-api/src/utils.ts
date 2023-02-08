@@ -133,11 +133,13 @@ export const formSubmissionsQuery = async (
     formId,
     tagId,
     contentTypeIds,
+    customerId,
     filters
   }: {
     formId: string;
     tagId: string;
     contentTypeIds: string[];
+    customerId: string;
     filters: IFormSubmissionFilter[];
   }
 ) => {
@@ -157,6 +159,10 @@ export const formSubmissionsQuery = async (
   }
 
   const submissionFilters: any[] = [];
+
+  if (customerId) {
+    submissionFilters.push({ customerId });
+  }
 
   if (filters && filters.length > 0) {
     for (const filter of filters) {
@@ -201,17 +207,13 @@ export const formSubmissionsQuery = async (
 
   const integration = await sendInboxMessage({
     subdomain,
-    action: 'integrations.find',
-    data: {
-      query: {
-        integrationsSelector
-      }
-    },
+    action: 'integrations.findOne',
+    data: integrationsSelector,
     isRPC: true,
-    defaultValue: []
+    defaultValue: {}
   });
 
-  if (!integration) {
+  if (!integration._id) {
     return null;
   }
 

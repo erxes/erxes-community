@@ -5,6 +5,7 @@ import {
   ORDER_STATUSES
 } from '../../../models/definitions/constants';
 import { checkLoyalties } from '../../utils/loyalties';
+import { checkPricing } from '../../utils/pricing';
 import {
   checkOrderAmount,
   checkOrderStatus,
@@ -85,11 +86,12 @@ const orderMutations = {
     try {
       let preparedDoc = await prepareOrderDoc(doc, config, models);
       preparedDoc = await checkLoyalties(subdomain, preparedDoc);
+      preparedDoc = await checkPricing(subdomain, preparedDoc, config);
 
       const order = await models.Orders.createOrder({
         ...doc,
         ...orderDoc,
-        totalAmount: preparedDoc.totalAmount,
+        totalAmount: getTotalAmount(preparedDoc.items),
         posToken: config.token,
         departmentId: config.departmentId,
         taxInfo: getTaxInfo(config)
@@ -133,7 +135,7 @@ const orderMutations = {
   async ordersEdit(
     _root,
     doc: IOrderEditParams,
-    { config, models, subdomain }: IContext
+    { posUser, config, models, subdomain }: IContext
   ) {
     const order = await models.Orders.getOrder(doc._id);
 
@@ -145,6 +147,7 @@ const orderMutations = {
 
     let preparedDoc = await prepareOrderDoc(doc, config, models);
     preparedDoc = await checkLoyalties(subdomain, preparedDoc);
+    preparedDoc = await checkPricing(subdomain, preparedDoc, config);
 
     preparedDoc.items = await reverseItemStatus(models, preparedDoc.items);
 
@@ -168,6 +171,7 @@ const orderMutations = {
       deliveryInfo: doc.deliveryInfo,
       branchId: doc.branchId,
       customerId: doc.customerId,
+      userId: posUser ? posUser._id : '',
       type: doc.type,
       totalAmount: getTotalAmount(preparedDoc.items),
       billType: doc.billType || BILL_TYPES.CITIZEN,
@@ -348,13 +352,20 @@ const orderMutations = {
 
   async ordersAddPayment(
     _root,
-    { _id, cashAmount = 0, receivableAmount = 0, cardAmount = 0, cardInfo },
+    {
+      _id,
+      cashAmount = 0,
+      receivableAmount = 0,
+      cardAmount = 0,
+      mobileAmount = 0,
+      cardInfo
+    },
     { models }: IContext
   ) {
     const order = await models.Orders.getOrder(_id);
 
     const amount = Number(
-      (cashAmount + receivableAmount + cardAmount).toFixed(2)
+      (cashAmount + receivableAmount + cardAmount + mobileAmount).toFixed(2)
     );
 
     checkOrderStatus(order);
@@ -368,15 +379,22 @@ const orderMutations = {
         receivableAmount: receivableAmount
           ? (order.receivableAmount || 0) + Number(receivableAmount.toFixed(2))
           : order.receivableAmount || 0,
+        mobileAmount: mobileAmount
+          ? (order.mobileAmount || 0) + Number(mobileAmount.toFixed(2))
+          : order.mobileAmount || 0,
         cardAmount: cardAmount
           ? (order.cardAmount || 0) + Number(cardAmount.toFixed(2))
           : order.cardAmount || 0
       }
     };
 
-    if (cardAmount) {
+    if (cardInfo) {
       modifier.$push = {
-        cardPayments: { amount: cardAmount, cardInfo, _id: Random.id() }
+        cardPayments: {
+          amount: cardAmount + mobileAmount,
+          cardInfo,
+          _id: Random.id()
+        }
       };
     }
 

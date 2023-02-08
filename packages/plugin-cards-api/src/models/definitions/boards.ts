@@ -175,6 +175,7 @@ const relationSchema = new Schema(
 
 export const commonItemFieldsSchema = {
   _id: field({ pkey: true }),
+  parentId: field({ type: String, optional: true, label: 'Parent Id' }),
   userId: field({ type: String, optional: true, esType: 'keyword' }),
   createdAt: field({ type: Date, label: 'Created at', esType: 'date' }),
   order: field({ type: Number }),
@@ -198,7 +199,7 @@ export const commonItemFieldsSchema = {
   watchedUserIds: field({ type: [String], esType: 'keyword' }),
   labelIds: field({ type: [String], esType: 'keyword' }),
   attachments: field({ type: [attachmentSchema], label: 'Attachments' }),
-  stageId: field({ type: String, index: true }),
+  stageId: field({ type: String, index: true, label: 'Stage' }),
   initialStageId: field({
     type: String,
     optional: true
@@ -249,6 +250,18 @@ export const commonItemFieldsSchema = {
     label: 'Related items used for gantt chart'
   }),
   tagIds: field({
+    type: [String],
+    optional: true,
+    index: true,
+    label: 'Tags'
+  }),
+  branchIds: field({
+    type: [String],
+    optional: true,
+    index: true,
+    label: 'Tags'
+  }),
+  departmentIds: field({
     type: [String],
     optional: true,
     index: true,

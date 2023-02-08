@@ -10,6 +10,16 @@ import {
   queries as clientPortalUserQueries,
   types as clientPortalUserTypes
 } from './schema/clientPortalUser';
+import {
+  queries as notificationQueries,
+  mutations as notificationMutations,
+  types as notificationTypes
+} from './schema/clientPortalNotifications';
+
+import {
+  queries as commentQueries,
+  types as commentTypes
+} from './schema/comment';
 
 const typeDefs = async serviceDiscovery => {
   const kbAvailable = await serviceDiscovery.isEnabled('knowledgebase');
@@ -22,15 +32,20 @@ const typeDefs = async serviceDiscovery => {
 
     ${clientPortalTypes(cardAvailable, kbAvailable)}
     ${clientPortalUserTypes(isContactsEnabled)}
+    ${notificationTypes}
+    ${commentTypes}
 
     extend type Query {
      ${clientPortalQueries(cardAvailable, kbAvailable)}
      ${clientPortalUserQueries()}
+     ${notificationQueries}
+     ${commentQueries}
     }
 
     extend type Mutation {
       ${clientPortalMutations(cardAvailable)} 
       ${clientPortalUserMutations()}
+      ${notificationMutations}
     }
   `;
 };

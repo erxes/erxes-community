@@ -19,6 +19,10 @@ interface IAttachment {
   size: number;
 }
 
+export interface ISubUom {
+  uomId: string;
+  ratio: number;
+}
 interface IProductCommonFields {
   name: string;
   code: string;
@@ -30,6 +34,8 @@ export interface IProduct extends IProductCommonFields {
   categoryId?: string;
   type?: string;
   sku?: string;
+  barcodes?: string[];
+  barcodeDescription?: string;
   unitPrice?: number;
   customFieldsData?: ICustomField[];
   tagIds?: string[];
@@ -38,6 +44,8 @@ export interface IProduct extends IProductCommonFields {
   vendorCode?: string;
   mergedIds?: string[];
   attachmentMore?: IAttachment[];
+  uomId?: string;
+  subUoms?: ISubUom[];
 }
 
 export interface IProductDocument extends IProduct, Document {
@@ -58,12 +66,24 @@ export interface IProductCategoryDocument extends IProductCategory, Document {
   tokens: string[];
 }
 
+const subUomSchema = new Schema({
+  _id: field({ pkey: true }),
+  uomId: field({ type: String, label: 'Sub unit of measurement' }),
+  ratio: field({ type: Number, label: 'ratio of sub uom to main uom' })
+});
+
 export const productSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
     categoryId: field({ type: String, label: 'Category' }),
     name: field({ type: String, label: 'Name' }),
     code: field({ type: String, label: 'Code' }),
+    barcodes: field({
+      type: [String],
+      optional: true,
+      label: 'Barcodes',
+      index: true
+    }),
     description: field({ type: String, optional: true, label: 'Description' }),
     attachment: field({ type: attachmentSchema }),
     createdAt: getDateFieldDefinition('Created at'),
@@ -84,6 +104,16 @@ export const productSchema = schemaWrapper(
       optional: true,
       label: 'Stock keeping unit',
       default: 'ш'
+    }),
+    uomId: field({
+      type: String,
+      optional: true,
+      label: 'Main unit of measurement'
+    }),
+    subUoms: field({
+      type: [subUomSchema],
+      optional: true,
+      label: 'Sum unit of measurements'
     }),
     unitPrice: field({
       type: Number,

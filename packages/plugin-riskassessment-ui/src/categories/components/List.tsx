@@ -18,20 +18,12 @@ import {
   Wrapper,
   __
 } from '@erxes/ui/src';
-import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IRouterProps } from '@erxes/ui/src/types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { statusColorConstant } from '../../common/constants';
 import { commonRefetchType } from '../../common/types';
 import { subOption } from '../../common/utils';
-import {
-  Box as StatusBox,
-  ClearableBtn,
-  ColorBox,
-  FormContainer as Container,
-  Padding
-} from '../../styles';
+import { Padding, FormContainer as Container } from '../../styles';
 import FormContainer from '../container/Form';
 
 type Props = {
@@ -47,16 +39,18 @@ type Props = {
 interface LayoutProps {
   children: React.ReactNode;
   label: string;
+  field: any;
   clearable?: boolean;
   type?: string;
 }
 
 type State = {
   searchValue: string;
+  isEnabledSearch: boolean;
   perPage: number;
   sortDirection: number;
-  From: string;
-  To: string;
+  from: string;
+  to: string;
 };
 
 const generateQueryParamsDate = params => {
@@ -68,14 +62,15 @@ class AssessmentCategories extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { From, To } = props.queryParams;
+    const { from, to } = props.queryParams;
 
     this.state = {
       searchValue: '',
+      isEnabledSearch: false,
       perPage: 20,
       sortDirection: -1,
-      From: generateQueryParamsDate(From),
-      To: generateQueryParamsDate(To)
+      from: generateQueryParamsDate(from),
+      to: generateQueryParamsDate(to)
     };
   }
 
@@ -87,13 +82,15 @@ class AssessmentCategories extends React.Component<Props, State> {
     );
 
     const content = ({ closeModal }) => {
-      return <FormContainer refetch={this.props.refetch} closeModal={closeModal} />;
+      return (
+        <FormContainer refetch={this.props.refetch} closeModal={closeModal} />
+      );
     };
 
     return (
       <ModalTrigger
         isAnimate
-        title="Add New Assessment Category"
+        title="Add New Indicators Category"
         content={content}
         trigger={trigger}
       />
@@ -118,7 +115,10 @@ class AssessmentCategories extends React.Component<Props, State> {
     const { categories, queryParams } = this.props;
 
     return categories.map(category => (
-      <SidebarListItem key={category._id} isActive={queryParams.categoryId === category._id}>
+      <SidebarListItem
+        key={category._id}
+        isActive={queryParams.categoryId === category._id}
+      >
         <Link to={`?categoryId=${category._id}`}>
           {category.parentId && subOption(category)}
           {category.name}
@@ -199,126 +199,47 @@ class AssessmentCategories extends React.Component<Props, State> {
   }
 
   renderCategories() {
+    const { isEnabledSearch } = this.state;
+
+    const extraButtons = (
+      <>
+        {this.props.queryParams.categoryId && (
+          <Button btnStyle="link" onClick={this.removeQueryParams}>
+            <Tip text="Clear Filter">
+              <Icon icon="cancel-1" />
+            </Tip>
+          </Button>
+        )}
+        <Button
+          btnStyle="link"
+          icon="search"
+          onClick={() =>
+            this.setState(prev => ({
+              ...prev,
+              isEnabledSearch: !prev.isEnabledSearch
+            }))
+          }
+        />
+      </>
+    );
+
     return (
       <Box
         name="categories"
         title={__('Categories')}
-        extraButtons={
-          this.props.queryParams.categoryId && (
-            <Button btnStyle="link" onClick={this.removeQueryParams}>
-              <Tip text="Clear Filter">
-                <Icon icon="cancel-1" />
-              </Tip>
-            </Button>
-          )
-        }
+        extraButtons={extraButtons}
       >
-        {this.renderCategoryList()}
-      </Box>
-    );
-  }
-
-  renderCategoriesFilter() {
-    return (
-      <Box name="filter_category" title={__('Addition Filter Categories')}>
-        <Padding horizontal vertical>
-          <FormGroup>
-            <ControlLabel>Search</ControlLabel>
+        {isEnabledSearch && (
+          <Padding horizontal>
             <FormControl
               type="text"
               placeholder="type a search"
               value={this.state.searchValue}
               onChange={this.handleSearch}
             />
-          </FormGroup>
-        </Padding>
-      </Box>
-    );
-  }
-
-  renderListFilter() {
-    const { From, To, sortDirection } = this.state;
-    const { riskAssessmentsRefetch, history, queryParams } = this.props;
-
-    const toggleSort = () => {
-      this.setState({ sortDirection: sortDirection * -1 });
-      riskAssessmentsRefetch && riskAssessmentsRefetch({ sortDirection: sortDirection * -1 });
-    };
-
-    const dateOrder = (value, name) => {
-      router.setParams(history, { [name]: new Date(value).valueOf() });
-    };
-    const selectStatus = color => {
-      router.setParams(history, { Status: color });
-    };
-
-    const CustomForm = ({ children, label, clearable }: LayoutProps) => {
-      const handleClearable = () => {
-        router.removeParams(history, label);
-      };
-
-      return (
-        <FormGroup>
-          <ControlLabel>{label}</ControlLabel>
-          {clearable && (
-            <ClearableBtn onClick={handleClearable}>
-              <Tip text="Clear">
-                <Icon icon="cancel-1" />
-              </Tip>
-            </ClearableBtn>
-          )}
-          {children}
-        </FormGroup>
-      );
-    };
-
-    return (
-      <Box name="filter_list" title={__('Addition Filter List')}>
-        <Padding horizontal vertical>
-          <CustomForm label="Status" clearable={!!this.props.queryParams.Status}>
-            <Container row>
-              {statusColorConstant.map(status => (
-                <StatusBox
-                  selected={this.props.queryParams.Status === status.name}
-                  onClick={() => selectStatus(status.name)}
-                  key={status.color}
-                >
-                  <Container row gap align="center">
-                    <ColorBox color={status.color} />
-                  </Container>
-                </StatusBox>
-              ))}
-            </Container>
-          </CustomForm>
-          <Container align="center" spaceBetween>
-            <ControlLabel>Sort:</ControlLabel>
-            <Button btnStyle="link" onClick={toggleSort}>
-              <Tip text={`Sort by Created Date`} placement="bottom">
-                <Icon size={15} icon="sort" />
-              </Tip>
-            </Button>
-          </Container>
-          <CustomForm label="From" clearable={queryParams.From}>
-            <DateContainer>
-              <DateControl
-                name="from"
-                value={From}
-                placeholder="select from date "
-                onChange={e => dateOrder(e, 'From')}
-              />
-            </DateContainer>
-          </CustomForm>
-          <CustomForm label="To" clearable={queryParams.To}>
-            <DateContainer>
-              <DateControl
-                name="to"
-                value={To}
-                placeholder="select to date "
-                onChange={e => dateOrder(e, 'To')}
-              />
-            </DateContainer>
-          </CustomForm>
-        </Padding>
+          </Padding>
+        )}
+        {this.renderCategoryList()}
       </Box>
     );
   }
@@ -326,11 +247,14 @@ class AssessmentCategories extends React.Component<Props, State> {
   render() {
     return (
       <Sidebar wide={true} hasBorder={true}>
-        <Section maxHeight={500} collapsible={this.props.totalCount > 9} noMargin noShadow>
+        <Section
+          maxHeight={500}
+          collapsible={this.props.totalCount > 9}
+          noMargin
+          noShadow
+        >
           {this.rightActionBar}
-          {this.renderCategoriesFilter()}
           {this.renderCategories()}
-          {this.renderListFilter()}
         </Section>
       </Sidebar>
     );

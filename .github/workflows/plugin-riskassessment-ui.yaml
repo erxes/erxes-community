@@ -18,9 +18,9 @@ on:
       - "packages/ui-segments/**"
       - "packages/ui-settings/**"
       - "packages/ui-team/**"
-      - "packages/ui-tags/**"
-      - "packages/plugin-tags-ui/**"
-      - ".github/workflows/plugin-tags-ui.yaml"
+      - "packages/ui-riskassessment/**"
+      - "packages/plugin-riskassessment-ui/**"
+      - ".github/workflows/plugin-riskassessment-ui.yaml"
   pull_request:
     branches:
       - dev
@@ -38,13 +38,13 @@ on:
       - "packages/ui-segments/**"
       - "packages/ui-settings/**"
       - "packages/ui-team/**"
-      - "packages/ui-tags/**"
-      - "packages/plugin-tags-ui/**"
+      - "packages/ui-riskassessment/**"
+      - "packages/plugin-riskassessment-ui/**"
       - ".github/workflows/plugin-riskassessment-ui.yaml"
 
 jobs:
   ui:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Use Node.js 14.18.x

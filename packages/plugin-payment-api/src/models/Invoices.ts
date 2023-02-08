@@ -1,9 +1,14 @@
+import { debugError } from '@erxes/api-utils/src/debuggers';
 import { Model } from 'mongoose';
 
 import { IModels } from '../connectionResolver';
 import redisUtils from '../redisUtils';
-import { cancelPayment, createNewInvoice, makeInvoiceNo } from '../utils';
-import { getInvoice } from './../api/qPay/utils';
+import {
+  cancelPayment,
+  checkInvoice,
+  createNewInvoice,
+  makeInvoiceNo
+} from '../utils';
 import {
   IInvoice,
   IInvoiceDocument,
@@ -15,6 +20,7 @@ export interface IInvoiceModel extends Model<IInvoiceDocument> {
   createInvoice(doc: IInvoice): Promise<IInvoiceDocument>;
   updateInvoice(_id: string, doc: any): Promise<IInvoiceDocument>;
   cancelInvoice(_id: string): Promise<String>;
+  checkInvoice(_id: string): Promise<String>;
 }
 
 export const loadInvoiceClass = (models: IModels) => {
@@ -34,11 +40,11 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Amount is required');
       }
 
-      if (!doc.paymentId) {
+      if (!doc.selectedPaymentId) {
         throw new Error('Payment config id is required');
       }
 
-      const payment = await models.Payments.getPayment(doc.paymentId);
+      const payment = await models.Payments.getPayment(doc.selectedPaymentId);
 
       const invoice = await models.Invoices.create({
         ...doc,
@@ -48,7 +54,7 @@ export const loadInvoiceClass = (models: IModels) => {
       try {
         const apiResponse = createNewInvoice(invoice, payment);
         invoice.apiResponse = apiResponse;
-        invoice.paymentId = payment._id;
+        invoice.selectedPaymentId = payment._id;
         invoice.paymentKind = payment.kind;
 
         await invoice.save();
@@ -56,6 +62,10 @@ export const loadInvoiceClass = (models: IModels) => {
         return invoice;
       } catch (e) {
         await models.Invoices.deleteOne({ _id: invoice._id });
+
+        debugError(
+          `Failed to create invoice with type ${invoice.paymentKind}. Error message: ${e.message}`
+        );
         throw new Error(e.message);
       }
     }
@@ -67,15 +77,17 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Already settled');
       }
 
-      if (!invoice.paymentId) {
+      if (!invoice.selectedPaymentId) {
         try {
-          const payment = await models.Payments.getPayment(doc.paymentId);
+          const payment = await models.Payments.getPayment(
+            doc.selectedPaymentId
+          );
           invoice.identifier = doc.identifier || makeInvoiceNo(32);
 
           const apiResponse = await createNewInvoice(invoice, payment);
           invoice.apiResponse = apiResponse;
           invoice.paymentKind = payment.kind;
-          invoice.paymentId = payment._id;
+          invoice.selectedPaymentId = payment._id;
 
           await invoice.save();
 
@@ -85,14 +97,18 @@ export const loadInvoiceClass = (models: IModels) => {
         }
       }
 
-      if (invoice.paymentId === doc.paymentId) {
+      if (invoice.selectedPaymentId === doc.selectedPaymentId) {
         await models.Invoices.updateOne({ _id }, { $set: doc });
 
         return models.Invoices.getInvoice({ _id });
       }
 
-      const prevPayment = await models.Payments.getPayment(invoice.paymentId);
-      const newPayment = await models.Payments.getPayment(doc.paymentId);
+      const prevPayment = await models.Payments.getPayment(
+        invoice.selectedPaymentId
+      );
+      const newPayment = await models.Payments.getPayment(
+        doc.selectedPaymentId
+      );
 
       cancelPayment(invoice, prevPayment);
 
@@ -100,7 +116,7 @@ export const loadInvoiceClass = (models: IModels) => {
         const apiResponse = await createNewInvoice(invoice, newPayment);
         invoice.apiResponse = apiResponse;
         invoice.paymentKind = newPayment.kind;
-        invoice.paymentId = newPayment._id;
+        invoice.selectedPaymentId = newPayment._id;
 
         await invoice.save();
 
@@ -118,7 +134,9 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Already settled');
       }
 
-      const payment = await models.Payments.getPayment(invoice.paymentId);
+      const payment = await models.Payments.getPayment(
+        invoice.selectedPaymentId
+      );
 
       cancelPayment(invoice, payment);
 
@@ -127,6 +145,20 @@ export const loadInvoiceClass = (models: IModels) => {
       redisUtils.removeInvoice(_id);
 
       return 'success';
+    }
+
+    public static async checkInvoice(_id: string) {
+      const invoice = await models.Invoices.getInvoice({ _id });
+
+      if (!invoice.selectedPaymentId || !invoice.selectedPaymentId.length) {
+        return 'pending';
+      }
+
+      const payment = await models.Payments.getPayment(
+        invoice.selectedPaymentId
+      );
+
+      return checkInvoice(invoice, payment);
     }
   }
   invoiceSchema.loadClass(Invoices);

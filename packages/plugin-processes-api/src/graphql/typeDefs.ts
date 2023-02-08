@@ -20,8 +20,7 @@ import {
 
 import {
   types as flowCategoryTypes,
-  queries as flowCategoryQueries,
-  mutations as flowCategoryMutations
+  queries as flowCategoryQueries
 } from './schema/flowCategory';
 
 import {
@@ -42,6 +41,8 @@ import {
   mutations as performMutations
 } from './schema/perform';
 
+import { types as commonTypes } from './schema/common';
+
 const typeDefs = async _serviceDiscovery => {
   return gql`
     scalar JSON
@@ -58,6 +59,7 @@ const typeDefs = async _serviceDiscovery => {
       inheritMaxAge: Boolean
     ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
 
+    ${commonTypes()}
     ${jobReferTypes}
     ${jobCategoryTypes}
     ${flowTypes}
@@ -80,7 +82,6 @@ const typeDefs = async _serviceDiscovery => {
       ${jobReferMutations}
       ${jobCategoryMutations}
       ${flowMutations}
-      ${flowCategoryMutations}
       ${workMutations}
       ${overallWorkMutations}
       ${performMutations}

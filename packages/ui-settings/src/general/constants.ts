@@ -131,10 +131,11 @@ export const KEY_LABELS = {
   MAIL_USER: 'Username',
   MAIL_PASS: 'Password',
   MAIL_HOST: 'Host',
-  FACEBOOK_APP_ID: 'Facebook App Id',
-  FACEBOOK_APP_SECRET: 'Facebook App Secret',
-  FACEBOOK_VERIFY_TOKEN: 'Facebook Verify Token',
-  FACEBOOK_PERMISSIONS: 'Facebook permissions',
+  TWITTER_CONSUMER_KEY: 'Twitter Consumer Key',
+  TWITTER_CONSUMER_SECRET: 'Twitter Consumer secret',
+  TWITTER_ACCESS_TOKEN: 'Twitter Access Token',
+  TWITTER_ACCESS_TOKEN_SECRET: 'Twitter Access Token Secret',
+  TWITTER_WEBHOOK_ENV: 'Twitter Webhook Env',
   NYLAS_CLIENT_ID: 'Nylas Client Id',
   NYLAS_CLIENT_SECRET: 'Nylas Client Secret',
   NYLAS_WEBHOOK_CALLBACK_URL: 'Nylas Webhook Callback Url',
@@ -174,14 +175,16 @@ export const KEY_LABELS = {
   company_industry_types: 'Company industry types',
   social_links: 'Social links',
 
-  NOTIFICATION_DATA_RETENTION: 'Notification data retention',
-  LOG_DATA_RETENTION: 'Log data retention',
-
   THEME_LOGO: 'Logo',
+  THEME_MOTTO: 'Motto',
   THEME_LOGIN_PAGE_DESCRIPTION: 'Login page description',
   THEME_FAVICON: 'Favicon',
   THEME_TEXT_COLOR: 'Text color',
   THEME_BACKGROUND: 'Background',
+
+  NOTIFICATION_DATA_RETENTION: 'Notification data retention',
+  LOG_DATA_RETENTION: 'Log data retention',
+
   MESSAGE_PRO_API_KEY: 'MessagePro api key',
   MESSAGE_PRO_PHONE_NUMBER: 'MessagePro phone number'
 };

@@ -100,6 +100,7 @@ export interface IItemParams {
   _id?: string;
   name?: string;
   stageId?: string;
+  parentId?: string;
   assignedUserIds?: string[];
   closeDate?: Date;
   description?: string;
@@ -211,6 +212,8 @@ export interface IItem {
   tags: ITag[];
   tagIds: string[];
   customProperties?: any;
+  departmentIds: string[];
+  branchIds: string[];
 }
 
 export interface IDraggableLocation {
@@ -385,11 +388,14 @@ export interface IFilterParams extends ISavedConformity {
   labelIds?: string;
   userIds?: string;
   segment?: string;
+  segmentData?: string;
   assignedToMe?: string;
   startDate?: string;
   endDate?: string;
   pipelineId?: string;
   tagIds?: string[];
+  branchIds: string[];
+  departmentIds: string[];
 }
 
 export interface INonFilterParams {
@@ -462,5 +468,7 @@ export type TicketCommentAddMutationResponse = {
 export type ITimeData = {
   closeDate?: Date;
   startDate?: Date;
-  tagId?: string[];
+  tagIds?: string[];
+  assignedUserIds?: string[];
+  stageId?: string;
 };

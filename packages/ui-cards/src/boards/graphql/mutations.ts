@@ -15,6 +15,7 @@ const createTicketComment = `
 `;
 
 export const commonMutationVariables = `
+  $parentId: String,
   $proccessId: String,
   $aboveItemId: String,
   $stageId: String,
@@ -31,9 +32,12 @@ export const commonMutationVariables = `
   $sourceConversationIds: [String],
   $customFieldsData: JSON,
   $tagIds: [String]
+  $branchIds:[String],
+  $departmentIds:[String]
 `;
 
 export const commonMutationParams = `
+  parentId: $parentId,
   proccessId: $proccessId,
   aboveItemId: $aboveItemId,
   stageId: $stageId,
@@ -50,6 +54,8 @@ export const commonMutationParams = `
   sourceConversationIds: $sourceConversationIds,
   customFieldsData: $customFieldsData,
   tagIds: $tagIds
+  branchIds: $branchIds
+  departmentIds: $departmentIds
 `;
 
 export const commonDragVariables = `
@@ -89,6 +95,7 @@ export const commonListFields = `
   number
   tagIds
   customProperties
+  status
 `;
 
 export const commonFields = `
@@ -100,8 +107,15 @@ export const commonFields = `
     _id
     name
     tagId
-    tag {
-      order
+
+    ${
+      isEnabled('tags')
+        ? `
+        tag {
+          order
+        }
+    `
+        : ``
     }
   }
   boardId
@@ -166,6 +180,7 @@ export const commonFields = `
   labelIds
   stage {
     probability
+    type
   }
   isWatched
   attachments {
@@ -197,6 +212,8 @@ export const commonFields = `
   }
   number
   customProperties
+  branchIds
+  departmentIds
 `;
 
 const pipelinesWatch = `

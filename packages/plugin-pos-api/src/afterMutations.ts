@@ -1,5 +1,9 @@
 import { generateModels, IModels } from './connectionResolver';
-import { sendPosclientMessage, sendProductsMessage } from './messageBroker';
+import {
+  sendPosclientMessage,
+  sendPricingMessage,
+  sendProductsMessage
+} from './messageBroker';
 import { IPosDocument } from './models/definitions/pos';
 import { getChildCategories } from './utils';
 
@@ -32,6 +36,9 @@ const isInProduct = async (
     allProductIds.push(pos.deliveryConfig.productId);
   }
 
+  let allExcludedProductIds: string[] = [];
+  let allCategoryIds: string[] = [];
+
   for (const group of groups) {
     const includeCatIds = await getChildCategories(
       subdomain,
@@ -46,24 +53,35 @@ const isInProduct = async (
       c => !excludeCatIds.includes(c)
     );
 
-    const products = await sendProductsMessage({
-      subdomain,
-      action: 'find',
-      data: {
-        query: {
-          status: { $ne: 'deleted' },
-          categoryId: { $in: productCategoryIds },
-          _id: { $nin: group.excludedProductIds }
-        }
-      },
-      isRPC: true,
-      defaultValue: []
-    });
-
-    allProductIds = allProductIds.concat(products.map(p => p._id));
+    allExcludedProductIds = allExcludedProductIds.concat(
+      group.excludedProductIds
+    );
+    allCategoryIds = allCategoryIds.concat(productCategoryIds);
   } // end product group for loop
 
-  return allProductIds.includes(productId);
+  if (allExcludedProductIds.includes(productId)) {
+    return false;
+  }
+
+  const products = await sendProductsMessage({
+    subdomain,
+    action: 'find',
+    data: {
+      query: {
+        status: { $ne: 'deleted' },
+        categoryId: { $in: allCategoryIds },
+        _id: productId
+      }
+    },
+    isRPC: true,
+    defaultValue: []
+  });
+
+  if (!products.length) {
+    return false;
+  }
+
+  return true;
 };
 
 const isInProductCategory = async (
@@ -122,7 +140,44 @@ export const afterMutationHandlers = async (subdomain, params) => {
   if (type === 'products:product') {
     for (const pos of poss) {
       if (await isInProduct(subdomain, models, pos, params.object._id)) {
-        await handler(subdomain, params, action, 'product', pos);
+        const item = params.updatedDocument || params.object;
+
+        const pricing = await sendPricingMessage({
+          subdomain,
+          action: 'checkPricing',
+          data: {
+            prioritizeRule: 'only',
+            totalAmount: 0,
+            departmentId: pos.departmentId,
+            branchId: pos.branchId,
+            products: [
+              {
+                productId: item._id,
+                quantity: 1,
+                price: item.unitPrice
+              }
+            ]
+          },
+          isRPC: true,
+          defaultValue: {}
+        });
+
+        const discount = pricing[item._id] || {};
+
+        if (Object.keys(discount).length) {
+          let unitPrice = (item.unitPrice -= discount.value);
+          if (unitPrice < 0) {
+            unitPrice = 0;
+          }
+
+          if (params.updatedDocument) {
+            params.updatedDocument.unitPrice = unitPrice;
+          } else {
+            params.object.unitPrice = unitPrice;
+          }
+        }
+
+        await handler(subdomain, { ...params }, action, 'product', pos);
       }
     }
     return;

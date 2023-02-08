@@ -4,7 +4,7 @@ module.exports = {
   scope: 'riskassessment',
   exposes: {
     './routes': './src/routes.tsx',
-    './dealSection': './src/section/container/List.tsx'
+    './cardSideBarSection': './src/assessments/section/containers/Section.tsx'
   },
   routes: {
     url: 'http://localhost:3012/remoteEntry.js',
@@ -14,31 +14,39 @@ module.exports = {
   menus: [
     {
       text: 'Risk Assessments',
-      to: '/riskassessments',
+      to: '/settings/risk-assessments',
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
-      scope: 'riskassessment'
+      scope: 'riskassessment',
+      action: 'riskAssessmentAll',
+      permissions: ['showRiskAssessment', 'manageRiskAssessment']
     }
   ],
   dealRightSidebarSection: [
     {
       text: 'riskAssessmentSection',
-      component: './dealSection',
-      scope: 'riskassessment'
+      component: './cardSideBarSection',
+      scope: 'riskassessment',
+      action: 'riskAssessmentAll',
+      permissions: ['showRiskAssessment', 'manageRiskAssessment']
     }
   ],
   ticketRightSidebarSection: [
     {
       text: 'riskAssessmentSection',
-      component: './dealSection',
-      scope: 'riskassessment'
+      component: './cardSideBarSection',
+      scope: 'riskassessment',
+      action: 'riskAssessmentAll',
+      permissions: ['showRiskAssessment', 'manageRiskAssessment']
     }
   ],
   taskRightSidebarSection: [
     {
       text: 'riskAssessmentSection',
-      component: './dealSection',
-      scope: 'riskassessment'
+      component: './cardSideBarSection',
+      scope: 'riskassessment',
+      action: 'riskAssessmentAll',
+      permissions: ['showRiskAssessment', 'manageRiskAssessment']
     }
   ]
 };

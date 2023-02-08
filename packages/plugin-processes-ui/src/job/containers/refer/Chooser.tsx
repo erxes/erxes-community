@@ -12,7 +12,7 @@ import {
 } from '../../graphql';
 import {
   IJobRefer,
-  AddMutationResponse,
+  JobRefersAddMutationResponse,
   JobRefersQueryResponse,
   JobCategoriesQueryResponse
 } from '../../types';
@@ -22,7 +22,7 @@ type Props = {
   data: { name: string; jobRefers: IJobRefer[] };
   types: string[];
   categoryId: string;
-  onChangeCategory: (catgeoryId: string) => void;
+  onChangeCategory: (categoryId: string) => void;
   closeModal: () => void;
   onSelect: (jobRefers: IJobRefer[]) => void;
 };
@@ -31,7 +31,7 @@ type FinalProps = {
   jobsQuery: JobRefersQueryResponse;
   jobCategoriesQuery: JobCategoriesQueryResponse;
 } & Props &
-  AddMutationResponse;
+  JobRefersAddMutationResponse;
 
 class JobReferChooser extends React.Component<FinalProps, { perPage: number }> {
   constructor(props) {
@@ -135,7 +135,7 @@ export default withProps<Props>(
       name: 'jobCategoriesQuery'
     }),
     // mutations
-    graphql<{}, AddMutationResponse, IJobRefer>(
+    graphql<{}, JobRefersAddMutationResponse, IJobRefer>(
       gql(jobMutations.jobRefersAdd),
       {
         name: 'jobRefersAdd',

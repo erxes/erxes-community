@@ -1,4 +1,10 @@
-import { Alert, __, confirm, router } from '@erxes/ui/src/utils';
+import {
+  loadDynamicComponent,
+  Alert,
+  __,
+  confirm,
+  router
+} from '@erxes/ui/src/utils';
 import { Count, Title } from '@erxes/ui/src/styles/main';
 import { IProduct, IProductCategory } from '../../types';
 
@@ -22,6 +28,7 @@ import Table from '@erxes/ui/src/components/table';
 import TaggerPopover from '@erxes/ui-tags/src/components/TaggerPopover';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { isEnabled } from '@erxes/ui/src/utils/core';
+import TemporarySegment from '@erxes/ui-segments/src/components/filter/TemporarySegment';
 
 interface IProps extends IRouterProps {
   history: any;
@@ -153,6 +160,9 @@ class List extends React.Component<IProps, State> {
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
+        {isEnabled('segments') && (
+          <TemporarySegment contentType={`products:product`} />
+        )}
         <Link to="/settings/importHistories?type=product">
           <Button btnStyle="simple" icon="arrow-from-right">
             {__('Import items')}
@@ -244,6 +254,8 @@ class List extends React.Component<IProps, State> {
 
       actionBarRight = (
         <BarItems>
+          {loadDynamicComponent('productListAction', { bulk }, true)}
+
           {bulk.length === 2 && (
             <ModalTrigger
               title="Merge Product"
