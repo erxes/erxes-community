@@ -44,7 +44,7 @@ export const types = `
   type PosOrderItem {
     ${commonFields}
     productId: String!
-    count: Int!
+    count: Float!
     orderId: String!
     unitPrice: Float
     discountAmount: Float
@@ -117,7 +117,7 @@ export const types = `
   input OrderItemInput {
     _id: String
     productId: String!
-    count: Int!
+    count: Float!
     unitPrice: Float!
     isPackage: Boolean
     isTake: Boolean
