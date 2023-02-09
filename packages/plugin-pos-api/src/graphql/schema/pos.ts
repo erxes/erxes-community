@@ -56,10 +56,9 @@ const posOrderFields = contactsEnabled => `
   paidDate: Date,
   number: String,
   customerId: String,
-  cardAmount: Float,
   cashAmount: Float,
-  receivableAmount: Float,
   mobileAmount: Float,
+  paidAmounts: JSON,
   totalAmount: Float,
   finalAmount: Float,
   shouldPrintEbarimt: Boolean,
@@ -249,5 +248,5 @@ export const mutations = `
   posSlotBulkUpdate(posId: String, slots: [SlotInput]): [PosSlot]
   posOrderSyncErkhet(_id: String!): PosOrder
   posOrderReturnBill(_id: String!): PosOrder
-  posOrderChangePayments(_id: String!, cashAmount: Float, receivableAmount: Float, cardAmount: Float, mobileAmount: Float): PosOrder
+  posOrderChangePayments(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: JSON): PosOrder
 `;
