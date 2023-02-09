@@ -5,9 +5,8 @@ import { __ } from '@erxes/ui/src/utils';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import TimeForm from '../../containers/timeclock/TimeFormList';
 import dayjs from 'dayjs';
-import { dateFormat } from '../../constants';
+import { dateFormat, timeFormat } from '../../constants';
 import Tip from '@erxes/ui/src/components/Tip';
-import { log } from 'console';
 
 type Props = {
   timeclock: ITimeclock;
@@ -49,14 +48,14 @@ class Row extends React.Component<Props> {
 
   render() {
     const { timeclock, removeTimeclock } = this.props;
-    const shiftStartTime = new Date(timeclock.shiftStart).toLocaleTimeString();
+    const shiftStartTime = dayjs(timeclock.shiftStart).format(timeFormat);
     const shiftDate =
       new Date(timeclock.shiftStart).toDateString().split(' ')[0] +
       '\t' +
       dayjs(timeclock.shiftStart).format(dateFormat);
 
     const shiftEndTime = timeclock.shiftEnd
-      ? new Date(timeclock.shiftEnd).toLocaleTimeString()
+      ? dayjs(timeclock.shiftEnd).format(timeFormat)
       : '-';
 
     const overNightShift =
