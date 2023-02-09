@@ -18,10 +18,11 @@ import {
 
 const customFixDate = (date?: Date) => {
   // get date, return date with 23:59:59
-  const getDate = date?.toLocaleDateString();
+  const getDate = new Date(date || '').toLocaleDateString();
   const returnDate = new Date(getDate + ' 23:59:59');
   return returnDate;
 };
+
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
     subdomain,
@@ -823,8 +824,8 @@ const createTeamMembersObject = async (subdomain: string) => {
 
     teamMembersObject[teamMember._id] = {
       employeeId: teamMember.employeeId,
-      firstName: teamMember.details.firstName,
       lastName: teamMember.details.lastName,
+      firstName: teamMember.details.firstName,
       position: teamMember.details.position
     };
   }

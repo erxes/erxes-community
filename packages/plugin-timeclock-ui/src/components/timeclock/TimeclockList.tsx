@@ -139,9 +139,9 @@ function List({
           <th>{__('Team member')}</th>
           <th>{__('Shift date')}</th>
           <th>{__('Check In')}</th>
-          <th>{__('Device')}</th>
+          <th>{__('In Device')}</th>
           <th>{__('Check Out')}</th>
-          <th>{__('Device')}</th>
+          <th>{__('Out Device')}</th>
           <th>{__('Overnight')}</th>
           <th>{__('Location')}</th>
           <th>{__('Status')}</th>

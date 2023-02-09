@@ -486,8 +486,8 @@ export const timeclockReportByUser = async (
 export const timeclockReportPreliminary = async (
   subdomain: string,
   userIds: string[],
-  startDate: string,
-  endDate: string,
+  startDate: Date,
+  endDate: Date,
   teamMembersObj?: any,
   exportToXlsx?: boolean
 ) => {
@@ -511,13 +511,13 @@ export const timeclockReportPreliminary = async (
       {
         shiftStart: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       },
       {
         shiftEnd: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       }
     ]
@@ -531,7 +531,7 @@ export const timeclockReportPreliminary = async (
         {
           shiftStart: {
             $gte: fixDate(startDate),
-            $lte: fixDate(endDate)
+            $lte: customFixDate(endDate)
           }
         }
       ]

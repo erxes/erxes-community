@@ -7,6 +7,7 @@ import TimeForm from '../../containers/timeclock/TimeFormList';
 import dayjs from 'dayjs';
 import { dateFormat, timeFormat } from '../../constants';
 import Tip from '@erxes/ui/src/components/Tip';
+import { returnDeviceTypes } from '../../utils';
 
 type Props = {
   timeclock: ITimeclock;
@@ -63,21 +64,6 @@ class Row extends React.Component<Props> {
       new Date(timeclock.shiftEnd).toLocaleDateString() !==
         new Date(timeclock.shiftStart).toLocaleDateString();
 
-    let checkInDevice;
-    let checkOutDevice;
-    const getDeviceNames =
-      timeclock.deviceName && timeclock.deviceType.split('x');
-
-    if (getDeviceNames) {
-      if (getDeviceNames.length === 2) {
-        checkInDevice = getDeviceNames[0];
-        checkOutDevice = getDeviceNames[1];
-      } else {
-        checkInDevice = getDeviceNames[0];
-        checkOutDevice = getDeviceNames[0];
-      }
-    }
-
     return (
       <tr>
         <td>
@@ -88,9 +74,9 @@ class Row extends React.Component<Props> {
         </td>
         <td>{shiftDate}</td>
         <td>{shiftStartTime}</td>
-        <td>{checkInDevice}</td>
+        <td>{returnDeviceTypes(timeclock.deviceType)[0]}</td>
         <td>{shiftEndTime}</td>
-        <td>{checkOutDevice}</td>
+        <td>{returnDeviceTypes(timeclock.deviceType)[1]}</td>
         <td>{overNightShift ? 'O' : ''}</td>
         <td>
           {timeclock.branchName ? timeclock.branchName : timeclock.deviceName}
