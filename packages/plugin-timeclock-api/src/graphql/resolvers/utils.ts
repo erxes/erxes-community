@@ -702,8 +702,6 @@ export const timeclockReportFinal = async (
           const totalHoursWorkedPerShift =
             (shiftEnd.getTime() - shiftStart.getTime()) / MMSTOHRS;
 
-          console.log(totalHoursWorkedPerShift);
-
           // make sure shift end is later than shift start
           if (totalHoursWorkedPerShift > 0) {
             totalRegularHoursWorkedPerUser += totalHoursWorkedPerShift;
