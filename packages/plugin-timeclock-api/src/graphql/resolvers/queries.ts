@@ -122,6 +122,10 @@ const timeclockQueries = {
     },
     { subdomain }: IContext
   ) {
+    let filterGiven = false;
+    if (userIds || branchIds || departmentIds) {
+      filterGiven = true;
+    }
     const teamMemberIdsFromFilter = await generateCommonUserIds(
       subdomain,
       userIds,
@@ -141,9 +145,10 @@ const timeclockQueries = {
 
       teamMemberIds.push(teamMember._id);
     }
-    const totalTeamMemberIds = teamMemberIdsFromFilter.length
-      ? teamMemberIdsFromFilter
-      : teamMemberIds;
+    const totalTeamMemberIds =
+      teamMemberIdsFromFilter.length || filterGiven
+        ? teamMemberIdsFromFilter
+        : teamMemberIds;
 
     switch (reportType) {
       case 'Урьдчилсан' || 'Preliminary':

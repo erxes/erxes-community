@@ -8,6 +8,7 @@ import {
   IUserReport,
   IUsersReport
 } from '../../models/definitions/timeclock';
+import { customFixDate } from '../../utils';
 
 // milliseconds to hrs
 const MMSTOHRS = 3600000;
@@ -597,8 +598,8 @@ export const timeclockReportPreliminary = async (
 export const timeclockReportFinal = async (
   subdomain: string,
   userIds: string[],
-  startDate?: string,
-  endDate?: string,
+  startDate?: Date,
+  endDate?: Date,
   teamMembersObj?: any,
   exportToXlsx?: boolean
 ) => {
@@ -621,13 +622,13 @@ export const timeclockReportFinal = async (
       {
         shiftStart: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       },
       {
         shiftEnd: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       }
     ]
@@ -641,7 +642,7 @@ export const timeclockReportFinal = async (
         {
           shiftStart: {
             $gte: fixDate(startDate),
-            $lte: fixDate(endDate)
+            $lte: customFixDate(endDate)
           }
         }
       ]
@@ -701,6 +702,8 @@ export const timeclockReportFinal = async (
           const totalHoursWorkedPerShift =
             (shiftEnd.getTime() - shiftStart.getTime()) / MMSTOHRS;
 
+          console.log(totalHoursWorkedPerShift);
+
           // make sure shift end is later than shift start
           if (totalHoursWorkedPerShift > 0) {
             totalRegularHoursWorkedPerUser += totalHoursWorkedPerShift;
@@ -721,22 +724,29 @@ export const timeclockReportFinal = async (
             const scheduleShiftStart = getScheduleOfTheDay.shiftStart;
             const scheduleShiftEnd = getScheduleOfTheDay.shiftEnd;
 
-            const getScheduleDuration =
-              scheduleShiftEnd.getTime() - scheduleShiftStart.getTime();
+            const getScheduleDuration = Math.abs(
+              scheduleShiftEnd.getTime() - scheduleShiftStart.getTime()
+            );
 
-            const getTimeClockDuration =
-              shiftEnd.getTime() - shiftStart.getTime();
+            const getTimeClockDuration = Math.abs(
+              shiftEnd.getTime() - shiftStart.getTime()
+            );
 
             // get difference in schedule duration and time clock duration
             const getShiftDurationDiff =
               getTimeClockDuration - getScheduleDuration;
 
-            // if timeclock > schedule -- overtime, else -- late
+            // get difference in shift start and scheduled start
+            const getShiftStartDiff =
+              shiftStart.getTime() - scheduleShiftStart.getTime();
+
+            // if shift start is later than scheduled start --> late
+            if (getShiftStartDiff > 0) {
+              totalMinsLatePerUser += getShiftStartDiff / MMSTOMINS;
+            }
+            // if timeclock > schedule --> overtime
             if (getShiftDurationDiff > 0) {
               totalHoursOvertimePerUser += getShiftDurationDiff / MMSTOHRS;
-            } else {
-              totalMinsLatePerUser +=
-                Math.abs(getShiftDurationDiff) / MMSTOMINS;
             }
           }
         }
@@ -787,8 +797,8 @@ export const timeclockReportFinal = async (
 export const timeclockReportPivot = async (
   subdomain: string,
   userIds: string[],
-  startDate?: string,
-  endDate?: string,
+  startDate?: Date,
+  endDate?: Date,
   teamMembersObj?: any,
   exportToXlsx?: boolean
 ) => {
@@ -811,13 +821,13 @@ export const timeclockReportPivot = async (
       {
         shiftStart: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       },
       {
         shiftEnd: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(endDate)
         }
       }
     ]
@@ -831,7 +841,7 @@ export const timeclockReportPivot = async (
         {
           shiftStart: {
             $gte: fixDate(startDate),
-            $lte: fixDate(endDate)
+            $lte: customFixDate(endDate)
           }
         }
       ]
@@ -882,8 +892,9 @@ export const timeclockReportPivot = async (
           );
 
           const scheduledDay = shiftStart.toLocaleDateString();
-          const getTimeClockDuration =
-            shiftEnd.getTime() - shiftStart.getTime();
+          const getTimeClockDuration = Math.abs(
+            shiftEnd.getTime() - shiftStart.getTime()
+          );
 
           let scheduleShiftStart;
           let scheduleShiftEnd;
@@ -897,8 +908,9 @@ export const timeclockReportPivot = async (
             scheduleShiftStart = getScheduleOfTheDay.shiftStart;
             scheduleShiftEnd = getScheduleOfTheDay.shiftEnd;
 
-            getScheduleDuration =
-              scheduleShiftEnd.getTime() - scheduleShiftStart.getTime();
+            getScheduleDuration = Math.abs(
+              scheduleShiftEnd.getTime() - scheduleShiftStart.getTime()
+            );
 
             // get difference in schedule duration and time clock duration
             const getShiftDurationDiff =
@@ -954,12 +966,15 @@ const returnOvernightHours = (shiftStart: Date, shiftEnd: Date) => {
   const shiftDay = shiftStart.toLocaleDateString();
   const nextDay = dayjs(shiftDay)
     .add(1, 'day')
-    .toDate();
+    .toDate()
+    .toLocaleDateString();
+
   const overnightStart = dayjs(shiftDay + ' ' + '22:00:00').toDate();
   const overnightEnd = dayjs(nextDay + ' ' + '06:00:00').toDate();
 
   let totalOvernightHours = 0;
 
+  // 19:42 08:16
   // if shift end is less than 22:00 then no overnight time
   if (shiftEnd > overnightStart) {
     const getOvernightDuration =

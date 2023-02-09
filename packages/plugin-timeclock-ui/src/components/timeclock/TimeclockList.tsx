@@ -138,11 +138,12 @@ function List({
         <tr>
           <th>{__('Team member')}</th>
           <th>{__('Shift date')}</th>
-          <th>{__('Shift started')}</th>
-          <th>{__('Shift ended')}</th>
+          <th>{__('Check In')}</th>
+          <th>{__('Device')}</th>
+          <th>{__('Check Out')}</th>
+          <th>{__('Device')}</th>
           <th>{__('Overnight')}</th>
-          <th>{__('Branch / Device name')}</th>
-          <th>{__('Device type')}</th>
+          <th>{__('Location')}</th>
           <th>{__('Status')}</th>
           <th>{__('Action')}</th>
         </tr>

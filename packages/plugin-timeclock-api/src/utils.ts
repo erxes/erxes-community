@@ -16,6 +16,12 @@ import {
   findDepartmentUsers
 } from './graphql/resolvers/utils';
 
+const customFixDate = (date?: Date) => {
+  // get date, return date with 23:59:59
+  const getDate = date?.toLocaleDateString();
+  const returnDate = new Date(getDate + ' 23:59:59');
+  return returnDate;
+};
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
     subdomain,
@@ -88,8 +94,16 @@ const connectAndQueryFromMsSql = async (
       teamEmployeeIds.push(teamMember.employeeId);
       teamMemberIds.push(teamMember._id);
     }
+    const devicesList = await models.DeviceConfigs.find({
+      serialNo: { $exists: true },
+      extractRequired: true
+    });
 
-    const query = `SELECT * FROM ${MYSQL_TABLE} WHERE authDateTime >= '${startDate}' AND authDateTime <= '${endDate}' AND ISNUMERIC(ID)=1 AND ID IN (${teamEmployeeIds}) ORDER BY ID, authDateTime`;
+    const deviceSerialNumbers = devicesList.map(device => device.serialNo);
+
+    const query = `SELECT * FROM ${MYSQL_TABLE} WHERE authDateTime >= '${startDate}' AND authDateTime <= '${endDate}' AND ISNUMERIC(ID)=1 AND ID IN (${teamEmployeeIds}) AND deviceSerialNo IN (${deviceSerialNumbers.map(
+      serialNo => `'${serialNo}'`
+    )}) ORDER BY ID, authDateTime`;
 
     const queryData = await sequelize.query(query, {
       type: QueryTypes.SELECT
@@ -661,26 +675,26 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
               startDate && endDate
                 ? {
                     $gte: fixDate(startDate),
-                    $lte: fixDate(endDate)
+                    $lte: customFixDate(endDate)
                   }
                 : startDate
                 ? {
                     $gte: fixDate(startDate)
                   }
-                : { $lte: fixDate(endDate) }
+                : { $lte: customFixDate(endDate) }
           },
           {
             shiftEnd:
               startDate && endDate
                 ? {
                     $gte: fixDate(startDate),
-                    $lte: fixDate(endDate)
+                    $lte: customFixDate(endDate)
                   }
                 : startDate
                 ? {
                     $gte: fixDate(startDate)
                   }
-                : { $lte: fixDate(endDate) }
+                : { $lte: customFixDate(endDate) }
           }
         ]
       : [
@@ -689,26 +703,26 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
               startDate && endDate
                 ? {
                     $gte: fixDate(startDate),
-                    $lte: fixDate(endDate)
+                    $lte: customFixDate(endDate)
                   }
                 : startDate
                 ? {
                     $gte: fixDate(startDate)
                   }
-                : { $lte: fixDate(endDate) }
+                : { $lte: customFixDate(endDate) }
           },
           {
             endTime:
               startDate && endDate
                 ? {
                     $gte: fixDate(startDate),
-                    $lte: fixDate(endDate)
+                    $lte: customFixDate(endDate)
                   }
                 : startDate
                 ? {
                     $gte: fixDate(startDate)
                   }
-                : { $lte: fixDate(endDate) }
+                : { $lte: customFixDate(endDate) }
           }
         ];
 
@@ -823,5 +837,6 @@ export {
   generateFilter,
   generateCommonUserIds,
   findAllTeamMembersWithEmpId,
-  createTeamMembersObject
+  createTeamMembersObject,
+  customFixDate
 };

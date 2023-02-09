@@ -272,6 +272,10 @@ function ScheduleForm(props: Props) {
       new Date(getLatestDayKey + ' ' + defaultStartTime),
       new Date(getLatestDayKey + ' ' + defaultEndTime)
     );
+
+    console.log('start', getCorrectShiftStart, overnight);
+    console.log('end', getCorrectShiftEnd);
+
     dates[getLatestDayKey] = {
       shiftDate: new Date(getLatestDayKey),
       shiftStart: getCorrectShiftStart,

@@ -163,7 +163,7 @@ const timeclockMutations = {
       updated = await models.Timeclocks.updateTimeClock(_id, {
         shiftEnd: new Date(),
         shiftActive: false,
-        deviceType: getShiftStartDeviceType + ' + ' + deviceType,
+        deviceType: getShiftStartDeviceType + ' x ' + deviceType,
         ...doc
       });
     } else {
@@ -513,8 +513,6 @@ const timeclockMutations = {
     { _id, ...doc }: IDeviceConfigDocument,
     { models }: IContext
   ) {
-    console.log(_id);
-
     await models.DeviceConfigs.updateDeviceConfig(_id, doc);
   },
 
