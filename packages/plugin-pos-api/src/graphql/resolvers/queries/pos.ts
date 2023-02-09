@@ -257,9 +257,7 @@ const queries = {
       { $match: { ...query } },
       {
         $project: {
-          cardAmount: '$cardAmount',
           cashAmount: '$cashAmount',
-          receivableAmount: '$receivableAmount',
           mobileAmount: '$mobileAmount',
           totalAmount: '$totalAmount',
           finalAmount: '$finalAmount '

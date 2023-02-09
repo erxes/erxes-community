@@ -183,13 +183,3 @@ export interface IProductShema {
 export type SchemaLabelsQueryResponse = {
   getDbSchemaLabels: IProductShema[];
 } & QueryResponse;
-
-export interface IOrdersSummary {
-  cardAmount: number;
-  cashAmount: number;
-  receivableAmount: number;
-  mobileAmount: number;
-  totalAmount: number;
-  finalAmount: number;
-  count: number;
-}

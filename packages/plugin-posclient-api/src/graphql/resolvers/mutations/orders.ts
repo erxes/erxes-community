@@ -414,7 +414,7 @@ const orderMutations = {
   },
 
   /**
-   * Захиалгын cashAmount, cardAmount, mobileAmount талбарууд тусдаа mutation-р
+   * Захиалгын cashAmount, mobileAmount талбарууд тусдаа mutation-р
    * утга авах учир энд эдгээр мөнгөн дүн талбар хүлээж авахгүйгээр хадгалагдсан дүнг
    * шалган тооцоо хаана.
    */

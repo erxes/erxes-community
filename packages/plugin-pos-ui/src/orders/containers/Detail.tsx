@@ -98,9 +98,8 @@ export default withProps<Props>(
       {
         _id: string;
         cashAmount: number;
-        receivableAmount: number;
-        cardAmount: number;
         mobileAmount: number;
+        paidAmounts: any;
       }
     >(gql(mutations.posOrderChangePayments), {
       name: 'posOrderChangePayments',

@@ -13,11 +13,9 @@ const orderFields = `
 
 const paymentInputDefs = `
   cashAmount: Float
-  receivableAmount: Float
   billType: String
   registerNumber: String
   mobileAmount: Float
-  cardAmount: Float
 `;
 export const types = `
   type PosOrderItem {
@@ -77,6 +75,7 @@ export const types = `
     ${commonFields}
     ${orderFields}
     ${paymentInputDefs}
+    paidAmounts: [PaidAmount]
 
     paidDate: Date
     modifiedAt: Date

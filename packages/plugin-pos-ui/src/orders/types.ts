@@ -1,4 +1,4 @@
-import { IOrdersSummary, QueryResponse } from '../types';
+import { QueryResponse } from '../types';
 import { IProduct, IProductCategory } from '@erxes/ui-products/src/types';
 
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
@@ -59,7 +59,7 @@ export type ListQueryVariables = {
 };
 
 export type OrdersSummaryQueryResponse = {
-  posOrdersSummary: IOrdersSummary;
+  posOrdersSummary: any;
   loading: boolean;
   refetch: () => void;
 };

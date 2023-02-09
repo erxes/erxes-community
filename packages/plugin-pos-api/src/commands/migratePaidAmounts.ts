@@ -38,7 +38,7 @@ const command = async () => {
         continue;
       }
 
-      const paidAmounts = [];
+      const paidAmounts: any[] = [];
       if (order.receivableAmount) {
         paidAmounts.push({
           _id: Math.random().toString(),

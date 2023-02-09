@@ -87,14 +87,6 @@ export const getPostData = async (subdomain, pos, order) => {
     payments.cashAmount = order.cashAmount;
     sumSaleAmount -= order.cashAmount;
   }
-  if (order.receivableAmount) {
-    payments.debtAmount = order.receivableAmount;
-    sumSaleAmount -= order.receivableAmount;
-  }
-  if (order.cardAmount) {
-    payments.cardAmount = order.cardAmount;
-    sumSaleAmount -= order.cardAmount;
-  }
   if (order.mobileAmount) {
     payments.mobileAmount = order.mobileAmount;
     sumSaleAmount -= order.mobileAmount;
