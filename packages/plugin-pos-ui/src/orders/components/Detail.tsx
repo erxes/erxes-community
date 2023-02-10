@@ -104,7 +104,7 @@ class PutResponseDetail extends React.Component<Props, State> {
     };
 
     return (
-      <li>
+      <li key={Math.random()}>
         <FlexRow>
           <FieldStyle>{__(`${label}`)}:</FieldStyle>
           <FormControl
@@ -193,7 +193,7 @@ class PutResponseDetail extends React.Component<Props, State> {
         <>
           {(order.putResponses || []).map(p => {
             return (
-              <DetailRow>
+              <DetailRow key={Math.random()}>
                 {this.renderRow('Bill ID', p.billId)}
                 {this.renderRow('Ebarimt Date', dayjs(p.date).format('lll'))}
               </DetailRow>

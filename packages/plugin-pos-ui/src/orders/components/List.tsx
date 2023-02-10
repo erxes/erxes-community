@@ -125,7 +125,7 @@ class Orders extends React.Component<IProps, {}> {
                 />
               </th>
               {otherPayTitles.map(key => (
-                <th>{__(key)}</th>
+                <th key={Math.random()}>{__(key)}</th>
               ))}
               <th>
                 <SortHandler sortField={'totalAmount'} label={__('Amount')} />

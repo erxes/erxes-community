@@ -92,6 +92,16 @@ export const getPostData = async (subdomain, pos, order) => {
     sumSaleAmount -= order.mobileAmount;
   }
 
+  for (const paidAmount of order.paidAmounts || []) {
+    const erkhetType = pos.erkhetConfig[`_${paidAmount.type}`];
+    if (!erkhetType) {
+      continue;
+    }
+
+    payments[erkhetType] = (payments[erkhetType] || 0) + paidAmount.amount;
+    sumSaleAmount -= paidAmount.amount;
+  }
+
   if (sumSaleAmount > 0.005) {
     payments[pos.erkhetConfig.defaultPay] = sumSaleAmount;
   }

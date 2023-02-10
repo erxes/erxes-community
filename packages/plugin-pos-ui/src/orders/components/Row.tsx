@@ -24,11 +24,15 @@ class PutResponseRow extends React.Component<Props> {
   displayPaid(order, key) {
     const { paidAmounts } = order;
     const value = (
-      paidAmounts.find(pa => pa.title === key || pa.type === key) || {
+      (paidAmounts || []).find(pa => pa.title === key || pa.type === key) || {
         amount: 0
       }
     ).amount;
-    return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
+    return (
+      <FinanceAmount key={Math.random()}>
+        {(value || 0).toLocaleString()}
+      </FinanceAmount>
+    );
   }
 
   syncErkhet = e => {
