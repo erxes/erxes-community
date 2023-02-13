@@ -29,7 +29,21 @@ type FinalProps = {
   uomsQuery: UomsQueryResponse;
 } & Props;
 
-class PerformFormContainer extends React.Component<FinalProps> {
+class PerformFormContainer extends React.Component<
+  FinalProps,
+  { changed: boolean; id?: string; perform?: IPerform }
+> {
+  constructor(props) {
+    super(props);
+
+    const { perform } = this.props;
+
+    this.state = {
+      id: perform ? perform._id : '' || '',
+      changed: false
+    };
+  }
+
   render() {
     const {
       overallWorkDetail,
@@ -45,6 +59,12 @@ class PerformFormContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
+    let perform = performDetailQuery && performDetailQuery.performDetail;
+
+    if (this.state.changed && this.state.id && this.state.perform) {
+      perform = this.state.perform;
+    }
+
     const renderButton = ({
       name,
       values,
@@ -52,12 +72,21 @@ class PerformFormContainer extends React.Component<FinalProps> {
       callback,
       disabled
     }: IButtonMutateProps & { disabled?: boolean }) => {
+      const callBack = data => {
+        perform = values._id ? data.performEdit : data.performAdd;
+        this.setState({ id: perform._id, changed: true, perform });
+
+        if (callback) {
+          callback(data);
+        }
+      };
+
       return (
         <ButtonMutate
           mutation={values._id ? mutations.performEdit : mutations.performAdd}
           variables={values}
-          callback={callback}
-          refetchQueries={getRefetchQueries()}
+          callback={callBack}
+          refetchQueries={getRefetchQueries(this.state.id)}
           isSubmitted={isSubmitted}
           type="submit"
           uppercase={false}
@@ -67,7 +96,6 @@ class PerformFormContainer extends React.Component<FinalProps> {
       );
     };
 
-    const perform = performDetailQuery && performDetailQuery.performDetail;
     const allUoms = uomsQuery.uoms || [];
 
     const updatedProps = {
@@ -83,8 +111,18 @@ class PerformFormContainer extends React.Component<FinalProps> {
   }
 }
 
-const getRefetchQueries = () => {
-  return ['performs', 'overallWorkDetail', 'performsCount'];
+const getRefetchQueries = (id?: string) => {
+  const qries = ['performs', 'overallWorkDetail', 'performsCount'];
+  if (id) {
+    return [
+      ...qries,
+      {
+        query: gql(queries.performDetail),
+        variables: { _id: id }
+      }
+    ];
+  }
+  return qries;
 };
 
 export default withProps<Props>(
