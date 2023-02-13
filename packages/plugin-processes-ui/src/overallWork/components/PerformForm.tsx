@@ -64,6 +64,7 @@ type State = {
   inProducts: IProductsData[];
   outProducts: IProductsData[];
   categoryId: string;
+  btnDisabled: boolean;
 };
 
 class Form extends React.Component<Props, State> {
@@ -130,8 +131,13 @@ class Form extends React.Component<Props, State> {
       resultProducts,
       inProducts,
       outProducts,
-      categoryId: ''
+      categoryId: '',
+      btnDisabled: true
     };
+  }
+
+  componentDidMount() {
+    this.setState({ btnDisabled: !this.checkValidation() });
   }
 
   generateDoc = (values: {
@@ -195,6 +201,54 @@ class Form extends React.Component<Props, State> {
       needProducts,
       resultProducts: type === 'move' ? needProducts : resultProducts
     };
+  };
+
+  checkValidation = () => {
+    const { max } = this.props;
+    const { overallWorkDet, inProducts, outProducts } = this.state;
+
+    if (
+      overallWorkDet.type === 'income' &&
+      (!overallWorkDet.outBranchId ||
+        !overallWorkDet.outDepartmentId ||
+        !outProducts.length)
+    ) {
+      return false;
+    }
+    if (
+      overallWorkDet.type === 'outlet' &&
+      (!overallWorkDet.inBranchId ||
+        !overallWorkDet.inDepartmentId ||
+        !inProducts.length)
+    ) {
+      return false;
+    }
+    if (overallWorkDet.type === 'move' && !inProducts.length) {
+      return false;
+    }
+    if (
+      ['job', 'end', 'move'].includes(overallWorkDet.type) &&
+      (!overallWorkDet.inBranchId ||
+        !overallWorkDet.inDepartmentId ||
+        !overallWorkDet.outBranchId ||
+        !overallWorkDet.outDepartmentId)
+    ) {
+      return false;
+    }
+    if (
+      ['job', 'end'].includes(overallWorkDet.type) &&
+      !overallWorkDet.jobReferId
+    ) {
+      return false;
+    }
+    if (overallWorkDet.type !== 'income' && max < this.state.count) {
+      return false;
+    }
+    return true;
+  };
+
+  setStateWrapper = state => {
+    this.setState({ ...state, btnDisabled: !this.checkValidation() });
   };
 
   renderViewInfo = (name: string, variable: number, uom: string) => {
@@ -275,7 +329,7 @@ class Form extends React.Component<Props, State> {
       }
 
       const chosenProductIds = products.map(p => p._id);
-      this.setState({
+      this.setStateWrapper({
         [stateName]: productsData.filter(pd =>
           chosenProductIds.includes(pd.productId)
         )
@@ -286,7 +340,7 @@ class Form extends React.Component<Props, State> {
       <ProductChooser
         {...props}
         onSelect={productOnChange}
-        onChangeCategory={categoryId => this.setState({ categoryId })}
+        onChangeCategory={categoryId => this.setStateWrapper({ categoryId })}
         categoryId={this.state.categoryId}
         data={{
           name: 'Product',
@@ -315,7 +369,7 @@ class Form extends React.Component<Props, State> {
   }
 
   onChangePerView = (values: any) => {
-    this.setState({
+    this.setStateWrapper({
       ...values
     } as any);
   };
@@ -462,7 +516,7 @@ class Form extends React.Component<Props, State> {
     const { needProducts, resultProducts } = this.state;
     const count = Number(e.target.value);
 
-    this.setState({
+    this.setStateWrapper({
       count,
       inProducts: needProducts.map(np => ({
         ...np,
@@ -478,7 +532,7 @@ class Form extends React.Component<Props, State> {
   onChangeInput = e => {
     const name = e.target.name;
     const value = e.target.value;
-    this.setState({ [name]: value } as any);
+    this.setStateWrapper({ [name]: value } as any);
   };
 
   renderLabel = (max?: number) => {
@@ -486,7 +540,7 @@ class Form extends React.Component<Props, State> {
   };
 
   onSelectDate = (value, name) => {
-    this.setState({ [name]: value } as any);
+    this.setStateWrapper({ [name]: value } as any);
   };
 
   renderLocLabel(obj) {
@@ -499,7 +553,7 @@ class Form extends React.Component<Props, State> {
 
   setLocations = (name, value) => {
     const { overallWorkDet } = this.state;
-    this.setState({
+    this.setStateWrapper({
       overallWorkDet: {
         ...overallWorkDet,
         key: { ...overallWorkDet.key, [name]: value }
@@ -660,7 +714,7 @@ class Form extends React.Component<Props, State> {
           variables: { id: value }
         })
         .then(({ data }) => {
-          this.setState({
+          this.setStateWrapper({
             overallWorkDet: {
               ...overallWorkDet,
               key: { ...overallWorkDet.key, typeId: value },
@@ -715,7 +769,7 @@ class Form extends React.Component<Props, State> {
                 name="companyId"
                 initialValue={perform ? perform.companyId : '' || ''}
                 onSelect={companyId =>
-                  this.setState({ companyId: companyId as string })
+                  this.setStateWrapper({ companyId: companyId as string })
                 }
                 customOption={{
                   value: '',
@@ -733,7 +787,7 @@ class Form extends React.Component<Props, State> {
                 name="customerId"
                 initialValue={perform ? perform.customerId : '' || ''}
                 onSelect={customerId =>
-                  this.setState({ customerId: customerId as string })
+                  this.setStateWrapper({ customerId: customerId as string })
                 }
                 customOption={{
                   value: '',
@@ -760,14 +814,14 @@ class Form extends React.Component<Props, State> {
 
   renderContent = (formProps: IFormProps) => {
     const { closeModal, renderButton, max, perform } = this.props;
-    const { overallWorkDet } = this.state;
+    const { overallWorkDet, btnDisabled } = this.state;
     const { values, isSubmitted } = formProps;
     const { count, startAt, endAt, description, appendix } = this.state;
 
     if (!overallWorkDet.type) {
       const onchangeType = e => {
         const value = e.target.value;
-        this.setState({
+        this.setStateWrapper({
           overallWorkDet: {
             ...overallWorkDet,
             type: value,
@@ -861,7 +915,7 @@ class Form extends React.Component<Props, State> {
                 name="assignedUserIds"
                 initialValue={perform ? perform.assignedUserIds : [] || []}
                 onSelect={userIds =>
-                  this.setState({ assignedUserIds: userIds as string[] })
+                  this.setStateWrapper({ assignedUserIds: userIds as string[] })
                 }
                 multi={true}
               />
@@ -931,8 +985,8 @@ class Form extends React.Component<Props, State> {
             values: this.generateDoc(values),
             isSubmitted,
             // callback: closeModal,
-            object: perform
-            // disabled: overallWorkDet.type !== 'income' && max < this.state.count
+            object: perform,
+            disabled: btnDisabled
           })}
         </ModalFooter>
       </>
