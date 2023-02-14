@@ -1,11 +1,18 @@
 import React from 'react';
 import moment from 'moment';
-import { __ } from '@erxes/ui/src/utils';
+import { __, confirm } from '@erxes/ui/src/utils';
 import { IPerform } from '../../overallWork/types';
+import ActionButtons from '@erxes/ui/src/components/ActionButtons';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import Button from '@erxes/ui/src/components/Button';
+import Tip from '@erxes/ui/src/components/Tip';
+import Icon from '@erxes/ui/src/components/Icon';
+import Form from '../../overallWork/containers/PerformForm';
 
 type Props = {
   perform: IPerform;
   history: any;
+  removePerform: (_id: string) => void;
 };
 
 class Row extends React.Component<Props> {
@@ -23,6 +30,14 @@ class Row extends React.Component<Props> {
     }
 
     return `${obj.code} - ${obj.title}`;
+  };
+
+  remove = () => {
+    const { removePerform, perform } = this.props;
+
+    confirm(__('Remove this performance?')).then(() => {
+      removePerform(perform._id || '');
+    });
   };
 
   render() {
@@ -43,8 +58,16 @@ class Row extends React.Component<Props> {
       outDepartment
     } = perform;
 
+    const onTrClick = () => {};
+
+    const onClick = e => {
+      e.stopPropagation();
+    };
+
+    const content = props => <Form {...props} perform={perform} />;
+
     return (
-      <tr>
+      <tr onClick={onTrClick} key={Math.random()}>
         <td>{(!!overallWorkId).toString()}</td>
         <td>{type}</td>
         <td>{this.displayDate(startAt)}</td>
@@ -58,6 +81,27 @@ class Row extends React.Component<Props> {
         <td>{this.displayLoc(outDepartment)}</td>
 
         <td>{status}</td>
+        <td key={'actions'} onClick={onClick}>
+          <ActionButtons>
+            <ModalTrigger
+              title={__(`Edit perform`)}
+              trigger={
+                <Button btnStyle="link">
+                  <Tip text={__('Edit')} placement="bottom">
+                    <Icon icon="edit" />
+                  </Tip>
+                </Button>
+              }
+              size="xl"
+              content={content}
+            />
+            <Button btnStyle="link" onClick={this.remove}>
+              <Tip text={__('Delete')} placement="bottom">
+                <Icon icon="trash-alt" />
+              </Tip>
+            </Button>
+          </ActionButtons>
+        </td>
       </tr>
     );
   }

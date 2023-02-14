@@ -25,6 +25,7 @@ interface IProps extends IRouterProps {
   performs: IPerform[];
   performsCount: number;
   loading: boolean;
+  removePerform: (_id: string) => void;
 }
 
 type State = {
@@ -73,9 +74,14 @@ class List extends React.Component<IProps, State> {
   };
 
   renderRow = () => {
-    const { performs, history } = this.props;
+    const { performs, history, removePerform } = this.props;
     return (performs || []).map(perform => (
-      <Row history={history} key={perform._id} perform={perform} />
+      <Row
+        history={history}
+        key={perform._id}
+        perform={perform}
+        removePerform={removePerform}
+      />
     ));
   };
 

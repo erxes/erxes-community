@@ -75,25 +75,38 @@ class Form extends React.Component<Props, State> {
     let startAt = new Date();
     let endAt = new Date();
 
-    const overallWorkDet = overallWorkDetail || {
-      _id: '',
-      key: {
+    const overallWorkDet = overallWorkDetail ||
+      (perform && {
+        _id: '',
+        key: perform.overallWorkKey,
+        startAt: perform.startAt,
+        dueDate: perform.endAt,
+        type: perform.type,
+        assignedUserIds: perform.assignedUserIds,
+        needProducts: perform.needProducts,
+        resultProducts: perform.resultProducts,
+        count: perform.count,
+        needProductsData: perform.needProducts,
+        resultProductsData: perform.resultProducts
+      }) || {
+        _id: '',
+        key: {
+          type: '',
+          inBranchId: '',
+          inDepartmentId: '',
+          outBranchId: '',
+          outDepartmentId: ''
+        },
+        startAt,
+        dueDate: endAt,
         type: '',
-        inBranchId: '',
-        inDepartmentId: '',
-        outBranchId: '',
-        outDepartmentId: ''
-      },
-      startAt,
-      dueDate: endAt,
-      type: '',
-      workIds: [],
-      needProducts: [],
-      resultProducts: [],
-      count: 0,
-      needProductsData: [],
-      resultProductsData: []
-    };
+        assignedUserIds: [],
+        needProducts: [],
+        resultProducts: [],
+        count: 0,
+        needProductsData: [],
+        resultProductsData: []
+      };
 
     const overCount = overallWorkDet.count;
     let count = 1;
