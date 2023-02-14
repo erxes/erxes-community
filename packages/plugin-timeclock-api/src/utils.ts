@@ -3,7 +3,9 @@ import { sendCoreMessage } from './messageBroker';
 import {
   IScheduleDocument,
   ITimeClock,
-  ITimeClockDocument
+  ITimeClockDocument,
+  ITimeLog,
+  ITimeLogDocument
 } from './models/definitions/timeclock';
 import * as dayjs from 'dayjs';
 import { fixDate, getEnv } from '@erxes/api-utils/src';
@@ -15,6 +17,30 @@ import {
   findBranchUsers,
   findDepartmentUsers
 } from './graphql/resolvers/utils';
+
+const createMsSqlConnection = () => {
+  const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST' });
+  const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
+  const MYSQL_USERNAME = getEnv({ name: 'MYSQL_USERNAME' });
+  const MYSQL_PASSWORD = getEnv({ name: 'MYSQL_PASSWORD' });
+
+  // create connection
+  const sequelize = new Sequelize(MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, {
+    host: MYSQL_HOST,
+    port: 1433,
+    dialect: 'mssql',
+    dialectOptions: {
+      options: {
+        useUTC: false,
+        cryptoCredentialsDetails: {
+          minVersion: 'TLSv1'
+        }
+      }
+    }
+  });
+
+  return sequelize;
+};
 
 const customFixDate = (date?: Date) => {
   // get date, return date with 23:59:59
@@ -37,31 +63,132 @@ const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   return users;
 };
 
+const returnNewTimeLogsFromEmpData = (
+  empData: any[],
+  teamMembersObj: any,
+  existingTimeLogs: ITimeLogDocument[]
+) => {
+  const returnData: ITimeLog[] = [];
+
+  for (const empDataRow of empData) {
+    const currEmpEmpId = parseInt(teamMembersObj[empDataRow.ID], 10);
+    const currEmpUserId = teamMembersObj[currEmpEmpId];
+
+    const newTimeLog = {
+      userId: currEmpUserId,
+      timelog: new Date(empDataRow.authDateTime),
+      deviceSerialNo: empDataRow.deviceSerialNo
+    };
+
+    const checkTimeLogAlreadyExists = existingTimeLogs.find(
+      existingTimeLog =>
+        existingTimeLog.userId === newTimeLog.userId &&
+        existingTimeLog.timelog === newTimeLog.timelog
+    );
+
+    if (!checkTimeClockAlreadyExists) {
+      returnData.push(newTimeLog);
+    }
+  }
+
+  return returnData;
+};
+
+const createTimelogs = async (
+  models: IModels,
+  startDate: string,
+  endDate: string,
+  queryData: any,
+  teamMembersObj: any
+) => {
+  const existingTimeLogs = await models.TimeLogs.find({
+    timelog: {
+      $gte: fixDate(startDate),
+      $lte: customFixDate(new Date(endDate))
+    }
+  });
+
+  const totalTimeLogs: ITimeLog[] = [];
+
+  let currentEmpId;
+  for (const queryRow of queryData) {
+    const currEmpId = queryRow.ID;
+
+    if (currEmpId === currentEmpId) {
+      continue;
+    }
+
+    const currEmpNumber = parseInt(currEmpId, 10);
+
+    if (currEmpNumber) {
+      currentEmpId = currEmpId;
+      const currEmpData = queryData.filter(row => row.ID === currEmpId);
+      totalTimeLogs.push(
+        ...returnNewTimeLogsFromEmpData(
+          currEmpData,
+          teamMembersObj,
+          existingTimeLogs
+        )
+      );
+    }
+  }
+
+  console.log(totalTimeLogs);
+
+  // return await models.Timeclocks.insertMany(totalTimeLogs);
+};
+
+const connectAndQueryTimeLogsFromMsSql = async (
+  subdomain: string,
+  startDate: string,
+  endDate: string
+) => {
+  const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
+  const sequelize = createMsSqlConnection();
+  const models = await generateModels(subdomain);
+
+  let returnData;
+
+  try {
+    const teamMembers = await findAllTeamMembersWithEmpId(subdomain);
+    const teamMembersObject = {};
+    const teamEmployeeIds: string[] = [];
+
+    for (const teamMember of teamMembers) {
+      if (!teamMember.employeeId) {
+        continue;
+      }
+      teamMembersObject[teamMember.employeeId] = teamMember._id;
+      teamEmployeeIds.push(teamMember.employeeId);
+    }
+
+    const query = `SELECT * FROM ${MYSQL_TABLE} WHERE authDateTime >= '${startDate}' AND authDateTime <= '${endDate}' AND ISNUMERIC(ID)=1 AND ID IN (${teamEmployeeIds}) ORDER BY ID, authDateTime`;
+
+    const queryData = await sequelize.query(query, {
+      type: QueryTypes.SELECT
+    });
+
+    returnData = await createTimelogs(
+      models,
+      startDate,
+      endDate,
+      queryData,
+      teamMembersObject
+    );
+  } catch (err) {
+    console.error(err);
+  }
+
+  return returnData;
+};
+
 const connectAndQueryFromMsSql = async (
   subdomain: string,
   startDate: string,
   endDate: string
 ) => {
-  const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST' });
-  const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
-  const MYSQL_USERNAME = getEnv({ name: 'MYSQL_USERNAME' });
-  const MYSQL_PASSWORD = getEnv({ name: 'MYSQL_PASSWORD' });
+  const sequelize = createMsSqlConnection();
   const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
-
-  // create connection
-  const sequelize = new Sequelize(MYSQL_DB, MYSQL_USERNAME, MYSQL_PASSWORD, {
-    host: MYSQL_HOST,
-    port: 1433,
-    dialect: 'mssql',
-    dialectOptions: {
-      options: {
-        useUTC: false,
-        cryptoCredentialsDetails: {
-          minVersion: 'TLSv1'
-        }
-      }
-    }
-  });
 
   // find team members with employee Id
   const teamMembers = await findAllTeamMembersWithEmpId(subdomain);
@@ -159,10 +286,15 @@ const importDataAndCreateTimeclock = async (
       {
         shiftStart: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(new Date(endDate))
         }
       },
-      { shiftEnd: { $gte: fixDate(startDate), $lte: fixDate(endDate) } }
+      {
+        shiftEnd: {
+          $gte: fixDate(startDate),
+          $lte: customFixDate(new Date(endDate))
+        }
+      }
     ]
   });
 
@@ -441,11 +573,11 @@ const createScheduleObjOfMembers = async (
       {
         shiftStart: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(new Date(endDate))
         },
         shiftEnd: {
           $gte: fixDate(startDate),
-          $lte: fixDate(endDate)
+          $lte: customFixDate(new Date(endDate))
         }
       }
     ]
@@ -835,6 +967,7 @@ const createTeamMembersObject = async (subdomain: string) => {
 
 export {
   connectAndQueryFromMsSql,
+  connectAndQueryTimeLogsFromMsSql,
   generateFilter,
   generateCommonUserIds,
   findAllTeamMembersWithEmpId,

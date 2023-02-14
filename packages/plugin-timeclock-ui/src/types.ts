@@ -14,6 +14,11 @@ export interface ITimeclock {
   deviceType: string;
   branchName: string;
 }
+export interface ITimelog {
+  _id: string;
+  timelog: Date;
+  user: IUser;
+}
 export interface IAbsence {
   _id: string;
   user: IUser;
@@ -140,6 +145,10 @@ export type TimeClockQueryResponse = {
   timeclocks: ITimeclock[];
 } & QueryResponse;
 
+export type LogsQueryResponse = {
+  timelogs: { list: ITimelog[]; totalCount: number };
+} & QueryResponse;
+
 export type AbsenceQueryResponse = {
   requestsMain: { list: IAbsence[]; totalCount: number };
 } & QueryResponse;
@@ -209,7 +218,7 @@ export type TimeClockMutationResponse = {
   startTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   timeclockRemove: (params: { variables: { _id: string } }) => Promise<any>;
-  extractAllMySqlDataMutation: (params: {
+  extractAllMsSqlDataMutation: (params: {
     variables: { startDate: string; endDate: string };
   }) => Promise<any>;
 };

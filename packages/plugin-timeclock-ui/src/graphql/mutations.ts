@@ -162,9 +162,9 @@ const deviceConfigRemove = `mutation deviceConfigRemove($_id: String){
   deviceConfigRemove(_id: $_id)
 }`;
 
-const extractAllDataFromMySQL = `
-mutation extractAllDataFromMySQL($startDate: String, $endDate: String){
-  extractAllDataFromMySQL(startDate: $startDate, endDate: $endDate){
+const extractAllDataFromMsSQL = `
+mutation extractAllDataFromMsSQL($startDate: String, $endDate: String){
+  extractAllDataFromMsSQL(startDate: $startDate, endDate: $endDate){
     _id
   }
 }`;
@@ -196,5 +196,5 @@ export default {
   deviceConfigAdd,
   deviceConfigEdit,
   deviceConfigRemove,
-  extractAllDataFromMySQL
+  extractAllDataFromMsSQL
 };

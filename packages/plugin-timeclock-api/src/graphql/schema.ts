@@ -261,5 +261,5 @@ export const mutations = `
   deviceConfigAdd(deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
   deviceConfigEdit(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
   deviceConfigRemove(_id: String): JSON
-  extractAllDataFromMySQL(startDate: String, endDate: String): [Timeclock]
+  extractAllDataFromMsSQL(startDate: String, endDate: String): [Timeclock]
 `;

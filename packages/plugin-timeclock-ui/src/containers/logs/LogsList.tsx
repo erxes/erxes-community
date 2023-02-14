@@ -4,12 +4,15 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import React from 'react';
-import ReportList from '../../components/report/ReportList';
+import LogsList from '../../components/logs/LogsList';
 import { queries } from '../../graphql';
-import { BranchesQueryResponse, ReportsQueryResponse } from '../../types';
+import {
+  BranchesQueryResponse,
+  LogsQueryResponse,
+  ReportsQueryResponse
+} from '../../types';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { generateParams } from '../../utils';
-import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 
 type Props = {
   history: any;
@@ -24,41 +27,28 @@ type Props = {
 };
 
 type FinalProps = {
-  listBranchesQuery: BranchesQueryResponse;
-  listReportsQuery: ReportsQueryResponse;
+  listTimelogsQuery: LogsQueryResponse;
 } & Props;
 
 const ListContainer = (props: FinalProps) => {
-  const { listReportsQuery, queryParams } = props;
+  const { listTimelogsQuery, queryParams } = props;
   const { branchId, deptId } = queryParams;
 
-  if (listReportsQuery.loading) {
-    return <Spinner />;
-  }
+  // if (listTimelogsQuery.loading) {
+  //   return <Spinner />;
+  // }
 
-  const exportReport = () => {
-    const stringified = queryString.stringify({
-      ...queryParams
-    });
-
-    const { REACT_APP_API_URL } = getEnv();
-    window.open(
-      `${REACT_APP_API_URL}/pl:timeclock/report-export?${stringified}`
-    );
-  };
-
-  const { list = [], totalCount = 0 } = listReportsQuery.timeclockReports;
+  // const { list = [], totalCount = 0 } = listTimelogsQuery.timelogs;
 
   const updatedProps = {
     ...props,
-    exportReport,
-    reports: list,
-    totalCount,
+    // timelogs: list,
+    // totalCount,
     branchId,
     deptId
   };
 
-  return <ReportList {...updatedProps} />;
+  return <LogsList {...updatedProps} />;
 };
 
 export default withProps<Props>(

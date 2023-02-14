@@ -10,6 +10,7 @@ import AbsenceForm from './AbsenceForm';
 import Attachment from '@erxes/ui/src/components/Attachment';
 import dayjs from 'dayjs';
 import { dateFormat, timeFormat } from '../../constants';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 
 type Props = {
   absences: IAbsence[];
@@ -18,6 +19,8 @@ type Props = {
   history: any;
   startTime?: Date;
   loading?: boolean;
+  totalCount: number;
+
   solveAbsence: (absenceId: string, status: string) => void;
   submitRequest: (
     userId: string,
@@ -26,11 +29,21 @@ type Props = {
     dateRange: any,
     absenceTypeId: string
   ) => void;
+
   getActionBar: (actionBar: any) => void;
+  getPagination: (pagination: any) => void;
+  showSideBar: (sideBar: boolean) => void;
 };
 
 function AbsenceList(props: Props) {
-  const { absences, solveAbsence, getActionBar } = props;
+  const {
+    absences,
+    solveAbsence,
+    getActionBar,
+    showSideBar,
+    getPagination,
+    totalCount
+  } = props;
 
   const trigger = (
     <Button id="timeClockButton2" btnStyle="success" icon="plus-circle">
@@ -80,9 +93,13 @@ function AbsenceList(props: Props) {
     return (
       <tr>
         <td>
-          {absence.user && absence.user.details.fullName
+          {absence.user
             ? absence.user.details.fullName
-            : absence.user.email}
+              ? absence.user.details.fullName
+              : absence.user.email
+              ? absence.user.email
+              : '-'
+            : '-'}
         </td>
         <td>{startingDate || '-'}</td>
         <td>{startingTime || '-'}</td>
@@ -143,6 +160,9 @@ function AbsenceList(props: Props) {
   );
 
   getActionBar(actionBar);
+  showSideBar(true);
+  getPagination(<Pagination count={totalCount} />);
+
   return content;
 }
 

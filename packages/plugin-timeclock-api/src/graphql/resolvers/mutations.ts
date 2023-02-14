@@ -16,7 +16,10 @@ import {
   findDepartmentUsers
 } from './utils';
 import dayjs = require('dayjs');
-import { connectAndQueryFromMsSql } from '../../utils';
+import {
+  connectAndQueryFromMsSql,
+  connectAndQueryTimeLogsFromMsSql
+} from '../../utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -524,12 +527,24 @@ const timeclockMutations = {
     return models.DeviceConfigs.removeDeviceConfig(_id);
   },
 
-  async extractAllDataFromMySQL(
+  async extractAllDataFromMsSQL(
     _root,
     { startDate, endDate },
     { subdomain }: IContext
   ) {
     return await connectAndQueryFromMsSql(subdomain, startDate, endDate);
+  },
+
+  async extractTimeLogsFromMsSQL(
+    _root,
+    { startDate, endDate },
+    { subdomain }: IContext
+  ) {
+    return await connectAndQueryTimeLogsFromMsSql(
+      subdomain,
+      startDate,
+      endDate
+    );
   }
 };
 
