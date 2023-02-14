@@ -18,6 +18,13 @@ import {
   findDepartmentUsers
 } from './graphql/resolvers/utils';
 
+const customFixDate = (date?: Date) => {
+  // get date, return date with 23:59:59
+  const getDate = new Date(date || '').toLocaleDateString();
+  const returnDate = new Date(getDate + ' 23:59:59');
+  return returnDate;
+};
+
 const createMsSqlConnection = () => {
   const MYSQL_HOST = getEnv({ name: 'MYSQL_HOST' });
   const MYSQL_DB = getEnv({ name: 'MYSQL_DB' });
@@ -42,13 +49,6 @@ const createMsSqlConnection = () => {
   return sequelize;
 };
 
-const customFixDate = (date?: Date) => {
-  // get date, return date with 23:59:59
-  const getDate = new Date(date || '').toLocaleDateString();
-  const returnDate = new Date(getDate + ' 23:59:59');
-  return returnDate;
-};
-
 const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   const users = await sendCoreMessage({
     subdomain,
@@ -63,7 +63,7 @@ const findAllTeamMembersWithEmpId = async (subdomain: string) => {
   return users;
 };
 
-const returnNewTimeLogsFromEmpData = (
+const returnNewTimeLogsFromEmpData = async (
   empData: any[],
   teamMembersObj: any,
   existingTimeLogs: ITimeLogDocument[]
@@ -71,13 +71,13 @@ const returnNewTimeLogsFromEmpData = (
   const returnData: ITimeLog[] = [];
 
   for (const empDataRow of empData) {
-    const currEmpEmpId = parseInt(teamMembersObj[empDataRow.ID], 10);
+    const currEmpEmpId = parseInt(empDataRow.ID, 10);
     const currEmpUserId = teamMembersObj[currEmpEmpId];
 
     const newTimeLog = {
       userId: currEmpUserId,
       timelog: new Date(empDataRow.authDateTime),
-      deviceSerialNo: empDataRow.deviceSerialNo
+      deviceSerialNo: empDataRow.deviceSerialNo && empDataRow.deviceSerialNo
     };
 
     const checkTimeLogAlreadyExists = existingTimeLogs.find(
@@ -86,7 +86,7 @@ const returnNewTimeLogsFromEmpData = (
         existingTimeLog.timelog === newTimeLog.timelog
     );
 
-    if (!checkTimeClockAlreadyExists) {
+    if (!checkTimeLogAlreadyExists) {
       returnData.push(newTimeLog);
     }
   }
@@ -124,18 +124,16 @@ const createTimelogs = async (
       currentEmpId = currEmpId;
       const currEmpData = queryData.filter(row => row.ID === currEmpId);
       totalTimeLogs.push(
-        ...returnNewTimeLogsFromEmpData(
+        ...(await returnNewTimeLogsFromEmpData(
           currEmpData,
           teamMembersObj,
           existingTimeLogs
-        )
+        ))
       );
     }
   }
 
-  console.log(totalTimeLogs);
-
-  // return await models.Timeclocks.insertMany(totalTimeLogs);
+  return await models.TimeLogs.insertMany(totalTimeLogs);
 };
 
 const connectAndQueryTimeLogsFromMsSql = async (
@@ -798,66 +796,7 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
   let returnFilter = {};
   let dateGiven: boolean = false;
 
-  const timeFields =
-    type === 'schedule'
-      ? []
-      : type === 'timeclock'
-      ? [
-          {
-            shiftStart:
-              startDate && endDate
-                ? {
-                    $gte: fixDate(startDate),
-                    $lte: customFixDate(endDate)
-                  }
-                : startDate
-                ? {
-                    $gte: fixDate(startDate)
-                  }
-                : { $lte: customFixDate(endDate) }
-          },
-          {
-            shiftEnd:
-              startDate && endDate
-                ? {
-                    $gte: fixDate(startDate),
-                    $lte: customFixDate(endDate)
-                  }
-                : startDate
-                ? {
-                    $gte: fixDate(startDate)
-                  }
-                : { $lte: customFixDate(endDate) }
-          }
-        ]
-      : [
-          {
-            startTime:
-              startDate && endDate
-                ? {
-                    $gte: fixDate(startDate),
-                    $lte: customFixDate(endDate)
-                  }
-                : startDate
-                ? {
-                    $gte: fixDate(startDate)
-                  }
-                : { $lte: customFixDate(endDate) }
-          },
-          {
-            endTime:
-              startDate && endDate
-                ? {
-                    $gte: fixDate(startDate),
-                    $lte: customFixDate(endDate)
-                  }
-                : startDate
-                ? {
-                    $gte: fixDate(startDate)
-                  }
-                : { $lte: customFixDate(endDate) }
-          }
-        ];
+  const timeFields = returnTimeFieldsFilter(type, params);
 
   if (startDate || endDate) {
     dateGiven = true;
@@ -891,6 +830,90 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
 
   // if no param is given, return empty filter
   return returnFilter;
+};
+
+const returnTimeFieldsFilter = (type: string, queryParams: any) => {
+  const startDate = queryParams.startDate;
+  const endDate = queryParams.endDate;
+
+  switch (type) {
+    case 'schedule':
+      return [];
+    case 'timeclock':
+      return [
+        {
+          shiftStart:
+            startDate && endDate
+              ? {
+                  $gte: fixDate(startDate),
+                  $lte: customFixDate(endDate)
+                }
+              : startDate
+              ? {
+                  $gte: fixDate(startDate)
+                }
+              : { $lte: customFixDate(endDate) }
+        },
+        {
+          shiftEnd:
+            startDate && endDate
+              ? {
+                  $gte: fixDate(startDate),
+                  $lte: customFixDate(endDate)
+                }
+              : startDate
+              ? {
+                  $gte: fixDate(startDate)
+                }
+              : { $lte: customFixDate(endDate) }
+        }
+      ];
+    case 'absence':
+      return [
+        {
+          startTime:
+            startDate && endDate
+              ? {
+                  $gte: fixDate(startDate),
+                  $lte: customFixDate(endDate)
+                }
+              : startDate
+              ? {
+                  $gte: fixDate(startDate)
+                }
+              : { $lte: customFixDate(endDate) }
+        },
+        {
+          endTime:
+            startDate && endDate
+              ? {
+                  $gte: fixDate(startDate),
+                  $lte: customFixDate(endDate)
+                }
+              : startDate
+              ? {
+                  $gte: fixDate(startDate)
+                }
+              : { $lte: customFixDate(endDate) }
+        }
+      ];
+    case 'timelog':
+      return [
+        {
+          timelog:
+            startDate && endDate
+              ? {
+                  $gte: fixDate(startDate),
+                  $lte: customFixDate(endDate)
+                }
+              : startDate
+              ? {
+                  $gte: fixDate(startDate)
+                }
+              : { $lte: customFixDate(endDate) }
+        }
+      ];
+  }
 };
 
 const generateCommonUserIds = async (

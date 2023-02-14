@@ -124,7 +124,11 @@ export const attachmentSchema = new Schema(
 export const timeLogSchema = new Schema({
   _id: field({ pkey: true }),
   userId: field({ type: String, label: 'User' }),
-  employeeId: field({ type: String, label: 'Employee id' }),
+  deviceSerialNo: field({
+    type: String,
+    label: 'Terminal device serial number',
+    optional: true
+  }),
   timelog: field({ type: Date, label: 'Shift starting time' })
 });
 

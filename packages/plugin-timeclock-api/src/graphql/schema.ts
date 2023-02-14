@@ -23,6 +23,13 @@ export const types = `
     deviceType: String
   }
 
+  type Timelog {
+    _id: String!
+    user: User
+    timelog: Date
+    deviceSerialNo: String
+  }
+
   type Absence {
     _id: String!
     user: User
@@ -176,6 +183,11 @@ export const types = `
     totalCount: Float
   }
   
+  type TimelogListResponse {
+    list: [Timelog]
+    totalCount: Float
+  }
+  
 `;
 
 const params = `
@@ -218,13 +230,14 @@ export const queries = `
   timeclocksMain(${queryParams}): TimeClocksListResponse
   schedulesMain(${queryParams}): SchedulesListResponse
   requestsMain(${queryParams}): RequestsListResponse
+  timelogsMain(${queryParams}): TimelogListResponse
 
   absenceTypes:[AbsenceType]
   
   timeclockReports(${queryParams}): ReportsListResponse
   timeclockReportByUser(selectedUser: String): UserReport
   timeclockDetail(_id: String!): Timeclock
-  
+
   absenceDetail(_id: String!): Absence
   scheduleDetail(_id: String!): Schedule
   scheduleConfigs: [ScheduleConfig]
@@ -262,4 +275,5 @@ export const mutations = `
   deviceConfigEdit(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
   deviceConfigRemove(_id: String): JSON
   extractAllDataFromMsSQL(startDate: String, endDate: String): [Timeclock]
+  extractTimeLogsFromMsSQL(startDate: String, endDate: String): [Timelog]
 `;

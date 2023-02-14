@@ -169,6 +169,13 @@ mutation extractAllDataFromMsSQL($startDate: String, $endDate: String){
   }
 }`;
 
+const extractTimeLogsFromMsSql = `
+mutation extractTimeLogsFromMsSQL($startDate: String, $endDate: String){
+  extractTimeLogsFromMsSQL(startDate: $startDate, endDate: $endDate){
+    _id
+  }
+}`;
+
 export default {
   sendScheduleRequest,
   submitSchedule,
@@ -196,5 +203,6 @@ export default {
   deviceConfigAdd,
   deviceConfigEdit,
   deviceConfigRemove,
-  extractAllDataFromMsSQL
+  extractAllDataFromMsSQL,
+  extractTimeLogsFromMsSql
 };

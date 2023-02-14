@@ -48,6 +48,21 @@ const listParamsValue = `
   reportType: $reportType
 `;
 
+const listTimelogsMain = `
+query timelogsMain(${listParamsDef}){
+  timelogsMain(${listParamsValue}){
+    list{
+      _id
+      user {
+        ${userFields}
+      }
+      timelog
+      deviceSerialNo
+    }
+    totalCount
+  }
+}`;
+
 const listTimeclocksMain = `
   query listTimeclocksQuery(${listParamsDef}) {
     timeclocksMain(${listParamsValue}) {
@@ -262,6 +277,7 @@ export default {
   listReportByUser,
   listBranches,
   listTimeclocksMain,
+  listTimelogsMain,
   listSchedulesMain,
   listRequestsMain,
   listAbsenceTypes,

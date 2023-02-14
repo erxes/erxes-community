@@ -18,6 +18,7 @@ export interface ITimelog {
   _id: string;
   timelog: Date;
   user: IUser;
+  deviceSerialNo?: string;
 }
 export interface IAbsence {
   _id: string;
@@ -146,7 +147,7 @@ export type TimeClockQueryResponse = {
 } & QueryResponse;
 
 export type LogsQueryResponse = {
-  timelogs: { list: ITimelog[]; totalCount: number };
+  timelogsMain: { list: ITimelog[]; totalCount: number };
 } & QueryResponse;
 
 export type AbsenceQueryResponse = {
@@ -212,6 +213,12 @@ export type ScheduleMutationVariables = {
   departmentIds?: string[];
   userIds?: string[];
   scheduleConfigId?: string;
+};
+
+export type TimeLogMutationResponse = {
+  extractTimeLogsFromMsSQLMutation: (params: {
+    variables: { startDate: string; endDate: string };
+  }) => Promise<any>;
 };
 
 export type TimeClockMutationResponse = {

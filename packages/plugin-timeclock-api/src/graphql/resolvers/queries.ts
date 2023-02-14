@@ -33,7 +33,7 @@ const timeclockQueries = {
 
   async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
     const selector = await generateFilter(queryParams, subdomain, 'timeclock');
-    const queryList = models.Timeclocks.find(selector);
+    const totalCount = models.Timeclocks.find(selector).countDocuments();
 
     const list = paginate(
       models.Timeclocks.find(selector).sort({
@@ -45,9 +45,23 @@ const timeclockQueries = {
       }
     );
 
-    const totalCount = queryList.countDocuments();
     return { list, totalCount };
   },
+
+  async timelogsMain(_root, queryParams, { subdomain, models }: IContext) {
+    const selector = await generateFilter(queryParams, subdomain, 'timelog');
+    const queryList = models.TimeLogs.find(selector);
+
+    const list = paginate(
+      models.TimeLogs.find(selector).sort({ timelog: -1 }),
+      { perPage: queryParams.perPage, page: queryParams.page }
+    );
+
+    const totalCount = queryList.countDocuments();
+
+    return { list, totalCount };
+  },
+
   async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {
     const selector = await generateFilter(queryParams, subdomain, 'schedule');
     const totalCount = models.Schedules.find(selector).countDocuments();
