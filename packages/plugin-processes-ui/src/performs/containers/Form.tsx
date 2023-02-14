@@ -1,20 +1,17 @@
 import * as compose from 'lodash.flowright';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
-import Form from '../components/PerformForm';
+import Form from '../components/Form';
 import gql from 'graphql-tag';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { graphql } from 'react-apollo';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import {
-  IOverallWorkDet,
-  IPerform,
-  PerformDetailQueryResponse
-} from '../types';
+import { IPerform, PerformDetailQueryResponse } from '../types';
 import { mutations, queries } from '../graphql';
 import { withProps } from '@erxes/ui/src/utils';
 import { UomsQueryResponse } from '@erxes/ui-products/src/types';
 import productsQueries from '@erxes/ui-products/src/graphql/queries';
+import { IOverallWorkDet } from '../../overallWork/types';
 
 type Props = {
   closeModal: () => void;

@@ -4,16 +4,13 @@ import Bulk from '@erxes/ui/src/components/Bulk';
 import { Alert, router, withProps } from '@erxes/ui/src/utils';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import List from '../components/PerformList';
-import {
-  mutations,
-  queries as performQueries
-} from '../../overallWork/graphql';
+import List from '../components/List';
+import { mutations, queries } from '../graphql';
 import {
   PerformsQueryResponse,
   PerformsCountQueryResponse,
   PerformRemoveMutationResponse
-} from '../../overallWork/types';
+} from '../types';
 import { IRouterProps } from '@erxes/ui/src/types';
 
 type Props = {
@@ -103,23 +100,20 @@ const generateParams = ({ queryParams }) => ({
 
 export default withProps<Props>(
   compose(
-    graphql<Props, PerformsQueryResponse, {}>(gql(performQueries.performs), {
+    graphql<Props, PerformsQueryResponse, {}>(gql(queries.performs), {
       name: 'performsQuery',
       options: ({ queryParams }) => ({
         variables: generateParams({ queryParams }),
         fetchPolicy: 'network-only'
       })
     }),
-    graphql<Props, PerformsCountQueryResponse, {}>(
-      gql(performQueries.performsCount),
-      {
-        name: 'performsTotalCountQuery',
-        options: ({ queryParams }) => ({
-          variables: generateParams({ queryParams }),
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
+    graphql<Props, PerformsCountQueryResponse, {}>(gql(queries.performsCount), {
+      name: 'performsTotalCountQuery',
+      options: ({ queryParams }) => ({
+        variables: generateParams({ queryParams }),
+        fetchPolicy: 'network-only'
+      })
+    }),
     graphql<Props, PerformRemoveMutationResponse, { performId: string }>(
       gql(mutations.performRemove),
       {

@@ -1,11 +1,11 @@
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
-import Form from '../../overallWork/containers/PerformForm';
+import Form from '../containers/Form';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
-import PerformSidebar from './PerformSidebar';
+import PerformSidebar from './Sidebar';
 import React from 'react';
-import Row from './PerformRow';
+import Row from './Row';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils';
@@ -15,7 +15,7 @@ import {
   SidebarCounter
 } from '@erxes/ui/src/layout/styles';
 import { Count } from '@erxes/ui/src/styles/main';
-import { IPerform } from '../../overallWork/types';
+import { IPerform } from '../types';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { menuNavs } from '../../constants';
 

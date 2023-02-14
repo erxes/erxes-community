@@ -32,11 +32,12 @@ import {
   SidebarList
 } from '@erxes/ui/src/layout/styles';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { IOverallWorkDet, IPerform } from '../types';
+import { IPerform } from '../types';
 import { IProduct, IUom } from '@erxes/ui-products/src/types';
 import { IProductsData } from '../../types';
 import { JOB_TYPE_CHOISES } from '../../constants';
 import { queries } from '../../job/graphql';
+import { IOverallWorkDet } from '../../overallWork/types';
 
 type Props = {
   renderButton: (
@@ -87,7 +88,8 @@ class Form extends React.Component<Props, State> {
         resultProducts: perform.resultProducts,
         count: perform.count,
         needProductsData: perform.needProducts,
-        resultProductsData: perform.resultProducts
+        resultProductsData: perform.resultProducts,
+        workIds: []
       }) || {
         _id: '',
         key: {
@@ -105,7 +107,8 @@ class Form extends React.Component<Props, State> {
         resultProducts: [],
         count: 0,
         needProductsData: [],
-        resultProductsData: []
+        resultProductsData: [],
+        workIds: []
       };
 
     const overCount = overallWorkDet.count;

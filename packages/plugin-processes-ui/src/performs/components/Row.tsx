@@ -1,13 +1,13 @@
 import React from 'react';
 import moment from 'moment';
 import { __, confirm } from '@erxes/ui/src/utils';
-import { IPerform } from '../../overallWork/types';
+import { IPerform } from '../types';
 import ActionButtons from '@erxes/ui/src/components/ActionButtons';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Button from '@erxes/ui/src/components/Button';
 import Tip from '@erxes/ui/src/components/Tip';
 import Icon from '@erxes/ui/src/components/Icon';
-import Form from '../../overallWork/containers/PerformForm';
+import Form from '../containers/Form';
 
 type Props = {
   perform: IPerform;

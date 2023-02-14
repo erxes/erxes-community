@@ -13,12 +13,6 @@ const Detail = asyncComponent(() =>
   )
 );
 
-const SeriesNumberPrint = asyncComponent(() =>
-  import(
-    /* webpackChunkName: "processes perfrom - SeriesPrint" */ './containers/SeriesPrint'
-  )
-);
-
 const ListComponent = ({ location, history }) => {
   return (
     <List queryParams={queryString.parse(location.search)} history={history} />
@@ -30,17 +24,6 @@ const DetailComponent = ({ location, history }) => {
     <Detail
       queryParams={queryString.parse(location.search)}
       history={history}
-    />
-  );
-};
-
-const seriesNumberPrint = ({ match, location }) => {
-  const id = match.params.id;
-
-  return (
-    <SeriesNumberPrint
-      id={id}
-      queryParams={queryString.parse(location.search)}
     />
   );
 };
@@ -59,12 +42,6 @@ const routes = () => {
         exact={true}
         key="/processes/overallWorkDetail"
         component={DetailComponent}
-      />
-      <Route
-        path="/processes/seriesNumberPrint/:id"
-        exact={true}
-        key="/processes/seriesNumberPrint/:id"
-        component={seriesNumberPrint}
       />
     </>
   );
