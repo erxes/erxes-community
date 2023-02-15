@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Barcode from 'react-barcode';
 import QRCode from 'react-qr-code';
 import dayjs from 'dayjs';
-
-//erxes
-import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils';
 
 // local
 import LeftSidebar from './SeriesPrintSidebar';
-import { PrintableWrapper } from '../../styles';
+import { PrintContents, PrintableWrapper } from '../../styles';
 import { SeriesPrintConfig, IPerform } from '../types';
 
 type Props = {
@@ -17,7 +14,7 @@ type Props = {
   perform: IPerform;
 };
 
-const BarcodeGenerator = (props: Props) => {
+const SeriesPrint = (props: Props) => {
   const { keyValue, perform } = props;
 
   const configStored: SeriesPrintConfig = {
@@ -148,58 +145,40 @@ const BarcodeGenerator = (props: Props) => {
     }
   };
 
-  const title = perform ? perform.type : 'Unknown';
-
-  const breadcrumb = [
-    { title: __('Settings'), link: '/settings' },
-    { title: __('Product & Service'), link: '/settings/perform-service' },
-    { title, link: `/settings/perform-service/details/${perform._id}` },
-    { title: __('Barcode Generator') }
-  ];
-
-  const content = (
-    <>
-      <PrintableWrapper id="barcodePrintable">
-        <div id="barcode">
-          <Barcode
-            type="EAN13"
-            value={`${keyValue}`}
-            fontSize={config.barcodeFontSize}
-            width={config.barWidth}
-            height={config.barHeight}
-          />
-        </div>
-        <div id="qrcode">
-          <QRCode value={`${keyValue}`} size={config.qrSize} level="Q" />
-        </div>
-      </PrintableWrapper>
-      <iframe
-        id="ifmcontentstoprint"
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          outline: 'none',
-          backgroundColor: '#F0F0F0'
-        }}
-      />
-    </>
-  );
-
   return (
-    <Wrapper
-      header={<Wrapper.Header title={title} breadcrumb={breadcrumb} />}
-      leftSidebar={
-        <LeftSidebar
-          config={config}
-          handleChangeConfig={handleChangeConfig}
-          handlePrint={handlePrint}
+    <PrintContents>
+      <LeftSidebar
+        config={config}
+        handleChangeConfig={handleChangeConfig}
+        handlePrint={handlePrint}
+      />
+      <>
+        <PrintableWrapper id="barcodePrintable">
+          <div id="barcode">
+            <Barcode
+              type="EAN13"
+              value={`${keyValue}`}
+              fontSize={config.barcodeFontSize}
+              width={config.barWidth}
+              height={config.barHeight}
+            />
+          </div>
+          <div id="qrcode">
+            <QRCode value={`${keyValue}`} size={config.qrSize} level="Q" />
+          </div>
+        </PrintableWrapper>
+        <iframe
+          id="ifmcontentstoprint"
+          style={{
+            width: '80%',
+            border: 'none',
+            outline: 'none',
+            backgroundColor: '#F0F0F0'
+          }}
         />
-      }
-      content={content}
-      transparent={true}
-    />
+      </>
+    </PrintContents>
   );
 };
 
-export default BarcodeGenerator;
+export default SeriesPrint;

@@ -4,12 +4,11 @@ import gql from 'graphql-tag';
 import Spinner from '@erxes/ui/src/components/Spinner';
 
 // local
-import BarcodeGeneratorComponent from '../components/SeriesPrint';
+import SeriesPrint from '../components/SeriesPrint';
 import { queries } from '../graphql';
 import { IPerform } from '../types';
 
 type Props = {
-  queryParams: any;
   id: string;
 };
 
@@ -30,7 +29,7 @@ const BarcodeGeneratorContainer = (props: Props) => {
     ? performDetailQuery.data.performDetail
     : ({} as IPerform);
 
-  return <BarcodeGeneratorComponent perform={performDetail} keyValue="test" />;
+  return <SeriesPrint perform={performDetail} keyValue="test" />;
 };
 
 export default BarcodeGeneratorContainer;

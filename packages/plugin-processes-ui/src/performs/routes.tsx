@@ -22,15 +22,10 @@ const performList = ({ location, history }) => {
   );
 };
 
-const seriesNumberPrint = ({ match, location }) => {
+const seriesNumberPrint = ({ match }) => {
   const id = match.params.id;
 
-  return (
-    <SeriesNumberPrint
-      id={id}
-      queryParams={queryString.parse(location.search)}
-    />
-  );
+  return <SeriesNumberPrint id={id} />;
 };
 
 const routes = () => {

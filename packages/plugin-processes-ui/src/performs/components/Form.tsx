@@ -38,6 +38,7 @@ import { IProductsData } from '../../types';
 import { JOB_TYPE_CHOISES } from '../../constants';
 import { queries } from '../../job/graphql';
 import { IOverallWorkDet } from '../../overallWork/types';
+import SeriesPrint from '../containers/SeriesPrint';
 
 type Props = {
   renderButton: (
@@ -828,6 +829,35 @@ class Form extends React.Component<Props, State> {
     window.open(`/processes/seriesNumberPrint/${perform._id}`);
   };
 
+  renderPrintBtn() {
+    const { perform } = this.props;
+    if (!perform || !perform._id) {
+      return <></>;
+    }
+    const trigger = (
+      <Button
+        btnStyle="simple"
+        onClick={this.printSeries}
+        icon="print"
+        uppercase={false}
+      >
+        Print
+      </Button>
+    );
+
+    const modalContent = props => <SeriesPrint {...props} id={perform._id} />;
+
+    return (
+      <ModalTrigger
+        title={__('Print performance series')}
+        size="xl"
+        trigger={trigger}
+        autoOpenKey="showPrintSeriesModal"
+        content={modalContent}
+      />
+    );
+  }
+
   renderContent = (formProps: IFormProps) => {
     const { closeModal, renderButton, max, perform } = this.props;
     const { overallWorkDet, btnDisabled } = this.state;
@@ -977,16 +1007,7 @@ class Form extends React.Component<Props, State> {
         </Box>
 
         <ModalFooter>
-          {perform && perform._id && (
-            <Button
-              btnStyle="simple"
-              onClick={this.printSeries}
-              icon="times-circle"
-              uppercase={false}
-            >
-              Print
-            </Button>
-          )}
+          {this.renderPrintBtn()}
           <Button
             btnStyle="simple"
             onClick={closeModal}
