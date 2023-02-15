@@ -272,12 +272,23 @@ query deviceConfigs {
   }
 }`;
 
+const listTimeLogsPerUser = `
+  query timeLogsPerUser($userId: String){
+    timeLogsPerUser(userId: $userId){
+      _id
+      timelog
+      deviceSerialNo
+    }
+  }
+`;
+
 export default {
   listReports,
   listReportByUser,
   listBranches,
   listTimeclocksMain,
   listTimelogsMain,
+  listTimeLogsPerUser,
   listSchedulesMain,
   listRequestsMain,
   listAbsenceTypes,

@@ -109,6 +109,7 @@ function ReportList(props: Props) {
     <Table>
       <thead>
         <tr>
+          <th>{__('Employee Id')}</th>
           <th>{__('Team member')}</th>
           <th>{__('Date')}</th>
           <th>{__('Time')}</th>
@@ -119,6 +120,7 @@ function ReportList(props: Props) {
         {timelogs.map(timelog => {
           return (
             <tr key={timelog._id}>
+              <td>{timelog.user && timelog.user.employeeId}</td>
               <td>
                 {timelog.user && timelog.user.details
                   ? timelog.user.details.fullName ||

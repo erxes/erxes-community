@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@erxes/ui/src/components/Button';
-import { ITimeclock } from '../../types';
+import { ITimeclock, ITimelog } from '../../types';
 import { __ } from '@erxes/ui/src/utils';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import TimeForm from '../../containers/timeclock/TimeFormList';
@@ -8,8 +8,14 @@ import dayjs from 'dayjs';
 import { dateFormat, timeFormat } from '../../constants';
 import Tip from '@erxes/ui/src/components/Tip';
 import { returnDeviceTypes } from '../../utils';
+import { CustomRangeContainer, FlexColumn } from '../../styles';
+import { ControlLabel } from '@erxes/ui/src/components/form';
+import { setParams } from '@erxes/ui/src/utils/router';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
 
 type Props = {
+  history: any;
+  timelogsPerUser: ITimelog[];
   timeclock: ITimeclock;
   removeTimeclock: (_id: string) => void;
 };
@@ -19,6 +25,11 @@ class Row extends React.Component<Props> {
     super(props);
   }
 
+  setUserId = () => {
+    console.log('kakakkaka');
+    // setParams(this.props.history, { timeclockUser: selectedUserId });
+  };
+
   shiftTrigger = shiftStarted =>
     shiftStarted ? (
       <Button id="timeClockButton1" btnStyle={'danger'} icon="plus-circle">
@@ -27,6 +38,14 @@ class Row extends React.Component<Props> {
     ) : (
       <>Ended</>
     );
+
+  shiftBtnTrigger = shiftStarted => (
+    <ModalTrigger
+      title={__('Start shift')}
+      trigger={this.shiftTrigger(shiftStarted)}
+      content={this.modalContent}
+    />
+  );
 
   modalContent = props => (
     <TimeForm
@@ -39,13 +58,58 @@ class Row extends React.Component<Props> {
     />
   );
 
-  shiftBtnTrigger = shiftStarted => (
-    <ModalTrigger
-      title={__('Start shift')}
-      trigger={this.shiftTrigger(shiftStarted)}
-      content={this.modalContent}
-    />
-  );
+  renderTimeLogs = () => {
+    const { timelogsPerUser } = this.props;
+  };
+
+  editShiftTimeContent = (shiftTime: string, userId: string) => {
+    return (
+      <FlexColumn marginNum={20}>
+        <ControlLabel>{shiftTime}</ControlLabel>
+
+        {/* <CustomRangeContainer>
+          <DateControl
+            value={timeLogStartDate}
+            name="startDate"
+            placeholder={'Starting date'}
+            dateFormat={'YYYY-MM-DD'}
+            onChange={onLogStartDateChange}
+          />
+          <DateControl
+            value={timeLogEndDate}
+            name="endDate"
+            placeholder={'Ending date'}
+            dateFormat={'YYYY-MM-DD'}
+            onChange={onLogEndDateChange}
+          />
+        </CustomRangeContainer> */}
+        {this.renderTimeLogs()}
+      </FlexColumn>
+    );
+  };
+
+  editShiftTime = (shiftTime: string, userId: string) => {
+    return (
+      <div style={{ cursor: 'pointer' }} onClick={this.setUserId}>
+        {shiftTime}
+      </div>
+    );
+  };
+
+  editShiftTimeTrigger = (
+    timeclockId: string,
+    userId: string,
+    shiftTime: string,
+    timeType?: string
+  ) => {
+    return (
+      <ModalTrigger
+        title={__(`Edit ${timeType}`)}
+        trigger={this.editShiftTime(shiftTime, userId)}
+        content={() => this.editShiftTimeContent(shiftTime, userId)}
+      />
+    );
+  };
 
   render() {
     const { timeclock, removeTimeclock } = this.props;
@@ -73,9 +137,23 @@ class Row extends React.Component<Props> {
             : timeclock.employeeUserName || timeclock.employeeId}
         </td>
         <td>{shiftDate}</td>
-        <td>{shiftStartTime}</td>
+        <td>
+          {this.editShiftTimeTrigger(
+            timeclock._id,
+            timeclock.user._id,
+            shiftStartTime,
+            'Shift Start'
+          )}
+        </td>
         <td>{returnDeviceTypes(timeclock.deviceType)[0]}</td>
-        <td>{shiftEndTime}</td>
+        <td>
+          {this.editShiftTimeTrigger(
+            timeclock._id,
+            timeclock.user._id,
+            shiftEndTime,
+            'Shift End'
+          )}
+        </td>
         <td>{returnDeviceTypes(timeclock.deviceType)[1]}</td>
         <td>{overNightShift ? 'O' : ''}</td>
         <td>

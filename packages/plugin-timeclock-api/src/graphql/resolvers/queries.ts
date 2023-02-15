@@ -53,13 +53,17 @@ const timeclockQueries = {
     const queryList = models.TimeLogs.find(selector);
 
     const list = paginate(
-      models.TimeLogs.find(selector).sort({ timelog: -1 }),
+      models.TimeLogs.find(selector).sort({ userId: 1, timelog: -1 }),
       { perPage: queryParams.perPage, page: queryParams.page }
     );
 
     const totalCount = queryList.countDocuments();
 
     return { list, totalCount };
+  },
+
+  async timeLogsPerUser(_root, { userId }, { subdomain, models }: IContext) {
+    return models.TimeLogs.find({ userId: `${userId}` });
   },
 
   async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {

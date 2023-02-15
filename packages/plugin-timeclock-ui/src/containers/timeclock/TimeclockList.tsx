@@ -18,6 +18,7 @@ import { generateParams } from '../../utils';
 type Props = {
   queryParams: any;
   history: any;
+  timeclockUser?: string;
 
   timeclockId?: string;
 
@@ -93,6 +94,15 @@ export default withProps<Props>(
       name: 'timeclocksMainQuery',
       options: ({ queryParams }) => ({
         variables: generateParams(queryParams),
+        fetchPolicy: 'network-only'
+      })
+    }),
+    graphql<Props, TimeClockQueryResponse>(gql(queries.listTimeLogsPerUser), {
+      name: 'timelogsPerUser',
+      options: ({ timeclockUser }) => ({
+        variables: {
+          userId: timeclockUser
+        },
         fetchPolicy: 'network-only'
       })
     }),

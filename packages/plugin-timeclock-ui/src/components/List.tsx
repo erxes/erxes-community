@@ -107,6 +107,7 @@ function List(props: Props) {
             showSideBar={setShowSideBar}
             getActionBar={setRightActionBar}
             getPagination={setPagination}
+            timeclockUser={queryParams.timeclockUser}
             history={history}
             queryParams={queryParams}
           />

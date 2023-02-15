@@ -231,7 +231,9 @@ export const queries = `
   schedulesMain(${queryParams}): SchedulesListResponse
   requestsMain(${queryParams}): RequestsListResponse
   timelogsMain(${queryParams}): TimelogListResponse
-
+  
+  timeLogsPerUser(userId: String): [Timelog]
+  
   absenceTypes:[AbsenceType]
   
   timeclockReports(${queryParams}): ReportsListResponse

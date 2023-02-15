@@ -19,7 +19,7 @@ export const findBranches = async (subdomain: string, userId: string) => {
   const branches = await sendCoreMessage({
     subdomain,
     action: 'branches.find',
-    data: { query: { userIds: userId } },
+    data: { query: { userIds: { $in: [userId] } } },
     isRPC: true
   });
 
