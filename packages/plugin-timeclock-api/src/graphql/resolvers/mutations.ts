@@ -67,8 +67,8 @@ const timeclockMutations = {
 
     const EARTH_RADIUS = 6378.14;
 
-    const userBranches = await findUser(subdomain, getUserId);
-    const branches = await findBranches(subdomain, userBranches.branchIds);
+    const userInfo = await findUser(subdomain, getUserId);
+    const branches = await findBranches(subdomain, userInfo.branchIds);
 
     for (const branch of branches) {
       // convert into radians
@@ -138,8 +138,8 @@ const timeclockMutations = {
 
     const EARTH_RADIUS = 6378.14;
 
-    const userBranches = await findUser(subdomain, getUserId);
-    const branches = await findBranches(subdomain, userBranches.branchIds);
+    const userInfo = await findUser(subdomain, getUserId);
+    const branches = await findBranches(subdomain, userInfo.branchIds);
 
     for (const branch of branches) {
       // convert into radians
