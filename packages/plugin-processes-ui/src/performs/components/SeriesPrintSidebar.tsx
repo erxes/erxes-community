@@ -90,12 +90,12 @@ const LeftSidebar = (props: Props) => {
           <FormControl
             name="productName"
             componentClass="checkbox"
-            defaultChecked={config.isProductName}
+            defaultChecked={config.isSeriesNum}
             onChange={(e: any) =>
-              handleChangeConfig('isProductName', e.target.checked)
+              handleChangeConfig('isSeriesNum', e.target.checked)
             }
           >
-            {__('Show product name')}
+            {__('Show series text')}
           </FormControl>
         </FormGroup>
         <FormGroup>

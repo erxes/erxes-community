@@ -41,6 +41,7 @@ export type IPerform = {
   modifiedBy?: string;
   createdUser?: IUser;
   modifiedUser?: IUser;
+  series?: string;
 };
 
 export type PerformsQueryResponse = {
@@ -110,7 +111,7 @@ export type SeriesPrintConfig = {
   width: number;
   height: number;
   margin: number;
-  isProductName: boolean;
+  isSeriesNum: boolean;
   productNameFontSize: number;
   priceFontSize: number;
 

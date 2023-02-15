@@ -62,6 +62,7 @@ export const performFields = `
     typeId
   }
   type
+  typeId
   status
   startAt
   dueDate
@@ -118,23 +119,24 @@ export const performFields = `
   ${
     isEnabled('contacts')
       ? `
-          customer {
-            _id
-            firstName
-            lastName
-            middleName
-            primaryEmail
-            primaryPhone
-          }
-          company {
-            _id
-            primaryEmail
-            primaryName
-            primaryPhone
-          }
-        `
+        customer {
+          _id
+          firstName
+          lastName
+          middleName
+          primaryEmail
+          primaryPhone
+        }
+        company {
+          _id
+          primaryEmail
+          primaryName
+          primaryPhone
+        }
+      `
       : ``
   }
+  series
 
 `;
 
@@ -168,8 +170,15 @@ const performDetail = `
   }
 `;
 
+const series = `
+  query series($search: String, $productId: String, $ids: [String], $excludeIds: Boolean, $page: Int, $perPage: Int) {
+    series(search: $search, productId: $productId, ids: $ids, excludeIds: $excludeIds, page: $page, perPage: $perPage)
+  }
+`;
+
 export default {
   performs,
   performsCount,
-  performDetail
+  performDetail,
+  series
 };

@@ -29,7 +29,9 @@ const BarcodeGeneratorContainer = (props: Props) => {
     ? performDetailQuery.data.performDetail
     : ({} as IPerform);
 
-  return <SeriesPrint perform={performDetail} keyValue="test" />;
+  return (
+    <SeriesPrint perform={performDetail} keyValue={performDetail.series} />
+  );
 };
 
 export default BarcodeGeneratorContainer;

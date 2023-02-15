@@ -79,9 +79,11 @@ class Form extends React.Component<Props, State> {
 
     const overallWorkDet = overallWorkDetail ||
       (perform && {
+        ...perform,
         _id: '',
         key: perform.overallWorkKey,
         startAt: perform.startAt,
+        jobReferId: perform.overallWorkKey.typeId || perform.typeId || '',
         dueDate: perform.endAt,
         type: perform.type,
         assignedUserIds: perform.assignedUserIds,
@@ -831,7 +833,7 @@ class Form extends React.Component<Props, State> {
 
   renderPrintBtn() {
     const { perform } = this.props;
-    if (!perform || !perform._id) {
+    if (!perform || !perform._id || !perform.series) {
       return <></>;
     }
     const trigger = (

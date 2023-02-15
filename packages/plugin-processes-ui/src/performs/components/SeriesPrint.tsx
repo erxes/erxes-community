@@ -24,7 +24,7 @@ const SeriesPrint = (props: Props) => {
       width: 80,
       height: 100,
       margin: 0,
-      isProductName: true,
+      isSeriesNum: true,
       productNameFontSize: 11,
       priceFontSize: 11,
 
@@ -106,14 +106,14 @@ const SeriesPrint = (props: Props) => {
             background-color: white;
           ">`;
 
-        if (config.isProductName) {
+        if (config.isSeriesNum) {
           printContentHTML += `
             <div style="
               width: 100%;
               text-align: center;
               font-size: ${config.productNameFontSize}px !important;
             ">
-              ${perform.type && perform.type}
+              ${keyValue}
             </div>`;
         }
 
