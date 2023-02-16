@@ -28,6 +28,7 @@ export const types = `
     user: User
     timelog: Date
     deviceSerialNo: String
+    deviceName: String
   }
 
   type Absence {

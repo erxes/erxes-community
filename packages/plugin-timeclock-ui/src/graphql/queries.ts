@@ -57,7 +57,7 @@ query timelogsMain(${listParamsDef}){
         ${userFields}
       }
       timelog
-      deviceSerialNo
+      deviceName
     }
     totalCount
   }

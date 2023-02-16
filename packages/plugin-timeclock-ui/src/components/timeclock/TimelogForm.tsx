@@ -107,11 +107,14 @@ export const TimelogForm = (props: Props) => {
   };
 
   const checkInput = () => {
-    const getShiftStart =
+    const getShiftStart = dayjs(
       (shiftStartInput === 'pick' ? shiftStart : shiftStartInsert) ||
-      timeclock.shiftStart;
+        timeclock.shiftStart
+    );
 
-    const getShiftEnd = shiftEndInput === 'pick' ? shiftEnd : shiftEndInsert;
+    const getShiftEnd = dayjs(
+      shiftEndInput === 'pick' ? shiftEnd : shiftEndInsert
+    );
 
     if (shiftStartInput === 'insert' && !getShiftStart) {
       Alert.error('Please insert shift start');
@@ -121,6 +124,7 @@ export const TimelogForm = (props: Props) => {
       Alert.error('Please insert shift end');
       return false;
     }
+
     if (getShiftStart && getShiftEnd && getShiftEnd < getShiftStart) {
       Alert.error('Shift end can not be sooner than shift start');
       return false;

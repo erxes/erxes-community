@@ -6,7 +6,7 @@ export interface ITimeclock {
   _id: string;
   shiftStart: Date;
   shiftActive?: boolean;
-  user?: IUser;
+  user: IUser;
   shiftEnd?: Date;
   employeeUserName?: string;
   employeeId?: number;
@@ -19,6 +19,7 @@ export interface ITimelog {
   timelog: Date;
   user: IUser;
   deviceSerialNo?: string;
+  deviceName?: string;
 }
 export interface IAbsence {
   _id: string;

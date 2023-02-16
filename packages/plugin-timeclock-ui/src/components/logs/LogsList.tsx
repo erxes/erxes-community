@@ -129,7 +129,7 @@ function ReportList(props: Props) {
               </td>
               <td>{dayjs(timelog.timelog).format(dateFormat)}</td>
               <td>{dayjs(timelog.timelog).format(timeFormat)}</td>
-              <td>{timelog.deviceSerialNo}</td>
+              <td>{timelog.deviceName}</td>
             </tr>
           );
         })}
