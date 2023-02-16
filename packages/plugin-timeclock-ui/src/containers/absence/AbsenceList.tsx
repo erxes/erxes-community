@@ -46,7 +46,6 @@ const ListContainer = (props: FinalProps) => {
     listAbsenceQuery,
     listAbsenceTypesQuery
   } = props;
-  const { reason } = queryParams;
 
   if (listAbsenceQuery.loading) {
     return <Spinner />;
@@ -62,6 +61,7 @@ const ListContainer = (props: FinalProps) => {
 
   const submitRequest = (
     usrId: string,
+    reason: string,
     expl: string,
     attchment: IAttachment,
     dateRange: any,

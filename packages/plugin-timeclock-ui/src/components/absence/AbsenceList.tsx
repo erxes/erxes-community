@@ -24,6 +24,7 @@ type Props = {
   solveAbsence: (absenceId: string, status: string) => void;
   submitRequest: (
     userId: string,
+    reason: string,
     explanation: string,
     attachment: IAttachment,
     dateRange: any,
