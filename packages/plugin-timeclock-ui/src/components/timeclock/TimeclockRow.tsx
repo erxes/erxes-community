@@ -9,6 +9,7 @@ import { dateFormat, timeFormat } from '../../constants';
 import Tip from '@erxes/ui/src/components/Tip';
 import { returnDeviceTypes } from '../../utils';
 import Icon from '@erxes/ui/src/components/Icon';
+import TimelogForm from '../../containers/timeclock/TimelogForm';
 
 type Props = {
   history: any;
@@ -21,11 +22,6 @@ class Row extends React.Component<Props> {
   constructor(props) {
     super(props);
   }
-
-  setUserId = () => {
-    console.log('kakakkaka');
-    // setParams(this.props.history, { timeclockUser: selectedUserId });
-  };
 
   shiftTrigger = shiftStarted =>
     shiftStarted ? (
@@ -59,7 +55,24 @@ class Row extends React.Component<Props> {
     const { timelogsPerUser } = this.props;
   };
 
-  editShiftTimeContent = (contentProps: any, timeclock: ITimeclock) => {};
+  editShiftTimeContent = (contentProps: any, timeclock: ITimeclock) => {
+    const getStartDate = dayjs(timeclock.shiftStart)
+      .add(-1, 'day')
+      .format(dateFormat);
+    const getEndDate = dayjs(timeclock.shiftStart)
+      .add(1, 'day')
+      .format(dateFormat);
+
+    return (
+      <TimelogForm
+        contentProps={contentProps}
+        startDate={getStartDate}
+        endDate={getEndDate}
+        userId={timeclock.user._id}
+        timeclock={timeclock}
+      />
+    );
+  };
 
   editShiftTimeTrigger = () => (
     <Button btnStyle="link">

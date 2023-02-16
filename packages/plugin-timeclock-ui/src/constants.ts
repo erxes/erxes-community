@@ -12,5 +12,6 @@ const menuTimeClock = (searchFilter: string) => {
 };
 const dateFormat = 'MM/DD/YYYY';
 const timeFormat = 'HH:mm';
+const dateAndTimeFormat = 'MM/DD/YYYY HH:mm';
 
-export { menuTimeClock, dateFormat, timeFormat };
+export { menuTimeClock, dateFormat, timeFormat, dateAndTimeFormat };

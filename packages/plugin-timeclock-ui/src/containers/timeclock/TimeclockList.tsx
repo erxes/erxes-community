@@ -97,15 +97,6 @@ export default withProps<Props>(
         fetchPolicy: 'network-only'
       })
     }),
-    graphql<Props, TimeClockQueryResponse>(gql(queries.listTimeLogsPerUser), {
-      name: 'timelogsPerUser',
-      options: ({ timeclockUser }) => ({
-        variables: {
-          userId: timeclockUser
-        },
-        fetchPolicy: 'network-only'
-      })
-    }),
     graphql<Props, TimeClockMutationResponse>(
       gql(mutations.extractAllDataFromMsSQL),
       {

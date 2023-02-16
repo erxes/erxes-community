@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import LogsList from '../../components/logs/LogsList';
 import { mutations, queries } from '../../graphql';
 import {
-  LogsQueryResponse,
+  TimeLogsQueryResponse,
   ReportsQueryResponse,
   TimeLogMutationResponse
 } from '../../types';
@@ -30,7 +30,7 @@ type Props = {
 };
 
 type FinalProps = {
-  listTimelogsQuery: LogsQueryResponse;
+  listTimelogsQuery: TimeLogsQueryResponse;
 } & Props &
   TimeLogMutationResponse;
 

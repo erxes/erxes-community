@@ -5,14 +5,14 @@ import { IAttachment, QueryResponse } from '@erxes/ui/src/types';
 export interface ITimeclock {
   _id: string;
   shiftStart: Date;
-  shiftActive: boolean;
-  user: IUser;
-  shiftEnd: Date;
-  employeeUserName: string;
-  employeeId: number;
-  deviceName: string;
-  deviceType: string;
-  branchName: string;
+  shiftActive?: boolean;
+  user?: IUser;
+  shiftEnd?: Date;
+  employeeUserName?: string;
+  employeeId?: number;
+  deviceName?: string;
+  deviceType?: string;
+  branchName?: string;
 }
 export interface ITimelog {
   _id: string;
@@ -146,8 +146,12 @@ export type TimeClockQueryResponse = {
   timeclocks: ITimeclock[];
 } & QueryResponse;
 
-export type LogsQueryResponse = {
+export type TimeLogsQueryResponse = {
   timelogsMain: { list: ITimelog[]; totalCount: number };
+} & QueryResponse;
+
+export type TimeLogsPerUserQueryResponse = {
+  timeLogsPerUser: ITimelog[];
 } & QueryResponse;
 
 export type AbsenceQueryResponse = {
@@ -189,10 +193,13 @@ export type ReportsQueryResponse = {
 
 export type MutationVariables = {
   _id?: string;
-  userId: string;
-  longitude: number;
-  latitude: number;
+  userId?: string;
+  longitude?: number;
+  latitude?: number;
   deviceType?: string;
+  shiftStart?: Date;
+  shiftEnd?: Date;
+  shiftActive?: boolean;
 };
 export type AbsenceMutationVariables = {
   _id?: string;
@@ -225,6 +232,9 @@ export type TimeClockMutationResponse = {
   startTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   timeclockRemove: (params: { variables: { _id: string } }) => Promise<any>;
+  timeclockEditMutation: (params: {
+    variables: MutationVariables;
+  }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {
     variables: { startDate: string; endDate: string };
   }) => Promise<any>;

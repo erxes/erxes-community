@@ -273,8 +273,8 @@ query deviceConfigs {
 }`;
 
 const listTimeLogsPerUser = `
-  query timeLogsPerUser($userId: String){
-    timeLogsPerUser(userId: $userId){
+  query timeLogsPerUser($userId: String, $startDate: String, $endDate: String){
+    timeLogsPerUser(userId: $userId, startDate: $startDate, endDate: $endDate){
       _id
       timelog
       deviceSerialNo

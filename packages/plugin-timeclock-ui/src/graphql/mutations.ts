@@ -1,3 +1,10 @@
+const timeclockEdit = `
+  mutation timeclockEdit($_id: String!, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
+    timeclockEdit(_id: $_id, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+      _id
+    }
+  }
+  `;
 const timeclockRemove = `
   mutation timeclockRemove($_id: String!){
     timeclockRemove(_id: $_id)
@@ -186,6 +193,7 @@ export default {
   solveAbsence,
   solveSchedule,
   solveShift,
+  timeclockEdit,
   timeclockRemove,
   timeclockStart,
   timeclockStop,

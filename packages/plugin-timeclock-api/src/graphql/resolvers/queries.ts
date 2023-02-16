@@ -6,11 +6,12 @@ import {
   timeclockReportPreliminary
 } from './utils';
 import {
+  customFixDate,
   findAllTeamMembersWithEmpId,
   generateCommonUserIds,
   generateFilter
 } from '../../utils';
-import { paginate } from '@erxes/api-utils/src';
+import { fixDate, paginate } from '@erxes/api-utils/src';
 import { IReport } from '../../models/definitions/timeclock';
 
 const paginateArray = (array, perPage = 20, page = 1) =>
@@ -62,8 +63,15 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
-  async timeLogsPerUser(_root, { userId }, { subdomain, models }: IContext) {
-    return models.TimeLogs.find({ userId: `${userId}` });
+  timeLogsPerUser(_root, { userId, startDate, endDate }, { models }: IContext) {
+    const timeField = {
+      timelog: {
+        $gte: fixDate(startDate),
+        $lte: customFixDate(endDate)
+      }
+    };
+
+    return models.TimeLogs.find({ $and: [{ userId: `${userId}` }, timeField] });
   },
 
   async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {

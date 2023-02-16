@@ -209,6 +209,14 @@ const timeclockMutations = {
     return models.Timeclocks.removeTimeClock(_id);
   },
 
+  async timeclockEdit(
+    _root,
+    { _id, ...doc }: ITimeClockEdit,
+    { models }: IContext
+  ) {
+    return models.Timeclocks.updateTimeClock(_id, doc);
+  },
+
   async sendAbsenceRequest(
     _root,
     doc: IAbsence,
