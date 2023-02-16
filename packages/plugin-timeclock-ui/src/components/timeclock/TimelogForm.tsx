@@ -24,7 +24,7 @@ type Props = {
 
   contentProps: any;
 
-  timeclockEdit: (values: ITimeclock) => void;
+  timeclockEdit: (values) => void;
 };
 export const TimelogForm = (props: Props) => {
   const { timeclock, timelogsPerUser, contentProps, timeclockEdit } = props;
