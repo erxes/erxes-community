@@ -265,90 +265,101 @@ const orderMutations = {
   /**
    * Веб болон мобайл дээр хэрэглээгүй бол устгана.
    */
-  // async ordersMakePayment(
-  //   _root,
-  //   { _id, doc }: IPaymentParams,
-  //   { config, models, subdomain }: IContext
-  // ) {
-  //   let order = await models.Orders.getOrder(_id);
+  async ordersMakePayment(
+    _root,
+    { _id, doc }: IPaymentParams,
+    { config, models, subdomain }: IContext
+  ) {
+    let order = await models.Orders.getOrder(_id);
 
-  //   checkOrderStatus(order);
+    checkOrderStatus(order);
 
-  //   const items = await models.OrderItems.find({
-  //     orderId: order._id
-  //   }).lean();
+    const items = await models.OrderItems.find({
+      orderId: order._id
+    }).lean();
 
-  //   await validateOrderPayment(order, doc);
+    await validateOrderPayment(order, doc);
+    const now = new Date();
 
-  //   const ebarimtConfig: any = config.ebarimtConfig;
+    const ebarimtConfig: any = config.ebarimtConfig;
 
-  //   const data = await prepareEbarimtData(
-  //     models,
-  //     order,
-  //     ebarimtConfig,
-  //     items,
-  //     doc.billType,
-  //     doc.registerNumber || order.registerNumber
-  //   );
+    try {
+      const ebarimtResponses: any[] = [];
 
-  //   ebarimtConfig.districtName = getDistrictName(
-  //     (config.ebarimtConfig && config.ebarimtConfig.districtCode) || ''
-  //   );
+      const ebarimtDatas = await prepareEbarimtData(
+        models,
+        order,
+        ebarimtConfig,
+        items,
+        doc.billType,
+        doc.registerNumber || order.registerNumber
+      );
 
-  //   try {
-  //     const response = await models.PutResponses.putData({
-  //       ...data,
-  //       config: ebarimtConfig,
-  //       models
-  //     });
+      ebarimtConfig.districtName = getDistrictName(
+        (config.ebarimtConfig && config.ebarimtConfig.districtCode) || ''
+      );
 
-  //     if (response && response.success === 'true') {
-  //       const now = new Date();
+      for (const data of ebarimtDatas) {
+        let response;
 
-  //       await models.Orders.updateOne(
-  //         { _id },
-  //         {
-  //           $set: {
-  //             ...doc,
-  //             paidDate: now,
-  //             modifiedAt: now
-  //           }
-  //         }
-  //       );
-  //     }
+        response = await models.PutResponses.putData({
+          ...data,
+          config: ebarimtConfig,
+          models
+        });
+        ebarimtResponses.push(response);
+      }
 
-  //     order = await models.Orders.getOrder(_id);
-  //     graphqlPubsub.publish('ordersOrdered', {
-  //       ordersOrdered: {
-  //         ...order,
-  //         _id,
-  //         status: order.status,
-  //         customerId: order.customerId
-  //       }
-  //     });
+      if (
+        ebarimtResponses.length &&
+        !ebarimtResponses.filter(er => er.success !== 'true').length
+      ) {
+        await models.Orders.updateOne(
+          { _id },
+          {
+            $set: {
+              ...doc,
+              paidDate: now,
+              modifiedAt: now
+            }
+          }
+        );
+      }
 
-  //     try {
-  //       sendPosMessage({
-  //         subdomain,
-  //         action: 'createOrUpdateOrders',
-  //         data: {
-  //           action: 'makePayment',
-  //           response,
-  //           order,
-  //           items
-  //         }
-  //       });
-  //     } catch (e) {
-  //       debugError(`Error occurred while sending data to erxes: ${e.message}`);
-  //     }
+      order = await models.Orders.getOrder(_id);
 
-  //     return response;
-  //   } catch (e) {
-  //     debugError(e);
+      graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          ...order,
+          _id,
+          status: order.status,
+          customerId: order.customerId
+        }
+      });
 
-  //     return e;
-  //   }
-  // }, // end payment mutation
+      try {
+        sendPosMessage({
+          subdomain,
+          action: 'createOrUpdateOrders',
+          data: {
+            posToken: config.token,
+            action: 'makePayment',
+            responses: ebarimtResponses,
+            order,
+            items
+          }
+        });
+      } catch (e) {
+        debugError(`Error occurred while sending data to erxes: ${e.message}`);
+      }
+
+      return ebarimtResponses;
+    } catch (e) {
+      debugError(e);
+
+      return e;
+    }
+  }, // end payment mutation
 
   async ordersAddPayment(
     _root,
@@ -466,7 +477,8 @@ const orderMutations = {
 
       if (
         billType === BILL_TYPES.INNER ||
-        (ebarimtResponses && ebarimtResponses.length)
+        (ebarimtResponses.length &&
+          !ebarimtResponses.filter(er => er.success !== 'true').length)
       ) {
         await models.Orders.updateOne(
           { _id },
