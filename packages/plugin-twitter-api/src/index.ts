@@ -2,7 +2,7 @@ import init from './controller';
 import { initStart } from './startup';
 
 const initApp = async app => {
-  initStart(app);
+  initStart();
   init(app);
 
   app.use((error, _req, res, _next) => {

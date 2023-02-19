@@ -16,16 +16,17 @@ module.exports = {
   inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxIntegrationForm: './inboxIntegrationForm',
   inboxConversationDetail: './inboxConversationDetail',
-  inboxIntegration: {
-    name: 'Twitter',
-    description: '',
-    inMessenger: false,
-    isAvailable: true,
-    kind: 'twitter',
-    logo: '/images/integrations/twitter.png',
-    createModal: 'twitter',
-    createUrl: '/settings/integrations/twitter',
-    category:
-      'All integrations, For support teams, Marketing automation, Email marketing'
-  }
+  inboxIntegrations: [
+    {
+      name: 'Twitter',
+      description: '',
+      inMessenger: false,
+      isAvailable: true,
+      kind: 'twitter',
+      logo: '/images/integrations/twitter.png',
+      createModal: 'twitter',
+      category:
+        'All integrations, For support teams, Marketing automation, Email marketing'
+    }
+  ]
 };

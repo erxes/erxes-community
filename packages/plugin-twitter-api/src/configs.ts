@@ -23,10 +23,12 @@ export default {
     };
   },
   meta: {
-    inboxIntegration: {
-      kind: 'twitter',
-      label: 'Twitter'
-    }
+    inboxIntegrations: [
+      {
+        kind: 'twitter',
+        label: 'Twitter'
+      }
+    ]
   },
   apolloServerContext: async (context, req) => {
     const subdomain = getSubdomain(req);

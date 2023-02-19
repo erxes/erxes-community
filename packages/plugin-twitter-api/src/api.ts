@@ -57,7 +57,7 @@ export const getTwitterAuthUrl = async (): Promise<{
         );
 
         const twitterAuthUrl =
-          'https://api.twitter.com/oauth/authenticate?force_login=true&oauth_token=' +
+          'https://api.twitter.com/oauth/authorize?oauth_token=' +
           responseParams.oauth_token;
 
         resolve({
