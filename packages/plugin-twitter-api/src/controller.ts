@@ -1,9 +1,9 @@
 import { downloadAttachment, getConfig, getEnv } from './utils';
 import * as twitterUtils from './api';
 import receiveDms from './receiveDms';
+import receiveTweets from './receiveTweets';
 import { generateModels, IModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
-import Accounts from './models/Accounts';
 
 const init = async app => {
   app.get('/login', async (_req, res) => {
@@ -67,12 +67,22 @@ const init = async app => {
     const subdomain = getSubdomain(req);
     const models = await generateModels(subdomain);
 
-    try {
-      await receiveDms(models, subdomain, req.body);
-    } catch (e) {
-      console.log('Webhook post husel deerh aldaanii medeelel:', e);
+    if (req.body.direct_message_events) {
+      try {
+        await receiveDms(models, subdomain, req.body);
+      } catch (e) {
+        console.log('Webhook post husel deerh aldaanii medeelel:', e);
 
-      return new Error(e);
+        return new Error(e);
+      }
+    }
+    if (req.body.tweet_create_events) {
+      try {
+        await receiveTweets(models, subdomain, req.body);
+      } catch (e) {
+        console.log('Webhook post husel deerh aldaanii medeelel:', e);
+        return new Error(e);
+      }
     }
 
     res.sendStatus(200);

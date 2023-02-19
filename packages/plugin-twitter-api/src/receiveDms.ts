@@ -28,7 +28,7 @@ const extractUrlFromAttachment = attachment => {
 };
 
 const receiveDms = async (models: IModels, subdomain, requestBody) => {
-  const { direct_message_events, tweet_create_events } = requestBody;
+  const { direct_message_events } = requestBody;
 
   const users: IUsers = requestBody.users;
 

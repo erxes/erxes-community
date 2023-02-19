@@ -69,6 +69,8 @@ export const INTEGRATION_KINDS = {
   MESSENGER: 'messenger',
   FACEBOOK_MESSENGER: 'facebook-messenger',
   FACEBOOK_POST: 'facebook-post',
+  TWITTER_MESSAGE: 'twitter-message',
+  TWITTER_TWEET: 'twitter-tweet',
   FORMS: 'lead',
   CALLPRO: 'callpro',
   WEBHOOK: 'webhook',
@@ -81,6 +83,8 @@ export const INTEGRATION_KINDS = {
       value: 'facebook-messenger'
     },
     { text: 'Facebook Post', value: 'facebook-post' },
+    { text: 'Twitter Message', value: 'twitter-message' },
+    { text: 'Twitter Tweet', value: 'twitter-tweet' },
     { text: 'Webhook', value: 'webhook' },
     { text: 'Callpro', value: 'callpro' },
     { text: 'Booking', value: 'booking' }

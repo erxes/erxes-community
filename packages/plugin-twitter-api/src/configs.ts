@@ -6,6 +6,7 @@ import { generateModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import initApp from './index';
 import { initMemoryStorage } from './inmemoryStorage';
+import { INTEGRATION_KINDS } from './constants';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -15,18 +16,23 @@ export let debug;
 
 export default {
   name: 'twitter',
-  graphql: sd => {
+  graphql: async sd => {
     serviceDiscovery = sd;
+
     return {
-      typeDefs,
-      resolvers
+      typeDefs: await typeDefs(sd),
+      resolvers: await resolvers(sd)
     };
   },
   meta: {
     inboxIntegrations: [
       {
-        kind: 'twitter',
-        label: 'Twitter'
+        kind: INTEGRATION_KINDS.DM,
+        label: 'Twitter message'
+      },
+      {
+        kind: INTEGRATION_KINDS.TWEET,
+        label: 'Twitter tweet'
       }
     ]
   },

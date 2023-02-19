@@ -1,23 +1,8 @@
 import { gql } from 'apollo-server-express';
+import { types, queries, mutations } from './schema';
 
-const types = `
-  type ITwitter {
-    _id: String!
-    title: String
-    data: JSON
-  }
-`;
-
-const queries = `
-  twitterConversationDetail(conversationId: String!): [ITwitter]
-  twitterGetAccounts(kind: String): JSON
-`;
-
-const mutations = `
-  twitterAccountRemove(_id: String!): String
-`;
-
-const typeDefs = gql`
+const typeDefs = async _serviceDiscovery => {
+  return gql`
   scalar JSON
   scalar Date
 
@@ -29,7 +14,8 @@ const typeDefs = gql`
 
   extend type Mutation {
     ${mutations}
-  }
-`;
+   }
+ `;
+};
 
 export default typeDefs;
