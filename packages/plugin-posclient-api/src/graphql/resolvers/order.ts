@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import { IContext } from '../../connectionResolver';
 import { IOrderDocument } from '../../models/definitions/orders';
-import { IOrderItem } from '../../../../../../erxes-pos/ui/src/modules/checkout/types';
+import { IOrderItem } from '../../models/definitions/orderItems';
 import { IPutResponseDocument } from '../../models/definitions/putResponses';
 import { sendContactsMessage } from '../../messageBroker';
 
