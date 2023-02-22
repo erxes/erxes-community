@@ -1,8 +1,9 @@
-import { IOrderDocument } from '../../models/definitions/orders';
-import { sendContactsMessage } from '../../messageBroker';
-import { IContext } from '../../connectionResolver';
 import * as moment from 'moment';
+import { IContext } from '../../connectionResolver';
+import { IOrderDocument } from '../../models/definitions/orders';
 import { IOrderItem } from '../../../../../../erxes-pos/ui/src/modules/checkout/types';
+import { IPutResponseDocument } from '../../models/definitions/putResponses';
+import { sendContactsMessage } from '../../messageBroker';
 
 export default {
   async items(order: IOrderDocument, {}, { models }: IContext) {
@@ -81,12 +82,35 @@ export default {
       ];
     }
 
-    return models.PutResponses.find({
-      contentType: 'pos',
-      contentId: order._id,
-      status: { $ne: 'inactive' }
-    })
+    const putResponses: IPutResponseDocument[] = await models.PutResponses.find(
+      {
+        contentType: 'pos',
+        contentId: order._id,
+        status: { $ne: 'inactive' }
+      }
+    )
       .sort({ createdAt: -1 })
       .lean();
+
+    if (!putResponses.length) {
+      return [];
+    }
+
+    const excludeIds: string[] = [];
+    for (const falsePR of putResponses.filter(pr => pr.success === 'false')) {
+      for (const truePR of putResponses.filter(pr => pr.success === 'true')) {
+        if (
+          falsePR.sendInfo &&
+          truePR.sendInfo &&
+          falsePR.sendInfo.amount === truePR.sendInfo.amount &&
+          falsePR.sendInfo.vat === truePR.sendInfo.vat &&
+          falsePR.sendInfo.taxType === truePR.sendInfo.taxType
+        ) {
+          excludeIds.push(falsePR._id);
+        }
+      }
+    }
+
+    return putResponses.filter(pr => !excludeIds.includes(pr._id));
   }
 };

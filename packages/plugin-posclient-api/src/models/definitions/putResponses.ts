@@ -19,7 +19,7 @@ export interface IPutResponse {
   taxType?: string;
   qrData?: string;
   lottery?: string;
-  sendInfo?: object;
+  sendInfo?: any;
   status?: string;
   stocks?: object[];
   amount?: string;
