@@ -65,7 +65,7 @@ export default {
             measureUnit: productById[item.productId].sku || 'ш',
             qty: item.count,
             unitPrice: item.unitPrice,
-            totalAmount: item.unitPrice * item.count,
+            totalAmount: (item.unitPrice || 0) * item.count,
             vat: '0.00',
             cityTax: '0.00',
             discount: item.discountAmount
