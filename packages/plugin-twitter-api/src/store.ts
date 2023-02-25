@@ -3,7 +3,8 @@ import {
   IConversationDocument,
   IIntegrationDocument
 } from './models/definitions/twitter';
-import { IModels, models } from './connectionResolver';
+import { IModels } from './connectionResolver';
+import { ITweetParams } from './receiveTweets';
 
 export interface IUser {
   id: string;
@@ -19,12 +20,17 @@ export interface IUser {
   profile_image_url_https: string;
 }
 
+interface IDoc {
+  content?: string;
+  tweetId?: string;
+}
+
 export const getOrCreateCustomer = async (
   models: IModels,
   subdomain: string,
   integration: IIntegrationDocument,
   userId: string,
-  receiver: IUser
+  receiver?: IUser
 ) => {
   let customer = await models.Customers.findOne({ userId });
 
@@ -32,15 +38,14 @@ export const getOrCreateCustomer = async (
     return customer;
   }
 
-  // save on integrations collection
+  // save on integrations db
   try {
     customer = await models.Customers.create({
-      userId: receiver.id,
-      // not integrationId on erxes-api !!
+      userId: receiver?.id,
+      firstName: receiver?.name,
+      lastName: receiver?.screen_name,
       integrationId: integration.inboxId,
-      profilePic: receiver.profile_image_url_https,
-      name: receiver.name,
-      screenName: receiver.screen_name
+      profilePic: receiver?.profile_image_url_https
     });
   } catch (e) {
     throw new Error(
@@ -59,21 +64,18 @@ export const getOrCreateCustomer = async (
         action: 'get-create-update-customer',
         payload: JSON.stringify({
           integrationId: integration.inboxId,
-          firstName: receiver.screen_name,
-          avatar: receiver.profile_image_url_https,
+          firstName: receiver?.screen_name,
+          lastName: '',
+          avatar: receiver?.profile_image_url_https,
           isUser: true
         })
       },
       isRPC: true
     });
 
-    console.log('apiCustomerResponse========>', apiCustomerResponse);
-
     customer.erxesApiId = apiCustomerResponse._id;
     await customer.save();
   } catch (e) {
-    console.log('Aldaanii medeelel bol:', e);
-
     await models.Customers.deleteOne({ _id: customer._id });
     throw new Error(e);
   }
@@ -151,6 +153,51 @@ export const getOrCreateConversationAndMessage = async (
     throw new Error(e);
   }
   return conversationId;
+};
+
+export const getOrCreateTweet = async (
+  models: IModels,
+  subdomain: string,
+  params: ITweetParams,
+  integration: IIntegrationDocument,
+  customerErxesApiId: string
+) => {
+  let tweet = await models.Tweets.findOne({ tweetId: params.id_str });
+
+  if (tweet) {
+    return tweet;
+  }
+
+  const doc: IDoc = {
+    tweetId: params.id_str,
+    content: params.text
+  };
+  tweet = await models.Tweets.create(doc);
+
+  // create conversation in api
+  try {
+    const apiConversationResponse = await sendInboxMessage({
+      subdomain,
+      action: 'integrations.receive',
+      data: {
+        action: 'create-or-update-conversation',
+        payload: JSON.stringify({
+          customerId: customerErxesApiId,
+          integrationId: integration.inboxId,
+          content: tweet.content
+        })
+      },
+      isRPC: true
+    });
+
+    tweet.erxesApiId = apiConversationResponse._id;
+    await tweet.save();
+  } catch (e) {
+    await models.Tweets.deleteOne({ _id: tweet._id });
+    throw new Error(e);
+  }
+
+  return tweet;
 };
 
 export const saveReplyMessage = async (

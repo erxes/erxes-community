@@ -72,7 +72,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
       );
 
       const content = message_data.text;
-      const customerId: any = customer.erxesApiId;
+      const customerId: any = customer?.erxesApiId;
 
       await getOrCreateConversationAndMessage(
         models,

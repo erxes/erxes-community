@@ -112,6 +112,16 @@ export const configSchema = new Schema({
 });
 export interface IMessageDocument extends IMessage, Document {}
 
+export interface ITweetDocument extends ITweet, Document {}
+
+export interface ITweet {
+  tweetId: string;
+  content: string;
+  createdAt: Date;
+  userId: string;
+  erxesApiId?: string;
+}
+
 export interface IMessage {
   inboxIntegrationId: string;
   inboxConversationId: string;
@@ -140,4 +150,12 @@ export const messageSchema = new Schema({
   content: String,
   receiverId: String,
   createdAt: Date
+});
+
+export const tweetSchema = new Schema({
+  tweetId: { type: String, unique: true },
+  content: String,
+  createdAt: Date,
+  userId: String,
+  erxesApiId: String
 });

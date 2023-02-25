@@ -21,7 +21,7 @@ export const initBroker = async cl => {
     async ({ subdomain, data: { doc, integrationId } }) => {
       const models = await generateModels(subdomain);
 
-      const integration = await models.Integrations.create({
+      await models.Integrations.create({
         inboxId: integrationId,
         ...(doc || {})
       });

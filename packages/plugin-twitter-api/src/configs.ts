@@ -27,12 +27,8 @@ export default {
   meta: {
     inboxIntegrations: [
       {
-        kind: INTEGRATION_KINDS.DM,
-        label: 'Twitter message'
-      },
-      {
-        kind: INTEGRATION_KINDS.TWEET,
-        label: 'Twitter tweet'
+        kind: 'twitter',
+        label: 'Twitter'
       }
     ]
   },

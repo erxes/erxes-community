@@ -6,7 +6,8 @@ import {
   IConversationMessageDocument,
   IIntegrationDocument,
   IAccountDocument,
-  IMessageDocument
+  IMessageDocument,
+  ITweetDocument
 } from './models/definitions/twitter';
 import {
   ICustomerModel,
@@ -15,12 +16,14 @@ import {
   IConfigModel,
   IAccountModel,
   IMessageModel,
+  ITweetModel,
   loadCustomerClass,
   loadConversationMessageClass,
   loadIntegrationClass,
   loadConfigClass,
   loadAccountClass,
-  loadMessageClass
+  loadMessageClass,
+  loadTweetClass
 } from './models/Twitter';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
 
@@ -31,6 +34,7 @@ export interface IModels {
   Configs: IConfigModel;
   Accounts: IAccountModel;
   Messages: IMessageModel;
+  Tweets: ITweetModel;
 }
 
 export interface IContext extends IMainContext {
@@ -74,6 +78,11 @@ export const loadClasses = (
   models.Messages = db.model<IMessageDocument, IMessageModel>(
     'twitter_messages',
     loadMessageClass(models)
+  );
+
+  models.Tweets = db.model<ITweetDocument, ITweetModel>(
+    'twitter_tweets',
+    loadTweetClass(models)
   );
 
   return models;

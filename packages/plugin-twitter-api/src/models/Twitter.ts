@@ -12,7 +12,9 @@ import {
   IAccountDocument,
   accountSchema,
   IMessageDocument,
-  messageSchema
+  messageSchema,
+  ITweetDocument,
+  tweetSchema
 } from './definitions/twitter';
 import { IModels } from '../connectionResolver';
 
@@ -67,6 +69,16 @@ export const loadMessageClass = models => {
   messageSchema.loadClass(Message);
 
   return messageSchema;
+};
+
+export interface ITweetModel extends Model<ITweetDocument> {}
+
+export const loadTweetClass = models => {
+  class Tweet {}
+
+  tweetSchema.loadClass(Tweet);
+
+  return tweetSchema;
 };
 
 export interface IConfig {

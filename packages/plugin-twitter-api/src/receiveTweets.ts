@@ -1,18 +1,22 @@
-import {
-  getOrCreateConversationAndMessage,
-  getOrCreateCustomer,
-  IUser
-} from './store';
+import { getOrCreateCustomer, getOrCreateTweet } from './store';
 import { IModels } from './connectionResolver';
 export interface IUsers {
-  [key: string]: IUser;
+  id_str: string;
 }
 
-const receiveDms = async (models: IModels, subdomain, requestBody) => {
-  const { tweet_create_events } = requestBody;
-  const { id_str } = tweet_create_events[0].user;
+export interface ITweetParams {
+  created_at: string;
+  text: string;
+  id_str: string;
+  user: any;
+}
 
-  const users: IUsers = requestBody.users;
+const receiveTweets = async (models: IModels, subdomain, requestBody) => {
+  const { tweet_create_events } = requestBody;
+
+  const params: ITweetParams = tweet_create_events[0];
+
+  const { id_str } = tweet_create_events[0].user;
 
   const account = await models.Accounts.findOne({ uid: id_str });
 
@@ -24,21 +28,23 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
     accountId: account._id
   });
 
+  if (!integration) {
+    throw new Error('Integration not found');
+  }
   const customer = await getOrCreateCustomer(
     models,
     subdomain,
     integration,
-    id_str,
-    users[id_str]
+    id_str
   );
 
-  //   await getOrCreatePost(
-  //     models,
-  //     subdomain,
-  //     params,
-  //     userId,
-  //     customer.erxesApiId || ''
-  //   );
+  await getOrCreateTweet(
+    models,
+    subdomain,
+    params,
+    integration,
+    customer.erxesApiId || ''
+  );
 };
 
-export default receiveDms;
+export default receiveTweets;
