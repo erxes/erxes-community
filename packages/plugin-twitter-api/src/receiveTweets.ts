@@ -14,14 +14,20 @@ export interface ITweetParams {
 const receiveTweets = async (models: IModels, subdomain, requestBody) => {
   const { tweet_create_events } = requestBody;
 
-  const params: ITweetParams = tweet_create_events[0];
+  const tweetParams: ITweetParams = tweet_create_events[0];
 
-  const { id_str } = tweet_create_events[0].user;
+  let params = {} as any;
 
-  const account = await models.Accounts.findOne({ uid: id_str });
+  params.first_name = tweet_create_events[0].user.name;
+  params.profile_image_url_https =
+    tweet_create_events[0].user.profile_image_url_https;
+
+  const userId = tweet_create_events[0].user.id_str;
+
+  const account = await models.Accounts.findOne({ uid: userId });
 
   if (!account) {
-    return;
+    throw new Error('Account not found');
   }
 
   const integration = await models.Integrations.getIntegration({
@@ -35,13 +41,13 @@ const receiveTweets = async (models: IModels, subdomain, requestBody) => {
     models,
     subdomain,
     integration,
-    id_str
+    userId
   );
 
   await getOrCreateTweet(
     models,
     subdomain,
-    params,
+    tweetParams,
     integration,
     customer.erxesApiId || ''
   );

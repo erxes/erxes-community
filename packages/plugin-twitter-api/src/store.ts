@@ -9,6 +9,8 @@ import { ITweetParams } from './receiveTweets';
 export interface IUser {
   id: string;
   created_timestamp: string;
+  first_name: string;
+  last_name: string;
   name: string;
   screen_name: string;
   protected: boolean;
@@ -30,7 +32,7 @@ export const getOrCreateCustomer = async (
   subdomain: string,
   integration: IIntegrationDocument,
   userId: string,
-  receiver?: IUser
+  params?: IUser
 ) => {
   let customer = await models.Customers.findOne({ userId });
 
@@ -38,14 +40,21 @@ export const getOrCreateCustomer = async (
     return customer;
   }
 
+  // create customer
+  let twUser = {} as any;
+
+  twUser.name = params?.name;
+
+  const twUserProfilePic = params?.profile_image_url_https;
+
   // save on integrations db
   try {
     customer = await models.Customers.create({
-      userId: receiver?.id,
-      firstName: receiver?.name,
-      lastName: receiver?.screen_name,
+      userId,
+      firstName: twUser.first_name || twUser.name,
+      lastName: twUser.last_name,
       integrationId: integration.inboxId,
-      profilePic: receiver?.profile_image_url_https
+      profilePic: twUserProfilePic
     });
   } catch (e) {
     throw new Error(
@@ -64,9 +73,9 @@ export const getOrCreateCustomer = async (
         action: 'get-create-update-customer',
         payload: JSON.stringify({
           integrationId: integration.inboxId,
-          firstName: receiver?.screen_name,
-          lastName: '',
-          avatar: receiver?.profile_image_url_https,
+          firstName: params?.first_name || params?.name,
+          lastName: params?.last_name || '',
+          avatar: params?.profile_image_url_https,
           isUser: true
         })
       },
@@ -158,19 +167,21 @@ export const getOrCreateConversationAndMessage = async (
 export const getOrCreateTweet = async (
   models: IModels,
   subdomain: string,
-  params: ITweetParams,
+  tweetParams: ITweetParams,
   integration: IIntegrationDocument,
   customerErxesApiId: string
 ) => {
-  let tweet = await models.Tweets.findOne({ tweetId: params.id_str });
+  let tweet = await models.Tweets.findOne({
+    tweetId: tweetParams.id_str
+  });
 
   if (tweet) {
     return tweet;
   }
 
   const doc: IDoc = {
-    tweetId: params.id_str,
-    content: params.text
+    tweetId: tweetParams.id_str,
+    content: tweetParams.text
   };
   tweet = await models.Tweets.create(doc);
 

@@ -30,7 +30,10 @@ const extractUrlFromAttachment = attachment => {
 const receiveDms = async (models: IModels, subdomain, requestBody) => {
   const { direct_message_events } = requestBody;
 
-  const users: IUsers = requestBody.users;
+  let params = {} as any;
+
+  params.first_name = requestBody.users.name;
+  params.profile_image_url_https = requestBody.users.profile_image_url_https;
 
   if (!direct_message_events) {
     return true;
@@ -39,7 +42,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
   for (const event of direct_message_events) {
     const { type, message_create, id, created_timestamp } = event;
 
-    const senderId = message_create.sender_id;
+    const userId = message_create.sender_id;
     const receiverId = message_create.target.recipient_id;
     const eventId = id;
 
@@ -67,8 +70,8 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         models,
         subdomain,
         integration,
-        senderId,
-        users[senderId]
+        userId,
+        params
       );
 
       const content = message_data.text;
@@ -78,7 +81,7 @@ const receiveDms = async (models: IModels, subdomain, requestBody) => {
         models,
         subdomain,
         integration.inboxId,
-        senderId,
+        userId,
         receiverId,
         eventId,
         customerId,
