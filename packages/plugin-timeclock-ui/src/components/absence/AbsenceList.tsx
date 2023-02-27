@@ -62,7 +62,7 @@ function AbsenceList(props: Props) {
 
   const actionBarRight = (
     <ModalTrigger
-      title={__('Absence Config')}
+      title={__('Create Request')}
       trigger={trigger}
       content={modalContent}
     />

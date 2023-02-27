@@ -50,6 +50,10 @@ export const types = `
     explRequired: Boolean
     attachRequired: Boolean
     shiftRequest: Boolean
+
+    requestType: String
+    requestTimeType: String
+    requestHoursPerDay: Float
   }
 
   
@@ -225,6 +229,11 @@ const absenceType_params = `
     explRequired: Boolean
     attachRequired: Boolean
     shiftRequest: Boolean
+
+    requestType: String
+    requestTimeType: String
+    requestHoursPerDay: Float
+  
 `;
 
 export const queries = `

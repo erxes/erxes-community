@@ -39,6 +39,10 @@ export interface IAbsenceType {
   explRequired: boolean;
   attachRequired: boolean;
   shiftRequest: boolean;
+
+  requestType: string;
+  requestTimeType: string;
+  requestHoursPerDay?: number;
 }
 
 export interface IReport {

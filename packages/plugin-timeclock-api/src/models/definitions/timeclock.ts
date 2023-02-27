@@ -42,6 +42,11 @@ export interface IAbsence {
 }
 export interface IAbsenceType {
   name: string;
+
+  requestType?: string;
+  requestTimeType?: string;
+  requestHoursPerDay?: number;
+
   explRequired: boolean;
   attachRequired: boolean;
   shiftRequest: boolean;
@@ -167,6 +172,14 @@ export const timeSchema = new Schema({
 export const absenceTypeSchema = new Schema({
   _id: field({ pkey: true }),
   name: field({ type: String, label: 'Absence type' }),
+
+  requestType: field({ type: String, label: 'Type of a request' }),
+  requestTimeType: field({ type: String, label: 'Either by day or by hours' }),
+  requestHoursPerDay: field({
+    type: Number,
+    label: 'Hours per day if requestTimeType is by day'
+  }),
+
   explRequired: field({
     type: Boolean,
     label: 'whether absence type requires explanation'
