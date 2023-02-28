@@ -32,11 +32,15 @@ export interface ITimeLogDocument extends ITimeLog, Document {
 export interface IAbsence {
   holidayName?: string;
   userId?: string;
+
   startTime: Date;
   endTime?: Date;
+  checkTime?: Date;
+  checkInOutRequest?: boolean;
+
   reason?: string;
   explanation?: string;
-  status: string;
+  status?: string;
   solved?: boolean;
   absenceTypeId?: string;
 }
@@ -107,7 +111,7 @@ export interface IScheduleConfigDocument extends IScheduleConfig, Document {
 
 export interface IDeviceConfig {
   deviceName?: string;
-  serialNo?: string;
+  serialNo: string;
   extractRequired?: boolean;
 }
 
@@ -211,6 +215,10 @@ export const absenceSchema = new Schema({
   status: field({
     type: String,
     label: 'Status of absence request, whether approved or rejected'
+  }),
+  checkInOutRequest: field({
+    type: Boolean,
+    label: 'Whether request is check in/out request'
   }),
   absenceTypeId: field({
     type: String,

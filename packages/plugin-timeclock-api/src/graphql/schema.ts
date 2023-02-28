@@ -270,6 +270,8 @@ export const mutations = `
   absenceTypeEdit(_id: String, ${absenceType_params}): AbsenceType
   sendAbsenceRequest(${absence_params}): Absence
   
+  submitCheckInOutRequest(checkType: String,userId: String, checkTime: Date, absenceTypeId: String): AbsenceType
+  
   sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String): Schedule
   submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String): Schedule
   

@@ -204,6 +204,13 @@ mutation extractTimeLogsFromMsSQL($startDate: String, $endDate: String){
   }
 }`;
 
+const submitCheckInOutRequest = `
+mutation submitCheckInOutRequest($checkType: String, $userId: String, $checkTime: Date, $absenceTypeId: String){
+  submitCheckInOutRequest(checkType: $checkType, userId: $userId, checkTime: $checkTime, absenceTypeId: $absenceTypeId){
+    _id
+  }
+}`;
+
 export default {
   sendScheduleRequest,
   submitSchedule,
@@ -211,27 +218,36 @@ export default {
   absenceTypeAdd,
   absenceTypeEdit,
   absenceTypeRemove,
+
   solveAbsence,
   solveSchedule,
   solveShift,
+
   timeclockEdit,
   timeclockRemove,
   timeclockStart,
   timeclockStop,
+
   payDateAdd,
   payDateEdit,
   payDateRemove,
+
   holidayAdd,
   holidayEdit,
   holidayRemove,
+
   scheduleRemove,
   scheduleShiftRemove,
   scheduleConfigAdd,
   scheduleConfigEdit,
   scheduleConfigRemove,
+
   deviceConfigAdd,
   deviceConfigEdit,
   deviceConfigRemove,
+
+  submitCheckInOutRequest,
+
   extractAllDataFromMsSQL,
   extractTimeLogsFromMsSql
 };

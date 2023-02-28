@@ -71,7 +71,9 @@ const timeclockQueries = {
       }
     };
 
-    return models.TimeLogs.find({ $and: [{ userId: `${userId}` }, timeField] });
+    return models.TimeLogs.find({
+      $and: [{ userId: `${userId}` }, timeField]
+    }).sort({ timelog: 1 });
   },
 
   async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {
