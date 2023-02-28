@@ -429,7 +429,7 @@ const createNewTimeClock = (
         shiftStart: getShiftStart,
         shiftEnd: getShiftEnd,
         shiftActive: false,
-        userId: `${userId}`,
+        userId,
         deviceName: getDeviceName,
         deviceType: 'faceTerminal'
       };
@@ -448,7 +448,7 @@ const createNewTimeClock = (
     const newTime = {
       shiftStart: getShiftStart,
       shiftActive: true,
-      userId: `${userId}`,
+      userId,
       deviceName: getDeviceName,
       deviceType: 'faceTerminal'
     };
