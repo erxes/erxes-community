@@ -8,6 +8,8 @@ query KhanbankConfigsList($page: Int, $perPage: Int) {
           _id
           title
         }
+        consumerKey
+        secretKey
         description
         name
         userIds
@@ -22,6 +24,7 @@ query KhanbankConfigsList($page: Int, $perPage: Int) {
           }
         }
       }
+      totalCount
     }
   }
 `;

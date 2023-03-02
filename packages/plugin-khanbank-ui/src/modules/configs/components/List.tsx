@@ -1,5 +1,6 @@
 import Button from '@erxes/ui/src/components/Button';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
+import EmptyContent from '@erxes/ui/src/components/empty/EmptyContent';
 import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
@@ -7,12 +8,14 @@ import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
-// import { submenu } from '../../../utils';
-
-// import CityForm from '../containers/Form';
+import Form from '../containers/Form';
 
 import { IKhanbankConfigsItem } from '../types';
 import Row from './Row';
+
+// import { submenu } from '../../../utils';
+
+// import CityForm from '../containers/Form';
 
 type Props = {
   configs: IKhanbankConfigsItem[];
@@ -28,6 +31,7 @@ const List = (props: Props) => {
 
   const renderRow = () => {
     const { configs } = props;
+
     return configs.map(config => (
       <Row key={config._id} config={config} remove={remove} />
     ));
@@ -42,14 +46,12 @@ const List = (props: Props) => {
     </Button>
   );
 
-  const formContent = props => {
-    return <> form here </>;
-  };
+  const formContent = props => <Form {...props} />;
 
   const righActionBar = (
     <ModalTrigger
       size="lg"
-      title="config"
+      title="Corporate Gateway Config"
       autoOpenKey="showAppAddModal"
       trigger={trigger}
       content={formContent}
@@ -88,8 +90,8 @@ const List = (props: Props) => {
       }
       mainHead={
         <HeaderDescription
-          icon="/images/actions/32.svg"
-          title={'Khanbank Corporate Gateway Configs'}
+          icon="/images/actions/27.svg"
+          title={'Khanbank Corporate Gateway'}
           description={__(
             `Corporate Gateway enables you access banking services through erxes.`
           )}
@@ -103,15 +105,24 @@ const List = (props: Props) => {
           loading={loading}
           count={totalCount}
           emptyContent={
-            <h3
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
+            <EmptyContent
+              content={{
+                title: __('Getting Started with Khanbank Corporate Gateway'),
+                steps: [
+                  {
+                    title: __('Create Corporate Gateway config'),
+                    description: __(
+                      'Register at Khanbank and become a Khanbank customer'
+                    ),
+                    url: `https://www.khanbank.com/en/corporate/product/429?activetab=2`,
+                    urlText: 'Apply for Corporate Gateway',
+                    isOutside: true,
+                    target: '_blank'
+                  }
+                ]
               }}
-            >
-              no data
-            </h3>
+              maxItemWidth="360px"
+            />
           }
         />
       }

@@ -8,14 +8,18 @@ const queries = {
     { page, perPage }: { page: number; perPage: number },
     { models }: IContext
   ) {
-    const response = await models.KhanbankConfigs.find({}).sort({
-      createdAt: -1
-    });
-
-    const totalCount = await models.KhanbankConfigs.find({}).countDocuments();
+    const totalCount = await models.KhanbankConfigs.find({}).count();
 
     return {
-      list: paginate(response, { page: page || 1, perPage: perPage || 20 }),
+      list: paginate(
+        models.KhanbankConfigs.find({})
+          .sort({ createdAt: -1 })
+          .lean(),
+        {
+          page: page || 1,
+          perPage: perPage || 20
+        }
+      ),
       totalCount
     };
   },

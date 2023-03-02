@@ -5,6 +5,7 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
+import Form from '../containers/Form';
 
 import { IKhanbankConfigsItem } from '../types';
 
@@ -33,9 +34,7 @@ const Row = (props: Props) => {
     );
   };
 
-  const formContent = props => {
-    return <> form here </>;
-  };
+  const formContent = props => <Form {...props} config={config} />;
 
   return (
     <tr>

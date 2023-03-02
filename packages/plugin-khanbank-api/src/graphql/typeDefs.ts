@@ -6,6 +6,12 @@ import {
   types as configTypes
 } from './schema/configs';
 
+import {
+  mutations as accountMutations,
+  queries as accountQueries,
+  types as accountTypes
+} from './schema/khanbankAccounts';
+
 const typeDefs = async () => {
   return gql`
     scalar JSON
@@ -31,15 +37,16 @@ const typeDefs = async () => {
     }
     
     ${configTypes}
-s
+    ${accountTypes}
+
     extend type Query {
       ${configQueries}
-
+      ${accountQueries}
     }
     
     extend type Mutation {
       ${configMutations}
-
+      ${accountMutations}
     }
   `;
 };
