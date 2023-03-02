@@ -3,19 +3,23 @@ import queryString from 'query-string';
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-const List = asyncComponent(() =>
-  import(/* webpackChunkName: "List - Kbcgws" */ './containers/List')
+const ConfigsList = asyncComponent(() =>
+  import(/* webpackChunkName: "CityList" */ './modules/configs/containers/List')
 );
 
-const kbcgws = ({ location, history }) => {
+const configsList = history => {
+  const { location } = history;
   const queryParams = queryString.parse(location.search);
-  const { type } = queryParams;
 
-  return <List typeId={type} history={history} />;
+  return <ConfigsList queryParams={queryParams} history={history} />;
 };
 
 const routes = () => {
-  return <Route path="/kbcgws/" component={kbcgws} />;
+  return (
+    <>
+      <Route path="/settings/khanbank" component={configsList} />
+    </>
+  );
 };
 
 export default routes;

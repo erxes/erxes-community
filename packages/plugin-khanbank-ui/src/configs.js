@@ -4,18 +4,18 @@ module.exports = {
   scope: 'khanbank',
   exposes: {
     './routes': './src/routes.tsx',
-    './extendSystemConfig': './src/modules/config/components/Config.tsx'
+    // './extendSystemConfig': './src/modules/config/components/Config.tsx'
   },
   routes: {
     url: 'http://localhost:3017/remoteEntry.js',
     scope: 'khanbank',
     module: './routes',
   },
-  extendSystemConfig: './extendSystemConfig',
+  // extendSystemConfig: './extendSystemConfig',
   menus: [
     {
       text: 'Khanbank Corporate Gateway',
-      to: '/khanbank-corporate-gateway',
+      to: '/settings/khanbank',
       image: '/images/icons/erxes-18.svg',
       location: 'settings',
       scope: 'khanbank',
