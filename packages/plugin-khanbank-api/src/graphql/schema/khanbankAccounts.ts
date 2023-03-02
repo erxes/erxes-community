@@ -9,6 +9,20 @@ export const types = `
     name: String
     holdBalance: Float
     availableBalance: Float
+    openDate: String
+    homeBranch: String
+    intMethod: String
+    intRate: String
+    customerName: String
+    homePhone: String
+    businessPhone: String
+
+    lastMaintenceDate: String
+    lastFinancialTranDate: String
+
+    intFrom: String
+    intTo: String
+    addr1: String
   }
 `;
 
@@ -27,4 +41,6 @@ const qryParams = `
 
 export const queries = `
   khanbankAccounts(configId: String!): [KhanbankAccount]
+  khanbankAccountBalance(configId: String!, accountNumber: String!): KhanbankAccount
+  khanbankAccountDetail(configId: String!, accountNumber: String!): KhanbankAccount
 `;

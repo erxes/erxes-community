@@ -50,8 +50,8 @@ const List = (props: Props) => {
 
   const righActionBar = (
     <ModalTrigger
-      size="lg"
-      title="Corporate Gateway Config"
+      size="sm"
+      title="Corporate Gateway"
       autoOpenKey="showAppAddModal"
       trigger={trigger}
       content={formContent}

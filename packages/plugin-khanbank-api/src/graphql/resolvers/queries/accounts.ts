@@ -1,5 +1,9 @@
+import {
+  getAccountBalance,
+  getAccountDetail,
+  getAccounts
+} from '../../../api/accounts';
 import { IContext } from '../../../connectionResolver';
-import * as api from '../../../khanbankApi/api';
 
 const queries = {
   async khanbankAccounts(
@@ -8,7 +12,31 @@ const queries = {
     { models }: IContext
   ) {
     try {
-      return api.getAccounts(models, configId);
+      return getAccounts(models, configId);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  async khanbankAccountBalance(
+    _root,
+    { configId, accountNumber }: { configId: string; accountNumber: string },
+    { models }: IContext
+  ) {
+    try {
+      return getAccountBalance(models, configId, accountNumber);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  async khanbankAccountDetail(
+    _root,
+    { configId, accountNumber }: { configId: string; accountNumber: string },
+    { models }: IContext
+  ) {
+    try {
+      return getAccountDetail(models, configId, accountNumber);
     } catch (e) {
       throw new Error(e.message);
     }
