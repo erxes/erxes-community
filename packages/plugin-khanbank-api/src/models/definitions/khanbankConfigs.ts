@@ -14,12 +14,14 @@ export interface IKhanbankConfig {
 
 export interface IKhanbankConfigDocument extends IKhanbankConfig, Document {
   _id: string;
+  createdAt: Date;
 }
 
 export const khanbankConfigSchema = new Schema({
   _id: field({ pkey: true }),
   name: field({ type: String, required: true }),
   description: field({ type: String }),
+  createdAt: field({ type: Date, default: Date.now }),
   departmentIds: field({ type: [String] }),
   userIds: field({ type: [String] }),
 

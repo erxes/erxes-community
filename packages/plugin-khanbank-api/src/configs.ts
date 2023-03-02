@@ -9,12 +9,12 @@ export let graphqlPubsub;
 export let serviceDiscovery;
 
 export default {
-  name: 'kbcgw',
+  name: 'khanbank',
   graphql: async sd => {
     serviceDiscovery = sd;
 
     return {
-      typeDefs: await typeDefs(sd),
+      typeDefs: await typeDefs(),
       resolvers: await resolvers(sd)
     };
   },
