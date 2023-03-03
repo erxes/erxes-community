@@ -1,9 +1,5 @@
-import {
-  getAccountBalance,
-  getAccountDetail,
-  getAccounts
-} from '../../../api/accounts';
 import { IContext } from '../../../connectionResolver';
+import Khanbank from '../../../khanbank/khanbank';
 
 const queries = {
   async khanbankAccounts(
@@ -12,19 +8,10 @@ const queries = {
     { models }: IContext
   ) {
     try {
-      return getAccounts(models, configId);
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  },
+      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
+      const khanbank = new Khanbank(config);
 
-  async khanbankAccountBalance(
-    _root,
-    { configId, accountNumber }: { configId: string; accountNumber: string },
-    { models }: IContext
-  ) {
-    try {
-      return getAccountBalance(models, configId, accountNumber);
+      return khanbank.accounts.list();
     } catch (e) {
       throw new Error(e.message);
     }
@@ -36,7 +23,72 @@ const queries = {
     { models }: IContext
   ) {
     try {
-      return getAccountDetail(models, configId, accountNumber);
+      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
+      const khanbank = new Khanbank(config);
+
+      return khanbank.accounts.get(accountNumber);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  async khanbankAccountHolder(
+    _root,
+    { configId, accountNumber }: { configId: string; accountNumber: string },
+    { models }: IContext
+  ) {
+    try {
+      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
+      const khanbank = new Khanbank(config);
+
+      return khanbank.accounts.getHolder(accountNumber);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  async khanbankStatements(
+    _root,
+    args: {
+      configId: string;
+      accountNumber: string;
+      startDate?: Date;
+      endDate?: Date;
+      page?: number;
+      perPage?: number;
+    },
+    { models }: IContext
+  ) {
+    const { configId } = args;
+
+    try {
+      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
+      const khanbank = new Khanbank(config);
+
+      return await khanbank.statements.list(args);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  async khanbankStatementsAfterRecord(
+    _root,
+    args: {
+      configId: string;
+      accountNumber: string;
+      record: number;
+      page?: number;
+      perPage?: number;
+    },
+    { models }: IContext
+  ) {
+    const { configId } = args;
+
+    try {
+      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
+      const khanbank = new Khanbank(config);
+
+      return await khanbank.statements.list(args);
     } catch (e) {
       throw new Error(e.message);
     }
