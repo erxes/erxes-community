@@ -1,6 +1,7 @@
 import { IKhanbankConfigDocument } from '../models/definitions/khanbankConfigs';
 import { AccountsApi } from './api/accounts';
 import { StatementsApi } from './api/statements';
+import { TaxesApi } from './api/taxes';
 import { TransferApi } from './api/transfer';
 
 class Khanbank {
@@ -10,6 +11,7 @@ class Khanbank {
   public accounts: AccountsApi;
   public statements: StatementsApi;
   public transfer: TransferApi;
+  public taxes: TaxesApi;
 
   constructor(config: IKhanbankConfigDocument) {
     const auth = {
@@ -29,6 +31,7 @@ class Khanbank {
     this.accounts = new AccountsApi(this);
     this.statements = new StatementsApi(this);
     this.transfer = new TransferApi(this);
+    this.taxes = new TaxesApi(this);
   }
 }
 

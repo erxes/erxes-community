@@ -1,4 +1,11 @@
 export const types = `
+type KhanbankAccountHolder {
+  number: String
+  currency: String
+  custFirstName: String
+  custLastName: String
+}
+
   type KhanbankAccount {
     number: String
     type: String
@@ -12,7 +19,6 @@ export const types = `
     homeBranch: String
     intMethod: String
     intRate: String
-    customerName: String
     homePhone: String
     businessPhone: String
 
@@ -22,6 +28,8 @@ export const types = `
     intFrom: String
     intTo: String
     addr1: String
+
+    holderInfo(configId: String!, accountNumber: String!): KhanbankAccountHolder
   }
 
   type KhanbankTransaction {
@@ -64,19 +72,6 @@ export const types = `
     transactions: [KhanbankTransaction]
   }
 
-  type KhanbankAccountHolder {
-    number: String
-    currency: String
-    custFirstName: String
-    custLastName: String
-  }
-`;
-
-const mutationParams = `
-
-`;
-
-export const mutations = `
 
 `;
 
@@ -86,8 +81,8 @@ const paginationParams = `
 `;
 
 const dateParams = `
-    startDate: Date
-    endDate: Date
+    startDate: String
+    endDate: String
 `;
 
 export const queries = `

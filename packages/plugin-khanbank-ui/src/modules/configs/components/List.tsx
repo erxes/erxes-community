@@ -13,10 +13,6 @@ import Form from '../containers/Form';
 import { IKhanbankConfigsItem } from '../types';
 import Row from './Row';
 
-// import { submenu } from '../../../utils';
-
-// import CityForm from '../containers/Form';
-
 type Props = {
   configs: IKhanbankConfigsItem[];
   totalCount: number;

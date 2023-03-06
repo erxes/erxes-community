@@ -7,10 +7,20 @@ import {
 } from './schema/configs';
 
 import {
-  mutations as accountMutations,
   queries as accountQueries,
   types as accountTypes
-} from './schema/khanbankAccounts';
+} from './schema/accounts';
+
+import {
+  mutations as transferMutations,
+  types as transferTypes
+} from './schema/transfer';
+
+import {
+  mutations as taxMutations,
+  queries as taxQueries,
+  types as taxTypes
+} from './schema/taxes';
 
 const typeDefs = async () => {
   return gql`
@@ -38,15 +48,19 @@ const typeDefs = async () => {
     
     ${configTypes}
     ${accountTypes}
+    ${transferTypes}
+    ${taxTypes}
 
     extend type Query {
       ${configQueries}
       ${accountQueries}
+      ${taxQueries}
     }
     
     extend type Mutation {
       ${configMutations}
-      ${accountMutations}
+      ${transferMutations}
+      ${taxMutations}
     }
   `;
 };

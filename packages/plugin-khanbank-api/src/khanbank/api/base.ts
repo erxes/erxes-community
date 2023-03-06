@@ -35,6 +35,8 @@ export class BaseApi {
 
       return sendRequest(requestOptions);
     } catch (e) {
+      console.log('222222222');
+
       throw new Error(e.message);
     }
   }

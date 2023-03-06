@@ -43,7 +43,7 @@ export class TransferApi extends BaseApi {
   }
 
   /**
-   * make transfer from khanbank to khanbank
+   * make transfer from khanbank to other banks
    * @param {string} fromAccount - from account number
    * @param {string} toAccount - to account number
    * @param {number} amount - amount
@@ -52,9 +52,18 @@ export class TransferApi extends BaseApi {
    * @param {string} loginName - login name
    * @param {string} password - password
    * @param {string} transferid - transfer id
+   * @param {string} toCurrency - to currency
+   * @param {string} toAccountName - to account name
+   * @param {string} toBank - to bank
    * @return {object} - Returns a response object
    */
-  async interbank(args: TransferParams) {
+  async interbank(
+    args: TransferParams & {
+      toCurrency: string;
+      toAccountName: string;
+      toBank: string;
+    }
+  ) {
     const { password } = args;
 
     const data: any = args;

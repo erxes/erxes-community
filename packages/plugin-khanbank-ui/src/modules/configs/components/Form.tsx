@@ -18,7 +18,6 @@ type Props = {
 };
 
 const ConfigForm = (props: Props) => {
-  console.log('configggg ', props);
   const { config } = props;
 
   const [configObject, setConfigObject] = useState<

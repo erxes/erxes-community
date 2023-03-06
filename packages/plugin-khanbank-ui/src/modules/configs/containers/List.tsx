@@ -4,15 +4,18 @@ import React from 'react';
 import { useMutation, useQuery } from 'react-apollo';
 import gql from 'graphql-tag';
 import List from '../components/List';
+import SidebarList from '../../corporateGateway/components/ConfigsList';
 import { mutations, queries } from '../graphql';
 import { ConfigsListQueryResponse } from '../types';
+import { IRouterProps } from '@erxes/ui/src/types';
 
 type Props = {
-  refetch: () => void;
+  refetch?: () => void;
+  history?: any;
   queryParams: any;
-};
+} & IRouterProps;
 
-export default function CityContainer(props: Props) {
+export default function ListContainer(props: Props) {
   const { data, loading, refetch } = useQuery<ConfigsListQueryResponse>(
     gql(queries.listQuery),
     {
@@ -25,12 +28,12 @@ export default function CityContainer(props: Props) {
 
   const [removeMutation] = useMutation(gql(mutations.removeMutation));
 
-  const remove = (cityId: string) => {
+  const remove = (_id: string) => {
     const message = 'Are you sure want to remove this config ?';
 
     confirm(message).then(() => {
       removeMutation({
-        variables: { _id: cityId }
+        variables: { _id }
       })
         .then(() => {
           refetch();
@@ -55,6 +58,14 @@ export default function CityContainer(props: Props) {
     refetch,
     remove
   };
+
+  if (
+    props.history &&
+    props.history.location &&
+    props.history.location.pathname !== '/settings/khanbank'
+  ) {
+    return <SidebarList {...extendedProps} />;
+  }
 
   return <List {...extendedProps} />;
 }

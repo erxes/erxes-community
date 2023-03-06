@@ -7,10 +7,11 @@ const queries = {
     { configId }: { configId: string },
     { models }: IContext
   ) {
-    try {
-      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
-      const khanbank = new Khanbank(config);
+    const config = await models.KhanbankConfigs.getConfig({ _id: configId });
 
+    const khanbank = new Khanbank(config);
+
+    try {
       return khanbank.accounts.list();
     } catch (e) {
       throw new Error(e.message);
@@ -22,10 +23,11 @@ const queries = {
     { configId, accountNumber }: { configId: string; accountNumber: string },
     { models }: IContext
   ) {
-    try {
-      const config = await models.KhanbankConfigs.getConfig({ _id: configId });
-      const khanbank = new Khanbank(config);
+    const config = await models.KhanbankConfigs.getConfig({ _id: configId });
 
+    const khanbank = new Khanbank(config);
+
+    try {
       return khanbank.accounts.get(accountNumber);
     } catch (e) {
       throw new Error(e.message);

@@ -30,7 +30,7 @@ export class StatementsApi extends BaseApi {
   }) {
     const { accountNumber, startDate, endDate, page, perPage, record } = args;
 
-    let queryParams: any = {};
+    const queryParams: any = {};
 
     if (startDate) {
       queryParams.from = formatDate(startDate);
@@ -64,6 +64,7 @@ export class StatementsApi extends BaseApi {
       });
     } catch (e) {
       console.error(e);
+      console.log('111111111111');
       throw new Error(e.message);
     }
   }

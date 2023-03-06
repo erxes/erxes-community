@@ -37,7 +37,7 @@ export const getAuthHeaders = async (args: {
       `khanbank_token_${consumerKey}:${secretKey}`,
       response.access_token,
       'EX',
-      response.access_token_expires_in
+      response.access_token_expires_in - 60
     );
 
     return {
@@ -52,8 +52,15 @@ export const getAuthHeaders = async (args: {
 export const formatDate = (date: Date) => {
   const d = new Date(date);
 
-  const month = `${d.getMonth() + 1}`;
-  const day = `${d.getDate()}`;
+  const fixDigit = num => {
+    if (num.length === 1) {
+      return `0${num}`;
+    }
+    return num;
+  };
+
+  const month = fixDigit(String(d.getMonth() + 1));
+  const day = fixDigit(String(d.getDate()));
   const year = d.getFullYear();
 
   return `${year}${month}${day}`;
