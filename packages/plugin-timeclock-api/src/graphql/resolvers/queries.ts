@@ -259,11 +259,9 @@ const timeclockQueries = {
         );
 
         for (const userId of Object.keys(reportPivot)) {
-          if (userId !== 'scheduleReport') {
-            returnReport.push({
-              groupReport: [{ userId, ...reportPivot[userId] }]
-            });
-          }
+          returnReport.push({
+            groupReport: [{ userId, ...reportPivot[userId] }]
+          });
         }
         break;
     }
