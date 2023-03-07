@@ -21,6 +21,8 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 type Props = {
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
+  getPagination: (pagination: any) => void;
+
   history: any;
   queryParams: any;
   absenceTypeId?: string;
@@ -175,9 +177,13 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
+  const { list = [], totalCount = 0 } =
+    listDeviceConfigsQuery.deviceConfigs || {};
+
   const updatedProps = {
     ...props,
-    deviceConfigs: listDeviceConfigsQuery.deviceConfigs,
+    deviceConfigs: list,
+    deviceConfigsTotalCount: totalCount,
     scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs,
     holidays: listHolidaysQuery.holidays,
     absenceTypes: listAbsenceTypesQuery.absenceTypes,

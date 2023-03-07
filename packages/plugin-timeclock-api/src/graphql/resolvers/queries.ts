@@ -34,6 +34,12 @@ const timeclockQueries = {
 
   async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
     const selector = await generateFilter(queryParams, subdomain, 'timeclock');
+
+    // if there's no common user, return empty list
+    if (!Object.keys(selector).length) {
+      return { list: [], totalCount: 0 };
+    }
+
     const totalCount = models.Timeclocks.find(selector).countDocuments();
 
     const list = paginate(
@@ -67,6 +73,11 @@ const timeclockQueries = {
     const selector = await generateFilter(queryParams, subdomain, 'timelog');
     const queryList = models.TimeLogs.find(selector);
 
+    // if there's no common user, return empty list
+    if (!Object.keys(selector).length) {
+      return { list: [], totalCount: 0 };
+    }
+
     const list = paginate(
       models.TimeLogs.find(selector).sort({ userId: 1, timelog: -1 }),
       { perPage: queryParams.perPage, page: queryParams.page }
@@ -94,6 +105,11 @@ const timeclockQueries = {
     const selector = await generateFilter(queryParams, subdomain, 'schedule');
     const totalCount = models.Schedules.find(selector).countDocuments();
 
+    // if there's no common user, return empty list
+    if (!Object.keys(selector).length) {
+      return { list: [], totalCount: 0 };
+    }
+
     const list = paginate(models.Schedules.find(selector), {
       perPage: queryParams.perPage,
       page: queryParams.page
@@ -106,13 +122,25 @@ const timeclockQueries = {
     return models.ScheduleConfigs.find();
   },
 
-  deviceConfigs(_root, {}, { models }: IContext) {
-    return models.DeviceConfigs.find();
+  deviceConfigs(_root, queryParams, { models }: IContext) {
+    const totalCount = models.DeviceConfigs.find().countDocuments();
+
+    const list = paginate(models.DeviceConfigs.find(), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    });
+
+    return { list, totalCount };
   },
 
   async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
     const selector = await generateFilter(queryParams, subdomain, 'absence');
     const totalCount = models.Absences.find(selector).countDocuments();
+
+    // if there's no common user, return empty list
+    if (!Object.keys(selector).length) {
+      return { list: [], totalCount: 0 };
+    }
 
     const list = paginate(
       models.Absences.find(selector).sort({ startTime: -1 }),

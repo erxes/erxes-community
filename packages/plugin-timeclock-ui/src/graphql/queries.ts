@@ -81,7 +81,7 @@ const listTimeclocksMain = `
             deviceType
         }
         totalCount
-  }
+    }
 }
 `;
 const listSchedulesMain = `
@@ -267,12 +267,15 @@ const listScheduleConfigs = `
 `;
 
 const listDeviceConfigs = `
-query deviceConfigs {
-  deviceConfigs {
-    _id 
-    deviceName
-    serialNo
-    extractRequired
+query deviceConfigs (${listParamsDef}){
+  deviceConfigs(${listParamsValue}) {
+    list {
+      _id 
+      deviceName
+      serialNo
+      extractRequired
+    }
+    totalCount
   }
 }`;
 

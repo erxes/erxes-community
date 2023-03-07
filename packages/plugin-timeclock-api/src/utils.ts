@@ -954,45 +954,58 @@ const generateCommonUserIds = async (
   departmentIds?: string[]
 ) => {
   const totalUserIds: string[] = [];
-  let commonUser: boolean = false;
 
-  if (branchIds) {
-    const branchUsers = await findBranchUsers(subdomain, branchIds);
-    const branchUserIds = branchUsers.map(branchUser => branchUser._id);
+  const branchUsers =
+    branchIds && (await findBranchUsers(subdomain, branchIds));
 
-    if (userIds) {
-      commonUser = true;
-      for (const userId of userIds) {
-        if (branchUserIds.includes(userId)) {
-          totalUserIds.push(userId);
-        }
-      }
-    } else {
-      totalUserIds.push(...branchUserIds);
-    }
-  }
+  const departmentUsers =
+    departmentIds && (await findDepartmentUsers(subdomain, departmentIds));
 
-  if (departmentIds) {
-    const departmentUsers = await findDepartmentUsers(subdomain, departmentIds);
+  const branchUserIds =
+    branchUsers && branchUsers.map(branchUser => branchUser._id);
 
-    const departmentUserIds = departmentUsers.map(
-      departmentUser => departmentUser._id
+  const departmentUserIds =
+    departmentUsers &&
+    departmentUsers.map(departmentUser => departmentUser._id);
+
+  // if both branch and department are given find common users between them
+  if (branchIds && departmentIds) {
+    const intersectionOfUserIds = branchUserIds.filter(branchUserId =>
+      departmentUserIds.includes(branchUserId)
     );
 
-    if (userIds) {
-      commonUser = true;
-      for (const userId of userIds) {
-        if (departmentUserIds.includes(userId)) {
-          totalUserIds.push(userId);
-        }
+    return intersectionOfUserIds;
+  }
+
+  // if no branch/department was given return userIds
+  if (userIds && !branchUserIds && !departmentUserIds) {
+    return userIds;
+  }
+
+  // if both branch, userIds were given
+  if (branchUserIds) {
+    if (!userIds) {
+      return branchUserIds;
+    }
+
+    for (const userId of userIds) {
+      if (branchUserIds.includes(userId)) {
+        totalUserIds.push(userId);
       }
-    } else {
-      totalUserIds.push(...departmentUserIds);
     }
   }
 
-  if (!commonUser && userIds) {
-    totalUserIds.push(...userIds);
+  // if both department, userIds were given
+  if (departmentUserIds) {
+    if (!userIds) {
+      return departmentUserIds;
+    }
+
+    for (const userId of userIds) {
+      if (departmentUserIds.includes(userId)) {
+        totalUserIds.push(userId);
+      }
+    }
   }
 
   return totalUserIds;
