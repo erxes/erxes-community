@@ -1,5 +1,6 @@
 import { IContext } from '../../connectionResolver';
 import {
+  paginateArray,
   timeclockReportByUser,
   timeclockReportFinal,
   timeclockReportPivot,
@@ -13,9 +14,6 @@ import {
 } from '../../utils';
 import { fixDate, paginate } from '@erxes/api-utils/src';
 import { IReport } from '../../models/definitions/timeclock';
-
-const paginateArray = (array, perPage = 20, page = 1) =>
-  array.slice((page - 1) * perPage, page * perPage);
 
 const timeclockQueries = {
   async absences(_root, queryParams, { models, subdomain }: IContext) {

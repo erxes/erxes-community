@@ -15,6 +15,9 @@ const MMSTOHRS = 3600000;
 // milliseconds to mins
 const MMSTOMINS = 60000;
 
+export const paginateArray = (array, perPage = 20, page = 1) =>
+  array.slice((page - 1) * perPage, page * perPage);
+
 export const findBranches = async (subdomain: string, branchIds: string[]) => {
   const branches = await sendCoreMessage({
     subdomain,
