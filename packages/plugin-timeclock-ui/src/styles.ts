@@ -219,6 +219,10 @@ const FlexColumnCustom = styledTS<{
 
   `;
 
+const TextAlignCenter = styled.div`
+  text-align: center;
+`;
+
 const ToggleDisplay = styledTS<{
   display: boolean;
 }>(styled.div)`
@@ -271,5 +275,6 @@ export {
   ToggleButton,
   InlineBlock,
   Margin,
-  RowField
+  RowField,
+  TextAlignCenter
 };
