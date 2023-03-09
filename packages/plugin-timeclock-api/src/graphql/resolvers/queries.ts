@@ -31,10 +31,14 @@ const timeclockQueries = {
   },
 
   async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
-    const selector = await generateFilter(queryParams, subdomain, 'timeclock');
+    const [selector, commonUserFound] = await generateFilter(
+      queryParams,
+      subdomain,
+      'timeclock'
+    );
 
     // if there's no common user, return empty list
-    if (!Object.keys(selector).length) {
+    if (!commonUserFound) {
       return { list: [], totalCount: 0 };
     }
 
@@ -68,11 +72,15 @@ const timeclockQueries = {
   },
 
   async timelogsMain(_root, queryParams, { subdomain, models }: IContext) {
-    const selector = await generateFilter(queryParams, subdomain, 'timelog');
+    const [selector, commonUserFound] = await generateFilter(
+      queryParams,
+      subdomain,
+      'timelog'
+    );
     const queryList = models.TimeLogs.find(selector);
 
     // if there's no common user, return empty list
-    if (!Object.keys(selector).length) {
+    if (!commonUserFound) {
       return { list: [], totalCount: 0 };
     }
 
@@ -100,11 +108,15 @@ const timeclockQueries = {
   },
 
   async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {
-    const selector = await generateFilter(queryParams, subdomain, 'schedule');
+    const [selector, commonUserFound] = await generateFilter(
+      queryParams,
+      subdomain,
+      'schedule'
+    );
     const totalCount = models.Schedules.find(selector).countDocuments();
 
     // if there's no common user, return empty list
-    if (!Object.keys(selector).length) {
+    if (!commonUserFound) {
       return { list: [], totalCount: 0 };
     }
 
@@ -132,11 +144,15 @@ const timeclockQueries = {
   },
 
   async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
-    const selector = await generateFilter(queryParams, subdomain, 'absence');
+    const [selector, commonUserFound] = await generateFilter(
+      queryParams,
+      subdomain,
+      'absence'
+    );
     const totalCount = models.Absences.find(selector).countDocuments();
 
     // if there's no common user, return empty list
-    if (!Object.keys(selector).length) {
+    if (!commonUserFound) {
       return { list: [], totalCount: 0 };
     }
 

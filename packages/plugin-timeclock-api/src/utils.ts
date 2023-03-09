@@ -826,11 +826,17 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
 
   let returnFilter = {};
   let dateGiven: boolean = false;
+  let userIdsGiven: boolean = false;
+  let commonUserFound: boolean = true;
 
   const timeFields = returnTimeFieldsFilter(type, params);
 
   if (startDate || endDate) {
     dateGiven = true;
+  }
+
+  if (branchIds || departmentIds || userIds) {
+    userIdsGiven = true;
   }
 
   if (totalUserIds.length > 0) {
@@ -849,18 +855,16 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
     }
   }
 
-  if (
-    !departmentIds &&
-    !branchIds &&
-    !userIds &&
-    dateGiven &&
-    type !== 'schedule'
-  ) {
+  if (!userIdsGiven && dateGiven && type !== 'schedule') {
     returnFilter = { $or: timeFields };
   }
 
+  if (userIdsGiven && !totalUserIds.length) {
+    commonUserFound = false;
+  }
+
   // if no param is given, return empty filter
-  return returnFilter;
+  return [returnFilter, commonUserFound];
 };
 
 const returnTimeFieldsFilter = (type: string, queryParams: any) => {
