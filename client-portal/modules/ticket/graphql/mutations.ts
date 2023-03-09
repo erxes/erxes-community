@@ -47,5 +47,5 @@ const clientPortalCreateTicket = `
 export default {
   clientPortalCommentsAdd,
   clientPortalCommentsRemove,
-  clientPortalCreateTicket 
+  clientPortalCreateTicket
 };

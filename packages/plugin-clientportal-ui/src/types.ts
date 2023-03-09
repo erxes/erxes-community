@@ -93,6 +93,7 @@ export type ClientPortalConfig = {
   knowledgeBaseLabel?: string;
   knowledgeBaseTopicId?: string;
   ticketLabel?: string;
+  dealLabel?: string;
   taskPublicBoardId?: string;
   taskPublicPipelineId?: string;
   taskLabel?: string;
@@ -102,6 +103,9 @@ export type ClientPortalConfig = {
   ticketStageId?: string;
   ticketBoardId?: string;
   ticketPipelineId?: string;
+  dealStageId?: string;
+  dealBoardId?: string;
+  dealPipelineId?: string;
   styles?: Styles;
   mobileResponsive?: boolean;
   googleCredentials?: object;
@@ -109,6 +113,7 @@ export type ClientPortalConfig = {
   kbToggle?: boolean;
   publicTaskToggle?: boolean;
   ticketToggle?: boolean;
+  dealToggle?: boolean;
   taskToggle?: boolean;
   otpConfig?: OTPConfig;
   mailConfig?: MailConfig;
