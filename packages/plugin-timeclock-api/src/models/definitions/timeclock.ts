@@ -119,6 +119,15 @@ export interface IDeviceConfigDocument extends IDeviceConfig, Document {
   _id: string;
 }
 
+export interface IReportCheck {
+  userId: string;
+  startDate: string;
+  endDate: string;
+}
+export interface IReportCheckDocument extends IReportCheck, Document {
+  _id: string;
+}
+
 export const attachmentSchema = new Schema(
   {
     name: field({ type: String }),
@@ -241,6 +250,10 @@ export const scheduleSchema = new Schema({
   scheduleConfigId: field({
     type: String,
     label: 'Schedule Config id used for reports'
+  }),
+  scheduleChecked: field({
+    type: Boolean,
+    label: 'Whether schedule is checked by employee'
   })
 });
 
@@ -309,6 +322,16 @@ export const deviceConfigSchema = new Schema({
   extractRequired: field({
     type: Boolean,
     label: 'whether extract from the device'
+  })
+});
+
+export const reportCheckSchema = new Schema({
+  _id: field({ pkey: true }),
+  userId: field({ type: String, label: 'User of the report' }),
+  startDate: field({ type: String, label: 'Start date of report' }),
+  endDate: field({
+    type: String,
+    label: 'End date of report'
   })
 });
 

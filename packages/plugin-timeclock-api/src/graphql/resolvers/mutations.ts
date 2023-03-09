@@ -587,6 +587,10 @@ const timeclockMutations = {
     return models.DeviceConfigs.removeDeviceConfig(_id);
   },
 
+  checkReport(_root, doc, { models, user }: IContext) {
+    return models.ReportChecks.createReportCheck({ userId: user._id, ...doc });
+  },
+
   async extractAllDataFromMsSQL(
     _root,
     { startDate, endDate },
