@@ -588,7 +588,11 @@ const timeclockMutations = {
   },
 
   checkReport(_root, doc, { models, user }: IContext) {
-    return models.ReportChecks.createReportCheck({ userId: user._id, ...doc });
+    const getUserId = doc.userId || user._id;
+    return models.ReportChecks.createReportCheck({
+      userId: getUserId,
+      ...doc
+    });
   },
 
   async extractAllDataFromMsSQL(
@@ -612,6 +616,6 @@ const timeclockMutations = {
   }
 };
 
-moduleRequireLogin(timeclockMutations);
+// moduleRequireLogin(timeclockMutations);
 
 export default timeclockMutations;

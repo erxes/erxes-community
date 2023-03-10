@@ -183,6 +183,11 @@ const timeclockQueries = {
     return models.Schedules.findOne({ _id });
   },
 
+  checkedReportsPerUser(_root, doc, { models, user }: IContext) {
+    const userId = doc.userId || user._id;
+    return models.ReportChecks.find({ userId });
+  },
+
   async timeclockReportByUser(
     _root,
     { selectedUser },
