@@ -12,16 +12,23 @@ module.exports = {
   },
   menus: [
     {
-      text: 'Khanbank Corporate Gateway',
+      text: 'Khanbank',
       to: '/settings/khanbank',
-      image: '/images/icons/erxes-18.svg',
+      image: '/images/icons/erxes-25.png',
       location: 'settings',
       scope: 'khanbank',
     },
     {
-      text: 'Khanbank CG',
+      text: 'Khanbank',
       url: '/khanbank-corporate-gateway',
-      icon: 'icon-dollar',
+      icon: 'icon-dollar-alt',
+      location: 'mainNavigation'
+    },
+    {
+      text: 'Khanbank rates',
+      url: '/khanbank-rates',
+      scope: 'khanbank',
+      icon: 'icon-dollar-alt',
       location: 'mainNavigation'
     }
   ]

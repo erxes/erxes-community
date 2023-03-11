@@ -30,7 +30,7 @@ const KhanbankAccount = {
     const api = new Khanbank(config);
 
     try {
-      const holderInfo = await api.accounts.getHolder(accountNumber);
+      const holderInfo = await api.accounts.getHolder(accountNumber, '050000');
       return holderInfo;
     } catch (_e) {
       return null;

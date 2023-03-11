@@ -36,14 +36,18 @@ const queries = {
 
   async khanbankAccountHolder(
     _root,
-    { configId, accountNumber }: { configId: string; accountNumber: string },
+    {
+      configId,
+      accountNumber,
+      bankCode
+    }: { configId: string; accountNumber: string; bankCode?: string },
     { models }: IContext
   ) {
     try {
       const config = await models.KhanbankConfigs.getConfig({ _id: configId });
       const khanbank = new Khanbank(config);
 
-      return khanbank.accounts.getHolder(accountNumber);
+      return khanbank.accounts.getHolder(accountNumber, bankCode);
     } catch (e) {
       throw new Error(e.message);
     }
@@ -54,8 +58,8 @@ const queries = {
     args: {
       configId: string;
       accountNumber: string;
-      startDate?: Date;
-      endDate?: Date;
+      startDate?: string;
+      endDate?: string;
       page?: number;
       perPage?: number;
     },

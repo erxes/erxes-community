@@ -16,12 +16,16 @@ type Props = {
 } & IRouterProps;
 
 export default function ListContainer(props: Props) {
+  const isSettings = props.history.location.pathname === '/settings/khanbank';
+
+  const variables: any = {
+    ...router.generatePaginationParams(props.queryParams || {})
+  };
+
   const { data, loading, refetch } = useQuery<ConfigsListQueryResponse>(
     gql(queries.listQuery),
     {
-      variables: {
-        ...router.generatePaginationParams(props.queryParams || {})
-      },
+      variables: isSettings ? variables : {},
       fetchPolicy: 'network-only'
     }
   );
@@ -59,11 +63,7 @@ export default function ListContainer(props: Props) {
     remove
   };
 
-  if (
-    props.history &&
-    props.history.location &&
-    props.history.location.pathname !== '/settings/khanbank'
-  ) {
+  if (!isSettings) {
     return <SidebarList {...extendedProps} />;
   }
 

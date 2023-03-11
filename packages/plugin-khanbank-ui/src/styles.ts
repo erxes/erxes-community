@@ -50,3 +50,12 @@ export const BlockRow = styled(FlexRow)`
     }
   }
 `;
+
+export const AccountList = styled.div`
+  margin-top: ${dimensions.unitSpacing}px;
+  padding: ${dimensions.coreSpacing}px;
+`;
+
+export const Content = styled.div`
+  padding: ${dimensions.coreSpacing}px;
+`;

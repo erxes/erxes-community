@@ -49,19 +49,6 @@ export const getAuthHeaders = async (args: {
   }
 };
 
-export const formatDate = (date: Date) => {
-  const d = new Date(date);
-
-  const fixDigit = num => {
-    if (num.length === 1) {
-      return `0${num}`;
-    }
-    return num;
-  };
-
-  const month = fixDigit(String(d.getMonth() + 1));
-  const day = fixDigit(String(d.getDate()));
-  const year = d.getFullYear();
-
-  return `${year}${month}${day}`;
+export const formatDate = (date: string) => {
+  return date.replace(/-/g, '');
 };

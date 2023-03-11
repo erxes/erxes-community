@@ -5,10 +5,11 @@ import React from 'react';
 import { useQuery } from 'react-apollo';
 import Detail from '../components/Detail';
 import queries from '../graphql/queries';
+import { IRouterProps } from '@erxes/ui/src/types';
 
 type Props = {
   queryParams: any;
-};
+} & IRouterProps;
 
 const DetailContainer = (props: Props) => {
   const { _id, account } = props.queryParams;

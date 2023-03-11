@@ -12,8 +12,8 @@ export class StatementsApi extends BaseApi {
   /**
    * get statement list
    * @param {string} accountNumber - account number
-   * @param {Date} startDate - start date
-   * @param {Date} endDate - end date
+   * @param {string} startDate - start date string
+   * @param {string} endDate - end date string
    * @param {number} page - page number
    * @param {number} perPage - per page
    * @param {number} record - record number
@@ -22,15 +22,15 @@ export class StatementsApi extends BaseApi {
    */
   async list(args: {
     accountNumber: string;
-    startDate?: Date;
-    endDate?: Date;
+    startDate?: string;
+    endDate?: string;
     page?: number;
     perPage?: number;
     record?: number;
   }) {
     const { accountNumber, startDate, endDate, page, perPage, record } = args;
 
-    const queryParams: any = {};
+    const queryParams: any = { sort: 'date,desc' };
 
     if (startDate) {
       queryParams.from = formatDate(startDate);
@@ -56,6 +56,8 @@ export class StatementsApi extends BaseApi {
       delete queryParams.to;
     }
 
+    // queryParams.from = '20190101';
+
     try {
       return await this.request({
         method: 'GET',
@@ -64,7 +66,6 @@ export class StatementsApi extends BaseApi {
       });
     } catch (e) {
       console.error(e);
-      console.log('111111111111');
       throw new Error(e.message);
     }
   }

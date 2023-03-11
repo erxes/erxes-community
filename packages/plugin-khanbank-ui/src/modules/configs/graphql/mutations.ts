@@ -1,22 +1,22 @@
 const addMutation = `
-mutation KhanbankConfigsAdd($consumerKey: String!, $name: String!, $secretKey: String!, $departmentIds: [String], $description: String, $userIds: [String]) {
-    khanbankConfigsAdd(consumerKey: $consumerKey, name: $name, secretKey: $secretKey, departmentIds: $departmentIds, description: $description, userIds: $userIds) {
+mutation KhanbankConfigsAdd($consumerKey: String!, $name: String!, $secretKey: String!,  $description: String) {
+    khanbankConfigsAdd(consumerKey: $consumerKey, name: $name, secretKey: $secretKey, description: $description) {
       _id
     }
   }
 `;
 
 const editMutation = `
-mutation KhanbankConfigsEdit($_id: String!, $consumerKey: String!, $name: String!, $secretKey: String!, $departmentIds: [String], $description: String, $userIds: [String]) {
-    khanbankConfigsEdit(_id: $_id, consumerKey: $consumerKey, name: $name, secretKey: $secretKey, departmentIds: $departmentIds, description: $description, userIds: $userIds) {
+mutation KhanbankConfigsEdit($_id: String!, $consumerKey: String!, $name: String!, $secretKey: String!, $description: String) {
+    khanbankConfigsEdit(_id: $_id, consumerKey: $consumerKey, name: $name, secretKey: $secretKey, description: $description) {
         _id
     }
 }
 `;
 
 const removeMutation = `
-mutation KhanbankConfigsRemove($id: [String]) {
-    khanbankConfigsRemove(_id: $id)
+mutation KhanbankConfigsRemove($_id: String) {
+    khanbankConfigsRemove(_id: $_id)
   }
 `;
 

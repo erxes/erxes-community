@@ -1,5 +1,19 @@
 import { QueryResponse } from '@erxes/ui/src/types';
 
+export interface IKhanbankTransactionInput {
+  type: 'domestic' | 'interbank';
+  transferid: string;
+  toCurrency: string;
+  toBank: string;
+  toAccountName: string;
+  toAccount: string;
+  password: string;
+  loginName: string;
+  fromAccount: string;
+  description: string;
+  currency: string;
+  amount: number;
+}
 export interface IKhanbankTransactionItem {
   amount: number;
   balance: number;

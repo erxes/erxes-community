@@ -45,7 +45,7 @@ export const loadKhanbankConfigClass = (models: IModels) => {
     }
 
     public static async removeConfig(_id: string) {
-      return models.KhanbankConfigs.deleteOne({ _id });
+      return models.KhanbankConfigs.remove({ _id });
     }
 
     public static async getConfig(doc: any) {

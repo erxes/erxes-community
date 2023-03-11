@@ -1,10 +1,23 @@
 import { checkPermission, requireLogin } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
+import { getAuthHeaders } from '../../../khanbank/utils';
 import { IKhanbankConfig } from '../../../models/definitions/khanbankConfigs';
 
 const mutations = {
   async khanbankConfigsAdd(_root, args: IKhanbankConfig, { models }: IContext) {
-    return models.KhanbankConfigs.createConfig(args);
+    const key = args.consumerKey;
+    const secret = args.secretKey;
+
+    try {
+      await getAuthHeaders({
+        consumerKey: key,
+        secretKey: secret
+      });
+
+      return models.KhanbankConfigs.createConfig(args);
+    } catch (e) {
+      throw new Error('Unable to authenticate with the provided credentials');
+    }
   },
 
   async khanbankConfigsEdit(
@@ -14,7 +27,19 @@ const mutations = {
     } & IKhanbankConfig,
     { models }: IContext
   ) {
-    return models.KhanbankConfigs.updateConfig(args._id, args);
+    const key = args.consumerKey;
+    const secret = args.secretKey;
+
+    try {
+      await getAuthHeaders({
+        consumerKey: key,
+        secretKey: secret
+      });
+
+      return models.KhanbankConfigs.updateConfig(args._id, args);
+    } catch (e) {
+      throw new Error('Unable to authenticate with the provided credentials');
+    }
   },
 
   async khanbankConfigsRemove(
@@ -22,6 +47,7 @@ const mutations = {
     { _id }: { _id: string },
     { models }: IContext
   ) {
+    console.log('khanbankConfigsRemoveeeee', _id);
     return models.KhanbankConfigs.removeConfig(_id);
   }
 };

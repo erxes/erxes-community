@@ -4,10 +4,6 @@ export const types = `
     _id: String
     name: String
     description: String
-    departmentIds: [String]
-    userIds: [String]
-    departments: [Department]
-    users: [User]
 
     consumerKey: String
     secretKey: String
@@ -22,8 +18,6 @@ export const types = `
 const mutationParams = `
     name: String!
     description: String
-    departmentIds: [String]
-    userIds: [String]
 
     consumerKey: String!
     secretKey: String!
@@ -32,7 +26,7 @@ const mutationParams = `
 export const mutations = `
   khanbankConfigsAdd(${mutationParams}): KhanbankConfig
   khanbankConfigsEdit(_id: String!, ${mutationParams}): KhanbankConfig
-  khanbankConfigsRemove(_id: [String]): JSON
+  khanbankConfigsRemove(_id: String): JSON
 `;
 
 const qryParams = `

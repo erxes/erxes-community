@@ -24,19 +24,22 @@ export class BaseApi {
   }) {
     const { method, path, params, data } = args;
 
+    console.log('url', `${this.apiUrl}/${path}`);
+    const headers = await this.getHeaders();
+
+    console.log('headers', headers);
+
     try {
       const requestOptions = {
         url: `${this.apiUrl}/${path}`,
         params,
         method,
-        headers: await this.getHeaders(),
+        headers,
         body: data
       };
 
       return sendRequest(requestOptions);
     } catch (e) {
-      console.log('222222222');
-
       throw new Error(e.message);
     }
   }

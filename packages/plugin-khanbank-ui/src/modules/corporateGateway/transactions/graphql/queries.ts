@@ -37,6 +37,31 @@ query KhanbankStatements($accountNumber: String!, $configId: String!, $endDate: 
   }
 `;
 
+const accountsQuery = `
+query KhanbankAccounts($configId: String!) {
+  khanbankAccounts(configId: $configId) {
+    number
+    type
+    currency
+    balance
+    name
+  }
+}
+`;
+
+const accountHolderQuery = `
+query KhanbankAccountHolder($accountNumber: String!, $configId: String!, $bankCode: String) {
+  khanbankAccountHolder(accountNumber: $accountNumber, configId: $configId, bankCode: $bankCode) {
+    number
+    custLastName
+    custFirstName
+    currency
+  }
+}
+`;
+
 export default {
-  transactionsQuery
+  transactionsQuery,
+  accountsQuery,
+  accountHolderQuery
 };

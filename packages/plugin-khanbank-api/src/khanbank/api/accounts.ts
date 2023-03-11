@@ -37,7 +37,7 @@ export class AccountsApi extends BaseApi {
     try {
       const res = await this.request({
         method: 'GET',
-        path: `accounts/${accountNumber}/balance`
+        path: `accounts/${accountNumber}/`
       });
 
       return res.account;
@@ -53,11 +53,11 @@ export class AccountsApi extends BaseApi {
    * @return {object} - Returns an account object
    * TODO: update return type
    */
-  async getHolder(accountNumber: string) {
+  async getHolder(accountNumber: string, bankCode?: string) {
     try {
       const res = await this.request({
         method: 'GET',
-        path: `accounts/${accountNumber}/name?bank=050000`
+        path: `accounts/${accountNumber}/name?bank=${bankCode}`
       });
 
       return { ...res.account, ...res.customer };

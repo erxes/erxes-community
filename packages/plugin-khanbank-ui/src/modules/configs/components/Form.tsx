@@ -36,8 +36,6 @@ const ConfigForm = (props: Props) => {
       finalValues.description = configObject.description;
       finalValues.consumerKey = configObject.consumerKey;
       finalValues.secretKey = configObject.secretKey;
-      finalValues.userIds = configObject.userIds;
-      finalValues.departmentIds = configObject.departmentIds;
     }
 
     return {
@@ -64,7 +62,6 @@ const ConfigForm = (props: Props) => {
           id={name}
           name={name}
           type={type}
-          required={true}
           defaultValue={value}
           onChange={onChangeInput}
         />
@@ -75,8 +72,6 @@ const ConfigForm = (props: Props) => {
   const renderContent = (formProps: IFormProps) => {
     const { closeModal, renderButton } = props;
     const { isSubmitted } = formProps;
-
-    console.log('config ', config);
 
     return (
       <>

@@ -1,17 +1,20 @@
 import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs';
+import { IRouterProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
+import { Content } from '../../../styles';
 import DetailContainer from '../accounts/containers/Detail';
+import TransactionsContainer from '../transactions/containers/List';
 
 type Props = {
   history?: any;
   queryParams: any;
-};
+} & IRouterProps;
 
 const Detail = (props: Props) => {
   const { queryParams } = props;
 
-  const serviceTypes = ['account', 'transactions', 'payments', 'rates'];
+  const serviceTypes = ['account', 'transactions'];
 
   const [currentTab, setCurrentTab] = React.useState<string>(serviceTypes[0]);
 
@@ -21,7 +24,19 @@ const Detail = (props: Props) => {
 
   const renderContent = () => {
     if (currentTab === 'account') {
-      return <DetailContainer queryParams={queryParams} />;
+      return (
+        <Content>
+          <DetailContainer {...props} queryParams={queryParams} />
+        </Content>
+      );
+    }
+
+    if (currentTab === 'transactions') {
+      return (
+        <Content>
+          <TransactionsContainer {...props} queryParams={queryParams} />
+        </Content>
+      );
     }
 
     return <>{currentTab}</>;

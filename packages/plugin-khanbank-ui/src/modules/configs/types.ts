@@ -6,14 +6,9 @@ export interface IKhanbankConfigsItem {
   _id: string;
   name: string;
   description: string;
-  departmentIds: string[];
-  userIds: string[];
 
   consumerKey: string;
   secretKey: string;
-
-  departments: IDepartment[];
-  users: IUser[];
 }
 
 export type ConfigsListQueryResponse = {

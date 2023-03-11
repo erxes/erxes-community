@@ -1,9 +1,9 @@
 import { router } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
+import dayjs from 'dayjs';
 import gql from 'graphql-tag';
 import React from 'react';
 import { useQuery } from 'react-apollo';
-import dayjs from 'dayjs';
 
 import List from '../components/List';
 import { queries } from '../graphql';
@@ -17,7 +17,7 @@ type Props = {
 } & IRouterProps;
 
 export default function ListContainer(props: Props) {
-  const { queryParams, showLatest } = props;
+  const { queryParams, showLatest, history } = props;
 
   let { page, perPage } = router.generatePaginationParams(queryParams || {});
   let startDate = queryParams.startDate;

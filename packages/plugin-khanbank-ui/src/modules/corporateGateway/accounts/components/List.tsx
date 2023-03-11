@@ -1,9 +1,9 @@
-import { Description } from '@erxes/ui-settings/src/styles';
-import ControlLabel from '@erxes/ui/src/components/form/Label';
+import { Description, SidebarListItem } from '@erxes/ui-settings/src/styles';
+import { FieldStyle } from '@erxes/ui/src/layout/styles';
 import { IRouterProps } from '@erxes/ui/src/types';
 import * as routerUtils from '@erxes/ui/src/utils/router';
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import { IKhanbankAccount } from '../types';
 
@@ -13,7 +13,7 @@ type Props = {
   accounts: IKhanbankAccount[];
 } & IRouterProps;
 
-const AccountList = (props: any) => {
+const List = (props: any) => {
   const { queryParams, accounts, history } = props;
 
   const onClickRow = e => {
@@ -24,23 +24,31 @@ const AccountList = (props: any) => {
   };
 
   return (accounts || []).map(account => (
-    <div
+    // <div
+    //   id={account.number}
+    //   key={account.number}
+    //   style={{ display: 'block' }}
+    //   onClick={onClickRow}
+    // >
+
+    <SidebarListItem
       id={account.number}
       key={account.number}
-      style={{ display: 'block' }}
       onClick={onClickRow}
+      isActive={queryParams.account === account.number}
     >
-      <ControlLabel>{account.number}</ControlLabel>
+      <Link to={`?_id=${props._id}&account=${account.number}`}>
+        <FieldStyle>
+          {account.number}
+          <Description>{account.name}</Description>
+        </FieldStyle>
+      </Link>
 
-      <Description>{account.name}</Description>
-    </div>
+      {/* <ControlLabel>{account.number}</ControlLabel>
 
-    //  <ActionButtons>
-    // {this.renderCategoryEditAction(category)}
-    // {this.renderCategoryRemoveAction(category._id)}
-    // </ActionButtons>
-    // </SidebarListItem>
+      <Description>{account.name}</Description> */}
+    </SidebarListItem>
   ));
 };
 
-export default withRouter<Props>(AccountList);
+export default withRouter<Props>(List);
