@@ -4,12 +4,14 @@ import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils/core';
+import * as routerUtils from '@erxes/ui/src/utils/router';
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 
-// import Detail from '../containers/Detail';
 import List from '../../configs/containers/List';
 import Detail from './Detail';
 
+// import Detail from '../containers/Detail';
 type Props = {
   queryParams: any;
   loading?: boolean;
@@ -17,6 +19,7 @@ type Props = {
 
 const CorporateGateway = (props: Props) => {
   const { loading = false, queryParams, history } = props;
+
   const breadcrumb = [
     {
       title: __('Khanbank Corporate Gateway'),
@@ -45,7 +48,7 @@ const CorporateGateway = (props: Props) => {
       leftSidebar={<List {...props} />}
       content={
         <DataWithLoader
-          data={<Detail queryParams={queryParams} history={history} />}
+          data={<Detail {...props} />}
           count={count}
           loading={loading}
           emptyContent={
@@ -76,4 +79,4 @@ const CorporateGateway = (props: Props) => {
   );
 };
 
-export default CorporateGateway;
+export default withRouter<Props>(CorporateGateway);

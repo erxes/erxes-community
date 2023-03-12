@@ -4,7 +4,9 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 
 const ConfigsList = asyncComponent(() =>
-  import(/* webpackChunkName: "CityList" */ './modules/configs/containers/List')
+  import(
+    /* webpackChunkName: "ConfigList" */ './modules/configs/containers/List'
+  )
 );
 
 const Menu = asyncComponent(() =>

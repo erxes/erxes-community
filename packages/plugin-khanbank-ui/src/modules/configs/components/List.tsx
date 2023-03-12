@@ -26,15 +26,12 @@ const List = (props: Props) => {
   const { totalCount, queryParams, loading, configs, remove } = props;
 
   const renderRow = () => {
-    const { configs } = props;
-
     return configs.map(config => (
       <Row key={config._id} config={config} remove={remove} />
     ));
   };
 
   queryParams.loadingMainQuery = loading;
-  let actionBarLeft: React.ReactNode;
 
   const trigger = (
     <Button btnStyle="success" size="small" icon="plus-circle">
@@ -42,7 +39,7 @@ const List = (props: Props) => {
     </Button>
   );
 
-  const formContent = props => <Form {...props} />;
+  const formContent = formProps => <Form {...formProps} />;
 
   const righActionBar = (
     <ModalTrigger
@@ -54,9 +51,7 @@ const List = (props: Props) => {
     />
   );
 
-  const actionBar = (
-    <Wrapper.ActionBar right={righActionBar} left={actionBarLeft} />
-  );
+  const actionBar = <Wrapper.ActionBar right={righActionBar} />;
 
   const breadcrumb = [
     { title: __('Settings'), link: '/settings' },
@@ -122,7 +117,7 @@ const List = (props: Props) => {
           }
         />
       }
-      hasBorder
+      hasBorder={true}
     />
   );
 };

@@ -44,16 +44,12 @@ export const sendRequest = async (
       responseBody: ${JSON.stringify(responseBody)}
     `);
 
-    console.log('url: ', url);
-    console.log('responseBody: ', JSON.stringify(responseBody));
-
     return responseBody;
   } catch (e) {
     if (e.code === 'ECONNREFUSED' || e.code === 'ENOTFOUND') {
       throw new Error(errorMessage);
     } else {
       const message = e.body || e.message;
-      console.log('2222222222 ', message);
       throw new Error(message);
     }
   }

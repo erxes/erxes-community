@@ -17,6 +17,8 @@ type Props = {
 } & IRouterProps;
 
 export default function ListContainer(props: Props) {
+  console.log('ListContainer', props.fetchPolicy);
+
   const { data, loading } = useQuery<AccountsListQueryResponse>(
     gql(queries.listQuery),
     {
@@ -24,12 +26,7 @@ export default function ListContainer(props: Props) {
         configId: props.configId,
         ...router.generatePaginationParams(props.queryParams || {})
       },
-      fetchPolicy: props.fetchPolicy || 'network-only',
-      context: {
-        headers: {
-          configId: props.configId
-        }
-      }
+      fetchPolicy: props.fetchPolicy || 'network-only'
     }
   );
 

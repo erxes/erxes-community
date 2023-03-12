@@ -51,10 +51,23 @@ const typeDefs = async () => {
     ${transferTypes}
     ${taxTypes}
 
+    type KhanbankRate {
+      currency: String
+      midRate: Float
+      buyRate: Float
+      sellRate: Float
+      cashBuyRate: Float
+      cashSellRate: Float
+      name: String
+      number: String
+    }
+
     extend type Query {
       ${configQueries}
       ${accountQueries}
       ${taxQueries}
+
+      khanbankRates: [KhanbankRate]
     }
     
     extend type Mutation {

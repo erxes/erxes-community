@@ -6,6 +6,7 @@ import { useQuery } from 'react-apollo';
 import Detail from '../components/Detail';
 import queries from '../graphql/queries';
 import { IRouterProps } from '@erxes/ui/src/types';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   queryParams: any;
@@ -24,6 +25,10 @@ const DetailContainer = (props: Props) => {
       fetchPolicy: 'network-only'
     }
   );
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   const accountDetail = data && data.khanbankAccountDetail;
 

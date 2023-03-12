@@ -3,8 +3,10 @@ module.exports = {
   port: 3017,
   scope: 'khanbank',
   exposes: {
-    './routes': './src/routes.tsx', 
+    './routes': './src/routes.tsx',
+    './widget': './src/modules/corporateGateway/components/Widget.tsx'
   },
+  widget: './widget',
   routes: {
     url: 'http://localhost:3017/remoteEntry.js',
     scope: 'khanbank',
@@ -25,11 +27,12 @@ module.exports = {
       location: 'mainNavigation'
     },
     {
-      text: 'Khanbank rates',
-      url: '/khanbank-rates',
+      text: 'Currency Rates Widget',
+      url: '/khanbank-corporate-gateway/widget',
+      icon: 'icon-dollar-sign',
+      location: 'topNavigation',
       scope: 'khanbank',
-      icon: 'icon-dollar-alt',
-      location: 'mainNavigation'
-    }
+      component: './widget'
+    },
   ]
 };

@@ -1,7 +1,7 @@
-import { Description } from '@erxes/ui-settings/src/styles';
 import Button from '@erxes/ui/src/components/Button';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import Spinner from '@erxes/ui/src/components/Spinner';
 import Toggle from '@erxes/ui/src/components/Toggle';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils/core';
@@ -9,9 +9,9 @@ import React from 'react';
 
 import { Block, BlockRow } from '../../../../styles';
 import { getCurrencySymbol } from '../../../../utils';
+import TransactionForm from '../../transactions/containers/Form';
 import Transactions from '../../transactions/containers/List';
 import { IKhanbankAccount } from '../types';
-import TransactionForm from '../../transactions/containers/Form';
 
 type Props = {
   queryParams: any;
@@ -21,6 +21,31 @@ type Props = {
 const Detail = (props: Props) => {
   const { account, queryParams } = props;
   const accountNumber = queryParams.account;
+
+  const defaultAccount = JSON.parse(
+    localStorage.getItem('khanbankDefaultAccount') || '{}'
+  );
+
+  const [isChecked, setIsChecked] = React.useState(
+    defaultAccount.accountNumber === accountNumber
+  );
+
+  React.useEffect(() => {
+    setIsChecked(defaultAccount.accountNumber === accountNumber);
+  }, [queryParams.account]);
+
+  const toggleChange = e => {
+    setIsChecked(e.target.checked);
+
+    if (!e.target.checked) {
+      return localStorage.removeItem('khanbankDefaultAccount');
+    }
+
+    localStorage.setItem(
+      'khanbankDefaultAccount',
+      JSON.stringify({ accountNumber, configId: queryParams._id })
+    );
+  };
 
   const transactionTrigger = (
     <Button btnStyle="simple" size="small" icon="money-insert">
@@ -67,10 +92,8 @@ const Detail = (props: Props) => {
           <FormGroup>
             <p>{__('Default account')}</p>
             <Toggle
-              checked={false}
-              onChange={() => {
-                console.log('toggle');
-              }}
+              checked={isChecked}
+              onChange={toggleChange}
               icons={{
                 checked: <span>Yes</span>,
                 unchecked: <span>No</span>
@@ -96,7 +119,6 @@ const Detail = (props: Props) => {
     return (
       <Block>
         <h4>{__('Latest transactions')}</h4>
-        {/* <Description>{__('transactions made today')}</Description> */}
         <Transactions {...props} showLatest={true} />
       </Block>
     );

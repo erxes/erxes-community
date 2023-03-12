@@ -5,11 +5,11 @@ import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import { IFormProps } from '@erxes/ui/src/types';
 import { __ } from '@erxes/ui/src/utils/core';
 import React, { useState } from 'react';
-import { BANK_CODES, TRANSACTION_TYPES } from '../../../../constants';
 
+import { BANK_CODES, TRANSACTION_TYPES } from '../../../../constants';
 import { IAccountHolder, IKhanbankAccount } from '../../accounts/types';
 import { IKhanbankTransactionInput } from '../types';
 
@@ -61,10 +61,13 @@ const TransactionForm = (props: Props) => {
     if (props.accountHolder) {
       const toAccountName = `${props.accountHolder.custFirstName || ''} ${props
         .accountHolder.custLastName || ''}`;
+
       setTransaction({
         ...transaction,
-        toAccount: props.accountHolder.number || '',
-        toAccountName,
+        toAccount: props.accountHolder.number || transaction.toAccount || '',
+        toAccountName: !toAccountName.length
+          ? transaction.toAccountName
+          : toAccountName,
         toCurrency: props.accountHolder.currency || 'MNT'
       });
     }
@@ -135,17 +138,6 @@ const TransactionForm = (props: Props) => {
       onBlur
     };
 
-    if (
-      transaction.toAccount &&
-      transaction.toAccount.length === 10 &&
-      props.accountHolder.number !== transaction.toAccount
-    ) {
-      accountHolderProps.errors = {
-        toAccount:
-          'Recipient info not found, please check recipient account number'
-      };
-    }
-
     return (
       <>
         {renderInput(
@@ -159,8 +151,13 @@ const TransactionForm = (props: Props) => {
           {
             ...formProps,
             required: true,
-            disabled: true,
-            value: transaction.toAccountName
+            disabled: transactionType !== 3,
+            value: transaction.toAccountName,
+            onFocus: () => {
+              if (transaction.toAccountName === ' ') {
+                setTransaction({ ...transaction, toAccountName: '' });
+              }
+            }
           },
           'Recipient name',
           'toAccountName',

@@ -8,6 +8,7 @@ import TransactionsContainer from '../transactions/containers/List';
 
 type Props = {
   history?: any;
+  loading?: boolean;
   queryParams: any;
 } & IRouterProps;
 

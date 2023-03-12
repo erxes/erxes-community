@@ -1,4 +1,5 @@
 import { router } from '@erxes/ui/src';
+import Spinner from '@erxes/ui/src/components/Spinner';
 import { IRouterProps } from '@erxes/ui/src/types';
 import dayjs from 'dayjs';
 import gql from 'graphql-tag';
@@ -48,6 +49,10 @@ export default function ListContainer(props: Props) {
       fetchPolicy: 'network-only'
     }
   );
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   const statement = data && data.khanbankStatements;
 

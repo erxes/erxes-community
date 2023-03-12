@@ -23,11 +23,7 @@ export class BaseApi {
     data?: any;
   }) {
     const { method, path, params, data } = args;
-
-    console.log('url', `${this.apiUrl}/${path}`);
     const headers = await this.getHeaders();
-
-    console.log('headers', headers);
 
     try {
       const requestOptions = {
@@ -38,9 +34,10 @@ export class BaseApi {
         body: data
       };
 
-      return sendRequest(requestOptions);
+      return await sendRequest(requestOptions);
     } catch (e) {
-      throw new Error(e.message);
+      const errorMessage = JSON.parse(e.message).message || e.message;
+      throw new Error(errorMessage);
     }
   }
 }

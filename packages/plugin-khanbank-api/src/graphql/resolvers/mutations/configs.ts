@@ -47,7 +47,6 @@ const mutations = {
     { _id }: { _id: string },
     { models }: IContext
   ) {
-    console.log('khanbankConfigsRemoveeeee', _id);
     return models.KhanbankConfigs.removeConfig(_id);
   }
 };

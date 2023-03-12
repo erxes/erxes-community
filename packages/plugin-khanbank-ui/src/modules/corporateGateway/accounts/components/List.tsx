@@ -24,13 +24,6 @@ const List = (props: any) => {
   };
 
   return (accounts || []).map(account => (
-    // <div
-    //   id={account.number}
-    //   key={account.number}
-    //   style={{ display: 'block' }}
-    //   onClick={onClickRow}
-    // >
-
     <SidebarListItem
       id={account.number}
       key={account.number}
@@ -43,10 +36,6 @@ const List = (props: any) => {
           <Description>{account.name}</Description>
         </FieldStyle>
       </Link>
-
-      {/* <ControlLabel>{account.number}</ControlLabel>
-
-      <Description>{account.name}</Description> */}
     </SidebarListItem>
   ));
 };

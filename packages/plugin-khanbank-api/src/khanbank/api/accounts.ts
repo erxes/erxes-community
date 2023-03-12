@@ -62,7 +62,6 @@ export class AccountsApi extends BaseApi {
 
       return { ...res.account, ...res.customer };
     } catch (e) {
-      console.error(e);
       throw new Error(e.message);
     }
   }

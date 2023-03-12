@@ -59,3 +59,22 @@ export const AccountList = styled.div`
 export const Content = styled.div`
   padding: ${dimensions.coreSpacing}px;
 `;
+
+export const WidgetButton = styled.div`
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  transition: all 0.3s ease;
+  color: ${colors.textSecondary};
+
+  span {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    padding: 3px;
+    min-width: 18px;
+    min-height: 18px;
+    line-height: 12px;
+  }
+`;

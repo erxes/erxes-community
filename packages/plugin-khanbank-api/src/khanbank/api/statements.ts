@@ -43,7 +43,7 @@ export class StatementsApi extends BaseApi {
     }
 
     if (page) {
-      queryParams.page = page;
+      queryParams.page = page - 1;
     }
 
     if (perPage) {

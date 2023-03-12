@@ -1,13 +1,15 @@
 import { router } from '@erxes/ui/src';
+import Spinner from '@erxes/ui/src/components/Spinner';
+import { IRouterProps } from '@erxes/ui/src/types';
 import { Alert, confirm } from '@erxes/ui/src/utils';
+import gql from 'graphql-tag';
 import React from 'react';
 import { useMutation, useQuery } from 'react-apollo';
-import gql from 'graphql-tag';
-import List from '../components/List';
+
 import SidebarList from '../../corporateGateway/components/ConfigsList';
+import List from '../components/List';
 import { mutations, queries } from '../graphql';
 import { ConfigsListQueryResponse } from '../types';
-import { IRouterProps } from '@erxes/ui/src/types';
 
 type Props = {
   refetch?: () => void;
@@ -49,6 +51,10 @@ export default function ListContainer(props: Props) {
         });
     });
   };
+
+  if (loading) {
+    return <Spinner />;
+  }
 
   const configs = (data && data.khanbankConfigsList.list) || [];
 

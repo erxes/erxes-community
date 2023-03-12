@@ -27,11 +27,26 @@ type Props = {
 } & IRouterProps;
 
 const ConfigsList = (props: Props) => {
-  const { configs, totalCount, queryParams, loading, history } = props;
+  const { configs, totalCount, queryParams, loading, history, refetch } = props;
 
   const [currentConfig, setCurrentConfig] = React.useState<string | undefined>(
     queryParams._id
   );
+
+  const [fetchPolicy, setFetchPolicy] = React.useState('cache-first');
+
+  React.useEffect(() => {
+    const defaultAccount = JSON.parse(
+      localStorage.getItem('khanbankDefaultAccount') || '{}'
+    );
+
+    if (defaultAccount.configId && defaultAccount.accountNumber) {
+      routerUtils.setParams(history, {
+        _id: defaultAccount.configId,
+        account: defaultAccount.accountNumber
+      });
+    }
+  }, []);
 
   const onClickRow = config => {
     setCurrentConfig(config._id);
@@ -39,11 +54,11 @@ const ConfigsList = (props: Props) => {
   };
 
   const onRefresh = () => {
-    console.log('refresh clicked');
+    setFetchPolicy('network-only');
   };
 
   const reload = (
-    <a href="#refresh" onClick={() => onRefresh()} tabIndex={0}>
+    <a href="#refresh" onClick={onRefresh} tabIndex={0}>
       <Icon icon="refresh" size={8} />
     </a>
   );
@@ -64,7 +79,7 @@ const ConfigsList = (props: Props) => {
           <AccountList
             {...props}
             configId={config._id}
-            fetchPolicy="cache-first"
+            fetchPolicy={fetchPolicy}
           />
         </Box>
       );
@@ -109,7 +124,6 @@ const ConfigsList = (props: Props) => {
           {renderRow()}
           <LoadMore all={totalCount} loading={loading} />
         </SidebarList>
-        {loading && <Spinner />}
         {!loading && totalCount === 0 && (
           <EmptyState
             image="/images/actions/18.svg"

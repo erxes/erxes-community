@@ -17,6 +17,22 @@ query KhanbankAccounts($configId: String!) {
   }
 `;
 
+const ratesQuery = `
+query KhanbankRates {
+  khanbankRates {
+    sellRate
+    number
+    name
+    midRate
+    currency
+    cashSellRate
+    cashBuyRate
+    buyRate
+  }
+}
+`;
+
 export default {
-  listQuery
+  listQuery,
+  ratesQuery
 };

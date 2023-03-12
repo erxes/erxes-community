@@ -56,6 +56,10 @@ const TransactionFormContainer = (props: Props) => {
     currency: ''
   };
 
+  if (qryRes.error) {
+    Alert.error(qryRes.error.message);
+  }
+
   const updatedProps = {
     ...props,
     accounts: (data && data.khanbankAccounts) || [],
