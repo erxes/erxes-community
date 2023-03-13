@@ -595,6 +595,10 @@ const timeclockMutations = {
     });
   },
 
+  // checkSchedule(_root, { scheduleId }, { models, user }: IContext) {
+
+  // },
+
   async extractAllDataFromMsSQL(
     _root,
     { startDate, endDate },

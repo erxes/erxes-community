@@ -69,6 +69,8 @@ export interface ISchedule {
   status?: string;
   solved?: boolean;
   scheduleConfigId?: string;
+  scheduleChecked?: boolean;
+  submittedByAdmin?: boolean;
 }
 
 export interface IScheduleDocument extends ISchedule, Document {
@@ -254,6 +256,10 @@ export const scheduleSchema = new Schema({
   scheduleChecked: field({
     type: Boolean,
     label: 'Whether schedule is checked by employee'
+  }),
+  submittedByAdmin: field({
+    type: Boolean,
+    label: 'Whether schedule was submitted/assigned directly by an admin'
   })
 });
 
