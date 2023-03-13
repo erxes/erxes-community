@@ -255,11 +255,13 @@ export const scheduleSchema = new Schema({
   }),
   scheduleChecked: field({
     type: Boolean,
-    label: 'Whether schedule is checked by employee'
+    label: 'Whether schedule is checked by employee',
+    default: false
   }),
   submittedByAdmin: field({
     type: Boolean,
-    label: 'Whether schedule was submitted/assigned directly by an admin'
+    label: 'Whether schedule was submitted/assigned directly by an admin',
+    default: false
   })
 });
 

@@ -81,6 +81,8 @@ export const types = `
     solved: Boolean
     status: String
     scheduleConfigId: String
+    scheduleChecked: Boolean
+    submittedByAdmin: Boolean
   }
 
   type ScheduleReport{
@@ -314,6 +316,7 @@ export const mutations = `
   deviceConfigRemove(_id: String): JSON
   
   checkReport(userId: String, startDate: String, endDate: String): CheckReport
+  checkSchedule(scheduleId: String): JSON
 
   extractAllDataFromMsSQL(startDate: String, endDate: String): [Timeclock]
   extractTimeLogsFromMsSQL(startDate: String, endDate: String): [Timelog]

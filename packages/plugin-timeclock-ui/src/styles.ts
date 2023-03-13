@@ -253,6 +253,25 @@ const RowField = styled.div`
   }
 `;
 
+const CustomCollapseRow = styledTS<{ isChild: boolean }>(styled.div)`
+  font-size: 15px;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  justify-content: space-between;
+  align-items: center;
+  padding: ${props =>
+    props.isChild ? dimensions.unitSpacing : dimensions.coreSpacing}px;
+  margin: 0px;
+  background: ${colors.colorWhite};
+
+  span {
+    font-size: 12px;
+    color: ${colors.colorCoreGray};
+    margin-left: 5px;
+  }
+`;
+
 export {
   FilterItem,
   FilterWrapper,
@@ -276,5 +295,6 @@ export {
   InlineBlock,
   Margin,
   RowField,
-  TextAlignCenter
+  TextAlignCenter,
+  CustomCollapseRow
 };

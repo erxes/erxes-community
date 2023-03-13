@@ -14,13 +14,13 @@ import { dateFormat, timeFormat } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import SortableList from '@erxes/ui/src/components/SortableList';
 import {
-  CollapseRow,
   DropIcon,
   PropertyListTable,
   PropertyTableHeader,
   PropertyTableRow
 } from '@erxes/ui-forms/src/settings/properties/styles';
 import Collapse from 'react-bootstrap/Collapse';
+import { CustomCollapseRow } from '../../styles';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 
 type Props = {
@@ -136,7 +136,7 @@ function ScheduleList(props: Props) {
     removeScheduleShifts(_id, type);
   };
 
-  const ListShiftContent = shifts => {
+  const ListShiftContent = (shifts, scheduleChecked) => {
     return shifts.map(shift => (
       <PropertyTableRow key="">
         <RowField>
@@ -211,6 +211,12 @@ function ScheduleList(props: Props) {
     const name =
       schedule.user && details && details.fullName ? details.fullName : email;
 
+    const scheduleChecked = schedule.submittedByAdmin
+      ? schedule.scheduleChecked
+        ? 'Member checked'
+        : 'Member not checked yet'
+      : 'Submitted by a member';
+
     const status = schedule.solved ? (
       __(schedule.status)
     ) : (
@@ -234,12 +240,12 @@ function ScheduleList(props: Props) {
     if (schedule.shifts.length > 0) {
       return (
         <div key={schedule._id} style={{ flex: 1 }}>
-          <CollapseRow isChild={false}>
+          <CustomCollapseRow isChild={false}>
             <div style={{ flex: 1 }} onClick={handleCollapse}>
               <DropIcon isOpen={collapse} />
               {name}
             </div>
-            {status}
+            {`${scheduleChecked}  |  ${status}`}
             <Tip text={__('Delete')} placement="top">
               <Button
                 btnStyle="link"
@@ -247,7 +253,7 @@ function ScheduleList(props: Props) {
                 icon="times-circle"
               />
             </Tip>
-          </CollapseRow>
+          </CustomCollapseRow>
           <Collapse in={collapse}>
             <Margin>
               <PropertyListTable>
@@ -261,7 +267,7 @@ function ScheduleList(props: Props) {
                   <ControlLabel>{__('Shift Status')}</ControlLabel>
                   <ControlLabel>{__('Actions')}</ControlLabel>
                 </PropertyTableHeader>
-                {ListShiftContent(schedule.shifts)}
+                {ListShiftContent(schedule.shifts, scheduleChecked)}
               </PropertyListTable>
             </Margin>
           </Collapse>
