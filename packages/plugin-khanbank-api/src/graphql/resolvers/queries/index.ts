@@ -14,7 +14,7 @@ export default {
         method: 'GET'
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       throw new Error(e.message);
     }
   }
