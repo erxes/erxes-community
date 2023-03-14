@@ -128,6 +128,11 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
+  schedulesPerUser(_root, queryParams, { models, user }: IContext) {
+    const getUserId = queryParams.userId || user._id;
+    return models.Schedules.find({ userId: getUserId });
+  },
+
   scheduleConfigs(_root, {}, { models }: IContext) {
     return models.ScheduleConfigs.find();
   },

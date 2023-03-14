@@ -213,7 +213,7 @@ const FlexColumnCustom = styledTS<{
   gap: ${props => props.marginNum}px
   margin: 20px 20px
 
-  .kOAWdn {
+  div:first-child {
     margin-bottom: 0;
   }
 
@@ -264,7 +264,12 @@ const CustomCollapseRow = styledTS<{ isChild: boolean }>(styled.div)`
     props.isChild ? dimensions.unitSpacing : dimensions.coreSpacing}px;
   margin: 0px;
   background: ${colors.colorWhite};
-
+  
+  div {
+    display: flex
+    flex: 1
+    gap: 10px
+  }
   span {
     font-size: 12px;
     color: ${colors.colorCoreGray};

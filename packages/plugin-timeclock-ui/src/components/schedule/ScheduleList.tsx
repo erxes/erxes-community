@@ -22,6 +22,7 @@ import {
 import Collapse from 'react-bootstrap/Collapse';
 import { CustomCollapseRow } from '../../styles';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
+import Icon from '@erxes/ui/src/components/Icon';
 
 type Props = {
   scheduleOfMembers: any;
@@ -211,11 +212,34 @@ function ScheduleList(props: Props) {
     const name =
       schedule.user && details && details.fullName ? details.fullName : email;
 
-    const scheduleChecked = schedule.submittedByAdmin
-      ? schedule.scheduleChecked
-        ? 'Member checked'
-        : 'Member not checked yet'
-      : 'Submitted by a member';
+    const scheduleChecked =
+      schedule.scheduleChecked || !schedule.submittedByAdmin ? (
+        <Icon icon="checked" color="green" />
+      ) : (
+        <Icon icon="times-circle" color="#F29339" />
+      );
+
+    const getScheduleEnd = new Date(schedule.shifts[0].shiftEnd);
+    const getScheduleStart = new Date(schedule.shifts.slice(-1)[0].shiftStart);
+
+    const scheduleStartDate = dayjs(getScheduleStart).format(dateFormat);
+    const scheduleEndDate = dayjs(getScheduleEnd).format(dateFormat);
+
+    const getTotalScheduledDays = Math.ceil(
+      (getScheduleEnd.getTime() - getScheduleStart.getTime()) /
+        (1000 * 3600 * 24)
+    );
+
+    let getTotalScheduledHours = 0;
+
+    schedule.shifts.forEach(shift => {
+      const shiftStart = new Date(shift.shiftStart);
+      const shiftEnd = new Date(shift.shiftEnd);
+
+      getTotalScheduledHours += Math.ceil(
+        (shiftEnd.getTime() - shiftStart.getTime()) / (1000 * 3600)
+      );
+    });
 
     const status = schedule.solved ? (
       __(schedule.status)
@@ -241,11 +265,19 @@ function ScheduleList(props: Props) {
       return (
         <div key={schedule._id} style={{ flex: 1 }}>
           <CustomCollapseRow isChild={false}>
-            <div style={{ flex: 1 }} onClick={handleCollapse}>
+            <div onClick={handleCollapse}>
               <DropIcon isOpen={collapse} />
               {name}
             </div>
-            {`${scheduleChecked}  |  ${status}`}
+
+            <div> {scheduleChecked}</div>
+            <div>{scheduleStartDate}</div>
+            <div>{scheduleEndDate}</div>
+
+            <div>{`Total ${getTotalScheduledDays} days / ${getTotalScheduledHours} hours`}</div>
+
+            {status}
+
             <Tip text={__('Delete')} placement="top">
               <Button
                 btnStyle="link"
