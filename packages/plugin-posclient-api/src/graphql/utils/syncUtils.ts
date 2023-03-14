@@ -142,7 +142,6 @@ export const importProducts = async (
       : attachment;
   };
 
-  console.log(token, 'tttttttttttttt');
   for (const group of groups) {
     const categories = group.categories || [];
 
@@ -165,7 +164,7 @@ export const importProducts = async (
           upsert: true;
         };
       }[] = [];
-      console.log(category.name, category.products.length, 'kkkkkkkkkk');
+
       for (const product of category.products) {
         bulkOps.push({
           updateOne: {
@@ -173,6 +172,7 @@ export const importProducts = async (
             update: {
               $set: {
                 ...product,
+                [`prices.${token}`]: product.unitPrice,
                 sku: product.sku || 'ш',
                 attachment: attachmentUrlChanger(product.attachment),
                 attachmentMore: (product.attachmentMore || []).map(a =>
