@@ -8,13 +8,13 @@ export const initBroker = async cl => {
 
   const { consumeQueue, consumeRPCQueue } = client;
 
-  consumeQueue('kbcgw:send', async ({ data }) => {
+  consumeQueue('khanbank:send', async ({ data }) => {
     return {
       status: 'success'
     };
   });
 
-  consumeRPCQueue('kbcgw:find', async ({ data }) => {
+  consumeRPCQueue('khanbank:find', async ({ data }) => {
     return {
       status: 'success',
       data: null
