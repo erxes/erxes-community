@@ -10,13 +10,12 @@ module.exports = {
                     'khanbankConfigsAdd',
                     'khanbankConfigsEdit',
                     'khanbankConfigsRemove',
-                    'khanbankConfigsList',
-                    'khanbankConfigs'
+                    'khanbankConfigsShow',
                 ]
             },
             {
                 name: 'khanbankConfigsAdd',
-                description: 'Add new config'   
+                description: 'Add new config'
             },
             {
                 name: 'khanbankConfigsEdit',
@@ -27,9 +26,51 @@ module.exports = {
                 description: 'Remove config'
             },
             {
-                name: 'khanbankConfigsList',
+                name: 'khanbankConfigsShow',
                 description: 'Show configs'
             }
         ]
+    },
+    khanbankAccounts: {
+        name: 'khanbankAccounts',
+        description: 'Khanbank Accounts',
+        actions: [
+            {
+                name: 'khanbankAccountsAll',
+                description: 'All',
+                use: [
+                    'khanbankAccountDetail',
+                    'khanbankAccounts',
+                ]
+            }, {
+                name: 'khanbankAccountDetail',
+                description: 'Show Khanbank Account detail'
+            }, {
+                name: 'khanbankAccounts',
+                description: 'Show Khanbank accounts'
+            },
+        ]
+    },
+    khanbankTransactions: {
+        name: 'khanbankTransactions',
+        description: 'Khanbank Transactions',
+        actions: [
+            {
+                name: 'khanbankTransactionsAll',
+                description: 'All',
+                use: [
+                    'khanbankTransactionsShow',
+                    'khanbankTransfer',
+                ]
+            },
+            {
+                name: 'khanbankTransactionsShow',
+                description: 'Show Khanbank transactions'
+            },
+            {
+                name: 'khanbankTransfer',
+                description: 'Create Khanbank transactions'
+            }
+        ]
     }
-}
+};

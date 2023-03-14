@@ -1,12 +1,11 @@
 import configQueries from './configs';
 import accountQueries from './accounts';
-import taxQueries from './taxes';
+
 import { sendRequest } from '@erxes/api-utils/src';
 
 export default {
   ...configQueries,
   ...accountQueries,
-  ...taxQueries,
 
   khanbankRates: async (_root, _args, _context) => {
     try {

@@ -45,7 +45,12 @@ const queries = {
   }
 };
 
-requireLogin(queries, 'khanbank');
-checkPermission(queries, 'khanbank', 'showKhanbankConfigs', []);
+requireLogin(queries, 'khanbankConfigs');
+requireLogin(queries, 'khanbankConfigsList');
+requireLogin(queries, 'khanbankConfigsDetail');
+
+checkPermission(queries, 'khanbankConfigs', 'khanbankConfigsShow', []);
+checkPermission(queries, 'khanbankConfigsList', 'khanbankConfigsShow', []);
+checkPermission(queries, 'khanbankConfigsDetail', 'khanbankConfigsShow', []);
 
 export default queries;

@@ -1,3 +1,4 @@
+import { checkPermission, requireLogin } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import Khanbank from '../../../khanbank/khanbank';
 
@@ -100,5 +101,22 @@ const queries = {
     }
   }
 };
+
+requireLogin(queries, 'khanbankAccounts');
+requireLogin(queries, 'khanbankAccountDetail');
+requireLogin(queries, 'khanbankAccountHolder');
+requireLogin(queries, 'khanbankStatements');
+requireLogin(queries, 'khanbankStatementsAfterRecord');
+
+checkPermission(queries, 'khanbankAccounts', 'khanbankAccountsShow', []);
+checkPermission(queries, 'khanbankAccountDetail', 'khanbankAccountDetail', []);
+checkPermission(queries, 'khanbankAccountHolder', 'khanbankAccountDetail', []);
+checkPermission(queries, 'khanbankStatements', 'khanbankTransactionsShow', []);
+checkPermission(
+  queries,
+  'khanbankStatementsAfterRecord',
+  'khanbankTransactionsShow',
+  []
+);
 
 export default queries;
