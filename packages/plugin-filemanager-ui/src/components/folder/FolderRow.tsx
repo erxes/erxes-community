@@ -15,6 +15,7 @@ type Props = {
   filemanagerFolders: IFolder[];
   remove: (folderId: string) => void;
   setParentId: (id: string) => void;
+  getSubfolders: (id: string, callback: (data) => void) => void;
   queryParams: any;
   isActive: boolean;
   isChild?: boolean;
@@ -44,6 +45,10 @@ class FolderRow extends React.Component<Props, State> {
 
     this.setState({ isParentOpen: !this.state.isParentOpen }, () => {
       setParentId(folder._id);
+    });
+
+    this.props.getSubfolders(folder._id, data => {
+      console.log(data);
     });
   };
 

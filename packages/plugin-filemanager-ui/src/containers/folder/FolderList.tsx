@@ -12,12 +12,13 @@ import { mutations, queries } from '../../graphql';
 import FolderList from '../../components/folder/FolderList';
 import React from 'react';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { graphql, useLazyQuery } from 'react-apollo';
 import { withRouter } from 'react-router-dom';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   queryParams: any;
-  filemanagerFolders: IFolder[];
+  filemanagerFolders: any[];
   loading: boolean;
   parentFolderId: string;
   setParentId: (id: string) => void;
@@ -32,7 +33,13 @@ type FinalProps = {
 const FolderListContainer = (props: FinalProps) => {
   const { removeMutation, history, filemanagerFoldersQuery } = props;
 
-  const childrens = filemanagerFoldersQuery.filemanagerFolders || [];
+  const [parentId, setParentId] = React.useState('');
+
+  // const childrens = filemanagerFoldersQuery.filemanagerFolders || [];
+
+  const [getSubfoldersQuery, { data, loading }] = useLazyQuery(
+    gql(queries.filemanagerFolders)
+  );
 
   // remove action
   const remove = folderId => {
@@ -51,10 +58,49 @@ const FolderListContainer = (props: FinalProps) => {
     });
   };
 
+  const getSubfolders = (folderId: string) => {
+    console.log('folderId', folderId);
+
+    setParentId(folderId);
+
+    getSubfoldersQuery({
+      variables: { parentId: folderId }
+    });
+  };
+
+  React.useEffect(() => {
+    console.log('parentId', parentId);
+  }, [setParentId, getSubfolders]);
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  const childFolders = (data && data.filemanagerFolders) || [];
+
+  const { filemanagerFolders } = props;
+
+  console.log('parentId', parentId);
+
+  const folderIndex = filemanagerFolders.findIndex(
+    folder => folder._id === parentId
+  );
+  console.log('folderIndex', folderIndex);
+
+  if (folderIndex !== -1) {
+    console.log('childFolders', childFolders);
+
+    filemanagerFolders[folderIndex].childrens = childFolders;
+  }
+
+  console.log('filemanagerFolders', filemanagerFolders);
+
   const updatedProps = {
     ...props,
-    childrens,
-    remove
+    childrens: [],
+    filemanagerFolders,
+    remove,
+    getSubfolders
   };
 
   return <FolderList {...updatedProps} />;
@@ -68,28 +114,30 @@ const getRefetchQueries = () => {
   ];
 };
 
-export default withProps<Props>(
-  compose(
-    graphql<Props, FilemanagerFoldersQueryResponse, { parentId: string }>(
-      gql(queries.filemanagerFolders),
-      {
-        name: 'filemanagerFoldersQuery',
-        options: ({ parentFolderId }: { parentFolderId: string }) => ({
-          variables: {
-            parentId: parentFolderId
-          },
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
-    graphql<Props, RemoveFilemanagerFolderMutationResponse, MutationVariables>(
-      gql(mutations.filemanagerFolderRemove),
-      {
-        name: 'removeMutation',
-        options: () => ({
-          refetchQueries: getRefetchQueries()
-        })
-      }
-    )
-  )(withRouter<FinalProps>(FolderListContainer))
-);
+// export default withProps<Props>(
+//   compose(
+//     graphql<Props, FilemanagerFoldersQueryResponse, { parentId: string }>(
+//       gql(queries.filemanagerFolders),
+//       {
+//         name: 'filemanagerFoldersQuery',
+//         options: ({ parentFolderId }: { parentFolderId: string }) => ({
+//           variables: {
+//             parentId: parentFolderId
+//           },
+//           fetchPolicy: 'network-only'
+//         })
+//       }
+//     ),
+//     graphql<Props, RemoveFilemanagerFolderMutationResponse, MutationVariables>(
+//       gql(mutations.filemanagerFolderRemove),
+//       {
+//         name: 'removeMutation',
+//         options: () => ({
+//           refetchQueries: getRefetchQueries()
+//         })
+//       }
+//     )
+//   )(withRouter<FinalProps>(FolderListContainer))
+// );
+
+export default FolderListContainer;

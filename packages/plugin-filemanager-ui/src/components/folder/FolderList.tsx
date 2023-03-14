@@ -9,16 +9,29 @@ import React from 'react';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 
 type Props = {
-  filemanagerFolders: IFolder[];
+  filemanagerFolders: any[];
   childrens: IFolder[];
   remove: (folderId: string) => void;
   loading: boolean;
   queryParams: any;
   currentChannelId?: string;
   setParentId: (id: string) => void;
+  getSubfolders: (id: string, callback: (data) => void) => void;
 };
 
-class FolderList extends React.Component<Props, {}> {
+type State = {
+  parents: any[];
+};
+
+class FolderList extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      parents: props.filemanagerFolders || []
+    };
+  }
+
   groupByParent = (array: any[]) => {
     const key = 'parentId';
 
@@ -42,6 +55,7 @@ class FolderList extends React.Component<Props, {}> {
         isChild={isChild}
         isParent={folder?.hasChild ? folder.hasChild : false}
         setParentId={setParentId}
+        getSubfolders={this.props.getSubfolders}
         filemanagerFolders={filemanagerFolders}
       />
     );
@@ -52,8 +66,8 @@ class FolderList extends React.Component<Props, {}> {
 
     const groupByParent = this.groupByParent(childrens);
 
-    return filemanagerFolders.map((folder: IFolder) => {
-      const childs = groupByParent[folder._id] || [];
+    return filemanagerFolders.map((folder: any) => {
+      const childs = folder.childrens || [];
 
       return (
         <React.Fragment key={folder._id}>

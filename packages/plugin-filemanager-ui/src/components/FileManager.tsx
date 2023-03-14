@@ -21,7 +21,7 @@ import { __ } from 'coreui/utils';
 type Props = {
   queryParams: any;
   currentFolder: IFolder;
-  filemanagerFolders: IFolder[];
+  filemanagerFolders: any[];
   folderQueryLoading: boolean;
 };
 
