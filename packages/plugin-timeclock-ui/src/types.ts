@@ -231,6 +231,10 @@ export type TimeLogMutationResponse = {
   extractTimeLogsFromMsSQLMutation: (params: {
     variables: { startDate: string; endDate: string };
   }) => Promise<any>;
+
+  createTimeClockFromLogMutation: (params: {
+    variables: { userId: string; timelog: Date };
+  }) => Promise<any>;
 };
 
 export type TimeClockMutationResponse = {
