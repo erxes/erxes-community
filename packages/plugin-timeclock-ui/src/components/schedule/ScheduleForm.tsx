@@ -4,7 +4,7 @@ import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateRange from '../datepicker/DateRange';
 import dayjs from 'dayjs';
 import DatePicker from '../datepicker/DateTimePicker';
-import { ISchedule, IScheduleConfig } from '../../types';
+import { IScheduleForm, IScheduleConfig } from '../../types';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { CustomLabel, FlexCenter, FlexColumn } from '../../styles';
@@ -57,7 +57,7 @@ function ScheduleForm(props: Props) {
   const [defaultEndTime, setDefaultEndTime] = useState('17:00:00');
   const [dateRangeStart, setDateStart] = useState(new Date());
   const [dateRangeEnd, setDateEnd] = useState(new Date());
-  const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
+  const [scheduleDates, setScheduleDates] = useState<IScheduleForm>({});
   const [contentType, setContentType] = useState('By Date Range');
   const [userIds, setUserIds] = useState([]);
   const [selectedDeptIds, setDepartments] = useState([]);
@@ -269,7 +269,9 @@ function ScheduleForm(props: Props) {
   const addDay = () => {
     // sort array of dates, in order to get the latest day
     let dates_arr = Object.values(scheduleDates).map(shift => shift.shiftDate);
-    dates_arr = dates_arr.sort((a, b) => b.getTime() - a.getTime());
+    dates_arr = dates_arr.sort(
+      (a, b) => (b?.getTime() || 0) - (a?.getTime() || 0)
+    );
 
     const dates = scheduleDates;
     const getLatestDayKey = dates_arr.length
@@ -480,7 +482,7 @@ function ScheduleForm(props: Props) {
       temp = temp.add(1, 'day');
     }
 
-    const newDatesByRange: ISchedule = scheduleDates;
+    const newDatesByRange: IScheduleForm = scheduleDates;
 
     for (const eachDay of totalDatesArray) {
       const [

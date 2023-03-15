@@ -8,7 +8,7 @@ import { CustomRow, Margin, RowField } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import Tip from '@erxes/ui/src/components/Tip';
 import ScheduleForm from './ScheduleForm';
-import { IScheduleConfig } from '../../types';
+import { ISchedule, IScheduleConfig } from '../../types';
 import dayjs from 'dayjs';
 import { dateFormat, timeFormat } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
@@ -201,7 +201,7 @@ function ScheduleList(props: Props) {
     ));
   };
 
-  const content = schedule => {
+  const content = (schedule: ISchedule) => {
     const [collapse, setCollapse] = useState(false);
     const { details, email } = schedule.user;
 
@@ -242,7 +242,7 @@ function ScheduleList(props: Props) {
     });
 
     const status = schedule.solved ? (
-      __(schedule.status)
+      __(schedule.status || '')
     ) : (
       <>
         <Button
