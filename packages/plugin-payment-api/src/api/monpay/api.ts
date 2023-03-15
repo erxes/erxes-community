@@ -6,13 +6,13 @@ import { PAYMENT_KINDS, PAYMENT_STATUS } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { IPaymentDocument } from '../../models/definitions/payments';
 import { IMonpayConfig, IMonpayInvoice } from '../types';
-import { QR_CHECK_URL, QR_GENERATE_URL, TOKEN_URL } from './constants';
+import { QR_CHECK_URL, QR_GENERATE_URL, AUTH_URL } from './constants';
 
 export const generateToken = async config => {
   const { clientId, clientSecret } = config;
 
   const requestOptions = {
-    url: TOKEN_URL,
+    url: AUTH_URL,
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: {
@@ -126,7 +126,7 @@ export const monpayHandler = async (models: IModels, queryParams) => {
     'apiResponse.uuid': uuid
   });
 
-  if (invoice.amount !== parseInt(amount)) {
+  if (invoice.amount !== Number(amount)) {
     throw new Error('Payment amount is not correct');
   }
 
@@ -137,9 +137,9 @@ export const monpayHandler = async (models: IModels, queryParams) => {
   }
 
   try {
-    const status = await checkInvoice(invoice, payment);
+    const invoiceStatus = await checkInvoice(invoice, payment);
 
-    if (status !== PAYMENT_STATUS.PAID) {
+    if (invoiceStatus !== PAYMENT_STATUS.PAID) {
       throw new Error('Payment failed');
     }
 

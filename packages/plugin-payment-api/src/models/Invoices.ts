@@ -19,8 +19,8 @@ export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(doc: any): IInvoiceDocument;
   createInvoice(doc: IInvoice): Promise<IInvoiceDocument>;
   updateInvoice(_id: string, doc: any): Promise<IInvoiceDocument>;
-  cancelInvoice(_id: string): Promise<String>;
-  checkInvoice(_id: string): Promise<String>;
+  cancelInvoice(_id: string): Promise<string>;
+  checkInvoice(_id: string): Promise<string>;
 }
 
 export const loadInvoiceClass = (models: IModels) => {
@@ -52,7 +52,7 @@ export const loadInvoiceClass = (models: IModels) => {
       });
 
       try {
-        const apiResponse = createNewInvoice(invoice, payment);
+        const apiResponse = await createNewInvoice(invoice, payment);
         invoice.apiResponse = apiResponse;
         invoice.selectedPaymentId = payment._id;
         invoice.paymentKind = payment.kind;

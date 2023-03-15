@@ -6,5 +6,6 @@
   "Description": "Description",
   "Select bank": "Select bank",
   "Status": "Status",
-  "pending": "pending"
+  "pending": "pending",
+  "Payment method": "Payment method"
 }

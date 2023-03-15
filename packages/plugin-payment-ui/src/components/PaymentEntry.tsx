@@ -12,6 +12,7 @@ import { PAYMENT_KINDS, PAYMENTCONFIGS } from './constants';
 import MonpayForm from './form/MonpayForm';
 import QpayForm from './form/QpayForm';
 import SocialPayForm from './form/SocialPayForm';
+import StorepayForm from './form/StorePayForm';
 import { Box, PaymentItem, Ribbon, Type } from './styles';
 
 type Props = {
@@ -84,6 +85,11 @@ function renderCreate(kind: string) {
     case PAYMENT_KINDS.MONPAY:
       formContent = props => (
         <MonpayForm {...props} renderButton={renderButton} />
+      );
+      break;
+    case PAYMENT_KINDS.STOREPAY:
+      formContent = props => (
+        <StorepayForm {...props} renderButton={renderButton} />
       );
       break;
     default:

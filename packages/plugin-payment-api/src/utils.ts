@@ -137,6 +137,7 @@ export const createNewInvoice = async (
       case PAYMENT_KINDS.MONPAY:
         // create monpay invoice
         return await monpayUtils.createInvoice(invoice, payment);
+
       default:
         break;
     }

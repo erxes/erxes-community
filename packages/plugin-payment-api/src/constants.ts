@@ -1,12 +1,31 @@
 export const QPAY_ENDPOINT = 'https://merchant.qpay.mn';
 export const SOCIALPAY_ENDPOINT = 'https://instore.golomtbank.com';
 
+export const META_DATA = {
+  QPAY: {
+    apiUrl: QPAY_ENDPOINT
+  },
+
+  SOCIAL_PAY: {
+    apiUrl: SOCIALPAY_ENDPOINT
+  },
+
+  MONPAY: {
+    apiUrl: 'https://wallet.monpay.mn'
+  },
+
+  STOREPAY: {
+    apiUrl: 'https://service-merchant.storepay.mn:7005'
+  }
+};
+
 export const PAYMENT_KINDS = {
   QPAY: 'qpay',
   SOCIAL_PAY: 'socialPay',
   MONPAY: 'monpay',
+  STOREPAY: 'storepay',
 
-  ALL: ['qpay', 'socialPay', 'monpay']
+  ALL: ['qpay', 'socialPay', 'monpay', 'storepay']
 };
 
 export const QPAY_ACTIONS = {
