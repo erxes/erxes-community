@@ -23,6 +23,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import { CustomCollapseRow } from '../../styles';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import Icon from '@erxes/ui/src/components/Icon';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
   scheduleOfMembers: any;
@@ -262,6 +263,7 @@ function ScheduleList(props: Props) {
     );
 
     if (schedule.shifts.length > 0) {
+      const showScheduleChecked = !isEnabled('bichil') ? scheduleChecked : '';
       return (
         <div key={schedule._id} style={{ flex: 1 }}>
           <CustomCollapseRow isChild={false}>
@@ -270,7 +272,7 @@ function ScheduleList(props: Props) {
               {name}
             </div>
 
-            <div> {scheduleChecked}</div>
+            <div> {showScheduleChecked}</div>
             <div>{scheduleStartDate}</div>
             <div>{scheduleEndDate}</div>
 
