@@ -137,7 +137,7 @@ function ScheduleList(props: Props) {
     removeScheduleShifts(_id, type);
   };
 
-  const ListShiftContent = (shifts, scheduleChecked) => {
+  const ListShiftContent = shifts => {
     return shifts.map(shift => (
       <PropertyTableRow key="">
         <RowField>
@@ -299,7 +299,7 @@ function ScheduleList(props: Props) {
                   <ControlLabel>{__('Shift Status')}</ControlLabel>
                   <ControlLabel>{__('Actions')}</ControlLabel>
                 </PropertyTableHeader>
-                {ListShiftContent(schedule.shifts, scheduleChecked)}
+                {ListShiftContent(schedule.shifts)}
               </PropertyListTable>
             </Margin>
           </Collapse>
