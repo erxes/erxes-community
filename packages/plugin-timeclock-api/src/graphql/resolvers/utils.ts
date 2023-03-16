@@ -41,6 +41,7 @@ export const findUser = async (subdomain: string, userId: string) => {
 
   return user;
 };
+
 export const findBranchUsers = async (
   subdomain: string,
   branchIds: string[]
