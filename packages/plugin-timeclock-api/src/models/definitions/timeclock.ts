@@ -45,7 +45,7 @@ export interface IAbsenceType {
 
   requestType?: string;
   requestTimeType?: string;
-  requestHoursPerDay?: number;
+  requestHoursPerDay: number;
 
   explRequired: boolean;
   attachRequired: boolean;
@@ -404,10 +404,10 @@ export interface IUserExportReport {
 }
 
 export interface IUserAbsenceInfo {
-  totalHoursWorkedAbroad?: string;
-  totalHoursPaidAbsence?: string;
-  totalHoursUnpaidAbsence?: string;
-  totalHoursSick?: string;
+  totalHoursWorkedAbroad?: number;
+  totalHoursPaidAbsence?: number;
+  totalHoursUnpaidAbsence?: number;
+  totalHoursSick?: number;
 }
 
 export interface IUsersReport {

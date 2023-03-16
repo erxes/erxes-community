@@ -4,6 +4,8 @@ import { generateModels, IModels } from '../../connectionResolver';
 import { sendCoreMessage } from '../../messageBroker';
 import {
   IAbsence,
+  IAbsenceType,
+  IAbsenceTypeDocument,
   IScheduleDocument,
   IShiftDocument,
   IUserAbsenceInfo,
@@ -12,10 +14,12 @@ import {
 } from '../../models/definitions/timeclock';
 import { customFixDate } from '../../utils';
 
-// milliseconds to hrs
-const MMSTOHRS = 3600000;
 // milliseconds to mins
 const MMSTOMINS = 60000;
+// milliseconds to hrs
+const MMSTOHRS = MMSTOMINS * 60;
+// millieseconds to days
+const MMSTODAYS = MMSTOHRS * 24;
 
 export const paginateArray = (array, perPage = 20, page = 1) =>
   array.slice((page - 1) * perPage, page * perPage);
@@ -450,9 +454,14 @@ export const timeclockReportFinal = async (
     status: /approved/gi
   });
 
-  // request.solved &&
-  //     request.status?.toLowerCase().includes('approved') &&
+  const relatedAbsenceTypes = await models.AbsenceTypes.find({
+    _id: { $in: requests.map(request => request.absenceTypeId) }
+  });
 
+  // get all related absences
+  const relatedAbsences = await returnTotalAbsences(requests, models);
+
+  // find total Timeclocks
   const timeclocks = await models.Timeclocks.find({
     $and: [
       { userId: { $in: userIds } },
@@ -613,8 +622,27 @@ export const timeclockReportFinal = async (
       });
     }
 
+    const userAbsenceInfo: IUserAbsenceInfo = await returnUserAbsenceInfo(
+      {
+        requestsWorkedAbroad: relatedAbsences.requestsWorkedAbroad.filter(
+          absence => absence.userId === currUserId
+        ),
+        requestsPaidAbsence: relatedAbsences.requestsPaidAbsence.filter(
+          absence => absence.userId === currUserId
+        ),
+        requestsUnpaidAbsence: relatedAbsences.requestsUnpaidAbsence.filter(
+          absence => absence.userId === currUserId
+        ),
+        requestsSick: relatedAbsences.requestsSick.filter(
+          absence => absence.userId === currUserId
+        )
+      },
+      relatedAbsenceTypes
+    );
+
     usersReport[currUserId] = {
       ...usersReport[currUserId],
+      absenceInfo: userAbsenceInfo,
       totalDaysScheduled: totalDaysScheduledPerUser,
       totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
       totalDaysWorked: totalDaysWorkedPerUser,
@@ -798,14 +826,107 @@ export const timeclockReportPivot = async (
 
   return usersReport;
 };
-const returnAbsenceInfo = (requestsPerUser: IAbsence[]): IUserAbsenceInfo => {
-  const requestsWorkedAbroad = requestsPerUser.filter(request =>
+
+const returnTotalAbsences = async (
+  totalRequests: IAbsence[],
+  models: IModels
+): Promise<{
+  requestsWorkedAbroad: IAbsence[];
+  requestsPaidAbsence: IAbsence[];
+  requestsUnpaidAbsence: IAbsence[];
+  requestsSick: IAbsence[];
+}> => {
+  // get all paid absence types' ids except sick absence
+  const paidAbsenceTypes = await models.AbsenceTypes.find({
+    requestType: 'paid absence',
+    name: { $not: /өвдсөн цаг/gi }
+  });
+
+  const paidAbsenceTypeIds = paidAbsenceTypes.map(
+    paidAbsence => paidAbsence._id
+  );
+
+  // get all unpaid absence types' ids
+  const unpaidAbsenceTypes = await models.AbsenceTypes.find({
+    requestType: 'unpaid absence'
+  });
+
+  const unpaidAbsenceTypeIds = unpaidAbsenceTypes.map(
+    unpaidAbsence => unpaidAbsence._id
+  );
+
+  // find Absences
+  const requestsWorkedAbroad = totalRequests.filter(request =>
     request.reason.toLocaleLowerCase().includes('томилолт')
   );
 
-  const requestsPaidAbsence = requestsPerUser.filter(request => request);
+  const requestsPaidAbsence = totalRequests.filter(request =>
+    paidAbsenceTypeIds.includes(request.absenceTypeId || '')
+  );
 
-  return {};
+  const requestsUnpaidAbsence = totalRequests.filter(request =>
+    unpaidAbsenceTypeIds.includes(request.absenceTypeId || '')
+  );
+
+  const requestsSick = totalRequests.filter(request =>
+    request.reason.toLowerCase().includes('өвдсөн цаг')
+  );
+
+  return {
+    requestsWorkedAbroad,
+    requestsPaidAbsence,
+    requestsUnpaidAbsence,
+    requestsSick
+  };
+};
+
+const returnUserAbsenceInfo = (
+  relatedAbsences: any,
+  relatedAbsenceTypes: IAbsenceTypeDocument[]
+): IUserAbsenceInfo => {
+  let totalHoursWorkedAbroad = 0;
+  let totalHoursPaidAbsence = 0;
+  let totalHoursUnpaidAbsence = 0;
+  let totalHoursSick = 0;
+
+  relatedAbsences.requestsWorkedAbroad.forEach(request => {
+    totalHoursWorkedAbroad +=
+      (request.endTime.getTime() - request.startTime.getTime()) / MMSTOHRS;
+  });
+
+  relatedAbsences.requestsPaidAbsence.forEach(request => {
+    const absenceType = relatedAbsenceTypes.find(
+      absType => absType._id === request.absenceTypeId
+    );
+
+    if (absenceType && absenceType.requestTimeType === 'by day') {
+      const getTotalDays = Math.ceil(
+        (request.endTime.getTime() - request.startTime.getTime()) /
+          (1000 * 3600 * 24)
+      );
+      totalHoursPaidAbsence += getTotalDays * absenceType.requestHoursPerDay;
+
+      return;
+    }
+    totalHoursPaidAbsence +=
+      (request.endTime.getTime() - request.startTime.getTime()) / MMSTOHRS;
+  });
+
+  relatedAbsences.requestsUnpaidAbsence.forEach(request => {
+    totalHoursUnpaidAbsence +=
+      (request.endTime.getTime() - request.startTime.getTime()) / MMSTOHRS;
+  });
+  relatedAbsences.requestsSick.forEach(request => {
+    totalHoursSick +=
+      (request.endTime.getTime() - request.startTime.getTime()) / MMSTOHRS;
+  });
+
+  return {
+    totalHoursWorkedAbroad,
+    totalHoursPaidAbsence,
+    totalHoursUnpaidAbsence,
+    totalHoursSick
+  };
 };
 
 const returnOvernightHours = (shiftStart: Date, shiftEnd: Date) => {
