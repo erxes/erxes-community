@@ -38,7 +38,7 @@ export interface IAbsence {
   checkTime?: Date;
   checkInOutRequest?: boolean;
 
-  reason?: string;
+  reason: string;
   explanation?: string;
   status?: string;
   solved?: boolean;
@@ -410,7 +410,16 @@ export interface IUserExportReport {
   totalHoursOvernight?: string;
   totalMinsLate?: string;
 
+  absenceInfo?: IUserAbsenceInfo;
+
   scheduleReport?: IScheduleReport[];
+}
+
+export interface IUserAbsenceInfo {
+  totalHoursWorkedAbroad?: string;
+  totalHoursPaidAbsence?: string;
+  totalHoursUnpaidAbsence?: string;
+  totalHoursSick?: string;
 }
 
 export interface IUsersReport {

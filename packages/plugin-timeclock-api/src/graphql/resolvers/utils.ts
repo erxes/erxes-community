@@ -3,8 +3,10 @@ import dayjs = require('dayjs');
 import { generateModels, IModels } from '../../connectionResolver';
 import { sendCoreMessage } from '../../messageBroker';
 import {
+  IAbsence,
   IScheduleDocument,
   IShiftDocument,
+  IUserAbsenceInfo,
   IUserReport,
   IUsersReport
 } from '../../models/definitions/timeclock';
@@ -442,6 +444,15 @@ export const timeclockReportFinal = async (
 
   const scheduleIds = schedules.map(schedule => schedule._id);
 
+  // get all approved absence requests
+  const requests = await models.Absences.find({
+    solved: true,
+    status: /approved/gi
+  });
+
+  // request.solved &&
+  //     request.status?.toLowerCase().includes('approved') &&
+
   const timeclocks = await models.Timeclocks.find({
     $and: [
       { userId: { $in: userIds } },
@@ -786,6 +797,15 @@ export const timeclockReportPivot = async (
   });
 
   return usersReport;
+};
+const returnAbsenceInfo = (requestsPerUser: IAbsence[]): IUserAbsenceInfo => {
+  const requestsWorkedAbroad = requestsPerUser.filter(request =>
+    request.reason.toLocaleLowerCase().includes('томилолт')
+  );
+
+  const requestsPaidAbsence = requestsPerUser.filter(request => request);
+
+  return {};
 };
 
 const returnOvernightHours = (shiftStart: Date, shiftEnd: Date) => {
