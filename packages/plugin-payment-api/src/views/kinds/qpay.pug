@@ -1,0 +1,4 @@
+mixin qpay(invoice)
+    h3 QR code
+        .border.flex-center
+            img(src=`${invoice.apiResponse.qrData}`)

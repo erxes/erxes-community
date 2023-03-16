@@ -1,4 +1,7 @@
 extends layout
+include ./kinds/socialPay.pug
+include ./kinds/qpay.pug
+
 
 block layout-content
     .my-layout
@@ -25,6 +28,7 @@ block layout-content
                 .col.m6.s12 
                     if invoice
                         .qr
+                            +#{invoice.paymentKind}(invoice)
                             .isMobile#isMobile
                                 if invoice.paymentKind === 'socialPay' && invoice.phone
                                     h3 #{__('Check Social pay app')}
@@ -32,7 +36,7 @@ block layout-content
                                     h3 #{__('Insert phone number')}
                                     .border
                                         form(method="post")
-                                            input(name='insertPhoneNumber' type="number").no-border 
+                                            input(name='socialPayPhone' type="number").no-border 
                                             button(type="submit").send-button #{__("Send")}
                                 else
                                     h3 #{__('Select bank')}
@@ -63,15 +67,8 @@ block layout-content
                                             }
     
                             .desktop#desktop
-                                if invoice.paymentKind === 'socialPay' && invoice.phone
-                                    .label #{invoice.apiResponse.text}
-                                else
-                                    h3 QR code
-                                    .border.flex-center
-                                        if invoice.apiResponse.qrData
-                                            img(src=invoice.apiResponse.qrData)
-                                        if invoice.apiResponse.socialPayQrCode
-                                            img(src=`${invoice.apiResponse.socialPayQrCode}`)
+                                +#{invoice.paymentKind}(invoice)
+                                
                                 if invoice.status === 'paid'
                                     script.
                                         const message = {

@@ -98,6 +98,9 @@ export const createInvoice = async (
 
   try {
     const { header, body } = await sendRequest(requestOptions);
+    console.log('body', body);
+    console.log('requestOptions', requestOptions);
+    console.log('header', header);
 
     if (header.code !== 200) {
       throw new Error(body.response.desc);

@@ -1,10 +1,12 @@
+import { PAYMENT_KINDS } from './constants';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { Router } from 'express';
 import { debugInfo } from '@erxes/api-utils/src/debuggers';
 
 import { generateModels } from './connectionResolver';
 import redisUtils from './redisUtils';
-
+import * as socialpayUtils from './api/socialPay/utils';
+import { makeInvoiceNo } from './utils';
 const router = Router();
 
 router.post('/checkInvoice', async (req, res) => {
@@ -47,7 +49,7 @@ router.get('/gateway', async (req, res) => {
     })
     .lean();
 
-  let invoice = await models.Invoices.findOne({ _id: data._id }).lean();
+  const invoice = await models.Invoices.findOne({ _id: data._id }).lean();
 
   const prefix = subdomain === 'localhost' ? '' : `/gateway`;
   const domain = process.env.DOMAIN || 'http://localhost:3000';
@@ -59,7 +61,7 @@ router.get('/gateway', async (req, res) => {
   if (invoice && invoice.status === 'paid') {
     return res.render('index', {
       title: 'Payment gateway',
-      payments: payments,
+      payments,
       invoiceData: data,
       invoice,
       prefix,
@@ -78,6 +80,8 @@ router.get('/gateway', async (req, res) => {
 
 router.post('/gateway', async (req, res) => {
   const { params } = req.query;
+
+  console.log('params', req.body);
 
   const data = JSON.parse(
     Buffer.from(params as string, 'base64').toString('ascii')
@@ -115,6 +119,26 @@ router.post('/gateway', async (req, res) => {
   });
 
   let invoice = await models.Invoices.findOne({ _id: data._id });
+
+  console.log('invoice', invoice);
+  console.log('selectedPaymentId', selectedPaymentId);
+
+  if (invoice && req.body.socialPayPhone) {
+    console.log('socialPayPhone', req.body.socialPayPhone);
+    invoice.phone = req.body.socialPayPhone;
+    // const invoiceObj: any = {...invoice, phone: req.body.socialPayPhone}
+    invoice.phone = req.body.socialPayPhone;
+    invoice.identifier = makeInvoiceNo(32);
+    console.log('invoiceObj', invoice);
+    const socialpayResponse = await socialpayUtils.createInvoice(
+      invoice,
+      await models.Payments.getPayment(invoice.selectedPaymentId)
+    );
+
+    console.log('socialpayResponse', socialpayResponse);
+
+    invoice.apiResponse = socialpayResponse;
+  }
 
   if (invoice && invoice.status === 'paid') {
     return res.render('index', {
