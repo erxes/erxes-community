@@ -640,9 +640,24 @@ export const timeclockReportFinal = async (
       relatedAbsenceTypes
     );
 
+    if (exportToXlsx) {
+      usersReport[currUserId] = {
+        ...usersReport[currUserId],
+        totalDaysScheduled: totalDaysScheduledPerUser,
+        totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
+        totalDaysWorked: totalDaysWorkedPerUser,
+        totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
+        totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
+        totalHoursOvernight: totalHoursOvernightPerUser.toFixed(2),
+        totalHoursWorked: totalHoursWorkedPerUser.toFixed(2),
+        totalMinsLate: totalMinsLatePerUser.toFixed(2),
+        ...userAbsenceInfo
+      };
+      return;
+    }
+
     usersReport[currUserId] = {
       ...usersReport[currUserId],
-      absenceInfo: userAbsenceInfo,
       totalDaysScheduled: totalDaysScheduledPerUser,
       totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
       totalDaysWorked: totalDaysWorkedPerUser,
@@ -650,7 +665,8 @@ export const timeclockReportFinal = async (
       totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
       totalHoursOvernight: totalHoursOvernightPerUser.toFixed(2),
       totalHoursWorked: totalHoursWorkedPerUser.toFixed(2),
-      totalMinsLate: totalMinsLatePerUser.toFixed(2)
+      totalMinsLate: totalMinsLatePerUser.toFixed(2),
+      absenceInfo: userAbsenceInfo
     };
   });
 
