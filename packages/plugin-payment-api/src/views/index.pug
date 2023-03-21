@@ -1,7 +1,8 @@
 extends layout
-include ./kinds/socialPay.pug
+include ./kinds/socialpay.pug
 include ./kinds/qpay.pug
-
+include ./kinds/monpay.pug
+include ./kinds/storepay.pug
 
 block layout-content
     .my-layout
@@ -29,66 +30,6 @@ block layout-content
                     if invoice
                         .qr
                             +#{invoice.paymentKind}(invoice)
-                            .isMobile#isMobile
-                                if invoice.paymentKind === 'socialPay' && invoice.phone
-                                    h3 #{__('Check Social pay app')}
-                                if invoice.paymentKind === 'socialPay' && !invoice.phone
-                                    h3 #{__('Insert phone number')}
-                                    .border
-                                        form(method="post")
-                                            input(name='socialPayPhone' type="number").no-border 
-                                            button(type="submit").send-button #{__("Send")}
-                                else
-                                    h3 #{__('Select bank')}
-                                    .border
-                                        if invoice.apiResponse.qrData
-                                            each url in (invoice.apiResponse.urls || [])
-                                                a(href=url.link class="bank")
-                                                    img(src=url.logo class="urlLogo")
-                                        if invoice.apiResponse.socialPayQrCode
-                                            img(src=`${invoice.apiResponse.socialPayQrCode}`)
-                                    if invoice.status === 'paid'
-                                        script.
-                                            const message = {
-                                                fromPayment: true,
-                                                message:"paymentSuccessfull",
-                                                contentType: invoice.contentType,
-                                                contentTypeId: invoice.contentTypeId,
-                                            }
-                                            if(window.opener) {
-                                                window.opener.postMessage(message, '*');
-                                            }
-                                            window.parent.postMessage(message, '*');
-
-                                            if(`#{invoiceData.redirectUri}` && window.confirm('Payment is completed. Do you want to continue?')) {
-                                                window.location.href = `#{invoiceData.redirectUri}`;
-                                            } else if (window.opener && window.confirm('Payment is completed. Do you want to close this window?')) {
-                                                window.close();
-                                            }
-    
-                            .desktop#desktop
-                                +#{invoice.paymentKind}(invoice)
-                                
-                                if invoice.status === 'paid'
-                                    script.
-                                        const message = {
-                                            fromPayment: true,
-                                            message:"paymentSuccessfull",
-                                            invoiceId: invoice._id,
-                                            contentType: invoice.contentType,
-                                            contentTypeId: invoice.contentTypeId,
-                                        };
-    
-                                        if(window.opener) {
-                                            window.opener.postMessage(message, '*');
-                                        }
-                                        window.parent.postMessage(message, '*');
-    
-                                        if(`#{invoiceData.redirectUri}` && window.confirm('Payment is completed. Do you want to continue?')) {
-                                            window.location.href = `#{invoiceData.redirectUri}`;
-                                        } else if (window.opener && window.confirm('Payment is completed. Do you want to close this window?')) {
-                                            window.close();
-                                        }
                 .col.m6.s12 
                     .amount
                         h4 Amount

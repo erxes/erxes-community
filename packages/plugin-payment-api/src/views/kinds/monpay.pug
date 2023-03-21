@@ -1,4 +1,4 @@
-mixin socialpay(invoice)
+mixin monpay(invoice)
     .isMobile#isMobile
         if invoice.phone
             h3 #{__('Check Social pay app')}
@@ -6,7 +6,7 @@ mixin socialpay(invoice)
             h3 #{__('Insert phone number')}
             .border
                 form(method="post")
-                    input(name="socialpayPhone" type="number").no-border
+                    input(name="socialPayPhone" type="number").no-border
                     button(type="submit").send-button #{__('Send')}
     .desktop#desktop
         if invoice.phone

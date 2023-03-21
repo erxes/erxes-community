@@ -42,7 +42,7 @@ export interface IPaymentDocument extends IPayment, Document {
 
 export type ByKindTotalCount = {
   qpay: number;
-  socialPay: number;
+  socialpay: number;
 };
 
 export type InvoicesCount = {

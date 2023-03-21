@@ -2,8 +2,8 @@ import { getSubdomain } from '@erxes/api-utils/src/core';
 
 import * as monpayUtils from './api/monpay/api';
 import * as qPayUtils from './api/qPay/utils';
-import * as socialPayUtils from './api/socialPay/utils';
-import { IMonpayConfig } from './api/types';
+import { StorePayAPI } from './api/storepay/api';
+import { SocialPayAPI } from './api/socialpay/api';
 import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
 import { PAYMENT_KINDS } from './constants';
@@ -74,7 +74,8 @@ export const postHandler = async (req, res) => {
     let invoice: any;
     switch (type) {
       case PAYMENT_KINDS.SOCIAL_PAY:
-        invoice = await socialPayUtils.socialPayHandler(models, body);
+        const socialPay = new SocialPayAPI();
+        invoice = await socialPay.callbackHandler(models, body);
     }
 
     if (invoice) {
@@ -115,7 +116,8 @@ export const cancelPayment = (
       break;
     case PAYMENT_KINDS.SOCIAL_PAY:
       // cancel socialpay invoice
-      socialPayUtils.cancelInvoice(invoice, payment);
+      const socialPay = new SocialPayAPI(payment);
+      socialPay.cancelInvoice(invoice);
       break;
     default:
       break;
@@ -137,6 +139,9 @@ export const createNewInvoice = async (
       case PAYMENT_KINDS.MONPAY:
         // create monpay invoice
         return await monpayUtils.createInvoice(invoice, payment);
+      case PAYMENT_KINDS.STOREPAY:
+        const storepay = new StorePayAPI(payment.config);
+        return await storepay.createInvoice(invoice, payment);
 
       default:
         break;

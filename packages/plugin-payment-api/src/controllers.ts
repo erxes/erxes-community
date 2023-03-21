@@ -5,7 +5,7 @@ import { debugInfo } from '@erxes/api-utils/src/debuggers';
 
 import { generateModels } from './connectionResolver';
 import redisUtils from './redisUtils';
-import * as socialpayUtils from './api/socialPay/utils';
+import * as socialpayUtils from './api/socialpay/utils';
 import { makeInvoiceNo } from './utils';
 const router = Router();
 

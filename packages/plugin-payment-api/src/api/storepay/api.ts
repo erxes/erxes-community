@@ -4,6 +4,7 @@ import { META_DATA, PAYMENT_KINDS, PAYMENT_STATUS } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { IPaymentDocument } from '../../models/definitions/payments';
 import redis from '../../redis';
+import { sendRequest } from '@erxes/api-utils/src/requests';
 
 export interface IStorePayParams {
   merchantUsername: string;
@@ -49,19 +50,23 @@ export class StorePayAPI extends BaseAPI {
     }
 
     try {
-      const res = await this.request({
-        method: 'POST',
-        path: 'oauth/token',
-        data,
+      const requestOptions = {
+        url: 'http://service-merchant.storepay.mn:7701/oauth/token',
         params: {
           grant_type: 'password',
           username,
           password
         },
+        method: 'POST',
         headers: {
-          Authorization: `Basic ${app_username}${app_password}`
-        }
-      });
+          Authorization: `Basic ${Buffer.from(
+            `${username}${password}`
+          ).toString('base64')}`
+        },
+        body: data
+      };
+
+      const res = await sendRequest(requestOptions);
 
       await redis.set(
         `storepay_token_${store_id}`,
@@ -75,6 +80,7 @@ export class StorePayAPI extends BaseAPI {
         'Content-Type': 'application/json'
       };
     } catch (e) {
+      console.error('******************* ', e);
       throw new Error(e.message);
     }
   }
@@ -99,6 +105,14 @@ export class StorePayAPI extends BaseAPI {
         storeId: this.store_id,
         callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENT_KINDS.STOREPAY}`
       };
+
+      const possibleAmount = await this.checkLoanAmount(invoice.phone);
+
+      console.log('possibleAmount', possibleAmount);
+
+      if (possibleAmount < invoice.amount) {
+        throw new Error('Insufficient loan amount');
+      }
 
       const res = await this.request({
         method: 'POST',
@@ -156,7 +170,7 @@ export class StorePayAPI extends BaseAPI {
         }
       });
       if (!res.value || res.value === 0) {
-        throw new Error('No loan amount');
+        throw new Error('Insufficient loan amount');
       }
 
       return res.value;

@@ -21,11 +21,11 @@ export const META_DATA = {
 
 export const PAYMENT_KINDS = {
   QPAY: 'qpay',
-  SOCIAL_PAY: 'socialPay',
+  SOCIAL_PAY: 'socialpay',
   MONPAY: 'monpay',
   STOREPAY: 'storepay',
 
-  ALL: ['qpay', 'socialPay', 'monpay', 'storepay']
+  ALL: ['qpay', 'socialpay', 'monpay', 'storepay']
 };
 
 export const QPAY_ACTIONS = {
@@ -34,16 +34,16 @@ export const QPAY_ACTIONS = {
 };
 
 export const SOCIALPAY_ACTIONS = {
-  INVOICE_PHONE: '/pos/invoice/phone',
-  INVOICE_QR: '/pos/invoice/qr',
-  INVOICE_CHECK: '/pos/invoice/check',
-  INVOICE_CANCEL: '/pos/invoice/cancel'
+  INVOICE_PHONE: 'pos/invoice/phone',
+  INVOICE_QR: 'pos/invoice/qr',
+  INVOICE_CHECK: 'pos/invoice/check',
+  INVOICE_CANCEL: 'pos/invoice/cancel'
 };
 
 export const POST_CALLBACK_TYPES = {
-  SOCIAL_PAY: 'socialPay',
+  SOCIAL_PAY: 'socialpay',
 
-  ALL: ['socialPay']
+  ALL: ['socialpay']
 };
 
 export const GET_CALLBACK_TYPES = {
