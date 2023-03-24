@@ -102,7 +102,7 @@ export const initBroker = async cl => {
           data: {
             mainType: 'deal',
             mainTypeId: deal._id,
-            relType: 'customer',
+            relType: doneOrder.customerType || 'customer',
             relTypeId: doneOrder.customerId
           },
           isRPC: true
@@ -223,7 +223,7 @@ export const initBroker = async cl => {
           data: {
             mainType: 'deal',
             mainTypeId: cardDeal._id,
-            relType: 'customer',
+            relType: newOrder.customerType || 'customer',
             relTypeId: newOrder.customerId
           },
           isRPC: true

@@ -3,6 +3,7 @@ import { IProduct, IProductCategory } from '@erxes/ui-products/src/types';
 
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { ICompany } from '@erxes/ui-contacts/src/companies/types';
 
 export type IOrder = {
   _id: string;
@@ -11,6 +12,7 @@ export type IOrder = {
   paidDate: Date;
   number: string;
   customerId: string;
+  customerType: string;
   cashAmount: number;
   paidAmounts: any;
   mobileAmount: number;
@@ -29,7 +31,14 @@ export type IOrder = {
   posToken: string;
   posName: string;
   user: IUser;
-  customer: ICustomer;
+  customer: {
+    _id: string;
+    code: string;
+    primaryPhone: string;
+    firstName: string;
+    primaryEmail: string;
+    lastName: string;
+  };
   origin?: string;
   syncedErkhet: boolean;
 };
