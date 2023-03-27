@@ -80,7 +80,7 @@ export class StorePayAPI extends BaseAPI {
         'Content-Type': 'application/json'
       };
     } catch (e) {
-      console.error('******************* ', e);
+      console.error('error ', e);
       throw new Error(e.message);
     }
   }
@@ -107,8 +107,6 @@ export class StorePayAPI extends BaseAPI {
       };
 
       const possibleAmount = await this.checkLoanAmount(invoice.phone);
-
-      console.log('possibleAmount', possibleAmount);
 
       if (possibleAmount < invoice.amount) {
         throw new Error('Insufficient loan amount');
