@@ -1,12 +1,12 @@
-import { PAYMENT_KINDS } from './constants';
 import { getSubdomain } from '@erxes/api-utils/src/core';
-import { Router } from 'express';
 import { debugInfo } from '@erxes/api-utils/src/debuggers';
+import { Router } from 'express';
 
 import { generateModels } from './connectionResolver';
 import redisUtils from './redisUtils';
-import * as socialpayUtils from './api/socialpay/utils';
 import { makeInvoiceNo } from './utils';
+import { SocialPayAPI } from './api/socialpay/api';
+
 const router = Router();
 
 router.post('/checkInvoice', async (req, res) => {
@@ -81,8 +81,6 @@ router.get('/gateway', async (req, res) => {
 router.post('/gateway', async (req, res) => {
   const { params } = req.query;
 
-  console.log('params', req.body);
-
   const data = JSON.parse(
     Buffer.from(params as string, 'base64').toString('ascii')
   );
@@ -118,24 +116,15 @@ router.post('/gateway', async (req, res) => {
     return p;
   });
 
+  const selectedPaymentMethod = payments.find(p => p._id === selectedPaymentId);
+
   let invoice = await models.Invoices.findOne({ _id: data._id });
 
-  console.log('invoice', invoice);
-  console.log('selectedPaymentId', selectedPaymentId);
-
   if (invoice && req.body.socialPayPhone) {
-    console.log('socialPayPhone', req.body.socialPayPhone);
-    invoice.phone = req.body.socialPayPhone;
-    // const invoiceObj: any = {...invoice, phone: req.body.socialPayPhone}
     invoice.phone = req.body.socialPayPhone;
     invoice.identifier = makeInvoiceNo(32);
-    console.log('invoiceObj', invoice);
-    const socialpayResponse = await socialpayUtils.createInvoice(
-      invoice,
-      await models.Payments.getPayment(invoice.selectedPaymentId)
-    );
-
-    console.log('socialpayResponse', socialpayResponse);
+    const socialpayApi = new SocialPayAPI(selectedPaymentMethod);
+    const socialpayResponse = await socialpayApi.createInvoice(invoice);
 
     invoice.apiResponse = socialpayResponse;
   }
