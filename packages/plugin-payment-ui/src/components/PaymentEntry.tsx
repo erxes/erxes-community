@@ -2,13 +2,13 @@ import { ButtonMutate } from '@erxes/ui/src/components';
 import Icon from '@erxes/ui/src/components/Icon';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import { __ } from '@erxes/ui/src/utils';
+import { getEnv, __ } from '@erxes/ui/src/utils';
 import React from 'react';
 
 import { getGqlString, getRefetchQueries } from '../containers/utils';
 import { mutations } from '../graphql';
 import { ByKindTotalCount } from '../types';
-import { PAYMENT_KINDS, PAYMENTCONFIGS } from './constants';
+import { PAYMENTCONFIGS, PAYMENT_KINDS } from './constants';
 import MonpayForm from './form/MonpayForm';
 import QpayForm from './form/QpayForm';
 import SocialPayForm from './form/SocialPayForm';
@@ -110,7 +110,10 @@ function Entry({ payment, getClassName, toggleBox, paymentsCount }: Props) {
   return (
     <PaymentItem key={name} className={getClassName(kind)}>
       <Box onClick={() => toggleBox(kind)} isInMessenger={inMessenger}>
-        <img alt="logo" src={logo} />
+        <img
+          alt="logo"
+          src={`${getEnv().REACT_APP_API_URL}/pl:payment/static/${logo}`}
+        />
         <h5>
           {name} {getCount(kind, paymentsCount)}
         </h5>

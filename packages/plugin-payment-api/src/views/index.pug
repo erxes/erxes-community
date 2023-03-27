@@ -21,7 +21,7 @@ block layout-content
                                 input(type="hidden" name="selectedPaymentId", value=val._id)
                                 button(type="submit").button
                                     div.Payment__logo( class=`payments ${val.selected === true && 'active'}`)
-                                        img(src=`${domain}/images/payments/${val.kind}.png`)
+                                        img(src=`${prefix}/pl:payment/static/images/payments/${val.kind}.png`)
                                         .payment-name  
                                             p !{val.name}
                                             span Pay with app

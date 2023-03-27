@@ -52,11 +52,8 @@ router.get('/gateway', async (req, res) => {
   const invoice = await models.Invoices.findOne({ _id: data._id }).lean();
 
   const prefix = subdomain === 'localhost' ? '' : `/gateway`;
-  const domain = process.env.DOMAIN || 'http://localhost:3000';
 
-  debugInfo(
-    `in gateway path-: subdomain: ${subdomain}, prefix: ${prefix}, domain: ${domain}`
-  );
+  debugInfo(`in gateway path-: subdomain: ${subdomain}, prefix: ${prefix}`);
 
   if (invoice && invoice.status === 'paid') {
     return res.render('index', {
@@ -64,8 +61,7 @@ router.get('/gateway', async (req, res) => {
       payments,
       invoiceData: data,
       invoice,
-      prefix,
-      domain
+      prefix
     });
   }
 
@@ -73,7 +69,6 @@ router.get('/gateway', async (req, res) => {
     title: 'Payment gateway',
     payments,
     invoiceData: data,
-    domain,
     prefix: subdomain === 'localhost' ? '' : `/gateway`
   });
 });
@@ -89,7 +84,6 @@ router.post('/gateway', async (req, res) => {
   const models = await generateModels(subdomain);
 
   const prefix = subdomain === 'localhost' ? '' : `/gateway`;
-  const domain = process.env.DOMAIN || 'http://localhost:3000';
 
   const filter: any = {};
 
@@ -135,8 +129,7 @@ router.post('/gateway', async (req, res) => {
       payments: paymentsModified,
       invoiceData: data,
       invoice,
-      prefix,
-      domain
+      prefix
     });
   }
 
@@ -165,8 +158,7 @@ router.post('/gateway', async (req, res) => {
       payments: paymentsModified,
       invoiceData: data,
       invoice,
-      prefix,
-      domain
+      prefix
     });
   } catch (e) {
     res.render('index', {
@@ -174,8 +166,7 @@ router.post('/gateway', async (req, res) => {
       payments: paymentsModified,
       invoiceData: data,
       error: e.message,
-      prefix,
-      domain
+      prefix
     });
   }
 });
