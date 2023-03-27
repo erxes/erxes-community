@@ -40,6 +40,9 @@ const createRouterConfig = () => {
   const rhaiPath = path.resolve(__dirname, 'rhai/main.rhai');
 
   const config = {
+    include_subgraph_errors: {
+      all: true
+    },
     rhai: {
       main: rhaiPath
     },
@@ -68,6 +71,7 @@ const createRouterConfig = () => {
       listen: `127.0.0.1:${apolloRouterPort}`
     }
   };
+
   fs.writeFileSync(routerConfigPath, yaml.stringify(config));
 };
 
