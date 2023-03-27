@@ -1,7 +1,7 @@
-import { PAYMENT_STATUS, PAYMENT_KINDS } from '../../constants';
-import { Schema, Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
+
+import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
 import { field, schemaHooksWrapper } from './utils';
-import { makeInvoiceNo } from '../../utils';
 
 export interface IInvoice {
   selectedPaymentId: string;
@@ -50,7 +50,7 @@ export const invoiceSchema = schemaHooksWrapper(
     paymentKind: field({
       type: String,
       label: 'payment kind',
-      enum: PAYMENT_KINDS.ALL
+      enum: PAYMENTS.ALL
     }),
     companyId: field({ type: String, label: 'company id' }),
     customerId: field({ type: String, label: 'customer id' }),

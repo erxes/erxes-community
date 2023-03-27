@@ -1,56 +1,47 @@
-export const QPAY_ENDPOINT = 'https://merchant.qpay.mn';
-export const SOCIALPAY_ENDPOINT = 'https://instore.golomtbank.com';
-
-export const META_DATA = {
-  QPAY: {
-    apiUrl: QPAY_ENDPOINT
+export const PAYMENTS = {
+  qpay: {
+    kind: 'qpay',
+    apiUrl: 'https://merchant.qpay.mn',
+    apiVersion: 'v2',
+    actions: {
+      getToken: 'auth/token',
+      invoice: 'invoice'
+    },
+    handlerMethod: 'GET'
   },
-
-  SOCIAL_PAY: {
-    apiUrl: SOCIALPAY_ENDPOINT
+  socialpay: {
+    kind: 'socialpay',
+    apiUrl: 'https://instore.golomtbank.com',
+    apiVersion: null,
+    actions: {
+      invoicePhone: 'pos/invoice/phone',
+      invoiceQr: 'pos/invoice/qr',
+      invoiceCheck: 'pos/invoice/check',
+      invoiceCancel: 'pos/invoice/cancel'
+    },
+    handlerMethod: 'POST'
   },
-
-  MONPAY: {
-    apiUrl: 'https://wallet.monpay.mn'
+  monpay: {
+    kind: 'monpay',
+    apiUrl: 'https://wallet.monpay.mn',
+    apiVersion: null,
+    actions: {
+      invoiceQr: 'rest/branch/qrpurchase/generate',
+      invoiceCheck: 'rest/branch/qrpurchase/check'
+    },
+    handlerMethod: 'GET'
   },
-
-  STOREPAY: {
-    apiUrl: 'https://service-merchant.storepay.mn:7005'
-  }
-};
-
-export const PAYMENT_KINDS = {
-  QPAY: 'qpay',
-  SOCIAL_PAY: 'socialpay',
-  MONPAY: 'monpay',
-  STOREPAY: 'storepay',
+  storepay: {
+    kind: 'storepay',
+    apiUrl: 'https://storepay.mn',
+    apiVersion: 'v1',
+    actions: {
+      invoice: 'invoice'
+    },
+    handlerMethod: 'GET'
+  },
 
   ALL: ['qpay', 'socialpay', 'monpay', 'storepay']
-};
-
-export const QPAY_ACTIONS = {
-  GET_TOKEN: '/v2/auth/token',
-  INVOICE: '/v2/invoice'
-};
-
-export const SOCIALPAY_ACTIONS = {
-  INVOICE_PHONE: 'pos/invoice/phone',
-  INVOICE_QR: 'pos/invoice/qr',
-  INVOICE_CHECK: 'pos/invoice/check',
-  INVOICE_CANCEL: 'pos/invoice/cancel'
-};
-
-export const POST_CALLBACK_TYPES = {
-  SOCIAL_PAY: 'socialpay',
-
-  ALL: ['socialpay']
-};
-
-export const GET_CALLBACK_TYPES = {
-  QPAY: 'qpay',
-  MONPAY: 'monpay',
-
-  ALL: ['qpay', 'monpay']
 };
 
 export const PAYMENT_STATUS = {

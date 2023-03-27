@@ -2,9 +2,8 @@ import * as crypto from 'crypto';
 import * as QRCode from 'qrcode';
 
 import { IModels } from '../../connectionResolver';
-import { META_DATA, PAYMENT_STATUS, SOCIALPAY_ACTIONS } from '../../constants';
+import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
-import { IPaymentDocument } from '../../models/definitions/payments';
 import { BaseAPI } from '../base';
 import { ISocialPayInvoice } from '../types';
 
@@ -13,20 +12,68 @@ export const hmac256 = (key, message) => {
   return hash.digest('hex');
 };
 
-export class SocialPayAPI extends BaseAPI {
-  public inStoreSPTerminal: string;
-  public inStoreSPKey: string;
+export const socialpayCallbackHandler = async (models: IModels, data: any) => {
+  const { resp_code, amount, checksum, invoice, terminal } = data;
 
-  constructor(payment?: IPaymentDocument) {
-    super(payment);
-    this.inStoreSPTerminal = payment ? payment.config.inStoreSPTerminal : '';
-    this.inStoreSPKey = payment ? payment.config.inStoreSPKey : '';
-    this.apiUrl = META_DATA.SOCIAL_PAY.apiUrl;
+  let status = PAYMENT_STATUS.PAID;
+
+  if (resp_code !== '00') {
+    status = PAYMENT_STATUS.PENDING;
+  }
+
+  const invoiceObj = await models.Invoices.getInvoice({
+    identifier: invoice
+  });
+
+  const payment = await models.Payments.getPayment(
+    invoiceObj.selectedPaymentId
+  );
+
+  try {
+    const api = new SocialPayAPI(payment.config);
+    const res = await api.checkInvoice({
+      amount,
+      checksum,
+      invoice,
+      terminal
+    });
+
+    if (res !== PAYMENT_STATUS.PAID) {
+      status = PAYMENT_STATUS.PENDING;
+    }
+
+    await models.Invoices.updateOne(
+      { _id: invoiceObj._id },
+      { $set: { status, resolvedAt: new Date() } }
+    );
+
+    return invoiceObj;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
+
+export interface ISocialPayParams {
+  inStoreSPTerminal: string;
+  inStoreSPKey: string;
+}
+
+export class SocialPayAPI extends BaseAPI {
+  private inStoreSPTerminal: string;
+  private inStoreSPKey: string;
+
+  constructor(config: ISocialPayParams) {
+    super(config);
+    this.inStoreSPTerminal = config.inStoreSPTerminal;
+    this.inStoreSPKey = config.inStoreSPKey;
+    this.apiUrl = PAYMENTS.socialpay.apiVersion
+      ? `${PAYMENTS.socialpay.apiUrl}/${PAYMENTS.socialpay.apiVersion}`
+      : PAYMENTS.socialpay.apiUrl;
   }
 
   async createInvoice(invoice: IInvoiceDocument) {
     const amount = invoice.amount.toString();
-    let path = SOCIALPAY_ACTIONS.INVOICE_QR;
+    let path = PAYMENTS.socialpay.actions.invoiceQr;
 
     const data: ISocialPayInvoice = {
       amount,
@@ -40,7 +87,7 @@ export class SocialPayAPI extends BaseAPI {
 
     if (invoice.phone) {
       data.phone = invoice.phone;
-      path = SOCIALPAY_ACTIONS.INVOICE_PHONE;
+      path = PAYMENTS.socialpay.actions.invoicePhone;
       data.checksum = hmac256(
         this.inStoreSPKey,
         this.inStoreSPTerminal + invoice.identifier + amount + invoice.phone
@@ -86,7 +133,7 @@ export class SocialPayAPI extends BaseAPI {
 
     try {
       return await this.request({
-        path: SOCIALPAY_ACTIONS.INVOICE_CANCEL,
+        path: PAYMENTS.socialpay.actions.invoiceCancel,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data
@@ -98,48 +145,18 @@ export class SocialPayAPI extends BaseAPI {
 
   async checkInvoice(data: any) {
     try {
-      return await this.request({
-        path: SOCIALPAY_ACTIONS.INVOICE_CHECK,
+      const { body } = await this.request({
+        path: PAYMENTS.socialpay.actions.invoiceCheck,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data
       });
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  }
-
-  async callbackHandler(models: IModels, data: any) {
-    const { resp_code, amount, checksum, invoice, terminal } = data;
-
-    let status = PAYMENT_STATUS.PAID;
-
-    if (resp_code !== '00') {
-      status = PAYMENT_STATUS.PENDING;
-    }
-    try {
-      const { body } = await this.checkInvoice({
-        amount,
-        checksum,
-        invoice,
-        terminal
-      });
 
       if (body.response.resp_code !== '00') {
-        status = PAYMENT_STATUS.PENDING;
         throw new Error(body.response.resp_desc);
       }
 
-      const invoiceObj = await models.Invoices.getInvoice({
-        identifier: invoice
-      });
-
-      await models.Invoices.updateOne(
-        { _id: invoiceObj._id },
-        { $set: { status, resolvedAt: new Date() } }
-      );
-
-      return invoiceObj;
+      return PAYMENT_STATUS.PAID;
     } catch (e) {
       throw new Error(e.message);
     }

@@ -1,118 +1,13 @@
-import { sendRequest } from '@erxes/api-utils/src';
 import * as QRCode from 'qrcode';
 
 import { IModels } from '../../connectionResolver';
-import { PAYMENT_KINDS, PAYMENT_STATUS } from '../../constants';
+import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
-import { IPaymentDocument } from '../../models/definitions/payments';
-import { IMonpayConfig, IMonpayInvoice } from '../types';
-import { QR_CHECK_URL, QR_GENERATE_URL, AUTH_URL } from './constants';
+import { BaseAPI } from '../base';
+import { IMonpayInvoice } from '../types';
 
-export const generateToken = async config => {
-  const { clientId, clientSecret } = config;
-
-  const requestOptions = {
-    url: AUTH_URL,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: {
-      client_id: clientId,
-      client_secret: clientSecret,
-      grant_type: 'authorization_code',
-      code: 'code'
-    }
-  };
-
-  try {
-    const res = await sendRequest(requestOptions);
-
-    return res.access_token;
-  } catch (e) {
-    throw new Error(e.message);
-  }
-};
-
-export const createInvoice = async (
-  invoice: IInvoiceDocument,
-  payment: IPaymentDocument
-) => {
-  const MAIN_API_DOMAIN = process.env.DOMAIN
-    ? `${process.env.DOMAIN}/gateway`
-    : 'http://localhost:4000';
-
-  const { username, accountId } = payment.config as IMonpayConfig;
-
-  const data: IMonpayInvoice = {
-    amount: invoice.amount,
-    generateUuid: true,
-    displayName: invoice.description || payment.name,
-    callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENT_KINDS.MONPAY}`
-  };
-
-  const requestOptions = {
-    url: QR_GENERATE_URL,
-    method: 'POST',
-    headers: {
-      Authorization:
-        'Basic ' + Buffer.from(`${username}:${accountId}`).toString('base64'),
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: data
-  };
-
-  try {
-    const res = await sendRequest(requestOptions);
-
-    if (res.code !== 0) {
-      throw new Error(res.info);
-    }
-
-    const { result } = res;
-
-    const qrData = await QRCode.toDataURL(result.qrcode);
-
-    return { ...result, qrData };
-  } catch (e) {
-    throw new Error(e.message);
-  }
-};
-
-export const checkInvoice = async (
-  invoice: IInvoiceDocument,
-  payment: IPaymentDocument
-) => {
-  const { username, accountId } = payment.config as IMonpayConfig;
-
-  const requestOptions = {
-    url: `${QR_CHECK_URL}?uuid=${invoice.apiResponse.uuid}`,
-    method: 'GET',
-    headers: {
-      Authorization:
-        'Basic ' + Buffer.from(`${username}:${accountId}`).toString('base64'),
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    }
-  };
-
-  try {
-    const res = await sendRequest(requestOptions);
-
-    switch (res.code) {
-      case 0:
-        return PAYMENT_STATUS.PAID;
-      case 23:
-        return PAYMENT_STATUS.PENDING;
-      default:
-        return PAYMENT_STATUS.FAILED;
-    }
-  } catch (e) {
-    throw new Error(e.message);
-  }
-};
-
-export const monpayHandler = async (models: IModels, queryParams) => {
-  const { uuid, status, amount = 0 } = queryParams;
+export const monpayCallbackHandler = async (models: IModels, data: any) => {
+  const { uuid, status, amount = 0 } = data;
 
   if (!uuid) {
     throw new Error('uuid is required');
@@ -137,7 +32,8 @@ export const monpayHandler = async (models: IModels, queryParams) => {
   }
 
   try {
-    const invoiceStatus = await checkInvoice(invoice, payment);
+    const api = new MonpayAPI(payment.config);
+    const invoiceStatus = await api.checkInvoice(invoice);
 
     if (invoiceStatus !== PAYMENT_STATUS.PAID) {
       throw new Error('Payment failed');
@@ -153,3 +49,87 @@ export const monpayHandler = async (models: IModels, queryParams) => {
     throw new Error(e.message);
   }
 };
+
+export interface IMonpayConfig {
+  username: string;
+  accountId: string;
+}
+
+export class MonpayAPI extends BaseAPI {
+  private username: string;
+  private accountId: string;
+  private headers: any;
+
+  constructor(config: IMonpayConfig) {
+    super(config);
+
+    this.username = config.username;
+    this.accountId = config.accountId;
+    this.apiUrl = PAYMENTS.monpay.apiVersion
+      ? `${PAYMENTS.monpay.apiUrl}/${PAYMENTS.monpay.apiVersion}`
+      : PAYMENTS.monpay.apiUrl;
+    this.headers = {
+      Authorization:
+        'Basic ' +
+        Buffer.from(`${this.username}:${this.accountId}`).toString('base64'),
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    };
+  }
+
+  async createInvoice(invoice: IInvoiceDocument) {
+    const MAIN_API_DOMAIN = process.env.DOMAIN
+      ? `${process.env.DOMAIN}/gateway`
+      : 'http://localhost:4000';
+
+    const data: IMonpayInvoice = {
+      amount: invoice.amount,
+      generateUuid: true,
+      displayName: invoice.description || 'monpay transaction',
+      callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENTS.monpay.kind}`
+    };
+
+    try {
+      const res = await this.request({
+        method: 'POST',
+        headers: this.headers,
+        path: PAYMENTS.monpay.actions.invoiceQr,
+        data
+      });
+
+      if (res.code !== 0) {
+        throw new Error(res.info);
+      }
+
+      const { result } = res;
+
+      const qrData = await QRCode.toDataURL(result.qrcode);
+
+      return { ...result, qrData };
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async checkInvoice(invoice: IInvoiceDocument) {
+    try {
+      const res = await this.request({
+        method: 'GET',
+        headers: this.headers,
+        path: PAYMENTS.monpay.actions.invoiceCheck,
+        params: { uuid: invoice.apiResponse.uuid }
+      });
+
+      switch (res.code) {
+        case 0:
+          return PAYMENT_STATUS.PAID;
+        case 23:
+          return PAYMENT_STATUS.PENDING;
+        default:
+          return PAYMENT_STATUS.FAILED;
+      }
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+}

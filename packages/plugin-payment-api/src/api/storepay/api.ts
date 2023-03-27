@@ -1,11 +1,49 @@
-import { BaseAPI } from '../../api/base';
-import { IModels } from '../../connectionResolver';
-import { META_DATA, PAYMENT_KINDS, PAYMENT_STATUS } from '../../constants';
-import { IInvoiceDocument } from '../../models/definitions/invoices';
-import { IPaymentDocument } from '../../models/definitions/payments';
-import redis from '../../redis';
 import { sendRequest } from '@erxes/api-utils/src/requests';
 
+import { BaseAPI } from '../../api/base';
+import { IModels } from '../../connectionResolver';
+import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
+import { IInvoiceDocument } from '../../models/definitions/invoices';
+import redis from '../../redis';
+
+export const storepayCallbackHandler = async (
+  models: IModels,
+  data: any
+): Promise<IInvoiceDocument> => {
+  const { id } = data;
+
+  if (!id) {
+    throw new Error('id is required');
+  }
+
+  const invoice = await models.Invoices.getInvoice({
+    'apiResponse.value': id
+  });
+
+  const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
+
+  if (payment.kind !== 'storepay') {
+    throw new Error('Payment config type is mismatched');
+  }
+
+  try {
+    const api = new StorePayAPI(payment.config);
+    const invoiceStatus = await api.checkInvoice(id);
+
+    if (invoiceStatus !== PAYMENT_STATUS.PAID) {
+      throw new Error('Payment failed');
+    }
+
+    await models.Invoices.updateOne(
+      { _id: invoice._id },
+      { $set: { status: invoiceStatus, resolvedAt: new Date() } }
+    );
+
+    return invoice;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
 export interface IStorePayParams {
   merchantUsername: string;
   merchantPassword: string;
@@ -17,20 +55,37 @@ export interface IStorePayParams {
 }
 
 export class StorePayAPI extends BaseAPI {
-  public username: string;
-  public password: string;
-  public app_username: string;
-  public app_password: string;
-  public store_id: string;
+  private username: string;
+  private password: string;
+  private app_username: string;
+  private app_password: string;
+  private store_id: string;
 
-  constructor(args: IStorePayParams) {
-    super(args);
-    this.username = args.merchantUsername;
-    this.password = args.merchantPassword;
-    this.app_username = args.appUsername;
-    this.app_password = args.appPassword;
-    this.store_id = args.storeId;
-    this.apiUrl = META_DATA.STOREPAY.apiUrl;
+  constructor(config: IStorePayParams) {
+    super(config);
+
+    const {
+      merchantPassword,
+      merchantUsername,
+      appPassword,
+      appUsername,
+      storeId
+    } = config || {
+      merchantPassword: '',
+      merchantUsername: '',
+      appPassword: '',
+      appUsername: '',
+      storeId: ''
+    };
+
+    this.username = merchantUsername;
+    this.password = merchantPassword;
+    this.app_username = appUsername;
+    this.app_password = appPassword;
+    this.store_id = storeId;
+    this.apiUrl = PAYMENTS.storepay.apiVersion
+      ? `${PAYMENTS.storepay.apiUrl}/${PAYMENTS.storepay.apiVersion}`
+      : PAYMENTS.storepay.apiUrl;
   }
 
   async getHeaders() {
@@ -92,7 +147,7 @@ export class StorePayAPI extends BaseAPI {
    * @return {[object]} - Returns invoice object
    * TODO: update return type
    */
-  async createInvoice(invoice: IInvoiceDocument, payment: IPaymentDocument) {
+  async createInvoice(invoice: IInvoiceDocument) {
     const MAIN_API_DOMAIN = process.env.DOMAIN
       ? `${process.env.DOMAIN}/gateway`
       : 'http://localhost:4000';
@@ -101,9 +156,9 @@ export class StorePayAPI extends BaseAPI {
       const data = {
         amount: invoice.amount,
         mobileNumber: invoice.phone,
-        description: invoice.description || payment.name,
+        description: invoice.description || 'transaction',
         storeId: this.store_id,
-        callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENT_KINDS.STOREPAY}`
+        callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENTS.storepay.kind}`
       };
 
       const possibleAmount = await this.checkLoanAmount(invoice.phone);
@@ -174,47 +229,6 @@ export class StorePayAPI extends BaseAPI {
       return res.value;
     } catch (e) {
       console.error(e);
-      throw new Error(e.message);
-    }
-  }
-
-  /**
-   * request handler
-   * @param {IModels} models - models
-   * @param {object} queryParams - query params
-   * @return {IInvoiceDocument} - Returns invoice document
-   */
-  async callbackHandler(models: IModels, queryParams) {
-    const { id } = queryParams;
-
-    if (!id) {
-      throw new Error('id is required');
-    }
-
-    const invoice = await models.Invoices.getInvoice({
-      'apiResponse.value': id
-    });
-
-    const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
-
-    if (payment.kind !== 'storepay') {
-      throw new Error('Payment config type is mismatched');
-    }
-
-    try {
-      const invoiceStatus = await this.checkInvoice(id);
-
-      if (invoiceStatus !== PAYMENT_STATUS.PAID) {
-        throw new Error('Payment failed');
-      }
-
-      await models.Invoices.updateOne(
-        { _id: invoice._id },
-        { $set: { status: invoiceStatus, resolvedAt: new Date() } }
-      );
-
-      return invoice;
-    } catch (e) {
       throw new Error(e.message);
     }
   }
