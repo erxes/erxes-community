@@ -1,7 +1,7 @@
 export const PAYMENTCONFIGS = [
   {
-    name: 'Qpay',
-    description: 'Qpay payment method',
+    name: 'QPay',
+    description: 'QPay payment method',
     isAvailable: true,
     kind: 'qpay',
     logo: '/images/payments/qpay.png',
@@ -10,7 +10,7 @@ export const PAYMENTCONFIGS = [
     category: 'Payment method'
   },
   {
-    name: 'Social pay',
+    name: 'SocialPay',
     description: 'SocialPay payment method',
     isAvailable: true,
     kind: 'socialpay',
@@ -20,8 +20,8 @@ export const PAYMENTCONFIGS = [
     category: 'Payment method'
   },
   {
-    name: 'Mon pay',
-    description: 'Monpay payment method',
+    name: 'MonPay',
+    description: 'MonPay payment method',
     isAvailable: true,
     kind: 'monpay',
     logo: '/images/payments/monpay.png',
