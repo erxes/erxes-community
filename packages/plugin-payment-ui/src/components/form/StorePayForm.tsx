@@ -157,8 +157,6 @@ class StorepayConfigForm extends React.Component<Props, State> {
   };
 
   render() {
-    console.log('StorepayConfigForm', this.state);
-
     return <Form renderContent={this.renderContent} />;
   }
 }
