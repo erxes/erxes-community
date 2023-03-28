@@ -24,6 +24,9 @@ import React from 'react';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
 
 import styled from 'styled-components';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 
 const TableWrapper = styled.div`
   table thead tr th {
@@ -71,8 +74,7 @@ type State = {
   changePayData: { [currency: string]: number };
   tempId: string;
   categoryId?: string;
-  filterProductSearch: string;
-  filterProductCategoryId: string;
+  filterValues: any;
   advancedView?: boolean;
 };
 
@@ -88,9 +90,9 @@ class ProductForm extends React.Component<Props, State> {
       currentTab: 'products',
       changePayData: {},
       tempId: '',
-      filterProductCategoryId:
-        localStorage.getItem('dealProductFormCategoryId') || '',
-      filterProductSearch: localStorage.getItem('dealProductFormSearch') || ''
+      filterValues: JSON.parse(
+        localStorage.getItem('dealProductFormFilter') || '{}'
+      )
     };
   }
 
@@ -278,6 +280,8 @@ class ProductForm extends React.Component<Props, State> {
               <th>{__('Is tick used')}</th>
               <th>{__('Is vat applied')}</th>
               <th>{__('Assigned to')}</th>
+              <th style={avStyle}>{__('Branch')}</th>
+              <th style={avStyle}>{__('Department')}</th>
               <th style={avStyle}>{__('Unit price (global)')}</th>
               <th style={avStyle}>{__('Unit price percent')}</th>
               <th />
@@ -393,47 +397,91 @@ class ProductForm extends React.Component<Props, State> {
     closeModal();
   };
 
-  onFilterSearch = (e: any) => {
-    const searchText = e.target.value;
-    localStorage.setItem('dealProductFormSearch', searchText);
-    this.setState({ filterProductSearch: searchText });
+  onFilter = (name, value, callback?, params?) => {
+    const { filterValues } = this.state;
+    this.setState({ filterValues: { ...filterValues, [name]: value } }, () => {
+      localStorage.setItem(
+        'dealProductFormFilter',
+        JSON.stringify({ ...filterValues, [name]: value })
+      );
+      if (callback) {
+        callback(params);
+      }
+    });
   };
 
-  onFilterCategory = (categoryId: string, childIds?: string[]) => {
+  onFilterCategory = (childIds?: string[]) => {
     localStorage.setItem(
       'dealProductFormCategoryIds',
       JSON.stringify(childIds || [])
     );
-    localStorage.setItem('dealProductFormCategoryId', categoryId);
-    this.setState({ filterProductCategoryId: categoryId });
   };
 
   clearFilter = () => {
-    localStorage.setItem('dealProductFormCategoryIds', '');
-    localStorage.setItem('dealProductFormCategoryId', '');
-    localStorage.setItem('dealProductFormSearch', '');
-    this.setState({ filterProductCategoryId: '', filterProductSearch: '' });
+    this.setState({ filterValues: {} }, () => {
+      localStorage.removeItem('dealProductFormFilter');
+    });
   };
 
   renderProductFilter() {
+    const { filterValues } = this.state;
     return (
       <FlexRowGap>
         <FormGroup>
-          <ControlLabel>Filter by product</ControlLabel>
+          <ControlLabel>By product</ControlLabel>
           <FormControl
             type="text"
             placeholder={__('Type to search')}
-            onChange={this.onFilterSearch}
-            value={localStorage.getItem('dealProductFormSearch')}
+            onChange={(e: any) => this.onFilter('search', e.target.value)}
+            value={filterValues.search}
           />
         </FormGroup>
         <FormGroup>
-          <ControlLabel>Filter by category</ControlLabel>
+          <ControlLabel>By category</ControlLabel>
           <ProductCategoryChooser
             categories={this.props.categories}
-            currentId={this.state.filterProductCategoryId}
-            onChangeCategory={this.onFilterCategory}
+            currentId={filterValues.category}
+            onChangeCategory={(categoryId, childIds) =>
+              this.onFilter(
+                'categoryId',
+                categoryId,
+                this.onFilterCategory,
+                childIds
+              )
+            }
             hasChildIds={true}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>By branch</ControlLabel>
+          <SelectBranches
+            label="Choose branch"
+            name="branches"
+            initialValue={filterValues.branches}
+            multi={true}
+            onSelect={branchIds => this.onFilter('branches', branchIds)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>By department</ControlLabel>
+          <SelectDepartments
+            label="Choose department"
+            name="departments"
+            initialValue={filterValues.departments}
+            multi={true}
+            onSelect={departmentIds =>
+              this.onFilter('departments', departmentIds)
+            }
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>By vendor</ControlLabel>
+          <SelectCompanies
+            label="Choose vendor"
+            name="vendors"
+            initialValue={filterValues.vendors}
+            multi={true}
+            onSelect={companyIds => this.onFilter('vendors', companyIds)}
           />
         </FormGroup>
         <Button

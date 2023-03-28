@@ -1,0 +1,231 @@
+import {
+  Button,
+  CollapseContent,
+  ControlLabel,
+  FormControl,
+  FormGroup
+} from '@erxes/ui/src/components';
+import client from '@erxes/ui/src/apolloClient';
+import gql from 'graphql-tag';
+import BoardSelectContainer from '@erxes/ui-cards/src/boards/containers/BoardSelect';
+import { __ } from '@erxes/ui/src/utils';
+import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
+import Select from 'react-select-plus';
+import React from 'react';
+import { IConfigsMap } from '../types';
+import { FieldsCombinedByType } from '../../../ui-forms/src/settings/properties/types';
+import { isEnabled } from '@erxes/ui/src/utils/core';
+import { queries as formQueries } from '@erxes/ui-forms/src/forms/graphql';
+import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
+import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
+import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
+import SelectSegments from '@erxes/ui-segments/src/containers/SelectSegments';
+
+type Props = {
+  configsMap: IConfigsMap;
+  config: any;
+  currentConfigKey: string;
+  save: (configsMap: IConfigsMap) => void;
+  delete: (currentConfigKey: string) => void;
+};
+
+type State = {
+  config: any;
+  hasOpen: boolean;
+  fieldsCombined: FieldsCombinedByType[];
+};
+
+class PerSettings extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      config: props.config,
+      hasOpen: false,
+      fieldsCombined: []
+    };
+
+    if (isEnabled('forms')) {
+      client
+        .query({
+          query: gql(formQueries.fieldsCombinedByContentType),
+          variables: {
+            contentType: 'cards:deal'
+          }
+        })
+        .then(({ data }) => {
+          this.setState({
+            fieldsCombined: data ? data.fieldsCombinedByContentType : [] || []
+          });
+        });
+    }
+  }
+
+  onChangeBoard = (boardId: string) => {
+    this.setState({ config: { ...this.state.config, boardId } });
+  };
+
+  onChangePipeline = (pipelineId: string) => {
+    this.setState({ config: { ...this.state.config, pipelineId } });
+  };
+
+  onChangeStage = (stageId: string) => {
+    this.setState({ config: { ...this.state.config, stageId } });
+  };
+
+  onSave = e => {
+    e.preventDefault();
+    const { configsMap, currentConfigKey } = this.props;
+    const { config } = this.state;
+    const key = config.stageId;
+
+    delete configsMap.dealsProductsDataPlaces[currentConfigKey];
+    configsMap.dealsProductsDataPlaces[key] = config;
+    this.props.save(configsMap);
+  };
+
+  onDelete = e => {
+    e.preventDefault();
+
+    this.props.delete(this.props.currentConfigKey);
+  };
+
+  onChangeCombo = option => {
+    this.onChangeConfig('defaultPay', option.value);
+  };
+
+  onChangeConfig = (code: string, value) => {
+    const { config } = this.state;
+    config[code] = value;
+    this.setState({ config });
+  };
+
+  onChangeInput = (code: string, e) => {
+    this.onChangeConfig(code, e.target.value);
+  };
+
+  onresponseCustomFieldChange = option => {
+    const value = !option ? '' : option.value.toString();
+    this.onChangeConfig('responseField', value);
+  };
+
+  render() {
+    const { config } = this.state;
+    return (
+      <CollapseContent
+        title={__(config.title)}
+        open={this.props.currentConfigKey === 'newPlacesConfig' ? true : false}
+      >
+        <FormGroup>
+          <ControlLabel>{'Title'}</ControlLabel>
+          <FormControl
+            defaultValue={config['title']}
+            onChange={this.onChangeInput.bind(this, 'title')}
+            required={true}
+            autoFocus={true}
+          />
+        </FormGroup>
+        <FormWrapper>
+          <FormColumn>
+            <FormGroup>
+              <BoardSelectContainer
+                type="deal"
+                autoSelectStage={false}
+                boardId={config.boardId}
+                pipelineId={config.pipelineId}
+                stageId={config.stageId}
+                onChangeBoard={this.onChangeBoard}
+                onChangePipeline={this.onChangePipeline}
+                onChangeStage={this.onChangeStage}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Choose response field')}</ControlLabel>
+              <Select
+                name="responseField"
+                value={config.responseField}
+                onChange={this.onresponseCustomFieldChange}
+                options={(this.state.fieldsCombined || []).map(f => ({
+                  value: f.name,
+                  label: f.label
+                }))}
+              />
+            </FormGroup>
+          </FormColumn>
+          <FormColumn>
+            <FormGroup>
+              <ControlLabel>{'Product Category'}</ControlLabel>
+              <SelectProductCategory
+                label="Choose product category"
+                name="productCategoryId"
+                initialValue={queryParams.productCategoryId || ''}
+                customOption={{
+                  value: '',
+                  label: '...Clear product category filter'
+                }}
+                onSelect={categoryIds =>
+                  this.setFilter('productCategoryId', categoryIds)
+                }
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Exclude categories')}</ControlLabel>
+              <SelectProductCategory
+                name="categoriesExcluded"
+                label="Choose categories to exclude"
+                initialValue={formValues.categoriesExcluded}
+                onSelect={categories =>
+                  handleState('categoriesExcluded', categories)
+                }
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Exclude products')}</ControlLabel>
+              <SelectProducts
+                name="productsExcluded"
+                label="Choose products to exclude"
+                initialValue={formValues.productsExcluded}
+                onSelect={products => handleState('productsExcluded', products)}
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Segment')}</ControlLabel>
+              <SelectSegments
+                name="segments"
+                label="Choose segments"
+                contentTypes={['products:product']}
+                initialValue={formValues.segments}
+                multi={true}
+                onSelect={segmentIds => handleState('segments', segmentIds)}
+              />
+            </FormGroup>
+          </FormColumn>
+        </FormWrapper>
+        <ModalFooter>
+          <Button
+            btnStyle="simple"
+            icon="cancel-1"
+            onClick={this.onDelete}
+            uppercase={false}
+          >
+            Delete
+          </Button>
+
+          <Button
+            btnStyle="primary"
+            icon="check-circle"
+            onClick={this.onSave}
+            uppercase={false}
+            disabled={config.stageId ? false : true}
+          >
+            Save
+          </Button>
+        </ModalFooter>
+      </CollapseContent>
+    );
+  }
+}
+export default PerSettings;
