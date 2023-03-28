@@ -229,33 +229,41 @@ class ProductForm extends React.Component<Props, State> {
       );
     }
 
-    const filterSearch = localStorage.getItem('dealProductFormSearch');
-
-    const filterParentCategory = localStorage.getItem(
-      'dealProductFormCategoryId'
-    );
-
-    const filterCategoryIds = JSON.parse(
-      localStorage.getItem('dealProductFormCategoryIds') || '[]'
-    );
-
     let filteredProductsData = productsData;
 
-    if (filterSearch) {
+    const { filterValues } = this.state;
+
+    if (filterValues.search) {
       filteredProductsData = filteredProductsData.filter(
         p =>
           p.product &&
-          (p.product.name.includes(filterSearch) ||
-            p.product.code.includes(filterSearch))
+          (p.product.name.includes(filterValues.search) ||
+            p.product.code.includes(filterValues.search))
       );
     }
 
-    if (filterParentCategory && filterCategoryIds.length > 0) {
-      filteredProductsData = filteredProductsData.filter(p => {
-        if (p.product) {
-          return filterCategoryIds.find(_id => _id === p.product?.categoryId);
-        }
-      });
+    if (filterValues.categories && filterValues.categories.length) {
+      filteredProductsData = filteredProductsData.filter(
+        p => p.product && filterValues.categories.includes(p.product.categoryId)
+      );
+    }
+
+    if (filterValues.vendors && filterValues.vendors.length) {
+      filteredProductsData = filteredProductsData.filter(
+        p => p.product && filterValues.vendors.includes(p.product.vendorId)
+      );
+    }
+
+    if (filterValues.branches && filterValues.branches.length) {
+      filteredProductsData = filteredProductsData.filter(p =>
+        filterValues.branches.includes(p.branchId)
+      );
+    }
+
+    if (filterValues.departments && filterValues.departments.length) {
+      filteredProductsData = filteredProductsData.filter(p =>
+        filterValues.departments.includes(p.departmentId)
+      );
     }
 
     const { advancedView } = this.state;
@@ -400,21 +408,22 @@ class ProductForm extends React.Component<Props, State> {
   onFilter = (name, value, callback?, params?) => {
     const { filterValues } = this.state;
     this.setState({ filterValues: { ...filterValues, [name]: value } }, () => {
+      let otherValues = {};
+      if (callback) {
+        otherValues = callback(params);
+      }
+
       localStorage.setItem(
         'dealProductFormFilter',
-        JSON.stringify({ ...filterValues, [name]: value })
+        JSON.stringify({ ...filterValues, [name]: value, ...otherValues })
       );
-      if (callback) {
-        callback(params);
-      }
     });
   };
 
   onFilterCategory = (childIds?: string[]) => {
-    localStorage.setItem(
-      'dealProductFormCategoryIds',
-      JSON.stringify(childIds || [])
-    );
+    const { filterValues } = this.state;
+    this.setState({ filterValues: { ...filterValues, categories: childIds } });
+    return { categories: childIds };
   };
 
   clearFilter = () => {
@@ -443,7 +452,7 @@ class ProductForm extends React.Component<Props, State> {
             currentId={filterValues.category}
             onChangeCategory={(categoryId, childIds) =>
               this.onFilter(
-                'categoryId',
+                'category',
                 categoryId,
                 this.onFilterCategory,
                 childIds
