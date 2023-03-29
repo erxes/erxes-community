@@ -178,7 +178,6 @@ const fillDealProductValue = async (subdomain, column, item) => {
         break;
 
       case 'productsData.maxQuantity':
-        console.log('productData.maxQuantity', productData.maxQuantity);
         value = productData.maxQuantity;
         break;
     }
