@@ -10,7 +10,7 @@ export interface IInvoice {
   email: string;
   description?: string;
   status: string;
-  companyId: string;
+  customerType: string;
   customerId: string;
   contentType: string;
   contentTypeId: string;
@@ -52,7 +52,11 @@ export const invoiceSchema = schemaHooksWrapper(
       label: 'payment kind',
       enum: PAYMENTS.ALL
     }),
-    companyId: field({ type: String, label: 'company id' }),
+    customerType: field({
+      type: String,
+      label: 'company id',
+      enum: ['company', 'customer', 'user']
+    }),
     customerId: field({ type: String, label: 'customer id' }),
     contentType: field({ type: String, label: 'content type' }),
     contentTypeId: field({ type: String, label: 'content type id' }),

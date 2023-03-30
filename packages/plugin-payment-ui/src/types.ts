@@ -64,8 +64,8 @@ export interface IInvoice {
   phone: string;
   resolvedAt: Date;
   status: string;
-  company?: ICompany;
-  customer?: ICustomer;
+  customerType: string;
+  customer?: any;
   pluginData?: any;
 }
 

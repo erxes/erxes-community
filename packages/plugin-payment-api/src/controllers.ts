@@ -112,13 +112,7 @@ router.post('/gateway', async (req, res, next) => {
     return p;
   });
 
-  const selectedPaymentMethod = payments.find(p => p._id === selectedPaymentId);
-
   let invoice = await models.Invoices.findOne({ _id: data._id });
-
-  if (req.body.storepayPhone) {
-    console.log('storepayPhone', req.body.storepayPhone);
-  }
 
   if (invoice && invoice.status === 'paid') {
     return res.render('index', {
