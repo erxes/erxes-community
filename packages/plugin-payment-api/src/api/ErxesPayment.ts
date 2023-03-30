@@ -1,12 +1,7 @@
-import { getSubdomain } from '@erxes/api-utils/src/core';
-import { graphqlPubsub } from '../configs';
-import { generateModels } from '../connectionResolver';
-import { PAYMENTS } from '../constants';
 import { IInvoiceDocument } from '../models/definitions/invoices';
 import { IPaymentDocument } from '../models/definitions/payments';
-import redisUtils from '../redisUtils';
 import { MonpayAPI } from './monpay/api';
-import { QpayAPI } from './qPay/api';
+import { QpayAPI } from './qpay/api';
 import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
 

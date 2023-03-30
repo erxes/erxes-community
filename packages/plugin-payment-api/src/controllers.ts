@@ -4,8 +4,6 @@ import { Router } from 'express';
 
 import { generateModels } from './connectionResolver';
 import redisUtils from './redisUtils';
-import { makeInvoiceNo } from './utils';
-import { SocialPayAPI } from './api/socialpay/api';
 
 const router = Router();
 

@@ -1,7 +1,7 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 
 import { monpayCallbackHandler } from './api/monpay/api';
-import { qpayCallbackHandler } from './api/qPay/api';
+import { qpayCallbackHandler } from './api/qpay/api';
 import { socialpayCallbackHandler } from './api/socialpay/api';
 import { storepayCallbackHandler } from './api/storepay/api';
 import { graphqlPubsub } from './configs';
