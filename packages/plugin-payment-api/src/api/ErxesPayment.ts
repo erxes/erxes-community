@@ -28,13 +28,12 @@ class ErxesPayment {
 
   async createInvoice(invoice: IInvoiceDocument) {
     const { payment } = this;
-
     const api = this[payment.kind];
 
     try {
       return await api.createInvoice(invoice, payment);
     } catch (e) {
-      throw new Error(e.message);
+      return { error: e.message };
     }
   }
 

@@ -32,10 +32,31 @@ block layout-content
                             +#{invoice.paymentKind}(invoice)
                 .col.m6.s12 
                     .amount
-                        h4 Amount
+                        h4 #{__('Amount')}
                         h2  #{invoiceData.amount.toLocaleString(undefined, {maximumFractionDigits: 2})} ₮
-                        .warning 
-                            p * Төлбөр төлөгдсөний дараа таны захиалга идэвхэждэг болохыг анхаараарай! Төлбөрийг дээрх дансанд шилжүүлэх ба захиалгын #{invoiceData.description || 'R972556760'} дугаарыг гүйлгээний утга дээр бичнэ үү. Мөн та өөрийн банкны аппликейшныг ашиглан QR кодыг уншуулж төлбөр төлөх боломжтой.
+
+                        if invoiceData && invoiceData.warningText 
+                            .warning 
+                                p #{invoiceData.warningText}
+
+            if invoice && invoice.apiResponse && invoice.apiResponse.error
+                .error
+                    h3 #{__('Error')}
+                    .border
+                        strong #{__(invoice.apiResponse.error)}
+                script.
+                    const message = {
+                        fromPayment: true,
+                        message:"paymentFailed",
+                        invoiceId: `#{invoice._id}`,
+                        contentType: `#{invoice.contentType}`,
+                        contentTypeId: `#{invoice.contentTypeId}`,
+                    }
+
+                    if(window.opener) {
+                        window.opener.postMessage(message, '*');
+                    }
+                    window.parent.postMessage(message, '*');
 
         if invoice && invoice.status !== 'paid'
             script.
@@ -59,6 +80,7 @@ block layout-content
                                 contentType: `#{invoice.contentType}`,
                                 contentTypeId: `#{invoice.contentTypeId}`,
                             }
+
                             if(window.opener) {
                                 window.opener.postMessage(message, '*');
                             }
@@ -66,8 +88,9 @@ block layout-content
 
                             if(`#{invoiceData.redirectUri}` && window.confirm('Payment is completed. Do you want to continue?')) {
                                 window.location.href = `#{invoiceData.redirectUri}`;
-                            } else if (window.opener && window.confirm('Payment is completed. Do you want to close this window?')) {
-                                window.close();
+                            } else if (window.confirm('Payment is completed. Do you want to close this window?')) {
+                                //- window.close();
+                                
                             }
                         }
                     });
@@ -86,6 +109,7 @@ block layout-content
                     })
                 }).then(res => res.json())
                 .then(json => {
+
                     if (json.status === 'paid') {
                         const message = {
                             fromPayment: true,
@@ -94,6 +118,7 @@ block layout-content
                             contentType: `#{invoice.contentType}`,
                             contentTypeId: `#{invoice.contentTypeId}`,
                         }
+
                         if(window.opener) {
                             window.opener.postMessage(message, '*');
                         }
@@ -101,7 +126,7 @@ block layout-content
 
                         if(`#{invoiceData.redirectUri}` && window.confirm('Payment is completed. Do you want to continue?')) {
                             window.location.href = `#{invoiceData.redirectUri}`;
-                        } else if (window.opener && window.confirm('Payment is completed. Do you want to close this window?')) {
+                        } else if (window.confirm('Payment is completed. Do you want to close this window?')) {
                             window.close();
                         }
                     }

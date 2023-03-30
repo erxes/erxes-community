@@ -36,13 +36,15 @@ export const monpayCallbackHandler = async (models: IModels, data: any) => {
     const invoiceStatus = await api.checkInvoice(invoice);
 
     if (invoiceStatus !== PAYMENT_STATUS.PAID) {
-      throw new Error('Payment failed');
+      return invoice;
     }
 
     await models.Invoices.updateOne(
       { _id: invoice._id },
       { $set: { status, resolvedAt: new Date() } }
     );
+
+    invoice.status = status;
 
     return invoice;
   } catch (e) {
@@ -65,9 +67,7 @@ export class MonpayAPI extends BaseAPI {
 
     this.username = config.username;
     this.accountId = config.accountId;
-    this.apiUrl = PAYMENTS.monpay.apiVersion
-      ? `${PAYMENTS.monpay.apiUrl}/${PAYMENTS.monpay.apiVersion}`
-      : PAYMENTS.monpay.apiUrl;
+    this.apiUrl = PAYMENTS.monpay.apiUrl;
     this.headers = {
       Authorization:
         'Basic ' +
@@ -98,7 +98,7 @@ export class MonpayAPI extends BaseAPI {
       });
 
       if (res.code !== 0) {
-        throw new Error(res.info);
+        return { error: 'Failed to create invoice, please try again' };
       }
 
       const { result } = res;
@@ -107,7 +107,7 @@ export class MonpayAPI extends BaseAPI {
 
       return { ...result, qrData };
     } catch (e) {
-      throw new Error(e.message);
+      return { error: e.message };
     }
   }
 

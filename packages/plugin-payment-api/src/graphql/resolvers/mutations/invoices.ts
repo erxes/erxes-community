@@ -13,6 +13,7 @@ type InvoiceParams = {
   contentTypeId: string;
   paymentIds: string[];
   redirectUri: string;
+  warningText: string;
 };
 
 const mutations = {

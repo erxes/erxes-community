@@ -22,6 +22,8 @@ router.post('/checkInvoice', async (req, res) => {
     redisUtils.removeInvoice(invoiceId);
 
     res.clearCookie(`paymentData_${invoice.contentTypeId}`);
+
+    return res.json({ status: invoice.status });
   }
 
   return res.json({ status });
@@ -73,7 +75,7 @@ router.get('/gateway', async (req, res) => {
   });
 });
 
-router.post('/gateway', async (req, res) => {
+router.post('/gateway', async (req, res, next) => {
   const { params } = req.query;
 
   const data = JSON.parse(
@@ -114,13 +116,8 @@ router.post('/gateway', async (req, res) => {
 
   let invoice = await models.Invoices.findOne({ _id: data._id });
 
-  if (invoice && req.body.socialPayPhone) {
-    invoice.phone = req.body.socialPayPhone;
-    invoice.identifier = makeInvoiceNo(32);
-    const socialpayApi = new SocialPayAPI(selectedPaymentMethod);
-    const socialpayResponse = await socialpayApi.createInvoice(invoice);
-
-    invoice.apiResponse = socialpayResponse;
+  if (req.body.storepayPhone) {
+    console.log('storepayPhone', req.body.storepayPhone);
   }
 
   if (invoice && invoice.status === 'paid') {

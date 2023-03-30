@@ -6,7 +6,7 @@ import { socialpayCallbackHandler } from './api/socialpay/api';
 import { storepayCallbackHandler } from './api/storepay/api';
 import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
-import { PAYMENTS } from './constants';
+import { PAYMENTS, PAYMENT_STATUS } from './constants';
 import redisUtils from './redisUtils';
 
 export const callbackHandler = async (req, res) => {
@@ -48,16 +48,16 @@ export const callbackHandler = async (req, res) => {
         return res.status(400).send('Invalid kind');
     }
 
-    if (invoiceDoc) {
+    if (invoiceDoc.status === PAYMENT_STATUS.PAID) {
       graphqlPubsub.publish('invoiceUpdated', {
         invoiceUpdated: {
           _id: invoiceDoc._id,
           status: 'paid'
         }
       });
-    }
 
-    redisUtils.updateInvoiceStatus(invoiceDoc._id, 'paid');
+      redisUtils.updateInvoiceStatus(invoiceDoc._id, 'paid');
+    }
   } catch (error) {
     return res.status(400).send(error);
   }

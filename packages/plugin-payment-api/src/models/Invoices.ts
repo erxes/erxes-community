@@ -81,7 +81,7 @@ export const loadInvoiceClass = (models: IModels) => {
             doc.selectedPaymentId
           );
 
-          const api = new ErxesPayment(payment.config);
+          const api = new ErxesPayment(payment);
           invoice.identifier = doc.identifier || makeInvoiceNo(32);
 
           const apiResponse = await api.createInvoice(invoice);
@@ -110,7 +110,7 @@ export const loadInvoiceClass = (models: IModels) => {
         doc.selectedPaymentId
       );
 
-      new ErxesPayment(prevPayment.config).cancelInvoice(invoice);
+      new ErxesPayment(prevPayment).cancelInvoice(invoice);
 
       try {
         const apiResponse = await new ErxesPayment(newPayment).createInvoice(

@@ -31,13 +31,15 @@ export const storepayCallbackHandler = async (
     const invoiceStatus = await api.checkInvoice(id);
 
     if (invoiceStatus !== PAYMENT_STATUS.PAID) {
-      throw new Error('Payment failed');
+      return invoice;
     }
 
     await models.Invoices.updateOne(
       { _id: invoice._id },
       { $set: { status: invoiceStatus, resolvedAt: new Date() } }
     );
+
+    invoice.status = invoiceStatus;
 
     return invoice;
   } catch (e) {
@@ -83,9 +85,7 @@ export class StorePayAPI extends BaseAPI {
     this.app_username = appUsername;
     this.app_password = appPassword;
     this.store_id = storeId;
-    this.apiUrl = PAYMENTS.storepay.apiVersion
-      ? `${PAYMENTS.storepay.apiUrl}/${PAYMENTS.storepay.apiVersion}`
-      : PAYMENTS.storepay.apiUrl;
+    this.apiUrl = PAYMENTS.storepay.apiUrl;
   }
 
   async getHeaders() {
@@ -115,7 +115,7 @@ export class StorePayAPI extends BaseAPI {
         method: 'POST',
         headers: {
           Authorization: `Basic ${Buffer.from(
-            `${username}${password}`
+            `${app_username}:${app_password}`
           ).toString('base64')}`
         },
         body: data
@@ -175,16 +175,16 @@ export class StorePayAPI extends BaseAPI {
       });
 
       if (res.status !== 'Success') {
-        const err =
-          res.msgList.lenth > 0 ? res.msgList[0].text : 'Unknown error';
-
-        throw new Error(err);
+        const error =
+          res.msgList.length > 0 ? res.msgList[0].code : 'Unknown error';
+        console.error(error);
+        return { error };
       }
 
-      return res;
+      return { ...res, text: `Invoice has sent to ${invoice.phone}` };
     } catch (e) {
       console.error(e);
-      throw new Error(e.message);
+      return { error: e.message };
     }
   }
 
@@ -222,6 +222,7 @@ export class StorePayAPI extends BaseAPI {
           mobileNumber
         }
       });
+
       if (!res.value || res.value === 0) {
         throw new Error('Insufficient loan amount');
       }

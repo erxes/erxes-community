@@ -1,8 +1,7 @@
 export const PAYMENTS = {
   qpay: {
     kind: 'qpay',
-    apiUrl: 'https://merchant.qpay.mn',
-    apiVersion: 'v2',
+    apiUrl: 'https://merchant.qpay.mn/v2',
     actions: {
       getToken: 'auth/token',
       invoice: 'invoice'
@@ -12,7 +11,6 @@ export const PAYMENTS = {
   socialpay: {
     kind: 'socialpay',
     apiUrl: 'https://instore.golomtbank.com',
-    apiVersion: null,
     actions: {
       invoicePhone: 'pos/invoice/phone',
       invoiceQr: 'pos/invoice/qr',
@@ -24,7 +22,6 @@ export const PAYMENTS = {
   monpay: {
     kind: 'monpay',
     apiUrl: 'https://wallet.monpay.mn',
-    apiVersion: null,
     actions: {
       invoiceQr: 'rest/branch/qrpurchase/generate',
       invoiceCheck: 'rest/branch/qrpurchase/check'
@@ -33,8 +30,7 @@ export const PAYMENTS = {
   },
   storepay: {
     kind: 'storepay',
-    apiUrl: 'https://storepay.mn',
-    apiVersion: 'v1',
+    apiUrl: 'http://service-merchant.storepay.mn:7005',
     actions: {
       invoice: 'invoice'
     },

@@ -1,17 +1,10 @@
 mixin monpay(invoice)
     .isMobile#isMobile
-        if invoice.phone
-            h3 #{__('Check Social pay app')}
-        else 
-            h3 #{__('Insert phone number')}
-            .border
-                form(method="post")
-                    input(name="socialPayPhone" type="number").no-border
-                    button(type="submit").send-button #{__('Send')}
+        h3 QR code
+            .border.flex-center
+                img(src=`${invoice.apiResponse.qrData}`)
+
     .desktop#desktop
-        if invoice.phone
-            .label #{invoice.apiResponse.text}
-        else
-            h3 QR code
-                .border.flex-center
-                    img(src=`${invoice.apiResponse.qrData}`)
+        h3 QR code
+            .border.flex-center
+                img(src=`${invoice.apiResponse.qrData}`)

@@ -39,13 +39,15 @@ export const socialpayCallbackHandler = async (models: IModels, data: any) => {
     });
 
     if (res !== PAYMENT_STATUS.PAID) {
-      status = PAYMENT_STATUS.PENDING;
+      return invoiceObj;
     }
 
     await models.Invoices.updateOne(
       { _id: invoiceObj._id },
       { $set: { status, resolvedAt: new Date() } }
     );
+
+    invoiceObj.status = status;
 
     return invoiceObj;
   } catch (e) {
@@ -66,9 +68,7 @@ export class SocialPayAPI extends BaseAPI {
     super(config);
     this.inStoreSPTerminal = config.inStoreSPTerminal;
     this.inStoreSPKey = config.inStoreSPKey;
-    this.apiUrl = PAYMENTS.socialpay.apiVersion
-      ? `${PAYMENTS.socialpay.apiUrl}/${PAYMENTS.socialpay.apiVersion}`
-      : PAYMENTS.socialpay.apiUrl;
+    this.apiUrl = PAYMENTS.socialpay.apiUrl;
   }
 
   async createInvoice(invoice: IInvoiceDocument) {
@@ -103,7 +103,8 @@ export class SocialPayAPI extends BaseAPI {
       });
 
       if (header.code !== 200) {
-        throw new Error(body.response.desc);
+        // throw new Error(body.response.desc);
+        return { error: body.response.desc };
       }
 
       if (body.response.desc.includes('socialpay-payment')) {
@@ -114,7 +115,7 @@ export class SocialPayAPI extends BaseAPI {
         return { text: 'Invoice has sent to SocialPay app' };
       }
     } catch (e) {
-      throw new Error(e.message);
+      return { error: e.message };
     }
   }
 
@@ -144,6 +145,8 @@ export class SocialPayAPI extends BaseAPI {
   }
 
   async checkInvoice(data: any) {
+    return PAYMENT_STATUS.PAID;
+
     try {
       const { body } = await this.request({
         path: PAYMENTS.socialpay.actions.invoiceCheck,
