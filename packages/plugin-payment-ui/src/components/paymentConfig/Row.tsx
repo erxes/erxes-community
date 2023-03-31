@@ -41,7 +41,7 @@ const Row = (props: Props) => {
   return (
     <tr>
       <td key={Math.random()}>
-        <RowTitle>Lead integration</RowTitle>
+        <RowTitle>Form integration</RowTitle>
       </td>
 
       <td key={Math.random()}>
