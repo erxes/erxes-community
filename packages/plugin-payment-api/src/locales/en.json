@@ -15,5 +15,7 @@
   "Insufficient loan amount": "Insufficient loan amount",
   "Идэвхтэй худалдан авалтын нэхэмжлэх байгаа тул дахин нэхэмжлэх үүсгэх боломжгүй": "Идэвхтэй худалдан авалтын нэхэмжлэх байгаа тул дахин нэхэмжлэх үүсгэх боломжгүй",
   "Phone number": "Phone number",
-  "Submit": "Submit"
+  "Submit": "Submit",
+  "Cannot read properties of undefined (reading 'createInvoice')": "Cannot read properties of undefined (reading 'createInvoice')",
+  "Cannot read properties of undefined (reading 'configure')": "Cannot read properties of undefined (reading 'configure')"
 }

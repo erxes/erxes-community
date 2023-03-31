@@ -34,7 +34,9 @@ const Row = (props: Props) => {
     );
   };
 
-  const formContent = props => <ConfigForm {...props} config={config} />;
+  const formContent = formProps => (
+    <ConfigForm {...formProps} config={config} />
+  );
 
   return (
     <tr>
