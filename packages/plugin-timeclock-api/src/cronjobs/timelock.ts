@@ -17,8 +17,5 @@ const connectAndImportFromMysql = (subdomain: string) => {
 export default {
   handleDailyJob: async ({ subdomain }) => {
     await connectAndImportFromMysql(subdomain);
-  },
-  handleMinutelyJob: async ({ subdomain }) => {
-    console.log(subdomain, 'handleMinutelyJob');
   }
 };

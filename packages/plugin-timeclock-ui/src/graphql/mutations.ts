@@ -93,7 +93,7 @@ const submitSchedule = `
     }
   }`;
 
-const solveAbsence = `
+const solveAbsenceRequest = `
   mutation solveAbsenceRequest($_id: String, $status: String){
     solveAbsenceRequest(_id: $_id, status: $status){
       _id
@@ -231,7 +231,7 @@ export default {
   absenceTypeEdit,
   absenceTypeRemove,
 
-  solveAbsence,
+  solveAbsenceRequest,
   removeAbsenceRequest,
   solveSchedule,
   solveShift,
