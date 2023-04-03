@@ -55,6 +55,11 @@ const sendAbsenceRequest = `
     }
   }`;
 
+const removeAbsenceRequest = `
+mutation removeAbsenceRequest($_id: String){
+  removeAbsenceRequest(_id: $_id)
+}`;
+
 const absenceTypeAdd = `
   mutation absenceTypeAdd(${absenceTypeParams}){
     absenceTypeAdd(${absenceTypeValues}){
@@ -227,6 +232,7 @@ export default {
   absenceTypeRemove,
 
   solveAbsence,
+  removeAbsenceRequest,
   solveSchedule,
   solveShift,
 
