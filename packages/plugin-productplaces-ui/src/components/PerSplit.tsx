@@ -1,4 +1,7 @@
 import BoardSelectContainer from '@erxes/ui-cards/src/boards/containers/BoardSelect';
+import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
+import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
+import SelectSegments from '@erxes/ui-segments/src/containers/SelectSegments';
 import {
   Button,
   CollapseContent,
@@ -11,7 +14,6 @@ import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
 import { IConfigsMap } from '../types';
-import PerConditions from './PerConditions';
 
 type Props = {
   configsMap: IConfigsMap;
@@ -56,8 +58,8 @@ class PerSettings extends React.Component<Props, State> {
     const { config } = this.state;
     const key = config.stageId;
 
-    delete configsMap.dealsProductsDataPlaces[currentConfigKey];
-    configsMap.dealsProductsDataPlaces[key] = config;
+    delete configsMap.dealsProductsDataSplit[currentConfigKey];
+    configsMap.dealsProductsDataSplit[key] = config;
     this.props.save(configsMap);
   };
 
@@ -77,43 +79,6 @@ class PerSettings extends React.Component<Props, State> {
     this.onChangeConfig(code, e.target.value);
   };
 
-  onChangeCheckbox = (code: string, e) => {
-    this.onChangeConfig(code, e.target.checked);
-  };
-
-  addCondition = () => {
-    const { conditions } = this.state;
-    conditions.push({
-      id: Math.random().toString()
-    });
-    this.setState({ conditions });
-  };
-
-  renderConditions = () => {
-    const { conditions } = this.state;
-    const remove = id => {
-      this.setState({ conditions: conditions.filter(c => c.id !== id) });
-    };
-
-    const editCondition = (id, condition) => {
-      const updated = (conditions || []).map(c =>
-        c.id === id ? condition : c
-      );
-      this.setState({ conditions: updated }, () => {
-        this.onChangeConfig('conditions', updated);
-      });
-    };
-
-    return (conditions || []).map(c => (
-      <PerConditions
-        key={c.id}
-        condition={c}
-        onChange={editCondition}
-        onRemove={remove}
-      />
-    ));
-  };
-
   render() {
     const { config } = this.state;
     return (
@@ -121,17 +86,17 @@ class PerSettings extends React.Component<Props, State> {
         title={__(config.title)}
         open={this.props.currentConfigKey === 'newPlacesConfig' ? true : false}
       >
-        <FormGroup>
-          <ControlLabel>{'Title'}</ControlLabel>
-          <FormControl
-            defaultValue={config['title']}
-            onChange={this.onChangeInput.bind(this, 'title')}
-            required={true}
-            autoFocus={true}
-          />
-        </FormGroup>
         <FormWrapper>
           <FormColumn>
+            <FormGroup>
+              <ControlLabel>{'Title'}</ControlLabel>
+              <FormControl
+                defaultValue={config['title']}
+                onChange={this.onChangeInput.bind(this, 'title')}
+                required={true}
+                autoFocus={true}
+              />
+            </FormGroup>
             <FormGroup>
               <BoardSelectContainer
                 type="deal"
@@ -147,26 +112,61 @@ class PerSettings extends React.Component<Props, State> {
           </FormColumn>
           <FormColumn>
             <FormGroup>
-              <ControlLabel>Split for packages</ControlLabel>
-              <FormControl
-                checked={config.isSplit || false}
-                onChange={this.onChangeCheckbox.bind(this, 'isSplit')}
-                componentClass="checkbox"
+              <ControlLabel>{'Product Category'}</ControlLabel>
+              <SelectProductCategory
+                label="Choose product category"
+                name="productCategoryIds"
+                initialValue={config.productCategoryIds || ''}
+                customOption={{
+                  value: '',
+                  label: '...Clear product category filter'
+                }}
+                onSelect={categoryIds =>
+                  this.onChangeConfig('productCategoryIds', categoryIds)
+                }
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Exclude categories')}</ControlLabel>
+              <SelectProductCategory
+                name="excludeCategoryIds"
+                label="Choose categories to exclude"
+                initialValue={config.excludeCategoryIds}
+                onSelect={categoryIds =>
+                  this.onChangeConfig('excludeCategoryIds', categoryIds)
+                }
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Exclude products')}</ControlLabel>
+              <SelectProducts
+                name="excludeProductIds"
+                label="Choose products to exclude"
+                initialValue={config.excludeProductIds}
+                onSelect={productIds =>
+                  this.onChangeConfig('excludeProductIds', productIds)
+                }
+                multi={true}
+              />
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>{__('Segment')}</ControlLabel>
+              <SelectSegments
+                name="segments"
+                label="Choose segments"
+                contentTypes={['products:product']}
+                initialValue={config.segments}
+                multi={true}
+                onSelect={segmentIds =>
+                  this.onChangeConfig('segments', segmentIds)
+                }
               />
             </FormGroup>
           </FormColumn>
         </FormWrapper>
-
-        {this.renderConditions()}
         <ModalFooter>
-          <Button
-            btnStyle="primary"
-            onClick={this.addCondition}
-            icon="plus"
-            uppercase={false}
-          >
-            Add condition
-          </Button>
           <Button
             btnStyle="simple"
             icon="cancel-1"
