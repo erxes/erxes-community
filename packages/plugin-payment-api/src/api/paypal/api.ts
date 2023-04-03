@@ -4,7 +4,6 @@ import { BaseAPI } from '../base';
 import redis from '../../redis';
 
 export const paypalCallbackHandler = async (models: IModels, data: any) => {
-  console.log('paypal ata', data);
   const { paymentId, PayerID } = data;
 
   if (!paymentId) {
