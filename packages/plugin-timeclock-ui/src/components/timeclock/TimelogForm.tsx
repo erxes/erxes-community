@@ -134,7 +134,6 @@ export const TimelogForm = (props: Props) => {
   };
 
   const renderTimelogForm = (formProps: IFormProps) => {
-    const { values } = formProps;
     return (
       <FlexColumn marginNum={20}>
         <div>

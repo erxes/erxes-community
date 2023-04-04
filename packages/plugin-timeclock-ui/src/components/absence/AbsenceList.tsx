@@ -11,6 +11,7 @@ import Attachment from '@erxes/ui/src/components/Attachment';
 import dayjs from 'dayjs';
 import { dateFormat, timeFormat } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import AbsenceCheckoutForm from '../../containers/absence/CheckoutForm';
 
 type Props = {
   absences: IAbsence[];
@@ -74,6 +75,10 @@ function AbsenceList(props: Props) {
       contentProps
     };
     return <AbsenceForm {...updatedProps} />;
+  };
+
+  const openCheckoutForm = (userId: string) => {
+    return <AbsenceCheckoutForm userId={userId} />;
   };
 
   const actionBarRight = (
@@ -147,7 +152,13 @@ function AbsenceList(props: Props) {
             <>
               <Button
                 btnStyle="success"
-                onClick={() => solveAbsence(absence._id, 'Approved')}
+                onClick={() => {
+                  if (absence.reason.toLowerCase() === 'check out request') {
+                    openCheckoutForm(absence.user._id);
+                    return;
+                  }
+                  solveAbsence(absence._id, 'Approved');
+                }}
               >
                 Approve
               </Button>

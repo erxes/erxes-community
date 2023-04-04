@@ -30,6 +30,10 @@ const timeclockQueries = {
     return models.Absences.find({ status: 'Holiday' });
   },
 
+  timeclocksPerUser(_root, queryParams, { models }: IContext) {
+    return models.Timeclocks.find({ queryParams });
+  },
+
   async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
