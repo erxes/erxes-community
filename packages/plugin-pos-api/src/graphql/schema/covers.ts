@@ -19,6 +19,7 @@ export const types = `
     posToken: String
     beginDate: Date
     endDate: Date
+    status: String
     description: String
     userId: String
     details: [PosCoverDetail]
@@ -26,6 +27,7 @@ export const types = `
     createdBy: String
     modifiedAt: Date
     modifiedBy: String
+    note: String
 
     user: User
     createdUser:  User
@@ -33,16 +35,23 @@ export const types = `
   }
 `;
 
-const coverParams = `
-  note: String
+const queryParams = `
+  page: Int
+  perPage: Int
+  sortField: String
+  sortDirection: Int
+  startDate: Date
+  endDate: Date
+  userId: String
+  posId: String
 `;
 
 export const mutations = `
-  posCoversEdit(_id: String!, ${coverParams}): PosCover
+  posCoversEdit(_id: String!, note: String): PosCover
   posCoversRemove(_id: String!): String
 `;
 
 export const queries = `
-  posCovers(startDate: Date, endDate: Date, userId: String): [PosCover]
+  posCovers(${queryParams}): [PosCover]
   posCoverDetail(_id: String!): PosCover
 `;

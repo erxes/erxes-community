@@ -10,16 +10,15 @@ import {
 import { IRouterProps, IQueryParams } from '@erxes/ui/src/types';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { menuPos } from '../../constants';
 
 import { TableWrapper } from '../../styles';
-import { IOrder } from '../types';
-import HeaderDescription from './MainHead';
+import { ICover } from '../types';
 import RightMenu from './RightMenu';
-import Row from './Row';
+import Row from './CoverRow';
 
 interface IProps extends IRouterProps {
-  orders: IOrder[];
-  loading: boolean;
+  covers: ICover[];
   bulk: any[];
   isAllSelected: boolean;
   history: any;
@@ -30,21 +29,9 @@ interface IProps extends IRouterProps {
   onSelect: (values: string[] | string, key: string) => void;
   isFiltered: boolean;
   clearFilter: () => void;
-  summary: any;
-
-  onSyncErkhet: (orderId: string) => void;
-  onReturnBill: (orderId: string) => void;
 }
 
-export const menuPos = [
-  { title: 'Pos Orders', link: '/pos-orders' },
-  { title: 'Pos Covers', link: '/pos-covers' },
-  { title: 'Pos Items', link: '/pos-order-items' }
-];
-
-class Orders extends React.Component<IProps, {}> {
-  private timer?: NodeJS.Timer = undefined;
-
+class Covers extends React.Component<IProps, {}> {
   constructor(props) {
     super(props);
   }
@@ -57,50 +44,15 @@ class Orders extends React.Component<IProps, {}> {
 
   render() {
     const {
-      orders,
+      covers,
       history,
-      loading,
       queryParams,
       onFilter,
       onSelect,
       onSearch,
       isFiltered,
-      clearFilter,
-      summary,
-      onSyncErkhet,
-      onReturnBill
+      clearFilter
     } = this.props;
-
-    const rightMenuProps = {
-      onFilter,
-      onSelect,
-      onSearch,
-      isFiltered,
-      clearFilter,
-      queryParams
-    };
-
-    const actionBarRight = (
-      <BarItems>
-        <RightMenu {...rightMenuProps} />
-      </BarItems>
-    );
-
-    const staticKeys = ['count', 'totalAmount', 'cashAmount', 'mobileAmount'];
-    const otherPayTitles = (Object.keys(summary) || [])
-      .filter(a => !['_id'].includes(a))
-      .filter(a => !staticKeys.includes(a))
-      .sort();
-
-    const header = (
-      <HeaderDescription
-        icon="/images/actions/26.svg"
-        title=""
-        summary={summary}
-        staticKeys={staticKeys}
-        actionBar={actionBarRight}
-      />
-    );
 
     const mainContent = (
       <TableWrapper>
@@ -125,9 +77,6 @@ class Orders extends React.Component<IProps, {}> {
                   label={__('Mobile Amount')}
                 />
               </th>
-              {otherPayTitles.map(key => (
-                <th key={Math.random()}>{__(key)}</th>
-              ))}
               <th>
                 <SortHandler sortField={'totalAmount'} label={__('Amount')} />
               </th>
@@ -143,16 +92,9 @@ class Orders extends React.Component<IProps, {}> {
               <th>Үйлдлүүд</th>
             </tr>
           </thead>
-          <tbody id="orders">
-            {(orders || []).map(order => (
-              <Row
-                order={order}
-                key={order._id}
-                history={history}
-                otherPayTitles={otherPayTitles}
-                onSyncErkhet={onSyncErkhet}
-                onReturnBill={onReturnBill}
-              />
+          <tbody id="covers">
+            {(covers || []).map(cover => (
+              <Row cover={cover} key={cover._id} history={history} />
             ))}
           </tbody>
         </Table>
@@ -163,19 +105,19 @@ class Orders extends React.Component<IProps, {}> {
       <Wrapper
         header={
           <Wrapper.Header
-            title={__(`Pos Orders`)}
+            title={__(`Pos Covers`)}
             queryParams={queryParams}
             submenu={menuPos}
           />
         }
-        mainHead={header}
-        footer={<Pagination count={(summary || {}).count} />}
+        // mainHead={header}
+        footer={<Pagination count={1} />}
         content={
           <DataWithLoader
             data={mainContent}
-            loading={loading}
-            count={(orders || []).length}
-            emptyText="Add in your first order!"
+            loading={false}
+            count={(covers || []).length}
+            emptyText="Add in your first cover!"
             emptyImage="/images/actions/1.svg"
           />
         }
@@ -184,4 +126,4 @@ class Orders extends React.Component<IProps, {}> {
   }
 }
 
-export default withRouter<IRouterProps>(Orders);
+export default withRouter<IRouterProps>(Covers);
