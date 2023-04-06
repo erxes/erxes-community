@@ -10,6 +10,12 @@ import {
   mutations as wishlistMutations
 } from './schema/wishlist';
 
+import {
+  types as lastViewedItemTypes,
+  queries as lastViewedItemQueries,
+  mutations as lastViewedItemMutations
+} from './schema/lastViewedItem';
+
 const typeDefs = async _serviceDiscovery => {
   return gql`
     scalar JSON
@@ -17,15 +23,18 @@ const typeDefs = async _serviceDiscovery => {
 
     ${productreviewTypes}
     ${wishlistTypes}
+    ${lastViewedItemTypes}
 
     extend type Query {
       ${productreviewQueries}
       ${wishlistQueries}
+      ${lastViewedItemQueries}
     }
 
     extend type Mutation {
       ${productreviewMutations}
       ${wishlistMutations}
+      ${lastViewedItemMutations}
     }
   `;
 };
