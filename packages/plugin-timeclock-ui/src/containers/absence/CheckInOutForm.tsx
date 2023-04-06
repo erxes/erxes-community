@@ -1,5 +1,5 @@
 import {
-  ITimeclock,
+  IAbsence,
   TimeClockMutationResponse,
   TimeClockQueryResponse,
   TimeLogsPerUserQueryResponse
@@ -8,8 +8,8 @@ import { Alert, withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import { mutations, queries } from '../../graphql';
-import CheckoutForm from '../../components/timeclock/CheckoutForm';
+import { queries } from '../../graphql';
+import CheckInOutForm from '../../components/absence/CheckInOutForm';
 import React from 'react';
 import { TimeClockMainQueryResponse } from '../../types';
 
@@ -18,10 +18,16 @@ type Props = {
   startDate?: string;
   endDate?: string;
 
+  absenceRequest: IAbsence;
+
+  timeType: string;
   timeclockId?: string;
   timeclockStart?: Date;
   timeclockEnd?: Date;
   timeclockActive?: boolean;
+
+  checkType?: string;
+  contentProps?: any;
 };
 
 type FinalProps = {
@@ -37,7 +43,13 @@ const ListContainer = (props: FinalProps) => {
     timeclockEditMutation
   } = props;
 
-  const timeclockEdit = values => {
+  const editTimeclock = values => {
+    timeclockEditMutation({ variables: values })
+      .then(() => Alert.success('Successfully edited time clock'))
+      .catch(err => Alert.error(err.message));
+  };
+
+  const createTimeclock = values => {
     timeclockEditMutation({ variables: values })
       .then(() => Alert.success('Successfully edited time clock'))
       .catch(err => Alert.error(err.message));
@@ -45,20 +57,29 @@ const ListContainer = (props: FinalProps) => {
 
   const updatedProps = {
     ...props,
-    timeclockEdit,
+    createTimeclock,
+    editTimeclock,
     timelogsPerUser: listTimeLogsPerUser.timeLogsPerUser || [],
-    activeTimeclocksPerUser: listTimeclocksPerUser.timeclocksMain.list || []
+    timeclocksPerUser: listTimeclocksPerUser.timeclocksPerUser || []
   };
 
-  return <CheckoutForm {...updatedProps} />;
+  return <CheckInOutForm {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, TimeClockQueryResponse>(gql(queries.timeclocksMain), {
-      name: 'timeclocksMainQuery',
-      options: ({ userId }) => ({
-        variables: { userIds: [userId] },
+    graphql<Props, TimeClockQueryResponse>(gql(queries.timeclocksPerUser), {
+      name: 'listTimeclocksPerUser',
+      options: ({ userId, startDate, endDate }) => ({
+        variables: { userId, startDate, endDate },
+        fetchPolicy: 'network-only'
+      })
+    }),
+
+    graphql<Props, TimeClockQueryResponse>(gql(queries.timeLogsPerUser), {
+      name: 'listTimeLogsPerUser',
+      options: ({ userId, startDate, endDate }) => ({
+        variables: { userId, startDate, endDate },
         fetchPolicy: 'network-only'
       })
     })

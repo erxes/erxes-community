@@ -9,9 +9,9 @@ import { IAttachment } from '@erxes/ui/src/types';
 import AbsenceForm from './AbsenceForm';
 import Attachment from '@erxes/ui/src/components/Attachment';
 import dayjs from 'dayjs';
-import { dateFormat, timeFormat } from '../../constants';
+import { dateAndTimeFormat, dateFormat, timeFormat } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
-import AbsenceCheckoutForm from '../../containers/absence/CheckoutForm';
+import CheckInOutForm from '../../containers/absence/CheckInOutForm';
 
 type Props = {
   absences: IAbsence[];
@@ -77,8 +77,36 @@ function AbsenceList(props: Props) {
     return <AbsenceForm {...updatedProps} />;
   };
 
-  const openCheckoutForm = (userId: string) => {
-    return <AbsenceCheckoutForm userId={userId} />;
+  const checkInOutFormBtn = <Button btnStyle="primary">Approve</Button>;
+
+  const openCheckInOutForm = (
+    contentProps: any,
+    absence: IAbsence,
+    absenceReason: string
+  ) => {
+    const dateTime = absence.startTime;
+    const userId = absence.user._id;
+
+    const startDate = dayjs(dateTime)
+      .add(-16, 'hour')
+      .format(dateAndTimeFormat);
+    const endDate = dayjs(dateTime)
+      .add(16, 'hour')
+      .format(dateAndTimeFormat);
+
+    // either check in or check out
+    const timeType = absenceReason.split('request')[0].toLocaleLowerCase();
+
+    return (
+      <CheckInOutForm
+        userId={userId}
+        timeType={timeType}
+        contentProps={contentProps}
+        startDate={startDate}
+        endDate={endDate}
+        absenceRequest={absence}
+      />
+    );
   };
 
   const actionBarRight = (
@@ -148,17 +176,29 @@ function AbsenceList(props: Props) {
         <td>
           {absence.solved ? (
             __(absence.status)
+          ) : absence.reason.toLowerCase().includes('check') ? (
+            <>
+              <ModalTrigger
+                size="lg"
+                title="Approve Request"
+                trigger={checkInOutFormBtn}
+                content={contentProps =>
+                  openCheckInOutForm(contentProps, absence, absence.reason)
+                }
+              />
+
+              <Button
+                btnStyle="danger"
+                onClick={() => solveAbsence(absence._id, 'Rejected')}
+              >
+                Reject
+              </Button>
+            </>
           ) : (
             <>
               <Button
                 btnStyle="success"
-                onClick={() => {
-                  if (absence.reason.toLowerCase() === 'check out request') {
-                    openCheckoutForm(absence.user._id);
-                    return;
-                  }
-                  solveAbsence(absence._id, 'Approved');
-                }}
+                onClick={() => solveAbsence(absence._id, 'Approved')}
               >
                 Approve
               </Button>

@@ -30,8 +30,29 @@ const timeclockQueries = {
     return models.Absences.find({ status: 'Holiday' });
   },
 
-  timeclocksPerUser(_root, queryParams, { models }: IContext) {
-    return models.Timeclocks.find({ queryParams });
+  timeclocksPerUser(
+    _root,
+    { userId, startDate, endDate },
+    { models }: IContext
+  ) {
+    const timeField = {
+      $or: [
+        {
+          shiftStart: {
+            $gte: fixDate(startDate),
+            $lte: fixDate(endDate)
+          }
+        },
+        {
+          shiftEnd: {
+            $gte: fixDate(startDate),
+            $lte: fixDate(endDate)
+          }
+        }
+      ]
+    };
+
+    return models.Timeclocks.find({ $and: [{ userId }, timeField] });
   },
 
   async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {

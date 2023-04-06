@@ -183,7 +183,6 @@ export const TimelogForm = (props: Props) => {
         <FlexRow>
           <ControlLabel>Shift Ended</ControlLabel>
           <FlexRowEven>
-            {/* <div>Active</div> */}
             <FormControl
               name="shiftActive"
               defaultChecked={shiftEnded}

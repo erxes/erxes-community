@@ -76,11 +76,9 @@ class Row extends React.Component<Props> {
   };
 
   editShiftTimeTrigger = () => (
-    <Tip text={__('Edit')} placement="top">
-      <Button btnStyle="link">
-        <Icon icon="edit-3" />
-      </Button>
-    </Tip>
+    <Button btnStyle="link">
+      <Icon icon="edit-3" />
+    </Button>
   );
 
   render() {
