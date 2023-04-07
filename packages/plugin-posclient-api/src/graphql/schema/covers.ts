@@ -3,6 +3,7 @@ export const types = `
     _id: String
     kind: String
     kindOfVal: Float
+    value: Float
     amount: Float
   }
 
