@@ -98,10 +98,13 @@ function CheckoutForm(props: Props) {
   };
 
   const generateTimelogOptions = () => {
-    return timelogsPerUser.map((log: ITimelog) => ({
-      value: log.timelog,
-      label: returnDateTimeFormatted(log, 'timelog')
-    }));
+    // time log options only occur for picking shift start for check out request
+    return timelogsPerUser
+      .filter(log => log.timelog < absenceRequest.startTime)
+      .map((log: ITimelog) => ({
+        value: log.timelog,
+        label: returnDateTimeFormatted(log, 'timelog')
+      }));
   };
 
   const generateRadioOptions = () => {
@@ -126,7 +129,7 @@ function CheckoutForm(props: Props) {
 
   const checkInput = () => {
     if (pickTimeclockType === 'pick' && !selectedTimeclockId) {
-      Alert.error('Please pick timeclock fromt the list');
+      Alert.error('Please pick timeclock from the list');
       return false;
     }
 
@@ -134,16 +137,27 @@ function CheckoutForm(props: Props) {
   };
 
   const onSaveBtn = () => {
-    if (pickTimeclockType === 'pick' && checkInput() && selectedTimeclockId) {
-      if (timeType === 'check in') {
+    if (isCheckOutRequest) {
+      if (pickTimeclockType === 'pick' && selectedTimeclockId) {
+        // edit concurrent timeclock
         editTimeclock(selectedTimeclockId, {
-          shiftStart: pickTimeclockType
+          shiftEnd: absenceRequest.startTime
         });
-        return;
       }
-      editTimeclock(selectedTimeclockId, { shiftEnd: pickTimeclockType });
-      return;
+      // create new timeclock
+      // createTimeClock({shiftStart: })
     }
+
+    // if (pickTimeclockType === 'pick' && checkInput() && selectedTimeclockId) {
+    //   if (timeType === 'check in') {
+    //     editTimeclock(selectedTimeclockId, {
+    //       shiftStart: pickTimeclockType
+    //     });
+    //     return;
+    //   }
+    //   editTimeclock(selectedTimeclockId, { shiftEnd: pickTimeclockType });
+    //   return;
+    // }
   };
 
   return (
@@ -190,7 +204,7 @@ function CheckoutForm(props: Props) {
         display={pickTimeclockType === 'insert' && isCheckOutRequest}
       >
         <FlexRow>
-          <ControlLabel>Shift Start</ControlLabel>
+          <ControlLabel>Choose shift start</ControlLabel>
           <FlexRowEven>
             <CustomWidthDiv width={120}>
               <TextAlignRight>Pick from time logs</TextAlignRight>
