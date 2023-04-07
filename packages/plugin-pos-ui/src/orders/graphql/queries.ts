@@ -167,6 +167,20 @@ const coverFields = `
   modifiedAt
   modifiedBy
   note
+  posName
+
+  user {
+    _id
+    email
+  }
+  createdUser {
+    _id
+    email
+  }
+  modifiedUser {
+    _id
+    email
+  }
 `;
 
 const coverParams = `

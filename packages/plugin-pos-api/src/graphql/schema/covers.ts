@@ -29,6 +29,7 @@ export const types = `
     modifiedBy: String
     note: String
 
+    posName: String
     user: User
     createdUser:  User
     modifiedUser:  User

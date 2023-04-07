@@ -37,5 +37,9 @@ export default {
       data: { _id: cover.modifiedBy },
       isRPC: true
     });
+  },
+  posName: async (cover, {}, { models }) => {
+    const pos = await models.Pos.findOne({ token: cover.posToken }).lean();
+    return pos ? pos.name : '';
   }
 };

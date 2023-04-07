@@ -39,7 +39,7 @@ const coverParams = `
   endDate: Date
   description: Date
   userId: String
-  details: String
+  details: JSON
 `;
 
 export const mutations = `
@@ -50,6 +50,6 @@ export const mutations = `
 `;
 
 export const queries = `
-  covers(startDate: Date, endDate: Date, userId: String): [Cover]
+  covers(startDate: Date, endDate: Date, userId: String, page: Int, perPage: Int): [Cover]
   coverDetail(_id: String!): Cover
 `;
