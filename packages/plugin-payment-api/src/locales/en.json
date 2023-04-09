@@ -17,5 +17,6 @@
   "Submit": "Submit",
   "Please enter your phone number": "Please enter your phone number",
   "Error: ": "Error: ",
-  "Enter your Storepay registered phone number": "Enter your Storepay registered phone number"
+  "Enter your Storepay registered phone number": "Enter your Storepay registered phone number",
+  "{\"error\":{\"sender_terminal_code\":{\"type\":\"REQUIRED\",\"message\":\"Required!\"}},\"message\":{\"sender_terminal_code\":{\"type\":\"REQUIRED\",\"message\":\"Required!\"}}}": "{\"error\":{\"sender_terminal_code\":{\"type\":\"REQUIRED\",\"message\":\"Required!\"}},\"message\":{\"sender_terminal_code\":{\"type\":\"REQUIRED\",\"message\":\"Required!\"}}}"
 }
