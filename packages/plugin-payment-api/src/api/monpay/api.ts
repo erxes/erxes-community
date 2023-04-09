@@ -142,25 +142,32 @@ export class MonpayAPI extends BaseAPI {
       data: { username: this.username, password: 'qwerty' }
     });
 
-    console.log('loginRes ', loginRes);
+    let token = '';
 
-    // try {
-    //   const res = await this.request({
-    //     method: 'GET',
-    //     headers: this.headers,
-    //     path: PAYMENTS.monpay.actions.couponScan,
-    //     params: { couponCode }
-    //   });
+    if (loginRes.code !== 0) {
+      return { error: 'Failed to login' };
+    }
 
-    //   console.log("coupon ",res);
+    token = loginRes.result.token;
 
-    //   if (res.code !== 0) {
-    //     return { error: 'Coupon is not valid' };
-    //   }
+    try {
+      const res = await this.request({
+        method: 'GET',
+        headers: {
+          ...this.headers,
+          Authorization: `Bearer ${token}`
+        },
+        path: PAYMENTS.monpay.actions.couponScan,
+        params: { couponCode }
+      });
 
-    //   return { ...res.result };
-    // } catch (e) {
-    //   return { error: e.message };
-    // }
+      if (res.code !== 0) {
+        return { error: 'Coupon is not valid' };
+      }
+
+      return { ...res.result };
+    } catch (e) {
+      return { error: e.message };
+    }
   }
 }
