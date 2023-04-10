@@ -52,8 +52,11 @@ function CheckoutForm(props: Props) {
 
   const [pickTimeclockType, setPickTimeclockType] = useState('');
   const [shiftStartInput, setShiftStartInput] = useState(null);
-  const [shiftStart, setShiftStart] = useState(requestedTime);
+  const [shiftStart, setShiftStart] = useState(null);
+  const [shiftStartInsert, setShiftStartInsert] = useState(requestedTime);
+
   const [selectedTimeclockId, setSelectedTimeclockId] = useState(null);
+  const [selectedTimeclockActive, setSelectedTimeclockActive] = useState(false);
 
   const returnAbsenceRequestTimeFormatted = () => {
     const getDate = dayjs(requestedTime).format(dateDayFormat);
@@ -95,15 +98,19 @@ function CheckoutForm(props: Props) {
 
     return filterShiftsOfThatDay.map(timeclock => ({
       value: timeclock._id,
+      shiftActive: timeclock.shiftActive,
       label: returnDateTimeFormatted(timeclock, 'timeclock')
     }));
   };
 
   const generateTimeclockSelectOptionsForShiftEnd = () => {
-    return timeclocksPerUser.map(timeclock => ({
-      value: timeclock._id,
-      label: returnDateTimeFormatted(timeclock, 'timeclock')
-    }));
+    return timeclocksPerUser
+      .filter(timeclock => timeclock.shiftStart <= requestedTime)
+      .map(timeclock => ({
+        value: timeclock._id,
+        shiftActive: timeclock.shiftActive,
+        label: returnDateTimeFormatted(timeclock, 'timeclock')
+      }));
   };
 
   const generateTimelogOptions = () => {
@@ -126,14 +133,15 @@ function CheckoutForm(props: Props) {
 
   const onSelectTimeclock = selectedTime => {
     setSelectedTimeclockId(selectedTime.value);
+    setSelectedTimeclockActive(selectedTime.shiftActive);
   };
 
   const onShiftStartChange = (selectedTime: any) => {
-    if (shiftStartInput === 'pick') {
-      setShiftStart(selectedTime.value);
-      return;
-    }
-    setShiftStart(selectedTime);
+    setShiftStart(selectedTime.value);
+  };
+
+  const onShiftStartInsertChange = timeVal => {
+    setShiftStartInsert(timeVal);
   };
 
   const checkInput = () => {
@@ -142,15 +150,20 @@ function CheckoutForm(props: Props) {
       return false;
     }
 
-    if (
-      pickTimeclockType === 'insert' &&
-      isCheckOutRequest &&
-      shiftStart >= requestedTime
-    ) {
-      Alert.error('Please choose shift start');
-      return false;
-    }
+    if (pickTimeclockType === 'insert' && isCheckOutRequest) {
+      if (
+        shiftStartInput === 'insert' &&
+        dayjs(shiftStartInsert) >= dayjs(requestedTime)
+      ) {
+        Alert.error('Please choose shift start earlier than shift end');
+        return false;
+      }
 
+      if (!shiftStartInput || (shiftStartInput === 'pick' && !shiftStart)) {
+        Alert.error('Please choose shift start');
+        return false;
+      }
+    }
     return true;
   };
 
@@ -169,7 +182,11 @@ function CheckoutForm(props: Props) {
           return;
         }
         // insert new timeclock
-        createTimeclock({ shiftStart, shiftEnd: requestedTime });
+        createTimeclock({
+          shiftStart:
+            shiftStartInput === 'pick' ? shiftStart : shiftStartInsert,
+          shiftEnd: requestedTime
+        });
         successfulSubmit();
       }
     } else {
@@ -178,14 +195,14 @@ function CheckoutForm(props: Props) {
         editTimeclock({
           _id: selectedTimeclockId,
           shiftStart: requestedTime,
-          shiftActive: true
+          shiftActive: selectedTimeclockActive
         });
         successfulSubmit();
         return;
       }
       // insert new active timeclock
       createTimeclock({
-        shiftStart,
+        shiftStart: requestedTime,
         shiftActive: true
       });
       successfulSubmit();
@@ -275,12 +292,12 @@ function CheckoutForm(props: Props) {
         <ToggleDisplay display={shiftStartInput === 'insert'}>
           <CustomRangeContainer>
             <DateControl
-              value={shiftStart}
+              value={shiftStartInsert}
               timeFormat={'HH:mm'}
-              name="startDate"
+              name="shiftStart"
               placeholder={'Starting date'}
               dateFormat={'YYYY-MM-DD'}
-              onChange={onShiftStartChange}
+              onChange={onShiftStartInsertChange}
             />
           </CustomRangeContainer>
         </ToggleDisplay>
