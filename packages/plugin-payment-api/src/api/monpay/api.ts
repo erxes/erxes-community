@@ -135,39 +135,72 @@ export class MonpayAPI extends BaseAPI {
   }
 
   async couponCheck(couponCode: string) {
-    const loginRes = await this.request({
-      method: 'POST',
-      headers: this.headers,
-      path: PAYMENTS.monpay.actions.branchLogin,
-      data: { username: this.username, password: 'qwerty' }
-    });
-
-    let token = '';
-
-    if (loginRes.code !== 0) {
-      return { error: 'Failed to login' };
-    }
-
-    token = loginRes.result.token;
-
     try {
-      const res = await this.request({
-        method: 'GET',
-        headers: {
-          ...this.headers,
-          Authorization: `Bearer ${token}`
-        },
-        path: PAYMENTS.monpay.actions.couponScan,
-        params: { couponCode }
+      const loginRes = await this.request({
+        method: 'POST',
+        headers: this.headers,
+        path: PAYMENTS.monpay.actions.branchLogin,
+        data: { username: 'Agent11', password: '1111' }
       });
 
-      if (res.code !== 0) {
-        return { error: 'Coupon is not valid' };
+      if (loginRes.code !== 0) {
+        return { error: 'Failed to login' };
       }
 
-      return { ...res.result };
+      const token = loginRes.result.token;
+
+      try {
+        const res = await this.request({
+          method: 'GET',
+          headers: {
+            ...this.headers,
+            Authorization: `Bearer ${token}`
+          },
+          path: PAYMENTS.monpay.actions.couponScan,
+          params: { couponCode }
+        });
+
+        if (res.code !== 0) {
+          return { error: 'Coupon is not valid' };
+        }
+
+        console.log('SCAN res ', res);
+
+        return { ...res.result };
+      } catch (e) {
+        console.error(e);
+        return { error: e.message };
+      }
     } catch (e) {
-      return { error: e.message };
+      throw new Error(e.message);
     }
+
+    // let token = '';
+
+    // if (loginRes.code !== 0) {
+    //   return { error: 'Failed to login' };
+    // }
+
+    // token = loginRes.result.token;
+
+    // try {
+    //   const res = await this.request({
+    //     method: 'GET',
+    //     headers: {
+    //       ...this.headers,
+    //       Authorization: `Bearer ${token}`
+    //     },
+    //     path: PAYMENTS.monpay.actions.couponScan,
+    //     params: { couponCode }
+    //   });
+
+    //   if (res.code !== 0) {
+    //     return { error: 'Coupon is not valid' };
+    //   }
+
+    //   return { ...res.result };
+    // } catch (e) {
+    //   return { error: e.message };
+    // }
   }
 }
