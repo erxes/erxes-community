@@ -187,6 +187,21 @@ const timeclockMutations = {
     return updated;
   },
 
+  /**
+   * Removes a single timeclock
+   */
+  timeclockRemove(_root, { _id }, { models }: IContext) {
+    return models.Timeclocks.removeTimeClock(_id);
+  },
+
+  timeclockEdit(_root, { _id, ...doc }: ITimeClockEdit, { models }: IContext) {
+    return models.Timeclocks.updateTimeClock(_id, doc);
+  },
+
+  timeclockCreate(_root, doc, { models }: IContext) {
+    return models.Timeclocks.createTimeClock(doc);
+  },
+
   absenceTypeAdd(_root, doc, { models }: IContext) {
     return models.AbsenceTypes.createAbsenceType(doc);
   },
@@ -201,21 +216,6 @@ const timeclockMutations = {
     { models }: IContext
   ) {
     return models.AbsenceTypes.updateAbsenceType(_id, doc);
-  },
-
-  /**
-   * Removes a single timeclock
-   */
-  async timeclockRemove(_root, { _id }, { models }: IContext) {
-    return models.Timeclocks.removeTimeClock(_id);
-  },
-
-  async timeclockEdit(
-    _root,
-    { _id, ...doc }: ITimeClockEdit,
-    { models }: IContext
-  ) {
-    return models.Timeclocks.updateTimeClock(_id, doc);
   },
 
   async submitCheckInOutRequest(

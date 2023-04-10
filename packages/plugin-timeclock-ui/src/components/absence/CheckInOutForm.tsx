@@ -24,10 +24,13 @@ type Props = {
   timelogsPerUser: ITimelog[];
 
   absenceRequest: IAbsence;
-
   timeType: string;
-  editTimeclock: (timeclockId: string, timeValue: any) => void;
-  createTimeclock: (timeValues: any) => void;
+
+  contentProps: any;
+
+  editTimeclock: (timeclockValues: any) => void;
+  createTimeclock: (timeclockValues: any) => void;
+  solveAbsence: (absenceRequestValues: any) => void;
 };
 
 function CheckoutForm(props: Props) {
@@ -36,19 +39,25 @@ function CheckoutForm(props: Props) {
     timelogsPerUser,
     timeType,
     absenceRequest,
-    editTimeclock
+    editTimeclock,
+    createTimeclock,
+    solveAbsence,
+    contentProps
   } = props;
 
   const isCheckOutRequest = timeType.includes('check out');
+  const requestedTime = absenceRequest.startTime;
+
+  const { closeModal } = contentProps;
 
   const [pickTimeclockType, setPickTimeclockType] = useState('');
   const [shiftStartInput, setShiftStartInput] = useState(null);
-  const [shiftStart, setShiftStart] = useState(absenceRequest.startTime);
+  const [shiftStart, setShiftStart] = useState(requestedTime);
   const [selectedTimeclockId, setSelectedTimeclockId] = useState(null);
 
   const returnAbsenceRequestTimeFormatted = () => {
-    const getDate = dayjs(absenceRequest.startTime).format(dateDayFormat);
-    const getTime = dayjs(absenceRequest.startTime).format(timeFormat);
+    const getDate = dayjs(requestedTime).format(dateDayFormat);
+    const getTime = dayjs(requestedTime).format(timeFormat);
 
     return getDate + ' ' + getTime;
   };
@@ -66,9 +75,9 @@ function CheckoutForm(props: Props) {
       const getShiftStart = dayjs(time.shiftStart).format(timeFormat);
       const getShiftEnd = time.shiftEnd
         ? dayjs(time.shiftEnd).format(timeFormat)
-        : 'N/A';
+        : 'Shift active';
 
-      return getShiftDate + ' ' + getShiftStart + ' ' + getShiftEnd;
+      return getShiftDate + ' ' + getShiftStart + ' ~ ' + getShiftEnd;
     }
 
     const getDate = dayjs(time.timelog).format(dateFormat);
@@ -81,7 +90,7 @@ function CheckoutForm(props: Props) {
     const filterShiftsOfThatDay = timeclocksPerUser.filter(
       timeclock =>
         dayjs(timeclock.shiftStart).format(dateFormat) ===
-        dayjs(absenceRequest.startTime).format(dateFormat)
+        dayjs(requestedTime).format(dateFormat)
     );
 
     return filterShiftsOfThatDay.map(timeclock => ({
@@ -100,7 +109,7 @@ function CheckoutForm(props: Props) {
   const generateTimelogOptions = () => {
     // time log options only occur for picking shift start for check out request
     return timelogsPerUser
-      .filter(log => log.timelog < absenceRequest.startTime)
+      .filter(log => log.timelog < requestedTime)
       .map((log: ITimelog) => ({
         value: log.timelog,
         label: returnDateTimeFormatted(log, 'timelog')
@@ -133,36 +142,67 @@ function CheckoutForm(props: Props) {
       return false;
     }
 
+    if (
+      pickTimeclockType === 'insert' &&
+      isCheckOutRequest &&
+      shiftStart >= requestedTime
+    ) {
+      Alert.error('Please choose shift start');
+      return false;
+    }
+
     return true;
   };
 
   const onSaveBtn = () => {
+    // check out request
     if (isCheckOutRequest) {
-      if (pickTimeclockType === 'pick' && selectedTimeclockId) {
-        // edit concurrent timeclock
-        editTimeclock(selectedTimeclockId, {
-          shiftEnd: absenceRequest.startTime
-        });
+      if (checkInput()) {
+        if (pickTimeclockType === 'pick' && selectedTimeclockId) {
+          // edit concurrent timeclock
+          editTimeclock({
+            _id: selectedTimeclockId,
+            shiftEnd: requestedTime,
+            shiftActive: false
+          });
+          successfulSubmit();
+          return;
+        }
+        // insert new timeclock
+        createTimeclock({ shiftStart, shiftEnd: requestedTime });
+        successfulSubmit();
       }
-      // create new timeclock
-      // createTimeClock({shiftStart: })
+    } else {
+      // check in request
+      if (pickTimeclockType === 'pick' && checkInput() && selectedTimeclockId) {
+        editTimeclock({
+          _id: selectedTimeclockId,
+          shiftStart: requestedTime,
+          shiftActive: true
+        });
+        successfulSubmit();
+        return;
+      }
+      // insert new active timeclock
+      createTimeclock({
+        shiftStart,
+        shiftActive: true
+      });
     }
+  };
 
-    // if (pickTimeclockType === 'pick' && checkInput() && selectedTimeclockId) {
-    //   if (timeType === 'check in') {
-    //     editTimeclock(selectedTimeclockId, {
-    //       shiftStart: pickTimeclockType
-    //     });
-    //     return;
-    //   }
-    //   editTimeclock(selectedTimeclockId, { shiftEnd: pickTimeclockType });
-    //   return;
-    // }
+  const successfulSubmit = () => {
+    solveAbsence({
+      _id: absenceRequest._id,
+      status: `Approved`
+    });
+    closeModal();
+    return;
   };
 
   return (
     <FlexColumn marginNum={20}>
-      <div style={{ fontSize: '16px' }}>
+      <div style={{ fontSize: '14px' }}>
         {returnAbsenceRequestTimeFormatted()}
       </div>
       <FlexRow>
@@ -189,7 +229,7 @@ function CheckoutForm(props: Props) {
 
       <ToggleDisplay display={pickTimeclockType === 'pick'}>
         <Select
-          placeholder="Pick timeclock"
+          placeholder="Pick a timeclock to finish"
           onChange={onSelectTimeclock}
           value={selectedTimeclockId}
           options={

@@ -261,6 +261,9 @@ export type TimeClockMutationResponse = {
   timeclockEditMutation: (params: {
     variables: MutationVariables;
   }) => Promise<any>;
+  timeclockCreateMutation: (params: {
+    variables: MutationVariables;
+  }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {
     variables: { startDate: string; endDate: string };
   }) => Promise<any>;
