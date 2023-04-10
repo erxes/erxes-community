@@ -42,7 +42,7 @@ export const PAYMENTCONFIGS = [
   {
     name: 'Qpay Wechat Pay',
     description: 'Receive payments in Mongolia through the WeChat Pay',
-    isAvailable: true,
+    isAvailable: false,
     kind: 'wechatpay',
     logo: 'images/payments/wechatpay.png',
     createModal: 'wechatpay',
