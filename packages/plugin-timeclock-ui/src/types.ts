@@ -161,6 +161,10 @@ export interface IDeviceConfig {
   extractRequired: boolean;
 }
 export type TimeClockMainQueryResponse = {
+  timeclocksMain: { list: ITimeclock[]; totalCount: number };
+} & QueryResponse;
+
+export type TimeClockPerUserQueryResponse = {
   timeclocksPerUser: ITimeclock[];
 } & QueryResponse;
 

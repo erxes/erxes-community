@@ -12,7 +12,7 @@ import gql from 'graphql-tag';
 import { mutations, queries } from '../../graphql';
 import CheckInOutForm from '../../components/absence/CheckInOutForm';
 import React from 'react';
-import { TimeClockMainQueryResponse } from '../../types';
+import { TimeClockPerUserQueryResponse } from '../../types';
 
 type Props = {
   userId: string;
@@ -40,7 +40,7 @@ type Props = {
 
 type FinalProps = {
   listTimeLogsPerUser: TimeLogsPerUserQueryResponse;
-  listTimeclocksPerUser: TimeClockMainQueryResponse;
+  listTimeclocksPerUser: TimeClockPerUserQueryResponse;
 } & Props &
   TimeClockMutationResponse &
   AbsenceMutationResponse;
