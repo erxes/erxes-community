@@ -118,15 +118,18 @@ export default withProps<Props>(
       })
     }),
 
-    graphql<Props, AbsenceMutationResponse>(gql(mutations.solveAbsence), {
-      name: 'solveAbsenceMutation',
-      options: ({ absenceId, status }) => ({
-        variables: {
-          _id: absenceId,
-          status
-        },
-        refetchQueries: ['requestsMain']
-      })
-    })
+    graphql<Props, AbsenceMutationResponse>(
+      gql(mutations.solveAbsenceRequest),
+      {
+        name: 'solveAbsenceMutation',
+        options: ({ absenceId, status }) => ({
+          variables: {
+            _id: absenceId,
+            status
+          },
+          refetchQueries: ['requestsMain']
+        })
+      }
+    )
   )(ListContainer)
 );

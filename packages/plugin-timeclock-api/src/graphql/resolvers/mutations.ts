@@ -291,34 +291,16 @@ const timeclockMutations = {
           });
         }
       }
+
+      return updated;
     }
 
-    // solve check in / out requests
-    const checkTime = shiftRequest.startTime;
-
-    updated = models.Absences.updateAbsence(_id, {
+    // if request is check in/out request
+    return models.Absences.updateAbsence(_id, {
       status: `${shiftRequest.reason} / ${status}`,
+      solved: true,
       ...doc
     });
-
-    // create time logs if request is approved
-    if (status === 'Approved') {
-      if (shiftRequest.reason?.toLowerCase() === 'check in request') {
-        await models.Timeclocks.createTimeClock({
-          userId: shiftRequest.userId,
-          shiftStart: checkTime,
-          shiftActive: true,
-          deviceType: shiftRequest.reason
-        });
-      }
-
-      await models.TimeLogs.createTimeLog({
-        userId: shiftRequest.userId,
-        timelog: checkTime
-      });
-    }
-
-    return updated;
   },
 
   async solveScheduleRequest(

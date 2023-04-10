@@ -188,6 +188,7 @@ function CheckoutForm(props: Props) {
         shiftStart,
         shiftActive: true
       });
+      successfulSubmit();
     }
   };
 
