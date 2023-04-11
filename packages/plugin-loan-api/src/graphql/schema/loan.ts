@@ -1,4 +1,8 @@
 import {
+  attachmentInput,
+  attachmentType
+} from '@erxes/api-utils/src/commonTypeDefs';
+import {
   mutations as adjustmentMutations,
   queries as adjustmentQueries,
   types as adjustmentTypes
@@ -43,12 +47,33 @@ import {
 } from './transaction';
 
 export const types = `
+  ${attachmentType}
+  ${attachmentInput}
+
+  extend type User @key(fields: "_id") {
+    _id: String! @external
+  }
+  extend type Company @key(fields: "_id") {
+    _id: String! @external
+  }
+  extend type Customer @key(fields: "_id") {
+    _id: String! @external
+  }
+  extend type ProductCategory @key(fields: "_id") {
+    _id: String! @external
+  }
+  extend type Product @key(fields: "_id") {
+    _id: String! @external
+  }
+  
   ${adjustmentTypes()},
   ${contractTypes()},
   ${collateralTypes()}
   ${contractTypeTypes()},
   ${insuranceTypeTypes()},
-
+  ${invoiceTypes},
+  ${transactionTypes},
+  ${erkhetResponseTypes()},
   ${scheduleTypes()},
  
 

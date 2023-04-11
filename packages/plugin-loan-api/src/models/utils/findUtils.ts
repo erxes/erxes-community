@@ -1,10 +1,6 @@
-import * as validator from 'validator';
-
 const findCustomerByDesc = async (models, words) => {
   let customer: any = undefined;
   for (const word of words) {
-    if (!validator.isEmail(word)) continue;
-
     customer = await models.Customers.findOne({ primaryEmail: word }).lean();
     if (customer && customer._id) {
       break;

@@ -6,7 +6,7 @@ const adjustmentMutations = {
   adjustmentsAdd: async (
     _root,
     doc,
-    { user, docModifier, models, checkPermission, messageBroker }
+    { user, docModifier, models, messageBroker }
   ) => {
     doc.createdBy = user._id;
     const adjustment = models.Adjustments.createAdjustment(

@@ -1,8 +1,5 @@
 export const types = () => {
   return `
-    extend type User @key(fields: "_id") {
-      _id: String! @external
-    }
   type InsuranceType {
     _id: String!
     code: String
