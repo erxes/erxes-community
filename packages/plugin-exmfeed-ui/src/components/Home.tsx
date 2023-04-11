@@ -1,13 +1,16 @@
+import { Col, FeedLayout, TabContent } from '../styles';
 import React, { useState } from 'react';
-import Icon from '@erxes/ui/src/components/Icon';
-import { Link } from 'react-router-dom';
-import { Wrapper } from '@erxes/ui/src/layout';
-import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs/index';
+import { TabTitle, Tabs } from '@erxes/ui/src/components/tabs/index';
+
 import Form from '../containers/Form';
-import ThankForm from '../containers/ThankForm';
+import Icon from '@erxes/ui/src/components/Icon';
+import LeftSidebar from './LeftSidebar';
+import { Link } from 'react-router-dom';
 import List from '../containers/List';
-import { FeedLayout, MainContent, TabContent } from '../styles';
+import { Row } from '@erxes/ui-settings/src/styles';
+import ThankForm from '../containers/ThankForm';
 import ThankList from '../containers/ThankList';
+import { Wrapper } from '@erxes/ui/src/layout';
 
 type Props = {
   queryParams: any;
@@ -42,42 +45,51 @@ export default function Home(props: Props) {
   const renderContent = () => {
     return (
       <FeedLayout>
-        <Tabs full={true}>
-          <TabTitle
-            className={currentTab === 'post' ? 'active' : ''}
-            onClick={() => onClickTab('post')}
-          >
-            Post
-          </TabTitle>
-          <TabTitle
-            className={currentTab === 'event' ? 'active' : ''}
-            onClick={() => onClickTab('event')}
-          >
-            Event
-          </TabTitle>
-          <TabTitle
-            className={currentTab === 'bravo' ? 'active' : ''}
-            onClick={() => onClickTab('bravo')}
-          >
-            Bravo{' '}
-            <Link target="_blank" to={`/settings/properties?type=exmFeedBravo`}>
-              <Icon color="black" icon="cog" />
-            </Link>
-          </TabTitle>
-          <TabTitle
-            className={currentTab === 'thankyou' ? 'active' : ''}
-            onClick={() => onClickTab('thankyou')}
-          >
-            Thank you
-          </TabTitle>
-          <TabTitle
-            className={currentTab === 'publicHoliday' ? 'active' : ''}
-            onClick={() => onClickTab('publicHoliday')}
-          >
-            Public holiday
-          </TabTitle>
-        </Tabs>
-        <TabContent>{renderTabContent()}</TabContent>
+        <Row>
+          <Col width={50}>
+            <Tabs full={true}>
+              <TabTitle
+                className={currentTab === 'post' ? 'active' : ''}
+                onClick={() => onClickTab('post')}
+              >
+                Post
+              </TabTitle>
+              <TabTitle
+                className={currentTab === 'event' ? 'active' : ''}
+                onClick={() => onClickTab('event')}
+              >
+                Event
+              </TabTitle>
+              <TabTitle
+                className={currentTab === 'bravo' ? 'active' : ''}
+                onClick={() => onClickTab('bravo')}
+              >
+                Bravo{' '}
+                <Link
+                  target="_blank"
+                  to={`/settings/properties?type=exmFeedBravo`}
+                >
+                  <Icon color="black" icon="cog" />
+                </Link>
+              </TabTitle>
+              <TabTitle
+                className={currentTab === 'thankyou' ? 'active' : ''}
+                onClick={() => onClickTab('thankyou')}
+              >
+                Thank you
+              </TabTitle>
+              <TabTitle
+                className={currentTab === 'publicHoliday' ? 'active' : ''}
+                onClick={() => onClickTab('publicHoliday')}
+              >
+                Public holiday
+              </TabTitle>
+            </Tabs>
+            <TabContent>{renderTabContent()}</TabContent>
+          </Col>
+          <Col>hi</Col>
+          <Col>hi</Col>
+        </Row>
       </FeedLayout>
     );
   };
@@ -87,7 +99,9 @@ export default function Home(props: Props) {
       header={
         <Wrapper.Header title={'Feed'} breadcrumb={[{ title: 'Feed' }]} />
       }
-      content={<MainContent>{renderContent()}</MainContent>}
+      leftSidebar={<LeftSidebar />}
+      content={renderContent()}
+      hasBorder={true}
     />
   );
 }

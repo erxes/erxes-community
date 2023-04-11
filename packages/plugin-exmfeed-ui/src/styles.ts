@@ -1,8 +1,12 @@
+import { colors, dimensions } from '@erxes/ui/src/styles';
+
+import { rgba } from '@erxes/ui/src/styles/ecolor';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
 
 export const FeedLayout = styled.div`
   flex: 1;
+  padding: $ ${dimensions.coreSpacing}px;
 
   p {
     margin-bottom: 0;
@@ -157,10 +161,6 @@ export const Attachments = styled.div`
   }
 `;
 
-export const MainContent = styled.div`
-  padding: 20px;
-`;
-
 export const CustomRangeContainer = styled.div`
   margin: 10px 0;
   display: flex;
@@ -202,6 +202,63 @@ export const FormWrap = styledTS<{ transparent?: boolean }>(styled.div)`
 
     label {
       margin-right: 20px;
+    }
+  }
+`;
+
+export const Col = styledTS<{ width?: number }>(styled.div)`
+  width: ${props => (props.width ? props.width : 25)}%;
+  padding: ${dimensions.coreSpacing}px;
+`;
+
+export const Sidebar = styled.ul`
+  list-style: none;
+  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+
+  li {
+    border-radius: ${dimensions.unitSpacing}px;
+    padding: ${dimensions.unitSpacing - 4}px 12px;
+    transition: 0.3s;
+    cursor: pointer;
+    font-weight: 700;
+    margin-bottom: ${dimensions.unitSpacing - 5}px;
+    width: 180px;
+    display: flex;
+    align-items: center;
+
+    > i {
+      margin-right: ${dimensions.unitSpacing}px;
+
+      &.feed {
+        color: ${colors.colorSecondary};
+      }
+      &.team {
+        color: ${colors.colorCoreBlue};
+      }
+      &.discover {
+        color: ${colors.colorCoreRed};
+      }
+      &.learn {
+        color: ${colors.colorCoreGreen};
+      }
+      &.leaderboard {
+        color: ${colors.colorCoreOrange};
+      }
+      &.structure {
+        color: ${colors.colorCoreTeal};
+      }
+      &.score {
+        color: ${colors.colorCoreYellow};
+      }
+    }
+
+    &.active {
+      background: ${rgba(colors.colorSecondary, 0.1)};
+      color: ${colors.colorSecondary};
+    }
+
+    &:hover {
+      background: ${colors.bgLight};
     }
   }
 `;
