@@ -31,7 +31,7 @@ const coverQueries = {
     );
   },
 
-  async coversDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+  async coverDetail(_root, { _id }: { _id: string }, { models }: IContext) {
     return await models.Covers.findOne({ _id }).lean();
   }
 };
