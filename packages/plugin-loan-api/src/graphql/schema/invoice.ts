@@ -15,7 +15,7 @@ export const types = `
     ${typeFields}
   }
 
-  type Invoice {
+  type LoanInvoice {
     _id: String,
     createdAt: Date,
     createdBy: String
@@ -30,8 +30,8 @@ export const types = `
     transaction: Transaction,
   }
 
-  type InvoicesListResponse {
-    list: [Invoice],
+  type LoanInvoicesListResponse {
+    list: [LoanInvoice],
     totalCount: Float,
   }
 `;
@@ -51,9 +51,9 @@ const queryParams = `
 `;
 
 export const queries = `
-  invoicesMain(${queryParams}): InvoicesListResponse
-  invoices(${queryParams}): [Invoice]
-  invoiceDetail(_id: String!): Invoice
+  loanInvoicesMain(${queryParams}): LoanInvoicesListResponse
+  loanInvoices(${queryParams}): [LoanInvoice]
+  loanInvoiceDetail(_id: String!): LoanInvoice
   getInvoicePreInfo(contractId: String!, payDate: String): InvoicePreInfo
 `;
 

@@ -86,16 +86,16 @@ const listParamsValue = `
 `;
 
 export const invoices = `
-  query invoices(${listParamsDef}) {
-    invoices(${listParamsValue}) {
+  query loanInvoices(${listParamsDef}) {
+    loanInvoices(${listParamsValue}) {
       ${invoiceFields}
     }
   }
 `;
 
 export const invoicesMain = `
-  query invoicesMain(${listParamsDef}) {
-    invoicesMain(${listParamsValue}) {
+  query loanInvoicesMain(${listParamsDef}) {
+    loanInvoicesMain(${listParamsValue}) {
       list {
         ${invoiceFields}
         ${invoiceOtherFields}
@@ -112,8 +112,8 @@ export const invoiceCounts = `
 `;
 
 export const invoiceDetail = `
-  query invoiceDetail($_id: String!) {
-    invoiceDetail(_id: $_id) {
+  query loanInvoiceDetail($_id: String!) {
+    loanInvoiceDetail(_id: $_id) {
       ${invoiceFields}
       ${invoiceOtherFields}
     }
