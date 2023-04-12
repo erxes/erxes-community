@@ -136,6 +136,7 @@ export type ICover = {
   modifiedAt: Date;
   modifiedBy: string;
   note?: string;
+  posName: string;
 
   user: IUser;
   createdUser: IUser;

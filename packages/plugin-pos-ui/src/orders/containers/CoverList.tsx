@@ -99,7 +99,7 @@ class OrdersContainer extends React.Component<FinalProps, State> {
     }
 
     const covers = coversQuery.posCovers || [];
-    console.log(covers, 'kkkkkkkkkkkkkkkkkkkkkkkkkk');
+
     const updatedProps = {
       ...this.props,
       covers,

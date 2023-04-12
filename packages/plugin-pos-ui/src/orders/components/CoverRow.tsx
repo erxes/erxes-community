@@ -12,7 +12,7 @@ type Props = {
   history: any;
 };
 
-class PutResponseRow extends React.Component<Props> {
+class CoverRow extends React.Component<Props> {
   displayValue(cover, name) {
     const value = _.get(cover, name);
     return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
@@ -46,16 +46,9 @@ class PutResponseRow extends React.Component<Props> {
 
     const trigger = (
       <tr>
-        <td key={'BillID'}>{cover.beginDate} </td>
-        <td key={'Date'}>{dayjs(cover.endDate).format('lll')}</td>
-        <td key={'cashAmount'}>{this.displayValue(cover, 'cashAmount')}</td>
-        <td key={'mobileAmount'}>{this.displayValue(cover, 'mobileAmount')}</td>
-        <td key={'totalAmount'}>{this.displayValue(cover, 'totalAmount')}</td>
-        <td key={'customer'}>{cover.user}</td>
-        {/* <td key={'pos'}>
-          {cover.posId || ''}
-          {cover.origin === 'kiosk' ? '*' : ''}
-        </td> */}
+        <td key={'beginDate'}>{cover.beginDate} </td>
+        <td key={'endDate'}>{dayjs(cover.endDate).format('lll')}</td>
+        <td key={'pos'}>{cover.posName}</td>
         <td key={'user'}>{cover.user ? cover.user.email : ''}</td>
       </tr>
     );
@@ -72,4 +65,4 @@ class PutResponseRow extends React.Component<Props> {
   }
 }
 
-export default PutResponseRow;
+export default CoverRow;

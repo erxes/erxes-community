@@ -60,31 +60,13 @@ class Covers extends React.Component<IProps, {}> {
           <thead>
             <tr>
               <th>
-                <SortHandler sortField={'number'} label={__('Bill number')} />
+                <SortHandler sortField={'beginDate'} label={__('Begin Date')} />
               </th>
               <th>
-                <SortHandler sortField={'paidDate'} label={__('Date')} />
+                <SortHandler sortField={'endDate'} label={__('End Date')} />
               </th>
               <th>
-                <SortHandler
-                  sortField={'cashAmount'}
-                  label={__('Cash Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler
-                  sortField={'mobileAmount'}
-                  label={__('Mobile Amount')}
-                />
-              </th>
-              <th>
-                <SortHandler sortField={'totalAmount'} label={__('Amount')} />
-              </th>
-              <th>
-                <SortHandler sortField={'customerId'} label={__('Customer')} />
-              </th>
-              <th>
-                <SortHandler sortField={'posName'} label={__('Pos')} />
+                <SortHandler sortField={'posToken'} label={__('POS')} />
               </th>
               <th>
                 <SortHandler sortField={'user'} label={__('User')} />
