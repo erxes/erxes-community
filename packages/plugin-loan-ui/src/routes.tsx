@@ -3,6 +3,8 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import Settings from './settings/containers/Settings';
+import HolidaySettings from './settings/components/HolidaySettings';
+import UndueSettings from './settings/components/UndueSettings';
 
 const ContractList = asyncComponent(() =>
   import(/* webpackChunkName: "ContractList" */ './contracts/containers/List')
@@ -122,12 +124,12 @@ const contractTypeDetail = ({ match }) => {
   return <ContractTypeDetails id={id} />;
 };
 
-const undueSettings = ({ location, history }) => {
-  return <Settings components={undueSettings}></Settings>;
+const undueSettings = () => {
+  return <Settings components={UndueSettings}></Settings>;
 };
 
 const holidaySettings = ({ location, history }) => {
-  return <Settings components={holidaySettings}></Settings>;
+  return <Settings components={HolidaySettings}></Settings>;
 };
 
 const LoanRoutes = () => {
