@@ -1,8 +1,12 @@
-import { IContractTypeDocument } from '../models/definitions/contractTypes';
-import { Model, Document } from 'mongoose';
-import { contractTypeSchema } from '../models/definitions/contractTypes';
+import {
+  IContractTypeDocument,
+  contractTypeSchema
+} from '../models/definitions/contractTypes';
+import { Model } from 'mongoose';
 
-export const loadContractTypeClass = models => {
+export const loadContractTypeClass = (models: {
+  ContractTypes: Model<IContractTypeDocument>;
+}) => {
   class ContractType {
     /**
      *

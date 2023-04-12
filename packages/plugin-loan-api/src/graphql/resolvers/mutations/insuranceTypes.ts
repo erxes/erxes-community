@@ -1,28 +1,43 @@
-import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
 import { gatherDescriptions } from '../../../utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import {
+  checkPermission,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
 
 const insuranceTypeMutations = {
   insuranceTypesAdd: async (
     _root,
     doc,
-    { user, docModifier, models, checkPermission, messageBroker }
+    { user, docModifier, models, subdomain }: IContext
   ) => {
     doc.yearPercents = doc.yearPercents.split(', ');
+
+    //TODO check this method
     const insuranceType = models.InsuranceTypes.createInsuranceType(
       models,
-      docModifier(doc),
-      user
+      docModifier(doc)
     );
 
+    const descriptions = gatherDescriptions({
+      type: 'insuranceType',
+      newData: doc,
+      object: insuranceType,
+      extraParams: { models }
+    });
+
     await putCreateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
         type: 'insuranceType',
         newData: doc,
         object: insuranceType,
-        extraParams: { models }
+        extraParams: { models },
+        ...descriptions
       },
       user
     );
@@ -36,7 +51,7 @@ const insuranceTypeMutations = {
   insuranceTypesEdit: async (
     _root,
     { _id, ...doc },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
     doc.yearPercents = doc.yearPercents.split(', ');
     const insuranceType = await models.InsuranceTypes.getInsuranceType(models, {
@@ -47,16 +62,23 @@ const insuranceTypeMutations = {
       _id,
       doc
     );
-
+    const descriptions = gatherDescriptions({
+      type: 'insuranceType',
+      object: insuranceType,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    });
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
         type: 'insuranceType',
         object: insuranceType,
         newData: { ...doc },
         updatedDocument: updated,
-        extraParams: { models }
+        extraParams: { models },
+        ...descriptions
       },
       user
     );
@@ -70,7 +92,7 @@ const insuranceTypeMutations = {
   insuranceTypesRemove: async (
     _root,
     { insuranceTypeIds }: { insuranceTypeIds: string[] },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
     // TODO: contracts check
     const insuranceTypes = await models.InsuranceTypes.find({
@@ -80,13 +102,19 @@ const insuranceTypeMutations = {
     await models.InsuranceTypes.removeInsuranceTypes(models, insuranceTypeIds);
 
     for (const insuranceType of insuranceTypes) {
+      const descriptions = gatherDescriptions({
+        type: 'insuranceType',
+        object: insuranceType,
+        extraParams: { models }
+      });
       await putDeleteLog(
+        subdomain,
         messageBroker,
-        gatherDescriptions,
         {
           type: 'insuranceType',
           object: insuranceType,
-          extraParams: { models }
+          extraParams: { models },
+          ...descriptions
         },
         user
       );

@@ -1,27 +1,40 @@
-import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
+// import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
 import { gatherDescriptions } from '../../../utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import {
+  checkPermission,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
 
 const contractTypeMutations = {
   contractTypesAdd: async (
     _root,
     doc,
-    { user, docModifier, models, checkPermission, messageBroker }
+    { user, docModifier, models, subdomain }: IContext
   ) => {
     const contractType = models.ContractTypes.createContractType(
-      models,
-      docModifier(doc),
-      user
+      docModifier(doc)
     );
 
+    const descriptions = await gatherDescriptions({
+      type: 'contractType',
+      newData: doc,
+      object: contractType,
+      extraParams: { models }
+    });
+
     await putCreateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
         type: 'contractType',
         newData: doc,
         object: contractType,
-        extraParams: { models }
+        extraParams: { models },
+        ...descriptions
       },
       user
     );
@@ -35,26 +48,29 @@ const contractTypeMutations = {
   contractTypesEdit: async (
     _root,
     { _id, ...doc },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
-    const contractType = await models.ContractTypes.getContractType(models, {
+    const contractType = await models.ContractTypes.getContractType({
       _id
     });
-    const updated = await models.ContractTypes.updateContractType(
-      models,
-      _id,
-      doc
-    );
+    const updated = await models.ContractTypes.updateContractType(_id, doc);
+
+    const descriptions = await gatherDescriptions({
+      type: 'contractType',
+      newData: doc,
+      object: contractType,
+      extraParams: { models }
+    });
 
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
         type: 'contractType',
+        newData: doc,
         object: contractType,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
+        extraParams: { models },
+        ...descriptions
       },
       user
     );
@@ -69,20 +85,30 @@ const contractTypeMutations = {
   contractTypesRemove: async (
     _root,
     { contractTypeIds }: { contractTypeIds: string[] },
-    { models, checkPermission, user, messageBroker }
+    { models, subdomain, user }: IContext
   ) => {
     // TODO: contracts check
     const contractTypes = await models.ContractTypes.find({
       _id: { $in: contractTypeIds }
     }).lean();
 
-    await models.ContractTypes.removeContractTypes(models, contractTypeIds);
+    await models.ContractTypes.removeContractTypes(contractTypeIds);
 
     for (const contractType of contractTypes) {
+      const descriptions = await gatherDescriptions({
+        type: 'contractType',
+        object: contractType,
+        extraParams: { models }
+      });
       await putDeleteLog(
+        subdomain,
         messageBroker,
-        gatherDescriptions,
-        { type: 'contractType', object: contractType, extraParams: { models } },
+        {
+          type: 'contractType',
+          object: contractType,
+          extraParams: { models },
+          ...descriptions
+        },
         user
       );
     }

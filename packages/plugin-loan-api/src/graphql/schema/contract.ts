@@ -97,6 +97,10 @@ export const types = () => `
     debt: Float,
     total: Float,
   }
+  type ContractsListResponse {
+    list: [Contract],
+    totalCount: Float,
+  }
 `;
 
 const queryParams = `
@@ -115,8 +119,17 @@ const queryParams = `
   closeDate: Date
 `;
 
+const queryMainParams = `
+  page: Int
+  perPage: Int
+  ids: [String]
+  searchValue: String
+  sortField: String
+  sortDirection: Int
+`;
+
 export const queries = `
-  
+  contractsMain(${queryMainParams}): ContractsListResponse
   contracts(${queryParams}): [Contract]
   contractDetail(_id: String!): Contract
   cpContracts(cpUserType: String cpUserEmail: String cpUserPhone: String): [Contract]

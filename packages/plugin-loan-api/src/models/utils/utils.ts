@@ -264,7 +264,7 @@ export const getRandomNumber = () => {
 };
 
 export const getNumber = async (models, contractTypeId) => {
-  const preNumbered = await models.LoanContracts.findOne({
+  const preNumbered = await models.Contracts.findOne({
     contractTypeId: contractTypeId
   }).sort({ number: -1 });
   const type = await models.ContractTypes.getContractType(models, {

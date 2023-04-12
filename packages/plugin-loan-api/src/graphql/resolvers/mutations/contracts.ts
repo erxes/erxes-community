@@ -13,11 +13,7 @@ const contractMutations = {
     doc,
     { user, docModifier, models, messageBroker }
   ) => {
-    const contract = models.Contracts.createContract(
-      models,
-      docModifier(doc),
-      user
-    );
+    const contract = models.Contracts.createContract(docModifier(doc), user);
 
     await putCreateLog(
       messageBroker,
