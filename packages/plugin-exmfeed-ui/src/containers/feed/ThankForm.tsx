@@ -1,9 +1,10 @@
-import React from 'react';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
+import { ButtonWrap, FormWrap } from '../../styles';
+
 import { ButtonMutate } from '@erxes/ui/src/components';
-import { mutations } from '../graphql';
-import ThankForm from '../components/ThankForm';
-import { ButtonWrap, FormWrap } from '../styles';
+import { IButtonMutateProps } from '@erxes/ui/src/types';
+import React from 'react';
+import ThankForm from '../../components/feed/ThankForm';
+import { mutations } from '../../graphql';
 
 type Props = {
   item?: any;

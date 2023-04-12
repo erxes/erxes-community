@@ -1,12 +1,13 @@
+import { CustomRangeContainer, UploadItems } from '../../styles';
+import { Form, FormControl, SelectTeamMembers, Uploader } from '@erxes/ui/src/';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
-import { Form, FormControl, Uploader, SelectTeamMembers } from '@erxes/ui/src/';
-import { IFormProps, IButtonMutateProps } from '@erxes/ui/src/types';
-import { UploadItems, CustomRangeContainer } from '../styles';
-import { title, description, getDepartmentOptions } from '../utils';
+import { description, getDepartmentOptions, title } from '../../utils';
+
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import GenerateFields from './GenerateFields';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
+import GenerateFields from '../GenerateFields';
+import Select from 'react-select-plus';
 import { __ } from '@erxes/ui/src/utils';
 
 type Props = {

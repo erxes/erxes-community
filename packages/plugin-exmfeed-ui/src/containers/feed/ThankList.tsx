@@ -1,10 +1,11 @@
-import React from 'react';
-import { useQuery, useMutation } from 'react-apollo';
-import gql from 'graphql-tag';
-import ThankList from '../components/ThankList';
-import { mutations, queries } from '../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
+import { mutations, queries } from '../../graphql';
+import { useMutation, useQuery } from 'react-apollo';
+
+import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import ThankList from '../../components/feed/ThankList';
+import gql from 'graphql-tag';
 
 type Props = {
   queryParams: any;

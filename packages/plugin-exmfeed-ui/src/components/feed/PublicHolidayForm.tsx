@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import { CustomRangeContainer, UploadItems } from '../../styles';
 import { Form, Uploader } from '@erxes/ui/src/components';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
-import { IFormProps, IButtonMutateProps } from '@erxes/ui/src/types';
-import { UploadItems, CustomRangeContainer } from '../styles';
-import { description, title } from '../utils';
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
+import React, { useState } from 'react';
+import { description, title } from '../../utils';
+
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import GenerateFields from './GenerateFields';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
+import GenerateFields from '../GenerateFields';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => any;

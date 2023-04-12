@@ -1,19 +1,20 @@
-import React from 'react';
-import FilterableListStyles from '@erxes/ui/src/components/filterableList/styles';
-import dayjs from 'dayjs';
-import ThankForm from '../containers/ThankForm';
 import {
+  FeedActions,
   HeaderFeed,
   NavItem,
   NewsFeedLayout,
-  TextFeed,
-  FeedActions
-} from '../styles';
+  TextFeed
+} from '../../styles';
+
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownToggle from '@erxes/ui/src/components/DropdownToggle';
+import FilterableListStyles from '@erxes/ui/src/components/filterableList/styles';
 import Icon from '@erxes/ui/src/components/Icon';
 import LoadMore from '@erxes/ui/src/components/LoadMore';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import React from 'react';
+import ThankForm from '../../containers/feed/ThankForm';
+import dayjs from 'dayjs';
 import { getUserAvatar } from '@erxes/ui/src/utils/core';
 
 const AvatarImg = FilterableListStyles.AvatarImg;

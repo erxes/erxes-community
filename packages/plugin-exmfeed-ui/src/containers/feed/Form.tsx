@@ -1,19 +1,20 @@
-import React from 'react';
-import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo';
-import { mutations, queries } from '../graphql';
-import Form from '../components/Form';
-import BravoForm from '../components/BravoForm';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
-import EventForm from '../components/EventForm';
-import PublicHolidayForm from '../components/PublicHolidayForm';
-import { ButtonWrap, FormWrap } from '../styles';
+import { ButtonWrap, FormWrap } from '../../styles';
+import { mutations, queries } from '../../graphql';
+
+import BravoForm from '../../components/feed/BravoForm';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
-import { isEnabled } from '@erxes/ui/src/utils/core';
+import EventForm from '../../components/feed/EventForm';
+import Form from '../../components/feed/Form';
+import { IButtonMutateProps } from '@erxes/ui/src/types';
+import PublicHolidayForm from '../../components/feed/PublicHolidayForm';
+import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import gql from 'graphql-tag';
+import { isEnabled } from '@erxes/ui/src/utils/core';
+import { useQuery } from 'react-apollo';
 
 type Props = {
-  contentType?: string;
+  contentType: string;
   item?: any;
   transparent?: boolean;
   closeModal?: () => void;

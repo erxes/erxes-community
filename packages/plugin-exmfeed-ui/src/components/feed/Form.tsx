@@ -1,11 +1,12 @@
+import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
-import { IFormProps, IButtonMutateProps } from '@erxes/ui/src/types';
-import { UploadItems } from '../styles';
-import { description, getDepartmentOptions, title } from '../utils';
+import { description, getDepartmentOptions, title } from '../../utils';
+
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import GenerateFields from './GenerateFields';
 import Form from '@erxes/ui/src/components/form/Form';
+import GenerateFields from '../GenerateFields';
+import Select from 'react-select-plus';
+import { UploadItems } from '../../styles';
 import Uploader from '@erxes/ui/src/components/Uploader';
 
 type Props = {

@@ -2,14 +2,14 @@ import { Col, FeedLayout, TabContent } from '../styles';
 import React, { useState } from 'react';
 import { TabTitle, Tabs } from '@erxes/ui/src/components/tabs/index';
 
-import Form from '../containers/Form';
+import Form from '../containers/feed/Form';
 import Icon from '@erxes/ui/src/components/Icon';
 import LeftSidebar from './LeftSidebar';
 import { Link } from 'react-router-dom';
-import List from '../containers/List';
+import List from '../containers/feed/List';
 import { Row } from '@erxes/ui-settings/src/styles';
-import ThankForm from '../containers/ThankForm';
-import ThankList from '../containers/ThankList';
+import ThankForm from '../containers/feed/ThankForm';
+import ThankList from '../containers/feed/ThankList';
 import { Wrapper } from '@erxes/ui/src/layout';
 
 type Props = {

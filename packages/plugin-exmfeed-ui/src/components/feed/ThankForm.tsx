@@ -1,10 +1,11 @@
+import { IButtonMutateProps, IFormProps, IOption } from '@erxes/ui/src/types';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
-import { IFormProps, IButtonMutateProps, IOption } from '@erxes/ui/src/types';
-import { description, getUserOptions } from '../utils';
-import { IUser } from '@erxes/ui/src/auth/types';
-import withTeamMembers from '../containers/withTeamMembers';
+import { description, getUserOptions } from '../../utils';
+
 import Form from '@erxes/ui/src/components/form/Form';
+import { IUser } from '@erxes/ui/src/auth/types';
+import Select from 'react-select-plus';
+import withTeamMembers from '../../containers/withTeamMembers';
 
 type Props = {
   item?: any;

@@ -1,11 +1,12 @@
+import { IButtonMutateProps, IFormProps, IOption } from '@erxes/ui/src/types';
 import React, { useState } from 'react';
-import Select from 'react-select-plus';
+import { description, getUserOptions, title } from '../../utils';
+
 import { Form } from '@erxes/ui/src/components/form';
-import { IFormProps, IButtonMutateProps, IOption } from '@erxes/ui/src/types';
-import { title, description, getUserOptions } from '../utils';
+import GenerateFields from '../GenerateFields';
 import { IUser } from '@erxes/ui/src/auth/types';
-import withTeamMembers from '../containers/withTeamMembers';
-import GenerateFields from './GenerateFields';
+import Select from 'react-select-plus';
+import withTeamMembers from '../../containers/withTeamMembers';
 
 type Props = {
   item?: any;
