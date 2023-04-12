@@ -5,6 +5,9 @@ import * as Random from 'meteor-random';
  */
 
 interface Options {
+  /**
+   * @property {boolean} pkey хувьсагч нь primary key эсэх
+   */
   pkey?: boolean;
   type?: any;
   optional?: boolean;
@@ -19,7 +22,11 @@ interface Options {
   selectOptions?: any;
   unique?: boolean;
 }
-
+/**
+ *
+ * @param options
+ * @returns {Object} тухайн талбарын бүтэцийг буцаана
+ */
 export const field = (options: Options) => {
   const { pkey, type, optional } = options;
 

@@ -1,28 +1,41 @@
-import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
 import {
   ICollateralData,
   IContractDocument
 } from '../../../models/definitions/contracts';
 import { gatherDescriptions } from '../../../utils';
 import { ConfirmBase } from '../../../models/utils/confirmContractUtils';
-import { checkPermission } from '@erxes/api-utils/src';
+import {
+  checkPermission,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
 
 const contractMutations = {
   contractsAdd: async (
     _root,
     doc,
-    { user, docModifier, models, messageBroker }
+    { user, docModifier, models, subdomain }: IContext
   ) => {
-    const contract = models.Contracts.createContract(docModifier(doc), user);
+    const contract = models.Contracts.createContract(docModifier(doc));
+
+    const logData = {
+      type: 'contract',
+      newData: doc,
+      object: contract,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
 
     await putCreateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'contract',
-        newData: doc,
-        object: contract,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -37,20 +50,30 @@ const contractMutations = {
   contractsEdit: async (
     _root,
     { _id, ...doc },
-    { models, user, messageBroker }
+    { models, user, docModifier, subdomain }: IContext
   ) => {
-    const contract = await models.Contracts.getContract(models, { _id });
-    const updated = await models.Contracts.updateContract(models, _id, doc);
+    const contract = await models.Contracts.getContract({ _id });
+    const updated = await models.Contracts.updateContract(
+      _id,
+      docModifier(doc)
+    );
+
+    const logData = {
+      type: 'contract',
+      object: contract,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
 
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'contract',
-        object: contract,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -100,19 +123,25 @@ const contractMutations = {
   contractsRemove: async (
     _root,
     { contractIds }: { contractIds: string[] },
-    { models, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
     const contracts = await models.Contracts.find({
       _id: { $in: contractIds }
     }).lean();
 
-    await models.Contracts.removeContracts(models, contractIds);
+    await models.Contracts.removeContracts(contractIds);
 
     for (const contract of contracts) {
+      const logData = {
+        type: 'contract',
+        object: contract,
+        extraParams: { models }
+      };
+      const descriptions = gatherDescriptions(logData);
       await putDeleteLog(
+        subdomain,
         messageBroker,
-        gatherDescriptions,
-        { type: 'contract', object: contract, extraParams: { models } },
+        { ...logData, ...descriptions },
         user
       );
     }
@@ -127,9 +156,9 @@ const contractMutations = {
   getProductsData: async (
     _root,
     { contractId }: { contractId: string },
-    { models, user }
+    { models }
   ) => {
-    const contract = await models.Contracts.getContract(models, {
+    const contract = await models.Contracts.getContract({
       _id: contractId
     });
 
