@@ -36,7 +36,7 @@ const coverQueries = {
     { _id }: { _id: string },
     { models, config }: IContext
   ) {
-    return models.Covers.find({ posToken: config.token, _id });
+    return models.Covers.findOne({ posToken: config.token, _id }).lean();
   }
 };
 
