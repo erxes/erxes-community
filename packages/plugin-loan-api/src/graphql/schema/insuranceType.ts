@@ -7,7 +7,7 @@ export const types = () => {
     description: String
     companyId: String
     percent: Float
-    yearPercents: String
+    yearPercents: [Float]
     createdBy: String
     createdAt: Date
 

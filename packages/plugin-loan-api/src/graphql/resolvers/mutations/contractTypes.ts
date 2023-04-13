@@ -19,21 +19,20 @@ const contractTypeMutations = {
       docModifier(doc)
     );
 
-    const descriptions = await gatherDescriptions({
+    const logData = {
       type: 'contractType',
       newData: doc,
       object: contractType,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = await gatherDescriptions(logData);
 
     await putCreateLog(
       subdomain,
       messageBroker,
       {
-        type: 'contractType',
-        newData: doc,
-        object: contractType,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user
@@ -55,21 +54,20 @@ const contractTypeMutations = {
     });
     const updated = await models.ContractTypes.updateContractType(_id, doc);
 
-    const descriptions = await gatherDescriptions({
+    const logData = {
       type: 'contractType',
       newData: doc,
       object: contractType,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = await gatherDescriptions(logData);
 
     await putUpdateLog(
       subdomain,
       messageBroker,
       {
-        type: 'contractType',
-        newData: doc,
-        object: contractType,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user

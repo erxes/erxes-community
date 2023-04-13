@@ -1,34 +1,37 @@
-import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
 import { gatherDescriptions } from '../../../utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import {
+  checkPermission,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
 
 const invoiceMutations = {
   invoicesAdd: async (
     _root,
     doc,
-    { user, docModifier, models, checkPermission, messageBroker }
+    { user, docModifier, models, subdomain }: IContext
   ) => {
-    await checkPermission('manageInvoices', user);
-
     if (!(doc.companyId || doc.customerId)) {
       throw new Error('must choose customer or company');
     }
 
-    const invoice = models.Invoices.createInvoice(
-      models,
-      docModifier(doc),
-      user
-    );
+    const invoice = models.Invoices.createInvoice(docModifier(doc));
+
+    const logData = {
+      type: 'invoice',
+      newData: doc,
+      object: invoice,
+      extraParams: { models }
+    };
+    const descriptions = gatherDescriptions(logData);
 
     await putCreateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
-      {
-        type: 'invoice',
-        newData: doc,
-        object: invoice,
-        extraParams: { models }
-      },
+      { ...descriptions, ...logData },
       user
     );
 
@@ -41,26 +44,29 @@ const invoiceMutations = {
   invoicesEdit: async (
     _root,
     { _id, ...doc },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
-    await checkPermission('manageInvoices', user);
     if (!(doc.companyId || doc.customerId)) {
       throw new Error('must choose customer or company');
     }
 
-    const invoice = await models.Invoices.getInvoice(models, { _id });
-    const updated = await models.Invoices.updateInvoice(models, _id, doc);
+    const invoice = await models.Invoices.getInvoice({ _id });
+    const updated = await models.Invoices.updateInvoice(_id, doc);
+
+    const logData = {
+      type: 'invoice',
+      object: invoice,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
 
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
-      {
-        type: 'invoice',
-        object: invoice,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
-      },
+      { ...descriptions, ...logData },
       user
     );
 
@@ -74,21 +80,26 @@ const invoiceMutations = {
   invoicesRemove: async (
     _root,
     { invoiceIds }: { invoiceIds: string[] },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
-    await checkPermission('manageInvoices', user);
     // TODO: contracts check
     const invoices = await models.Invoices.find({
       _id: { $in: invoiceIds }
     }).lean();
 
-    await models.Invoices.removeInvoices(models, invoiceIds);
+    await models.Invoices.removeInvoices(invoiceIds);
 
     for (const invoice of invoices) {
+      const logData = {
+        type: 'invoice',
+        object: invoice,
+        extraParams: { models }
+      };
+      const descriptions = gatherDescriptions(logData);
       await putDeleteLog(
+        subdomain,
         messageBroker,
-        gatherDescriptions,
-        { type: 'invoice', object: invoice, extraParams: { models } },
+        { ...logData, ...descriptions },
         user
       );
     }

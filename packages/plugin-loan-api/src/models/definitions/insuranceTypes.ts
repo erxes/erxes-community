@@ -1,10 +1,16 @@
 import { Document, Schema } from 'mongoose';
 import { schemaHooksWrapper, field } from './utils';
+/**
+ * Даатгалын үйлчилгээ үзүүлэгч байгууллагын бүртгэл
+ */
 export interface IInsuranceType {
   code: string;
   name: string;
   description: string;
   companyId: string;
+  /**
+   * @property {Number} percent даатгалийн шимтгэлийн хувь
+   */
   percent: number;
   yearPercents: number[];
   createdBy: string;

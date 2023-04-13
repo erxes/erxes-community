@@ -17,21 +17,20 @@ const adjustmentMutations = {
     doc.createdBy = user._id;
     const adjustment = models.Adjustments.createAdjustment(docModifier(doc));
 
-    const descriptions = gatherDescriptions({
+    const logData = {
       type: 'adjustment',
-      newData: doc,
       object: adjustment,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = gatherDescriptions(logData);
 
     await putCreateLog(
       subdomain,
       messageBroker,
       {
-        type: 'adjustment',
         newData: doc,
-        object: adjustment,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user
@@ -49,22 +48,22 @@ const adjustmentMutations = {
   ) => {
     const adjustment = await models.Adjustments.getAdjustment({ _id });
     const updated = await models.Adjustments.updateAdjustment(_id, doc);
-    const descriptions = gatherDescriptions({
+
+    const logData = {
       type: 'adjustment',
       object: adjustment,
-      newData: { ...doc },
-      updatedDocument: updated,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putUpdateLog(
       subdomain,
       messageBroker,
       {
-        type: 'adjustment',
-        object: adjustment,
         newData: { ...doc },
         updatedDocument: updated,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user
@@ -90,18 +89,18 @@ const adjustmentMutations = {
     await models.Adjustments.removeAdjustments(adjustmentIds);
 
     for (const adjustment of adjustments) {
-      const descriptions = gatherDescriptions({
+      const logData = {
         type: 'adjustment',
         object: adjustment,
         extraParams: { models }
-      });
+      };
+
+      const descriptions = gatherDescriptions(logData);
       await putDeleteLog(
         subdomain,
         messageBroker,
         {
-          type: 'adjustment',
-          object: adjustment,
-          extraParams: { models },
+          ...logData,
           ...descriptions
         },
         user

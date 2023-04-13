@@ -15,7 +15,7 @@ import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import { IInsuranceType, IInsuranceTypeDoc } from '../types';
 
 import React from 'react';
-import { __ } from 'coreui/utils';
+import { __ } from '@erxes/ui/src/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 

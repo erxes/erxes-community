@@ -18,25 +18,23 @@ const insuranceTypeMutations = {
 
     //TODO check this method
     const insuranceType = models.InsuranceTypes.createInsuranceType(
-      models,
       docModifier(doc)
     );
 
-    const descriptions = gatherDescriptions({
+    const logData = {
       type: 'insuranceType',
       newData: doc,
       object: insuranceType,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = gatherDescriptions(logData);
 
     await putCreateLog(
       subdomain,
       messageBroker,
       {
-        type: 'insuranceType',
-        newData: doc,
-        object: insuranceType,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user
@@ -54,30 +52,26 @@ const insuranceTypeMutations = {
     { models, user, subdomain }: IContext
   ) => {
     doc.yearPercents = doc.yearPercents.split(', ');
-    const insuranceType = await models.InsuranceTypes.getInsuranceType(models, {
+    const insuranceType = await models.InsuranceTypes.getInsuranceType({
       _id
     });
-    const updated = await models.InsuranceTypes.updateInsuranceType(
-      models,
-      _id,
-      doc
-    );
-    const descriptions = gatherDescriptions({
+    const updated = await models.InsuranceTypes.updateInsuranceType(_id, doc);
+
+    const logData = {
       type: 'insuranceType',
       object: insuranceType,
       newData: { ...doc },
       updatedDocument: updated,
       extraParams: { models }
-    });
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putUpdateLog(
       subdomain,
       messageBroker,
       {
-        type: 'insuranceType',
-        object: insuranceType,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models },
+        ...logData,
         ...descriptions
       },
       user
@@ -99,21 +93,21 @@ const insuranceTypeMutations = {
       _id: { $in: insuranceTypeIds }
     }).lean();
 
-    await models.InsuranceTypes.removeInsuranceTypes(models, insuranceTypeIds);
+    await models.InsuranceTypes.removeInsuranceTypes(insuranceTypeIds);
 
     for (const insuranceType of insuranceTypes) {
-      const descriptions = gatherDescriptions({
+      let logData = {
         type: 'insuranceType',
         object: insuranceType,
         extraParams: { models }
-      });
+      };
+
+      const descriptions = gatherDescriptions(logData);
       await putDeleteLog(
         subdomain,
         messageBroker,
         {
-          type: 'insuranceType',
-          object: insuranceType,
-          extraParams: { models },
+          ...logData,
           ...descriptions
         },
         user

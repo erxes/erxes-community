@@ -1,14 +1,16 @@
 import { insuranceTypeSchema } from './definitions/insuranceTypes';
 import { IInsuranceTypeDocument } from '../models/definitions/insuranceTypes';
 import { Model } from 'mongoose';
+import { IModels } from '../connectionResolver';
 
 export interface IInsuranceTypeModel extends Model<IInsuranceTypeDocument> {
-  getInsuranceType(models, selector: any);
-  createInsuranceType(models, doc);
-  updateInsuranceType(models, _id, doc);
-  removeInsuranceTypes(models, _ids);
+  getInsuranceType(selector: any);
+  createInsuranceType(doc);
+  updateInsuranceType(_id, doc);
+  removeInsuranceTypes(_ids);
 }
-export const loadInsuranceTypeClass = models => {
+
+export const loadInsuranceTypeClass = (models: IModels) => {
   class InsuranceType {
     /**
      *

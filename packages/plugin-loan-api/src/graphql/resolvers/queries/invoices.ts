@@ -2,6 +2,8 @@ import { paginate } from 'erxes-api-utils';
 import { getFullDate, getRandomNumber } from '../../../models/utils/utils';
 import { getCalcedAmounts } from '../../../models/utils/transactionUtils';
 import { checkPermission } from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -60,7 +62,7 @@ const invoiceQueries = {
   handinvoicesler: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.Invoices.find(await generateFilter(params, commonQuerySelector)),
@@ -78,7 +80,7 @@ const invoiceQueries = {
   invoicesMain: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     const filter = await generateFilter(params, commonQuerySelector);
 
@@ -95,8 +97,8 @@ const invoiceQueries = {
    * Get one invoice
    */
 
-  invoiceDetail: async (_root, { _id }, { models, checkPermission, user }) => {
-    return models.Invoices.getInvoice(models, { _id });
+  invoiceDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.Invoices.getInvoice({ _id });
   },
   /**
    * Get invoice pre info
@@ -105,7 +107,7 @@ const invoiceQueries = {
   getInvoicePreInfo: async (
     _root,
     { contractId, payDate },
-    { models, memoryStorage }
+    { models }: IContext
   ) => {
     const currentDate = getFullDate(payDate);
     const {
@@ -115,7 +117,7 @@ const invoiceQueries = {
       interestNonce,
       insurance,
       debt
-    } = (await getCalcedAmounts(models, memoryStorage, {
+    } = (await getCalcedAmounts(models, messageBroker, {
       contractId,
       payDate: currentDate
     })) as any;

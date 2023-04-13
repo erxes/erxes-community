@@ -10,8 +10,15 @@ const gatherContractFieldNames = async (_models, _doc, prevList = null) => {
   return options;
 };
 
-export const gatherDescriptions = async params => {
-  const { action, obj, type, extraParams } = params;
+interface IParams {
+  action?: string;
+  type: string;
+  object: any;
+  extraParams: any;
+}
+
+export const gatherDescriptions = async (params: IParams) => {
+  const { action, object, type, extraParams } = params;
   const { models } = extraParams;
 
   let extraDesc = [];
@@ -19,16 +26,16 @@ export const gatherDescriptions = async params => {
 
   switch (type) {
     case 'contract': {
-      description = `${obj.number} has been ${action}d`;
+      description = `${object.number} has been ${action}d`;
 
-      extraDesc = await gatherContractFieldNames(models, obj);
+      extraDesc = await gatherContractFieldNames(models, object);
       break;
     }
 
     case 'collateral': {
-      description = `${obj.code} has been ${action}d`;
+      description = `${object.code} has been ${action}d`;
 
-      extraDesc = await gatherContractFieldNames(models, obj);
+      extraDesc = await gatherContractFieldNames(models, object);
       break;
     }
     default:

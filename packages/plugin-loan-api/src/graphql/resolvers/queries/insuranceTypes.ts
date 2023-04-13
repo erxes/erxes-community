@@ -1,5 +1,6 @@
 import { paginate } from 'erxes-api-utils';
 import { checkPermission } from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -34,7 +35,7 @@ const insuranceTypeQueries = {
   insuranceTypes: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.InsuranceTypes.find(
@@ -54,7 +55,7 @@ const insuranceTypeQueries = {
   insuranceTypesMain: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     const filter = await generateFilter(params, commonQuerySelector);
 
@@ -74,12 +75,8 @@ const insuranceTypeQueries = {
    * Get one insuranceType
    */
 
-  insuranceTypeDetail: async (
-    _root,
-    { _id },
-    { models, checkPermission, user }
-  ) => {
-    return models.InsuranceTypes.getInsuredType(models, { _id });
+  insuranceTypeDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.InsuranceTypes.getInsuranceType({ _id });
   }
 };
 
