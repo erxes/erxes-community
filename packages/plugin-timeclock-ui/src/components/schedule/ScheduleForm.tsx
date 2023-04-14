@@ -9,6 +9,11 @@ import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import { CustomLabel, FlexCenter, FlexColumn } from '../../styles';
 
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import { PopoverButton } from '@erxes/ui/src/styles/main';
+import Icon from '@erxes/ui/src/components/Icon';
+
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row } from '../../styles';
@@ -17,6 +22,7 @@ import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import { Alert, __ } from '@erxes/ui/src/utils';
 import { compareStartAndEndTime } from '../../utils';
+import Datetime from '@nateradebaugh/react-datetime';
 
 type Props = {
   scheduleOfMembers: any;
@@ -62,6 +68,8 @@ function ScheduleForm(props: Props) {
   const [userIds, setUserIds] = useState([]);
   const [selectedDeptIds, setDepartments] = useState([]);
   const [selectedBranchIds, setBranches] = useState([]);
+
+  const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
 
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
@@ -377,34 +385,34 @@ function ScheduleForm(props: Props) {
     </FlexColumn>
   );
 
-  const adminModalContent = () => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <SelectTeamMembers
-          queryParams={queryParams}
-          label={'Team member'}
-          onSelect={onUserSelect}
-          name="userId"
-        />
-        <Select
-          value={selectedScheduleConfig}
-          onChange={onScheduleConfigSelect}
-          placeholder="Select Schedule"
-          multi={false}
-          options={renderScheduleConfigOptions()}
-        />
-        <FlexCenter>
-          <CustomLabel>
-            {`Total ${calculateScheduledDaysAndHours()[0]} days / ${
-              calculateScheduledDaysAndHours()[1]
-            } hours `}
-          </CustomLabel>
-        </FlexCenter>
-        {renderWeekDays()}
-        {actionButtons('admin')}
-      </div>
-    );
-  };
+  // const adminModalContent = () => {
+  //   return (
+  //     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+  //       <SelectTeamMembers
+  //         queryParams={queryParams}
+  //         label={'Team member'}
+  //         onSelect={onUserSelect}
+  //         name="userId"
+  //       />
+  //       <Select
+  //         value={selectedScheduleConfig}
+  //         onChange={onScheduleConfigSelect}
+  //         placeholder="Select Schedule"
+  //         multi={false}
+  //         options={renderScheduleConfigOptions()}
+  //       />
+  //       <FlexCenter>
+  //         <CustomLabel>
+  //           {`Total ${calculateScheduledDaysAndHours()[0]} days / ${
+  //             calculateScheduledDaysAndHours()[1]
+  //           } hours `}
+  //         </CustomLabel>
+  //       </FlexCenter>
+  //       {renderWeekDays()}
+  //       {actionButtons('admin')}
+  //     </div>
+  //   );
+  // };
 
   const adminConfigDefaultContent = () => {
     return (
@@ -536,6 +544,15 @@ function ScheduleForm(props: Props) {
     if (dateString) {
       const getDate = new Date(dateString).toLocaleDateString();
 
+      // // if date is already selected remove from schedule date
+      // if (getDate in scheduleDates) {
+      //   delete scheduleDates[getDate];
+      //   setScheduleDates({
+      //     ...scheduleDates
+      //   });
+      //   return;
+      // }
+
       const newDates = scheduleDates;
 
       const [
@@ -560,19 +577,75 @@ function ScheduleForm(props: Props) {
       setScheduleDates({ ...newDates });
     }
   };
+  {
+    /* <DateControl
+    required={false}
+    name="startDate"
+    closeOnSelect={false}
+    onChange={onDateSelectChange}
+    placeholder={'Select date'}
+    dateFormat={'YYYY-MM-DD'}
+  /> */
+  }
+
+  const closePopover = () => {
+    if (overlayTrigger) {
+      overlayTrigger.hide();
+    }
+  };
+
+  const renderDay = (dateTimeProps: any, currentDate) => {
+    let isSelected = false;
+    if (new Date(currentDate).toLocaleDateString() in scheduleDates) {
+      isSelected = true;
+    }
+
+    return (
+      <td
+        {...dateTimeProps}
+        className={`rdtDay ${isSelected ? 'rdtActive' : ''}`}
+      >
+        {new Date(currentDate).getDate()}
+      </td>
+    );
+  };
+
+  const renderDateSelection = () => {
+    return (
+      <Popover id="schedule-date-select-popover" content={true}>
+        <Datetime
+          open={true}
+          input={false}
+          renderDay={renderDay}
+          closeOnSelect={false}
+          timeFormat={false}
+          onChange={onDateSelectChange}
+          inputProps={{ required: false }}
+        />
+
+        <FlexCenter>
+          <Button onClick={closePopover}>Close</Button>
+        </FlexCenter>
+      </Popover>
+    );
+  };
 
   const adminConfigBySelect = () => (
     <>
-      <CustomRangeContainer>
-        <DateControl
-          required={false}
-          name="startDate"
-          onChange={onDateSelectChange}
-          placeholder={'Select date'}
-          dateFormat={'YYYY-MM-DD'}
-        />
-      </CustomRangeContainer>
       {renderWeekDays()}
+      <OverlayTrigger
+        ref={overlay => setOverlayTrigger(overlay)}
+        placement="bottom-start"
+        trigger="click"
+        overlay={renderDateSelection()}
+        container={this}
+        rootClose={this}
+      >
+        <PopoverButton>
+          {__('Please select date')}
+          <Icon icon="angle-down" />
+        </PopoverButton>
+      </OverlayTrigger>
     </>
   );
 
@@ -593,8 +666,8 @@ function ScheduleForm(props: Props) {
   };
 
   switch (modalContentType) {
-    case 'admin':
-      return adminModalContent();
+    // case 'admin':
+    //   return adminModalContent();
     case 'adminConfig':
       return adminConfigDefaultContent();
     default:

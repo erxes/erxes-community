@@ -18,7 +18,7 @@ import {
 } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import { PropertyTableRow } from '@erxes/ui-forms/src/settings/properties/styles';
-import { isEnabled } from '@erxes/ui/src/utils/core';
+import { isEnabled, router } from '@erxes/ui/src/utils/core';
 import Table from '@erxes/ui/src/components/table';
 import { IUser } from '@erxes/ui/src/auth/types';
 import Icon from '@erxes/ui/src/components/Icon';
@@ -54,6 +54,7 @@ type Props = {
 
 function ScheduleList(props: Props) {
   const {
+    history,
     scheduleOfMembers,
     totalCount,
     queryParams,
@@ -65,11 +66,10 @@ function ScheduleList(props: Props) {
     getPagination
   } = props;
 
-  const [selectedScheduleStatus, setScheduleStatus] = useState('Approved');
+  const [selectedScheduleStatus, setScheduleStatus] = useState(
+    router.getParam(history, 'scheduleStatus') || ''
+  );
   const [showRemoveBtn, setShowRemoveBtn] = useState(false);
-  // const [showSolveScheduleBtns, setSolveScheduleBtns] = useState(
-  //   selectedScheduleStatus === 'Pending'
-  // );
 
   const [isSideBarOpen, setIsOpen] = useState(
     localStorage.getItem('isSideBarOpen') === 'true' ? true : false
@@ -166,6 +166,11 @@ function ScheduleList(props: Props) {
     }
   };
 
+  const onSelectScheduleStatus = e => {
+    setScheduleStatus(e.value);
+    router.setParams(history, { scheduleStatus: e.value });
+  };
+
   const actionBarLeft = (
     <FlexRowLeft>
       <ToggleButton
@@ -178,7 +183,7 @@ function ScheduleList(props: Props) {
       <div style={{ width: '20%' }}>
         <Select
           value={selectedScheduleStatus}
-          onChange={e => setScheduleStatus(e.value)}
+          onChange={onSelectScheduleStatus}
           placeholder="Select Schedule"
           multi={false}
           options={['Approved', 'Rejected', 'Pending'].map(el => ({

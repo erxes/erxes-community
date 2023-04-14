@@ -203,7 +203,7 @@ export type DeviceConfigsQueryResponse = {
 } & QueryResponse;
 
 export type ScheduleQueryResponse = {
-  schedulesMain: { list: IShiftSchedule[]; totalCount: number };
+  schedulesMain: { list: ISchedule[]; totalCount: number };
 } & QueryResponse;
 
 export type BranchesQueryResponse = {

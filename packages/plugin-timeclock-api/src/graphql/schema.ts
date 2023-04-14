@@ -233,6 +233,7 @@ const queryParams = `
   branchIds: [String]
   departmentIds: [String]
   reportType: String
+  scheduleStatus: String
 `;
 
 const absence_params = `
