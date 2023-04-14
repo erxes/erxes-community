@@ -9,7 +9,6 @@ import { mutations, queries } from '../../graphql';
 import {
   DetailQueryResponse,
   EditMutationResponse,
-  FillFromDealMutationResponse,
   IContractDoc,
   RegenSchedulesMutationResponse
 } from '../../types';
@@ -43,9 +42,7 @@ const ContractDetailsContainer = (props: FinalProps) => {
   };
 
   const regenSchedules = (contractId: string) => {
-    const { regenSchedules } = props;
-
-    regenSchedules({ variables: { contractId } }).catch(error => {
+    props.regenSchedules({ variables: { contractId } }).catch(error => {
       Alert.error(error.message);
     });
   };
@@ -62,7 +59,7 @@ const ContractDetailsContainer = (props: FinalProps) => {
 
   const contractDetail = contractDetailQuery.contractDetail;
 
-  const updatedProps = {
+  const updatedProps: any = {
     ...props,
     loading: contractDetailQuery.loading,
     contract: contractDetail,

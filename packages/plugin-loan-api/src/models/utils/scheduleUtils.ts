@@ -1,3 +1,4 @@
+import { IModels } from '../../connectionResolver';
 import { SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
 import {
@@ -136,7 +137,7 @@ const insuranceHelper = (contract, insuranceTypeRulesById, currentYear) => {
 };
 
 export const reGenerateSchedules = async (
-  models,
+  models: IModels,
   contract: IContractDocument,
   perHolidays: IPerHoliday[]
 ) => {
@@ -263,11 +264,11 @@ export const reGenerateSchedules = async (
     }
   }
 
-  await models.RepaymentSchedules.deleteMany({ contractId: contract._id });
-  await models.RepaymentSchedules.insertMany(bulkEntries);
+  await models.Schedules.deleteMany({ contractId: contract._id });
+  await models.Schedules.insertMany(bulkEntries);
 
-  await models.FirstSchedules.deleteMany({ contractId: contract._id });
-  await models.FirstSchedules.insertMany(bulkEntries);
+  // await models.FirstSchedules.deleteMany({ contractId: contract._id });
+  // await models.FirstSchedules.insertMany(bulkEntries);
 };
 
 const fillAmounts = async (

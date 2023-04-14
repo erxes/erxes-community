@@ -8,6 +8,7 @@ import { getCloseInfo } from './utils/closeUtils';
 import { getFullDate, getNumber } from './utils/utils';
 import { Model } from 'mongoose';
 import { IContractDocument } from '../models/definitions/contracts';
+import { IModels } from '../connectionResolver';
 
 const getLeaseAmount = collateralsData => {
   let lease = 0;
@@ -39,7 +40,7 @@ export interface IContractModel extends Model<IContractDocument> {
   closeContract(messageBroker, memoryStorage, doc: ICloseVariable);
   removeContracts(_ids);
 }
-export const loadContractClass = models => {
+export const loadContractClass = (models: IModels) => {
   class Contract {
     /**
      *
@@ -82,7 +83,7 @@ export const loadContractClass = models => {
      * Update Contract
      */
     public static async updateContract(_id, doc: IContract) {
-      const oldContract = await models.Contracts.getContract(models, {
+      const oldContract = await models.Contracts.getContract({
         _id
       });
 
@@ -118,7 +119,7 @@ export const loadContractClass = models => {
       memoryStorage,
       doc: ICloseVariable
     ) {
-      const contract = await models.Contracts.getContract(models, {
+      const contract = await models.Contracts.getContract({
         _id: doc.contractId
       });
       const closeInfo = await getCloseInfo(
@@ -153,7 +154,7 @@ export const loadContractClass = models => {
         }
       );
 
-      return models.Contracts.getContract(models, {
+      return models.Contracts.getContract({
         _id: doc.contractId
       });
     }
@@ -162,7 +163,7 @@ export const loadContractClass = models => {
      * Remove Contract category
      */
     public static async removeContracts(_ids) {
-      await models.RepaymentSchedules.deleteMany({
+      await models.Schedules.deleteMany({
         contractId: { $in: _ids }
       });
 

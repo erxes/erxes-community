@@ -10,7 +10,7 @@ import React from 'react';
 import RightSidebar from './RightSidebar';
 import ScheduleSection from '../schedules/ScheduleSection';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { __ } from 'coreui/utils';
+import { __ } from '@erxes/ui/src/utils/core';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 
@@ -35,6 +35,7 @@ type Props = {
   currentUser: IUser;
   saveItem: (doc: IContractDoc, callback?: (item) => void) => void;
   regenSchedules: (contractId: string) => void;
+  loading: boolean;
 };
 
 type State = {

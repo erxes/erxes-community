@@ -124,8 +124,8 @@ const contractQueries = {
    * Get one contract
    */
 
-  contractDetail: async (_root, { _id }, { models, checkPermission, user }) => {
-    return models.Contracts.getContract(models, { _id });
+  contractDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.Contracts.getContract({ _id });
   },
   cpContracts: async (_root, params, { models }) => {
     const mainType = params.cpUserType || 'customer';

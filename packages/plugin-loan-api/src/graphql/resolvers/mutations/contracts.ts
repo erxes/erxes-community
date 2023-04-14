@@ -11,7 +11,8 @@ import {
   putUpdateLog
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
+import messageBroker, { sendCoreMessage } from '../../../messageBroker';
+import redis from '../../../redis';
 
 const contractMutations = {
   contractsAdd: async (
@@ -88,27 +89,33 @@ const contractMutations = {
   contractsClose: async (
     _root,
     { ...doc },
-    { models, user, messageBroker, memoryStorage }
+    { models, user, docModifier, subdomain }: IContext
   ) => {
-    const contract = await models.Contracts.getContract(models, {
+    const contract = await models.Contracts.getContract({
       _id: doc.contractId
     });
     const updated = await models.Contracts.closeContract(
-      models,
       messageBroker,
-      memoryStorage,
-      doc
+      redis,
+      docModifier(doc)
     );
 
+    const logData = {
+      type: 'contract',
+      object: contract,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'contract',
-        object: contract,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -156,22 +163,34 @@ const contractMutations = {
   getProductsData: async (
     _root,
     { contractId }: { contractId: string },
-    { models }
+    { models, subdomain }: IContext
   ) => {
     const contract = await models.Contracts.getContract({
       _id: contractId
     });
 
-    const dealIds = await models.Conformities.savedConformity({
-      mainType: 'contract',
-      relTypes: ['deal'],
-      mainTypeId: contract._id
+    const dealIds = await sendCoreMessage({
+      subdomain,
+      action: 'savedConformity',
+      data: {
+        mainType: 'contract',
+        relTypes: ['deal'],
+        mainTypeId: contract._id
+      },
+      isRPC: true
     });
+
     if (!dealIds) {
       return contract;
     }
 
-    const deals = await models.Deals.find({ _id: { $in: dealIds } }).lean();
+    const deals = await sendCoreMessage({
+      subdomain,
+      action: 'deals.find',
+      data: { _id: { $in: dealIds } },
+      isRPC: true
+    });
+
     const oldCollateralIds = contract.collateralsData.map(
       item => item.collateralId
     );
@@ -197,9 +216,13 @@ const contractMutations = {
     const collaterals: any = [];
 
     for (const data of collateralsData || []) {
-      const collateral = await models.Products.findOne({
-        _id: data.collateralId
+      const collateral = await sendCoreMessage({
+        subdomain,
+        action: 'products.findOne',
+        data: { _id: data.collateralId },
+        isRPC: true
       });
+
       const insuranceType = await models.InsuranceTypes.findOne({
         _id: data.insuranceTypeId
       });
