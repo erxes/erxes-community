@@ -1,3 +1,4 @@
+import { IModels } from '../connectionResolver';
 import {
   erkhetResponseSchema,
   IErkhetResponseDocument
@@ -10,7 +11,7 @@ export interface IErkhetResponseModel extends Model<IErkhetResponseDocument> {
   updateErkhetResponse(models, _id, doc);
   removeErkhetResponses(models, _ids);
 }
-export const loadErkhetResponseClass = models => {
+export const loadErkhetResponseClass = (models: IModels) => {
   class ErkhetResponse {
     /**
      *

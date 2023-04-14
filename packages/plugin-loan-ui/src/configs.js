@@ -22,7 +22,7 @@ module.exports = {
     {
       text: 'Contract types',
       image: '/images/icons/erxes-01.svg',
-      to: '/settings/contract-types/',
+      to: '/erxes-plugin-loan/contract-types/',
       action: 'loanConfig',
       scope: 'loan',
       location: 'settings',
@@ -40,7 +40,7 @@ module.exports = {
     {
       text: 'Loan config',
       image: '/images/icons/erxes-16.svg',
-      to: '/settings/holiday-settings/',
+      to: '/erxes-plugin-loan/holiday-settings/',
       action: 'loanConfig',
       scope: 'loan',
       location: 'settings',

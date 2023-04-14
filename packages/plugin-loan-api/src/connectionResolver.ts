@@ -35,6 +35,7 @@ export interface IModels {
   InsuranceTypes: IInsuranceTypeModel;
   Invoices: IInvoiceModel;
   Schedules: IScheduleModel;
+  FirstSchedules: IScheduleModel;
   Transactions: ITransactionModel;
 }
 
@@ -92,6 +93,11 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
 
   models.Schedules = db.model<IScheduleDocument, IScheduleModel>(
     'loan_schedules',
+    loadScheduleClass(models)
+  );
+
+  models.FirstSchedules = db.model<IScheduleDocument, IScheduleModel>(
+    'loan_first_schedules',
     loadScheduleClass(models)
   );
 

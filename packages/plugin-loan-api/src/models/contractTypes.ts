@@ -3,10 +3,9 @@ import {
   contractTypeSchema
 } from '../models/definitions/contractTypes';
 import { Model } from 'mongoose';
+import { IModels } from '../connectionResolver';
 
-export const loadContractTypeClass = (models: {
-  ContractTypes: Model<IContractTypeDocument>;
-}) => {
+export const loadContractTypeClass = (models: IModels) => {
   class ContractType {
     /**
      *

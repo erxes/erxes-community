@@ -140,10 +140,16 @@ const LoanRoutes = () => {
       <Route path="/collateral-list" component={collateralLists} />
       <Route path="/transaction-list" component={transactionLists} />
       <Route path="/insurance-types" component={insuranceTypesLists} />
-      <Route path="/settings/contract-types" component={contractTypesLists} />
+      <Route
+        path="/erxes-plugin-loan/contract-types"
+        component={contractTypesLists}
+      />
       <Route path="/contract-type-details/:id" component={contractTypeDetail} />
       <Route path="/undue-settings" component={undueSettings} />
-      <Route path="/settings/holiday-settings" component={holidaySettings} />
+      <Route
+        path="/erxes-plugin-loan/holiday-settings"
+        component={holidaySettings}
+      />
       <Route path="/adjustment-list" component={adjustmentLists} />
       {/* <Route path="/adjustment-details/:id" component={adjustmentDetail} /> */}
     </React.Fragment>

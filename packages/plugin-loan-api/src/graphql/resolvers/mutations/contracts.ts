@@ -11,7 +11,10 @@ import {
   putUpdateLog
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker, { sendCoreMessage } from '../../../messageBroker';
+import messageBroker, {
+  sendCardsMessage,
+  sendCoreMessage
+} from '../../../messageBroker';
 import redis from '../../../redis';
 
 const contractMutations = {
@@ -171,7 +174,7 @@ const contractMutations = {
 
     const dealIds = await sendCoreMessage({
       subdomain,
-      action: 'savedConformity',
+      action: 'conformities.savedConformity',
       data: {
         mainType: 'contract',
         relTypes: ['deal'],
@@ -184,7 +187,7 @@ const contractMutations = {
       return contract;
     }
 
-    const deals = await sendCoreMessage({
+    const deals = await sendCardsMessage({
       subdomain,
       action: 'deals.find',
       data: { _id: { $in: dealIds } },

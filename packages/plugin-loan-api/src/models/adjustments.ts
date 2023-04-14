@@ -1,8 +1,9 @@
 import { adjustmentSchema } from './definitions/adjustments';
 import { Model } from 'mongoose';
 import { IAdjustmentDocument } from '../models/definitions/adjustments';
+import { IModels } from '../connectionResolver';
 
-export const loadAdjustmentClass = models => {
+export const loadAdjustmentClass = (models: IModels) => {
   class Adjustment {
     /**
      *

@@ -1,13 +1,14 @@
 import { scheduleSchema } from './definitions/schedules';
 import { IScheduleDocument } from '../models/definitions/schedules';
 import { Model } from 'mongoose';
+import { IModels } from '../connectionResolver';
 export interface IScheduleModel extends Model<IScheduleDocument> {
-  getSchedule(models, selector: any);
-  createSchedule(models, doc);
-  updateSchedule(models, _id, doc);
-  removeSchedule(models, _id);
+  getSchedule(selector: any);
+  createSchedule(doc);
+  updateSchedule(_id, doc);
+  removeSchedule(_id);
 }
-export const loadScheduleClass = models => {
+export const loadScheduleClass = (models: IModels) => {
   class Schedule {
     /**
      *
@@ -44,7 +45,7 @@ export const loadScheduleClass = models => {
      * Remove Schedule
      */
     public static async removeSchedule(_id) {
-      await models.Schedules.getScheduleCatogery(models, { _id });
+      await models.Schedules.getSchedule({ _id });
 
       return models.Schedules.deleteOne({ _id });
     }

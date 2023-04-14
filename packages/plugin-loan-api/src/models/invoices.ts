@@ -1,13 +1,14 @@
 import { invoiceSchema } from './definitions/invoices';
 import { IInvoiceDocument } from '../models/definitions/invoices';
 import { Model } from 'mongoose';
+import { IModels } from '../connectionResolver';
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(selector: any);
   createInvoice(doc);
   updateInvoice(_id, doc);
   removeInvoices(_ids);
 }
-export const loadInvoiceClass = models => {
+export const loadInvoiceClass = (models: IModels) => {
   class Invoice {
     /**
      *

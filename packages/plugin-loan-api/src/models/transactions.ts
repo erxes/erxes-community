@@ -10,6 +10,7 @@ import {
 } from './utils/transactionUtils';
 import { Model } from 'mongoose';
 import { ITransactionDocument } from '../models/definitions/transactions';
+import { IModels } from '../connectionResolver';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(models, selector: any);
@@ -18,7 +19,7 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
   changeTransaction(models, messageBroker, memoryStorage, _id, doc);
   removeTransactions(models, _ids);
 }
-export const loadTransactionClass = models => {
+export const loadTransactionClass = (models: IModels) => {
   class Transaction {
     /**
      *
@@ -49,7 +50,7 @@ export const loadTransactionClass = models => {
       }
 
       if (doc.invoiceId) {
-        await models.Invoices.updateInvoice(models, doc.invoiceId, {
+        await models.Invoices.updateInvoice(doc.invoiceId, {
           status: INVOICE_STATUS.DONE
         });
       }
@@ -90,7 +91,7 @@ export const loadTransactionClass = models => {
       await removeTrAfterSchedule(models, oldTr);
 
       if (doc.invoiceId) {
-        await models.Invoices.updateInvoice(models, doc.invoiceId, {
+        await models.Invoices.updateInvoice(doc.invoiceId, {
           status: INVOICE_STATUS.DONE
         });
       }
@@ -132,12 +133,12 @@ export const loadTransactionClass = models => {
         return models.Transactions.getTransaction(models, { _id });
       }
 
-      const oldSchedule = await models.RepaymentSchedules.findOne({
+      const oldSchedule = await models.Schedules.findOne({
         contractId: contract._id,
         transactionIds: { $in: [_id] }
       }).lean();
 
-      const preSchedules = await models.RepaymentSchedules.find({
+      const preSchedules = await models.Schedules.find({
         contractId: contract._id,
         payDate: { $lt: oldSchedule.payDate }
       }).lean();
@@ -169,7 +170,7 @@ export const loadTransactionClass = models => {
       const newBalance =
         oldSchedule.balance + oldSchedule.didPayment - doc.payment;
 
-      await models.RepaymentSchedules.updateOne(
+      await models.Schedules.updateOne(
         { _id: oldSchedule._id },
         {
           $set: {
@@ -195,11 +196,11 @@ export const loadTransactionClass = models => {
         }
       );
 
-      let updatedSchedule = await models.RepaymentSchedules.findOne({
+      let updatedSchedule = await models.Schedules.findOne({
         _id: oldSchedule._id
       }).lean();
 
-      const pendingSchedules = await models.RepaymentSchedules.find({
+      const pendingSchedules = await models.Schedules.find({
         contractId: contract._id,
         status: SCHEDULE_STATUS.PENDING
       })
@@ -261,7 +262,7 @@ export const loadTransactionClass = models => {
           });
         }
 
-        await models.RepaymentSchedules.bulkWrite(bulkOps);
+        await models.Schedules.bulkWrite(bulkOps);
         await models.Transactions.updateOne(
           { _id: newTr._id },
           {
