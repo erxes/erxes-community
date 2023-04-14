@@ -4,7 +4,7 @@ import { ISite, ISiteDocument, siteSchema } from './definitions/sites';
 
 export interface ISiteModel extends Model<ISiteDocument> {
   checkDuplication(doc: ISite, _id?: string): void;
-  getSite(_id: string): Promise<ISiteDocument>;
+  getSite(selector): Promise<ISiteDocument>;
   createSite(doc: ISite, userId: string): Promise<ISiteDocument>;
   updateSite(_id: string, doc: ISite, userId: string): Promise<ISiteDocument>;
   removeSite(_id: string): Promise<ISiteDocument>;
@@ -31,8 +31,8 @@ export const loadSiteClass = (models: IModels) => {
       }
     }
 
-    public static async getSite(_id: string) {
-      const site = await models.Sites.findOne({ _id }, { _id: 0 }).lean();
+    public static async getSite(selector) {
+      const site = await models.Sites.findOne(selector).lean();
 
       if (!site) {
         throw new Error('Site not found');
@@ -83,7 +83,7 @@ export const loadSiteClass = (models: IModels) => {
 
     public static async duplicateSite(_id: string, userId: string) {
       // get old site
-      const site = await models.Sites.getSite(_id);
+      const site = await models.Sites.getSite({ _id });
 
       // create new site
       const newSite = await models.Sites.createSite(

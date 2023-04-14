@@ -52,11 +52,7 @@ export default {
       const subdomain = getSubdomain(req);
       const models = await generateModels(subdomain);
 
-      const site = await models.Sites.findOne({ name: sitename }).lean();
-
-      if (!site) {
-        return res.status(404).send('Not found');
-      }
+      const site = await models.Sites.getSite({ name: sitename });
 
       const page = await models.Pages.findOne({
         siteId: site._id,
@@ -67,15 +63,14 @@ export default {
         return res.status(404).send('Not found');
       }
 
-      const html = await pageReplacer(models, subdomain, page, site);
-
       return res.send(
-        `
-          ${html}
-          <style>
-            ${page.css}
-          </style>
-        `
+        await pageReplacer({
+          models,
+          subdomain,
+          page,
+          site,
+          options: { replaceCss: true }
+        })
       );
     });
 
@@ -85,11 +80,7 @@ export default {
 
       const { sitename, contenttype, entryid } = req.params;
 
-      const site = await models.Sites.findOne({ name: sitename }).lean();
-
-      if (!site) {
-        return res.status(404).send('Not found');
-      }
+      const site = await models.Sites.getSite({ name: sitename });
 
       const ct = await models.ContentTypes.findOne({
         siteId: site._id,
@@ -115,7 +106,7 @@ export default {
         return res.status(404).send('Entry not found');
       }
 
-      let html = await pageReplacer(models, subdomain, page, site);
+      let html = await pageReplacer({ models, subdomain, page, site });
 
       for (const evalue of entry.values) {
         const { fieldCode, value } = evalue;
@@ -140,28 +131,82 @@ export default {
 
       const { sitename, name } = req.params;
 
-      const site = await models.Sites.findOne({ name: sitename }).lean();
-
-      if (!site) {
-        return res.status(404).send('Not found');
-      }
-
+      const site = await models.Sites.getSite({ name: sitename });
       const page = await models.Pages.findOne({ siteId: site._id, name });
 
       if (!page) {
         return res.status(404).send('Page not found');
       }
 
-      const html = await pageReplacer(models, subdomain, page, site);
+      return res.send(
+        await pageReplacer({
+          models,
+          subdomain,
+          page,
+          site,
+          options: { replaceCss: true }
+        })
+      );
+    });
+
+    app.get('/:sitename/product-category/:categoryId', async (req, res) => {
+      const subdomain = getSubdomain(req);
+      const models = await generateModels(subdomain);
+
+      const { sitename } = req.params;
+
+      const site = await models.Sites.getSite({ name: sitename });
+      const page = await models.Pages.findOne({
+        siteId: site._id,
+        name: 'product_category_detail'
+      });
+
+      if (!page) {
+        return res.status(404).send('Product category detail page not found');
+      }
 
       return res.send(
-        `
-          ${html}
-          <style>
-            ${page.css}
-          </style>
-        `
+        await pageReplacer({
+          models,
+          subdomain,
+          page,
+          site,
+          options: { queryParams: req.params, replaceCss: true }
+        })
       );
+    });
+
+    app.get('/:sitename/product-detail/:productId', async (req, res) => {
+      const subdomain = getSubdomain(req);
+      const models = await generateModels(subdomain);
+
+      const { sitename } = req.params;
+
+      const site = await models.Sites.getSite({ name: sitename });
+      const page = await models.Pages.findOne({
+        siteId: site._id,
+        name: 'product_detail'
+      });
+
+      if (!page) {
+        return res.status(404).send('Product detail page not found');
+      }
+
+      return res.send(
+        await pageReplacer({
+          models,
+          subdomain,
+          page,
+          site,
+          options: { queryParams: req.params, replaceCss: true }
+        })
+      );
+    });
+
+    app.post('/:sitename/add-to-cart', async (req, res) => {
+      console.log('mmmmmmmm', req.body);
+
+      return res.json({ status: 'received' });
     });
 
     app.get('/:sitename/get-data', async (req, res) => {

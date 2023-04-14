@@ -1,6 +1,15 @@
+import { isEnabled } from '@erxes/api-utils/src/serviceDiscovery';
 import { IModels } from './connectionResolver';
+import { sendCommonMessage } from './messageBroker';
 import { IPageDocument } from './models/definitions/pages';
 import { ISiteDocument } from './models/definitions/sites';
+
+const generateUrl = (subdomain: string, sitename: string, path: string) => {
+  return (
+    (subdomain === 'localhost' ? `/pl:webbuilder/` : `gateway/pl:webbuilder/`) +
+    `${sitename}/${path}`
+  );
+};
 
 const pathReplacer = (subdomain: string, html: any, site: ISiteDocument) => {
   const siteHolder = `{{sitename}}`;
@@ -70,13 +79,145 @@ const entryReplacer = async (
   return subHtml;
 };
 
-const pageReplacer = async (
-  models: IModels,
-  subdomain: string,
-  page: IPageDocument,
-  site: ISiteDocument
-) => {
+const replaceProductInfo = (html, product) => {
+  if (!product) {
+    return html;
+  }
+
+  let replacedHtml = html.replace('{{ product._id }}', product._id);
+
+  replacedHtml = replacedHtml.replace('{{ product.name }}', product.name);
+  replacedHtml = replacedHtml.replace(
+    '{{ product.image }}',
+    product.attachment ? product.attachment.url : ''
+  );
+
+  return replacedHtml;
+};
+
+const ecommerceReplacer = async ({
+  models,
+  subdomain,
+  site,
+  page,
+  html,
+  queryParams = {}
+}: {
+  models: IModels;
+  subdomain: string;
+  site: ISiteDocument;
+  page: IPageDocument;
+  html: string;
+  queryParams?: any;
+}) => {
+  const isProductsEnabled = await isEnabled('products');
+
+  if (!isProductsEnabled) {
+    return html;
+  }
+
+  if (html.includes('{{ productCategories }}')) {
+    const productCategories = await sendCommonMessage({
+      subdomain,
+      serviceName: 'products',
+      action: 'categories.find',
+      isRPC: true,
+      data: {}
+    });
+
+    let categoriesHtml = '';
+
+    for (const category of productCategories) {
+      categoriesHtml += `
+        <ul>
+          <li>
+            <a href="${generateUrl(
+              subdomain,
+              site.name,
+              `product-category/${category._id}`
+            )}">${category.name}</a>
+          </li>
+        </ul>
+      `;
+    }
+
+    html = html.replace('{{ productCategories }}', categoriesHtml);
+
+    return html;
+  }
+
+  if (html.includes('{{ products }}')) {
+    const productEntryPage = await models.Pages.findOne({
+      siteId: site._id,
+      name: `product_entry`
+    });
+
+    let productEntryHtml = '';
+    let productEntryCss = '';
+
+    if (productEntryPage) {
+      productEntryHtml = productEntryPage.html;
+      productEntryCss = productEntryPage.css;
+    }
+
+    const products = await sendCommonMessage({
+      subdomain,
+      serviceName: 'products',
+      action: 'find',
+      isRPC: true,
+      data: { query: { categoryId: queryParams.categoryId } }
+    });
+
+    let productsHtml = '';
+
+    for (const product of products) {
+      let replacedHtml = replaceProductInfo(productEntryHtml, product);
+      productsHtml += ` <div class="product-item">${replacedHtml}</div>`;
+    }
+
+    html = html.replace(
+      '{{ products }}',
+      `${productsHtml}<style>${productEntryCss}</style>`
+    );
+
+    return html;
+  }
+
+  if (page.name === 'product_detail') {
+    const product = await sendCommonMessage({
+      subdomain,
+      serviceName: 'products',
+      action: 'findOne',
+      isRPC: true,
+      data: { _id: queryParams.productId }
+    });
+
+    html = replaceProductInfo(html, product);
+  }
+
+  return html;
+};
+
+const pageReplacer = async (args: {
+  models: IModels;
+  subdomain: string;
+  page: IPageDocument;
+  site: ISiteDocument;
+  options?: { queryParams?: any; replaceCss: boolean };
+}) => {
+  const { models, subdomain, page, site, options } = args;
+  const { queryParams } = options || {};
+
   let html = pathReplacer(subdomain, page.html, site);
+
+  html = await ecommerceReplacer({
+    models,
+    subdomain,
+    site,
+    page,
+    html,
+    queryParams
+  });
 
   const pages = await models.Pages.find({
     siteId: site._id,
@@ -113,6 +254,70 @@ const pageReplacer = async (
         await entryReplacer(models, subdomain, site, p, limit, skip)
       );
     }
+  }
+
+  let productDetailScript = '';
+
+  if (page.name === 'product_detail') {
+    productDetailScript = `
+      <div id="quantity-chooser">
+        <button id="quantity-chooser-minus">-<button>
+          <span id="quantity-chooser-quantity"><span>
+        <button id="quantity-chooser-plus">+</button>
+      </div>
+
+      <script>
+        let quantity = 1;
+
+        function showQuantity() {
+          $("#quantity-chooser-quantity").text(quantity);
+        }
+
+        $(document).ready(() => {
+          showQuantity();
+
+          $("#quantity-chooser-minus").click(() => {
+            if (quantity > 1) {
+              quantity--;
+              showQuantity();
+            }
+          });
+
+          $("#quantity-chooser-plus").click(() => {
+            quantity++;
+            showQuantity();
+          });
+
+          $("#add-to-cart").click(() => {
+            $.ajax({
+              url: "${generateUrl(subdomain, site.name, 'add-to-cart')}",
+              method: "post",
+              data: {
+                quantity,
+                productId: "${queryParams.productId}"
+              },
+              success: () => {
+                alert('Success');
+              }
+            })
+          });
+        });
+      </script>
+    `;
+  }
+
+  html += `
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    ${productDetailScript}
+  `;
+
+  if (options && options.replaceCss) {
+    return `
+      ${html}
+      <style>
+        ${page.css}
+      </style>
+    `;
   }
 
   return html;
