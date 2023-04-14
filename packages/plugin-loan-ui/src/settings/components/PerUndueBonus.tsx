@@ -39,7 +39,7 @@ class PerSettings extends React.Component<Props, State> {
     e.preventDefault();
     const { configsMap, currentConfigKey } = this.props;
     const { config } = this.state;
-    const key = Math.random();
+    const key = Math.floor(Math.random() * 1000000000000000);
 
     delete configsMap.undueConfig[currentConfigKey];
     configsMap.undueConfig[key] = config;

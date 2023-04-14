@@ -16,7 +16,7 @@ function Header() {
   return (
     <HeaderDescription
       icon="/images/actions/25.svg"
-      title="Баярын өдрүүдийг бүртгэх"
+      title={__('Holiday config')}
       description=""
     />
   );
