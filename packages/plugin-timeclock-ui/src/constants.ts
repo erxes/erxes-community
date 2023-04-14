@@ -26,4 +26,14 @@ const dateFormat = 'MM/DD/YYYY';
 const timeFormat = 'HH:mm';
 const dateAndTimeFormat = 'MM/DD/YYYY HH:mm';
 
-export { menuTimeClock, dateFormat, timeFormat, dateAndTimeFormat };
+const dayOfTheWeekFormat = 'dd';
+const dateOfTheMonthFormat = 'MM/DD';
+
+export {
+  menuTimeClock,
+  dateFormat,
+  timeFormat,
+  dateAndTimeFormat,
+  dayOfTheWeekFormat,
+  dateOfTheMonthFormat
+};

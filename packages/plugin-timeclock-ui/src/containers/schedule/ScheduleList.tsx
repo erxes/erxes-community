@@ -101,7 +101,7 @@ const ListContainer = (props: FinalProps) => {
   };
 
   const removeScheduleShifts = (scheduleId, type) => {
-    confirm(`Are you sure to remove schedele ${type}`).then(() => {
+    confirm(`Are you sure to remove schedule ${type}`).then(() => {
       (type === 'shift'
         ? removeScheduleShiftMutation({ variables: { _id: scheduleId } })
         : removeScheduleMutation({ variables: { _id: scheduleId } })

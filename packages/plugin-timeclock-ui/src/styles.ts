@@ -182,6 +182,13 @@ const FlexRow = styled.div`
   justify-content: space-between;
 `;
 
+const FlexRowLeft = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+`;
+
 const InlineBlock = styled.div`
   display: inline;
   align-items: center;
@@ -306,6 +313,7 @@ export {
   SidebarActions,
   Input,
   FlexRow,
+  FlexRowLeft,
   FlexColumn,
   FlexColumnMargined,
   FlexColumnCustom,
