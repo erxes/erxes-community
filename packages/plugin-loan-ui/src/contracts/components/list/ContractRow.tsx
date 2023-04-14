@@ -33,7 +33,7 @@ function ContractRow({ contract, history, isChecked, toggleBulk }: Props) {
   };
 
   const onTrClick = () => {
-    history.push(`/contract-details/${contract._id}`);
+    history.push(`/erxes-plugin-loan/contract-details/${contract._id}`);
   };
 
   return (

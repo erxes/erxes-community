@@ -135,22 +135,46 @@ const holidaySettings = ({ location, history }) => {
 const LoanRoutes = () => {
   return (
     <React.Fragment>
-      <Route path="/contract-list" component={contractLists} />
-      <Route path="/contract-details/:id" component={detailsOfContract} />
-      <Route path="/collateral-list" component={collateralLists} />
-      <Route path="/transaction-list" component={transactionLists} />
-      <Route path="/insurance-types" component={insuranceTypesLists} />
+      <Route
+        path="/erxes-plugin-loan/contract-list"
+        component={contractLists}
+      />
+      <Route
+        path="/erxes-plugin-loan/contract-details/:id"
+        component={detailsOfContract}
+      />
+      <Route
+        path="/erxes-plugin-loan/collateral-list"
+        component={collateralLists}
+      />
+      <Route
+        path="/erxes-plugin-loan/transaction-list"
+        component={transactionLists}
+      />
+      <Route
+        path="/erxes-plugin-loan/insurance-types"
+        component={insuranceTypesLists}
+      />
       <Route
         path="/erxes-plugin-loan/contract-types"
         component={contractTypesLists}
       />
-      <Route path="/contract-type-details/:id" component={contractTypeDetail} />
-      <Route path="/undue-settings" component={undueSettings} />
+      <Route
+        path="/erxes-plugin-loan/contract-type-details/:id"
+        component={contractTypeDetail}
+      />
+      <Route
+        path="/erxes-plugin-loan/undue-settings"
+        component={undueSettings}
+      />
       <Route
         path="/erxes-plugin-loan/holiday-settings"
         component={holidaySettings}
       />
-      <Route path="/adjustment-list" component={adjustmentLists} />
+      <Route
+        path="/erxes-plugin-loan/adjustment-list"
+        component={adjustmentLists}
+      />
       {/* <Route path="/adjustment-details/:id" component={adjustmentDetail} /> */}
     </React.Fragment>
   );

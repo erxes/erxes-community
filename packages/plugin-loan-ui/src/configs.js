@@ -14,7 +14,7 @@ module.exports = {
   menus: [
     {
       text: 'Contracts',
-      url: '/contract-list',
+      url: '/erxes-plugin-loan/contract-list',
       icon: 'icon-medal',
       location: 'mainNavigation',
       permission: 'showContracts',
@@ -31,7 +31,7 @@ module.exports = {
     {
       text: 'Insurance types',
       image: '/images/icons/erxes-13.svg',
-      to: '/insurance-types/',
+      to: '/erxes-plugin-loan/insurance-types/',
       action: 'loanConfig',
       scope: 'loan',
       location: 'settings',
