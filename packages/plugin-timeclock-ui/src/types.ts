@@ -147,12 +147,18 @@ export interface IScheduleConfigDays {
   overnightShift?: boolean;
 }
 export interface IScheduleForm {
-  [key: string]: {
-    overnightShift?: boolean;
-    shiftDate?: Date;
-    shiftStart: Date;
-    shiftEnd: Date;
-  };
+  [key: string]: IScheduleDate;
+}
+
+export interface IScheduleDate {
+  overnightShift?: boolean;
+
+  scheduleConfigId: string;
+  lunchBreakInMins: number;
+
+  shiftDate?: Date;
+  shiftStart: Date;
+  shiftEnd: Date;
 }
 
 export interface IDeviceConfig {

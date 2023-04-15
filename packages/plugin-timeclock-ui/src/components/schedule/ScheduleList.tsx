@@ -17,7 +17,6 @@ import {
   timeFormat
 } from '../../constants';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
-import { PropertyTableRow } from '@erxes/ui-forms/src/settings/properties/styles';
 import { isEnabled, router } from '@erxes/ui/src/utils/core';
 import Table from '@erxes/ui/src/components/table';
 import { IUser } from '@erxes/ui/src/auth/types';
@@ -199,6 +198,7 @@ function ScheduleList(props: Props) {
     <>
       <ModalTrigger
         title={__('Send schedule request')}
+        size="lg"
         trigger={trigger}
         content={modalContent}
       />
@@ -230,7 +230,12 @@ function ScheduleList(props: Props) {
     return (
       <thead>
         <tr>
-          <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
+          <th
+            rowSpan={2}
+            style={{ border: '1px solid #EEE' }}
+            onMouseOver={() => setShowRemoveBtn(true)}
+            onMouseLeave={() => setShowRemoveBtn(false)}
+          >
             {''}
           </th>
           {selectedScheduleStatus === 'Pending' && (
@@ -453,7 +458,6 @@ function ScheduleList(props: Props) {
   const content = () => {
     const getFilteredSchedules = filterSchedules(scheduleOfMembers);
 
-    console.log('filtered ', getFilteredSchedules);
     return (
       <Table bordered={true} condensed={true} responsive={true}>
         {renderTableHeaders()}

@@ -278,6 +278,11 @@ export const scheduleShiftSchema = new Schema({
     label: 'to be sure of whether shift occurs overnight'
   }),
 
+  chosenScheduleConfigId: field({
+    type: String,
+    label: '_id of a chosen schedule config when creating schedule'
+  }),
+
   solved: field({
     type: Boolean,
     default: false,

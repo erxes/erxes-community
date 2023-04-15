@@ -262,8 +262,12 @@ const DateName = styled.div`
   text-align: center;
 `;
 
-const Margin = styled.div`
+const MarginX = styled.div`
   margin: 0 ${dimensions.coreSpacing}px;
+`;
+
+const MarginY = styled.div`
+  margin: ${dimensions.unitSpacing}px 0;
 `;
 
 const RowField = styled.div`
@@ -326,7 +330,8 @@ export {
   ConfigFormWrapper,
   ToggleButton,
   InlineBlock,
-  Margin,
+  MarginX,
+  MarginY,
   RowField,
   TextAlignCenter,
   CustomCollapseRow,
