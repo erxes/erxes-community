@@ -211,8 +211,17 @@ const FlexRowEven = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 15px
+  justify-content: space-evenly;
+`;
+
+const CustomFlexRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 10px
-  justify-content: space-even;
+  justify-content: start;
+  max-width: 460px;
 `;
 
 const FlexColumn = styledTS<{
@@ -246,8 +255,19 @@ const FlexColumnCustom = styledTS<{
 
   `;
 
+const CustomWidthDiv = styledTS<{
+  width: number;
+}>(styled.div)`
+    width: ${props => props.width}px
+    justify-content: right;
+  `;
+
 const TextAlignCenter = styled.div`
   text-align: center;
+`;
+
+const TextAlignRight = styled.div`
+  text-align: right;
 `;
 
 const ToggleDisplay = styledTS<{
@@ -318,6 +338,8 @@ export {
   Input,
   FlexRow,
   FlexRowLeft,
+  CustomFlexRow,
+  CustomWidthDiv,
   FlexColumn,
   FlexColumnMargined,
   FlexColumnCustom,
@@ -334,6 +356,7 @@ export {
   MarginY,
   RowField,
   TextAlignCenter,
+  TextAlignRight,
   CustomCollapseRow,
   CustomLabel
 };

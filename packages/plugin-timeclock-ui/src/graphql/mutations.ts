@@ -48,6 +48,14 @@ const timeclockStop = `
   }
 `;
 
+const timeclockCreate = `
+    mutation timeclockCreate($userId: String, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
+      timeclockCreate(userId: $userId, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+        _id
+      }
+    }
+`;
+
 const sendAbsenceRequest = `
   mutation sendAbsenceRequest($startTime: Date, $endTime: Date, $userId: String, $reason: String, $explanation: String, $attachment: AttachmentInput, $absenceTypeId: String){
     sendAbsenceRequest(startTime: $startTime, endTime: $endTime, userId: $userId, reason: $reason, explanation: $explanation, attachment: $attachment, absenceTypeId: $absenceTypeId){
@@ -80,15 +88,15 @@ const absenceTypeRemove = `
   }`;
 
 const sendScheduleRequest = `
-  mutation sendScheduleRequest($userId: String, $shifts: [ShiftsRequestInput], $scheduleConfigId: String){
-    sendScheduleRequest(userId: $userId, shifts: $shifts, scheduleConfigId: $scheduleConfigId){
+  mutation sendScheduleRequest($userId: String, $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+    sendScheduleRequest(userId: $userId, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
     }
   }`;
 
 const submitSchedule = `
-  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftsRequestInput], $scheduleConfigId: String){
-    submitSchedule(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, scheduleConfigId: $scheduleConfigId){
+  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+    submitSchedule(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
     }
   }`;
@@ -237,6 +245,7 @@ export default {
   solveShift,
 
   timeclockEdit,
+  timeclockCreate,
   timeclockRemove,
   timeclockStart,
   timeclockStop,

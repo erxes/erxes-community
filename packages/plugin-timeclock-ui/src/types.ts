@@ -118,12 +118,14 @@ export interface ISchedule {
   scheduleConfigId: string;
   scheduleChecked: boolean;
   submittedByAdmin: boolean;
+  totalBreakInMins?: number;
 }
 export interface IShift {
   user?: IUser;
   date?: Date;
   shiftStart: Date;
   shiftEnd: Date;
+  scheduleConfigId: string;
 }
 
 export interface IShiftSchedule {
@@ -169,6 +171,10 @@ export interface IDeviceConfig {
 }
 export type TimeClockMainQueryResponse = {
   timeclocksMain: { list: ITimeclock[]; totalCount: number };
+} & QueryResponse;
+
+export type TimeClockPerUserQueryResponse = {
+  timeclocksPerUser: ITimeclock[];
 } & QueryResponse;
 
 export type TimeClockQueryResponse = {
@@ -249,6 +255,7 @@ export type ScheduleMutationVariables = {
   departmentIds?: string[];
   userIds?: string[];
   scheduleConfigId?: string;
+  totalBreakInMins?: number | string;
 };
 
 export type TimeLogMutationResponse = {
@@ -266,6 +273,9 @@ export type TimeClockMutationResponse = {
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   timeclockRemove: (params: { variables: { _id: string } }) => Promise<any>;
   timeclockEditMutation: (params: {
+    variables: MutationVariables;
+  }) => Promise<any>;
+  timeclockCreateMutation: (params: {
     variables: MutationVariables;
   }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {

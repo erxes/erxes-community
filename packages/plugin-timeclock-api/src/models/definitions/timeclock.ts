@@ -67,6 +67,7 @@ export interface ISchedule {
   scheduleConfigId?: string;
   scheduleChecked?: boolean;
   submittedByAdmin?: boolean;
+  totalBreakInMins?: number;
 }
 
 export interface IScheduleDocument extends ISchedule, Document {
@@ -250,6 +251,11 @@ export const scheduleSchema = new Schema({
   submittedByAdmin: field({
     type: Boolean,
     label: 'Whether schedule was submitted/assigned directly by an admin',
+    default: false
+  }),
+  totalBreakInMins: field({
+    type: Number,
+    label: 'Total break time in mins',
     default: false
   })
 });

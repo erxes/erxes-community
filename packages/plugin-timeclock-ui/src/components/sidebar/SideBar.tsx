@@ -166,6 +166,7 @@ const LeftSideBar = (props: Props) => {
           <ControlLabel>Team members</ControlLabel>
           <SelectTeamMembers
             initialValue={currUserIds}
+            customField="employeeId"
             label="Select team member"
             name="userIds"
             queryParams={queryParams}

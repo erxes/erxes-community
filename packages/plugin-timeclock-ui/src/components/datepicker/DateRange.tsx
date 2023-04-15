@@ -104,7 +104,7 @@ const DateRange = (props: Props) => {
               {...props}
               renderDay={renderDay}
               input={false}
-              timeFormat={showTime}
+              timeFormat={showTime ? 'HH:mm' : false}
               value={startDate}
               onChange={onDateStartChange}
             />
@@ -115,7 +115,7 @@ const DateRange = (props: Props) => {
             <Datetime
               {...props}
               renderDay={renderDay}
-              timeFormat={showTime}
+              timeFormat={showTime ? 'HH:mm' : false}
               input={false}
               value={endDate}
               onChange={onDateEndChange}

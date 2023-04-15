@@ -35,6 +35,7 @@ type Props = {
   submitRequest: (
     userId: any,
     filledShifts: any,
+    totalBreakInMins?: number | string,
     selectedScheduleConfigId?: string
   ) => void;
   submitSchedule: (
@@ -42,6 +43,7 @@ type Props = {
     departmentIds: any,
     userIds: any,
     filledShifts: any,
+    totalBreakInMins?: number | string,
     selectedScheduleConfigId?: string
   ) => void;
   removeScheduleShifts: (_id: string, type: string) => void;
@@ -257,6 +259,9 @@ function ScheduleList(props: Props) {
             {__('Total hours')}
           </th>
           <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
+            {__('Total Break')}
+          </th>
+          <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
             {__('Member checked')}
           </th>
           {daysAndDatesHeaders.map(column => {
@@ -402,6 +407,9 @@ function ScheduleList(props: Props) {
         (1000 * 3600);
     });
 
+    const totalBreakInHours = scheduleOfMember.totalBreakInMins
+      ? (scheduleOfMember.totalBreakInMins / 60).toFixed(1)
+      : 0;
     return (
       <tr style={{ textAlign: 'left' }}>
         <td
@@ -445,6 +453,7 @@ function ScheduleList(props: Props) {
         <td>{employeeId}</td>
         <td>{totalDaysScheduled}</td>
         <td>{totalHoursScheduled}</td>
+        <td>{totalBreakInHours}</td>
         <td>{scheduleChecked}</td>
         {renderScheduleShifts(scheduleOfMember.shifts, user._id)}
       </tr>

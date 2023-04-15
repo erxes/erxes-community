@@ -59,6 +59,7 @@ export const types = `
   
   input ShiftsRequestInput {
     _id: String
+    scheduleConfigId: String
     overnightShift: Boolean
     configName: String
     shiftStart: Date
@@ -67,6 +68,7 @@ export const types = `
 
   type ShiftsRequest{
     _id: String
+    scheduleConfigId: String
     shiftStart: Date
     shiftEnd: Date
     solved: Boolean
@@ -83,6 +85,7 @@ export const types = `
     scheduleConfigId: String
     scheduleChecked: Boolean
     submittedByAdmin: Boolean
+    totalBreakInMins: Int
   }
 
   type IUserAbsenceInfo{ 
@@ -264,6 +267,7 @@ export const queries = `
   requestsMain(${queryParams}): RequestsListResponse
   timelogsMain(${queryParams}): TimelogListResponse
   
+  timeclocksPerUser(userId: String, shiftActive: Boolean, startDate: String, endDate:String): [Timeclock]
   timeLogsPerUser(userId: String, startDate: String, endDate: String ): [Timelog]
   schedulesPerUser(userId: String, startDate: String, endDate: String): [Schedule]
   absenceTypes:[AbsenceType]
@@ -289,6 +293,7 @@ export const mutations = `
   timeclockStart(${params}): Timeclock
   timeclockStop(${params}): Timeclock
   timeclockRemove(_id : String): JSON
+  timeclockCreate(userId: String, shiftStart: Date, shiftEnd: Date, shiftActive: Boolean): Timeclock
   timeclockEdit(_id: String, shiftStart: Date, shiftEnd: Date, shiftActive: Boolean): Timeclock
   
   absenceTypeRemove(_id: String): JSON
@@ -300,8 +305,8 @@ export const mutations = `
 
   submitCheckInOutRequest(checkType: String,userId: String, checkTime: Date): AbsenceType
   
-  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String): Schedule
-  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String): Schedule
+  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
+  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
   
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule

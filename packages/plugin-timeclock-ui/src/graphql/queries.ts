@@ -86,6 +86,18 @@ const timeclocksMain = `
     }
 }
 `;
+
+const timeclocksPerUser = `
+  query timeclocksPerUser($userId: String, $startDate: String, $endDate: String){
+    timeclocksPerUser(userId: $userId, startDate: $startDate, endDate: $endDate){
+      _id
+      shiftStart
+      shiftEnd
+      shiftActive
+    }
+  }
+`;
+
 const schedulesMain = `
   query schedulesMain(${listParamsDef}) {
     schedulesMain(${listParamsValue}) {
@@ -97,6 +109,7 @@ const schedulesMain = `
             shiftEnd
             solved
             status
+            scheduleConfigId
           }
           scheduleConfigId
           solved
@@ -106,6 +119,7 @@ const schedulesMain = `
           }
           scheduleChecked
           submittedByAdmin
+          totalBreakInMins
         }
         totalCount
   }
@@ -286,6 +300,8 @@ export default {
   branches,
 
   timeclocksMain,
+  timeclocksPerUser,
+
   timelogsMain,
   timeLogsPerUser,
 

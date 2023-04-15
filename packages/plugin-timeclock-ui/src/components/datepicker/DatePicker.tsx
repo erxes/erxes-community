@@ -117,8 +117,8 @@ const DatePicker = (props: Props) => {
           multi={false}
         />
       </div>
-      <FlexRow style={{ width: '25%' }}>
-        <FlexRowEven>
+      <FlexRow style={{ width: '28%' }}>
+        <FlexRowEven style={{ gap: '20px' }}>
           <CustomRangeContainer>
             {dayjs(shiftStart).format(timeFormat)}
           </CustomRangeContainer>
@@ -127,15 +127,9 @@ const DatePicker = (props: Props) => {
           </CustomRangeContainer>
           <CustomRangeContainer>( {lunchBreakInMins}' )</CustomRangeContainer>
         </FlexRowEven>
-        <div style={{ alignSelf: 'end', marginLeft: '5px' }}>
-          <Tip text="Delete" placement="auto-start">
-            <Button
-              btnStyle="link"
-              onClick={onDeleteDate}
-              icon="times-circle"
-            />
-          </Tip>
-        </div>
+        <Tip text="Delete" placement="auto-start">
+          <Button btnStyle="link" onClick={onDeleteDate} icon="times-circle" />
+        </Tip>
       </FlexRow>
     </FlexRow>
   );
