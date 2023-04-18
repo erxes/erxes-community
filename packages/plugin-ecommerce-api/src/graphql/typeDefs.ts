@@ -20,6 +20,10 @@ const typeDefs = async _serviceDiscovery => {
   return gql`
     scalar JSON
     scalar Date
+    
+    extend type Product @key(fields: "_id") {
+      _id: String! @external
+    }
 
     ${productreviewTypes}
     ${wishlistTypes}

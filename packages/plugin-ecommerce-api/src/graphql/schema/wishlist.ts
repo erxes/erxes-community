@@ -1,20 +1,19 @@
 export const types = `
-	type Wishlist {
+	type Wish {
 		_id: String!
 		productId: String
 		customerId: String
+		product: Product
 	}
 `;
-const params = `
-    productId: String,
-		customerId: String
-`;
+
 export const queries = `
-	wishlist(productId: String!): [Wishlist]
-	allWishlists(customerId: String): [Wishlist]
+	wish(productId: String, customerId: String): Wish
+	wishlist(customerId: String): [Wish]
 `;
+
 export const mutations = `
-	wishlistAdd(${params}): Wishlist
-	wishlistUpdate(_id: String!, ${params}): Wishlist
-	wishlistRemove(_id: String!): Wishlist
+	wishlistAdd(productId: String, customerId: String): Wish
+	wishlistUpdate(_id: String!, productId: String, customerId: String): Wish
+	wishlistRemove(_id: String!): Wish
 `;

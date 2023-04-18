@@ -1,8 +1,10 @@
 export const types = `
+  
   type LastViewedItem {
     _id: String!
     productId: String!
-    customerId : String!
+    customerId: String!
+    product: Product
   }
 `;
 
@@ -12,7 +14,7 @@ const mutationParams = `
 `;
 
 export const queries = `
-  lastViewedItems(customerId: String!): [LastViewedItem]
+  lastViewedItems(customerId: String!, limit: Int): [LastViewedItem]
 `;
 
 export const mutations = `

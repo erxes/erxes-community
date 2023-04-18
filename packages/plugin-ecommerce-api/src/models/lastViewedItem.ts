@@ -8,7 +8,10 @@ import { IModels } from '../connectionResolver';
 
 export interface ILastViewedItemModel extends Model<ILastViewedItemDocument> {
   getLastViewedItemById(_id: string): Promise<ILastViewedItemDocument>;
-  getLastViewedItem(productId: string): Promise<ILastViewedItemDocument>;
+  getLastViewedItem(
+    productId: string,
+    customerId: string
+  ): Promise<ILastViewedItemDocument>;
   getLastViewedItems(customerId: string): Promise<ILastViewedItemDocument>;
   lastViewedItemAdd(doc: ILastViewedItem): Promise<ILastViewedItemDocument>;
   updateLastViewedItem(
@@ -20,18 +23,24 @@ export interface ILastViewedItemModel extends Model<ILastViewedItemDocument> {
 
 export const loadLastViewedItemClass = (models: IModels, subdomain: string) => {
   class LastViewedItem {
-    public static async getLastViewedItem(productId: string) {
-      return models.LastViewedItem.findOne({ productId }).lean();
+    public static async getLastViewedItem(
+      customerId: string,
+      productId: string
+    ) {
+      return models.LastViewedItem.findOne({ productId, customerId }).lean();
     }
-    public static async getLastViewedItems(customerId: string) {
-      return models.LastViewedItem.find({ customerId })
-        .sort({ modifiedAt: 1 })
-        .lean();
-    }
+
     public static async lastViewedItemAdd(doc: ILastViewedItem) {
-      const current = await models.LastViewedItem.getLastViewedItem(
-        doc.productId
-      );
+      const items = await models.LastViewedItem.find({
+        customerId: doc.customerId
+      }).sort({ modifiedAt: 1 });
+
+      let current = items.find(i => i.productId === doc.productId);
+
+      if (!current && items.length >= 100) {
+        current = items[0];
+      }
+
       if (current) {
         await models.LastViewedItem.updateOne(
           { _id: current._id },
@@ -39,9 +48,9 @@ export const loadLastViewedItemClass = (models: IModels, subdomain: string) => {
         );
         return models.LastViewedItem.findOne({ _id: current._id });
       }
+
       const item = await models.LastViewedItem.create({
         ...doc,
-        createdAt: new Date(),
         modifiedAt: new Date()
       });
       return item;

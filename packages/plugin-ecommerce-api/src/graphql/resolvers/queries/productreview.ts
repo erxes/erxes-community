@@ -1,19 +1,34 @@
-import { requireLogin } from '@erxes/api-utils/src/permissions';
 import { IContext } from '../../../connectionResolver';
 import { models } from '../../../connectionResolver';
 const productreviewQueries = {
-  productreviews: async (
+  productreview: async (
     _root,
     params,
     { models: { ProductReview } }: IContext
   ) => {
     const { productId } = params;
-    return ProductReview.getProductReview(productId);
+    const reviews = await ProductReview.find({ productId }).lean();
+    if (!reviews.length)
+      return {
+        productId,
+        average: 0,
+        length: 0
+      };
+
+    return {
+      productId,
+      average:
+        reviews.reduce((sum, cur) => sum + cur.review, 0) / reviews.length,
+      length: reviews.length
+    };
   },
-  allProductreviews: async (_root, params) => {
-    const { customerId } = params;
-    return models?.ProductReview.getAllProductReview(customerId);
+  productreviews: async (
+    _root,
+    params,
+    { models: { ProductReview } }: IContext
+  ) => {
+    const { customerId, productIds } = params;
+    return ProductReview.find({ customerId, productId: { $in: productIds } });
   }
 };
-//requireLogin(productreviewQueries, 'productreviews');
 export default productreviewQueries;
