@@ -1,164 +1,179 @@
+import { IContext } from '../../connectionResolver';
+import { sendCoreMessage, sendMessageBroker } from '../../messageBroker';
 import { SCHEDULE_STATUS } from '../../models/definitions/constants';
+import { IContractDocument } from '../../models/definitions/contracts';
+import { IContract } from '../../models/definitions/contracts';
 import { getDiffDay, getNextMonthDay } from '../../models/utils/utils';
 
 const Contracts = {
-  contractType(contract) {
-    return (
-      contract.contractTypeId && {
-        __typename: 'User',
-        _id: contract.contractTypeId
-      }
+  contractType(contract: IContract, {}, { models }: IContext) {
+    return models.ContractTypes.findOne({ _id: contract.contractTypeId });
+  },
+  relationExpert(contract: IContract, {}, { subdomain }: IContext) {
+    if (!contract.relationExpertId) return null;
+
+    return sendCoreMessage({
+      subdomain,
+      action: 'users.findOne',
+      data: { _id: contract.relationExpertId },
+      isRPC: true
+    });
+  },
+  leasingExpert(contract: IContract, {}, { subdomain }: IContext) {
+    if (!contract.leasingExpertId) return null;
+
+    return sendCoreMessage({
+      subdomain,
+      action: 'users.findOne',
+      data: { _id: contract.leasingExpertId },
+      isRPC: true
+    });
+  },
+  riskExpert(contract: IContract, {}, { subdomain }: IContext) {
+    if (!contract.riskExpertId) return null;
+
+    return sendCoreMessage({
+      subdomain,
+      action: 'users.findOne',
+      data: { _id: contract.riskExpertId },
+      isRPC: true
+    });
+  },
+  async customers(contract: IContract, {}, { subdomain }: IContext) {
+    if (contract.customerType !== 'customer') return null;
+    return sendMessageBroker(
+      {
+        subdomain,
+        action: 'customers.findOne',
+        data: { _id: contract.customerId },
+        isRPC: true
+      },
+      'contacts'
     );
   },
-  relationExpert(contract) {
-    return (
-      contract.relationExpertId && {
-        __typename: 'User',
-        _id: contract.relationExpertId
-      }
+  companies(contract: IContract, {}, { subdomain }: IContext) {
+    if (contract.customerType !== 'company') return null;
+    return sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        data: { _id: contract.customerId },
+        isRPC: true
+      },
+      'contacts'
     );
   },
-  leasingExpert(contract) {
-    return (
-      contract.leasingExpertId && {
-        __typename: 'User',
-        _id: contract.leasingExpertId
+  async insurances(
+    contract: IContractDocument,
+    {},
+    { models, subdomain }: IContext
+  ) {
+    const insurances: any = [];
+
+    for (const data of contract.insurancesData || []) {
+      if (!data.insuranceTypeId) {
+        continue;
       }
-    );
-  },
-  riskExpert(contract) {
-    return (
-      contract.riskExpertId && {
-        __typename: 'User',
-        _id: contract.riskExpertId
-      }
-    );
-  },
-  customers(contract) {
-    async ({ models }) => {
-      const customerIds = await models.Conformities.savedConformity({
-        mainType: 'contract',
-        mainTypeId: contract._id.toString(),
-        relTypes: ['customer']
+
+      const insurance = await models.InsuranceTypes.getInsuranceType({
+        _id: data.insuranceTypeId
       });
-
-      return models.Customers.find({ _id: { $in: customerIds || [] } });
-    };
-  },
-  companies(contract) {
-    async ({ models }) => {
-      const companyIds = await models.Conformities.savedConformity({
-        mainType: 'contract',
-        mainTypeId: contract._id.toString(),
-        relTypes: ['company']
-      });
-
-      return models.Companies.find({ _id: { $in: companyIds || [] } });
-    };
-  },
-  insurances(contract) {
-    async ({ models }) => {
-      const insurances: any = [];
-
-      for (const data of contract.insurancesData || []) {
-        if (!data.insuranceTypeId) {
-          continue;
-        }
-
-        const insurance = await models.InsuranceTypes.getInsuranceType(models, {
-          _id: data.insuranceTypeId
-        });
-        const company = await models.Companies.findOne(
-          { _id: insurance.companyId },
-          { _id: 1, primaryName: 1, code: 1 }
-        );
-
-        insurances.push({
-          ...(typeof data.toJSON === 'function' ? data.toJSON() : data),
-          insurance,
-          company
-        });
-      }
-
-      return insurances;
-    };
-  },
-  collaterals(contract) {
-    async ({ models }) => {
-      const collaterals: any = [];
-
-      for (const data of contract.collateralsData || []) {
-        const collateral = await models.Products.findOne({
-          _id: data.collateralId
-        });
-        const insuranceType = await models.InsuranceTypes.findOne({
-          _id: data.insuranceTypeId
-        });
-
-        collaterals.push({
-          ...(typeof data.toJSON === 'function' ? data.toJSON() : data),
-          collateral,
-          insuranceType
-        });
-      }
-
-      return collaterals;
-    };
-  },
-  currentSchedule(contract) {
-    async ({ models }) => {
-      const currentSchedule = await models.RepaymentSchedules.findOne({
-        contractId: contract._id,
-        status: { $in: [SCHEDULE_STATUS.LESS, SCHEDULE_STATUS.PENDING] }
-      }).sort({ payDate: 1 });
-
-      if (!currentSchedule) {
-        const lastDone = await models.RepaymentSchedules.findOne({
-          contractId: contract._id
-        }).sort({ payDate: -1 });
-
-        if (!lastDone) {
-          contract.untilDay = getDiffDay(
-            new Date(),
-            getNextMonthDay(contract.startDate, contract.scheduleDay)
-          );
-          contract.donePercent = 0;
-          return contract;
-        }
-
-        lastDone.untilDay = 0;
-        lastDone.donePercent = 100;
-
-        return lastDone;
-      }
-
-      currentSchedule.untilDay = getDiffDay(
-        new Date(),
-        currentSchedule.payDate
+      const company = await sendMessageBroker(
+        {
+          subdomain,
+          action: 'companies.findOne',
+          data: { _id: insurance.companyId },
+          isRPC: true
+        },
+        'contacts'
       );
-      currentSchedule.donePercent =
-        ((contract.leaseAmount -
-          (currentSchedule.balance + currentSchedule.payment)) /
-          contract.leaseAmount) *
-        100;
-      currentSchedule.balance =
-        currentSchedule.balance + currentSchedule.payment;
-      currentSchedule.remainderTenor = await models.RepaymentSchedules.find({
-        contractId: contract._id,
-        status: SCHEDULE_STATUS.PENDING
-      }).countDocuments();
 
-      return currentSchedule;
-    };
+      insurances.push({
+        ...(typeof data.toJSON === 'function' ? data.toJSON() : data),
+        insurance,
+        company
+      });
+    }
+
+    return insurances;
   },
-  relContract(contract) {
-    async ({ models }) => {
-      if (!contract.relContractId) {
-        return;
+  async collaterals(
+    contract: IContractDocument,
+    {},
+    { models, subdomain }: IContext
+  ) {
+    const collaterals: any = [];
+
+    for (const data of contract.collateralsData || []) {
+      const collateral = await sendMessageBroker(
+        {
+          subdomain,
+          action: 'product.findOne',
+          data: { _id: data.collateralId },
+          isRPC: true
+        },
+        'cards'
+      );
+      const insuranceType = await models.InsuranceTypes.findOne({
+        _id: data.insuranceTypeId
+      });
+
+      collaterals.push({
+        ...(typeof data.toJSON === 'function' ? data.toJSON() : data),
+        collateral,
+        insuranceType
+      });
+    }
+
+    return collaterals;
+  },
+  async currentSchedule(contract: IContractDocument, {}, { models }: IContext) {
+    const currentSchedule: any = await models.Schedules.findOne({
+      contractId: contract._id,
+      status: { $in: [SCHEDULE_STATUS.LESS, SCHEDULE_STATUS.PENDING] }
+    }).sort({ payDate: 1 });
+
+    if (!currentSchedule) {
+      const lastDone: any = await models.Schedules.findOne({
+        contractId: contract._id
+      }).sort({ payDate: -1 });
+
+      if (!lastDone) {
+        let data: any = contract;
+        data.untilDay = getDiffDay(
+          new Date(),
+          getNextMonthDay(contract.startDate, contract.scheduleDay)
+        );
+        data.donePercent = 0;
+        return data;
       }
 
-      return models.LoanContracts.findOne({ _id: contract.relContractId });
-    };
+      lastDone.untilDay = 0;
+      lastDone.donePercent = 100;
+
+      return lastDone;
+    }
+
+    currentSchedule.untilDay = getDiffDay(new Date(), currentSchedule.payDate);
+    currentSchedule.donePercent =
+      ((contract.leaseAmount -
+        (currentSchedule.balance + currentSchedule.payment)) /
+        contract.leaseAmount) *
+      100;
+    currentSchedule.balance = currentSchedule.balance + currentSchedule.payment;
+    currentSchedule.remainderTenor = await models.Schedules.find({
+      contractId: contract._id,
+      status: SCHEDULE_STATUS.PENDING
+    }).countDocuments();
+
+    return currentSchedule;
+  },
+  relContract(contract: IContractDocument, {}, { models }: IContext) {
+    if (!contract.relContractId) {
+      return;
+    }
+
+    return models.Contracts.findOne({ _id: contract.relContractId });
   }
 };
 

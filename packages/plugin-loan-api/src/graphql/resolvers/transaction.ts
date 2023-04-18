@@ -1,35 +1,35 @@
+import { IContext } from '../../connectionResolver';
+import { sendMessageBroker } from '../../messageBroker';
+import { ITransaction } from '../../models/definitions/transactions';
+
 const Transactions = {
-  company(transaction) {
-    return (
-      transaction.companyId && {
-        __typename: 'User',
-        _id: transaction.companyId
-      }
+  company(transaction: ITransaction, {}, { subdomain }: IContext) {
+    return sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        data: { _id: transaction.companyId },
+        isRPC: true
+      },
+      'contacts'
     );
   },
-  customer(transaction) {
-    return (
-      transaction.customerId && {
-        __typename: 'User',
-        _id: transaction.customerId
-      }
+  customer(transaction: ITransaction, {}, { subdomain }: IContext) {
+    return sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        data: { _id: transaction.companyId },
+        isRPC: true
+      },
+      'contacts'
     );
   },
-  contract(transaction) {
-    return (
-      transaction.contractId && {
-        __typename: 'User',
-        _id: transaction.contractId
-      }
-    );
+  contract(transaction: ITransaction, {}, { models }: IContext) {
+    return models.Contracts.findOne({ _id: transaction.contractId });
   },
-  invoice(transaction) {
-    return (
-      transaction.invoiceId && {
-        __typename: 'User',
-        _id: transaction.invoiceId
-      }
-    );
+  invoice(transaction: ITransaction, {}, { models }: IContext) {
+    return models.Invoices.findOne({ _id: transaction.invoiceId });
   }
 };
 

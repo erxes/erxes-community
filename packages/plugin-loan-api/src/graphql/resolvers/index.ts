@@ -1,25 +1,25 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
 
-import Collaterals from './collateral';
-import Contracts from './contract';
-import contractTypeResolvers from './contractType';
-import InsuranceTypes from './insuranceType';
-import Invoices from './invoice';
-import Schedules from './schedule';
-import Transactions from './transaction';
+import Collateral from './collateral';
+import Contract from './contract';
+import ContractType from './contractType';
+import InsuranceType from './insuranceType';
+import Invoice from './invoice';
+import Schedule from './schedule';
+import Transaction from './transaction';
 import Mutation from './mutations';
 import Query from './queries';
 
 const resolvers: any = async () => ({
   ...customScalars,
 
-  Collaterals,
-  Contracts,
-  contractTypeResolvers,
-  InsuranceTypes,
-  Invoices,
-  Schedules,
-  Transactions,
+  Collateral,
+  Contract,
+  ContractType,
+  InsuranceType,
+  Invoice,
+  Schedule,
+  Transaction,
 
   Mutation,
   Query

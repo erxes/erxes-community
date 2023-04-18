@@ -7,6 +7,18 @@ export const initBroker = async cl => {
   client = cl;
 };
 
+export const sendMessageBroker = async (
+  args: ISendMessageArgs,
+  name: 'core' | 'cards' | 'reactions' | 'contacts'
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: name,
+    ...args
+  });
+};
+
 export const sendCoreMessage = async (args: ISendMessageArgs): Promise<any> => {
   return sendMessage({
     client,

@@ -1,5 +1,7 @@
+import { IContractTypeDocument } from '../../models/definitions/contractTypes';
+
 const contractTypeResolvers = {
-  productCategories(contractType) {
+  productCategories(contractType: IContractTypeDocument) {
     return (contractType.productCategoryIds || []).map(_id => ({
       __typename: 'User',
       _id
