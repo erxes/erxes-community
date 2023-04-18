@@ -94,7 +94,7 @@ const uploadHandler = async (params: Params) => {
     userId,
     extraFormData = []
   } = params;
-  console.log(files);
+
   if (!files) {
     return;
   }
@@ -183,7 +183,7 @@ const uploadHandler = async (params: Params) => {
           Alert.error(error.message);
         });
     };
-    console.log('aaaa', file);
+
     // begin read
     uploadReader.readAsArrayBuffer(file);
 
