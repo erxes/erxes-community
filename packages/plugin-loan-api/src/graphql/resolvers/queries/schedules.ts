@@ -1,10 +1,15 @@
+import { IContext } from '../../../connectionResolver';
 import { SCHEDULE_STATUS } from '../../../models/definitions/constants';
 import { IDefaultScheduleParam } from '../../../models/definitions/schedules';
 import { calcPerVirtual, getFullDate } from '../../../models/utils/utils';
 
 const scheduleQueries = {
-  scheduleYears: async (_root, params: { contractId: string }, { models }) => {
-    const dates = await models.RepaymentSchedules.find(
+  scheduleYears: async (
+    _root,
+    params: { contractId: string },
+    { models }: IContext
+  ) => {
+    const dates = await models.Schedules.find(
       { contractId: params.contractId },
       { payDate: 1 }
     ).sort({ payDate: 1 });
@@ -17,7 +22,7 @@ const scheduleQueries = {
   schedules: async (
     _root,
     params: { contractId: string; isFirst: boolean; year?: number },
-    { models }
+    { models }: IContext
   ) => {
     let filter = { contractId: params.contractId } as any;
     if (params.year) {
@@ -58,7 +63,7 @@ const scheduleQueries = {
   cpSchedules: async (
     _root,
     params: { contractId: string; status: string },
-    { models }
+    { models }: IContext
   ) => {
     if (params.status === 'done')
       return models.Schedules.find({

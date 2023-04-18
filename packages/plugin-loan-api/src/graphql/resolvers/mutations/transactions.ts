@@ -1,29 +1,41 @@
-import { putCreateLog, putDeleteLog, putUpdateLog } from 'erxes-api-utils';
 import { gatherDescriptions } from '../../../utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import {
+  checkPermission,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import messageBroker from '../../../messageBroker';
+import redis from '../../../redis';
 
 const transactionMutations = {
   transactionsAdd: async (
     _root,
     doc,
-    { user, docModifier, models, checkPermission, memoryStorage, messageBroker }
+    { user, docModifier, models, subdomain }: IContext
   ) => {
     const transaction = models.Transactions.createTransaction(
-      models,
       messageBroker,
-      memoryStorage,
-      docModifier(doc),
-      user
+      redis,
+      docModifier(doc)
     );
 
+    const logData = {
+      type: 'transaction',
+      newData: doc,
+      object: transaction,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putCreateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'transaction',
-        newData: doc,
-        object: transaction,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -38,29 +50,35 @@ const transactionMutations = {
   transactionsEdit: async (
     _root,
     { _id, ...doc },
-    { models, checkPermission, memoryStorage, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
-    const transaction = await models.Transactions.getTransaction(models, {
+    const transaction = await models.Transactions.getTransaction({
       _id
     });
 
     const updated = await models.Transactions.updateTransaction(
-      models,
       messageBroker,
-      memoryStorage,
+      redis,
       _id,
       doc
     );
 
+    const logData = {
+      type: 'transaction',
+      object: transaction,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'transaction',
-        object: transaction,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -75,29 +93,35 @@ const transactionMutations = {
   transactionsChange: async (
     _root,
     { _id, ...doc },
-    { models, checkPermission, memoryStorage, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
-    const transaction = await models.Transactions.getTransaction(models, {
+    const transaction = await models.Transactions.getTransaction({
       _id
     });
 
     const updated = await models.Transactions.changeTransaction(
-      models,
       messageBroker,
-      memoryStorage,
+      redis,
       _id,
       doc
     );
 
+    const logData = {
+      type: 'transaction',
+      object: transaction,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
     await putUpdateLog(
+      subdomain,
       messageBroker,
-      gatherDescriptions,
       {
-        type: 'transaction',
-        object: transaction,
-        newData: { ...doc },
-        updatedDocument: updated,
-        extraParams: { models }
+        ...logData,
+        ...descriptions
       },
       user
     );
@@ -112,20 +136,29 @@ const transactionMutations = {
   transactionsRemove: async (
     _root,
     { transactionIds }: { transactionIds: string[] },
-    { models, checkPermission, user, messageBroker }
+    { models, user, subdomain }: IContext
   ) => {
     // TODO: contracts check
     const transactions = await models.Transactions.find({
       _id: { $in: transactionIds }
     }).lean();
 
-    await models.Transactions.removeTransactions(models, transactionIds);
+    await models.Transactions.removeTransactions(transactionIds);
 
     for (const transaction of transactions) {
+      const logData = {
+        type: 'transaction',
+        object: transaction,
+        extraParams: { models }
+      };
+
+      const descriptions = gatherDescriptions(logData);
+
       await putDeleteLog(
+        subdomain,
         messageBroker,
-        gatherDescriptions,
-        { type: 'transaction', object: transaction, extraParams: { models } },
+
+        { ...logData, ...descriptions },
         user
       );
     }

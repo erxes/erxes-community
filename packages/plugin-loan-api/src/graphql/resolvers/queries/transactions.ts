@@ -1,5 +1,6 @@
 import { paginate } from 'erxes-api-utils';
 import { checkPermission } from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
 
 const generateFilter = async (models, params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -78,7 +79,7 @@ const transactionQueries = {
   transactions: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.Transactions.find(
@@ -98,7 +99,7 @@ const transactionQueries = {
   transactionsMain: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     const filter = await generateFilter(models, params, commonQuerySelector);
 
@@ -118,12 +119,8 @@ const transactionQueries = {
    * Get one transaction
    */
 
-  transactionDetail: async (
-    _root,
-    { _id },
-    { models, checkPermission, user }
-  ) => {
-    return models.Transactions.getTransaction(models, { _id });
+  transactionDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.Transactions.getTransaction({ _id });
   }
 };
 
