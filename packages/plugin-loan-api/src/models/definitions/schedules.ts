@@ -26,7 +26,8 @@ export interface ISchedule {
   total: number;
 
   didUndue?: number;
-  didInterest?: number;
+  didInterestEve?: number;
+  didInterestNonce?: number;
   didPayment?: number;
   didInsurance?: number;
   didDebt?: number;
