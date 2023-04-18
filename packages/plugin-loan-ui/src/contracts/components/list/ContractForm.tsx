@@ -22,6 +22,8 @@ import SelectContractType, {
 } from '../../../contractTypes/containers/SelectContractType';
 import SelectContract, { ContractById } from '../../containers/SelectContract';
 import { IContract, IContractDoc } from '../../types';
+import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -42,6 +44,8 @@ type State = {
   repayment: string;
   startDate: Date;
   scheduleDay: number;
+  customerId: string;
+  customerType: string;
 
   debt: number;
   debtTenor: number;
@@ -60,7 +64,7 @@ type State = {
   relContractId?: string;
 };
 
-class ContractForm extends React.Component<Props, State> {
+class ContractForm extends React.Component<Props, State | any> {
   constructor(props) {
     super(props);
 
@@ -89,7 +93,8 @@ class ContractForm extends React.Component<Props, State> {
       relationExpertId: contract.relationExpertId || '',
       leasingExpertId: contract.leasingExpertId || '',
       riskExpertId: contract.riskExpertId || '',
-
+      customerId: contract.customerId || '',
+      customerType: contract.customerType || '',
       leaseType:
         (contract.contractType && contract.contractType.leaseType) || 'finance',
       weekends: contract.weekends || [],
@@ -127,7 +132,8 @@ class ContractForm extends React.Component<Props, State> {
       debt: Number(this.state.debt),
       debtTenor: Number(this.state.debtTenor),
       debtLimit: Number(this.state.debtLimit),
-
+      customerId: this.state.customerId || '',
+      customerType: this.state.customerType || '',
       salvageAmount: 0,
       salvagePercent: 0,
       salvageTenor: 0,
@@ -278,6 +284,20 @@ class ContractForm extends React.Component<Props, State> {
     });
   };
 
+  onSelectCustomer = value => {
+    this.setState({
+      customerId: value,
+      customerType: 'customer'
+    });
+  };
+
+  onSelectCompany = value => {
+    this.setState({
+      customerId: value,
+      customerType: 'company'
+    });
+  };
+
   onFieldClick = e => {
     e.target.select();
   };
@@ -292,8 +312,6 @@ class ContractForm extends React.Component<Props, State> {
     this.setState({
       relContractId: value
     });
-
-    console.log(contractObj);
   };
 
   renderContent = (formProps: IFormProps) => {
@@ -331,6 +349,35 @@ class ContractForm extends React.Component<Props, State> {
                   onSelect={this.onSelectContractType}
                   multi={false}
                 ></SelectContractType>
+              </FormGroup>
+              <FormGroup>
+                <ControlLabel required={true}>Customer</ControlLabel>
+                <SelectCustomers
+                  label="Choose customer"
+                  name="customerId"
+                  initialValue={
+                    (this.state.customerType === 'customer' &&
+                      this.state.customerId) ||
+                    ''
+                  }
+                  onSelect={this.onSelectCustomer}
+                  multi={false}
+                />
+              </FormGroup>
+
+              <FormGroup>
+                <ControlLabel required={true}>Company</ControlLabel>
+                <SelectCompanies
+                  label="Choose company"
+                  name="customerId"
+                  initialValue={
+                    (this.state.customerType === 'company' &&
+                      this.state.customerId) ||
+                    ''
+                  }
+                  onSelect={this.onSelectCompany}
+                  multi={false}
+                />
               </FormGroup>
 
               {this.renderFormGroup('margin Amount', {

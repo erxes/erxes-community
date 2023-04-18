@@ -39,6 +39,8 @@ export const types = () => `
     repayment: String
     startDate: Date
     scheduleDay: Float
+    customerId: String
+    customerType: String
 
     debt: Float
     debtTenor: Float
@@ -145,6 +147,8 @@ const commonFields = `
   scheduleDay: Float
   insurancesData: JSON
   collateralsData: JSON
+  customerId: String
+  customerType: String
   debt: Float
   debtTenor: Float
   debtLimit: Float
