@@ -19,23 +19,18 @@ import { Amount } from '../../contracts/styles';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IInvoice } from '../../invoices/types';
 import React from 'react';
-import { __ } from 'coreui/utils';
+import { __ } from '@erxes/ui/src/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
+import SelectContractts, {
+  Contracts
+} from '../../contracts/components/common/SelectContract';
 
 const SelectCompanies = asyncComponent(
   () =>
     isEnabled('contacts') &&
     import(
-      /* webpackChunkName: "SelectCompanies" */ '@erxes/ui-contacts/src/companies/containers/SelectCompanies'
-    )
-);
-
-const SelectCustomers = asyncComponent(
-  () =>
-    isEnabled('contacts') &&
-    import(
-      /* webpackChunkName: "SelectCustomers" */ '@erxes/ui-contacts/src/customers/containers/SelectCustomers'
+      /* webpackChunkName: 'SelectCompanies' */ '@erxes/ui-contacts/src/companies/containers/SelectCompanies'
     )
 );
 
@@ -89,8 +84,6 @@ class TransactionForm extends React.Component<Props, State> {
 
     return {
       _id: finalValues._id,
-      contractId: this.state.contractId,
-      invoiceId: this.state.invoiceId,
       ...this.state,
       payDate: finalValues.payDate,
       total: Number(this.state.total)
@@ -282,11 +275,15 @@ class TransactionForm extends React.Component<Props, State> {
 
                   <FormGroup>
                     <ControlLabel>Customer</ControlLabel>
-                    <SelectCustomers
+                    <SelectContractts
                       label="Choose an customer"
-                      name="customerId"
-                      initialValue={this.state.customerId}
-                      onSelect={onSelect}
+                      name="contractId"
+                      initialValue={this.state.contractId}
+                      onSelect={(v, n) => {
+                        onSelect(v, n);
+                        typeof v === 'string' &&
+                          onSelect(Contracts[v].customerId, 'customerId');
+                      }}
                       multi={false}
                     />
                   </FormGroup>

@@ -26,7 +26,8 @@ const contractFields = `
   salvageAmount
   salvagePercent
   salvageTenor
-
+  customerId
+  customerType
   relationExpertId
   leasingExpertId
   riskExpertId

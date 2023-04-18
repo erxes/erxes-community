@@ -62,6 +62,8 @@ export interface IContract {
   relationExpertId: string;
   leasingExpertId: string;
   riskExpertId: string;
+  customerId: string;
+  customerType: string;
 
   contractType?: IContractTypeDoc;
   weekends: number[];
