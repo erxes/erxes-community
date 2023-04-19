@@ -3,6 +3,10 @@ import { getCloseInfo } from '../../../models/utils/closeUtils';
 import { getFullDate } from '../../../models/utils/utils';
 import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
+import redis from '../../../redis';
+import { sendMessageBroker } from '../../../messageBroker';
+import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
+import { ICompany } from '@erxes/ui-contacts/src/companies/types';
 
 const generateFilter = async (models, params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -127,65 +131,77 @@ const contractQueries = {
   contractDetail: async (_root, { _id }, { models }: IContext) => {
     return models.Contracts.getContract({ _id });
   },
-  cpContracts: async (_root, params, { models }) => {
+  cpContracts: async (_root, params, { models, subdomain }: IContext) => {
     const mainType = params.cpUserType || 'customer';
     if (mainType === 'customer') {
-      const customer = await models.Customers.getWidgetCustomer({
-        email: params.cpUserEmail,
-        phone: params.cpUserPhone
-      });
+      const customer: ICustomer = await sendMessageBroker(
+        {
+          subdomain,
+          action: 'customers.findOne',
+          isRPC: true,
+          data: {
+            email: params.cpUserEmail,
+            phone: params.cpUserPhone
+          }
+        },
+        'contacts'
+      );
 
-      const contractIds = await models.Conformities.savedConformity({
-        mainType,
-        mainTypeId: customer._id,
-        relTypes: ['contract']
-      });
-
-      return models.Contracts.find({ _id: { $in: contractIds } }).sort({
+      return models.Contracts.find({
+        customerId: customer._id
+      }).sort({
         createdAt: -1
       });
     }
 
-    let company = await models.Companies.findOne({
-      $or: [
-        { emails: { $in: [params.cpUserEmail] } },
-        { primaryEmail: params.cpUserEmail }
-      ]
-    }).lean();
+    var company: ICompany = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        isRPC: true,
+        data: {
+          email: params.cpUserEmail,
+          phone: params.cpUserPhone
+        }
+      },
+      'contacts'
+    );
 
     if (!company) {
-      company = await models.Companies.findOne({
-        $or: [
-          { phones: { $in: [params.cpUserPhone] } },
-          { primaryPhone: params.cpUserPhone }
-        ]
-      }).lean();
+      company = await sendMessageBroker(
+        {
+          subdomain,
+          action: 'companies.findOne',
+          isRPC: true,
+          data: {
+            $or: [
+              { phones: { $in: [params.cpUserPhone] } },
+              { primaryPhone: params.cpUserPhone }
+            ]
+          }
+        },
+        'contacts'
+      );
     }
 
     if (!company) {
       return [];
     }
 
-    const contractIds = await models.Conformities.savedConformity({
-      mainType,
-      mainTypeId: company._id,
-      relTypes: ['contract']
-    });
-
-    return models.Contracts.find({ _id: { $in: contractIds } }).sort({
+    return models.Contracts.find({ customerId: company._id }).sort({
       createdAt: -1
     });
   },
 
-  cpContractDetail: async (_root, { _id }, { models }) => {
-    return models.Contracts.getContract(models, { _id });
+  cpContractDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.Contracts.getContract({ _id });
   },
 
-  closeInfo: async (_root, { contractId, date }, { models, memoryStorage }) => {
-    const contract = await models.Contracts.getContract(models, {
+  closeInfo: async (_root, { contractId, date }, { models }: IContext) => {
+    const contract = await models.Contracts.getContract({
       _id: contractId
     });
-    return getCloseInfo(models, memoryStorage, contract, date);
+    return getCloseInfo(models, redis, contract, date);
   }
 };
 
