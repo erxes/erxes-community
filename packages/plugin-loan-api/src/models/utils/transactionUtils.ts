@@ -1,5 +1,6 @@
 import { IModels } from '../../connectionResolver';
 import { INVOICE_STATUS, SCHEDULE_STATUS } from '../definitions/constants';
+import { IInvoice } from '../definitions/invoices';
 import {
   ICalcDivideParams,
   ICalcTrParams,
@@ -473,9 +474,8 @@ export const removeTrAfterSchedule = async (
   }
 
   if (tr.invoiceId) {
-    await models.Invoices.updateInvoice(tr.invoiceId, {
-      status: INVOICE_STATUS.PENDING
-    });
+    const invoiceData: any = { status: INVOICE_STATUS.PENDING };
+    await models.Invoices.updateInvoice(tr.invoiceId, invoiceData);
   }
 
   const bulkOps: any[] = [];

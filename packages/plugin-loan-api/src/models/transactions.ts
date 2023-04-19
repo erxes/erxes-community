@@ -67,9 +67,10 @@ export const loadTransactionClass = (models: IModels) => {
       }
 
       if (doc.invoiceId) {
-        await models.Invoices.updateInvoice(doc.invoiceId, {
+        const invoiceData: any = {
           status: INVOICE_STATUS.DONE
-        });
+        };
+        await models.Invoices.updateInvoice(doc.invoiceId, invoiceData);
       }
 
       const trInfo = await transactionRule(models, memoryStorage, {
@@ -110,9 +111,10 @@ export const loadTransactionClass = (models: IModels) => {
       await removeTrAfterSchedule(models, oldTr);
 
       if (doc.invoiceId) {
-        await models.Invoices.updateInvoice(doc.invoiceId, {
+        const invoiceData: any = {
           status: INVOICE_STATUS.DONE
-        });
+        };
+        await models.Invoices.updateInvoice(doc.invoiceId, invoiceData);
       }
 
       const trInfo = await transactionRule(models, memoryStorage, { ...doc });
