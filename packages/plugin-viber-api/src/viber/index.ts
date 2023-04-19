@@ -1,14 +1,38 @@
 import { sendRequest } from '@erxes/api-utils/src';
 
 const ApiKey1: string = '50dfa9d00f67df44-cbcbe4fcc2f83742-d80626370fd9edff';
-const ApiKey2: string = '50e486c1f867e4cc-faa151fa47843647-3312be901c5f82f7';
+const boldId1: string = 'xKRVb9BFQEPU1KNU+d+ktw==';
+const bold1: string = 'pa:5827563153917468484';
 
-const authHeader = {
-  'X-Viber-Auth-Token': ApiKey2
+const ApiKey2: string = '50e486c1f867e4cc-faa151fa47843647-3312be901c5f82f7';
+const boldId2: string = 'JfRXjsS4tUjvbEZhE6t2gg==';
+const bold2: string = 'pa:5828931985378632908';
+
+const enjiKey: string = '50e5d5cf29e7dc89-8d12405dd4a2fb3f-ea2d189a334f469e';
+const enjiId: string = '+bXrAhvAr7+OOdFB5Pfywg==';
+const enji: string = 'pa:5829300378438982793';
+
+const testKey: string = '50e5ec8f93f81afa-18929e46118ddadf-d403a42f5e5c40c3';
+const testId: string = 'XBEn/ssvUm7uCWb0eZK6OQ==';
+const testM: string = 'pa:5829325394107964154';
+
+type AuthHeaderType = {
+  'X-Viber-Auth-Token': string;
 };
 
-export const setWebhook = async (webhookURL: string) => {
-  const payload = {
+const authHeader: AuthHeaderType = {
+  'X-Viber-Auth-Token': testKey
+};
+
+interface RequestInterface {
+  method: 'POST' | 'GET';
+  headers: AuthHeaderType;
+  url: string;
+  body: object;
+}
+
+export const setWebhook = async (webhookURL: string): Promise<any> => {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/set_webhook',
@@ -20,7 +44,8 @@ export const setWebhook = async (webhookURL: string) => {
         'failed',
         'subscribed',
         'unsubscribed',
-        'conversation_started'
+        'conversation_started',
+        'message'
       ],
       send_name: true,
       send_photo: true
@@ -30,8 +55,8 @@ export const setWebhook = async (webhookURL: string) => {
   return await sendRequest(payload);
 };
 
-export const removeWebhook = async () => {
-  const payload = {
+export const removeWebhook = async (): Promise<any> => {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/set_webhook',
@@ -42,12 +67,12 @@ export const removeWebhook = async () => {
 };
 
 export const sendMessage = async () => {
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/send_message',
     body: {
-      receiver: '01234567890A=',
+      receiver: enjiId,
       min_api_version: 1,
       sender: {
         name: 'John McClane',
@@ -63,16 +88,12 @@ export const sendMessage = async () => {
 };
 
 export const broadcastMessage = async () => {
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/broadcast_message',
     body: {
-      broadcast_list: [
-        'ABB102akPCRKFaqxWnafEIA==',
-        'ABB102akPCRKFaqxWna111==',
-        'ABB102akPCRKFaqxWnaf222=='
-      ]
+      broadcast_list: [enjiId]
     }
   };
 
@@ -80,7 +101,7 @@ export const broadcastMessage = async () => {
 };
 
 export const getAccountInfo = async () => {
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/get_account_info',
@@ -91,7 +112,7 @@ export const getAccountInfo = async () => {
 };
 
 export const getUserDetail = async (userId: string) => {
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/get_user_details',
@@ -102,12 +123,12 @@ export const getUserDetail = async (userId: string) => {
 };
 
 export const getOnline = async () => {
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/get_online',
     body: {
-      ids: ['01234567890=', '01234567891=', '01234567893=']
+      ids: [enjiId]
     }
   };
 
@@ -115,12 +136,11 @@ export const getOnline = async () => {
 };
 
 export const subscribe = async (body: object) => {
-  console.log('subscribe!');
-  const payload = {
+  const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/subscribe',
-    body: body
+    body
   };
 
   return await sendRequest(payload);
