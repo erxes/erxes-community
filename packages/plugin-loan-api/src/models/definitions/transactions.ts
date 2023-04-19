@@ -24,8 +24,6 @@ export interface IBankTransaction {
 
 export interface ITransaction {
   contractId?: string;
-  createdAt: Date;
-  createdBy?: string;
   customerId?: string;
   companyId?: string;
   invoiceId?: string;
@@ -55,6 +53,8 @@ export interface ITransaction {
 
 export interface ITransactionDocument extends ITransaction, Document {
   _id: string;
+  createdAt?: Date;
+  createdBy?: string;
 }
 
 export const transactionSchema = schemaHooksWrapper(

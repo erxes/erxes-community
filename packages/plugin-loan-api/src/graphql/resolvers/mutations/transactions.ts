@@ -8,6 +8,7 @@ import {
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
 import redis from '../../../redis';
+import { ITransactionDocument } from '../../../models/definitions/transactions';
 
 const transactionMutations = {
   transactionsAdd: async (
@@ -49,7 +50,7 @@ const transactionMutations = {
 
   transactionsEdit: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: ITransactionDocument,
     { models, user, subdomain }: IContext
   ) => {
     const transaction = await models.Transactions.getTransaction({
@@ -92,7 +93,7 @@ const transactionMutations = {
 
   transactionsChange: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: ITransactionDocument,
     { models, user, subdomain }: IContext
   ) => {
     const transaction = await models.Transactions.getTransaction({

@@ -1,4 +1,4 @@
-import { transactionSchema } from './definitions/transactions';
+import { ITransaction, transactionSchema } from './definitions/transactions';
 import { ConfirmTrBase } from './utils/confirmTrUtils';
 import { INVOICE_STATUS, SCHEDULE_STATUS } from './definitions/constants';
 import { findContractOfTr } from './utils/findUtils';
@@ -11,13 +11,24 @@ import {
 import { Model } from 'mongoose';
 import { ITransactionDocument } from '../models/definitions/transactions';
 import { IModels } from '../connectionResolver';
+import { FilterQuery } from 'mongodb';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
-  getTransaction(models, selector: any);
-  createTransaction(models, messageBroker, memoryStorage, doc);
-  updateTransaction(models, messageBroker, memoryStorage, _id, doc);
-  changeTransaction(models, messageBroker, memoryStorage, _id, doc);
-  removeTransactions(models, _ids);
+  getTransaction(selector: FilterQuery<ITransactionDocument>);
+  createTransaction(messageBroker: any, memoryStorage: any, doc: ITransaction);
+  updateTransaction(
+    messageBroker: any,
+    memoryStorage: any,
+    _id: string,
+    doc: ITransaction
+  );
+  changeTransaction(
+    messageBroker: any,
+    memoryStorage: any,
+    _id: string,
+    doc: ITransaction
+  );
+  removeTransactions(_ids: string[]);
 }
 export const loadTransactionClass = (models: IModels) => {
   class Transaction {
@@ -26,7 +37,9 @@ export const loadTransactionClass = (models: IModels) => {
      * Get Transaction
      */
 
-    public static async getTransaction(selector: any) {
+    public static async getTransaction(
+      selector: FilterQuery<ITransactionDocument>
+    ) {
       const transaction = await models.Transactions.findOne(selector);
 
       if (!transaction) {
@@ -39,7 +52,11 @@ export const loadTransactionClass = (models: IModels) => {
     /**
      * Create a transaction
      */
-    public static async createTransaction(messageBroker, memoryStorage, doc) {
+    public static async createTransaction(
+      messageBroker: any,
+      memoryStorage: any,
+      doc: ITransaction
+    ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
       const contract = await models.Contracts.findOne({
@@ -55,12 +72,14 @@ export const loadTransactionClass = (models: IModels) => {
         });
       }
 
-      const trInfo = await transactionRule(models, memoryStorage, { ...doc });
+      const trInfo = await transactionRule(models, memoryStorage, {
+        ...doc
+      });
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
 
       await trAfterSchedule(models, tr);
 
-      ConfirmTrBase(models, messageBroker, memoryStorage, contract, tr);
+      //ConfirmTrBase(models, messageBroker, memoryStorage, contract, tr);
 
       return tr;
     }
@@ -71,12 +90,12 @@ export const loadTransactionClass = (models: IModels) => {
     public static async updateTransaction(
       messageBroker,
       memoryStorage,
-      _id,
-      doc
+      _id: string,
+      doc: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
-      const oldTr = await models.Transactions.getTransaction(models, {
+      const oldTr = await models.Transactions.getTransaction({
         _id
       });
 
@@ -85,7 +104,7 @@ export const loadTransactionClass = (models: IModels) => {
       }).lean();
       if (!contract || !contract._id) {
         await models.Transactions.updateOne({ _id }, { $set: { ...doc } });
-        return models.Transactions.getTransaction(models, { _id });
+        return models.Transactions.getTransaction({ _id });
       }
 
       await removeTrAfterSchedule(models, oldTr);
@@ -102,7 +121,7 @@ export const loadTransactionClass = (models: IModels) => {
         { _id },
         { $set: { ...doc, ...trInfo } }
       );
-      const newTr = await models.Transactions.getTransaction(models, {
+      const newTr = await models.Transactions.getTransaction({
         _id
       });
 
@@ -118,10 +137,10 @@ export const loadTransactionClass = (models: IModels) => {
     public static async changeTransaction(
       messageBroker,
       memoryStorage,
-      _id,
+      _id: string,
       doc
     ) {
-      const oldTr = await models.Transactions.getTransaction(models, {
+      const oldTr = await models.Transactions.getTransaction({
         _id
       });
 
@@ -130,7 +149,7 @@ export const loadTransactionClass = (models: IModels) => {
       }).lean();
       if (!contract || !contract._id) {
         await models.Transactions.updateOne({ _id }, { $set: { ...doc } });
-        return models.Transactions.getTransaction(models, { _id });
+        return models.Transactions.getTransaction({ _id });
       }
 
       const oldSchedule = await models.Schedules.findOne({
@@ -165,7 +184,7 @@ export const loadTransactionClass = (models: IModels) => {
         { _id },
         { $set: { ...doc, total: newTotal } }
       );
-      let newTr = await models.Transactions.getTransaction(models, { _id });
+      let newTr = await models.Transactions.getTransaction({ _id });
 
       const newBalance =
         oldSchedule.balance + oldSchedule.didPayment - doc.payment;
