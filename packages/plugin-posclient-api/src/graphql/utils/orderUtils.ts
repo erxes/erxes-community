@@ -17,11 +17,14 @@ import {
 } from '../../models/definitions/configs';
 import * as moment from 'moment';
 import { debugError } from '@erxes/api-utils/src/debuggers';
+import { isValidBarcode } from './otherUtils';
+import { IProductDocument } from '../../models/definitions/products';
 
 interface IDetailItem {
   count: number;
   amount: number;
   inventoryCode: string;
+  barcode: string;
   productId: string;
 }
 
@@ -220,26 +223,50 @@ export const prepareEbarimtData = async (
   }
 
   const details: IDetailItem[] = [];
+  const detailsFree: IDetailItem[] = [];
+  const details0: IDetailItem[] = [];
+  let amountDefault = 0;
+  let amountFree = 0;
+  let amount0 = 0;
 
   for (const item of items) {
+    const product = productsById[item.productId];
+
     // if wrong productId then not sent
-    if (!productsById[item.productId]) {
+    if (!product) {
       continue;
     }
 
     const amount = (item.count || 0) * (item.unitPrice || 0);
 
-    details.push({
+    const stock = {
       count: item.count,
       amount,
-      inventoryCode: productsById[item.productId].code,
+      discount: item.discountAmount,
+      inventoryCode: product.code,
       productId: item.productId
-    });
+    };
+
+    if (product.taxType === '2') {
+      detailsFree.push({ ...stock, barcode: product.taxCode });
+      amountFree += amount;
+    } else if (product.taxType === '3' && billType === '3') {
+      details0.push({ ...stock, barcode: product.taxCode });
+      amount0 += amount;
+    } else {
+      let trueBarcode = '';
+      for (const barcode of product.barcodes) {
+        if (isValidBarcode(barcode)) {
+          trueBarcode = barcode;
+          continue;
+        }
+      }
+      details.push({ ...stock, barcode: trueBarcode });
+      amountDefault += amount;
+    }
   }
 
-  const cashAmount = order.totalAmount || 0;
-
-  const orderInfo = {
+  const commonOderInfo = {
     date: new Date().toISOString().slice(0, 10),
     orderId: order._id,
     number: order.number,
@@ -249,18 +276,97 @@ export const prepareEbarimtData = async (
     customerCode,
     customerName,
     description: order.number,
-    details,
-    cashAmount,
-    nonCashAmount: 0,
-    ebarimtResponse: {}
-  };
-
-  return {
-    ...orderInfo,
+    ebarimtResponse: {},
     productsById,
     contentType: 'pos',
     contentId: order._id
   };
+
+  const result: any[] = [];
+  let calcCashAmount = order.cashAmount || 0;
+  let cashAmount = 0;
+
+  if (detailsFree && detailsFree.length) {
+    if (calcCashAmount > amountFree) {
+      cashAmount = amountFree;
+      calcCashAmount -= amountFree;
+    } else {
+      cashAmount = calcCashAmount;
+      calcCashAmount = 0;
+    }
+    result.push({
+      ...commonOderInfo,
+      hasVat: false,
+      taxType: '2',
+      details: detailsFree,
+      cashAmount,
+      nonCashAmount: amountFree - cashAmount
+    });
+  }
+
+  if (details0 && details0.length) {
+    if (calcCashAmount > amount0) {
+      cashAmount = amount0;
+      calcCashAmount -= amount0;
+    } else {
+      cashAmount = calcCashAmount;
+      calcCashAmount = 0;
+    }
+    result.push({
+      ...commonOderInfo,
+      hasVat: false,
+      taxType: '3',
+      details: details0,
+      cashAmount,
+      nonCashAmount: amount0 - cashAmount
+    });
+  }
+
+  if (details && details.length) {
+    if (calcCashAmount > amountDefault) {
+      cashAmount = amountDefault;
+    } else {
+      cashAmount = calcCashAmount;
+    }
+    result.push({
+      ...commonOderInfo,
+      details,
+      cashAmount,
+      nonCashAmount: amountDefault - cashAmount
+    });
+  }
+
+  return result;
+};
+
+const getMatchMaps = (matchOrders, lastCatProdMaps, product) => {
+  for (const order of matchOrders) {
+    const matchMaps = lastCatProdMaps.filter(
+      lcp => lcp.category.order === order
+    );
+
+    if (matchMaps.length) {
+      const withCodeMatch = matchMaps.find(
+        m => m.code && product.code.includes(m.code)
+      );
+      if (withCodeMatch) {
+        return withCodeMatch;
+      }
+
+      const withNameMatch = matchMaps.find(
+        m => !m.code && m.name && product.name.includes(m.name)
+      );
+      if (withNameMatch) {
+        return withNameMatch;
+      }
+
+      const normalMatch = matchMaps.find(m => !m.code && !m.name);
+      if (normalMatch) {
+        return normalMatch;
+      }
+    }
+  }
+  return;
 };
 
 export const prepareOrderDoc = async (
@@ -272,11 +378,11 @@ export const prepareOrderDoc = async (
 
   const items = doc.items.filter(i => !i.isPackage) || [];
 
-  const products = await models.Products.find({
+  const products: IProductDocument[] = await models.Products.find({
     _id: { $in: items.map(i => i.productId) }
   }).lean();
 
-  const productsOfId = {};
+  const productsOfId: { [_id: string]: IProductDocument } = {};
 
   for (const prod of products) {
     productsOfId[prod._id] = prod;
@@ -287,7 +393,7 @@ export const prepareOrderDoc = async (
   for (const item of items) {
     const fixedUnitPrice = Number(
       (
-        (productsOfId[item.productId] || {}).unitPrice ||
+        ((productsOfId[item.productId] || {}).prices || {})[config.token] ||
         item.unitPrice ||
         0
       ).toFixed(2)
@@ -300,27 +406,53 @@ export const prepareOrderDoc = async (
   const hasTakeItems = items.filter(i => i.isTake);
 
   if (hasTakeItems.length > 0 && catProdMappings.length > 0) {
-    const packOfCategoryId = {};
-
-    for (const rel of catProdMappings) {
-      packOfCategoryId[rel.categoryId] = rel.productId;
-    }
-
     const toAddProducts = {};
+
+    const mapCatIds = catProdMappings
+      .filter(cpm => cpm.categoryId)
+      .map(cpm => cpm.categoryId);
+    const hasTakeProducIds = hasTakeItems.map(hti => hti.productId);
+    const hasTakeCatIds = hasTakeProducIds.map(
+      htpi => (productsOfId[htpi] || {}).categoryId
+    );
+    const categories = await models.ProductCategories.find({
+      _id: { $in: [...mapCatIds, ...hasTakeCatIds] }
+    }).lean();
+
+    const categoriesOfId = {};
+    for (const cat of categories) {
+      categoriesOfId[cat._id] = cat;
+    }
+    const lastCatProdMaps = catProdMappings.map(cpm => ({
+      ...cpm,
+      category: categoriesOfId[cpm.categoryId]
+    }));
 
     for (const item of hasTakeItems) {
       const product = productsOfId[item.productId];
+      const category = categoriesOfId[product.categoryId || ''];
 
-      if (Object.keys(packOfCategoryId).includes(product.categoryId)) {
-        const packProductId = packOfCategoryId[product.categoryId];
-
-        if (!Object.keys(toAddProducts).includes(packProductId)) {
-          toAddProducts[packProductId] = { count: 0 };
-        }
-
-        toAddProducts[packProductId].count += item.count;
+      if (!category) {
+        continue;
       }
-    } // end items loop
+
+      const perOrders = category.order.split('/');
+      const matchOrders: string[] = [];
+      for (let i = perOrders.length - 1; i > 0; i--) {
+        matchOrders.push(`${perOrders.slice(0, i).join('/')}/`);
+      }
+
+      const matchMap = getMatchMaps(matchOrders, lastCatProdMaps, product);
+      if (matchMap) {
+        const packProductId = matchMap.productId;
+        if (packProductId) {
+          if (!Object.keys(toAddProducts).includes(packProductId)) {
+            toAddProducts[packProductId] = { count: 0 };
+          }
+          toAddProducts[packProductId].count += item.count;
+        }
+      }
+    }
 
     const addProductIds = Object.keys(toAddProducts);
 
@@ -332,7 +464,9 @@ export const prepareOrderDoc = async (
       for (const addProduct of takingProducts) {
         const toAddItem = toAddProducts[addProduct._id];
 
-        const fixedUnitPrice = Number((addProduct.unitPrice || 0).toFixed(2));
+        const fixedUnitPrice = Number(
+          ((addProduct.prices || {})[config.token] || 0).toFixed(2)
+        );
 
         items.push({
           _id: Math.random().toString(),
@@ -386,7 +520,18 @@ export const checkOrderAmount = (order: IOrderDocument, amount: number) => {
     mobileAmount +
     (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
 
-  if (paidAmount + amount > order.totalAmount) {
+  if (amount < 0 && paidAmount <= order.totalAmount) {
+    throw new Error('Amount less 0');
+  }
+
+  if (amount > 0 && paidAmount > order.totalAmount) {
+    throw new Error('Amount exceeds total amount');
+  }
+
+  if (
+    paidAmount <= order.totalAmount &&
+    paidAmount + amount > order.totalAmount
+  ) {
     throw new Error('Amount exceeds total amount');
   }
 };

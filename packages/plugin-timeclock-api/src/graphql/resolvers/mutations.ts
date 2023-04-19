@@ -13,10 +13,14 @@ import {
   createScheduleShiftsByUserIds,
   findBranches,
   findBranchUsers,
-  findDepartmentUsers
+  findDepartmentUsers,
+  findUser
 } from './utils';
 import dayjs = require('dayjs');
-import { connectAndQueryFromMsSql } from '../../utils';
+import {
+  connectAndQueryFromMsSql,
+  connectAndQueryTimeLogsFromMsSql
+} from '../../utils';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -58,8 +62,13 @@ const timeclockMutations = {
 
     let insideCoordinate = false;
     let getBranchName;
+
+    const getUserId = userId || user._id;
+
     const EARTH_RADIUS = 6378.14;
-    const branches = await findBranches(subdomain, user._id);
+
+    const userInfo = await findUser(subdomain, getUserId);
+    const branches = await findBranches(subdomain, userInfo.branchIds);
 
     for (const branch of branches) {
       // convert into radians
@@ -118,6 +127,9 @@ const timeclockMutations = {
     if (!timeclock) {
       throw new Error('time clock not found');
     }
+
+    const getUserId = userId || user._id;
+
     // convert long, lat into radians
     const longRad = (Math.PI * longitude) / 180;
     const latRad = (latitude * Math.PI) / 180;
@@ -125,7 +137,9 @@ const timeclockMutations = {
     let insideCoordinate = false;
 
     const EARTH_RADIUS = 6378.14;
-    const branches = await findBranches(subdomain, user._id);
+
+    const userInfo = await findUser(subdomain, getUserId);
+    const branches = await findBranches(subdomain, userInfo.branchIds);
 
     for (const branch of branches) {
       // convert into radians
@@ -172,6 +186,22 @@ const timeclockMutations = {
 
     return updated;
   },
+
+  /**
+   * Removes a single timeclock
+   */
+  timeclockRemove(_root, { _id }, { models }: IContext) {
+    return models.Timeclocks.removeTimeClock(_id);
+  },
+
+  timeclockEdit(_root, { _id, ...doc }: ITimeClockEdit, { models }: IContext) {
+    return models.Timeclocks.updateTimeClock(_id, doc);
+  },
+
+  timeclockCreate(_root, doc, { models }: IContext) {
+    return models.Timeclocks.createTimeClock(doc);
+  },
+
   absenceTypeAdd(_root, doc, { models }: IContext) {
     return models.AbsenceTypes.createAbsenceType(doc);
   },
@@ -188,11 +218,21 @@ const timeclockMutations = {
     return models.AbsenceTypes.updateAbsenceType(_id, doc);
   },
 
-  /**
-   * Removes a single timeclock
-   */
-  async timeclockRemove(_root, { _id }, { models }: IContext) {
-    return models.Timeclocks.removeTimeClock(_id);
+  async submitCheckInOutRequest(
+    _root,
+    { checkType, userId, checkTime },
+    { models }: IContext
+  ) {
+    return models.Absences.createAbsence({
+      reason: `${checkType} request`,
+      userId: `${userId}`,
+      startTime: checkTime,
+      checkInOutRequest: true
+    });
+  },
+
+  async removeAbsenceRequest(_root, { _id }, { models }: IContext) {
+    return models.Absences.removeAbsence(_id);
   },
 
   async sendAbsenceRequest(
@@ -215,43 +255,52 @@ const timeclockMutations = {
       ...doc
     });
 
-    const findAbsenceType = await models.AbsenceTypes.getAbsenceType(
-      shiftRequest.absenceTypeId || ''
-    );
+    if (!shiftRequest.checkInOutRequest) {
+      const findAbsenceType = await models.AbsenceTypes.getAbsenceType(
+        shiftRequest.absenceTypeId || ''
+      );
 
-    // if request is shift request
-    if (findAbsenceType && findAbsenceType.shiftRequest) {
-      updated = models.Absences.updateAbsence(_id, {
-        status: `Shift request / ${status}`,
-        ...doc
-      });
-      // if shift request is approved
-      if (status === 'Approved') {
-        const newSchedule = await models.Schedules.createSchedule({
-          userId: shiftRequest.userId,
-          solved: true,
-          status: 'Approved'
+      // if request is shift request
+      if (findAbsenceType && findAbsenceType.shiftRequest) {
+        updated = models.Absences.updateAbsence(_id, {
+          status: `Shift request / ${status}`,
+          ...doc
         });
+        // if shift request is approved
+        if (status === 'Approved') {
+          const newSchedule = await models.Schedules.createSchedule({
+            userId: shiftRequest.userId,
+            solved: true,
+            status: 'Approved'
+          });
 
-        await models.Shifts.createShift({
-          scheduleId: newSchedule._id,
-          shiftStart: shiftRequest.startTime,
-          shiftEnd: shiftRequest.endTime,
-          solved: true,
-          status: 'Approved'
-        });
+          await models.Shifts.createShift({
+            scheduleId: newSchedule._id,
+            shiftStart: shiftRequest.startTime,
+            shiftEnd: shiftRequest.endTime,
+            solved: true,
+            status: 'Approved'
+          });
 
-        await models.Timeclocks.createTimeClock({
-          userId: shiftRequest.userId,
-          shiftStart: shiftRequest.startTime,
-          shiftEnd: shiftRequest.endTime,
-          shiftActive: false,
-          deviceType: 'Shift request'
-        });
+          await models.Timeclocks.createTimeClock({
+            userId: shiftRequest.userId,
+            shiftStart: shiftRequest.startTime,
+            shiftEnd: shiftRequest.endTime,
+            shiftActive: false,
+            deviceType: 'Shift request'
+          });
+        }
       }
+
+      return updated;
     }
 
-    return updated;
+    // if request is check in/out request
+    return models.Absences.updateAbsence(_id, {
+      status: `${shiftRequest.reason} / ${status}`,
+      solved: true,
+      ...doc
+    });
   },
 
   async solveScheduleRequest(
@@ -322,7 +371,7 @@ const timeclockMutations = {
 
   async submitSchedule(
     _root,
-    { branchIds, departmentIds, userIds, shifts, scheduleConfigId },
+    { branchIds, departmentIds, userIds, shifts, totalBreakInMins },
     { subdomain, models }: IContext
   ) {
     if (userIds.length) {
@@ -330,7 +379,7 @@ const timeclockMutations = {
         userIds,
         shifts,
         models,
-        scheduleConfigId
+        totalBreakInMins
       );
     }
 
@@ -358,12 +407,7 @@ const timeclockMutations = {
       return concatBranchDept.indexOf(value) === pos;
     });
 
-    return createScheduleShiftsByUserIds(
-      unionOfUserIds,
-      shifts,
-      models,
-      scheduleConfigId
-    );
+    return createScheduleShiftsByUserIds(unionOfUserIds, shifts, models);
   },
 
   scheduleRemove(_root, { _id }, { models }: IContext) {
@@ -401,6 +445,7 @@ const timeclockMutations = {
       startTime: startDate,
       endTime: endDate,
       status: 'Holiday',
+      reason: 'Holiday',
       solved: true
     });
   },
@@ -425,12 +470,19 @@ const timeclockMutations = {
 
   async scheduleConfigAdd(
     _root,
-    { scheduleName, scheduleConfig, configShiftStart, configShiftEnd },
+    {
+      scheduleName,
+      lunchBreakInMins,
+      scheduleConfig,
+      configShiftStart,
+      configShiftEnd
+    },
     { models }: IContext
   ) {
     const newScheduleConfig = await models.ScheduleConfigs.createScheduleConfig(
       {
-        scheduleName: `${scheduleName}`,
+        scheduleName,
+        lunchBreakInMins,
         shiftStart: configShiftStart,
         shiftEnd: configShiftEnd
       }
@@ -466,6 +518,7 @@ const timeclockMutations = {
     {
       _id,
       scheduleName,
+      lunchBreakInMins,
       scheduleConfig,
       configShiftStart,
       configShiftEnd,
@@ -476,7 +529,8 @@ const timeclockMutations = {
     const newScheduleConfig = await models.ScheduleConfigs.updateScheduleConfig(
       _id,
       {
-        scheduleName: `${scheduleName}`,
+        scheduleName,
+        lunchBreakInMins,
         shiftEnd: configShiftEnd,
         shiftStart: configShiftStart,
         ...doc
@@ -524,15 +578,49 @@ const timeclockMutations = {
     return models.DeviceConfigs.removeDeviceConfig(_id);
   },
 
-  async extractAllDataFromMySQL(
+  checkReport(_root, doc, { models, user }: IContext) {
+    const getUserId = doc.userId || user._id;
+    return models.ReportChecks.createReportCheck({
+      userId: getUserId,
+      ...doc
+    });
+  },
+
+  checkSchedule(_root, { scheduleId }, { models }: IContext) {
+    return models.Schedules.updateSchedule(scheduleId, {
+      scheduleChecked: true
+    });
+  },
+
+  createTimeClockFromLog(_root, { userId, timelog }, { models }: IContext) {
+    return models.Timeclocks.createTimeClock({
+      shiftStart: timelog,
+      userId,
+      shiftActive: true
+    });
+  },
+
+  async extractAllDataFromMsSQL(
     _root,
     { startDate, endDate },
     { subdomain }: IContext
   ) {
     return await connectAndQueryFromMsSql(subdomain, startDate, endDate);
+  },
+
+  async extractTimeLogsFromMsSQL(
+    _root,
+    { startDate, endDate },
+    { subdomain }: IContext
+  ) {
+    return await connectAndQueryTimeLogsFromMsSql(
+      subdomain,
+      startDate,
+      endDate
+    );
   }
 };
 
-moduleRequireLogin(timeclockMutations);
+// moduleRequireLogin(timeclockMutations);
 
 export default timeclockMutations;

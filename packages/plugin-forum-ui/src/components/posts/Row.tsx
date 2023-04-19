@@ -15,10 +15,9 @@ import dayjs from 'dayjs';
 
 type Props = {
   post: IPost;
-  remove: (postId: string, emptyBulk: () => void) => void;
+  remove: (postId: string, emptyBulk?: () => void) => void;
   isChecked?: boolean;
   toggleBulk: (target: any, toAdd: boolean) => void;
-  emptyBulk: () => void;
 };
 
 class Row extends React.Component<Props> {
@@ -39,14 +38,15 @@ class Row extends React.Component<Props> {
         size="lg"
         trigger={trigger}
         content={content}
+        enforceFocus={false}
       />
     );
   }
 
   renderRemoveAction() {
-    const { post, remove, emptyBulk } = this.props;
+    const { post, remove } = this.props;
 
-    const onClick = () => remove(post._id || '', emptyBulk);
+    const onClick = () => remove(post._id || '');
 
     return (
       <Tip text={__('Delete')} placement="top">
@@ -89,7 +89,7 @@ class Row extends React.Component<Props> {
 
     return (
       <tr>
-        <td id="customersCheckBox" onClick={onClick}>
+        <td id="postsCheckBox" onClick={onClick}>
           <FormControl
             checked={isChecked}
             componentClass="checkbox"

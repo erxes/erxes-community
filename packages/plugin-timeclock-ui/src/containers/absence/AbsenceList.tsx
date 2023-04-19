@@ -11,9 +11,8 @@ import {
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import { Alert } from '@erxes/ui/src/utils';
+import { Alert, confirm } from '@erxes/ui/src/utils';
 import { IAttachment } from '@erxes/ui/src/types';
-import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import { generateParams } from '../../utils';
 
 type Props = {
@@ -27,6 +26,11 @@ type Props = {
   absenceId?: string;
   absenceStatus?: string;
   attachment?: IAttachment;
+
+  absenceTypeId?: string;
+
+  checkTime?: Date;
+  checkType?: string;
 
   getActionBar: (actionBar: any) => void;
   getPagination: (pagination: any) => void;
@@ -44,12 +48,13 @@ const ListContainer = (props: FinalProps) => {
     queryParams,
     sendAbsenceReqMutation,
     solveAbsenceMutation,
-    getPagination,
-    showSideBar,
+    removeAbsenceMutation,
+
+    submitCheckInOutRequestMutation,
+
     listAbsenceQuery,
     listAbsenceTypesQuery
   } = props;
-  const { reason } = queryParams;
 
   if (listAbsenceQuery.loading) {
     return <Spinner />;
@@ -63,8 +68,17 @@ const ListContainer = (props: FinalProps) => {
       .catch(err => Alert.error(err.message));
   };
 
+  const removeAbsence = (_id: string) => {
+    confirm('Are you sure to remove this request').then(() => {
+      removeAbsenceMutation({ variables: { _id } })
+        .then(() => Alert.success('Successfully removed absence request'))
+        .catch(err => Alert.error(err.message));
+    });
+  };
+
   const submitRequest = (
     usrId: string,
+    reason: string,
     expl: string,
     attchment: IAttachment,
     dateRange: any,
@@ -89,25 +103,38 @@ const ListContainer = (props: FinalProps) => {
     }
   };
 
+  const submitCheckInOut = (type: string, userId: string, dateVal: Date) => {
+    submitCheckInOutRequestMutation({
+      variables: {
+        checkType: type,
+        userId: `${userId}`,
+        checkTime: dateVal
+      }
+    })
+      .then(() => Alert.success(`Successfully sent ${type} request`))
+      .catch(err => Alert.error(err.message));
+  };
+
   const { list = [], totalCount = 0 } = listAbsenceQuery.requestsMain || {};
 
   const updatedProps = {
     ...props,
+    totalCount,
     absences: list,
     absenceTypes: listAbsenceTypesQuery.absenceTypes || [],
     loading: listAbsenceQuery.loading,
     solveAbsence,
-    submitRequest
+    removeAbsence,
+    submitRequest,
+    submitCheckInOut
   };
 
-  showSideBar(true);
-  getPagination(<Pagination count={totalCount} />);
   return <AbsenceList {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, AbsenceQueryResponse>(gql(queries.listRequestsMain), {
+    graphql<Props, AbsenceQueryResponse>(gql(queries.requestsMain), {
       name: 'listAbsenceQuery',
       options: ({ queryParams }) => ({
         variables: generateParams(queryParams),
@@ -115,7 +142,7 @@ export default withProps<Props>(
       })
     }),
 
-    graphql<Props, AbsenceTypeQueryResponse>(gql(queries.listAbsenceTypes), {
+    graphql<Props, AbsenceTypeQueryResponse>(gql(queries.absenceTypes), {
       name: 'listAbsenceTypesQuery',
       options: () => ({
         fetchPolicy: 'network-only'
@@ -130,29 +157,62 @@ export default withProps<Props>(
         userId,
         reason,
         explanation,
-        attachment
+        attachment,
+        absenceTypeId
       }) => ({
         variables: {
-          startTime: `${startTime}`,
-          endTime: `${endTime}`,
-          userId: `${userId}`,
-          reason: `${reason}`,
-          explanation: `${explanation}`,
-          attachment: `${attachment}`
+          startTime,
+          endTime,
+          userId,
+          reason,
+          explanation,
+          attachment,
+          absenceTypeId
         },
-        refetchQueries: ['listRequestsMain']
+        refetchQueries: ['requestsMain']
       })
     }),
 
-    graphql<Props, AbsenceMutationResponse>(gql(mutations.solveAbsence), {
-      name: 'solveAbsenceMutation',
-      options: ({ absenceId, absenceStatus }) => ({
-        variables: {
-          _id: absenceId,
-          status: absenceStatus
-        },
-        refetchQueries: ['listRequestsMain']
-      })
-    })
+    graphql<Props, AbsenceMutationResponse>(
+      gql(mutations.solveAbsenceRequest),
+      {
+        name: 'solveAbsenceMutation',
+        options: ({ absenceId, absenceStatus }) => ({
+          variables: {
+            _id: absenceId,
+            status: absenceStatus
+          },
+          refetchQueries: ['requestsMain']
+        })
+      }
+    ),
+
+    graphql<Props, AbsenceMutationResponse>(
+      gql(mutations.removeAbsenceRequest),
+      {
+        name: 'removeAbsenceMutation',
+        options: ({ absenceId }) => ({
+          variables: {
+            _id: absenceId
+          },
+          refetchQueries: ['requestsMain']
+        })
+      }
+    ),
+
+    graphql<Props, AbsenceMutationResponse>(
+      gql(mutations.submitCheckInOutRequest),
+      {
+        name: 'submitCheckInOutRequestMutation',
+        options: ({ checkType, userId, checkTime }) => ({
+          variables: {
+            checkType,
+            userId,
+            checkTime
+          },
+          refetchQueries: ['requestsMain', 'timeclocksMain']
+        })
+      }
+    )
   )(ListContainer)
 );

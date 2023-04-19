@@ -1,3 +1,4 @@
+import { IAttachment } from './../../../client-portal/modules/common/types';
 import { ICompany } from '@erxes/ui-contacts/src/companies/types';
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 import { QueryResponse } from '@erxes/ui/src/types';
@@ -15,6 +16,26 @@ export type MailConfig = {
   registrationContent: string;
   invitationContent: string;
 };
+
+export type ManualVerificationConfig = {
+  userIds: string[];
+  verifyCustomer: boolean;
+  verifyCompany: boolean;
+};
+
+export type PasswordVerificationConfig = {
+  verifyByOTP: boolean;
+  emailSubject: string;
+  emailContent: string;
+  smsContent: string;
+};
+
+export interface IVerificationRequest {
+  status: string;
+  attachments: IAttachment[];
+  description?: string;
+  verifiedBy?: string;
+}
 
 export interface IClientPortalUserDoc {
   firstName: string;
@@ -44,6 +65,8 @@ export interface IClientPortalUserDoc {
 
   customFieldsData: JSON;
   avatar: string;
+
+  verificationRequest: IVerificationRequest;
 }
 
 export interface IClientPortalUser extends IClientPortalUserDoc {
@@ -109,6 +132,10 @@ export type ClientPortalConfig = {
   styles?: Styles;
   mobileResponsive?: boolean;
   googleCredentials?: object;
+  googleClientId?: string;
+  googleRedirectUri?: string;
+  googleClientSecret?: string;
+  facebookAppId?: string;
 
   kbToggle?: boolean;
   publicTaskToggle?: boolean;
@@ -117,6 +144,8 @@ export type ClientPortalConfig = {
   taskToggle?: boolean;
   otpConfig?: OTPConfig;
   mailConfig?: MailConfig;
+  manualVerificationConfig?: ManualVerificationConfig;
+  passwordVerificationConfig?: PasswordVerificationConfig;
 };
 
 export type Styles = {

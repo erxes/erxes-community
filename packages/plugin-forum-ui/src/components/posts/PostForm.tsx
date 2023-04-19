@@ -1,61 +1,78 @@
-import React from 'react';
-import { IPost, ICategory, IPollOption } from '../../types';
+import { readFile } from '@erxes/ui/src/utils';
+import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
+import {
+  IAttachment,
+  IButtonMutateProps,
+  IFormProps
+} from '@erxes/ui/src/types';
+import { ICategory, IPollOption, IPost, ITag } from '../../types';
+
+import Button from '@erxes/ui/src/components/Button';
+import ControlLabel from '@erxes/ui/src/components/form/Label';
+import { CustomRangeContainer } from '../../styles';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
 import EditorCK from '@erxes/ui/src/components/EditorCK';
 import Form from '@erxes/ui/src/components/form/Form';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
-import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { __ } from '@erxes/ui/src/utils';
-import ControlLabel from '@erxes/ui/src/components/form/Label';
-import Button from '@erxes/ui/src/components/Button';
-import Select from 'react-select-plus';
 import PollOptions from './PollOptions';
-import { FlexContent, FlexItem } from '@erxes/ui/src/layout/styles';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
+import React from 'react';
+import Select from 'react-select-plus';
+import Uploader from '@erxes/ui/src/components/Uploader';
+import { __ } from '@erxes/ui/src/utils';
 import dayjs from 'dayjs';
 
 type Props = {
   post?: IPost;
-  tags?: any;
+  tags?: ITag[];
   closeModal: () => void;
   categories: ICategory[];
   renderButton: (props: IButtonMutateProps) => JSX.Element;
 };
 
 type State = {
-  content: string;
-  title: string;
+  content?: string;
+  title?: string;
   categoryId: string;
   selectedTags: string[];
-  pollOptions: IPollOption[];
+  pollOptions: any;
   multipleChoice: boolean;
   hasEndDate: boolean;
-  endDate: any;
+  endDate?: any;
+  thumbnail: any;
+  createdAt: string;
 };
 
 class PostForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const post = props.post || ({ content: '' } as any);
+    const post = props.post || ({} as IPost);
 
     this.state = {
-      content: post.content,
-      title: post.title,
+      content: post.content || '',
+      title: post.title || '',
       categoryId: post.categoryId,
       selectedTags: post.tagIds || [],
       pollOptions: post.pollOptions || [],
       multipleChoice: post.isPollMultiChoice || false,
       hasEndDate: post.pollEndDate ? true : false,
-      endDate: post.pollEndDate || null
+      endDate: post.pollEndDate || null,
+      createdAt: post.createdAt || new Date().toString(),
+      thumbnail: post.thumbnail
+        ? {
+            name: post && post.thumbnailAlt ? post.thumbnailAlt : '',
+            type: 'image',
+            url: post.thumbnail
+          }
+        : ({} as IAttachment)
     };
   }
 
   generateDoc = (values: {
     _id?: string;
     title: string;
-    thumbnail: string;
     categoryId?: string;
     description?: string;
   }) => {
@@ -68,7 +85,7 @@ class PostForm extends React.Component<Props, State> {
 
     const optionsCleaned = this.state.pollOptions.map(
       ({ _id, title, order }) => {
-        const option: any = {
+        const option = {
           _id,
           order,
           title
@@ -81,13 +98,14 @@ class PostForm extends React.Component<Props, State> {
       _id: finalValues._id,
       title: finalValues.title,
       content: this.state.content,
-      thumbnail: finalValues.thumbnail,
+      thumbnail: readFile(this.state.thumbnail.url) || '',
       categoryId: finalValues.categoryId,
       description: finalValues.description,
       tagIds: this.state.selectedTags,
       pollEndDate: this.state.endDate,
       isPollMultiChoice: this.state.multipleChoice,
-      pollOptions: optionsCleaned
+      pollOptions: optionsCleaned,
+      createdAt: this.state.createdAt
     };
   };
 
@@ -113,9 +131,18 @@ class PostForm extends React.Component<Props, State> {
     );
   };
 
-  onChangeRangeFilter = date => {
+  onChangeRangeFilter = (date, key: string) => {
     const formattedDate = date ? dayjs(date).format('YYYY-MM-DD') : '';
-    this.setState({ endDate: formattedDate });
+    this.setState({ ...this.state, [key]: formattedDate });
+  };
+
+  onChangeThumbnail = attachment => {
+    return this.setState({
+      thumbnail:
+        attachment && attachment.length !== 0
+          ? attachment[0]
+          : ({} as IAttachment)
+    });
   };
 
   renderContent = (formProps: IFormProps) => {
@@ -131,10 +158,10 @@ class PostForm extends React.Component<Props, State> {
 
     const { isSubmitted, values } = formProps;
 
-    const object = post || ({} as any);
+    const object = post || ({} as IPost);
 
     const renderTagOptions = () => {
-      return tags.map(tag => ({
+      return (tags || []).map(tag => ({
         value: tag._id,
         label: tag.name,
         _id: tag._id
@@ -150,6 +177,11 @@ class PostForm extends React.Component<Props, State> {
       this.setState({ pollOptions: ops });
     };
 
+    const thumbnail =
+      Object.keys(this.state.thumbnail).length === 0
+        ? []
+        : [this.state.thumbnail];
+
     return (
       <>
         <FormGroup>
@@ -164,12 +196,29 @@ class PostForm extends React.Component<Props, State> {
         </FormGroup>
 
         <FormGroup>
-          <ControlLabel>{__('Thumbnail')}</ControlLabel>
-          <FormControl
-            {...formProps}
-            name="thumbnail"
-            defaultValue={object.thumbnail}
-          />
+          <FlexContent>
+            <FlexItem>
+              <ControlLabel>{__('Thumbnail')}</ControlLabel>
+              <Uploader
+                defaultFileList={thumbnail}
+                onChange={this.onChangeThumbnail}
+                single={true}
+              />
+            </FlexItem>
+            <FlexItem>
+              <CustomRangeContainer>
+                <ControlLabel>{__('Created At')}</ControlLabel>
+                <DateControl
+                  value={this.state.createdAt}
+                  required={false}
+                  name="createdAt"
+                  onChange={date => this.onChangeRangeFilter(date, 'createdAt')}
+                  placeholder={'End date'}
+                  dateFormat={'YYYY-MM-DD'}
+                />
+              </CustomRangeContainer>
+            </FlexItem>
+          </FlexContent>
         </FormGroup>
 
         <FormGroup>
@@ -241,20 +290,22 @@ class PostForm extends React.Component<Props, State> {
             </FlexItem>
             {hasEndDate && (
               <FlexItem>
-                <DateControl
-                  value={this.state.endDate}
-                  required={false}
-                  name="endDate"
-                  onChange={date => this.onChangeRangeFilter(date)}
-                  placeholder={'End date'}
-                  dateFormat={'YYYY-MM-DD'}
-                />
+                <CustomRangeContainer>
+                  <DateControl
+                    value={this.state.endDate}
+                    required={false}
+                    name="endDate"
+                    onChange={date => this.onChangeRangeFilter(date, 'endDate')}
+                    placeholder={'End date'}
+                    dateFormat={'YYYY-MM-DD'}
+                  />
+                </CustomRangeContainer>
               </FlexItem>
             )}
           </FlexContent>
           <PollOptions
             emptyMessage="There is no options"
-            onChangeOption={options => changeOption(options)}
+            onChangeOption={options => changeOption(options || [])}
             options={pollOptions}
           />
         </FormGroup>
@@ -262,7 +313,7 @@ class PostForm extends React.Component<Props, State> {
         <FormGroup>
           <ControlLabel required={true}>{__('Content')}</ControlLabel>
           <EditorCK
-            content={content}
+            content={content || ''}
             onChange={this.onChange}
             isSubmitted={isSubmitted}
             height={300}

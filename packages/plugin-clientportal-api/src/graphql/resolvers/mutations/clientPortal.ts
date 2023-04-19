@@ -28,7 +28,6 @@ const clientPortalMutations = {
       description,
       stageId,
       parentId,
-      createdDate,
       closeDate,
       startDate
     },
@@ -50,6 +49,11 @@ const clientPortalMutations = {
     if (!customer) {
       throw new Error('Customer not registered');
     }
+
+    if (['High', 'Critical'].includes(priority)) {
+      priority = 'Normal';
+    }
+
     const card = await sendCardsMessage({
       subdomain,
       action: `${type}s.create`,
@@ -62,6 +66,7 @@ const clientPortalMutations = {
         status: 'active',
         customerId: customer._id,
         createdAt: new Date(),
+        stageChangedDate: null,
         parentId,
         closeDate,
         startDate

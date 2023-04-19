@@ -14,8 +14,7 @@ import {
 import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
 import { IBranch } from '@erxes/ui/src/team/types';
-import Pagination from '@erxes/ui/src/components/pagination/Pagination';
-import { generateParams } from '../../utils';
+import { generatePaginationParams } from '@erxes/ui/src/utils/router';
 
 type Props = {
   history: any;
@@ -30,6 +29,7 @@ type Props = {
   scheduleConfigs: IScheduleConfig[];
 
   branchesList: IBranch[];
+
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
   getPagination: (pagination: any) => void;
@@ -49,8 +49,6 @@ const ListContainer = (props: FinalProps) => {
     solveShiftMutation,
     removeScheduleMutation,
     removeScheduleShiftMutation,
-    getPagination,
-    showSideBar,
     listSchedulesMain
   } = props;
 
@@ -69,12 +67,14 @@ const ListContainer = (props: FinalProps) => {
   const submitRequest = (
     selectedUserIds: string[],
     requestedShifts: IShift[],
+    totalBreakInMins?: number | string,
     selectedScheduleConfigId?: string
   ) => {
     sendScheduleReqMutation({
       variables: {
         userId: `${selectedUserIds}`,
         shifts: requestedShifts,
+        totalBreakInMins,
         scheduleConfigId: selectedScheduleConfigId
       }
     })
@@ -87,6 +87,7 @@ const ListContainer = (props: FinalProps) => {
     selectedDeptIds: string[],
     selectedUserIds: string[],
     requestedShifts: IShift[],
+    totalBreakInMins?: number | string,
     selectedScheduleConfigId?: string
   ) => {
     submitScheduleMutation({
@@ -95,6 +96,7 @@ const ListContainer = (props: FinalProps) => {
         departmentIds: selectedDeptIds,
         userIds: selectedUserIds,
         shifts: requestedShifts,
+        totalBreakInMins,
         scheduleConfigId: selectedScheduleConfigId
       }
     })
@@ -103,7 +105,7 @@ const ListContainer = (props: FinalProps) => {
   };
 
   const removeScheduleShifts = (scheduleId, type) => {
-    confirm(`Are you sure to remove schedele ${type}`).then(() => {
+    confirm(`Are you sure to remove schedule ${type}`).then(() => {
       (type === 'shift'
         ? removeScheduleShiftMutation({ variables: { _id: scheduleId } })
         : removeScheduleMutation({ variables: { _id: scheduleId } })
@@ -116,6 +118,7 @@ const ListContainer = (props: FinalProps) => {
   const updatedProps = {
     ...props,
     scheduleOfMembers: list,
+    totalCount,
     loading: listSchedulesMain.loading,
     solveSchedule,
     solveShift,
@@ -124,17 +127,23 @@ const ListContainer = (props: FinalProps) => {
     removeScheduleShifts
   };
 
-  showSideBar(true);
-  getPagination(<Pagination count={totalCount} />);
   return <ScheduleList {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, ScheduleQueryResponse>(gql(queries.listSchedulesMain), {
+    graphql<Props, ScheduleQueryResponse>(gql(queries.schedulesMain), {
       name: 'listSchedulesMain',
       options: ({ queryParams }) => ({
-        variables: generateParams(queryParams),
+        variables: {
+          ...generatePaginationParams(queryParams || {}),
+          startDate: queryParams.startDate,
+          endDate: queryParams.endDate,
+          userIds: queryParams.userIds,
+          departmentIds: queryParams.departmentIds,
+          branchIds: queryParams.branchIds,
+          scheduleStatus: queryParams.scheduleStatus
+        },
         fetchPolicy: 'network-only'
       })
     }),
@@ -147,7 +156,7 @@ export default withProps<Props>(
             userId: `${userId}`,
             shifts: requestedShifts
           },
-          refetchQueries: ['listSchedulesMain']
+          refetchQueries: ['schedulesMain']
         })
       }
     ),
@@ -158,7 +167,7 @@ export default withProps<Props>(
           userIds: `${userIds}`,
           shifts: `${requestedShifts}`
         },
-        refetchQueries: ['listSchedulesMain']
+        refetchQueries: ['schedulesMain']
       })
     }),
     graphql<Props, ScheduleMutationResponse>(gql(mutations.solveSchedule), {
@@ -168,7 +177,7 @@ export default withProps<Props>(
           _id: scheduleId,
           status: scheduleStatus
         },
-        refetchQueries: ['listSchedulesMain']
+        refetchQueries: ['schedulesMain']
       })
     }),
 
@@ -179,7 +188,7 @@ export default withProps<Props>(
           _id: shiftId,
           status: shiftStatus
         },
-        refetchQueries: ['listSchedulesMain']
+        refetchQueries: ['schedulesMain']
       })
     }),
     graphql<Props, ScheduleMutationResponse>(gql(mutations.scheduleRemove), {
@@ -188,7 +197,7 @@ export default withProps<Props>(
         variables: {
           _id: scheduleId
         },
-        refetchQueries: ['listSchedulesMain']
+        refetchQueries: ['schedulesMain']
       })
     }),
 
@@ -200,7 +209,7 @@ export default withProps<Props>(
           variables: {
             _id: shiftId
           },
-          refetchQueries: ['listSchedulesMain']
+          refetchQueries: ['schedulesMain']
         })
       }
     )

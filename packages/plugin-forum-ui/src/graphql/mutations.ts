@@ -105,9 +105,12 @@ const createPost = `
     $description: String
     $title: String!
     $thumbnail: String
+    $thumbnailAlt: String
     $pollEndDate: Date
     $pollOptions: [ForumPollOptionInput!]
     $isPollMultiChoice: Boolean
+    $createdAt: Date
+    $tagIds: [ID!]
   ) {
     forumCreatePost(
       categoryId: $categoryId
@@ -115,9 +118,12 @@ const createPost = `
       description: $description
       title: $title
       thumbnail: $thumbnail
+      thumbnailAlt: $thumbnailAlt
       pollEndDate: $pollEndDate
       pollOptions: $pollOptions
       isPollMultiChoice: $isPollMultiChoice
+      createdAt: $createdAt
+      tagIds: $tagIds
     ) {
       _id
     }
@@ -131,11 +137,13 @@ const editPost = `
     $content: String
     $description: String
     $thumbnail: String
+    $thumbnailAlt: String
     $title: String
     $tagIds: [ID!]
     $pollEndDate: Date
     $pollOptions: [ForumPollOptionInput!]
     $isPollMultiChoice: Boolean
+    $createdAt: Date
   ) {
     forumPatchPost(
       _id: $_id
@@ -143,11 +151,13 @@ const editPost = `
       content: $content
       description: $description
       thumbnail: $thumbnail
+      thumbnailAlt: $thumbnailAlt
       title: $title
       tagIds: $tagIds
       pollEndDate: $pollEndDate
       pollOptions: $pollOptions
       isPollMultiChoice: $isPollMultiChoice
+      createdAt: $createdAt
     ) {
       _id
     }
@@ -497,8 +507,8 @@ mutation ForumQuizQuestionCreate(
 `;
 
 const setQuizState = `
-mutation ForumQuizSetState($id: ID!, $state: ForumQuizState!) {
-  forumQuizSetState(_id: $id, state: $state)
+mutation ForumQuizSetState($_id: ID!, $state: ForumQuizState!) {
+  forumQuizSetState(_id: $_id, state: $state)
 }
 `;
 
@@ -573,11 +583,17 @@ mutation ForumQuizChoiceCreate(
 `;
 
 const deleteQuizQuestion = `
-mutation ForumQuizQuestionDelete($id: ID!) {
-  forumQuizQuestionDelete(_id: $id) {
+mutation ForumQuizQuestionDelete($_id: ID!) {
+  forumQuizQuestionDelete(_id: $_id) {
     _id
   }
 }
+`;
+
+const featuredToggle = `
+  mutation ForumPostSetFeatured($id: ID!, $featured: Boolean!) {
+    forumPostSetFeatured(_id: $id, featured: $featured)
+  }
 `;
 
 export default {
@@ -618,5 +634,6 @@ export default {
   quizChoiceDelete,
   quizQuestionPatch,
   createChoice,
-  deleteQuizQuestion
+  deleteQuizQuestion,
+  featuredToggle
 };

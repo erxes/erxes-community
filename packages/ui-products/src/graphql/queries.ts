@@ -52,6 +52,8 @@ const productFields = `
     name
   }
   subUoms
+  taxType
+  taxCode
 `;
 
 const products = `
@@ -105,6 +107,7 @@ const productCategories = `
       parentId
       description
       status
+      meta
       attachment {
         name
         url

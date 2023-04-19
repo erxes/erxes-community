@@ -2,7 +2,7 @@ import { router, __ } from '@erxes/ui/src/utils';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import React, { useState } from 'react';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
-import { SidebarActions, SidebarHeader } from '../../styles';
+import { FlexColumnCustom, SidebarActions, SidebarHeader } from '../../styles';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Button from '@erxes/ui/src/components/Button';
@@ -146,22 +146,7 @@ const LeftSideBar = (props: Props) => {
 
   return (
     <Sidebar wide={true} hasBorder={true} header={renderSidebarHeader()}>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          margin: '20px 20px',
-          gap: '10px'
-        }}
-      >
-        <ControlLabel>Team members</ControlLabel>
-        <SelectTeamMembers
-          initialValue={currUserIds}
-          label="Select team member"
-          name="userIds"
-          queryParams={queryParams}
-          onSelect={onMemberSelect}
-        />
+      <FlexColumnCustom marginNum={20}>
         <SelectDepartments
           isRequired={false}
           defaultValue={deptIds}
@@ -177,10 +162,22 @@ const LeftSideBar = (props: Props) => {
             options={branchesList && renderBranchOptions(branchesList)}
           />
         </div>
+        <div>
+          <ControlLabel>Team members</ControlLabel>
+          <SelectTeamMembers
+            initialValue={currUserIds}
+            customField="employeeId"
+            label="Select team member"
+            name="userIds"
+            queryParams={queryParams}
+            onSelect={onMemberSelect}
+          />
+        </div>
+
         <Button btnStyle="warning" onClick={cleanFilter}>
           Clear filter
         </Button>
-      </div>
+      </FlexColumnCustom>
     </Sidebar>
   );
 };

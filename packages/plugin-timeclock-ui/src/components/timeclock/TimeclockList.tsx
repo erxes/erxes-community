@@ -8,28 +8,43 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
 import TimeForm from '../../containers/timeclock/TimeFormList';
-import { CustomRangeContainer, FlexCenter, FlexColumn } from '../../styles';
+import {
+  CustomRangeContainer,
+  FlexCenter,
+  FlexColumn,
+  TextAlignCenter
+} from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import { ControlLabel } from '@erxes/ui/src/components/form';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
   queryParams: any;
   history: any;
   startTime?: Date;
   timeclocks: ITimeclock[];
-  startClockTime?: (userId: string) => void;
   loading: boolean;
-  getActionBar: (actionBar: any) => void;
-  extractAllMySqlData: (startDate: Date, endDate: Date) => void;
+  totalCount: number;
+
+  startClockTime?: (userId: string) => void;
+  extractAllMsSqlData: (startDate: Date, endDate: Date) => void;
   removeTimeclock: (_id: string) => void;
+
+  getActionBar: (actionBar: any) => void;
+  showSideBar: (sideBar: boolean) => void;
+  getPagination: (pagination: any) => void;
 };
 
 function List({
   timeclocks,
+  totalCount,
   startClockTime,
+  extractAllMsSqlData,
+  removeTimeclock,
   getActionBar,
-  extractAllMySqlData,
-  removeTimeclock
+  showSideBar,
+  getPagination
 }: Props) {
   const trigger = (
     <Button btnStyle={'success'} icon="plus-circle">
@@ -85,7 +100,7 @@ function List({
         />
       </CustomRangeContainer>
       <FlexCenter>
-        <Button onClick={() => extractAllMySqlData(startDate, endDate)}>
+        <Button onClick={() => extractAllMsSqlData(startDate, endDate)}>
           Extract all data
         </Button>
       </FlexCenter>
@@ -94,11 +109,13 @@ function List({
 
   const actionBarRight = (
     <>
-      <ModalTrigger
-        title={__('Extract all data')}
-        trigger={extractTrigger}
-        content={extractContent}
-      />
+      {!isEnabled('bichil') && (
+        <ModalTrigger
+          title={__('Extract all data')}
+          trigger={extractTrigger}
+          content={extractContent}
+        />
+      )}
       <ModalTrigger
         title={__('Start shift')}
         trigger={trigger}
@@ -145,7 +162,9 @@ function List({
           <th>{__('Overnight')}</th>
           <th>{__('Location')}</th>
           <th>{__('Status')}</th>
-          <th>{__('Action')}</th>
+          <th>
+            <TextAlignCenter>{__('Action')}</TextAlignCenter>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -163,6 +182,9 @@ function List({
   );
 
   getActionBar(actionBar);
+  showSideBar(true);
+  getPagination(<Pagination count={totalCount} />);
+
   return content;
 }
 

@@ -32,8 +32,20 @@ const inventoryMutations = {
       isRPC: true
     });
 
-    const productCodes = products.map(p => p.code) || [];
+    const uoms = await sendProductsMessage({
+      subdomain,
+      action: 'uoms.find',
+      data: {},
+      isRPC: true,
+      defaultValue: []
+    });
 
+    const uomById = {};
+    for (const uom of uoms) {
+      uomById[uom._id] = uom;
+    }
+
+    const productCodes = products.map(p => p.code) || [];
     const response = await sendRequest({
       url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
@@ -70,12 +82,16 @@ const inventoryMutations = {
     for (const resProd of result) {
       if (productCodes.includes(resProd.code)) {
         const product = productByCode[resProd.code];
+        const uom = uomById[product.uomId];
 
         if (
           (resProd.name === product.name ||
             resProd.nickname === product.name) &&
           resProd.unit_price === product.unitPrice &&
-          resProd.barcodes === (product.barcodes || []).join(',')
+          resProd.barcodes === (product.barcodes || []).join(',') &&
+          (resProd.vat_type || '') === (product.taxType || '') &&
+          uom &&
+          resProd.measure_unit_code === uom.code
         ) {
           matchedCount = matchedCount + 1;
         } else {

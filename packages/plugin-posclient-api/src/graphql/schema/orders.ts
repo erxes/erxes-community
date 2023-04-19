@@ -29,6 +29,7 @@ const addEditParams = `
   type: String!,
   branchId: String,
   customerId: String,
+  customerType: String,
   deliveryInfo: JSON,
   billType: String,
   registerNumber: String,
@@ -85,6 +86,7 @@ export const types = `
     message: String
     getInformation: String
     returnBillId: String
+    stocks: JSON
   }
 
 
@@ -107,6 +109,7 @@ export const types = `
     deliveryInfo: JSON
     origin: String
     customer: PosCustomer
+    customerType: String,
     items: [PosOrderItem]
     user: PosUser
     putResponses: [PosPutResponse]
@@ -139,6 +142,7 @@ export const ordersQueryParams = `
   searchValue: String,
   statuses: [String],
   customerId: String,
+  customerType: String,
   startDate: Date,
   endDate: Date,
   page: Int,

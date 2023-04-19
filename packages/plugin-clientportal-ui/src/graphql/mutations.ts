@@ -31,14 +31,21 @@ const createOrUpdateConfig = `
     $styles: StylesParams
     $mobileResponsive: Boolean
     $googleCredentials: JSON
+    $googleClientId: String
+    $googleRedirectUri: String
+    $googleClientSecret: String
+    $facebookAppId: String
 
     $kbToggle: Boolean
     $publicTaskToggle: Boolean
     $ticketToggle: Boolean
     $dealToggle: Boolean
     $taskToggle: Boolean
+    $dealToggle: Boolean
     $otpConfig: OTPConfigInput
     $mailConfig: MailConfigInput
+    $manualVerificationConfig: JSON
+    $passwordVerificationConfig: JSON
   ) {
     clientPortalConfigUpdate(
       _id: $_id,
@@ -58,6 +65,7 @@ const createOrUpdateConfig = `
       ticketLabel: $ticketLabel,
       dealLabel: $dealLabel,
       taskLabel: $taskLabel,
+      dealLabel: $dealLabel,
       taskStageId: $taskStageId,
       taskPipelineId: $taskPipelineId,
       taskBoardId: $taskBoardId,
@@ -70,14 +78,21 @@ const createOrUpdateConfig = `
       styles: $styles
       mobileResponsive: $mobileResponsive
       googleCredentials: $googleCredentials
+      googleClientId: $googleClientId
+      googleRedirectUri: $googleRedirectUri
+      googleClientSecret: $googleClientSecret
+      facebookAppId: $facebookAppId
 
       kbToggle: $kbToggle,
       publicTaskToggle: $publicTaskToggle,
       ticketToggle: $ticketToggle,
       dealToggle: $dealToggle,
       taskToggle: $taskToggle,
+      dealToggle: $dealToggle,
       otpConfig: $otpConfig
       mailConfig: $mailConfig
+      manualVerificationConfig: $manualVerificationConfig
+      passwordVerificationConfig: $passwordVerificationConfig
     ) {
       ${commonFields}
     }
@@ -184,6 +199,12 @@ const clientPortalCommentsRemove = `
   }
 `;
 
+const changeVerificationStatus = `
+mutation ClientPortalUsersChangeVerificationStatus($status: ClientPortalUserVerificationStatus!, $userId: String!) {
+  clientPortalUsersChangeVerificationStatus(status: $status, userId: $userId)
+}
+`;
+
 export default {
   createOrUpdateConfig,
   remove,
@@ -192,5 +213,6 @@ export default {
   clientPortalUsersRemove,
   verifyUsers,
   clientPortalCommentsAdd,
-  clientPortalCommentsRemove
+  clientPortalCommentsRemove,
+  changeVerificationStatus
 };

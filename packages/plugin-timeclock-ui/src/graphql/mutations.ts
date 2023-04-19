@@ -1,3 +1,31 @@
+const absenceTypeParams = `
+$name: String, 
+$explRequired: Boolean,
+$attachRequired: Boolean,
+$shiftRequest: Boolean,
+
+$requestType: String,
+$requestTimeType: String
+$requestHoursPerDay: Float
+`;
+
+const absenceTypeValues = `
+name: $name,
+explRequired: $explRequired,
+attachRequired: $attachRequired,
+shiftRequest: $shiftRequest,
+requestType: $requestType,
+requestTimeType: $requestTimeType,
+requestHoursPerDay: $requestHoursPerDay
+`;
+
+const timeclockEdit = `
+  mutation timeclockEdit($_id: String!, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
+    timeclockEdit(_id: $_id, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+      _id
+    }
+  }
+  `;
 const timeclockRemove = `
   mutation timeclockRemove($_id: String!){
     timeclockRemove(_id: $_id)
@@ -20,6 +48,14 @@ const timeclockStop = `
   }
 `;
 
+const timeclockCreate = `
+    mutation timeclockCreate($userId: String, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
+      timeclockCreate(userId: $userId, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+        _id
+      }
+    }
+`;
+
 const sendAbsenceRequest = `
   mutation sendAbsenceRequest($startTime: Date, $endTime: Date, $userId: String, $reason: String, $explanation: String, $attachment: AttachmentInput, $absenceTypeId: String){
     sendAbsenceRequest(startTime: $startTime, endTime: $endTime, userId: $userId, reason: $reason, explanation: $explanation, attachment: $attachment, absenceTypeId: $absenceTypeId){
@@ -27,16 +63,21 @@ const sendAbsenceRequest = `
     }
   }`;
 
+const removeAbsenceRequest = `
+mutation removeAbsenceRequest($_id: String){
+  removeAbsenceRequest(_id: $_id)
+}`;
+
 const absenceTypeAdd = `
-  mutation absenceTypeAdd($name: String, $explRequired: Boolean, $attachRequired: Boolean, $shiftRequest: Boolean){
-    absenceTypeAdd(name: $name, explRequired: $explRequired, attachRequired: $attachRequired, shiftRequest: $shiftRequest){
+  mutation absenceTypeAdd(${absenceTypeParams}){
+    absenceTypeAdd(${absenceTypeValues}){
       _id
     }
   }`;
 
 const absenceTypeEdit = `
-  mutation absenceTypeEdit($_id: String, $name: String, $explRequired: Boolean, $attachRequired: Boolean, $shiftRequest: Boolean){
-    absenceTypeEdit(_id: $_id, name: $name, explRequired: $explRequired, attachRequired: $attachRequired, shiftRequest: $shiftRequest){
+  mutation absenceTypeEdit($_id: String, ${absenceTypeParams}){
+    absenceTypeEdit(_id: $_id, ${absenceTypeValues}){
       _id
     }
   }`;
@@ -47,20 +88,20 @@ const absenceTypeRemove = `
   }`;
 
 const sendScheduleRequest = `
-  mutation sendScheduleRequest($userId: String, $shifts: [ShiftsRequestInput], $scheduleConfigId: String){
-    sendScheduleRequest(userId: $userId, shifts: $shifts, scheduleConfigId: $scheduleConfigId){
+  mutation sendScheduleRequest($userId: String, $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+    sendScheduleRequest(userId: $userId, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
     }
   }`;
 
 const submitSchedule = `
-  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftsRequestInput], $scheduleConfigId: String){
-    submitSchedule(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, scheduleConfigId: $scheduleConfigId){
+  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+    submitSchedule(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
     }
   }`;
 
-const solveAbsence = `
+const solveAbsenceRequest = `
   mutation solveAbsenceRequest($_id: String, $status: String){
     solveAbsenceRequest(_id: $_id, status: $status){
       _id
@@ -131,13 +172,13 @@ const scheduleShiftRemove = `
     scheduleShiftRemove(_id: $_id)
   }`;
 
-const scheduleConfigAdd = `mutation scheduleConfigAdd($scheduleName: String, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
-  scheduleConfigAdd(scheduleName: $scheduleName, configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
+const scheduleConfigAdd = `mutation scheduleConfigAdd($scheduleName: String, $lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
+  scheduleConfigAdd(scheduleName: $scheduleName, lunchBreakInMins : $lunchBreakInMins, configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
     _id
   }
 }`;
-const scheduleConfigEdit = `mutation scheduleConfigEdit($_id: String, $scheduleName: String, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
-  scheduleConfigEdit(_id: $_id, scheduleName: $scheduleName,configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
+const scheduleConfigEdit = `mutation scheduleConfigEdit($_id: String, $scheduleName: String,$lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
+  scheduleConfigEdit(_id: $_id, scheduleName: $scheduleName, lunchBreakInMins : $lunchBreakInMins, configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
     _id
   }
 }`;
@@ -162,9 +203,30 @@ const deviceConfigRemove = `mutation deviceConfigRemove($_id: String){
   deviceConfigRemove(_id: $_id)
 }`;
 
-const extractAllDataFromMySQL = `
-mutation extractAllDataFromMySQL($startDate: String, $endDate: String){
-  extractAllDataFromMySQL(startDate: $startDate, endDate: $endDate){
+const extractAllDataFromMsSQL = `
+mutation extractAllDataFromMsSQL($startDate: String, $endDate: String){
+  extractAllDataFromMsSQL(startDate: $startDate, endDate: $endDate){
+    _id
+  }
+}`;
+
+const extractTimeLogsFromMsSql = `
+mutation extractTimeLogsFromMsSQL($startDate: String, $endDate: String){
+  extractTimeLogsFromMsSQL(startDate: $startDate, endDate: $endDate){
+    _id
+  }
+}`;
+
+const createTimeClockFromLog = `
+mutation createTimeClockFromLog($userId: String, $timelog: Date){
+  createTimeClockFromLog(userId: $userId, timelog: $timelog){
+    _id
+  }
+}`;
+
+const submitCheckInOutRequest = `
+mutation submitCheckInOutRequest($checkType: String, $userId: String, $checkTime: Date){
+  submitCheckInOutRequest(checkType: $checkType, userId: $userId, checkTime: $checkTime){
     _id
   }
 }`;
@@ -176,25 +238,39 @@ export default {
   absenceTypeAdd,
   absenceTypeEdit,
   absenceTypeRemove,
-  solveAbsence,
+
+  solveAbsenceRequest,
+  removeAbsenceRequest,
   solveSchedule,
   solveShift,
+
+  timeclockEdit,
+  timeclockCreate,
   timeclockRemove,
   timeclockStart,
   timeclockStop,
+
   payDateAdd,
   payDateEdit,
   payDateRemove,
+
   holidayAdd,
   holidayEdit,
   holidayRemove,
+
   scheduleRemove,
   scheduleShiftRemove,
   scheduleConfigAdd,
   scheduleConfigEdit,
   scheduleConfigRemove,
+
   deviceConfigAdd,
   deviceConfigEdit,
   deviceConfigRemove,
-  extractAllDataFromMySQL
+
+  submitCheckInOutRequest,
+
+  extractAllDataFromMsSQL,
+  extractTimeLogsFromMsSql,
+  createTimeClockFromLog
 };

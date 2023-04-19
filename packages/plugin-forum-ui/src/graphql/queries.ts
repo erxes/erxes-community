@@ -13,6 +13,7 @@ const categoriesAll = `
       parentId
 
       parent {
+        _id
         name
       }
     }
@@ -113,6 +114,7 @@ const forumPostsQuery = `
       title
       state
       thumbnail
+      thumbnailAlt
       categoryId
       createdAt
       updatedAt
@@ -365,8 +367,16 @@ const pageDetail = `
 const pageRefetch = ['ForumPages', 'ForumPage'];
 
 const pages = `
-query ForumPages($sort: JSON) {
-  forumPages(sort: $sort) {
+query ForumPages(
+    $sort: JSON
+    $limit: Int 
+    $offset: Int 
+  ) {
+  forumPages(
+    sort: $sort
+    limit: $limit
+    offset: $offset
+  ) {
     _id
     code
     content
@@ -465,6 +475,7 @@ query ForumQuizzes($limit: Int, $offset: Int, $sort: JSON) {
     _id
     name
     description
+    state
     company {
       _id
       primaryName
@@ -486,8 +497,8 @@ query ForumQuizzes($limit: Int, $offset: Int, $sort: JSON) {
 `;
 
 const quizDetail = `
-query ForumQuiz($id: ID!) {
-  forumQuiz(_id: $id) {
+query ForumQuiz($_id: ID!) {
+  forumQuiz(_id: $_id) {
     _id
     postId
     companyId

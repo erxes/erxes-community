@@ -1,12 +1,15 @@
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
+import Select from 'react-select-plus';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import {
   CustomRangeContainer,
   FlexRow,
   FlexColumn,
   FlexColumnMargined,
-  FlexCenter
+  FlexCenter,
+  ConfigFormWrapper,
+  ToggleDisplay
 } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Form from '@erxes/ui/src/components/form/Form';
@@ -16,7 +19,7 @@ import {
   IAbsenceType,
   IDeviceConfig,
   IPayDates,
-  ISchedule,
+  IScheduleForm,
   IScheduleConfig
 } from '../../types';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -41,9 +44,19 @@ type Props = {
 function ConfigForm(props: Props) {
   const { renderButton, history, scheduleConfig, deviceConfig } = props;
   const { absenceType, holiday, payDate } = props;
-  const [isShiftRequest, setShiftRequest] = useState(
-    (absenceType && absenceType.shiftRequest) || false
+
+  const [requestTime, setRequestTime] = useState(
+    absenceType?.requestTimeType || 'by day'
   );
+
+  const [requestType, setRequestType] = useState(
+    absenceType?.requestType || 'shift request'
+  );
+
+  const [hoursPerDay, setHoursPerDay] = useState(8);
+
+  const [payPeriod, setPayPeriod] = useState('');
+
   const [explanationRequired, setExplRequired] = useState(
     (absenceType && absenceType.explRequired) || false
   );
@@ -54,8 +67,6 @@ function ConfigForm(props: Props) {
   const [deviceExtractRequired, setDeviceExtractRequired] = useState(
     (deviceConfig && deviceConfig.extractRequired) || false
   );
-
-  const [payPeriod, setPayPeriod] = useState('');
 
   const defaultStartTime = new Date(
     new Date().toLocaleDateString() + ' 08:30:00'
@@ -76,7 +87,7 @@ function ConfigForm(props: Props) {
       (scheduleConfig ? scheduleConfig.shiftEnd : '17:00:00')
   );
 
-  const configDaysTime: ISchedule = {
+  const configDaysTime: IScheduleForm = {
     configTime: {
       shiftStart: shiftStartTime,
       shiftEnd: shiftEndTime
@@ -104,7 +115,7 @@ function ConfigForm(props: Props) {
     );
   });
 
-  const [configDays, setConfigDays] = useState<ISchedule>({
+  const [configDays, setConfigDays] = useState<IScheduleForm>({
     ...configDaysTime
   });
 
@@ -119,11 +130,17 @@ function ConfigForm(props: Props) {
 
   const { afterSave, closeModal } = props;
 
+  const toggleRequestType = e => {
+    setRequestType(e.value);
+  };
+  const toggleRequestTime = e => {
+    setRequestTime(e.value);
+  };
   const togglePayPeriod = e => {
     setPayPeriod(e.target.value);
   };
-  const toggleShiftRequest = e => {
-    setShiftRequest(e.target.checked);
+  const onAbsenceHoursPerDay = e => {
+    setHoursPerDay(parseInt(e.target.value, 10));
   };
   const toggleExplRequired = e => {
     setExplRequired(e.target.checked);
@@ -139,7 +156,6 @@ function ConfigForm(props: Props) {
     payDates[dateNum] = newDate;
     setpayDates({ ...payDates });
   };
-
   const onHolidayStartDateChange = newStartDate => {
     setHolidayDates({ ...holidayDates, startingDate: newStartDate });
   };
@@ -155,6 +171,7 @@ function ConfigForm(props: Props) {
       endDate?: Date;
       absenceName?: string;
       scheduleName?: string;
+      lunchBreak: number;
       explRequired?: boolean;
       attachRequired?: boolean;
       shiftRequest?: boolean;
@@ -169,14 +186,26 @@ function ConfigForm(props: Props) {
         if (absenceType) {
           values._id = absenceType._id;
         }
-
-        return {
+        let generateValues: any = {
           name: values.absenceName,
+
+          requestType: `${requestType}`,
+          requestTimeType: requestTime,
+
           explRequired: explanationRequired,
           attachRequired: attachmentRequired,
-          shiftRequest: isShiftRequest,
+          shiftRequest: requestType === 'shift request',
           _id: values._id
         };
+
+        if (requestTime === 'by day') {
+          generateValues = {
+            ...generateValues,
+            requestHoursPerDay: hoursPerDay || 8
+          };
+        }
+
+        return generateValues;
 
       case 'holiday':
         if (holiday) {
@@ -207,6 +236,7 @@ function ConfigForm(props: Props) {
         const returnVariables: {
           _id?: string;
           scheduleName?: string;
+          lunchBreakInMins?: number;
           configShiftStart?: string;
           configShiftEnd?: string;
           scheduleConfig: any[];
@@ -218,6 +248,8 @@ function ConfigForm(props: Props) {
           returnVariables._id = scheduleConfig._id;
         }
         const timeFormat = 'HH:mm';
+
+        returnVariables.lunchBreakInMins = parseInt(`${values.lunchBreak}`, 10);
 
         Object.keys(configDays).forEach(day_key => {
           if (day_key.toLocaleLowerCase() !== 'configtime') {
@@ -236,6 +268,7 @@ function ConfigForm(props: Props) {
             ).format(timeFormat);
           }
         });
+
         return returnVariables;
 
       case 'deviceConfig':
@@ -317,52 +350,88 @@ function ConfigForm(props: Props) {
     const { values, isSubmitted } = formProps;
 
     return (
-      <FlexColumn marginNum={20}>
-        <ControlLabel required={true}>Name</ControlLabel>
-        <FormControl
-          {...formProps}
-          name="absenceName"
-          defaultValue={absenceType && absenceType.name}
-          required={true}
-          autoFocus={true}
-        />
-        <FlexRow>
-          <ControlLabel>Shift Request</ControlLabel>
+      <ConfigFormWrapper>
+        <FlexColumn marginNum={30}>
+          <ControlLabel required={true}>Name</ControlLabel>
           <FormControl
-            name="shiftRequest"
-            componentClass="checkbox"
-            defaultChecked={isShiftRequest}
-            onChange={toggleShiftRequest}
+            {...formProps}
+            name="absenceName"
+            defaultValue={absenceType && absenceType.name}
+            required={true}
+            autoFocus={true}
           />
-        </FlexRow>
-        <FlexRow>
-          <ControlLabel>Explanation Required</ControlLabel>
-          <FormControl
-            name="explRequired"
-            componentClass="checkbox"
-            defaultChecked={explanationRequired}
-            onChange={toggleExplRequired}
+
+          <ControlLabel required={true}>Request Type</ControlLabel>
+
+          <Select
+            value={requestType}
+            onChange={toggleRequestType}
+            placeholder="Select type"
+            multi={false}
+            options={['shift request', 'paid absence', 'unpaid absence'].map(
+              ipt => ({
+                value: ipt,
+                label: __(ipt)
+              })
+            )}
           />
-        </FlexRow>
-        <FlexRow>
-          <ControlLabel>Attachment Required</ControlLabel>
-          <FormControl
-            name="attachRequired"
-            componentClass="checkbox"
-            defaultChecked={attachmentRequired}
-            onChange={toggleAttachRequired}
+
+          <ControlLabel required={true}>Request Time Period</ControlLabel>
+
+          <Select
+            value={requestTime}
+            onChange={toggleRequestTime}
+            placeholder="Select type"
+            multi={false}
+            options={['by day', 'by hour'].map(ipt => ({
+              value: ipt,
+              label: __(ipt)
+            }))}
           />
-        </FlexRow>
-        <FlexCenter style={{ marginTop: '10px' }}>
-          {renderButton({
-            name: 'absenceType',
-            values: generateDoc(values, 'absenceType'),
-            isSubmitted,
-            callback: closeModal || afterSave,
-            object: absenceType || null
-          })}
-        </FlexCenter>
-      </FlexColumn>
+          <ToggleDisplay display={requestTime === 'by day'}>
+            <FlexRow>
+              <ControlLabel>Hour(s) per day</ControlLabel>
+              <div style={{ width: '20%' }}>
+                <FormControl
+                  type="number"
+                  inline={true}
+                  align="center"
+                  value={hoursPerDay}
+                  onChange={onAbsenceHoursPerDay}
+                />
+              </div>
+            </FlexRow>
+          </ToggleDisplay>
+
+          <FlexRow>
+            <ControlLabel>Explanation Required</ControlLabel>
+            <FormControl
+              name="explRequired"
+              componentClass="checkbox"
+              defaultChecked={explanationRequired}
+              onChange={toggleExplRequired}
+            />
+          </FlexRow>
+          <FlexRow>
+            <ControlLabel>Attachment Required</ControlLabel>
+            <FormControl
+              name="attachRequired"
+              componentClass="checkbox"
+              defaultChecked={attachmentRequired}
+              onChange={toggleAttachRequired}
+            />
+          </FlexRow>
+          <FlexCenter style={{ marginTop: '10px' }}>
+            {renderButton({
+              name: 'absenceType',
+              values: generateDoc(values, 'absenceType'),
+              isSubmitted,
+              callback: closeModal || afterSave,
+              object: absenceType || null
+            })}
+          </FlexCenter>
+        </FlexColumn>
+      </ConfigFormWrapper>
     );
   };
 
@@ -448,7 +517,7 @@ function ConfigForm(props: Props) {
         />
 
         <FlexColumnMargined marginNum={10}>
-          {renderConfigTime()}
+          {renderConfigTime(formProps)}
         </FlexColumnMargined>
 
         <FlexCenter style={{ marginTop: '10px' }}>
@@ -537,7 +606,7 @@ function ConfigForm(props: Props) {
     setConfigDays(newconfigDays);
   };
 
-  const renderConfigTime = () => {
+  const renderConfigTime = (formProps: IFormProps) => {
     return (
       <>
         <FlexRow>
@@ -552,6 +621,32 @@ function ConfigForm(props: Props) {
             changeStartTime={onStartTimeChange}
             timeOnly={true}
           />
+        </FlexRow>
+
+        <FlexRow>
+          <ControlLabel>Lunch break</ControlLabel>
+
+          <div
+            style={{
+              display: 'flex',
+              width: '67%',
+              alignItems: 'center'
+            }}
+          >
+            <div style={{ width: '10%' }}>
+              <FormControl
+                {...formProps}
+                defaultValue={
+                  scheduleConfig ? scheduleConfig?.lunchBreakInMins : 30
+                }
+                align="center"
+                name="lunchBreak"
+                type="number"
+                required={true}
+              />
+            </div>
+            <div style={{ width: '80%' }}>minutes</div>
+          </div>
         </FlexRow>
         <FlexRow>
           <ControlLabel>Valid Check-In</ControlLabel>

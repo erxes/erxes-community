@@ -51,12 +51,17 @@ export const commonFields = `
   }
   mobileResponsive
   googleCredentials
+  googleClientId
+  googleClientSecret
+  googleRedirectUri
+  facebookAppId
 
   kbToggle
   publicTaskToggle
   ticketToggle
   dealToggle
   taskToggle
+  dealToggle
   otpConfig {
     smsTransporterType
     content
@@ -69,6 +74,19 @@ export const commonFields = `
     subject
     invitationContent
     registrationContent
+  }
+
+  manualVerificationConfig {
+    userIds
+    verifyCustomer
+    verifyCompany
+  }
+
+  passwordVerificationConfig {
+    verifyByOTP
+    emailSubject
+    emailContent
+    smsContent
   }
 `;
 
@@ -104,6 +122,17 @@ export const basicFields = `
 export const clientPortalUserFields = `
   ${basicFields}
   createdAt
+
+  verificationRequest {
+    status
+    attachments{
+      name
+      url
+      size
+      type
+    }
+    description
+  }
 
   customFieldsData
 `;

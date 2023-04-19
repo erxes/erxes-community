@@ -76,8 +76,8 @@ function General({
   kbToggle,
   publicTaskToggle,
   taskToggle,
-  ticketToggle,
-  dealToggle
+  dealToggle,
+  ticketToggle
 }: Props) {
   const [show, setShow] = useState<boolean>(false);
 
@@ -389,6 +389,28 @@ function General({
             'dealToggle',
             dealToggle || false
           )}
+        {isEnabled('cards') &&
+          renderFeatureBlock(
+            'deals',
+            <>
+              {renderControl({
+                label: 'Deals',
+                subtitle: 'Shown name on menu',
+                formValueName: 'dealLabel',
+                formValue: dealLabel,
+                placeholder: 'Please enter a label for Deal'
+              })}
+              {renderBoardSelect({
+                type: 'deal',
+                stageId: dealStageId,
+                pipelineId: dealPipelineId,
+                boardId: dealBoardId
+              })}
+            </>,
+            'dealToggle',
+            dealToggle || false
+          )}
+
         {isEnabled('cards') &&
           renderFeatureBlock(
             'tasks',

@@ -376,11 +376,13 @@ class GenerateGroup extends React.Component<Props, State> {
             };
           }
 
+          const object = this.props.object || {};
+
           return {
             fieldId,
             operator: logic.logicOperator,
             logicValue: logic.logicValue,
-            fieldValue: this.props.object[logic.fieldId || ''],
+            fieldValue: object[logic.fieldId || ''],
             validation: allFields.find(e => e._id === fieldId)?.validation
           };
         });
@@ -484,7 +486,13 @@ class GenerateGroups extends React.Component<GroupsProps> {
   };
 
   render() {
-    const { loading, fieldsGroups, customFieldsData, isDetail } = this.props;
+    const {
+      loading,
+      fieldsGroups = [],
+      customFieldsData,
+      isDetail
+    } = this.props;
+
     const groups = fieldsGroups.filter(gro => !gro.parentId);
     const groupsWithParents = fieldsGroups.filter(gro => !!gro.parentId);
 
