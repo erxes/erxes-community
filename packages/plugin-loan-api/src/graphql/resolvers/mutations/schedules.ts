@@ -1,15 +1,14 @@
 import { SCHEDULE_STATUS } from '../../../models/definitions/constants';
 import { reGenerateSchedules } from '../../../models/utils/scheduleUtils';
-import { IPerHoliday } from '../../../models/utils/utils';
 import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import redis from '../../../redis';
+import { sendMessageBroker } from '../../../messageBroker';
 
 const scheduleMutations = {
   regenSchedules: async (
     _root,
     { contractId }: { contractId: string },
-    { user, models }: IContext
+    { models, subdomain }: IContext
   ) => {
     const doneSchedules = await models.Schedules.find({
       contractId,
@@ -22,21 +21,31 @@ const scheduleMutations = {
       }
     }
 
-    // const holidayConfig = (await getConfig(
-    //   models,
-    //   redis,
-    //   'holidayConfig',
-    //   {}
-    // )) as [IPerHoliday];
-    // const perHolidays = Object.keys(holidayConfig).map(key => ({
-    //   month: Number(holidayConfig[key].month) - 1,
-    //   day: Number(holidayConfig[key].day)
-    // }));
+    const holidayConfig: any = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'configs.findOne',
+        data: {
+          query: {
+            code: 'holidayConfig'
+          }
+        },
+        isRPC: true
+      },
+      'core'
+    );
+
+    const perHolidays = !holidayConfig?.value
+      ? []
+      : Object.keys(holidayConfig.value).map(key => ({
+          month: Number(holidayConfig.value[key].month) - 1,
+          day: Number(holidayConfig.value[key].day)
+        }));
 
     const contract = await models.Contracts.getContract({
       _id: contractId
     });
-    await reGenerateSchedules(models, contract, []);
+    await reGenerateSchedules(models, contract, perHolidays);
 
     return 'ok';
   }
