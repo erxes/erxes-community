@@ -1,13 +1,17 @@
-import { insuranceTypeSchema } from './definitions/insuranceTypes';
+import {
+  IInsuranceType,
+  insuranceTypeSchema
+} from './definitions/insuranceTypes';
 import { IInsuranceTypeDocument } from '../models/definitions/insuranceTypes';
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
+import { FilterQuery } from 'mongodb';
 
 export interface IInsuranceTypeModel extends Model<IInsuranceTypeDocument> {
-  getInsuranceType(selector: any);
-  createInsuranceType(doc);
-  updateInsuranceType(_id, doc);
-  removeInsuranceTypes(_ids);
+  getInsuranceType(selector: FilterQuery<IInsuranceTypeDocument>);
+  createInsuranceType(doc: IInsuranceType);
+  updateInsuranceType(_id: string, doc: IInsuranceTypeDocument);
+  removeInsuranceTypes(_ids: string[]);
 }
 
 export const loadInsuranceTypeClass = (models: IModels) => {
@@ -17,7 +21,9 @@ export const loadInsuranceTypeClass = (models: IModels) => {
      * Get InsuranceType
      */
 
-    public static async getInsuranceType(selector: any) {
+    public static async getInsuranceType(
+      selector: FilterQuery<IInsuranceTypeDocument>
+    ) {
       const insuranceType = await models.InsuranceTypes.findOne(selector);
 
       if (!insuranceType) {
@@ -30,14 +36,17 @@ export const loadInsuranceTypeClass = (models: IModels) => {
     /**
      * Create a insuranceType
      */
-    public static async createInsuranceType(doc) {
+    public static async createInsuranceType(doc: IInsuranceType) {
       return models.InsuranceTypes.create(doc);
     }
 
     /**
      * Update InsuranceType
      */
-    public static async updateInsuranceType(_id, doc) {
+    public static async updateInsuranceType(
+      _id: string,
+      doc: IInsuranceTypeDocument
+    ) {
       await models.InsuranceTypes.updateOne({ _id }, { $set: doc });
 
       return models.InsuranceTypes.findOne({ _id });
@@ -46,7 +55,7 @@ export const loadInsuranceTypeClass = (models: IModels) => {
     /**
      * Remove InsuranceType
      */
-    public static async removeInsuranceTypes(_ids) {
+    public static async removeInsuranceTypes(_ids: string[]) {
       // await models.InsuranceTypes.getInsuranceTypeCatogery(models, { _id });
       // TODO: check collateralsData
       return models.InsuranceTypes.deleteMany({ _id: { $in: _ids } });

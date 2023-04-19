@@ -7,6 +7,7 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
+import { IInsuranceTypeDocument } from '../../../models/definitions/insuranceTypes';
 
 const insuranceTypeMutations = {
   insuranceTypesAdd: async (
@@ -48,14 +49,20 @@ const insuranceTypeMutations = {
 
   insuranceTypesEdit: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: IInsuranceTypeDocument & { yearPercents: string },
     { models, user, subdomain }: IContext
   ) => {
-    doc.yearPercents = doc.yearPercents.split(', ');
+    const modifiedDoc: any = {
+      ...doc,
+      yearPercents: doc.yearPercents.split(', ')
+    };
     const insuranceType = await models.InsuranceTypes.getInsuranceType({
       _id
     });
-    const updated = await models.InsuranceTypes.updateInsuranceType(_id, doc);
+    const updated = await models.InsuranceTypes.updateInsuranceType(
+      _id,
+      modifiedDoc
+    );
 
     const logData = {
       type: 'insuranceType',

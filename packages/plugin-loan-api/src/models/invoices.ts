@@ -1,12 +1,13 @@
-import { invoiceSchema } from './definitions/invoices';
+import { IInvoice, invoiceSchema } from './definitions/invoices';
 import { IInvoiceDocument } from '../models/definitions/invoices';
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
+import { FilterQuery } from 'mongodb';
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
-  getInvoice(selector: any);
-  createInvoice(doc);
-  updateInvoice(_id, doc);
-  removeInvoices(_ids);
+  getInvoice(selector: FilterQuery<IInvoiceDocument>);
+  createInvoice(doc: IInvoice | any);
+  updateInvoice(_id: string, doc: IInvoice | any);
+  removeInvoices(_ids: string[]);
 }
 export const loadInvoiceClass = (models: IModels) => {
   class Invoice {
@@ -15,7 +16,7 @@ export const loadInvoiceClass = (models: IModels) => {
      * Get Invoice
      */
 
-    public static async getInvoice(selector: any) {
+    public static async getInvoice(selector: FilterQuery<IInvoiceDocument>) {
       const invoice = await models.Invoices.findOne(selector);
 
       if (!invoice) {
@@ -28,7 +29,7 @@ export const loadInvoiceClass = (models: IModels) => {
     /**
      * Create a invoice
      */
-    public static async createInvoice(doc) {
+    public static async createInvoice(doc: IInvoice) {
       doc.total =
         (doc.payment || 0) +
         (doc.interestEve || 0) +
@@ -42,7 +43,7 @@ export const loadInvoiceClass = (models: IModels) => {
     /**
      * Update Invoice
      */
-    public static async updateInvoice(_id, doc) {
+    public static async updateInvoice(_id: string, doc: IInvoiceDocument) {
       await models.Invoices.updateOne({ _id }, { $set: doc });
 
       return models.Invoices.findOne({ _id });
@@ -51,7 +52,7 @@ export const loadInvoiceClass = (models: IModels) => {
     /**
      * Remove Invoice
      */
-    public static async removeInvoices(_ids) {
+    public static async removeInvoices(_ids: string[]) {
       return models.Invoices.deleteMany({ _id: { $in: _ids } });
     }
   }
