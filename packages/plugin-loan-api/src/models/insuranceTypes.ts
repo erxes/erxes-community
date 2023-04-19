@@ -10,7 +10,7 @@ import { FilterQuery } from 'mongodb';
 export interface IInsuranceTypeModel extends Model<IInsuranceTypeDocument> {
   getInsuranceType(selector: FilterQuery<IInsuranceTypeDocument>);
   createInsuranceType(doc: IInsuranceType);
-  updateInsuranceType(_id: string, doc: IInsuranceTypeDocument);
+  updateInsuranceType(_id: string, doc: IInsuranceType);
   removeInsuranceTypes(_ids: string[]);
 }
 

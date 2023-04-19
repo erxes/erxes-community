@@ -7,15 +7,21 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
-import { IInsuranceTypeDocument } from '../../../models/definitions/insuranceTypes';
+import {
+  IInsuranceType,
+  IInsuranceTypeDocument
+} from '../../../models/definitions/insuranceTypes';
 
 const insuranceTypeMutations = {
   insuranceTypesAdd: async (
     _root,
-    doc,
+    doc: IInsuranceType & { yearPercents: string | number[] },
     { user, docModifier, models, subdomain }: IContext
   ) => {
-    doc.yearPercents = doc.yearPercents.split(', ');
+    doc.yearPercents =
+      typeof doc.yearPercents === 'string'
+        ? doc.yearPercents.split(',').map(a => Number(a))
+        : [];
 
     //TODO check this method
     const insuranceType = models.InsuranceTypes.createInsuranceType(
@@ -49,20 +55,22 @@ const insuranceTypeMutations = {
 
   insuranceTypesEdit: async (
     _root,
-    { _id, ...doc }: IInsuranceTypeDocument & { yearPercents: string },
+    {
+      _id,
+      ...doc
+    }: IInsuranceTypeDocument & { yearPercents: string | number[] },
     { models, user, subdomain }: IContext
   ) => {
-    const modifiedDoc: any = {
-      ...doc,
-      yearPercents: doc.yearPercents.split(', ')
-    };
+    doc.yearPercents =
+      typeof doc.yearPercents === 'string'
+        ? doc.yearPercents.split(',').map(a => Number(a))
+        : [];
+
     const insuranceType = await models.InsuranceTypes.getInsuranceType({
       _id
     });
-    const updated = await models.InsuranceTypes.updateInsuranceType(
-      _id,
-      modifiedDoc
-    );
+
+    const updated = await models.InsuranceTypes.updateInsuranceType(_id, doc);
 
     const logData = {
       type: 'insuranceType',
