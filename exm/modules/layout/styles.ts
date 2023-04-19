@@ -518,45 +518,20 @@ const SectionBodyItem = styled.div`
 const AuthWrapper = styled.div`
   width: 100%;
   height: 100%;
-  display: flex;
-  flex: auto;
   position: relative;
-  background-color: #f0f0f0;
-  align-items: center;
-  justify-content: center;
-
-  @media (max-width: 768px) {
-    overflow: auto;
-    padding-bottom: ${dimensions.coreSpacing * 5}px;
-  }
 `;
 
 const AuthBox = styled.div`
   position: relative;
-  margin: auto;
   display: flex;
   flex: 1;
-  min-height: 600px;
-  max-height: 800px;
-  border-radius: 32px;
-  box-shadow: 0px 24px 32px rgba(0, 0, 0, 0.04),
-    0px 16px 24px rgba(0, 0, 0, 0.04), 0px 4px 8px rgba(0, 0, 0, 0.04),
-    0px 0px 1px rgba(0, 0, 0, 0.04);
+  height: 90%;
   overflow: hidden;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
 `;
 
 const AuthItem = styledTS<{ order?: number }>(styled.div)`
   position: relative;
   width: 50%;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-    order: ${props => (props.order ? props.order : 0)};
-  }
 `;
 
 const AuthContent = styled.div`
@@ -569,142 +544,57 @@ const AuthContent = styled.div`
   background: ${colors.colorWhite};
 `;
 
-const AuthCustomDescription = styled.div`
-  width: 100%;
-  height: 100%;
-  background: ${colors.colorPrimaryDark} url('/images/stars.png') repeat top
-    center;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 70px;
-
-  &:before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: transparent url('/images/twinkling.png') repeat top center;
-    animation: ${twinkling} 200s linear infinite;
-  }
-
-  @media (max-width: 768px) {
-    padding: 40px;
-    overflow: hidden;
-    padding-bottom: ${dimensions.coreSpacing * 5}px;
-  }
-
-  img {
-    position: absolute;
-    width: 100px;
-    top: 100px;
-  }
-
-  h1 {
-    position: relative;
-    font-weight: bold;
-    font-size: 48px;
-    color: ${colors.colorWhite};
-    margin: 0px;
-
-    @media (max-width: 768px) {
-      font-size: 38px;
-    }
-  }
-
-  h2 {
-    position: relative;
-    font-size: 18px;
-    color: ${colors.colorWhite};
-    line-height: 1.5em;
-    font-weight: 900;
-    margin: 1.75em 0;
-
-    @media (max-width: 768px) {
-      font-size: 16px;
-    }
-  }
-
-  p {
-    position: relative;
-    color: ${colors.colorWhite};
-    margin-bottom: 50px;
-    font-size: 18px;
-    line-height: 1.8em;
-  }
-`;
-
 const AuthDescription = styled.div`
-  width: 100%;
+  width: 60%;
   height: 100%;
   background: ${
     thBackground
       ? thBackground
-      : `${colors.colorPrimaryDark} url('/images/stars.png') repeat top center;`
+      : `${colors.colorPrimaryDark} url('/static/auth-cover.png') no-repeat top center;`
   }
+  background-size: cover;
   position: relative;
   overflow: hidden;
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   padding: 70px;
-
-  &:before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: ${
-      thBackground
-        ? thBackground
-        : `transparent url('/images/twinkling.png') repeat top center`
-    }
-    animation: ${twinkling} 200s linear infinite;
-  }
-
-  @media (max-width: 768px) {
-    padding: 40px;
-    overflow: hidden;
-    padding-bottom: ${dimensions.coreSpacing * 5}px;
-  }
+  border-bottom-left-radius: 25px;
 
   img {
     position: relative;
-    width: 100px;
+    width: 200px;
     margin-bottom: 5%;
   }
+`;
 
-  h1 {
-    position: relative;
-    font-weight: bold;
-    font-size: 48px;
-    color: ${thColor || colors.colorWhite};
-    margin: 0px;
+const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: ${dimensions.coreSpacing}px 100px;
+  font-size: 13px;
+  color: ${colors.colorCoreBlueGray};
+  background: ${colors.colorWhite};
 
-    @media (max-width: 768px) {
-      font-size: 38px;
-    }
+  span > b {
+    color: ${colors.colorSecondary};
   }
 
-  h2 {
-    position: relative;
-    font-size: 28px;
-    font-weight: 400;
-    line-height: 1.5em;
-    color: ${thColor || colors.colorWhite};
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
 
-    @media (max-width: 768px) {
-      font-size: 16px;
+    li {
+      padding-right: ${dimensions.coreSpacing}px;
     }
-  }
-
-  p {
-    position: relative;
-    color: ${thColor || colors.colorWhite};
-    margin-bottom: 50px;
-    font-size: 20px;
-    line-height: 1.8em;
   }
 `;
 
@@ -760,7 +650,7 @@ export {
   AuthWrapper,
   AuthBox,
   AuthItem,
-  AuthCustomDescription,
+  Footer,
   AuthDescription,
   AuthContent,
   MobileRecommend,

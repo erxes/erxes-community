@@ -1,5 +1,5 @@
 import AuthLayout from "../modules/layout/components/AuthLayout";
-import HomeContainer from "../modules/feed/containers/Home";
+import HomeContainer from "../modules/exmFeed/containers/Home";
 import React from "react";
 import SignIn from "../modules/auth/containers/SignIn";
 

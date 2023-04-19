@@ -1,92 +1,52 @@
 import {
   AuthBox,
   AuthContent,
-  AuthCustomDescription,
   AuthDescription,
   AuthItem,
   AuthWrapper,
-  CenterContent,
-  MobileRecommend,
+  Footer,
 } from "../styles";
-import { bustIframe, getThemeItem } from "../../utils";
 
-import Button from "../../common/Button";
-import Container from "react-bootstrap/Container";
+import Link from "next/link";
 import React from "react";
 import { __ } from "../../../utils";
+import { bustIframe } from "../../utils";
 
 type Props = {
   content: React.ReactNode;
-  description?: React.ReactNode;
-  col?: { first: number; second: number };
 };
 
 class AuthLayout extends React.Component<Props, {}> {
-  renderContent(desciption: string, link: string) {
-    return (
-      <MobileRecommend>
-        <CenterContent>
-          <div>
-            <b>{__("erxes Inc")}</b>
-            <div>{__(desciption)}</div>
-          </div>
-          <Button btnStyle="link" size="small" href={link}>
-            {__("Get")}
-          </Button>
-        </CenterContent>
-      </MobileRecommend>
-    );
+  componentDidMount() {
+    // click-jack attack defense
+    bustIframe();
   }
 
-  renderRecommendMobileVersion() {
-    const { userAgent = [] } =
-      typeof window !== "undefined" ? navigator : ({} as any);
-
-    if (userAgent.indexOf("Mobile") !== -1) {
-      if (userAgent.match(/Android/i)) {
-        return this.renderContent(
-          "Download android app for free on the Google play",
-          "https://play.google.com/store/apps/details?id=io.erxes.erxes_android&fbclid=IwAR1bVPBSE0pC_KUNNjOJQA4upb1AuTUfqFcDaHTHTptyke7rNvuvb2mgwb0"
-        );
-      }
-    }
-
-    return null;
-  }
-
-  renderDesciption() {
-    const { description } = this.props;
-
-    if (description) {
-      return (
-        <AuthCustomDescription>
-          <img src="/images/logo.png" alt="erxes" />
-          {description}
-        </AuthCustomDescription>
-      );
-    }
-
+  renderCover() {
     return (
       <AuthDescription>
-        <h1>
-          {getThemeItem("motto") || __("Grow your business better and faster")}
-        </h1>
-        <h2>
-          {getThemeItem("login_page_description") || (
-            <>
-              {__("Single ")}
-              <b>{__("experience operating system (XOS)")}</b>
-              {__(" to align your entire business")}
-            </>
-          )}
-        </h2>
+        <img src="/static/logos/erxes-logo-white.svg" />
       </AuthDescription>
     );
   }
 
-  componentDidMount() {
-    // click-jack attack defense
-    bustIframe();
+  renderFooter() {
+    return (
+      <Footer>
+        <span>
+          @ {new Date().getFullYear()}, Made with ❤️ by <b>erxes Team</b> for a
+          better web
+        </span>
+        <ul>
+          <li>
+            <Link href={"#"}>Blog</Link>
+          </li>
+          <li>
+            <Link href={"#"}>License</Link>
+          </li>
+        </ul>
+      </Footer>
+    );
   }
 
   render() {
@@ -94,15 +54,13 @@ class AuthLayout extends React.Component<Props, {}> {
 
     return (
       <AuthWrapper>
-        <Container>
-          <AuthBox>
-            <AuthItem order={1}>
-              <AuthContent>{content}</AuthContent>
-            </AuthItem>
-            <AuthItem order={0}>{this.renderDesciption()}</AuthItem>
-          </AuthBox>
-          {this.renderRecommendMobileVersion()}
-        </Container>
+        <AuthBox>
+          <AuthItem order={1}>
+            <AuthContent>{content}</AuthContent>
+          </AuthItem>
+          {this.renderCover()}
+        </AuthBox>
+        {this.renderFooter()}
       </AuthWrapper>
     );
   }

@@ -5,6 +5,11 @@ body {
   font-family: 'Open Sans', sans-serif;
   line-height: 1.5;
   color: #444;
+  height: 100%;
+}
+
+#__next, #__next>div {
+  height: 100%;
 }
 
 a,

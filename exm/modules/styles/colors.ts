@@ -13,6 +13,7 @@ const colorCoreBlue = "#3B85F4";
 const colorCoreDarkBlue = "#0a1e41";
 const colorCoreBlack = "#393C40";
 const colorCoreGray = "#888";
+const colorCoreBlueGray = "#A0AEC0";
 const colorCoreLightGray = "#AAAEB3";
 
 const colorLightGray = "#AAA";
@@ -74,6 +75,7 @@ export default {
   colorCoreGreen,
   colorCoreBlack,
   colorCoreGray,
+  colorCoreBlueGray,
   colorCoreLightGray,
   colorCoreSunYellow,
   colorWhite,

@@ -1,6 +1,7 @@
 import { colors, dimensions, typography } from '../styles';
 
 import { getThemeItem } from '../utils';
+import { rgba } from '../styles/ecolor';
 import styled from 'styled-components';
 
 const thBackground = getThemeItem('background');
@@ -8,7 +9,7 @@ const thBackground = getThemeItem('background');
 const AuthBox = styled.div`
   width: 100%;
   background-color: ${colors.colorWhite};
-  padding: 30px 40px;
+  padding: 20%;
   border-radius: 2px;
   max-height: 700px;
   overflow: auto;
@@ -20,34 +21,36 @@ const AuthBox = styled.div`
 
   h2 {
     color: ${thBackground || colors.colorPrimary};
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 800;
     margin: 0 0 10px;
   }
   
   p {
-    color: #666;
-    font-size: 16px;
-  }
-
-  input {
-    padding: 1.75em 1em;
-    color: ${colors.colorCoreBlack};
-    font-size: 16px;
-    outline: 0;
-    border-radius: 8px;
-    background-color: ${colors.bgLight}
-    border: 1.5px solid ${colors.bgLight}
-
-    &:focus {
-      outline: 0;
-      box-shadow: none;
-      border: 1.5px solid ${colors.borderDarker}
-    }
+    color: ${colors.colorCoreBlueGray};
+    font-size: 14px;
   }
 
   form {
     margin-top: ${dimensions.unitSpacing + dimensions.coreSpacing}px;
+
+    label {
+      font-size: 13px;
+      color: #2D3748;
+    }
+
+    input {
+      padding: 1.75em 1em;
+      color: ${colors.colorCoreBlack};
+      font-size: 14px;
+      outline: 0;
+      border-radius: 15px;
+      border: 1px solid #E2E8F0;
+
+      &::placeholder {
+        color: ${rgba(colors.colorCoreBlueGray, 0.8)}
+      }
+    }
   }
 
   button {
@@ -72,8 +75,13 @@ const AuthBox = styled.div`
   a {
     display: block;
     text-align: center;
-    color: ${colors.colorCoreSunYellow}
-    font-size: 16px;
+    color: ${colors.colorCoreBlueGray};
+    font-size: 14px;
+    transition: all ease .3s;
+
+    &:hover {
+      color: ${colors.colorSecondary};
+    }
   }
 
   @media (max-width: 768px) {

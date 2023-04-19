@@ -1,4 +1,5 @@
 import { AuthBox } from "../styles";
+import ControlLabel from "../../common/form/Label";
 import Form from "../../common/form/Form";
 import FormControl from "../../common/form/Control";
 import FormGroup from "../../common/form/Group";
@@ -21,16 +22,18 @@ class SignIn extends React.Component<Props> {
     return (
       <>
         <FormGroup>
+          <ControlLabel uppercase={false}>{__("Email")}</ControlLabel>
           <FormControl
             {...formProps}
             name="email"
             type="email"
-            placeholder={__("Enter your email")}
+            placeholder={__("Enter your email address")}
             required={true}
           />
         </FormGroup>
 
         <FormGroup>
+          <ControlLabel uppercase={false}>{__("Password")}</ControlLabel>
           <FormControl
             {...formProps}
             name="password"
@@ -48,16 +51,9 @@ class SignIn extends React.Component<Props> {
     );
   };
 
-  renderLogo() {
-    const logo = "/images/logo-dark.png";
-    const thLogo = getThemeItem("logo");
-    return thLogo ? readFile(thLogo) : logo;
-  }
-
   render() {
     return (
       <AuthBox>
-        <img src={this.renderLogo()} alt="erxes" />
         <h2>{__("Welcome!")}</h2>
         <p>{__("Please sign in to your account to continue")}</p>
         <Form renderContent={this.renderContent} />
