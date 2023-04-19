@@ -1,4 +1,5 @@
 import { sendRequest } from '@erxes/api-utils/src';
+import { IRequestParams } from '@erxes/api-utils/src/requests';
 
 const ApiKey1: string = '50dfa9d00f67df44-cbcbe4fcc2f83742-d80626370fd9edff';
 const boldId1: string = 'xKRVb9BFQEPU1KNU+d+ktw==';
@@ -21,10 +22,10 @@ type AuthHeaderType = {
 };
 
 const authHeader: AuthHeaderType = {
-  'X-Viber-Auth-Token': testKey
+  'X-Viber-Auth-Token': ApiKey2
 };
 
-interface RequestInterface {
+interface RequestInterface extends IRequestParams {
   method: 'POST' | 'GET';
   headers: AuthHeaderType;
   url: string;
@@ -100,7 +101,7 @@ export const broadcastMessage = async () => {
   return await sendRequest(payload);
 };
 
-export const getAccountInfo = async () => {
+export const getAccountInfo = async (): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
