@@ -121,7 +121,6 @@ ${
     ticketToggle: Boolean,
     dealToggle: Boolean,
     taskToggle: Boolean,
-    dealToggle: Boolean,
   }
 
   type Styles {

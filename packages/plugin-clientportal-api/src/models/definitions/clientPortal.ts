@@ -168,8 +168,16 @@ export const clientPortalSchema = new Schema({
   manualVerificationConfig: field({
     type: {
       userIds: field({ type: [String], required: true }),
-      verifyCustomer: field({ type: Boolean, optional: true, default: false }),
-      verifyCompany: field({ type: Boolean, optional: true, default: false })
+      verifyCustomer: field({
+        type: Boolean,
+        optional: true,
+        default: false
+      }),
+      verifyCompany: field({
+        type: Boolean,
+        optional: true,
+        default: false
+      })
     },
     optional: true
   }),
@@ -200,8 +208,8 @@ export const clientPortalSchema = new Schema({
   kbToggle: field({ type: Boolean }),
   publicTaskToggle: field({ type: Boolean }),
   ticketToggle: field({ type: Boolean }),
-  dealToggle: field({ type: Boolean }),
   taskToggle: field({ type: Boolean }),
+  dealToggle: field({ type: Boolean }),
 
   createdAt: field({
     type: Date,
@@ -211,7 +219,11 @@ export const clientPortalSchema = new Schema({
 
   passwordVerificationConfig: field({
     type: {
-      verifyByOTP: field({ type: Boolean, optional: true, default: false }),
+      verifyByOTP: field({
+        type: Boolean,
+        optional: true,
+        default: false
+      }),
       emailSubject: field({ type: String, optional: true }),
       emailContent: field({ type: String, optional: true }),
       smsContent: field({ type: String, optional: true })
