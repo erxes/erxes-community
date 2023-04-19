@@ -1,3 +1,4 @@
+import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 import { IContext } from '../../connectionResolver';
 import { sendCoreMessage, sendMessageBroker } from '../../messageBroker';
 import { SCHEDULE_STATUS } from '../../models/definitions/constants';
@@ -41,7 +42,8 @@ const Contracts = {
   },
   async customers(contract: IContract, {}, { subdomain }: IContext) {
     if (contract.customerType !== 'customer') return null;
-    return sendMessageBroker(
+
+    const customer: ICustomer = await sendMessageBroker(
       {
         subdomain,
         action: 'customers.findOne',
@@ -50,10 +52,11 @@ const Contracts = {
       },
       'contacts'
     );
+    return customer;
   },
-  companies(contract: IContract, {}, { subdomain }: IContext) {
+  async companies(contract: IContract, {}, { subdomain }: IContext) {
     if (contract.customerType !== 'company') return null;
-    return sendMessageBroker(
+    const company = await sendMessageBroker(
       {
         subdomain,
         action: 'companies.findOne',
@@ -62,6 +65,8 @@ const Contracts = {
       },
       'contacts'
     );
+
+    return company;
   },
   async insurances(
     contract: IContractDocument,

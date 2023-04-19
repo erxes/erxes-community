@@ -58,8 +58,8 @@ export const types = () => `
     riskExpert: JSON
 
     contractType: ContractType
-    companies: [Company]
-    customers: [Customer]
+    companies: Company
+    customers: Customer
 
     insurances: JSON
     collaterals: JSON
