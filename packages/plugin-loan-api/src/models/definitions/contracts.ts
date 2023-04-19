@@ -34,6 +34,9 @@ export interface IContract {
   marginAmount?: number;
   leaseAmount: number;
   feeAmount?: number;
+  /**
+   * @property {number} tenor зээлийн хугацаа сараар
+   */
   tenor: number;
   interestRate: number;
   unduePercent: number;
@@ -51,6 +54,11 @@ export interface IContract {
   salvageAmount?: number;
   salvagePercent?: number;
   salvageTenor?: number;
+
+  customerId?: string;
+  customerType?: string;
+
+  relCustomer?: [{ customerId: string; customerType: string }];
 
   relationExpertId?: string;
   leasingExpertId?: string;
@@ -221,7 +229,21 @@ export const contractSchema = schemaHooksWrapper(
       optional: true,
       label: 'Salvage Tenor'
     }),
-
+    customerId: field({
+      type: String,
+      optional: true,
+      label: 'Customer ID'
+    }),
+    customerType: field({
+      type: String,
+      optional: true,
+      label: 'Customer Type'
+    }),
+    relCustomer: field({
+      type: [{ customerId: String, customerType: String }],
+      optional: true,
+      label: "Loan related customer's"
+    }),
     relationExpertId: field({
       type: String,
       optional: true,

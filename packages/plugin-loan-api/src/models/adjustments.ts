@@ -1,7 +1,8 @@
-import { adjustmentSchema } from './definitions/adjustments';
+import { IAdjustment, adjustmentSchema } from './definitions/adjustments';
 import { Model } from 'mongoose';
 import { IAdjustmentDocument } from '../models/definitions/adjustments';
 import { IModels } from '../connectionResolver';
+import { FilterQuery } from 'mongodb';
 
 export const loadAdjustmentClass = (models: IModels) => {
   class Adjustment {
@@ -10,7 +11,7 @@ export const loadAdjustmentClass = (models: IModels) => {
      * Get Adjustment
      */
 
-    public static async getAdjustment(selector: any) {
+    public static async getAdjustment(selector: FilterQuery<IAdjustment>) {
       const adjustment = await models.Adjustments.findOne(selector);
 
       if (!adjustment) {
@@ -23,14 +24,14 @@ export const loadAdjustmentClass = (models: IModels) => {
     /**
      * Create a adjustment
      */
-    public static async createAdjustment(doc) {
+    public static async createAdjustment(doc: IAdjustment) {
       return models.Adjustments.create(doc);
     }
 
     /**
      * Update Adjustment
      */
-    public static async updateAdjustment(_id, doc) {
+    public static async updateAdjustment(_id: string, doc: IAdjustment) {
       await models.Adjustments.updateOne({ _id }, { $set: doc });
 
       return models.Adjustments.findOne({ _id });
@@ -39,7 +40,7 @@ export const loadAdjustmentClass = (models: IModels) => {
     /**
      * Remove Adjustment
      */
-    public static async removeAdjustments(_ids) {
+    public static async removeAdjustments(_ids: string[]) {
       return models.Adjustments.deleteMany({ _id: { $in: _ids } });
     }
   }
@@ -47,8 +48,8 @@ export const loadAdjustmentClass = (models: IModels) => {
   return adjustmentSchema;
 };
 export interface IAdjustmentModel extends Model<IAdjustmentDocument> {
-  getAdjustment(selector: any);
-  createAdjustment(doc);
-  updateAdjustment(_id, doc);
-  removeAdjustments(_ids);
+  getAdjustment(selector: FilterQuery<IAdjustmentDocument>);
+  createAdjustment(doc: IAdjustment);
+  updateAdjustment(_id: string, doc: IAdjustment);
+  removeAdjustments(_ids: string[]);
 }

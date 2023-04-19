@@ -9,34 +9,44 @@ import { getFullDate, getNumber } from './utils/utils';
 import { Model } from 'mongoose';
 import { IContractDocument } from '../models/definitions/contracts';
 import { IModels } from '../connectionResolver';
+import { FilterQuery } from 'mongodb';
+import { ITransaction } from './definitions/transactions';
+import { ICollateralDataDoc } from './definitions/contracts';
+import { IInsurancesData } from './definitions/contracts';
+import { ICollateralData } from './definitions/contracts';
 
-const getLeaseAmount = collateralsData => {
+const getLeaseAmount = (collateralsData: ICollateralDataDoc[]) => {
   let lease = 0;
   let margin = 0;
 
   for (const data of collateralsData) {
-    lease += parseFloat(data.leaseAmount);
-    margin += parseFloat(data.marginAmount);
+    lease += parseFloat(data.leaseAmount.toString());
+    margin += parseFloat(data.marginAmount.toString());
   }
 
   return { lease, margin };
 };
 
-const getInsurancAmount = (insurancesData, collateralsData) => {
+const getInsurancAmount = (
+  insurancesData: IInsurancesData[],
+  collateralsData: ICollateralData[]
+) => {
   let result = 0;
   for (const data of insurancesData) {
-    result += parseFloat(data.amount);
+    result += parseFloat((data.amount || 0).toString());
   }
 
   for (const data of collateralsData) {
-    result += parseFloat(data.insuranceAmount || 0);
+    result += parseFloat((data.insuranceAmount || 0).toString());
   }
   return result;
 };
 export interface IContractModel extends Model<IContractDocument> {
-  getContract(selector: any);
-  createContract(doc: IContract);
-  updateContract(_id, doc: IContract);
+  getContract(
+    selector: FilterQuery<IContractDocument>
+  ): Promise<IContractDocument>;
+  createContract(doc: IContract): Promise<IContractDocument>;
+  updateContract(_id, doc: IContract): Promise<IContractDocument>;
   closeContract(messageBroker, memoryStorage, doc: ICloseVariable);
   removeContracts(_ids);
 }
@@ -47,7 +57,9 @@ export const loadContractClass = (models: IModels) => {
      * Get Contract
      */
 
-    public static async getContract(selector: any) {
+    public static async getContract(
+      selector: FilterQuery<IContractDocument>
+    ): Promise<IContractDocument> {
       const contract = await models.Contracts.findOne(selector);
 
       if (!contract) {
@@ -60,7 +72,9 @@ export const loadContractClass = (models: IModels) => {
     /**
      * Create a contract
      */
-    public static async createContract(doc: IContract) {
+    public static async createContract(
+      doc: IContract
+    ): Promise<IContractDocument> {
       doc.startDate = getFullDate(doc.startDate || new Date());
       doc.number = await getNumber(models, doc.contractTypeId);
 
@@ -71,7 +85,7 @@ export const loadContractClass = (models: IModels) => {
       doc.feeAmount = (leaseAmount / 100) * 0.5;
 
       doc.insuranceAmount = getInsurancAmount(
-        doc.insuranceAmount || [],
+        doc.insurancesData || [],
         doc.collateralsData || []
       );
       const contract = await models.Contracts.create(doc);
@@ -82,7 +96,10 @@ export const loadContractClass = (models: IModels) => {
     /**
      * Update Contract
      */
-    public static async updateContract(_id, doc: IContract) {
+    public static async updateContract(
+      _id,
+      doc: IContract
+    ): Promise<IContractDocument | null> {
       const oldContract = await models.Contracts.getContract({
         _id
       });
@@ -102,7 +119,7 @@ export const loadContractClass = (models: IModels) => {
       doc.feeAmount = (doc.leaseAmount / 100) * 0.5;
 
       doc.insuranceAmount = getInsurancAmount(
-        doc.insuranceAmount || [],
+        doc.insurancesData || [],
         doc.collateralsData || []
       );
       await models.Contracts.updateOne({ _id }, { $set: doc });
@@ -129,14 +146,13 @@ export const loadContractClass = (models: IModels) => {
         doc.closeDate
       );
 
-      const trDoc = {
+      const trDoc: ITransaction = {
         contractId: doc.contractId,
         payDate: doc.closeDate,
         description: doc.description,
         total: closeInfo.total
       };
       await models.Transactions.createTransaction(
-        models,
         messageBroker,
         memoryStorage,
         trDoc

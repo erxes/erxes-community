@@ -1,10 +1,12 @@
+import { IModels } from '../../connectionResolver';
 import { SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
+import { ISchedule } from '../definitions/schedules';
 import { getCalcedAmounts } from './transactionUtils';
 import { getFullDate } from './utils';
 
 export const getCloseInfo = async (
-  models,
+  models: IModels,
   memoryStorage,
   contract: IContractDocument,
   date: Date
@@ -12,7 +14,7 @@ export const getCloseInfo = async (
   const closeDate = getFullDate(date);
   const contractId = contract._id;
 
-  let lastPaySchedule = await models.RepaymentSchedules.findOne({
+  let lastPaySchedule = await models.Schedules.findOne({
     contractId,
     status: { $in: [SCHEDULE_STATUS.DONE, SCHEDULE_STATUS.LESS] }
   })
@@ -40,16 +42,16 @@ export const getCloseInfo = async (
     payDate: closeDate
   })) as any;
 
-  const pendingSchedules = await models.RepaymentSchedules.find({
+  const pendingSchedules = await models.Schedules.find({
     contractId,
     payDate: { $gt: lastPaySchedule.payDate },
     debt: { $exists: true }
   });
 
   const debt = pendingSchedules.length
-    ? pendingSchedules.reduce((a, c) => {
-        return { debt: (a.debt || 0) + (c.debt || 0) };
-      }).debt
+    ? pendingSchedules.reduce((a: number, c: ISchedule) => {
+        return (a || 0) + (c.debt || 0);
+      }, 0)
     : 0;
 
   const result = {
