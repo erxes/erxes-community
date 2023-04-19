@@ -7,12 +7,15 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
-import { IAdjustmentDocument } from '../../../models/definitions/adjustments';
+import {
+  IAdjustment,
+  IAdjustmentDocument
+} from '../../../models/definitions/adjustments';
 
 const adjustmentMutations = {
   adjustmentsAdd: async (
     _root,
-    doc,
+    doc: IAdjustment,
     { user, docModifier, models, subdomain }: IContext
   ) => {
     doc.createdBy = user._id;
