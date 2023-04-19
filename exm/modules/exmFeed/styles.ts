@@ -225,58 +225,6 @@ export const Col = styledTS<{ width?: number }>(styled.div)`
   padding: ${dimensions.coreSpacing}px;
 `;
 
-export const Sidebar = styled.ul`
-  list-style: none;
-  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
-
-  li {
-    border-radius: ${dimensions.unitSpacing}px;
-    padding: ${dimensions.unitSpacing - 4}px 12px;
-    transition: 0.3s;
-    cursor: pointer;
-    font-weight: 700;
-    margin-bottom: ${dimensions.unitSpacing - 5}px;
-    width: 180px;
-    display: flex;
-    align-items: center;
-
-    > i {
-      margin-right: ${dimensions.unitSpacing}px;
-
-      &.feed {
-        color: ${colors.colorSecondary};
-      }
-      &.team {
-        color: ${colors.colorCoreBlue};
-      }
-      &.discover {
-        color: ${colors.colorCoreRed};
-      }
-      &.learn {
-        color: ${colors.colorCoreGreen};
-      }
-      &.leaderboard {
-        color: ${colors.colorCoreOrange};
-      }
-      &.structure {
-        color: ${colors.colorCoreTeal};
-      }
-      &.score {
-        color: ${colors.colorCoreYellow};
-      }
-    }
-
-    &.active {
-      background: ${rgba(colors.colorSecondary, 0.1)};
-      color: ${colors.colorSecondary};
-    }
-
-    &:hover {
-      background: ${colors.bgLight};
-    }
-  }
-`;
-
 export const AvatarImg = styled.img`
   width: ${dimensions.coreSpacing + 6}px;
   height: ${dimensions.coreSpacing + 6}px;

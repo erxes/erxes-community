@@ -57,7 +57,7 @@ class SignIn extends React.Component<Props> {
         <h2>{__("Welcome!")}</h2>
         <p>{__("Please sign in to your account to continue")}</p>
         <Form renderContent={this.renderContent} />
-        <Link href="/forgot-password">{__("Forgot password?")}</Link>
+        <Link href="/forgotPassword">{__("Forgot password?")}</Link>
       </AuthBox>
     );
   }

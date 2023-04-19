@@ -28,7 +28,7 @@ const colorWhite = "#FFF";
 // backgrounds
 const bgMain = "#EDF1F5";
 const bgDark = rgba(colorBlack, 0.95);
-const bgLight = "#FAFAFA";
+const bgLight = "#F8F9FA";
 const bgActive = "#F0F0F0";
 const bgGray = "#e6e6e6";
 const bgLightPurple = "#F7F8FC";

@@ -34,7 +34,7 @@ const AuthBox = styled.div`
   form {
     margin-top: ${dimensions.unitSpacing + dimensions.coreSpacing}px;
 
-    label {
+    div > label {
       font-size: 13px;
       color: #2D3748;
     }

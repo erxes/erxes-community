@@ -4,7 +4,6 @@ import { TabTitle, Tabs } from "../../common/tabs";
 
 import Form from "../containers/feed/Form";
 import Icon from "../../common/Icon";
-import LeftSidebar from "./LeftSidebar";
 import Link from "next/link";
 import List from "../containers/feed/List";
 import ThankForm from "../containers/feed/ThankForm";
@@ -94,12 +93,8 @@ export default function Home(props: Props) {
 
   return (
     <Wrapper
-      header={
-        <Wrapper.Header title={"Feed"} breadcrumb={[{ title: "Feed" }]} />
-      }
-      leftSidebar={<LeftSidebar />}
+      header={<Wrapper.Header title={"Feed"} />}
       content={renderContent()}
-      hasBorder={true}
     />
   );
 }

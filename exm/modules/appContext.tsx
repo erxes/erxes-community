@@ -2,7 +2,6 @@ import React, { createContext, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 import { CurrentUserQueryResponse } from "./auth/types";
-import { clientPortalGetConfig } from "./main/graphql/queries";
 import queries from "./auth/graphql/queries";
 
 const AppContext = createContext({});

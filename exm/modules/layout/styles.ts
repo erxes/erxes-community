@@ -138,6 +138,102 @@ const HeaderItems = styledTS<{ rightAligned?: boolean; hasFlex?: boolean }>(
   }
 `;
 
+const MainWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  transition: width 0.3s;
+`;
+
+const Sidebar = styled.ul`
+  list-style: none;
+  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+
+  li {
+    border-radius: ${dimensions.unitSpacing + 5}px;
+    padding: ${dimensions.unitSpacing}px 12px;
+    transition: 0.3s;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: ${dimensions.unitSpacing - 5}px;
+    display: flex;
+    align-items: center;
+    color: ${colors.colorCoreBlueGray};
+
+    > i {
+      margin-right: ${dimensions.unitSpacing}px;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 3.5px 5.5px rgba(0, 0, 0, 0.02);
+      background: ${colors.colorWhite};
+      border-radius: 12px;
+
+      &.feed {
+        color: ${colors.colorSecondary};
+      }
+      &.team {
+        color: ${colors.colorCoreBlue};
+      }
+      &.discover {
+        color: ${colors.colorCoreRed};
+      }
+      &.learn {
+        color: ${colors.colorCoreGreen};
+      }
+      &.leaderboard {
+        color: ${colors.colorCoreOrange};
+      }
+      &.structure {
+        color: ${colors.colorCoreTeal};
+      }
+      &.score {
+        color: ${colors.colorCoreYellow};
+      }
+    }
+
+    &.active {
+      background: ${colors.colorWhite};
+      box-shadow: 0px 3.5px 5.5px rgba(0, 0, 0, 0.02);
+      color: ${colors.textPrimary};
+
+      > i {
+        color: ${colors.colorWhite};
+        
+        &.feed {
+          background: ${colors.colorSecondary};
+        }
+        &.team {
+          background: ${colors.colorCoreBlue};
+        }
+        &.discover {
+          background: ${colors.colorCoreRed};
+        }
+        &.learn {
+          background: ${colors.colorCoreGreen};
+        }
+        &.leaderboard {
+          background: ${colors.colorCoreOrange};
+        }
+        &.structure {
+          background: ${colors.colorCoreTeal};
+        }
+        &.score {
+          background: ${colors.colorCoreYellow};
+        }
+      }
+    }
+
+    &:hover {
+      color: ${colors.textSecondary};
+    }
+  }
+`;
+
 const SideContent = styledTS<{
   wide?: boolean;
   half?: boolean;
@@ -645,12 +741,88 @@ const NotFoundWrapper = styled.div`
   }
 `;
 
+const Layout = styled.div`
+  height: 100%;
+  display: flex;
+  flex: 1;
+  max-width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: ${colors.bgLight};
+`;
+
+const LeftNavigation = styled.div`
+  width: 250px;
+  position: relative;
+
+  .image-wrapper {
+    padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+    margin: 0 ${dimensions.coreSpacing}px ${dimensions.unitSpacing}px;
+    text-align: center;
+    border-bottom: 1px solid ${colors.borderPrimary};
+      
+    img {
+      width: 100px;
+    }
+  }
+`;
+
+const HelpBox = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: ${colors.colorPrimaryDark};
+  color: ${colors.colorWhite};
+  height: 170px;
+  font-size: 13px;
+  margin: ${dimensions.coreSpacing}px;
+  padding: ${dimensions.coreSpacing}px;
+  border-radius: ${dimensions.unitSpacing + 5}px;
+  overflow: hidden;
+
+  p {
+    margin-bottom: ${dimensions.unitSpacing}px;
+  }
+
+  button {
+    font-weight: 600;
+    padding: 6px 20px;
+    border-radius: 10px;
+  }
+
+  .icon-wrapper {
+    > i {
+      background: ${colors.colorWhite};
+      width: 35px;
+      height: 35px;
+      display: block;
+      border-radius: 12px;
+      margin-bottom: ${dimensions.coreSpacing}px;
+      color: ${colors.colorPrimaryDark};
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &:before {
+    content: '';
+    background: url(/static/radius.png) no-repeat center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+`;
+
 export {
   PageHeader,
   AuthWrapper,
   AuthBox,
   AuthItem,
   Footer,
+  HelpBox,
+  LeftNavigation,
   AuthDescription,
   AuthContent,
   MobileRecommend,
@@ -658,6 +830,7 @@ export {
   HeightedWrapper,
   Contents,
   MainHead,
+  MainWrapper,
   MainContent,
   ContentBox,
   ContenFooter,
@@ -681,7 +854,9 @@ export {
   SidebarCollapse,
   WhiteBoxRoot,
   WhiteBox,
+  Layout,
   BarItems,
+  Sidebar,
   SidebarFlexRow,
   FlexItem,
   FlexContent,
