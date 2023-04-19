@@ -7,6 +7,7 @@ import {
 } from './confirmUtils';
 import { IContractDocument } from '../definitions/contracts';
 import { getPureDate } from './utils';
+import { IModels } from '../../connectionResolver';
 
 const saveJournals = async (
   models,
@@ -259,13 +260,13 @@ const mainPayEbarimt = async (
 };
 
 export const ConfirmBase = async (
-  models,
+  models: IModels,
   messageBroker,
   memoryStorage,
   contract: IContractDocument
 ) => {
   const journalConfig = (
-    await models.ContractTypes.findOne({ _id: contract.contractTypeId })
+    await models.ContractTypes.findOne({ _id: contract.contractTypeId }).lean()
   ).config;
   const config = await getConfig(models, memoryStorage, 'ERKHET', {});
   const { customerCode, billType } = await checkCompanyRd(

@@ -249,12 +249,11 @@ const contractMutations = {
   contractConfirm: async (
     _root,
     { contractId }: { contractId: string },
-    { models, checkPermission, user, messageBroker, memoryStorage }
+    { models }: IContext
   ) => {
-    const contract: IContractDocument = await models.Contracts.getContract(
-      models,
-      { _id: contractId }
-    );
+    const contract: IContractDocument = await models.Contracts.getContract({
+      _id: contractId
+    });
 
     if (!contract.number) {
       throw new Error('Number is required');
@@ -268,7 +267,7 @@ const contractMutations = {
     }
 
     return {
-      result: await ConfirmBase(models, messageBroker, memoryStorage, contract)
+      result: await ConfirmBase(models, messageBroker, redis, contract)
     };
   }
 };

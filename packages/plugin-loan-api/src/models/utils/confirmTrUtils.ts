@@ -8,6 +8,7 @@ import {
 import { IContractDocument } from '../definitions/contracts';
 import { ITransactionDocument } from '../definitions/transactions';
 import { getPureDate } from './utils';
+import { IModels } from '../../connectionResolver';
 
 export interface IConformity {
   mainType: string;
@@ -349,15 +350,15 @@ const interestEbarimt = async (
 };
 
 export const ConfirmTrBase = async (
-  models,
+  models: IModels,
   messageBroker,
   memoryStorage,
   contract: IContractDocument,
   transaction: ITransactionDocument
 ) => {
-  const journalConfig = (
-    await models.ContractTypes.findOne({ _id: contract.contractTypeId })
-  ).config;
+  const journalConfig = await models.ContractTypes.findOne({
+    _id: contract.contractTypeId
+  }).lean();
   const config = await getConfig(models, memoryStorage, 'ERKHET', {});
   const { customerCode, billType } = await checkCompanyRd(
     models,
