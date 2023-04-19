@@ -1,5 +1,6 @@
 import {
   ICollateralData,
+  IContract,
   IContractDocument
 } from '../../../models/definitions/contracts';
 import { gatherDescriptions } from '../../../utils';
@@ -20,10 +21,10 @@ import redis from '../../../redis';
 const contractMutations = {
   contractsAdd: async (
     _root,
-    doc,
-    { user, docModifier, models, subdomain }: IContext
+    doc: IContract,
+    { user, models, subdomain }: IContext
   ) => {
-    const contract = models.Contracts.createContract(docModifier(doc));
+    const contract = models.Contracts.createContract(doc);
 
     const logData = {
       type: 'contract',
@@ -53,14 +54,11 @@ const contractMutations = {
 
   contractsEdit: async (
     _root,
-    { _id, ...doc },
-    { models, user, docModifier, subdomain }: IContext
+    { _id, ...doc }: IContractDocument,
+    { models, user, subdomain }: IContext
   ) => {
     const contract = await models.Contracts.getContract({ _id });
-    const updated = await models.Contracts.updateContract(
-      _id,
-      docModifier(doc)
-    );
+    const updated = await models.Contracts.updateContract(_id, doc);
 
     const logData = {
       type: 'contract',
@@ -89,24 +87,20 @@ const contractMutations = {
    * to close contract
    */
 
-  contractsClose: async (
-    _root,
-    { ...doc },
-    { models, user, docModifier, subdomain }: IContext
-  ) => {
+  contractsClose: async (_root, doc, { models, user, subdomain }: IContext) => {
     const contract = await models.Contracts.getContract({
       _id: doc.contractId
     });
     const updated = await models.Contracts.closeContract(
       messageBroker,
       redis,
-      docModifier(doc)
+      doc
     );
 
     const logData = {
       type: 'contract',
       object: contract,
-      newData: { ...doc },
+      newData: doc,
       updatedDocument: updated,
       extraParams: { models }
     };
