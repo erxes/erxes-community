@@ -815,9 +815,19 @@ const HelpBox = styled.div`
   }
 `;
 
+const MainContainer = styled.div`
+  width: 70%;
+`;
+
+const SideContainer = styled.div`
+  width: 30%;
+`;
+
 export {
   PageHeader,
   AuthWrapper,
+  MainContainer,
+  SideContainer,
   AuthBox,
   AuthItem,
   Footer,

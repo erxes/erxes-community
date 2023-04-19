@@ -1,13 +1,16 @@
+import { MainContainer, SideContainer } from "../styles";
+import { colors, dimensions } from "../../styles";
+
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownToggle from "../../common/DropdownToggle";
 import { IUser } from "../../auth/types";
 import Icon from "../../common/Icon";
 import Link from "next/link";
 import ModalTrigger from "../../common/ModalTrigger";
+import NameCard from "../../common/nameCard/NameCard";
 import React from "react";
 import Search from "../containers/Search";
 import { __ } from "../../../utils";
-import { colors } from "../../styles";
 import styled from "styled-components";
 
 const UserHelper = styled.div`
@@ -36,9 +39,6 @@ const UserInfo = styled.div`
 `;
 
 export const NavItem = styled.div`
-  display: table-cell;
-  vertical-align: middle;
-
   > a {
     color: ${colors.textSecondary};
     display: flex;
@@ -47,6 +47,26 @@ export const NavItem = styled.div`
     &:hover {
       color: ${colors.colorSecondary};
     }
+  }
+`;
+
+export const RightTopbar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  > i {
+    background: ${colors.colorWhite};
+    box-shadow: 0px 3.5px 5.5px rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${colors.colorPrimaryDark};
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    margin-right: ${dimensions.unitSpacing}px;
   }
 
   .dropdown-menu {
@@ -57,29 +77,34 @@ export const NavItem = styled.div`
 const QuickNavigation = ({ currentUser }: { currentUser: IUser }) => {
   return (
     <nav id={"SettingsNav"}>
-      <NavItem>
-        <Search />
-      </NavItem>
-      <NavItem>
-        <Dropdown alignRight={true}>
-          <Dropdown.Toggle as={DropdownToggle} id="dropdown-user">
-            <UserHelper>
-              <UserInfo>
-                hi
-                <Icon icon="angle-down" size={14} />
-              </UserInfo>
-            </UserHelper>
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <li>
-              <Link href="/profile">{__("My Profile")}</Link>
-            </li>
+      <MainContainer>
+        <NavItem>
+          <Search />
+        </NavItem>
+      </MainContainer>
+      <SideContainer>
+        <RightTopbar>
+          <Icon icon="bell" size={22} />
+          <Icon icon="settings" size={18} />
+          <Dropdown alignRight={true}>
+            <Dropdown.Toggle as={DropdownToggle} id="dropdown-user">
+              <UserHelper>
+                <UserInfo>
+                  <NameCard.Avatar user={currentUser} size={45} />
+                </UserInfo>
+              </UserHelper>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <li>
+                <Link href="/profile">{__("My Profile")}</Link>
+              </li>
 
-            <Dropdown.Divider />
-            <Dropdown.Item>{__("Sign out")}</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </NavItem>
+              <Dropdown.Divider />
+              <Dropdown.Item>{__("Sign out")}</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </RightTopbar>
+      </SideContainer>
     </nav>
   );
 };

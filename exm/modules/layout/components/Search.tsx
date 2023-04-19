@@ -16,16 +16,16 @@ const MainContainer = styledTS<{ active?: boolean }>(styled.div)`
   height: 50px;
   position: relative;
   transition: .3s all;
-  width: 500px;
+  width: 100%
   display: flex;
-  padding: 0 ${dimensions.unitSpacing}px;
+  padding: ${dimensions.unitSpacing}px 0 10px 10px;
   align-items: center;
   position: relative;
   font-size: 12px;
 
   > span {
     color: ${colors.colorCoreGray};
-    padding-left: 3px;
+    padding-left: ${dimensions.unitSpacing}px;
   }
   
   i {
@@ -39,6 +39,7 @@ const MainContainer = styledTS<{ active?: boolean }>(styled.div)`
     padding: 5px ${dimensions.unitSpacing}px;
     flex: 1;
     height: 100%;
+    width: 93%;
     outline: 0;
 
     &:focus {
