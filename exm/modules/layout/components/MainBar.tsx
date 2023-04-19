@@ -4,13 +4,12 @@ import { dimensions } from "../../styles";
 import styled from "styled-components";
 
 const TopBar = styled.div`
-  height: ${dimensions.headerSpacing + dimensions.unitSpacing}px;
+  height: ${dimensions.headerSpacing + dimensions.coreSpacing}px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   margin: 0;
   flex-shrink: 0;
-  padding: 0 ${dimensions.coreSpacing}px;
   z-index: 3;
 
   nav {

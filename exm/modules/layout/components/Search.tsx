@@ -10,15 +10,13 @@ import styled from "styled-components";
 import styledTS from "styled-components-ts";
 
 const MainContainer = styledTS<{ active?: boolean }>(styled.div)`
-  background-color: ${(props) =>
-    props.active ? colors.colorWhite : colors.bgMain};
-  border: 1px solid ${(props) =>
-    props.active ? colors.borderDarker : colors.bgMain};
-  border-radius: 35px;
-  height: 32px;
+  background-color: ${colors.colorWhite};
+  border: 1px solid ${colors.borderPrimary};
+  border-radius: 12px;
+  height: 50px;
   position: relative;
   transition: .3s all;
-  width: ${(props) => (props.active ? "280px" : "120px")};
+  width: 500px;
   display: flex;
   padding: 0 ${dimensions.unitSpacing}px;
   align-items: center;

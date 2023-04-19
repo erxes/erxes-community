@@ -36,7 +36,6 @@ const UserInfo = styled.div`
 `;
 
 export const NavItem = styled.div`
-  padding-left: 18px;
   display: table-cell;
   vertical-align: middle;
 
