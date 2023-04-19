@@ -8,16 +8,18 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
+import {
+  IContractType,
+  IContractTypeDocument
+} from '../../../models/definitions/contractTypes';
 
 const contractTypeMutations = {
   contractTypesAdd: async (
     _root,
-    doc,
-    { user, docModifier, models, subdomain }: IContext
+    doc: IContractType,
+    { user, models, subdomain }: IContext
   ) => {
-    const contractType = models.ContractTypes.createContractType(
-      docModifier(doc)
-    );
+    const contractType = models.ContractTypes.createContractType(doc);
 
     const logData = {
       type: 'contractType',
@@ -46,7 +48,7 @@ const contractTypeMutations = {
 
   contractTypesEdit: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: IContractTypeDocument,
     { models, user, subdomain }: IContext
   ) => {
     const contractType = await models.ContractTypes.getContractType({
