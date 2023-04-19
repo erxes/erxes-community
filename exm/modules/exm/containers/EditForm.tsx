@@ -4,7 +4,7 @@ import { IExm } from "../../types";
 import React from "react";
 import gql from "graphql-tag";
 import { mutations } from "../graphql";
-import { useMutation } from "react-apollo";
+import { useMutation } from "@apollo/client";
 
 type Props = {
   exm: IExm;

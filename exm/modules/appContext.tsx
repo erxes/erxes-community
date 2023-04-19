@@ -1,9 +1,9 @@
 import React, { createContext, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 
-import { UserQueryResponse } from "./types";
+import { CurrentUserQueryResponse } from "./auth/types";
 import { clientPortalGetConfig } from "./main/graphql/queries";
-import queries from "./user/graphql/queries";
+import queries from "./auth/graphql/queries";
 
 const AppContext = createContext({});
 
@@ -16,15 +16,15 @@ type Props = {
 function AppProvider({ children }: Props) {
   const [currentUser, setCurrentUser] = React.useState(null);
 
-  const userQuery = useQuery<UserQueryResponse>(gql(queries.currentUser));
+  const userQuery = useQuery<CurrentUserQueryResponse>(
+    gql(queries.currentUser)
+  );
 
   useEffect(() => {
-    if (userQuery.data && userQuery.data.clientPortalCurrentUser) {
-      setCurrentUser(userQuery.data.clientPortalCurrentUser);
+    if (userQuery.data && userQuery.data.currentUser) {
+      setCurrentUser(userQuery.data.currentUser);
     }
   }, [userQuery, currentUser]);
-
-  const response: any = useQuery(gql(clientPortalGetConfig), {});
 
   return (
     <AppContext.Provider

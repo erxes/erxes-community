@@ -5,6 +5,12 @@ export interface IAttachment {
   size?: number;
 }
 
+export type IOption = {
+  label: string;
+  value: string;
+  avatar?: string;
+};
+
 export type IFormProps = {
   errors: any;
   values: any;
@@ -28,3 +34,7 @@ export type IButtonMutateProps = {
   type?: string;
   disableLoading?: boolean;
 };
+
+export interface IQueryParams {
+  [key: string]: string;
+}

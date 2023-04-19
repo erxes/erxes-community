@@ -4,7 +4,7 @@ import React from "react";
 import Spinner from "../../common/Spinner";
 import gql from "graphql-tag";
 import { queries } from "../graphql";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 
 function Home() {
   const { data, loading, error } = useQuery(gql(queries.exmGet));

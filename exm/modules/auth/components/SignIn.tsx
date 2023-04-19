@@ -3,7 +3,7 @@ import Form from "../../common/form/Form";
 import FormControl from "../../common/form/Control";
 import FormGroup from "../../common/form/Group";
 import { IButtonMutateProps } from "../../common/types";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import React from "react";
 import _ from "lodash";
 import { __ } from "../../../utils";
@@ -24,6 +24,7 @@ class SignIn extends React.Component<Props> {
           <FormControl
             {...formProps}
             name="email"
+            type="email"
             placeholder={__("Enter your email")}
             required={true}
           />
@@ -60,7 +61,7 @@ class SignIn extends React.Component<Props> {
         <h2>{__("Welcome!")}</h2>
         <p>{__("Please sign in to your account to continue")}</p>
         <Form renderContent={this.renderContent} />
-        {/* <Link to="/forgot-password">{__("Forgot password?")}</Link> */}
+        <Link href="/forgot-password">{__("Forgot password?")}</Link>
       </AuthBox>
     );
   }

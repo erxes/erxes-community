@@ -387,6 +387,28 @@ const ModalWrapper = styledTS<{ isFull?: boolean }>(styled.div)`
   }
 `;
 
+const CloseModal = styled.div`
+  position: absolute;
+  right: -40px;
+  width: 30px;
+  height: 30px;
+  background: ${rgba(colors.colorBlack, 0.3)};
+  line-height: 30px;
+  border-radius: 15px;
+  text-align: center;
+  color: ${colors.colorWhite};
+
+  &:hover {
+    background: ${rgba(colors.colorBlack, 0.4)};
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 1092px) {
+    right: 10px;
+    top: 10px;
+  }
+`;
+
 const ModalClose = styled.div`
   position: absolute;
   right: 10px;
@@ -572,6 +594,7 @@ export {
   LinkItem,
   ModalWrapper,
   ModalClose,
+  CloseModal,
   HeaderWrapper,
   FormWrapper,
   Badge,

@@ -8,7 +8,6 @@ const Home = asyncComponent(() =>
 );
 
 const home = ({ location, history }) => {
-  console.log('aaa');
   return (
     <Home queryParams={queryString.parse(location.search)} history={history} />
   );

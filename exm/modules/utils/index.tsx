@@ -1,8 +1,10 @@
 import * as animations from "./animations";
 
 import Alert from "./Alert";
+import { IUserDoc } from "../auth/types";
 import React from "react";
 import confirm from "./confirmation/confirm";
+import { getEnv } from "../../utils/configs";
 import parseMD from "./parseMd";
 import toggleCheckBoxes from "./toggleCheckBoxes";
 import urlParser from "./urlParser";
@@ -50,16 +52,6 @@ const sendDesktopNotification = (doc: { title: string; content?: string }) => {
       }
     });
   }
-};
-
-export const isEnabled = (service: string) => {
-  const enabledServices = JSON.parse(
-    typeof window !== "undefined"
-      ? localStorage.getItem("enabledServices")
-      : "{}"
-  );
-
-  return enabledServices[service];
 };
 
 export const getThemeItem = (code) => {
@@ -115,6 +107,35 @@ export function withProps<IProps>(
     }
   };
 }
+
+export const readFile = (value: string): string => {
+  if (
+    !value ||
+    urlParser.isValidURL(value) ||
+    value.includes("http") ||
+    value.startsWith("/")
+  ) {
+    return value;
+  }
+
+  const { REACT_APP_API_URL } = getEnv();
+
+  return `${REACT_APP_API_URL}/read-file?key=${value}`;
+};
+
+export const getUserAvatar = (user: IUserDoc) => {
+  if (!user) {
+    return "";
+  }
+
+  const details = user.details;
+
+  if (!details || !details.avatar) {
+    return "/images/avatar-colored.svg";
+  }
+
+  return readFile(details.avatar);
+};
 
 export {
   animations,

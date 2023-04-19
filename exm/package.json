@@ -46,6 +46,7 @@
     "react-facebook-login": "^4.1.1",
     "react-scrollspy": "^3.4.3",
     "react-select-plus": "^1.0.0-rc.5",
+    "react-transition-group": "^2.5.1",
     "react-social-login-buttons": "^3.6.1",
     "reactjs-popup": "^2.0.5",
     "sass": "^1.32.5",

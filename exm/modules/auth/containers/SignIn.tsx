@@ -1,23 +1,17 @@
 import ButtonMutate from "../../common/ButtonMutate";
 import { IButtonMutateProps } from "../../common/types";
-import { IRouterProps } from "../../types";
 import React from "react";
 import SignIn from "../components/SignIn";
 import { __ } from "../../../utils";
 import apolloClient from "../../apolloClient";
 import { mutations } from "../graphql";
-// import { withRouter } from "react-router-dom";
 
-const SignInContainer = (props: IRouterProps) => {
-  const { history = {} } = props;
-
+const SignInContainer = () => {
   const renderButton = ({ values, isSubmitted }: IButtonMutateProps) => {
     const callbackResponse = () => {
       apolloClient.resetStore();
 
-      history.push("/?signedIn=true");
-
-      window.location.reload();
+      window.location.href = "/";
     };
 
     return (
@@ -37,7 +31,6 @@ const SignInContainer = (props: IRouterProps) => {
   };
 
   const updatedProps = {
-    ...props,
     renderButton,
   };
 

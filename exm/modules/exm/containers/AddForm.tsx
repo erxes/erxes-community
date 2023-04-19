@@ -3,7 +3,7 @@ import { Alert } from "../../utils";
 import React from "react";
 import gql from "graphql-tag";
 import { mutations } from "../graphql";
-import { useMutation } from "react-apollo";
+import { useMutation } from "@apollo/client";
 
 function AddFormContainer() {
   const [addMutation] = useMutation(gql(mutations.exmsAdd));

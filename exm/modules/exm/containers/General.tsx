@@ -1,6 +1,6 @@
-import { Alert, isEnabled } from "../../utils";
 import React, { useState } from "react";
 
+import { Alert } from "../../utils";
 import ErrorMsg from "../../common/ErrorMsg";
 import General from "../components/General";
 import { IExm } from "../../types";
@@ -8,7 +8,7 @@ import Spinner from "../../common/Spinner";
 import client from "../../apolloClient";
 import gql from "graphql-tag";
 import { queries } from "../graphql";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 
 type Props = {
   exm: IExm;
@@ -19,9 +19,7 @@ export default function GeneralContainer(props: Props) {
   const brandsQuery = useQuery(gql(queries.allBrands), {
     variables: { kind: "lead" },
   });
-  const kbQuery = useQuery(gql(queries.knowledgeBaseTopics), {
-    skip: !isEnabled("knowledgebase"),
-  });
+  const kbQuery = useQuery(gql(queries.knowledgeBaseTopics));
 
   const [kbCategories, setKbCategories] = useState({});
   const [forms, setForms] = useState([]);
@@ -39,10 +37,6 @@ export default function GeneralContainer(props: Props) {
   }
 
   const getKbCategories = (topicId: string) => {
-    if (!isEnabled("knowledgebase")) {
-      return;
-    }
-
     client
       .query({
         query: gql(queries.knowledgeBaseCategories),
@@ -58,10 +52,6 @@ export default function GeneralContainer(props: Props) {
   };
 
   const getForms = (brandId: string) => {
-    if (!isEnabled("inbox")) {
-      return;
-    }
-
     client
       .query({
         query: gql(queries.integrations),
