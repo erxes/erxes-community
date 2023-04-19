@@ -7,6 +7,7 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
+import { IAdjustmentDocument } from '../../../models/definitions/adjustments';
 
 const adjustmentMutations = {
   adjustmentsAdd: async (
@@ -43,7 +44,7 @@ const adjustmentMutations = {
    */
   adjustmentsEdit: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: IAdjustmentDocument,
     { models, user, subdomain }: IContext
   ) => {
     const adjustment = await models.Adjustments.getAdjustment({ _id });
