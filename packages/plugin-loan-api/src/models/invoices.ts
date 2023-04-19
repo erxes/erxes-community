@@ -5,8 +5,8 @@ import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(selector: FilterQuery<IInvoiceDocument>);
-  createInvoice(doc: IInvoice | any);
-  updateInvoice(_id: string, doc: IInvoice | any);
+  createInvoice(doc: IInvoice);
+  updateInvoice(_id: string, doc: IInvoice);
   removeInvoices(_ids: string[]);
 }
 export const loadInvoiceClass = (models: IModels) => {

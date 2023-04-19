@@ -7,18 +7,22 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
+import {
+  IInvoice,
+  IInvoiceDocument
+} from '../../../models/definitions/invoices';
 
 const invoiceMutations = {
   invoicesAdd: async (
     _root,
-    doc,
-    { user, docModifier, models, subdomain }: IContext
+    doc: IInvoice,
+    { user, models, subdomain }: IContext
   ) => {
     if (!(doc.companyId || doc.customerId)) {
       throw new Error('must choose customer or company');
     }
 
-    const invoice = models.Invoices.createInvoice(docModifier(doc));
+    const invoice = models.Invoices.createInvoice(doc);
 
     const logData = {
       type: 'invoice',
@@ -43,7 +47,7 @@ const invoiceMutations = {
 
   invoicesEdit: async (
     _root,
-    { _id, ...doc },
+    { _id, ...doc }: IInvoiceDocument,
     { models, user, subdomain }: IContext
   ) => {
     if (!(doc.companyId || doc.customerId)) {
