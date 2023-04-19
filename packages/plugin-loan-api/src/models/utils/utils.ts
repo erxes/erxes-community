@@ -1,6 +1,7 @@
 import { getConfig } from 'erxes-api-utils';
 import { IContractDocument } from '../definitions/contracts';
 import { IDefaultScheduleParam } from '../definitions/schedules';
+import { IModels } from '../../connectionResolver';
 
 export const calcInterest = ({
   balance,
@@ -11,7 +12,7 @@ export const calcInterest = ({
   interestRate: number;
   dayOfMonth?: number;
 }): number => {
-  return Math.round((((balance / 100) * interestRate) / 360) * dayOfMonth);
+  return Math.round((((balance / 100) * interestRate) / 365) * dayOfMonth);
 };
 
 export const calcPerVirtual = (doc: IDefaultScheduleParam) => {
@@ -194,7 +195,7 @@ export const getEqualPay = async ({
         : getNextMonthDay(currentDate, scheduleDay);
     nextDay = checkNextDay(nextDay, weekends, useHoliday, perHolidays);
     const dayOfMonth = getDiffDay(currentDate, nextDay);
-    const newRatio = ratio / (1 + (dayOfMonth * (interestRate / 100)) / 360);
+    const newRatio = ratio / (1 + (dayOfMonth * (interestRate / 100)) / 365);
     mainRatio = mainRatio + newRatio;
     currentDate = nextDay;
     ratio = newRatio;
@@ -263,11 +264,12 @@ export const getRandomNumber = () => {
   return `${yy}${mm}${dd}-${random}`;
 };
 
-export const getNumber = async (models, contractTypeId) => {
+export const getNumber = async (models: IModels, contractTypeId: string) => {
   const preNumbered = await models.Contracts.findOne({
     contractTypeId: contractTypeId
   }).sort({ number: -1 });
-  const type = await models.ContractTypes.getContractType(models, {
+
+  const type = await models.ContractTypes.getContractType({
     _id: contractTypeId
   });
 
@@ -286,13 +288,17 @@ export const getNumber = async (models, contractTypeId) => {
   return `${type.number}${'0'.repeat(lessLen)}${preInt + 1}`;
 };
 
-export const getUnduePercent = async (models, memoryStorage, date) => {
+export const getUnduePercent = async (
+  models,
+  memoryStorage,
+  date
+): Promise<number> => {
   const undueConfig = (await getConfig(
     models,
     memoryStorage,
     'undueConfig',
     {}
-  )) as [{ startDate: Date; endDate: Date; percent: Number }];
+  )) as [{ startDate: Date; endDate: Date; percent: number }];
   const ruledUndueConfigs = Object.values(undueConfig)
     .filter(conf => conf.startDate < date && date < conf.endDate)
     .sort((a, b) =>
@@ -305,7 +311,7 @@ export const getUnduePercent = async (models, memoryStorage, date) => {
         : -1
     );
   if (!ruledUndueConfigs || !ruledUndueConfigs.length) {
-    return;
+    return 0;
   }
 
   return ruledUndueConfigs[0].percent;
