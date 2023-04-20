@@ -2,7 +2,7 @@ import typeDefs from './graphql/typeDefs';
 import { sendRequest } from '@erxes/api-utils/src';
 import resolvers from './graphql/resolvers';
 
-import { initBroker } from './messageBroker';
+import { initBroker, sendCommonMessage } from './messageBroker';
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import { generateModels } from './connectionResolver';
 import { pageReplacer } from './utils';
@@ -149,64 +149,60 @@ export default {
       );
     });
 
-    app.get('/:sitename/product-category/:categoryId', async (req, res) => {
+    app.get('/:sitename/plw/:pluginname/:pagename', async (req, res) => {
       const subdomain = getSubdomain(req);
       const models = await generateModels(subdomain);
 
-      const { sitename } = req.params;
+      const { sitename, pluginname, pagename } = req.params;
 
       const site = await models.Sites.getSite({ name: sitename });
+
       const page = await models.Pages.findOne({
         siteId: site._id,
-        name: 'product_category_detail'
+        name: `${pluginname}:${pagename}`
       });
 
       if (!page) {
-        return res.status(404).send('Product category detail page not found');
+        return res.status(404).send(`${pluginname}:${pagename} page not found`);
       }
 
-      return res.send(
-        await pageReplacer({
-          models,
-          subdomain,
-          page,
-          site,
-          options: { queryParams: req.params, replaceCss: true }
-        })
-      );
-    });
-
-    app.get('/:sitename/product-detail/:productId', async (req, res) => {
-      const subdomain = getSubdomain(req);
-      const models = await generateModels(subdomain);
-
-      const { sitename } = req.params;
-
-      const site = await models.Sites.getSite({ name: sitename });
-      const page = await models.Pages.findOne({
-        siteId: site._id,
-        name: 'product_detail'
+      let html = await pageReplacer({
+        models,
+        subdomain,
+        page,
+        site,
+        options: {
+          query: req.query,
+          params: req.params
+        }
       });
 
-      if (!page) {
-        return res.status(404).send('Product detail page not found');
+      const replacedHtml = await sendCommonMessage({
+        subdomain,
+        serviceName: pluginname,
+        action: 'webbuilder.replacer',
+        isRPC: true,
+        defaultValue: '',
+        data: {
+          html,
+          pagename,
+          query: req.query,
+          params: req.params
+        }
+      });
+
+      if (replacedHtml) {
+        html = replacedHtml;
       }
 
       return res.send(
-        await pageReplacer({
-          models,
-          subdomain,
-          page,
-          site,
-          options: { queryParams: req.params, replaceCss: true }
-        })
+        `
+          ${html}
+          <style>
+            ${page.css}
+          </style>
+        `
       );
-    });
-
-    app.post('/:sitename/add-to-cart', async (req, res) => {
-      console.log('mmmmmmmm', req.body);
-
-      return res.json({ status: 'received' });
     });
 
     app.get('/:sitename/get-data', async (req, res) => {

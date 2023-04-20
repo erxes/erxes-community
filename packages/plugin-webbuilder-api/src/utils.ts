@@ -1,4 +1,3 @@
-import { isEnabled } from '@erxes/api-utils/src/serviceDiscovery';
 import { IModels } from './connectionResolver';
 import { sendCommonMessage } from './messageBroker';
 import { IPageDocument } from './models/definitions/pages';
@@ -79,145 +78,17 @@ const entryReplacer = async (
   return subHtml;
 };
 
-const replaceProductInfo = (html, product) => {
-  if (!product) {
-    return html;
-  }
-
-  let replacedHtml = html.replace('{{ product._id }}', product._id);
-
-  replacedHtml = replacedHtml.replace('{{ product.name }}', product.name);
-  replacedHtml = replacedHtml.replace(
-    '{{ product.image }}',
-    product.attachment ? product.attachment.url : ''
-  );
-
-  return replacedHtml;
-};
-
-const ecommerceReplacer = async ({
-  models,
-  subdomain,
-  site,
-  page,
-  html,
-  queryParams = {}
-}: {
-  models: IModels;
-  subdomain: string;
-  site: ISiteDocument;
-  page: IPageDocument;
-  html: string;
-  queryParams?: any;
-}) => {
-  const isProductsEnabled = await isEnabled('products');
-
-  if (!isProductsEnabled) {
-    return html;
-  }
-
-  if (html.includes('{{ productCategories }}')) {
-    const productCategories = await sendCommonMessage({
-      subdomain,
-      serviceName: 'products',
-      action: 'categories.find',
-      isRPC: true,
-      data: {}
-    });
-
-    let categoriesHtml = '';
-
-    for (const category of productCategories) {
-      categoriesHtml += `
-        <ul>
-          <li>
-            <a href="${generateUrl(
-              subdomain,
-              site.name,
-              `product-category/${category._id}`
-            )}">${category.name}</a>
-          </li>
-        </ul>
-      `;
-    }
-
-    html = html.replace('{{ productCategories }}', categoriesHtml);
-
-    return html;
-  }
-
-  if (html.includes('{{ products }}')) {
-    const productEntryPage = await models.Pages.findOne({
-      siteId: site._id,
-      name: `product_entry`
-    });
-
-    let productEntryHtml = '';
-    let productEntryCss = '';
-
-    if (productEntryPage) {
-      productEntryHtml = productEntryPage.html;
-      productEntryCss = productEntryPage.css;
-    }
-
-    const products = await sendCommonMessage({
-      subdomain,
-      serviceName: 'products',
-      action: 'find',
-      isRPC: true,
-      data: { query: { categoryId: queryParams.categoryId } }
-    });
-
-    let productsHtml = '';
-
-    for (const product of products) {
-      let replacedHtml = replaceProductInfo(productEntryHtml, product);
-      productsHtml += ` <div class="product-item">${replacedHtml}</div>`;
-    }
-
-    html = html.replace(
-      '{{ products }}',
-      `${productsHtml}<style>${productEntryCss}</style>`
-    );
-
-    return html;
-  }
-
-  if (page.name === 'product_detail') {
-    const product = await sendCommonMessage({
-      subdomain,
-      serviceName: 'products',
-      action: 'findOne',
-      isRPC: true,
-      data: { _id: queryParams.productId }
-    });
-
-    html = replaceProductInfo(html, product);
-  }
-
-  return html;
-};
-
 const pageReplacer = async (args: {
   models: IModels;
   subdomain: string;
   page: IPageDocument;
   site: ISiteDocument;
-  options?: { queryParams?: any; replaceCss: boolean };
+  options?: { query?: any; params?: any; replaceCss?: boolean };
 }) => {
   const { models, subdomain, page, site, options } = args;
-  const { queryParams } = options || {};
+  const { query, params } = options || {};
 
   let html = pathReplacer(subdomain, page.html, site);
-
-  html = await ecommerceReplacer({
-    models,
-    subdomain,
-    site,
-    page,
-    html,
-    queryParams
-  });
 
   const pages = await models.Pages.find({
     siteId: site._id,
@@ -256,60 +127,33 @@ const pageReplacer = async (args: {
     }
   }
 
-  let productDetailScript = '';
+  // regex to find plugin placeholer
+  const matches = html.matchAll(/{{plugin-(\w+):(\w+)}}/g) || [];
 
-  if (page.name === 'product_detail') {
-    productDetailScript = `
-      <div id="quantity-chooser">
-        <button id="quantity-chooser-minus">-<button>
-          <span id="quantity-chooser-quantity"><span>
-        <button id="quantity-chooser-plus">+</button>
-      </div>
+  for (const match of matches) {
+    const [holder, pluginname, action] = match;
 
-      <script>
-        let quantity = 1;
+    const pluginHtml = await sendCommonMessage({
+      subdomain,
+      serviceName: pluginname,
+      action: 'webbuilder.replacer',
+      isRPC: true,
+      defaultValue: '',
+      data: {
+        sitename: site.name,
+        query,
+        params,
+        action
+      }
+    });
 
-        function showQuantity() {
-          $("#quantity-chooser-quantity").text(quantity);
-        }
-
-        $(document).ready(() => {
-          showQuantity();
-
-          $("#quantity-chooser-minus").click(() => {
-            if (quantity > 1) {
-              quantity--;
-              showQuantity();
-            }
-          });
-
-          $("#quantity-chooser-plus").click(() => {
-            quantity++;
-            showQuantity();
-          });
-
-          $("#add-to-cart").click(() => {
-            $.ajax({
-              url: "${generateUrl(subdomain, site.name, 'add-to-cart')}",
-              method: "post",
-              data: {
-                quantity,
-                productId: "${queryParams.productId}"
-              },
-              success: () => {
-                alert('Success');
-              }
-            })
-          });
-        });
-      </script>
-    `;
+    html = html.replace(new RegExp(holder, 'g'), pluginHtml);
   }
 
-  html += `
+  html =
+    `
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
-    ${productDetailScript}
-  `;
+  ` + html;
 
   if (options && options.replaceCss) {
     return `

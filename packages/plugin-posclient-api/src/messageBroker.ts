@@ -14,6 +14,152 @@ import { sendRPCMessage } from '@erxes/api-utils/src/messageBroker';
 
 let client;
 
+const webbuilderReplacer = async ({
+  models,
+  subdomain,
+  action,
+  sitename,
+  query,
+  html,
+  pagename,
+  params
+}) => {
+  let result = '';
+
+  if (action === 'productCategories') {
+    result = `
+      <ul id="product-categories">
+      </ul>
+    `;
+  }
+
+  if (action === 'productCategoriesScript') {
+    result = `
+      <script>
+        $(document).ready(() => {
+          $.ajax({
+            url: "http://localhost:4000/pl:posclient/product-categories",
+            data: {},
+            success: (data) => {
+              var rows = '';
+
+              for (const category of data) {
+                rows += '<li><a href="${sitename}/plw/posclient/product-category-detail?categoryId='+category._id+'">' + category.name + '</a></li>';
+              }
+
+              $('#product-categories').append(rows);
+            }
+          })
+        });
+      </script>
+    `;
+  }
+
+  if (action === 'products') {
+    result = `
+      <div id="products">
+      </div>
+    `;
+  }
+
+  if (action === 'productsScript') {
+    const productItemTemplate = await sendCommonMessage({
+      subdomain,
+      serviceName: 'webbuilder',
+      action: 'pages.findOne',
+      isRPC: true,
+      data: {
+        name: 'posclient:product-item'
+      }
+    });
+
+    result = `
+      <script>
+        $(document).ready(() => {
+          var productItemTemplate = '${productItemTemplate.html}';
+
+          $.ajax({
+            url: "http://localhost:4000/pl:posclient/products?categoryId=${query.categoryId}",
+            data: {},
+            success: (data) => {
+              var rows = '';
+
+              for (const product of data) {
+                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
+                temp = temp.replace('{{ product._id }}', product._id);
+                rows+= temp;
+              }
+
+              $('#products').append(rows);
+            }
+          })
+        });
+      </script>
+    `;
+  }
+
+  if (pagename) {
+    result = html;
+
+    if (pagename === 'product-detail') {
+      const product = await models.Products.findOne({ _id: query.productId });
+
+      if (product) {
+        result = result.replace('{{ product.name }}', product.name);
+        result = result.replace('{{ product.image }}', product.image);
+
+        result += `
+          <div id="quantity-chooser">
+            <button id="quantity-chooser-minus">-<button>
+              <span id="quantity-chooser-quantity"><span>
+            <button id="quantity-chooser-plus">+</button>
+          </div>
+
+          <script>
+            let quantity = 1;
+
+            function showQuantity() {
+              $("#quantity-chooser-quantity").text(quantity);
+            }
+
+            $(document).ready(() => {
+              showQuantity();
+
+              $("#quantity-chooser-minus").click(() => {
+                if (quantity > 1) {
+                  quantity--;
+                  showQuantity();
+                }
+              });
+
+              $("#quantity-chooser-plus").click(() => {
+                quantity++;
+                showQuantity();
+              });
+
+              $("#add-to-cart").click(() => {
+                $.ajax({
+                  url: "http://localhost:4000/pl:posclient/add-to-cart",
+                  method: "post",
+                  data: {
+                    quantity,
+                    productId: "${product._id}"
+                  },
+                  success: () => {
+                    alert('Success');
+                  }
+                })
+              });
+            });
+          </script>
+        `;
+      }
+    }
+  }
+
+  return result;
+};
+
 export const initBroker = async cl => {
   const { SKIP_REDIS } = process.env;
 
@@ -173,6 +319,18 @@ export const initBroker = async cl => {
       return {
         status: 'success',
         data: await models.Covers.findOne({ _id: cover._id })
+      };
+    }
+  );
+
+  consumeRPCQueue(
+    'posclient:webbuilder.replacer',
+    async ({ subdomain, data }) => {
+      const models = await generateModels(subdomain);
+
+      return {
+        status: 'success',
+        data: await webbuilderReplacer({ models, subdomain, ...data })
       };
     }
   );
