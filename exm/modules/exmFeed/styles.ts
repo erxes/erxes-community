@@ -84,8 +84,9 @@ export const NewsFeedLayout = styled.div`
   > div {
     margin-bottom: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.1);
-
+    background: ${colors.colorWhite};
+    border: 1px solid ${colors.borderPrimary};
+    
     > img {
       width: 100%;
       border-top: 1px solid #ddd;
@@ -178,7 +179,7 @@ export const TextFeed = styled.div`
 
 export const LikeCommentShare = styled.div`
   display: flex;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid ${colors.borderPrimary};
   padding: 10px 20px;
 
   b {
@@ -312,5 +313,58 @@ export const AdditionalItem = styled.div`
 
   &:hover {
     color: ${colors.textSecondary};
+  }
+`;
+
+export const Card = styled.div`
+  background: ${colors.colorWhite};
+  border: 1px solid ${colors.borderPrimary};
+  padding: ${dimensions.coreSpacing}px;
+  margin: 0 ${dimensions.coreSpacing}px ${dimensions.coreSpacing}px;
+  border-radius: 12px;
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: ${dimensions.unitSpacing}px;
+  }
+`;
+
+export const SingleEvent = styled.div`
+  display: flex;
+  align-items: center;
+  
+  .image-wrapper {
+    overflow: hidden;
+    width: 70px;
+    height: 60px;
+    flex-shrink: 0;
+    border-radius: ${dimensions.unitSpacing}px;
+    margin-right: ${dimensions.unitSpacing}px;
+
+    img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  i {
+    margin-right: ${dimensions.unitSpacing}px;
+    color: ${colors.colorPrimaryDark};
+  }
+
+  b {
+    font-size: 14px;
+    display: block;
+    line-height: 15px;
+    margin-bottom: 3px;
+  }
+
+  span {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: ${colors.colorCoreGray};
   }
 `;

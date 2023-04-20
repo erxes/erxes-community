@@ -2,6 +2,7 @@ import React, { createContext, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 import { CurrentUserQueryResponse } from "./auth/types";
+import Spinner from "./common/Spinner";
 import queries from "./auth/graphql/queries";
 
 const AppContext = createContext({});
@@ -13,17 +14,18 @@ type Props = {
 };
 
 function AppProvider({ children }: Props) {
-  const [currentUser, setCurrentUser] = React.useState(null);
-
-  const userQuery = useQuery<CurrentUserQueryResponse>(
-    gql(queries.currentUser)
+  const { data, loading } = useQuery<CurrentUserQueryResponse>(
+    gql(queries.currentUser),
+    {
+      fetchPolicy: "network-only",
+    }
   );
 
-  useEffect(() => {
-    if (userQuery.data && userQuery.data.currentUser) {
-      setCurrentUser(userQuery.data.currentUser);
-    }
-  }, [userQuery, currentUser]);
+  if (loading) {
+    return <Spinner />;
+  }
+
+  const currentUser = data?.currentUser || null;
 
   return (
     <AppContext.Provider

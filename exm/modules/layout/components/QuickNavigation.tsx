@@ -54,6 +54,7 @@ export const RightTopbar = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  padding: 0 ${dimensions.coreSpacing}px;
 
   > i {
     background: ${colors.colorWhite};

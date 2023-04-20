@@ -7,7 +7,7 @@ import MainBar from "./MainBar";
 import Navigation from "./Navigation";
 import React from "react";
 
-interface IProps extends IRouterProps {
+interface IProps {
   currentUser?: IUser;
   children: React.ReactNode;
 }

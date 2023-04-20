@@ -57,7 +57,10 @@ export default class MyDocument extends Document {
           />
           <meta httpEquiv="Pragma" content="no-cache" />
           <meta httpEquiv="Expires" content="0" />
-          <title>Exm website - For team members</title>
+          <meta
+            property="og:title"
+            content={"Exm website - For team members"}
+          />
           <link rel="shortcut icon" id="favicon" href="/static/favicon.png" />
           <link
             rel="stylesheet"
