@@ -1,10 +1,9 @@
-import { Col, FeedLayout, Row, TabContent } from "../styles";
+import { FeedLayout, Row, TabContent } from "../styles";
+import { MainContainer, SideContainer } from "../../layout/styles";
 import React, { useState } from "react";
 import { TabTitle, Tabs } from "../../common/tabs";
 
 import Form from "../containers/feed/Form";
-import Icon from "../../common/Icon";
-import Link from "next/link";
 import List from "../containers/feed/List";
 import ThankForm from "../containers/feed/ThankForm";
 import ThankList from "../containers/feed/ThankList";
@@ -44,7 +43,7 @@ export default function Home(props: Props) {
     return (
       <FeedLayout>
         <Row>
-          <Col width={50}>
+          <MainContainer>
             <Tabs full={true}>
               <TabTitle
                 className={currentTab === "post" ? "active" : ""}
@@ -62,18 +61,7 @@ export default function Home(props: Props) {
                 className={currentTab === "bravo" ? "active" : ""}
                 onClick={() => onClickTab("bravo")}
               >
-                Bravo{" "}
-                <Link href={`/settings/properties?type=exmFeedBravo`}>
-                  <a target="_blank">
-                    <Icon color="black" icon="cog" />
-                  </a>
-                </Link>
-              </TabTitle>
-              <TabTitle
-                className={currentTab === "thankyou" ? "active" : ""}
-                onClick={() => onClickTab("thankyou")}
-              >
-                Thank you
+                Bravo
               </TabTitle>
               <TabTitle
                 className={currentTab === "publicHoliday" ? "active" : ""}
@@ -83,9 +71,8 @@ export default function Home(props: Props) {
               </TabTitle>
             </Tabs>
             <TabContent>{renderTabContent()}</TabContent>
-          </Col>
-          <Col>hi</Col>
-          <Col>hi</Col>
+          </MainContainer>
+          <SideContainer>hi</SideContainer>
         </Row>
       </FeedLayout>
     );
@@ -95,6 +82,7 @@ export default function Home(props: Props) {
     <Wrapper
       header={<Wrapper.Header title={"Feed"} />}
       content={renderContent()}
+      transparent={true}
     />
   );
 }

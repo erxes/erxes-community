@@ -817,6 +817,8 @@ const HelpBox = styled.div`
 
 const MainContainer = styled.div`
   width: 70%;
+  max-width: 800px;
+  margin: 0 auto;
 `;
 
 const SideContainer = styled.div`

@@ -1,3 +1,11 @@
+import {
+  AdditionalInfo,
+  AdditionalItem,
+  CreateFormContainer,
+  CreateInput,
+  FlexRow,
+  UploadItems,
+} from "../../styles";
 import { IButtonMutateProps, IFormProps } from "../../../common/types";
 import React, { useState } from "react";
 import { description, getDepartmentOptions, title } from "../../utils";
@@ -5,9 +13,11 @@ import { description, getDepartmentOptions, title } from "../../utils";
 import ControlLabel from "../../../common/form/Label";
 import { Form } from "../../../common/form";
 import GenerateFields from "../GenerateFields";
+import Icon from "../../../common/Icon";
+import NameCard from "../../../common/nameCard/NameCard";
 import Select from "react-select-plus";
-import { UploadItems } from "../../styles";
 import Uploader from "../../../common/Uploader";
+import { __ } from "../../../../utils";
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => any;
@@ -85,5 +95,20 @@ export default function PostForm(props: Props) {
     );
   };
 
-  return <Form renderContent={renderContent} />;
+  return (
+    <CreateFormContainer>
+      <FlexRow>
+        <NameCard.Avatar user={{}} size={45} />
+        <CreateInput>{__("What`s on your mind?")}</CreateInput>
+      </FlexRow>
+      <AdditionalInfo>
+        <AdditionalItem>
+          <Icon icon="picture" size={16} />
+          <span>{__("Photo/video")}</span>
+        </AdditionalItem>
+      </AdditionalInfo>
+    </CreateFormContainer>
+  );
+
+  // return <Form renderContent={renderContent} />;
 }

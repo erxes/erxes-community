@@ -38,7 +38,6 @@ export const Row = styled.div`
 `;
 
 export const TabContent = styled.div`
-  width: 700px;
   margin: 20px auto;
 `;
 
@@ -233,4 +232,58 @@ export const AvatarImg = styled.img`
   vertical-align: middle;
   background: ${colors.bgActive};
   margin-right: ${dimensions.unitSpacing}px;
+`;
+
+export const CreateFormContainer = styled.div`
+  background: ${colors.colorWhite};
+  border-radius: 12px;
+  border: 1px solid ${colors.borderPrimary};
+`;
+
+export const FlexRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: ${dimensions.coreSpacing}px;
+`;
+
+export const CreateInput = styled.div`
+  border: 1px solid ${colors.borderPrimary};
+  border-radius: ${dimensions.coreSpacing}px;
+  color: ${colors.colorCoreBlueGray};
+  flex: 1;
+  font-size: 14px;
+  margin-left: ${dimensions.coreSpacing}px;
+  height: ${dimensions.headerSpacing - dimensions.unitSpacing}px;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all ease .3s;
+
+  &:hover {
+    background: ${colors.bgMain};
+  }
+`;
+
+export const AdditionalInfo = styled(FlexRow)`
+  border-top: 1px solid ${colors.borderPrimary};
+  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+  color: ${colors.colorCoreBlueGray};
+  font-size: 13px;
+  flex: 1;
+
+  i {
+    margin-right: ${dimensions.unitSpacing}px;
+  }
+`;
+
+export const AdditionalItem = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all ease .3s;
+
+  &:hover {
+    color: ${colors.textSecondary};
+  }
 `;
