@@ -67,35 +67,23 @@ export const removeWebhook = async (): Promise<any> => {
   return await sendRequest(payload);
 };
 
-export const sendMessage = async () => {
+export const sendMessage = async (message: object): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/send_message',
-    body: {
-      receiver: enjiId,
-      min_api_version: 1,
-      sender: {
-        name: 'John McClane',
-        avatar: 'http://avatar.example.com'
-      },
-      tracking_data: 'tracking data',
-      type: 'text',
-      text: 'Hello world!'
-    }
+    body: message
   };
 
   return await sendRequest(payload);
 };
 
-export const broadcastMessage = async () => {
+export const broadcastMessage = async (body: object): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/broadcast_message',
-    body: {
-      broadcast_list: [enjiId]
-    }
+    body
   };
 
   return await sendRequest(payload);
@@ -112,7 +100,7 @@ export const getAccountInfo = async (): Promise<any> => {
   return await sendRequest(payload);
 };
 
-export const getUserDetail = async (userId: string) => {
+export const getUserDetail = async (userId: string): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
@@ -123,24 +111,11 @@ export const getUserDetail = async (userId: string) => {
   return await sendRequest(payload);
 };
 
-export const getOnline = async () => {
+export const getOnline = async (body: object): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/get_online',
-    body: {
-      ids: [enjiId]
-    }
-  };
-
-  return await sendRequest(payload);
-};
-
-export const subscribe = async (body: object) => {
-  const payload: RequestInterface = {
-    method: 'POST',
-    headers: authHeader,
-    url: 'https://chatapi.viber.com/pa/subscribe',
     body
   };
 

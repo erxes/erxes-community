@@ -94,3 +94,21 @@ export const integration1Schema = new Schema({
   inboxId: String,
   accountId: String
 });
+
+export interface IViberMessage {
+  senderId: string;
+  senderName: string;
+  sendDate: Date;
+  messageText: string;
+  messageType: string;
+}
+
+export const ViberMessageSchema: Schema = new Schema<IViberMessage>({
+  senderId: { type: String, required: true },
+  senderName: { type: String, required: true },
+  sendDate: { type: Date, required: true },
+  messageText: { type: String, required: true },
+  messageType: { type: String, required: true }
+});
+
+export const ViberMessage = model('ViberMessage', ViberMessageSchema);

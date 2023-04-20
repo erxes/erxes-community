@@ -5,8 +5,7 @@ import {
   broadcastMessage,
   getAccountInfo,
   getUserDetail,
-  getOnline,
-  subscribe
+  getOnline
 } from './viber';
 
 const init = async (app: any): Promise<void> => {
@@ -31,7 +30,7 @@ const init = async (app: any): Promise<void> => {
   app.post(
     '/send_message',
     async (req: any, res: any): Promise<any> => {
-      const response = await sendMessage();
+      const response = await sendMessage(req.body);
       return res.json(response);
     }
   );
@@ -39,7 +38,7 @@ const init = async (app: any): Promise<void> => {
   app.post(
     '/broadcast_message',
     async (req: any, res: any): Promise<any> => {
-      const response = await broadcastMessage();
+      const response = await broadcastMessage(req.body);
       return res.json(response);
     }
   );
@@ -63,15 +62,7 @@ const init = async (app: any): Promise<void> => {
   app.post(
     '/get_online',
     async (req: any, res: any): Promise<any> => {
-      const response = await getOnline();
-      return res.json(response);
-    }
-  );
-
-  app.post(
-    '/subscribe',
-    async (req: any, res: any): Promise<any> => {
-      const response = await subscribe(req.body);
+      const response = await getOnline(req.body);
       return res.json(response);
     }
   );
