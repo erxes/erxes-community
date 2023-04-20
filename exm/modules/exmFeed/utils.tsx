@@ -7,7 +7,7 @@ export const description = (formProps: IFormProps, item: any) => {
   return (
     <FormControl
       {...formProps}
-      placeholder="Description"
+      placeholder="What's Your Mind? ..."
       componentClass="textarea"
       name="description"
       required={true}

@@ -1,5 +1,6 @@
 import { colors, dimensions } from '../styles';
 
+import { UploadBtn } from '../common/Uploader';
 import { rgba } from '../styles/ecolor';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
@@ -47,13 +48,39 @@ export const ButtonWrap = styled.div`
 `;
 
 export const UploadItems = styled.div`
+  margin-bottom: ${dimensions.coreSpacing}px;
+  display: flex;
+
   > div {
-    display: flex;
-    flex-direction: column-reverse;
+    ${UploadBtn} {
+      label {
+        border: 1px dashed #d9d9d9;
+        background: ${rgba(colors.bgMain, .6)};
+        padding: 30px ${dimensions.headerSpacing}px;
+        border-radius: ${dimensions.unitSpacing}px;
+        margin-right: ${dimensions.coreSpacing}px;
+        color: ${colors.colorCoreGray};
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all ease .3s;
+        font-size: 13px;
+        
+        &:hover {
+          border-color: ${colors.colorCoreBlueGray};
+        }
+
+        i {
+          color: ${colors.colorSecondary};
+        }
+      }
+    }
   }
 `;
 
 export const NewsFeedLayout = styled.div`
+  margin-top: ${dimensions.coreSpacing}px;
+  
   > div {
     margin-bottom: 20px;
     border-radius: 10px;

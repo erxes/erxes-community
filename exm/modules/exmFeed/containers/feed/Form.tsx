@@ -58,22 +58,21 @@ export default function FormContainer(props: Props) {
     }
 
     return (
-      <ButtonWrap>
-        <ButtonMutate
-          mutation={variables._id ? mutations.editFeed : mutations.addFeed}
-          variables={variables}
-          callback={callBackResponse}
-          refetchQueries={[{ query: gql(queries.feed) }]}
-          isSubmitted={isSubmitted}
-          successMessage={`You successfully ${
-            variables._id ? "edited" : "added"
-          }`}
-          type="submit"
-          icon="check-circle"
-        >
-          Send
-        </ButtonMutate>
-      </ButtonWrap>
+      <ButtonMutate
+        mutation={variables._id ? mutations.editFeed : mutations.addFeed}
+        variables={variables}
+        callback={callBackResponse}
+        refetchQueries={[{ query: gql(queries.feed) }]}
+        isSubmitted={isSubmitted}
+        block={true}
+        btnStyle="default"
+        successMessage={`You successfully ${
+          variables._id ? "edited" : "added"
+        }`}
+        type="submit"
+      >
+        Post
+      </ButtonMutate>
     );
   };
 

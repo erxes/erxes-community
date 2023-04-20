@@ -6,14 +6,15 @@ import {
   FlexRow,
   UploadItems,
 } from "../../styles";
+import { Form, FormGroup } from "../../../common/form";
 import { IButtonMutateProps, IFormProps } from "../../../common/types";
 import React, { useState } from "react";
 import { description, getDepartmentOptions, title } from "../../utils";
 
 import ControlLabel from "../../../common/form/Label";
-import { Form } from "../../../common/form";
 import GenerateFields from "../GenerateFields";
 import Icon from "../../../common/Icon";
+import ModalTrigger from "../../../common/ModalTrigger";
 import NameCard from "../../../common/nameCard/NameCard";
 import Select from "react-select-plus";
 import Uploader from "../../../common/Uploader";
@@ -30,7 +31,7 @@ type Props = {
 export default function PostForm(props: Props) {
   const item = props.item || {};
   const fields = props.fields;
-  const departments = props.departments || {};
+  const departments = props.departments || [];
 
   const [attachments, setAttachment] = useState(item.attachments || []);
   const [images, setImage] = useState(item.images || []);
@@ -49,32 +50,55 @@ export default function PostForm(props: Props) {
 
     return (
       <>
-        {title(formProps, item)}
-        {description(formProps, item)}
-        <Select
-          placeholder="Choose one department"
-          name="departmentId"
-          value={selectedDepartment}
-          onChange={onChangeDepartment}
-          multi={false}
-          options={getDepartmentOptions(departments)}
-        />
-        <GenerateFields
-          fields={fields}
-          customFieldsData={customFieldsData}
-          setCustomFieldsData={setCustomFieldsData}
-        />
+        <FormGroup>
+          <ControlLabel>Title</ControlLabel>
+          {title(formProps, item)}
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Main Post</ControlLabel>
+          {description(formProps, item)}
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Choose department</ControlLabel>
+          <Select
+            placeholder="Choose one department"
+            name="departmentId"
+            value={selectedDepartment}
+            onChange={onChangeDepartment}
+            multi={false}
+            options={getDepartmentOptions(departments)}
+          />
+        </FormGroup>
+        {fields && fields.length !== 0 && (
+          <FormGroup>
+            <ControlLabel>Custom fields</ControlLabel>
+            <GenerateFields
+              fields={fields}
+              customFieldsData={customFieldsData}
+              setCustomFieldsData={setCustomFieldsData}
+            />
+          </FormGroup>
+        )}
+        <ControlLabel>Add to your post</ControlLabel>
         <UploadItems>
+          <div>
+            <Uploader
+              defaultFileList={images || []}
+              onChange={setImage}
+              btnText="Cover Image"
+              btnIcon="image"
+              single={true}
+              btnIconSize={30}
+            />
+          </div>
           <div>
             <Uploader
               defaultFileList={attachments || []}
               onChange={setAttachment}
+              btnText="Attachments"
+              btnIcon="files-landscapes-alt"
+              btnIconSize={30}
             />
-            <ControlLabel>Add attachments:</ControlLabel>
-          </div>
-          <div>
-            <Uploader defaultFileList={images || []} onChange={setImage} />
-            <ControlLabel>Add image:</ControlLabel>
           </div>
         </UploadItems>
 
@@ -95,20 +119,34 @@ export default function PostForm(props: Props) {
     );
   };
 
+  const content = (datas) => <Form {...datas} renderContent={renderContent} />;
+
   return (
     <CreateFormContainer>
       <FlexRow>
         <NameCard.Avatar user={{}} size={45} />
-        <CreateInput>{__("What`s on your mind?")}</CreateInput>
+        <ModalTrigger
+          dialogClassName="create-post"
+          size="lg"
+          title="Create post"
+          trigger={<CreateInput>{__("What`s on your mind?")}</CreateInput>}
+          content={content}
+        />
       </FlexRow>
       <AdditionalInfo>
-        <AdditionalItem>
-          <Icon icon="picture" size={16} />
-          <span>{__("Photo/video")}</span>
-        </AdditionalItem>
+        <ModalTrigger
+          dialogClassName="create-post"
+          size="lg"
+          title="Create post"
+          trigger={
+            <AdditionalItem>
+              <Icon icon="picture" size={16} />
+              <span>{__("Photo/video")}</span>
+            </AdditionalItem>
+          }
+          content={content}
+        />
       </AdditionalInfo>
     </CreateFormContainer>
   );
-
-  // return <Form renderContent={renderContent} />;
 }

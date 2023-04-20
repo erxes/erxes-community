@@ -1,13 +1,11 @@
 import * as routerUtils from "../utils/router";
 
 import { CloseModal } from "../styles/main";
-import { IRouterProps } from "../types";
 import Icon from "./Icon";
 import { Modal } from "react-bootstrap";
 import RTG from "react-transition-group";
 import React from "react";
 import { __ } from "../../utils";
-import { withRouter } from "react-router-dom";
 
 type Props = {
   title: string;
@@ -21,13 +19,13 @@ type Props = {
   enforceFocus?: boolean;
   hideHeader?: boolean;
   isOpen?: boolean;
-  history: any;
+  history?: any;
   paddingContent?: "less-padding";
   centered?: boolean;
   style?: any;
   onExit?: () => void;
   isAnimate?: boolean;
-} & IRouterProps;
+};
 
 type State = {
   isOpen?: boolean;
@@ -37,7 +35,12 @@ type State = {
 class ModalTrigger extends React.Component<Props, State> {
   static getDerivedStateFromProps(props, state) {
     if (props.autoOpenKey !== state.autoOpenKey) {
-      if (routerUtils.checkHashKeyInURL(props.history, props.autoOpenKey)) {
+      if (
+        routerUtils.checkHashKeyInURL(
+          props.history ? props.history : {},
+          props.autoOpenKey
+        )
+      ) {
         return {
           isOpen: true,
           autoOpenKey: props.autoOpenKey,
@@ -135,4 +138,4 @@ class ModalTrigger extends React.Component<Props, State> {
   }
 }
 
-export default withRouter(ModalTrigger);
+export default ModalTrigger;

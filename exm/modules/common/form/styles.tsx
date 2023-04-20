@@ -1,16 +1,17 @@
-import { rgba } from '../../styles/ecolor';
-import styled, { css } from 'styled-components';
-import styledTS from 'styled-components-ts';
-import { colors, dimensions, typography } from '../../styles';
+import { colors, dimensions, typography } from "../../styles";
+import styled, { css } from "styled-components";
 
-const inputPadding = '0px';
-const inputHeight = '15px';
-const inputScale = '12px';
-const inputBorderWidth = '2px';
-const textInputHeight = '34px';
+import { rgba } from "../../styles/ecolor";
+import styledTS from "styled-components-ts";
+
+const inputPadding = "0px";
+const inputHeight = "15px";
+const inputScale = "12px";
+const inputBorderWidth = "2px";
+const textInputHeight = "34px";
 
 const Label = styledTS<{ uppercase?: boolean }>(styled.label)`
-  text-transform: ${(props) => (props.uppercase ? 'uppercase' : 'none')};
+  text-transform: ${(props) => (props.uppercase ? "uppercase" : "none")};
   display: inline-block;
   font-weight: ${typography.fontWeightMedium};
   color: ${colors.textPrimary};
@@ -50,16 +51,16 @@ const Formgroup = styledTS<{ horizontal?: boolean }>(styled.div)`
 
 const Input = styledTS<{ round?: boolean; hasError?: boolean }>(styled.input)`
   display: block;
-  border: none;
   width: 100%;
   height: ${textInputHeight};
-  padding: ${dimensions.unitSpacing}px 0;
   color: ${colors.textPrimary};
-  border-bottom: 1px solid;
-  border-color:${(props) =>
-    props.hasError ? colors.colorCoreRed : colors.colorShadowGray};
   background: none;
-  transition: all 0.3s ease;
+  transition: all ease .3s;
+  padding: 1.75em 1em;
+  font-size: 14px;
+  outline: 0;
+  border-radius: 15px;
+  border: 1px solid #E2E8F0;
 
   ${(props) => {
     if (props.round) {
@@ -71,7 +72,7 @@ const Input = styledTS<{ round?: boolean; hasError?: boolean }>(styled.input)`
       `;
     }
 
-    return '';
+    return "";
   }};
 
   &:hover {
@@ -116,7 +117,7 @@ const SelectWrapper = styledTS<{ hasError?: boolean }>(styled.div)`
   }
 `;
 
-const Select = styled(Input.withComponent('select'))`
+const Select = styled(Input.withComponent("select"))`
   border: none;
   height: ${textInputHeight};
   padding: 0;
@@ -126,7 +127,7 @@ const Select = styled(Input.withComponent('select'))`
 
 const TextArea = styledTS<{
   maxHeight?: number;
-}>(styled(Input.withComponent('textarea')))`
+}>(styled(Input.withComponent("textarea")))`
   transition: none;
   max-height: ${(props) => props.maxHeight && `${props.maxHeight}px`};
   min-height: 80px;
@@ -156,7 +157,7 @@ const inputStyle = styledTS<{ disabled?: boolean; color?: string }>(
   position: absolute !important;
   width: 1px !important;
   white-space: nowrap !important;
-  cursor: ${(props) => props.disabled && 'not-allowed'}
+  cursor: ${(props) => props.disabled && "not-allowed"}
 
   &:focus {
     + span {
@@ -203,7 +204,7 @@ const inputStyle = styledTS<{ disabled?: boolean; color?: string }>(
       display: inline-block;
       vertical-align: text-top;
       border-radius: 2px;
-      cursor: ${(props) => props.disabled && 'not-allowed'}
+      cursor: ${(props) => props.disabled && "not-allowed"}
     }
 
     &:after {

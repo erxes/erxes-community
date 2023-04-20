@@ -86,7 +86,8 @@ export default function List({
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format("lll")} <b>#{item.contentType}</b>
+                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
+                <b>#{item.contentType}</b>
               </p>
             </div>
           </FeedActions>
