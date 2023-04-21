@@ -10,6 +10,9 @@ const viberMutations = {
     await Accounts.removeAccount(_id);
 
     return 'deleted';
+  },
+  async viberSendMessageCreate(_root, body, _context: IContext) {
+    return 'done';
   }
 };
 

@@ -1,7 +1,16 @@
 import { IContext } from '@erxes/api-utils/src/types';
-import { Accounts, Messages } from '../../models';
+import {
+  Accounts,
+  Messages,
+  ViberReceivedMessage,
+  ViberSentMessage
+} from '../../models';
 
 const queries = {
+  viberAPIKey(_root, _args, _context: IContext) {
+    return ViberSentMessage.find({});
+  },
+
   async viberConversationDetail(_root, { conversationId }, _context: IContext) {
     const messages = await Messages.find({
       inboxConversationId: conversationId
@@ -28,6 +37,14 @@ const queries = {
 
   async viberAccounts(_root, _args, _context: IContext) {
     return Accounts.getAccounts();
+  },
+
+  viberReceivedMessage(_root, _args, _context: IContext) {
+    return ViberReceivedMessage.find({});
+  },
+
+  viberSentMessage(_root, _args, _context: IContext) {
+    return ViberSentMessage.find({});
   }
 };
 

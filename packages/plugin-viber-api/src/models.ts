@@ -90,12 +90,8 @@ export const Messages = model<any, any>('viber_messages', loadMessageClass());
 
 export const Accounts = model<any, any>('viber_accounts', loadAccountClass());
 
-export const integration1Schema = new Schema({
-  inboxId: String,
-  accountId: String
-});
-
-export interface IViberMessage {
+export interface IViberReceivedMessage {
+  userId: string;
   senderId: string;
   senderName: string;
   sendDate: Date;
@@ -103,7 +99,10 @@ export interface IViberMessage {
   messageType: string;
 }
 
-export const ViberMessageSchema: Schema = new Schema<IViberMessage>({
+export const ViberReceivedMessageSchema: Schema = new Schema<
+  IViberReceivedMessage
+>({
+  userId: { type: String, required: true },
   senderId: { type: String, required: true },
   senderName: { type: String, required: true },
   sendDate: { type: Date, required: true },
@@ -111,9 +110,13 @@ export const ViberMessageSchema: Schema = new Schema<IViberMessage>({
   messageType: { type: String, required: true }
 });
 
-export const ViberMessage = model('viber_received_message', ViberMessageSchema);
+export const ViberReceivedMessage = model(
+  'viber_received_message',
+  ViberReceivedMessageSchema
+);
 
 export interface IViberSentMessage {
+  userId: string;
   senderId: string;
   receiverId: string;
   sendDate: Date;
@@ -121,6 +124,7 @@ export interface IViberSentMessage {
 }
 
 export const ViberSentMessageSchema: Schema = new Schema<IViberSentMessage>({
+  userId: { type: String, required: true },
   senderId: { type: String, required: true },
   receiverId: { type: String, required: true },
   sendDate: { type: Date, required: true },
