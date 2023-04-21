@@ -115,8 +115,12 @@ const webbuilderReplacer = async ({
             <button id="quantity-chooser-plus">+</button>
           </div>
 
+          <button id="checkout">Checkout<button>
+
           <script>
             let quantity = 1;
+
+            const items = [];
 
             function showQuantity() {
               $("#quantity-chooser-quantity").text(quantity);
@@ -138,13 +142,26 @@ const webbuilderReplacer = async ({
               });
 
               $("#add-to-cart").click(() => {
+                items.push({
+                  productId: "${product._id}",
+                  count: quantity,
+                  unitPrice: ${product.unitPrice}
+                })
+              });
+
+              $("#checkout").click(() => {
                 $.ajax({
-                  url: "http://localhost:4000/pl:posclient/add-to-cart",
+                  url: "http://localhost:4000/graphql",
                   method: "post",
-                  data: {
-                    quantity,
-                    productId: "${product._id}"
-                  },
+                  contentType: "application/json",
+                  data: JSON.stringify({
+                    query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type) { _id } }',
+                    variables: {
+                      items,
+                      totalAmount: 100,
+                      type: 'test'
+                    }
+                  }),
                   success: () => {
                     alert('Success');
                   }
