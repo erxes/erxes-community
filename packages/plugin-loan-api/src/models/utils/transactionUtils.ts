@@ -41,7 +41,7 @@ export const getAOESchedules = async (models: IModels, contract) => {
 
 export const getCalcedAmounts = async (
   models: IModels,
-  memoryStorage: any,
+  subdomain: string,
   doc: ICalcDivideParams
 ) => {
   let result: {
@@ -102,11 +102,11 @@ export const getCalcedAmounts = async (
   // closed contract
   if (!nextSchedule) {
     const unduePercent =
-      (await getUnduePercent(models, memoryStorage, preSchedule.payDate)) ||
+      (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
       contract.unduePercent ||
       0.2;
     result.undue = Math.round(
-      (preSchedule.balance / 100) *
+      ((preSchedule.balance * contract.interestRate) / 100 / 365) *
         unduePercent *
         getDiffDay(prePayDate, trDate)
     );
@@ -215,12 +215,14 @@ export const getCalcedAmounts = async (
 
   // after
   const unduePercent =
-    (await getUnduePercent(models, memoryStorage, preSchedule.payDate)) ||
+    (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
     contract.unduePercent ||
     0.2;
 
   result.undue = Math.round(
-    (preSchedule.balance / 100) * unduePercent * getDiffDay(nextPayDate, trDate)
+    ((preSchedule.balance * contract.interestRate) / 100 / 365) *
+      unduePercent *
+      getDiffDay(nextPayDate, trDate)
   );
   const { diffEve, diffNonce } = getDatesDiffMonth(prePayDate, trDate);
 
@@ -256,8 +258,8 @@ export const getCalcedAmounts = async (
 };
 
 export const transactionRule = async (
-  models: any,
-  memoryStorage: any,
+  models: IModels,
+  subdomain: string,
   doc: ICalcTrParams | any,
   result?: {
     payment: number;
@@ -285,7 +287,7 @@ export const transactionRule = async (
     return result;
   }
 
-  result.calcedInfo = await getCalcedAmounts(models, memoryStorage, {
+  result.calcedInfo = await getCalcedAmounts(models, subdomain, {
     contractId: doc.contractId,
     payDate: doc.payDate
   });
@@ -312,6 +314,7 @@ export const transactionRule = async (
 
   result.debt = debt;
   mainAmount = mainAmount - debt;
+  console.log(undue, '------------------>');
   if (undue > mainAmount) {
     result.undue = mainAmount;
     return result;
@@ -357,7 +360,10 @@ export const transactionRule = async (
 
   return result;
 };
-
+/**
+ * when transaction done
+ * then schedule must be modified by paid amount
+ */
 export const trAfterSchedule = async (
   models: IModels,
   tr: ITransactionDocument
@@ -380,6 +386,8 @@ export const trAfterSchedule = async (
     .sort({ payDate: -1 })
     .lean();
 
+  console.log('preSchedule1', preSchedule);
+
   const pendingSchedules = await models.Schedules.find({
     contractId: contract._id,
     status: SCHEDULE_STATUS.PENDING
@@ -387,7 +395,7 @@ export const trAfterSchedule = async (
     .sort({ payDate: 1 })
     .lean();
 
-  // hasnt schedule
+  // hasn't schedule
   if ((!pendingSchedules || !pendingSchedules.length) && !preSchedule) {
     // reschedule
   }
@@ -401,6 +409,7 @@ export const trAfterSchedule = async (
   const nextPayDate = getFullDate(nextSchedule.payDate);
 
   // first pay
+  // in this case if this contract get first payment this will be in to the loan schedule then it's used on calculation
   if (!preSchedule) {
     preSchedule = {
       payDate: contract.startDate,
@@ -412,6 +421,8 @@ export const trAfterSchedule = async (
 
   const prePayDate = getFullDate(preSchedule.payDate);
 
+  console.log('preSchedule2', preSchedule);
+
   // wrong date
   if (trDate < prePayDate) {
     throw new Error('transaction is not valid date');
@@ -419,18 +430,21 @@ export const trAfterSchedule = async (
 
   // one day multi pay
   if (getDiffDay(trDate, prePayDate) === 0) {
+    console.log('getDiffDay(trDate, prePayDate) === 0');
     await onPreScheduled(models, contract, tr, preSchedule, pendingSchedules);
     return;
   }
 
   // between
   if (trDate < nextPayDate) {
+    console.log('trDate < nextPayDate');
     await betweenScheduled(models, contract, tr, preSchedule, pendingSchedules);
     return;
   }
 
   // on schedule
   if (getDiffDay(trDate, nextPayDate) === 0) {
+    console.log('getDiffDay(trDate, nextPayDate) === 0');
     await onNextScheduled(
       models,
       contract,
@@ -442,6 +456,7 @@ export const trAfterSchedule = async (
     return;
   }
 
+  console.log('else');
   // delayed
   await afterNextScheduled(
     models,
@@ -502,6 +517,9 @@ export const removeTrAfterSchedule = async (
   }
 
   if (delIds.length) {
-    await models.Schedules.deleteMany({ _id: { $in: delIds } });
+    await models.Schedules.deleteMany({
+      _id: { $in: delIds },
+      isDefault: { $ne: true }
+    });
   }
 };

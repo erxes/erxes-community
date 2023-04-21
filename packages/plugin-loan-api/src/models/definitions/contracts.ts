@@ -35,7 +35,7 @@ export interface IContract {
   leaseAmount: number;
   feeAmount?: number;
   /**
-   * @property {number} tenor зээлийн хугацаа сараар
+   * @property {number} tenor loan duration month
    */
   tenor: number;
   interestRate: number;
@@ -44,7 +44,16 @@ export interface IContract {
   startDate: Date;
   scheduleDay: number;
   insuranceAmount: number;
+  /**
+   * @property {number} debt loan debit amount it will be chance to lender can pay lower than main payment amount
+   * if current payment 15000 amount then lender payed 1000 debt then lender can pay 14000 amount
+   */
   debt?: number;
+  /**
+   * @property {number} debtTenor this field is related with debt field
+   * it's meaning duration of debt split payment
+   * for example debt amount is 5000 then debtTenor is 2 then first month 2500 tenor payment required next month 2500 tenor payment required
+   */
   debtTenor?: number;
   debtLimit?: number;
 

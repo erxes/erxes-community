@@ -1,6 +1,8 @@
 import { IModels } from '../../connectionResolver';
 import { SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
+import { IScheduleDocument } from '../definitions/schedules';
+import { ITransactionDocument } from '../definitions/transactions';
 import {
   calcInterest,
   calcPerMonthEqual,
@@ -15,15 +17,15 @@ import {
 } from './utils';
 
 export const scheduleHelper = async (
-  contract,
-  bulkEntries,
-  startDate,
-  balance,
-  tenor,
-  salvageAmount,
-  salvageTenor,
-  nextDate,
-  perHolidays
+  contract: IContractDocument,
+  bulkEntries: any[],
+  startDate: Date,
+  balance: number,
+  tenor: number,
+  salvageAmount: number,
+  salvageTenor: number,
+  nextDate: Date,
+  perHolidays: IPerHoliday[]
 ) => {
   if (tenor === 0) {
     return bulkEntries;
@@ -40,7 +42,7 @@ export const scheduleHelper = async (
         currentDate,
         payment,
         perHolidays,
-        i === 0 && nextDate
+        i === 0 ? nextDate : undefined
       );
       currentDate = perMonth.date;
       balance = perMonth.loanBalance;
@@ -108,11 +110,16 @@ export const scheduleHelper = async (
   return bulkEntries;
 };
 
-const insuranceHelper = (contract, insuranceTypeRulesById, currentYear) => {
+const insuranceHelper = (
+  contract: IContractDocument,
+  insuranceTypeRulesById: any,
+  currentYear: number
+) => {
   let perMonthInsurance = 0;
   let perYearInsurance = 0;
   for (const data of contract.collateralsData) {
-    const insuranceType = insuranceTypeRulesById[data.insuranceTypeId];
+    const insuranceType =
+      data.insuranceTypeId && insuranceTypeRulesById[data.insuranceTypeId];
 
     if (!insuranceType) {
       continue;
@@ -184,8 +191,8 @@ export const reGenerateSchedules = async (
     startDate,
     balance,
     tenor,
-    contract.salvageAmount,
-    contract.salvageTenor,
+    contract.salvageAmount || 0,
+    contract.salvageTenor || 0,
     nextDate,
     perHolidays
   );
@@ -198,8 +205,8 @@ export const reGenerateSchedules = async (
     contract,
     bulkEntries,
     startDate,
-    contract.salvageAmount,
-    contract.salvageTenor,
+    contract.salvageAmount || 0,
+    contract.salvageTenor || 0,
     0,
     0,
     nextDate,
@@ -271,21 +278,22 @@ export const reGenerateSchedules = async (
 
 const fillAmounts = async (
   models: IModels,
-  doc,
-  tr,
-  preSchedule,
+  doc: IScheduleDocument,
+  tr: ITransactionDocument,
+  preSchedule: IScheduleDocument,
   isSetAmount: boolean = false
 ) => {
   if (isSetAmount) {
-    doc.undue = tr.calcedInfo.undue || 0;
-    doc.interestEve = tr.calcedInfo.interestEve || 0;
-    doc.interestNonce = tr.calcedInfo.interestNonce || 0;
-    doc.payment = tr.calcedInfo.payment || 0;
-    doc.insurance = tr.calcedInfo.insurance || 0;
-    doc.debt = tr.calcedInfo.debt || 0;
-    doc.total = tr.calcedInfo.total || 0;
+    doc.undue = tr?.calcedInfo?.undue || 0;
+    doc.interestEve = tr?.calcedInfo?.interestEve || 0;
+    doc.interestNonce = tr?.calcedInfo?.interestNonce || 0;
+    doc.payment = tr?.calcedInfo?.payment || 0;
+    doc.insurance = tr?.calcedInfo?.insurance || 0;
+    doc.debt = tr?.calcedInfo?.debt || 0;
+    doc.total = tr?.calcedInfo?.total || 0;
   }
 
+  doc.undue = (doc.undue || 0) + (tr.undue || 0);
   doc.didUndue = (doc.didUndue || 0) + (tr.undue || 0);
   doc.didInterestEve = (doc.didInterestEve || 0) + (tr.interestEve || 0);
   doc.didInterestNonce = (doc.didInterestNonce || 0) + (tr.interestNonce || 0);
@@ -303,7 +311,7 @@ const fillAmounts = async (
 
   if (doc.balance < 0) {
     doc.surplus = -1 * doc.balance;
-    doc.didPayment = tr.payment + doc.balance;
+    doc.didPayment = (tr?.payment || 0) + doc.balance;
     await models.Transactions.updateOne(
       { _id: tr._id },
       { $set: { surplus: doc.surplus, payment: doc.didPayment } }
@@ -316,16 +324,20 @@ const fillAmounts = async (
 
 export const generatePendingSchedules = async (
   models: IModels,
-  contract,
-  updatedSchedule,
-  pendingSchedules,
-  tr,
+  contract: IContractDocument,
+  updatedSchedule: IScheduleDocument,
+  pendingSchedules: IScheduleDocument[],
+  tr: ITransactionDocument,
   trReaction,
   allowLess: boolean = false
 ) => {
   let changeDoc = {};
-
-  if (updatedSchedule.didDebt < updatedSchedule.debt) {
+  /**when didDebt less than debt then only change status */
+  if (
+    !!updatedSchedule.didDebt &&
+    !!updatedSchedule.debt &&
+    updatedSchedule.didDebt < updatedSchedule.debt
+  ) {
     trReaction.push({
       scheduleId: updatedSchedule._id,
       preData: { status: updatedSchedule.status }
@@ -343,7 +355,11 @@ export const generatePendingSchedules = async (
     return;
   }
 
-  if (updatedSchedule.didUndue < updatedSchedule.undue) {
+  if (
+    !!updatedSchedule.didUndue &&
+    !!updatedSchedule.undue &&
+    updatedSchedule.didUndue < updatedSchedule.undue
+  ) {
     // allowLess is forever false
     trReaction.push({
       scheduleId: updatedSchedule._id,
@@ -372,8 +388,9 @@ export const generatePendingSchedules = async (
 
   let preSchedule = updatedSchedule;
   let schedule = pendingSchedules[0];
-
   let balance = updatedSchedule.balance;
+  let paymentBalance =
+    (updatedSchedule.payment || 0) - (updatedSchedule.didPayment || 0);
   let interestEve = 0;
   let interestNonce = 0;
   let index = 0;
@@ -407,18 +424,17 @@ export const generatePendingSchedules = async (
       (updatedSchedule.interestNonce || 0) -
       (updatedSchedule.didInterestNonce || 0);
 
-    const payment = schedule.payment - updatedSchedule.didPayment;
+    let payment = (schedule.payment || 0) - (updatedSchedule.didPayment || 0);
 
     changeDoc = {
-      interestEve: schedule.interestEve + interestEve,
-      interestNonce: schedule.interestNonce + interestNonce,
-      payment,
+      interestEve: (schedule.interestEve || 0) + interestEve,
+      interestNonce: (schedule.interestNonce || 0) + interestNonce,
       balance: balance - payment,
       total:
         schedule.total +
         interestEve +
         interestNonce -
-        updatedSchedule.didPayment
+        (updatedSchedule.didPayment || 0)
     };
 
     trReaction.push({
@@ -439,10 +455,14 @@ export const generatePendingSchedules = async (
     return;
   }
 
-  if (updatedSchedule.didInsurance < updatedSchedule.insurance) {
+  if (
+    !!updatedSchedule.didInsurance &&
+    !!updatedSchedule.insurance &&
+    updatedSchedule.didInsurance < updatedSchedule.insurance
+  ) {
     const insurance = updatedSchedule.insurance - updatedSchedule.didInsurance;
     changeDoc = {
-      insurance: schedule.insurance + insurance,
+      insurance: (schedule.insurance || 0) + insurance,
       total: schedule.total + insurance
     };
 
@@ -464,7 +484,11 @@ export const generatePendingSchedules = async (
     return;
   }
 
-  if (updatedSchedule.didDebt < updatedSchedule.debt) {
+  if (
+    !!updatedSchedule.didDebt &&
+    !!updatedSchedule.debt &&
+    updatedSchedule.didDebt < updatedSchedule.debt
+  ) {
     // debt less then next schedule debt up and not change other fields
     const debt = updatedSchedule.debt - updatedSchedule.didDebt;
 
@@ -496,7 +520,14 @@ export const generatePendingSchedules = async (
     };
   }> = [];
 
-  while (diff > schedule.payment && index < pendingSchedules.length - 1) {
+  let overPaidPayment = 0;
+
+  if (paymentBalance < 0 && tr.payment) overPaidPayment = tr.payment;
+
+  while (
+    diff > (schedule.payment || 0) &&
+    index < pendingSchedules.length - 1
+  ) {
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
       schedule.payDate
@@ -512,15 +543,24 @@ export const generatePendingSchedules = async (
       interestRate: contract.interestRate,
       dayOfMonth: diffNonce
     });
-    diff = diff - schedule.payment;
+
+    diff = diff - (schedule.payment || 0);
+
+    let payment = schedule.payment || 0;
+    if (overPaidPayment > 0 && payment > 0) {
+      payment -= overPaidPayment;
+      if (payment < 0) {
+        overPaidPayment = payment * -1;
+        payment = 0;
+      } else overPaidPayment = 0;
+    }
 
     changeDoc = {
-      debt: 0,
-      payment: 0,
+      payment: payment,
       interestEve,
       interestNonce,
       balance,
-      total: interestEve + interestNonce + (schedule.insurance || 0)
+      total: payment + interestEve + interestNonce + (schedule.insurance || 0)
     };
     trReaction.push({
       scheduleId: schedule._id,
@@ -555,7 +595,7 @@ export const generatePendingSchedules = async (
       interestRate: contract.interestRate,
       dayOfMonth: diffNonce
     });
-    diff = diff - schedule.payment;
+    diff = diff - (schedule.payment || 0);
 
     changeDoc = {
       debt: 0,
@@ -577,7 +617,7 @@ export const generatePendingSchedules = async (
         update: { $set: { ...changeDoc } }
       }
     });
-  } else {
+  } else if (overPaidPayment > 0) {
     // diff < 0 condition
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
@@ -593,19 +633,19 @@ export const generatePendingSchedules = async (
       interestRate: contract.interestRate,
       dayOfMonth: diffNonce
     });
-    balance = balance - schedule.payment + diff;
+    balance = balance - (schedule.payment || 0) - overPaidPayment;
 
     changeDoc = {
       debt: 0,
-      payment: schedule.payment - diff,
+      payment: (schedule.payment || 0) - overPaidPayment,
       interestEve,
       interestNonce,
       balance,
       total:
         interestEve +
         interestNonce +
-        schedule.payment -
-        diff +
+        (schedule.payment || 0) -
+        overPaidPayment +
         (schedule.insurance || 0)
     };
     trReaction.push({
@@ -660,20 +700,28 @@ export const generatePendingSchedules = async (
   );
   await models.Schedules.bulkWrite(bulkOps);
 };
-
+/**
+ *
+ * @param models
+ * @param contract
+ * @param tr transactionData
+ * @param preSchedule
+ * @param pendingSchedules
+ * this method called when the loan repayment not done that current date
+ */
 export const onPreScheduled = async (
   models: IModels,
-  contract,
-  tr,
-  preSchedule,
-  pendingSchedules
+  contract: IContractDocument,
+  tr: ITransactionDocument,
+  preSchedule: IScheduleDocument,
+  pendingSchedules: IScheduleDocument[]
 ) => {
   const trReaction: any[] = [];
 
   // multi pay on day
   const doc = await fillAmounts(
     models,
-    { ...preSchedule },
+    Object.assign({}, preSchedule),
     tr,
     preSchedule,
     false
@@ -715,13 +763,19 @@ export const onPreScheduled = async (
 
 export const betweenScheduled = async (
   models: IModels,
-  contract,
-  tr,
-  preSchedule,
-  pendingSchedules
+  contract: IContractDocument,
+  tr: ITransactionDocument,
+  preSchedule: IScheduleDocument,
+  pendingSchedules: IScheduleDocument[]
 ) => {
   const trReaction: any = [];
-  const doc = await fillAmounts(models, {}, tr, preSchedule, true);
+  const doc = await fillAmounts(
+    models,
+    {} as IScheduleDocument,
+    tr,
+    preSchedule,
+    true
+  );
 
   doc.contractId = contract._id;
   doc.payDate = tr.payDate;
@@ -747,17 +801,17 @@ export const betweenScheduled = async (
 
 export const onNextScheduled = async (
   models: IModels,
-  contract,
-  tr,
-  preSchedule,
-  nextSchedule,
-  pendingSchedules
+  contract: IContractDocument,
+  tr: ITransactionDocument,
+  preSchedule: IScheduleDocument,
+  nextSchedule: IScheduleDocument,
+  pendingSchedules: IScheduleDocument[]
 ) => {
   const trReaction: any[] = [];
 
   const doc = await fillAmounts(
     models,
-    { ...nextSchedule },
+    Object.assign({}, nextSchedule),
     tr,
     preSchedule,
     false
@@ -784,12 +838,12 @@ export const onNextScheduled = async (
 };
 
 export const afterNextScheduled = async (
-  models,
-  contract,
-  tr,
-  preSchedule,
-  nextSchedule,
-  pendingSchedules
+  models: IModels,
+  contract: IContractDocument,
+  tr: ITransactionDocument,
+  preSchedule: IScheduleDocument,
+  nextSchedule: IScheduleDocument,
+  pendingSchedules: IScheduleDocument[]
 ) => {
   interface ITrReaction {
     scheduleId: string;
@@ -798,21 +852,22 @@ export const afterNextScheduled = async (
   const trReaction: ITrReaction[] = [];
   const doc = await fillAmounts(
     models,
-    { ...nextSchedule },
+    Object.assign({}, nextSchedule),
     tr,
     preSchedule,
     true
   );
 
-  const updatedSchedule = await models.RepaymentSchedules.create({
+  const updatedSchedule = await models.Schedules.create({
     ...doc,
     _id: undefined,
     isDefault: false,
     status: SCHEDULE_STATUS.DONE
   });
+
   trReaction.push({ scheduleId: updatedSchedule._id, preData: undefined });
 
-  const skippedSchedules = await models.RepaymentSchedules.find(
+  const skippedSchedules = await models.Schedules.find(
     {
       $and: [
         { payDate: { $gte: nextSchedule.payDate } },
@@ -830,7 +885,7 @@ export const afterNextScheduled = async (
     });
   }
 
-  await models.RepaymentSchedules.updateMany(
+  await models.Schedules.updateMany(
     {
       $and: [
         { payDate: { $gte: nextSchedule.payDate } },
@@ -844,7 +899,7 @@ export const afterNextScheduled = async (
   await generatePendingSchedules(
     models,
     contract,
-    { ...updatedSchedule._doc },
+    Object.assign({}, updatedSchedule),
     pendingSchedules.filter(s => s.payDate > updatedSchedule.payDate),
     tr,
     trReaction

@@ -12,10 +12,11 @@ import { Model } from 'mongoose';
 import { ITransactionDocument } from '../models/definitions/transactions';
 import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
+import { IContractDocument } from './definitions/contracts';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
-  createTransaction(messageBroker: any, memoryStorage: any, doc: ITransaction);
+  createTransaction(messageBroker: any, subdomain: string, doc: ITransaction);
   updateTransaction(
     messageBroker: any,
     memoryStorage: any,
@@ -54,14 +55,15 @@ export const loadTransactionClass = (models: IModels) => {
      */
     public static async createTransaction(
       messageBroker: any,
-      memoryStorage: any,
+      subdomain: string,
       doc: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
       const contract = await models.Contracts.findOne({
         _id: doc.contractId
-      }).lean();
+      }).lean<IContractDocument>();
+
       if (!contract || !contract._id) {
         return models.Transactions.create({ ...doc });
       }
@@ -73,7 +75,7 @@ export const loadTransactionClass = (models: IModels) => {
         await models.Invoices.updateInvoice(doc.invoiceId, invoiceData);
       }
 
-      const trInfo = await transactionRule(models, memoryStorage, {
+      const trInfo = await transactionRule(models, subdomain, {
         ...doc
       });
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
@@ -300,9 +302,10 @@ export const loadTransactionClass = (models: IModels) => {
      * Remove Transaction
      */
     public static async removeTransactions(_ids) {
-      for (const _id of _ids) {
-        const oldTr = await models.Transactions.findOne({ _id });
-
+      const transactions = await models.Transactions.find({ _id: _ids })
+        .sort({ createdAt: -1 })
+        .lean();
+      for (const oldTr of transactions) {
         if (oldTr) {
           await removeTrAfterSchedule(models, oldTr);
         }

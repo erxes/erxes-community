@@ -1,7 +1,7 @@
-import { getConfig } from 'erxes-api-utils';
 import { IContractDocument } from '../definitions/contracts';
 import { IDefaultScheduleParam } from '../definitions/schedules';
 import { IModels } from '../../connectionResolver';
+import { sendMessageBroker } from '../../messageBroker';
 
 export const calcInterest = ({
   balance,
@@ -210,7 +210,7 @@ export const calcPerMonthFixed = (
   currentDate: Date,
   total: number,
   perHolidays: IPerHoliday[],
-  nextDate?: Date
+  nextDate?: Date | any
 ) => {
   let nextDay = nextDate || getNextMonthDay(currentDate, doc.scheduleDay);
   nextDay = checkNextDay(nextDay, doc.weekends, doc.useHoliday, perHolidays);
@@ -290,18 +290,30 @@ export const getNumber = async (models: IModels, contractTypeId: string) => {
 
 export const getUnduePercent = async (
   models,
-  memoryStorage,
+  subdomain,
   date
 ): Promise<number> => {
-  const undueConfig = (await getConfig(
-    models,
-    memoryStorage,
-    'undueConfig',
-    {}
-  )) as [{ startDate: Date; endDate: Date; percent: number }];
-  const ruledUndueConfigs = Object.values(undueConfig)
-    .filter(conf => conf.startDate < date && date < conf.endDate)
-    .sort((a, b) =>
+  const holidayConfig: any = await sendMessageBroker(
+    {
+      subdomain,
+      action: 'configs.findOne',
+      data: {
+        query: {
+          code: 'undueConfig'
+        }
+      },
+      isRPC: true
+    },
+    'core'
+  );
+
+  const ruledUndueConfigs = Object.values<{
+    startDate: Date;
+    endDate: Date;
+    percent: number;
+  }>(holidayConfig?.value)
+    .filter((conf: any) => conf.startDate < date && date < conf.endDate)
+    .sort((a: any, b: any) =>
       a.endDate < b.endDate
         ? 1
         : a.endDate === b.endDate
@@ -310,11 +322,11 @@ export const getUnduePercent = async (
           : -1
         : -1
     );
-  if (!ruledUndueConfigs || !ruledUndueConfigs.length) {
-    return 0;
-  }
 
-  return ruledUndueConfigs[0].percent;
+  if (!!ruledUndueConfigs && ruledUndueConfigs.length > 0) {
+    return ruledUndueConfigs[0].percent;
+  }
+  return 0;
 };
 
 export const getChanged = (old, anew) => {

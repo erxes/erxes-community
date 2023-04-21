@@ -107,7 +107,7 @@ const invoiceQueries = {
   getInvoicePreInfo: async (
     _root,
     { contractId, payDate },
-    { models }: IContext
+    { models, subdomain }: IContext
   ) => {
     const currentDate = getFullDate(payDate);
     const {
@@ -117,7 +117,7 @@ const invoiceQueries = {
       interestNonce,
       insurance,
       debt
-    } = (await getCalcedAmounts(models, messageBroker, {
+    } = (await getCalcedAmounts(models, subdomain, {
       contractId,
       payDate: currentDate
     })) as any;

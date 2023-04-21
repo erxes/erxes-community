@@ -8,18 +8,21 @@ import {
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
 import redis from '../../../redis';
-import { ITransactionDocument } from '../../../models/definitions/transactions';
+import {
+  ITransaction,
+  ITransactionDocument
+} from '../../../models/definitions/transactions';
 
 const transactionMutations = {
   transactionsAdd: async (
     _root,
-    doc,
-    { user, docModifier, models, subdomain }: IContext
+    doc: ITransaction,
+    { user, models, subdomain }: IContext
   ) => {
     const transaction = models.Transactions.createTransaction(
       messageBroker,
-      redis,
-      docModifier(doc)
+      subdomain,
+      doc
     );
 
     const logData = {
