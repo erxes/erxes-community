@@ -7,6 +7,7 @@ import {
   getUserDetail,
   getOnline
 } from './viber';
+import { ViberSentMessage } from './models';
 
 const init = async (app: any): Promise<void> => {
   console.log('Viber Init');
@@ -31,6 +32,17 @@ const init = async (app: any): Promise<void> => {
     '/send_message',
     async (req: any, res: any): Promise<any> => {
       const response = await sendMessage(req.body);
+
+      if (response.status === 0) {
+        const viberSentMessage = new ViberSentMessage({
+          senderId: 'SENDER',
+          receiverId: req.body.receiver,
+          sendDate: new Date(),
+          messageText: req.body.text
+        });
+        viberSentMessage.save();
+      }
+
       return res.json(response);
     }
   );

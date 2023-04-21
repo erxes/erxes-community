@@ -2,10 +2,6 @@ import { Request, Response } from 'express';
 import { ViberMessage } from '../models';
 
 export const receiveWebhook = (req: Request, res: Response) => {
-  //   console.log("################");
-  //   console.log(req.body);
-  //   console.log("################");
-
   if (req.body.event === 'message') {
     saveMessage(req.body);
   }
@@ -21,10 +17,6 @@ export const saveMessage = (message: any) => {
     messageText: message.message.text,
     messageType: message.message.type
   };
-
-  console.log('################');
-  console.log(data);
-  console.log('################');
 
   const viberMessage = new ViberMessage(data);
 

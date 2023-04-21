@@ -111,4 +111,23 @@ export const ViberMessageSchema: Schema = new Schema<IViberMessage>({
   messageType: { type: String, required: true }
 });
 
-export const ViberMessage = model('ViberMessage', ViberMessageSchema);
+export const ViberMessage = model('viber_received_message', ViberMessageSchema);
+
+export interface IViberSentMessage {
+  senderId: string;
+  receiverId: string;
+  sendDate: Date;
+  messageText: string;
+}
+
+export const ViberSentMessageSchema: Schema = new Schema<IViberSentMessage>({
+  senderId: { type: String, required: true },
+  receiverId: { type: String, required: true },
+  sendDate: { type: Date, required: true },
+  messageText: { type: String, required: true }
+});
+
+export const ViberSentMessage = model(
+  'viber_sent_message',
+  ViberSentMessageSchema
+);
