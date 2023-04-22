@@ -145,7 +145,7 @@ const webbuilderReplacer = async ({
                 items.push({
                   productId: "${product._id}",
                   count: quantity,
-                  unitPrice: ${product.unitPrice}
+                  unitPrice: ${product.unitPrice || 0}
                 })
               });
 
@@ -155,11 +155,13 @@ const webbuilderReplacer = async ({
                   method: "post",
                   contentType: "application/json",
                   data: JSON.stringify({
-                    query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type) { _id } }',
+                    query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
                     variables: {
                       items,
+                      customerId: 'fdfsdfdsfds',
                       totalAmount: 100,
-                      type: 'test'
+                      branchId: "czWMik5pHMCYMNDgK",
+                      type: 'take'
                     }
                   }),
                   success: () => {
