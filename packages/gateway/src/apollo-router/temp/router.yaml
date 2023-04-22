@@ -1,0 +1,20 @@
+include_subgraph_errors:
+  all: true
+rhai:
+  main: /Users/baterdenekhashbat/Documents/erxes-community/packages/gateway/src/apollo-router/rhai/main.rhai
+cors:
+  allow_credentials: true
+  origins:
+    - http://localhost:3000
+    - http://localhost:3200
+    - http://localhost:4500/
+    - https://studio.apollographql.com
+  match_origins:
+    - .*
+headers:
+  all:
+    request:
+      - propagate:
+          matching: .*
+supergraph:
+  listen: 127.0.0.1:50000

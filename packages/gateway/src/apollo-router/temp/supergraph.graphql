@@ -1,0 +1,3101 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type App
+  @join__type(graph: CORE)
+{
+  _id: String
+  isEnabled: Boolean
+  createdAt: Date
+  name: String
+  userGroupId: String
+  expireDate: Date
+  accessToken: String
+  refreshToken: String
+  userGroupName: String
+}
+
+type Attachment
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CORE)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+{
+  url: String!
+  name: String
+  type: String
+  size: Float
+  duration: Float
+}
+
+input AttachmentInput
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CORE)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+{
+  url: String!
+  name: String!
+  type: String
+  size: Float
+  duration: Float
+}
+
+type AutomationResponse
+  @join__type(graph: EBARIMT)
+{
+  content: JSON
+  responseId: String
+  userId: String
+  sessionCode: String
+}
+
+type AverageReview
+  @join__type(graph: ECOMMERCE)
+{
+  productId: String
+  average: Float
+  length: Int
+}
+
+type Board
+  @join__type(graph: CARDS, key: "_id")
+{
+  _id: String!
+  name: String!
+  order: Int
+  createdAt: Date
+  type: String
+  pipelines: [Pipeline]
+}
+
+type BoardCount
+  @join__type(graph: CARDS)
+{
+  _id: String
+  name: String
+  count: Int
+}
+
+type Branch
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CORE, key: "_id")
+{
+  _id: String!
+  title: String @join__field(graph: CORE)
+  parentId: String @join__field(graph: CORE)
+  supervisorId: String @join__field(graph: CORE)
+  supervisor: User @join__field(graph: CORE)
+  code: String @join__field(graph: CORE)
+  order: String @join__field(graph: CORE)
+  users: [User] @join__field(graph: CORE)
+  userIds: [String] @join__field(graph: CORE)
+  userCount: Int @join__field(graph: CORE)
+  parent: Branch @join__field(graph: CORE)
+  children: [Branch] @join__field(graph: CORE)
+  address: String @join__field(graph: CORE)
+  radius: Int @join__field(graph: CORE)
+  phoneNumber: String @join__field(graph: CORE)
+  email: String @join__field(graph: CORE)
+  links: JSON @join__field(graph: CORE)
+  coordinate: Coordinate @join__field(graph: CORE)
+  image: Attachment @join__field(graph: CORE)
+}
+
+type BranchListQueryResponse
+  @join__type(graph: CORE)
+{
+  list: [Branch]
+  totalCount: Int
+  totalUsersCount: Int
+}
+
+type Brand
+  @join__type(graph: CORE, key: "_id")
+  @join__type(graph: KNOWLEDGEBASE, key: "_id")
+{
+  _id: String!
+  name: String @join__field(graph: CORE)
+  description: String @join__field(graph: CORE)
+  code: String @join__field(graph: CORE)
+  userId: String @join__field(graph: CORE)
+  createdAt: Date @join__field(graph: CORE)
+  emailConfig: JSON @join__field(graph: CORE)
+  memberIds: [String] @join__field(graph: CORE)
+}
+
+enum CacheControlScope
+  @join__type(graph: CONTACTS)
+  @join__type(graph: CORE)
+  @join__type(graph: PAYMENT)
+  @join__type(graph: PRODUCTS)
+{
+  PUBLIC @join__enumValue(graph: CONTACTS) @join__enumValue(graph: CORE) @join__enumValue(graph: PAYMENT) @join__enumValue(graph: PRODUCTS)
+  PRIVATE @join__enumValue(graph: CONTACTS) @join__enumValue(graph: CORE) @join__enumValue(graph: PAYMENT) @join__enumValue(graph: PRODUCTS)
+}
+
+type Callout
+  @join__type(graph: FORMS)
+{
+  title: String
+  body: String
+  buttonText: String
+  featuredImage: String
+  skip: Boolean
+}
+
+type CatProd
+  @join__type(graph: POS)
+{
+  _id: String
+  categoryId: String
+  code: String
+  name: String
+  productId: String
+}
+
+input CatProdInput
+  @join__type(graph: POS)
+{
+  _id: String
+  categoryId: String
+  code: String
+  name: String
+  productId: String
+}
+
+type Checklist
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  contentType: String
+  contentTypeId: String
+  title: String
+  createdUserId: String
+  createdDate: Date
+  items: [ChecklistItem]
+  percent: Float
+}
+
+type ChecklistItem
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  checklistId: String
+  isChecked: Boolean
+  content: String
+  order: Int
+}
+
+type CheckOrderResponse
+  @join__type(graph: POS)
+{
+  orderId: String
+  isSynced: Boolean
+  syncedDate: Date
+  syncedBillNumber: String
+}
+
+type ClientPortal
+  @join__type(graph: CLIENTPORTAL)
+{
+  _id: String!
+  name: String!
+  description: String
+  url: String
+  logo: String
+  icon: String
+  headerHtml: String
+  footerHtml: String
+  domain: String
+  dnsStatus: String
+  messengerBrandCode: String
+  knowledgeBaseLabel: String
+  knowledgeBaseTopicId: String
+  ticketLabel: String
+  dealLabel: String
+  taskPublicBoardId: String
+  taskPublicPipelineId: String
+  taskLabel: String
+  taskStageId: String
+  taskPipelineId: String
+  taskBoardId: String
+  ticketStageId: String
+  ticketPipelineId: String
+  ticketBoardId: String
+  dealStageId: String
+  dealPipelineId: String
+  dealBoardId: String
+  googleCredentials: JSON
+  googleClientId: String
+  googleClientSecret: String
+  googleRedirectUri: String
+  facebookAppId: String
+  erxesAppToken: String
+  styles: Styles
+  mobileResponsive: Boolean
+  otpConfig: OTPConfig
+  mailConfig: MailConfig
+  manualVerificationConfig: ManualVerificationConfig
+  passwordVerificationConfig: PasswordVerificationConfig
+  kbToggle: Boolean
+  publicTaskToggle: Boolean
+  ticketToggle: Boolean
+  taskToggle: Boolean
+  dealToggle: Boolean
+}
+
+type ClientPortalComment
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  type: String
+  typeId: String
+  userId: String
+  userType: String
+  content: String
+  createdUser: JSON
+  createdAt: Date
+}
+
+type ClientPortalNotification
+  @join__type(graph: CLIENTPORTAL)
+{
+  _id: String!
+  notifType: NotificationType
+  title: String
+  link: String
+  content: String
+  createdUser: User
+  receiver: String
+  createdAt: Date
+  isRead: Boolean
+  clientPortalId: String
+  eventData: JSON
+}
+
+type ClientPortalUser
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  createdAt: Date
+  modifiedAt: Date
+  firstName: String
+  lastName: String
+  phone: String
+  email: String
+  username: String
+  type: String
+  companyName: String
+  companyRegistrationNumber: String
+  erxesCustomerId: String
+  erxesCompanyId: String
+  clientPortalId: String
+  code: String
+  ownerId: String
+  links: JSON
+  customFieldsData: JSON
+  customFieldsDataByFieldCode: JSON
+  password: String
+  isEmailVerified: Boolean
+  isPhoneVerified: Boolean
+  isOnline: Boolean
+  lastSeenAt: Date
+  sessionCount: Int
+  clientPortal: ClientPortal
+  notificationSettings: UserNotificationSettings
+  avatar: String
+  verificationRequest: VerificationRequest
+  customer: Customer
+  company: Company
+}
+
+type clientPortalUsersListResponse
+  @join__type(graph: CLIENTPORTAL)
+{
+  list: [ClientPortalUser]
+  totalCount: Float
+}
+
+input ClientPortalUserUpdate
+  @join__type(graph: CLIENTPORTAL)
+{
+  firstName: String
+  lastName: String
+  phone: String
+  email: String
+  username: String
+  companyName: String
+  companyRegistrationNumber: String
+  code: String
+  links: JSON
+  customFieldsData: JSON
+  isEmailVerified: Boolean
+  isPhoneVerified: Boolean
+  isOnline: Boolean
+  avatar: String
+}
+
+enum ClientPortalUserVerificationStatus
+  @join__type(graph: CLIENTPORTAL)
+{
+  verified @join__enumValue(graph: CLIENTPORTAL)
+  notVerified @join__enumValue(graph: CLIENTPORTAL)
+  pending @join__enumValue(graph: CLIENTPORTAL)
+}
+
+type ColumnConfigItem
+  @join__type(graph: FORMS)
+{
+  name: String
+  label: String
+  order: Int
+}
+
+type CompaniesListResponse
+  @join__type(graph: CONTACTS)
+{
+  list: [Company]
+  totalCount: Float
+}
+
+type Company
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+  @join__type(graph: CONTACTS, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
+  @join__type(graph: PRODUCTS, key: "_id")
+{
+  _id: String!
+  createdAt: Date @join__field(graph: CONTACTS)
+  modifiedAt: Date @join__field(graph: CONTACTS)
+  avatar: String @join__field(graph: CONTACTS)
+  size: Int @join__field(graph: CONTACTS)
+  website: String @join__field(graph: CONTACTS)
+  industry: String @join__field(graph: CONTACTS)
+  plan: String @join__field(graph: CONTACTS)
+  parentCompanyId: String @join__field(graph: CONTACTS)
+  ownerId: String @join__field(graph: CONTACTS)
+  mergedIds: [String] @join__field(graph: CONTACTS)
+  names: [String] @join__field(graph: CONTACTS)
+  primaryName: String @join__field(graph: CONTACTS)
+  emails: [String] @join__field(graph: CONTACTS)
+  primaryEmail: String @join__field(graph: CONTACTS)
+  phones: [String] @join__field(graph: CONTACTS)
+  primaryPhone: String @join__field(graph: CONTACTS)
+  businessType: String @join__field(graph: CONTACTS)
+  description: String @join__field(graph: CONTACTS)
+  isSubscribed: String @join__field(graph: CONTACTS)
+  links: JSON @join__field(graph: CONTACTS)
+  owner: User @join__field(graph: CONTACTS)
+  parentCompany: Company @join__field(graph: CONTACTS)
+  tagIds: [String] @join__field(graph: CONTACTS)
+  customFieldsData: JSON @join__field(graph: CONTACTS)
+  customFieldsDataByFieldCode: JSON @join__field(graph: CONTACTS)
+  trackedData: JSON @join__field(graph: CONTACTS)
+  customers: [Customer] @join__field(graph: CONTACTS)
+  code: String @join__field(graph: CONTACTS)
+  location: String @join__field(graph: CONTACTS)
+  score: Float @join__field(graph: CONTACTS)
+}
+
+type Config
+  @join__type(graph: CORE)
+{
+  _id: String!
+  code: String!
+  value: JSON
+}
+
+type Conformity
+  @join__type(graph: CORE)
+{
+  _id: String!
+  mainType: String
+  mainTypeId: String
+  relType: String
+  relTypeId: String
+}
+
+type ConvertTo
+  @join__type(graph: CARDS)
+{
+  ticketUrl: String
+  dealUrl: String
+  taskUrl: String
+}
+
+type Coordinate
+  @join__type(graph: CORE)
+{
+  longitude: String
+  latitude: String
+}
+
+input CoordinateInput
+  @join__type(graph: CORE)
+{
+  longitude: String
+  latitude: String
+}
+
+type Cover
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  posToken: String
+  status: String
+  beginDate: Date
+  endDate: Date
+  description: String
+  userId: String
+  details: [CoverDetail]
+  createdAt: Date
+  createdBy: String
+  modifiedAt: Date
+  modifiedBy: String
+  user: User
+  createdUser: User
+  modifiedUser: User
+}
+
+type CoverDetail
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  paidType: String
+  paidSummary: [CoverSummary]
+  paidDetail: JSON
+}
+
+type CoverSummary
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  kind: String
+  kindOfVal: Float
+  value: Float
+  amount: Float
+}
+
+type Customer
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+  @join__type(graph: CONTACTS, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
+  @join__type(graph: POS, key: "_id")
+{
+  _id: String!
+  state: String @join__field(graph: CONTACTS)
+  createdAt: Date @join__field(graph: CONTACTS)
+  modifiedAt: Date @join__field(graph: CONTACTS)
+  avatar: String @join__field(graph: CONTACTS)
+  integrationId: String @join__field(graph: CONTACTS)
+  firstName: String @join__field(graph: CONTACTS)
+  lastName: String @join__field(graph: CONTACTS)
+  middleName: String @join__field(graph: CONTACTS)
+  birthDate: Date @join__field(graph: CONTACTS)
+  sex: Int @join__field(graph: CONTACTS)
+  email: String @join__field(graph: CONTACTS)
+  primaryEmail: String @join__field(graph: CONTACTS)
+  emails: [String] @join__field(graph: CONTACTS)
+  primaryPhone: String @join__field(graph: CONTACTS)
+  phones: [String] @join__field(graph: CONTACTS)
+  phone: String @join__field(graph: CONTACTS)
+  tagIds: [String] @join__field(graph: CONTACTS)
+  remoteAddress: String @join__field(graph: CONTACTS)
+  location: JSON @join__field(graph: CONTACTS)
+  visitorContactInfo: JSON @join__field(graph: CONTACTS)
+  customFieldsData: JSON @join__field(graph: CONTACTS)
+  customFieldsDataByFieldCode: JSON @join__field(graph: CONTACTS)
+  trackedData: JSON @join__field(graph: CONTACTS)
+  ownerId: String @join__field(graph: CONTACTS)
+  position: String @join__field(graph: CONTACTS)
+  department: String @join__field(graph: CONTACTS)
+  leadStatus: String @join__field(graph: CONTACTS)
+  hasAuthority: String @join__field(graph: CONTACTS)
+  description: String @join__field(graph: CONTACTS)
+  isSubscribed: String @join__field(graph: CONTACTS)
+  code: String @join__field(graph: CONTACTS)
+  emailValidationStatus: String @join__field(graph: CONTACTS)
+  phoneValidationStatus: String @join__field(graph: CONTACTS)
+  isOnline: Boolean @join__field(graph: CONTACTS)
+  lastSeenAt: Date @join__field(graph: CONTACTS)
+  sessionCount: Int @join__field(graph: CONTACTS)
+  urlVisits: [JSON] @join__field(graph: CONTACTS)
+  links: JSON @join__field(graph: CONTACTS)
+  companies: [Company] @join__field(graph: CONTACTS)
+  owner: User @join__field(graph: CONTACTS)
+  score: Float @join__field(graph: CONTACTS)
+}
+
+type CustomerConnectionChangedResponse
+  @join__type(graph: CONTACTS)
+{
+  _id: String!
+  status: String!
+}
+
+type CustomerPos
+  @join__type(graph: POS)
+{
+  _id: String!
+  code: String
+  primaryPhone: String
+  firstName: String
+  primaryEmail: String
+  lastName: String
+}
+
+type CustomersListResponse
+  @join__type(graph: CONTACTS)
+{
+  list: [Customer]
+  totalCount: Float
+}
+
+enum CustomerType
+  @join__type(graph: PAYMENT)
+{
+  company @join__enumValue(graph: PAYMENT)
+  customer @join__enumValue(graph: PAYMENT)
+  user @join__enumValue(graph: PAYMENT)
+}
+
+type DailyReport
+  @join__type(graph: POSCLIENT)
+{
+  report: JSON
+}
+
+"""Date custom scalar type"""
+scalar Date
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CONTACTS)
+  @join__type(graph: CORE)
+  @join__type(graph: EBARIMT)
+  @join__type(graph: ECOMMERCE)
+  @join__type(graph: FORMS)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: NOTIFICATIONS)
+  @join__type(graph: PAYMENT)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+
+type Deal
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  amount: JSON @join__field(graph: CARDS)
+  companies: [Company] @join__field(graph: CARDS)
+  customers: [Customer] @join__field(graph: CARDS)
+  products: JSON @join__field(graph: CARDS)
+  productsData: JSON @join__field(graph: CARDS)
+  paymentsData: JSON @join__field(graph: CARDS)
+  name: String! @join__field(graph: CARDS)
+  order: Float @join__field(graph: CARDS)
+  createdAt: Date @join__field(graph: CARDS)
+  hasNotified: Boolean @join__field(graph: CARDS)
+  assignedUserIds: [String] @join__field(graph: CARDS)
+  branchIds: [String] @join__field(graph: CARDS)
+  departmentIds: [String] @join__field(graph: CARDS)
+  labelIds: [String] @join__field(graph: CARDS)
+  startDate: Date @join__field(graph: CARDS)
+  closeDate: Date @join__field(graph: CARDS)
+  description: String @join__field(graph: CARDS)
+  modifiedAt: Date @join__field(graph: CARDS)
+  modifiedBy: String @join__field(graph: CARDS)
+  reminderMinute: Int @join__field(graph: CARDS)
+  isComplete: Boolean @join__field(graph: CARDS)
+  isWatched: Boolean @join__field(graph: CARDS)
+  stageId: String @join__field(graph: CARDS)
+  boardId: String @join__field(graph: CARDS)
+  priority: String @join__field(graph: CARDS)
+  status: String @join__field(graph: CARDS)
+  attachments: [Attachment] @join__field(graph: CARDS)
+  userId: String @join__field(graph: CARDS)
+  tagIds: [String] @join__field(graph: CARDS)
+  assignedUsers: [User] @join__field(graph: CARDS)
+  stage: Stage @join__field(graph: CARDS)
+  labels: [PipelineLabel] @join__field(graph: CARDS)
+  pipeline: Pipeline @join__field(graph: CARDS)
+  createdUser: User @join__field(graph: CARDS)
+  customFieldsData: JSON @join__field(graph: CARDS)
+  score: Float @join__field(graph: CARDS)
+  timeTrack: TimeTrack @join__field(graph: CARDS)
+  number: String @join__field(graph: CARDS)
+  stageChangedDate: Date @join__field(graph: CARDS)
+  customProperties: JSON @join__field(graph: CARDS)
+}
+
+type DealListItem
+  @join__type(graph: CARDS, key: "_id")
+{
+  products: JSON
+  amount: JSON
+  customFieldsData: JSON
+  _id: String!
+  name: String
+  companies: JSON
+  customers: JSON
+  assignedUsers: JSON
+  stage: JSON
+  labels: JSON
+  isComplete: Boolean
+  isWatched: Boolean
+  relations: JSON
+  startDate: Date
+  closeDate: Date
+  createdAt: Date
+  modifiedAt: Date
+  priority: String
+  hasNotified: Boolean
+  score: Float
+  number: String
+  stageChangedDate: Date
+  tagIds: [String]
+  customProperties: JSON
+  status: String
+  branchIds: [String]
+  branches: [Branch]
+  departmentIds: [String]
+  departments: [Department]
+}
+
+type DealTotalCurrency
+  @join__type(graph: CARDS)
+{
+  amount: Float
+  name: String
+}
+
+type Department
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CORE, key: "_id")
+{
+  _id: String!
+  title: String @join__field(graph: CORE)
+  description: String @join__field(graph: CORE)
+  parentId: String @join__field(graph: CORE)
+  supervisorId: String @join__field(graph: CORE)
+  supervisor: User @join__field(graph: CORE)
+  code: String @join__field(graph: CORE)
+  order: String @join__field(graph: CORE)
+  parent: Department @join__field(graph: CORE)
+  children: [Department] @join__field(graph: CORE)
+  childCount: Int @join__field(graph: CORE)
+  users: [User] @join__field(graph: CORE)
+  userCount: Int @join__field(graph: CORE)
+  userIds: [String] @join__field(graph: CORE)
+}
+
+type DepartmentListQueryResponse
+  @join__type(graph: CORE)
+{
+  list: [Department]
+  totalCount: Int
+  totalUsersCount: Int
+}
+
+type EbarimtConfig
+  @join__type(graph: POSCLIENT)
+{
+  companyName: String
+  ebarimtUrl: String
+  checkCompanyUrl: String
+  hasVat: Boolean
+  hasCitytax: Boolean
+  districtCode: String
+  companyRD: String
+  defaultGSCode: String
+  vatPercent: Int
+  cityTaxPercent: Int
+  footerText: String
+}
+
+input EmailSignature
+  @join__type(graph: CORE)
+{
+  brandId: String
+  signature: String
+}
+
+type ENV
+  @join__type(graph: CORE)
+{
+  USE_BRAND_RESTRICTIONS: String
+}
+
+type Field
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  contentType: String! @join__field(graph: FORMS)
+  contentTypeId: String @join__field(graph: FORMS)
+  name: String @join__field(graph: FORMS)
+  isVisible: Boolean @join__field(graph: FORMS)
+  isVisibleInDetail: Boolean @join__field(graph: FORMS)
+  canHide: Boolean @join__field(graph: FORMS)
+  groupId: String @join__field(graph: FORMS)
+  lastUpdatedUser: User @join__field(graph: FORMS)
+  lastUpdatedUserId: String @join__field(graph: FORMS)
+  associatedField: Field @join__field(graph: FORMS)
+  locationOptions: [LocationOption] @join__field(graph: FORMS)
+  objectListConfigs: [ObjectListConfig] @join__field(graph: FORMS)
+  optionsValues: String @join__field(graph: FORMS)
+  products: [Product] @join__field(graph: FORMS)
+  description: String @join__field(graph: FORMS)
+  options: [String] @join__field(graph: FORMS)
+  type: String @join__field(graph: FORMS)
+  validation: String @join__field(graph: FORMS)
+  text: String @join__field(graph: FORMS)
+  content: String @join__field(graph: FORMS)
+  isRequired: Boolean @join__field(graph: FORMS)
+  order: Int @join__field(graph: FORMS)
+  associatedFieldId: String @join__field(graph: FORMS)
+  logicAction: String @join__field(graph: FORMS)
+  column: Int @join__field(graph: FORMS)
+  groupName: String @join__field(graph: FORMS)
+  pageNumber: Int @join__field(graph: FORMS)
+  code: String @join__field(graph: FORMS)
+  searchable: Boolean @join__field(graph: FORMS)
+  showInCard: Boolean @join__field(graph: FORMS)
+  isVisibleToCreate: Boolean @join__field(graph: FORMS)
+  productCategoryId: String @join__field(graph: FORMS)
+  field: String @join__field(graph: FORMS)
+  isDefinedByErxes: Boolean @join__field(graph: FORMS)
+  logics: [Logic] @join__field(graph: FORMS)
+}
+
+input FieldItem
+  @join__type(graph: FORMS)
+{
+  _id: String
+  tempFieldId: String
+  logics: [LogicInput]
+  locationOptions: [LocationOptionInput]
+  objectListConfigs: [objectListConfigInput]
+  optionsValues: String
+  description: String
+  options: [String]
+  type: String
+  validation: String
+  text: String
+  content: String
+  isRequired: Boolean
+  order: Int
+  associatedFieldId: String
+  logicAction: String
+  column: Int
+  groupName: String
+  pageNumber: Int
+  code: String
+  searchable: Boolean
+  showInCard: Boolean
+  isVisibleToCreate: Boolean
+  productCategoryId: String
+  field: String
+  isDefinedByErxes: Boolean
+}
+
+type FieldsGroup
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  name: String
+  contentType: String
+  order: Int
+  code: String
+  parentId: String
+  description: String
+  isMultiple: Boolean
+  isVisible: Boolean
+  isVisibleInDetail: Boolean
+  isDefinedByErxes: Boolean
+  fields: [Field]
+  lastUpdatedUserId: String
+  lastUpdatedUser: User
+  config: JSON
+  logicAction: String
+  logics: [Logic]
+}
+
+type Form
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  title: String
+  code: String
+  type: String
+  description: String
+  buttonText: String
+  createdUserId: String
+  createdUser: User
+  createdDate: Date
+  numberOfPages: Int
+  googleMapApiKey: String
+  fields: [Field]
+}
+
+type FormCode
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  brandId: String
+  formId: String
+}
+
+input FormCodeInput
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  brandId: String
+  formId: String
+}
+
+type FormSubmission
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  customerId: String
+  formId: String
+  formFieldId: String
+  text: String
+  formFieldText: String
+  value: JSON
+  submittedAt: Date
+}
+
+input FormSubmissionInput
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  value: JSON
+}
+
+input GroupInput
+  @join__type(graph: POS)
+{
+  _id: String
+  description: String
+  name: String
+  categoryIds: [String]
+  excludedCategoryIds: [String]
+  excludedProductIds: [String]
+}
+
+type GrowthHack
+  @join__type(graph: CARDS, key: "_id")
+{
+  _id: String!
+  hackStages: [String]
+  reach: Int
+  impact: Int
+  confidence: Int
+  ease: Int
+  voteCount: Int
+  votedUsers: [User]
+  isVoted: Boolean
+  formId: String
+  scoringType: String
+  formSubmissions: JSON
+  formFields: [Field]
+  name: String!
+  order: Float
+  createdAt: Date
+  hasNotified: Boolean
+  assignedUserIds: [String]
+  branchIds: [String]
+  departmentIds: [String]
+  labelIds: [String]
+  startDate: Date
+  closeDate: Date
+  description: String
+  modifiedAt: Date
+  modifiedBy: String
+  reminderMinute: Int
+  isComplete: Boolean
+  isWatched: Boolean
+  stageId: String
+  boardId: String
+  priority: String
+  status: String
+  attachments: [Attachment]
+  userId: String
+  tagIds: [String]
+  assignedUsers: [User]
+  stage: Stage
+  labels: [PipelineLabel]
+  pipeline: Pipeline
+  createdUser: User
+  customFieldsData: JSON
+  score: Float
+  timeTrack: TimeTrack
+  number: String
+  stageChangedDate: Date
+  customProperties: JSON
+}
+
+input InputRule
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  kind: String!
+  text: String!
+  condition: String!
+  value: String
+}
+
+input Interval
+  @join__type(graph: CARDS)
+{
+  startTime: Date
+  endTime: Date
+}
+
+input InvitationEntry
+  @join__type(graph: CORE)
+{
+  email: String
+  password: String
+  groupId: String
+  channelIds: [String]
+  unitId: String
+  branchId: String
+  departmentId: String
+}
+
+type Invoice
+  @join__type(graph: PAYMENT, key: "_id")
+{
+  _id: String
+  paymentId: String
+  amount: Float
+  phone: String
+  email: String
+  description: String
+  status: String
+  customerType: CustomerType
+  customerId: String
+  contentType: String
+  contentTypeId: String
+  createdAt: Date
+  resolvedAt: Date
+  payment: Payment
+  paymentKind: String
+  apiResponse: JSON
+  customer: JSON
+  pluginData: JSON
+}
+
+type invoicesTotalCount
+  @join__type(graph: PAYMENT)
+{
+  total: Int
+  byKind: JSON
+  byStatus: JSON
+}
+
+input ItemDate
+  @join__type(graph: CARDS)
+{
+  month: Int
+  year: Int
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  CARDS @join__graph(name: "cards", url: "http://localhost:3307/graphql")
+  CLIENTPORTAL @join__graph(name: "clientportal", url: "http://localhost:3301/graphql")
+  CONTACTS @join__graph(name: "contacts", url: "http://localhost:3309/graphql")
+  CORE @join__graph(name: "core", url: "http://localhost:3300/graphql")
+  EBARIMT @join__graph(name: "ebarimt", url: "http://localhost:3311/graphql")
+  ECOMMERCE @join__graph(name: "ecommerce", url: "http://localhost:3312/graphql")
+  FORMS @join__graph(name: "forms", url: "http://localhost:3305/graphql")
+  KNOWLEDGEBASE @join__graph(name: "knowledgebase", url: "http://localhost:3306/graphql")
+  NOTIFICATIONS @join__graph(name: "notifications", url: "http://localhost:3308/graphql")
+  PAYMENT @join__graph(name: "payment", url: "http://localhost:3310/graphql")
+  POS @join__graph(name: "pos", url: "http://localhost:3303/graphql")
+  POSCLIENT @join__graph(name: "posclient", url: "http://localhost:3304/graphql")
+  PRODUCTS @join__graph(name: "products", url: "http://localhost:3302/graphql")
+}
+
+"""
+The `jSON` scalar type represents jSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CONTACTS)
+  @join__type(graph: CORE)
+  @join__type(graph: EBARIMT)
+  @join__type(graph: ECOMMERCE)
+  @join__type(graph: FORMS)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: NOTIFICATIONS)
+  @join__type(graph: PAYMENT)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+
+type KnowledgeBaseArticle
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+  @join__type(graph: KNOWLEDGEBASE, key: "_id")
+{
+  _id: String!
+  title: String @join__field(graph: KNOWLEDGEBASE)
+  summary: String @join__field(graph: KNOWLEDGEBASE)
+  content: String @join__field(graph: KNOWLEDGEBASE)
+  status: String @join__field(graph: KNOWLEDGEBASE)
+  reactionChoices: [String] @join__field(graph: KNOWLEDGEBASE)
+  reactionCounts: JSON @join__field(graph: KNOWLEDGEBASE)
+  createdBy: String @join__field(graph: KNOWLEDGEBASE)
+  createdUser: User @join__field(graph: KNOWLEDGEBASE)
+  createdDate: Date @join__field(graph: KNOWLEDGEBASE)
+  modifiedBy: String @join__field(graph: KNOWLEDGEBASE)
+  modifiedDate: Date @join__field(graph: KNOWLEDGEBASE)
+  topicId: String @join__field(graph: KNOWLEDGEBASE)
+  categoryId: String @join__field(graph: KNOWLEDGEBASE)
+  viewCount: Int @join__field(graph: KNOWLEDGEBASE)
+  attachments: [Attachment] @join__field(graph: KNOWLEDGEBASE)
+  image: Attachment @join__field(graph: KNOWLEDGEBASE)
+  forms: [FormCode] @join__field(graph: KNOWLEDGEBASE)
+}
+
+input KnowledgeBaseArticleDoc
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  title: String!
+  summary: String
+  content: String!
+  status: String!
+  reactionChoices: [String]
+  categoryIds: [String]
+  topicId: String
+  categoryId: String
+  image: AttachmentInput
+  attachments: [AttachmentInput]
+  forms: [FormCodeInput]
+}
+
+type KnowledgeBaseCategory
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  _id: String
+  title: String
+  description: String
+  articles: [KnowledgeBaseArticle]
+  icon: String
+  createdBy: String
+  createdDate: Date
+  modifiedBy: String
+  modifiedDate: Date
+  parentCategoryId: String
+  firstTopic: KnowledgeBaseTopic
+  authors: [User]
+  numOfArticles: Float
+}
+
+input KnowledgeBaseCategoryDoc
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  title: String!
+  description: String
+  articleIds: [String]
+  icon: String!
+  topicIds: [String]
+  topicId: String
+  parentCategoryId: String
+}
+
+type KnowledgeBaseLoader
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  loadType: String
+}
+
+type KnowledgeBaseParentCategory
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  _id: String
+  title: String
+  description: String
+  articles: [KnowledgeBaseArticle]
+  icon: String
+  createdBy: String
+  createdDate: Date
+  modifiedBy: String
+  modifiedDate: Date
+  parentCategoryId: String
+  firstTopic: KnowledgeBaseTopic
+  authors: [User]
+  numOfArticles: Float
+  childrens: [KnowledgeBaseCategory]
+}
+
+type KnowledgeBaseTopic
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+  @join__type(graph: KNOWLEDGEBASE, key: "_id")
+{
+  _id: String!
+  title: String @join__field(graph: KNOWLEDGEBASE)
+  description: String @join__field(graph: KNOWLEDGEBASE)
+  categories: [KnowledgeBaseCategory] @join__field(graph: KNOWLEDGEBASE)
+  brand: Brand @join__field(graph: KNOWLEDGEBASE)
+  color: String @join__field(graph: KNOWLEDGEBASE)
+  backgroundImage: String @join__field(graph: KNOWLEDGEBASE)
+  languageCode: String @join__field(graph: KNOWLEDGEBASE)
+  createdBy: String @join__field(graph: KNOWLEDGEBASE)
+  createdDate: Date @join__field(graph: KNOWLEDGEBASE)
+  modifiedBy: String @join__field(graph: KNOWLEDGEBASE)
+  modifiedDate: Date @join__field(graph: KNOWLEDGEBASE)
+  parentCategories: [KnowledgeBaseParentCategory] @join__field(graph: KNOWLEDGEBASE)
+  notificationSegmentId: String @join__field(graph: KNOWLEDGEBASE)
+}
+
+input KnowledgeBaseTopicDoc
+  @join__type(graph: KNOWLEDGEBASE)
+{
+  title: String!
+  description: String
+  categoryIds: [String]
+  brandId: String!
+  color: String
+  backgroundImage: String
+  languageCode: String
+  notificationSegmentId: String
+}
+
+type LastViewedItem
+  @join__type(graph: ECOMMERCE)
+{
+  _id: String!
+  productId: String!
+  customerId: String!
+  product: Product
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type LocationOption
+  @join__type(graph: FORMS)
+{
+  lat: Float
+  lng: Float
+  description: String
+}
+
+input LocationOptionInput
+  @join__type(graph: FORMS)
+{
+  lat: Float
+  lng: Float
+  description: String
+}
+
+type Logic
+  @join__type(graph: FORMS)
+{
+  fieldId: String!
+  logicOperator: String
+  logicValue: JSON
+}
+
+input LogicInput
+  @join__type(graph: FORMS)
+{
+  fieldId: String
+  tempFieldId: String
+  logicOperator: String
+  logicValue: JSON
+}
+
+type MailConfig
+  @join__type(graph: CLIENTPORTAL)
+{
+  subject: String
+  invitationContent: String
+  registrationContent: String
+}
+
+input MailConfigInput
+  @join__type(graph: CLIENTPORTAL)
+{
+  subject: String
+  invitationContent: String
+  registrationContent: String
+}
+
+type ManualVerificationConfig
+  @join__type(graph: CLIENTPORTAL)
+{
+  userIds: [String]
+  verifyCustomer: Boolean
+  verifyCompany: Boolean
+}
+
+type Mutation
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CONTACTS)
+  @join__type(graph: CORE)
+  @join__type(graph: ECOMMERCE)
+  @join__type(graph: FORMS)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: NOTIFICATIONS)
+  @join__type(graph: PAYMENT)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+{
+  boardsAdd(name: String!, type: String!): Board @join__field(graph: CARDS)
+  boardsEdit(_id: String!, name: String!, type: String!): Board @join__field(graph: CARDS)
+  boardsRemove(_id: String!): JSON @join__field(graph: CARDS)
+  boardItemUpdateTimeTracking(_id: String!, type: String!, status: String!, timeSpent: Int!, startDate: String): JSON @join__field(graph: CARDS)
+  boardItemsSaveForGanttTimeline(items: JSON, links: JSON, type: String!): String @join__field(graph: CARDS)
+  pipelinesAdd(name: String!, type: String!, boardId: String!, stages: JSON, visibility: String!, memberIds: [String], tagId: String, bgColor: String, startDate: Date, endDate: Date, metric: String, hackScoringType: String, templateId: String, isCheckUser: Boolean, isCheckDepartment: Boolean, excludeCheckUserIds: [String], numberConfig: String, numberSize: String, departmentIds: [String]): Pipeline @join__field(graph: CARDS)
+  pipelinesEdit(_id: String!, name: String!, type: String!, boardId: String!, stages: JSON, visibility: String!, memberIds: [String], tagId: String, bgColor: String, startDate: Date, endDate: Date, metric: String, hackScoringType: String, templateId: String, isCheckUser: Boolean, isCheckDepartment: Boolean, excludeCheckUserIds: [String], numberConfig: String, numberSize: String, departmentIds: [String]): Pipeline @join__field(graph: CARDS)
+  pipelinesUpdateOrder(orders: [OrderItem]): [Pipeline] @join__field(graph: CARDS)
+  pipelinesWatch(_id: String!, isAdd: Boolean, type: String!): Pipeline @join__field(graph: CARDS)
+  pipelinesRemove(_id: String!): JSON @join__field(graph: CARDS)
+  pipelinesArchive(_id: String!): JSON @join__field(graph: CARDS)
+  pipelinesCopied(_id: String!): JSON @join__field(graph: CARDS)
+  stagesUpdateOrder(orders: [OrderItem]): [Stage] @join__field(graph: CARDS)
+  stagesRemove(_id: String!): JSON @join__field(graph: CARDS)
+  stagesEdit(_id: String!, type: String, name: String, status: String): Stage @join__field(graph: CARDS)
+  stagesSortItems(stageId: String!, type: String, proccessId: String, sortType: String): String @join__field(graph: CARDS)
+  dealsAdd(name: String!, companyIds: [String], customerIds: [String], labelIds: [String], paymentsData: JSON, productsData: JSON, parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Deal @join__field(graph: CARDS)
+  dealsEdit(_id: String!, name: String, paymentsData: JSON, productsData: JSON, parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Deal @join__field(graph: CARDS)
+  dealsChange(itemId: String!, aboveItemId: String, destinationStageId: String!, sourceStageId: String, proccessId: String): Deal @join__field(graph: CARDS)
+  dealsRemove(_id: String!): Deal @join__field(graph: CARDS)
+  dealsWatch(_id: String, isAdd: Boolean): Deal @join__field(graph: CARDS)
+  dealsCopy(_id: String!, proccessId: String): Deal @join__field(graph: CARDS)
+  dealsArchive(stageId: String!, proccessId: String): String @join__field(graph: CARDS)
+  dealsCreateProductsData(proccessId: String, dealId: String, docs: JSON): JSON @join__field(graph: CARDS)
+  dealsEditProductData(proccessId: String, dealId: String, dataId: String, doc: JSON): JSON @join__field(graph: CARDS)
+  dealsDeleteProductData(proccessId: String, dealId: String, dataId: String): JSON @join__field(graph: CARDS)
+  tasksAdd(name: String!, companyIds: [String], customerIds: [String], labelIds: [String], parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Task @join__field(graph: CARDS)
+  tasksEdit(_id: String!, name: String, parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Task @join__field(graph: CARDS)
+  tasksChange(itemId: String!, aboveItemId: String, destinationStageId: String!, sourceStageId: String, proccessId: String): Task @join__field(graph: CARDS)
+  tasksRemove(_id: String!): Task @join__field(graph: CARDS)
+  tasksWatch(_id: String, isAdd: Boolean): Task @join__field(graph: CARDS)
+  tasksCopy(_id: String!, proccessId: String): Task @join__field(graph: CARDS)
+  tasksArchive(stageId: String!, proccessId: String): String @join__field(graph: CARDS)
+  ticketsAdd(name: String!, companyIds: [String], customerIds: [String], labelIds: [String], source: String, parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Ticket @join__field(graph: CARDS)
+  ticketsEdit(_id: String!, name: String, source: String, parentId: String, proccessId: String, aboveItemId: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], startDate: Date, closeDate: Date, description: String, order: Int, reminderMinute: Int, isComplete: Boolean, priority: String, status: String, sourceConversationIds: [String], customFieldsData: JSON, tagIds: [String], branchIds: [String], departmentIds: [String]): Ticket @join__field(graph: CARDS)
+  ticketsChange(itemId: String!, aboveItemId: String, destinationStageId: String!, sourceStageId: String, proccessId: String): Ticket @join__field(graph: CARDS)
+  ticketsRemove(_id: String!): Ticket @join__field(graph: CARDS)
+  ticketsWatch(_id: String, isAdd: Boolean): Ticket @join__field(graph: CARDS)
+  ticketsCopy(_id: String!, proccessId: String): Ticket @join__field(graph: CARDS)
+  ticketsArchive(stageId: String!, proccessId: String): String @join__field(graph: CARDS)
+  growthHacksAdd(proccessId: String, aboveItemId: String, name: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], closeDate: Date, status: String, description: String, hackStages: [String], priority: String, reach: Int, impact: Int, confidence: Int, ease: Int, labelIds: [String]): GrowthHack @join__field(graph: CARDS)
+  growthHacksEdit(_id: String!, proccessId: String, aboveItemId: String, name: String, stageId: String, assignedUserIds: [String], attachments: [AttachmentInput], closeDate: Date, status: String, description: String, hackStages: [String], priority: String, reach: Int, impact: Int, confidence: Int, ease: Int): GrowthHack @join__field(graph: CARDS)
+  growthHacksChange(itemId: String!, aboveItemId: String, destinationStageId: String!, sourceStageId: String, proccessId: String): GrowthHack @join__field(graph: CARDS)
+  growthHacksRemove(_id: String!): GrowthHack @join__field(graph: CARDS)
+  growthHacksWatch(_id: String, isAdd: Boolean): GrowthHack @join__field(graph: CARDS)
+  growthHacksVote(_id: String!, isVote: Boolean): GrowthHack @join__field(graph: CARDS)
+  growthHacksCopy(_id: String!, proccessId: String): GrowthHack @join__field(graph: CARDS)
+  growthHacksArchive(stageId: String!, proccessId: String): String @join__field(graph: CARDS)
+  pipelineLabelsAdd(name: String!, colorCode: String!, pipelineId: String!): PipelineLabel @join__field(graph: CARDS)
+  pipelineLabelsEdit(_id: String!, name: String!, colorCode: String!, pipelineId: String!): PipelineLabel @join__field(graph: CARDS)
+  pipelineLabelsRemove(_id: String!): JSON @join__field(graph: CARDS)
+  pipelineLabelsLabel(pipelineId: String!, targetId: String!, labelIds: [String!]!): String @join__field(graph: CARDS)
+  pipelineTemplatesAdd(name: String!, description: String, type: String!, stages: [PipelineTemplateStageInput]): PipelineTemplate @join__field(graph: CARDS)
+  pipelineTemplatesEdit(_id: String!, name: String!, description: String, type: String!, stages: [PipelineTemplateStageInput]): PipelineTemplate @join__field(graph: CARDS)
+  pipelineTemplatesRemove(_id: String!): JSON @join__field(graph: CARDS)
+  pipelineTemplatesDuplicate(_id: String!): PipelineTemplate @join__field(graph: CARDS)
+  checklistsAdd(contentType: String, contentTypeId: String, title: String): Checklist @join__field(graph: CARDS)
+  checklistsEdit(_id: String!, title: String, contentType: String, contentTypeId: String): Checklist @join__field(graph: CARDS)
+  checklistsRemove(_id: String!): Checklist @join__field(graph: CARDS)
+  checklistItemsOrder(_id: String!, destinationIndex: Int): ChecklistItem @join__field(graph: CARDS)
+  checklistItemsAdd(checklistId: String, content: String, isChecked: Boolean): ChecklistItem @join__field(graph: CARDS)
+  checklistItemsEdit(_id: String!, checklistId: String, content: String, isChecked: Boolean): ChecklistItem @join__field(graph: CARDS)
+  checklistItemsRemove(_id: String!): ChecklistItem @join__field(graph: CARDS)
+  clientPortalConfigUpdate(_id: String, name: String, description: String, logo: String, icon: String, headerHtml: String, footerHtml: String, url: String, domain: String, messengerBrandCode: String, knowledgeBaseLabel: String, knowledgeBaseTopicId: String, ticketLabel: String, taskLabel: String, dealLabel: String, taskPublicBoardId: String, taskPublicPipelineId: String, taskStageId: String, taskPipelineId: String, taskBoardId: String, ticketStageId: String, ticketPipelineId: String, ticketBoardId: String, dealStageId: String, dealPipelineId: String, dealBoardId: String, googleCredentials: JSON, googleClientId: String, googleClientSecret: String, googleRedirectUri: String, facebookAppId: String, erxesAppToken: String, styles: StylesParams, mobileResponsive: Boolean, kbToggle: Boolean, publicTaskToggle: Boolean, ticketToggle: Boolean, dealToggle: Boolean, taskToggle: Boolean, otpConfig: OTPConfigInput, mailConfig: MailConfigInput, manualVerificationConfig: JSON, passwordVerificationConfig: JSON): ClientPortal @join__field(graph: CLIENTPORTAL)
+  clientPortalRemove(_id: String!): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalCreateCard(type: String!, stageId: String!, subject: String!, description: String, priority: String, parentId: String, closeDate: Date, startDate: Date, attachments: [AttachmentInput], customFieldsData: JSON, labelIds: [String]): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalCommentsAdd(type: String!, typeId: String!, content: String!, userType: String!): ClientPortalComment @join__field(graph: CLIENTPORTAL)
+  clientPortalCommentsRemove(_id: String!): String @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersInvite(clientPortalId: String, phone: String, email: String, username: String, password: String, companyName: String, companyRegistrationNumber: String, firstName: String, lastName: String, code: String, ownerId: String, links: JSON, customFieldsData: JSON, type: String, avatar: String): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersEdit(_id: String!, clientPortalId: String, phone: String, email: String, username: String, password: String, companyName: String, companyRegistrationNumber: String, firstName: String, lastName: String, code: String, ownerId: String, links: JSON, customFieldsData: JSON, type: String, avatar: String): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersRemove(clientPortalUserIds: [String!]): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalRegister(clientPortalId: String, phone: String, email: String, username: String, password: String, companyName: String, companyRegistrationNumber: String, firstName: String, lastName: String, code: String, ownerId: String, links: JSON, customFieldsData: JSON, type: String, avatar: String): String @join__field(graph: CLIENTPORTAL)
+  clientPortalVerifyOTP(userId: String!, phoneOtp: String, emailOtp: String, password: String): String @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersVerify(userIds: [String]!, type: String): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalLogin(login: String!, password: String!, clientPortalId: String!, deviceToken: String): String @join__field(graph: CLIENTPORTAL)
+  clientPortalGoogleAuthentication(clientPortalId: String, code: String): String @join__field(graph: CLIENTPORTAL)
+  clientPortalFacebookAuthentication(accessToken: String, clientPortalId: String!): String @join__field(graph: CLIENTPORTAL)
+  clientPortalLogout: String @join__field(graph: CLIENTPORTAL)
+  clientPortalLoginWithPhone(phone: String!, clientPortalId: String!, deviceToken: String): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersReplacePhone(clientPortalId: String!, phone: String!): String! @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersVerifyPhone(code: String!): String! @join__field(graph: CLIENTPORTAL)
+  clientPortalConfirmInvitation(token: String, password: String, passwordConfirmation: String, username: String): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalForgotPassword(clientPortalId: String!, email: String, phone: String): String! @join__field(graph: CLIENTPORTAL)
+  clientPortalResetPasswordWithCode(phone: String!, code: String!, password: String!): String @join__field(graph: CLIENTPORTAL)
+  clientPortalResetPassword(token: String!, newPassword: String!): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalUserChangePassword(currentPassword: String!, newPassword: String!): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersSendVerificationRequest(login: String!, password: String!, clientPortalId: String!, attachments: [AttachmentInput]!, description: String): String @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersChangeVerificationStatus(userId: String!, status: ClientPortalUserVerificationStatus!): String @join__field(graph: CLIENTPORTAL)
+  clientPortalUpdateUser(_id: String!, doc: ClientPortalUserUpdate!): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalNotificationsMarkAsRead(_ids: [String]): String @join__field(graph: CLIENTPORTAL)
+  clientPortalNotificationsRemove(_ids: [String]): JSON @join__field(graph: CLIENTPORTAL)
+  clientPortalUserUpdateNotificationSettings(receiveByEmail: Boolean, receiveBySms: Boolean, configs: [NotificationConfigInput]): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalSendNotification(receivers: [String], title: String, content: String, isMobile: Boolean): JSON @join__field(graph: CLIENTPORTAL)
+  customersAdd(state: String, avatar: String, firstName: String, lastName: String, middleName: String, primaryEmail: String, emails: [String], primaryPhone: String, phones: [String], ownerId: String, position: String, department: String, leadStatus: String, hasAuthority: String, description: String, isSubscribed: String, links: JSON, customFieldsData: JSON, code: String, sex: Int, birthDate: Date, emailValidationStatus: String, phoneValidationStatus: String): Customer @join__field(graph: CONTACTS)
+  customersEdit(_id: String!, avatar: String, firstName: String, lastName: String, middleName: String, primaryEmail: String, emails: [String], primaryPhone: String, phones: [String], ownerId: String, position: String, department: String, leadStatus: String, hasAuthority: String, description: String, isSubscribed: String, links: JSON, customFieldsData: JSON, code: String, sex: Int, birthDate: Date, emailValidationStatus: String, phoneValidationStatus: String): Customer @join__field(graph: CONTACTS)
+  customersEditByField(selector: JSON, doc: JSON): Customer @join__field(graph: CONTACTS)
+  customersMerge(customerIds: [String], customerFields: JSON): Customer @join__field(graph: CONTACTS)
+  customersRemove(customerIds: [String]): [String] @join__field(graph: CONTACTS)
+  customersChangeState(_id: String!, value: String!): Customer @join__field(graph: CONTACTS)
+  customersVerify(verificationType: String!): String @join__field(graph: CONTACTS)
+  customersChangeVerificationStatus(customerIds: [String], type: String!, status: String!): [Customer] @join__field(graph: CONTACTS)
+  customersChangeStateBulk(_ids: [String]!, value: String!): JSON @join__field(graph: CONTACTS)
+  companiesAdd(avatar: String, primaryName: String, names: [String], primaryPhone: String, phones: [String], primaryEmail: String, emails: [String], size: Int, website: String, industry: String, parentCompanyId: String, email: String, ownerId: String, businessType: String, description: String, isSubscribed: String, links: JSON, tagIds: [String], customFieldsData: JSON, code: String, location: String): Company @join__field(graph: CONTACTS)
+  companiesEdit(_id: String!, avatar: String, primaryName: String, names: [String], primaryPhone: String, phones: [String], primaryEmail: String, emails: [String], size: Int, website: String, industry: String, parentCompanyId: String, email: String, ownerId: String, businessType: String, description: String, isSubscribed: String, links: JSON, tagIds: [String], customFieldsData: JSON, code: String, location: String): Company @join__field(graph: CONTACTS)
+  companiesEditByField(selector: JSON, doc: JSON): Company @join__field(graph: CONTACTS)
+  companiesRemove(companyIds: [String]): [String] @join__field(graph: CONTACTS)
+  companiesMerge(companyIds: [String], companyFields: JSON): Company @join__field(graph: CONTACTS)
+  usersCreateOwner(email: String!, password: String!, firstName: String!, lastName: String, purpose: String, subscribeEmail: Boolean): String @join__field(graph: CORE)
+  login(email: String!, password: String!, deviceToken: String): String @join__field(graph: CORE)
+  logout: String @join__field(graph: CORE)
+  forgotPassword(email: String!): String! @join__field(graph: CORE)
+  resetPassword(token: String!, newPassword: String!): JSON @join__field(graph: CORE)
+  usersResetMemberPassword(_id: String!, newPassword: String!): User @join__field(graph: CORE)
+  usersEditProfile(username: String!, email: String!, details: UserDetails, links: JSON, password: String!, employeeId: String): User @join__field(graph: CORE)
+  usersEdit(_id: String!, username: String, email: String, details: UserDetails, links: JSON, channelIds: [String], groupIds: [String], brandIds: [String], branchIds: [String], departmentIds: [String], customFieldsData: JSON, employeeId: String): User @join__field(graph: CORE)
+  usersChangePassword(currentPassword: String!, newPassword: String!): User @join__field(graph: CORE)
+  usersSetActiveStatus(_id: String!): User @join__field(graph: CORE)
+  usersInvite(entries: [InvitationEntry]): Boolean @join__field(graph: CORE)
+  usersResendInvitation(email: String!): String @join__field(graph: CORE)
+  usersConfirmInvitation(token: String, password: String, passwordConfirmation: String, fullName: String, username: String): User @join__field(graph: CORE)
+  usersSeenOnBoard: User @join__field(graph: CORE)
+  usersConfigEmailSignatures(signatures: [EmailSignature]): User @join__field(graph: CORE)
+  usersConfigGetNotificationByEmail(isAllowed: Boolean): User @join__field(graph: CORE)
+  brandsAdd(name: String!, description: String, emailConfig: JSON): Brand @join__field(graph: CORE)
+  brandsEdit(_id: String!, name: String!, description: String, emailConfig: JSON): Brand @join__field(graph: CORE)
+  brandsRemove(_id: String!): JSON @join__field(graph: CORE)
+  configsUpdate(configsMap: JSON!): JSON @join__field(graph: CORE)
+  configsActivateInstallation(token: String!, hostname: String!): JSON @join__field(graph: CORE)
+  configsManagePluginInstall(type: String!, name: String!): JSON @join__field(graph: CORE)
+  permissionsAdd(module: String!, actions: [String!]!, userIds: [String!], groupIds: [String!], allowed: Boolean): [Permission] @join__field(graph: CORE)
+  permissionsRemove(ids: [String]!): JSON @join__field(graph: CORE)
+  permissionsFix: [String] @join__field(graph: CORE)
+  usersGroupsAdd(name: String!, description: String, memberIds: [String]): UsersGroup @join__field(graph: CORE)
+  usersGroupsEdit(_id: String!, name: String!, description: String, memberIds: [String]): UsersGroup @join__field(graph: CORE)
+  usersGroupsRemove(_id: String!): JSON @join__field(graph: CORE)
+  usersGroupsCopy(_id: String!, memberIds: [String]): UsersGroup @join__field(graph: CORE)
+  conformityAdd(mainType: String, mainTypeId: String, relType: String, relTypeId: String): Conformity @join__field(graph: CORE)
+  conformityEdit(mainType: String, mainTypeId: String, relType: String, relTypeIds: [String]): SuccessResult @join__field(graph: CORE)
+  robotEntriesMarkAsNotified(_id: String): [RobotEntry] @join__field(graph: CORE)
+  onboardingCheckStatus: String @join__field(graph: CORE)
+  onboardingForceComplete: JSON @join__field(graph: CORE)
+  onboardingCompleteShowStep(step: String): JSON @join__field(graph: CORE)
+  structuresAdd(title: String!, description: String, supervisorId: String, code: String, website: String, phoneNumber: String, email: String, links: JSON, coordinate: CoordinateInput, image: AttachmentInput): Structure @join__field(graph: CORE)
+  structuresEdit(_id: String!, title: String!, description: String, supervisorId: String, code: String, website: String, phoneNumber: String, email: String, links: JSON, coordinate: CoordinateInput, image: AttachmentInput): Structure @join__field(graph: CORE)
+  structuresRemove(_id: String!): JSON @join__field(graph: CORE)
+  departmentsAdd(title: String, description: String, supervisorId: String, code: String, parentId: String, userIds: [String]): Department @join__field(graph: CORE)
+  departmentsEdit(_id: String!, title: String, description: String, supervisorId: String, code: String, parentId: String, userIds: [String]): Department @join__field(graph: CORE)
+  departmentsRemove(ids: [String!]): JSON @join__field(graph: CORE)
+  unitsAdd(title: String, description: String, supervisorId: String, code: String, departmentId: String, userIds: [String]): Unit @join__field(graph: CORE)
+  unitsEdit(_id: String!, title: String, description: String, supervisorId: String, code: String, departmentId: String, userIds: [String]): Unit @join__field(graph: CORE)
+  unitsRemove(ids: [String!]): JSON @join__field(graph: CORE)
+  branchesAdd(title: String, address: String, supervisorId: String, code: String, parentId: String, userIds: [String], radius: Int, phoneNumber: String, email: String, links: JSON, coordinate: CoordinateInput, image: AttachmentInput): Branch @join__field(graph: CORE)
+  branchesEdit(_id: String!, title: String, address: String, supervisorId: String, code: String, parentId: String, userIds: [String], radius: Int, phoneNumber: String, email: String, links: JSON, coordinate: CoordinateInput, image: AttachmentInput): Branch @join__field(graph: CORE)
+  branchesRemove(ids: [String!]): JSON @join__field(graph: CORE)
+  appsAdd(name: String, userGroupId: String, expireDate: Date): App @join__field(graph: CORE)
+  appsEdit(_id: String!, name: String, userGroupId: String, expireDate: Date): App @join__field(graph: CORE)
+  appsRemove(_id: String!): JSON @join__field(graph: CORE)
+  productreviewAdd(productId: String, customerId: String, review: Float): Productreview @join__field(graph: ECOMMERCE)
+  productreviewUpdate(_id: String!, productId: String, customerId: String, review: Float): Productreview @join__field(graph: ECOMMERCE)
+  productreviewRemove(_id: String!): Productreview @join__field(graph: ECOMMERCE)
+  wishlistAdd(productId: String, customerId: String): Wish @join__field(graph: ECOMMERCE)
+  wishlistUpdate(_id: String!, productId: String, customerId: String): Wish @join__field(graph: ECOMMERCE)
+  wishlistRemove(_id: String!): Wish @join__field(graph: ECOMMERCE)
+  lastViewedItemAdd(productId: String!, customerId: String!): LastViewedItem @join__field(graph: ECOMMERCE)
+  lastViewedItemRemove(_id: String!): LastViewedItem @join__field(graph: ECOMMERCE)
+  formsAdd(title: String, description: String, buttonText: String, type: String!, numberOfPages: Int, googleMapApiKey: String): Form @join__field(graph: FORMS)
+  formsEdit(_id: String!, title: String, description: String, buttonText: String, type: String!, numberOfPages: Int, googleMapApiKey: String): Form @join__field(graph: FORMS)
+  formSubmissionsSave(formId: String, contentTypeId: String, contentType: String, formSubmissions: JSON): Boolean @join__field(graph: FORMS)
+  formSubmissionsRemove(customerId: String!, contentTypeId: String!): JSON @join__field(graph: FORMS)
+  formSubmissionsEdit(contentTypeId: String!, customerId: String!, submissions: [FormSubmissionInput]): Submission @join__field(graph: FORMS)
+  fieldsAdd(contentType: String!, contentTypeId: String, type: String, validation: String, text: String, description: String, code: String, options: [String], locationOptions: [LocationOptionInput], isRequired: Boolean, order: Int, groupId: String, isVisible: Boolean, canHide: Boolean, associatedFieldId: String, logicAction: String, logics: [LogicInput], searchable: Boolean, showInCard: Boolean, objectListConfigs: [objectListConfigInput], isVisibleToCreate: Boolean): Field @join__field(graph: FORMS)
+  fieldsBulkAddAndEdit(contentType: String!, contentTypeId: String, addingFields: [FieldItem], editingFields: [FieldItem]): [Field] @join__field(graph: FORMS)
+  fieldsEdit(_id: String!, type: String, validation: String, text: String, description: String, code: String, options: [String], locationOptions: [LocationOptionInput], isRequired: Boolean, order: Int, groupId: String, isVisible: Boolean, canHide: Boolean, associatedFieldId: String, logicAction: String, logics: [LogicInput], searchable: Boolean, showInCard: Boolean, objectListConfigs: [objectListConfigInput], isVisibleToCreate: Boolean): Field @join__field(graph: FORMS)
+  fieldsRemove(_id: String!): Field @join__field(graph: FORMS)
+  fieldsUpdateOrder(orders: [OrderItem]): [Field] @join__field(graph: FORMS)
+  fieldsUpdateVisible(_id: String!, isVisible: Boolean, isVisibleInDetail: Boolean): Field @join__field(graph: FORMS)
+  fieldsUpdateSystemFields(_id: String!, isVisibleToCreate: Boolean, isRequired: Boolean): Field @join__field(graph: FORMS)
+  fieldsGroupsAdd(name: String, contentType: String, order: Int, description: String, parentId: String, code: String, isMultiple: Boolean, isVisible: Boolean, isVisibleInDetail: Boolean, config: JSON, logicAction: String, logics: [LogicInput]): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsEdit(_id: String!, name: String, contentType: String, order: Int, description: String, parentId: String, code: String, isMultiple: Boolean, isVisible: Boolean, isVisibleInDetail: Boolean, config: JSON, logicAction: String, logics: [LogicInput]): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsRemove(_id: String!): JSON @join__field(graph: FORMS)
+  fieldsGroupsUpdateVisible(_id: String, isVisible: Boolean, isVisibleInDetail: Boolean): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsUpdateOrder(orders: [OrderItem]): [FieldsGroup] @join__field(graph: FORMS)
+  knowledgeBaseTopicsAdd(doc: KnowledgeBaseTopicDoc!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseTopicsEdit(_id: String!, doc: KnowledgeBaseTopicDoc!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseTopicsRemove(_id: String!): JSON @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoriesAdd(doc: KnowledgeBaseCategoryDoc!): KnowledgeBaseCategory @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoriesEdit(_id: String!, doc: KnowledgeBaseCategoryDoc!): KnowledgeBaseCategory @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoriesRemove(_id: String!): JSON @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticlesAdd(doc: KnowledgeBaseArticleDoc!): KnowledgeBaseArticle @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticlesEdit(_id: String!, doc: KnowledgeBaseArticleDoc!): KnowledgeBaseArticle @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticlesRemove(_id: String!): JSON @join__field(graph: KNOWLEDGEBASE)
+  notificationsSaveConfig(notifType: String!, isAllowed: Boolean): NotificationConfiguration @join__field(graph: NOTIFICATIONS)
+  notificationsMarkAsRead(_ids: [String], contentTypeId: String): JSON @join__field(graph: NOTIFICATIONS)
+  notificationsShow: String @join__field(graph: NOTIFICATIONS)
+  paymentAdd(name: String!, kind: String!, status: String, config: JSON): Payment @join__field(graph: PAYMENT)
+  paymentEdit(_id: String!, name: String!, kind: String!, status: String, config: JSON): Payment @join__field(graph: PAYMENT)
+  paymentRemove(_id: String!): String @join__field(graph: PAYMENT)
+  paymentConfigsAdd(contentType: String!, contentTypeId: String!, paymentIds: [String]): PaymentConfig @join__field(graph: PAYMENT)
+  paymentConfigsEdit(_id: String!, paymentIds: [String]): PaymentConfig @join__field(graph: PAYMENT)
+  paymentConfigsRemove(_id: String!): JSON @join__field(graph: PAYMENT)
+  generateInvoiceUrl(amount: Float!, phone: String, email: String, description: String, customerId: String, customerType: String, contentType: String, contentTypeId: String, redirectUri: String, paymentIds: [String], warningText: String): String @join__field(graph: PAYMENT)
+  posAdd(name: String, description: String, productDetails: [String], adminIds: [String], cashierIds: [String], paymentIds: [String], paymentTypes: [JSON], isOnline: Boolean, onServer: Boolean, branchId: String, departmentId: String, allowBranchIds: [String], beginNumber: String, maxSkipNumber: Int, waitingScreen: JSON, kitchenScreen: JSON, kioskMachine: JSON, uiOptions: JSON, token: String, erxesAppToken: String, ebarimtConfig: JSON, erkhetConfig: JSON, initialCategoryIds: [String], kioskExcludeCategoryIds: [String], kioskExcludeProductIds: [String], deliveryConfig: JSON, cardsConfig: JSON, checkRemainder: Boolean, permissionConfig: JSON, allowTypes: [String], catProdMappings: [CatProdInput]): Pos @join__field(graph: POS)
+  posEdit(_id: String, name: String, description: String, productDetails: [String], adminIds: [String], cashierIds: [String], paymentIds: [String], paymentTypes: [JSON], isOnline: Boolean, onServer: Boolean, branchId: String, departmentId: String, allowBranchIds: [String], beginNumber: String, maxSkipNumber: Int, waitingScreen: JSON, kitchenScreen: JSON, kioskMachine: JSON, uiOptions: JSON, token: String, erxesAppToken: String, ebarimtConfig: JSON, erkhetConfig: JSON, initialCategoryIds: [String], kioskExcludeCategoryIds: [String], kioskExcludeProductIds: [String], deliveryConfig: JSON, cardsConfig: JSON, checkRemainder: Boolean, permissionConfig: JSON, allowTypes: [String], catProdMappings: [CatProdInput]): Pos @join__field(graph: POS)
+  posRemove(_id: String!): JSON @join__field(graph: POS)
+  productGroupsAdd(posId: String, description: String, name: String, categoryIds: [String], excludedCategoryIds: [String], excludedProductIds: [String]): ProductGroups @join__field(graph: POS)
+  productGroupsBulkInsert(posId: String, groups: [GroupInput]): [ProductGroups] @join__field(graph: POS)
+  posSlotBulkUpdate(posId: String, slots: [SlotInput]): [PosSlot] @join__field(graph: POS)
+  posOrderReturnBill(_id: String!): PosOrder @join__field(graph: POS)
+  posOrderChangePayments(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: JSON): PosOrder @join__field(graph: POS)
+  posCoversEdit(_id: String!, note: String): PosCover @join__field(graph: POS)
+  posCoversRemove(_id: String!): JSON @join__field(graph: POS)
+  posUsersCreateOwner(email: String!, password: String!, firstName: String!, lastName: String): String @join__field(graph: POSCLIENT)
+  posLogin(email: String!, password: String!, deviceToken: String): String @join__field(graph: POSCLIENT)
+  posLogout: String @join__field(graph: POSCLIENT)
+  ordersAdd(items: [OrderItemInput], totalAmount: Float!, type: String!, branchId: String, customerId: String, customerType: String, deliveryInfo: JSON, billType: String, registerNumber: String, slotCode: String, origin: String): Order @join__field(graph: POSCLIENT)
+  ordersEdit(_id: String!, items: [OrderItemInput], totalAmount: Float!, type: String!, branchId: String, customerId: String, customerType: String, deliveryInfo: JSON, billType: String, registerNumber: String, slotCode: String, origin: String): Order @join__field(graph: POSCLIENT)
+  ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse @join__field(graph: POSCLIENT)
+  orderChangeStatus(_id: String!, status: String): Order @join__field(graph: POSCLIENT)
+  ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput]): Order @join__field(graph: POSCLIENT)
+  ordersCancel(_id: String!): JSON @join__field(graph: POSCLIENT)
+  ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse @join__field(graph: POSCLIENT)
+  orderItemChangeStatus(_id: String!, status: String): PosOrderItem @join__field(graph: POSCLIENT)
+  posConfigsFetch(token: String!): PosConfig @join__field(graph: POSCLIENT)
+  syncConfig(type: String!): JSON @join__field(graph: POSCLIENT)
+  syncOrders: JSON @join__field(graph: POSCLIENT)
+  deleteOrders: JSON @join__field(graph: POSCLIENT)
+  posChooseConfig(token: String!): String @join__field(graph: POSCLIENT)
+  poscCustomersAdd(firstName: String, lastName: String, email: String, phone: String, sex: Int): PosCustomer @join__field(graph: POSCLIENT)
+  coversAdd(status: String, beginDate: Date, endDate: Date, description: Date, userId: String, details: JSON): Cover @join__field(graph: POSCLIENT)
+  coversEdit(_id: String!, status: String, beginDate: Date, endDate: Date, description: Date, userId: String, details: JSON): Cover @join__field(graph: POSCLIENT)
+  coversRemove(_id: String!): String @join__field(graph: POSCLIENT)
+  coversConfirm(_id: String!): Cover @join__field(graph: POSCLIENT)
+  productsAdd(name: String, categoryId: String, type: String, description: String, sku: String, barcodes: [String], barcodeDescription: String, unitPrice: Float, code: String, customFieldsData: JSON, attachment: AttachmentInput, attachmentMore: [AttachmentInput], supply: String, productCount: Int, minimiumCount: Int, vendorId: String, uomId: String, subUoms: JSON, taxType: String, taxCode: String): Product @join__field(graph: PRODUCTS)
+  productsEdit(_id: String!, name: String, categoryId: String, type: String, description: String, sku: String, barcodes: [String], barcodeDescription: String, unitPrice: Float, code: String, customFieldsData: JSON, attachment: AttachmentInput, attachmentMore: [AttachmentInput], supply: String, productCount: Int, minimiumCount: Int, vendorId: String, uomId: String, subUoms: JSON, taxType: String, taxCode: String): Product @join__field(graph: PRODUCTS)
+  productsRemove(productIds: [String!]): String @join__field(graph: PRODUCTS)
+  productsMerge(productIds: [String], productFields: JSON): Product @join__field(graph: PRODUCTS)
+  productCategoriesAdd(name: String!, code: String!, description: String, meta: String, parentId: String, attachment: AttachmentInput, status: String): ProductCategory @join__field(graph: PRODUCTS)
+  productCategoriesEdit(_id: String!, name: String!, code: String!, description: String, meta: String, parentId: String, attachment: AttachmentInput, status: String): ProductCategory @join__field(graph: PRODUCTS)
+  productCategoriesRemove(_id: String!): JSON @join__field(graph: PRODUCTS)
+  productsConfigsUpdate(configsMap: JSON!): JSON @join__field(graph: PRODUCTS)
+  uomsAdd(name: String, code: String): Uom @join__field(graph: PRODUCTS)
+  uomsEdit(_id: String!, name: String, code: String): Uom @join__field(graph: PRODUCTS)
+  uomsRemove(uomIds: [String!]): String @join__field(graph: PRODUCTS)
+}
+
+type Notification
+  @join__type(graph: NOTIFICATIONS)
+{
+  _id: String!
+  notifType: String
+  title: String
+  link: String
+  content: String
+  action: String
+  createdUser: User
+  receiver: String
+  date: Date
+  isRead: Boolean
+}
+
+type NotificationConfig
+  @join__type(graph: CLIENTPORTAL)
+{
+  notifType: String
+  label: String
+  isAllowed: Boolean
+}
+
+input NotificationConfigInput
+  @join__type(graph: CLIENTPORTAL)
+{
+  notifType: String
+  label: String
+  isAllowed: Boolean
+}
+
+type NotificationConfiguration
+  @join__type(graph: NOTIFICATIONS)
+{
+  _id: String!
+  user: String
+  notifType: String
+  isAllowed: Boolean
+}
+
+enum NotificationType
+  @join__type(graph: CLIENTPORTAL)
+{
+  system @join__enumValue(graph: CLIENTPORTAL)
+  engage @join__enumValue(graph: CLIENTPORTAL)
+}
+
+type ObjectListConfig
+  @join__type(graph: FORMS)
+{
+  key: String
+  label: String
+  type: String
+}
+
+input objectListConfigInput
+  @join__type(graph: FORMS)
+{
+  key: String
+  label: String
+  type: String
+}
+
+type OnboardingGetAvailableFeaturesResponse
+  @join__type(graph: CORE)
+{
+  name: String
+  settings: [String]
+  showSettings: Boolean
+  isComplete: Boolean
+}
+
+type OnboardingHistory
+  @join__type(graph: CORE)
+{
+  _id: String
+  userId: String
+  isCompleted: Boolean
+  completedSteps: [String]
+}
+
+type OnboardingNotification
+  @join__type(graph: CORE)
+{
+  userId: String
+  type: String
+}
+
+type Order
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  createdAt: Date
+  status: String
+  customerId: String
+  number: String
+  cashAmount: Float
+  mobileAmount: Float
+  billType: String
+  registerNumber: String
+  paidAmounts: [PaidAmount]
+  paidDate: Date
+  modifiedAt: Date
+  totalAmount: Float
+  finalAmount: Float
+  shouldPrintEbarimt: Boolean
+  printedEbarimt: Boolean
+  billId: String
+  oldBillId: String
+  type: String
+  branchId: String
+  deliveryInfo: JSON
+  origin: String
+  customer: PosCustomer
+  customerType: String
+  items: [PosOrderItem]
+  user: PosUser
+  putResponses: [PosPutResponse]
+  slotCode: String
+}
+
+input OrderItem
+  @join__type(graph: CARDS)
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  order: Int!
+}
+
+input OrderItemInput
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  productId: String!
+  count: Float!
+  unitPrice: Float!
+  isPackage: Boolean
+  isTake: Boolean
+  status: String
+  manufacturedDate: String
+}
+
+input OrderPaymentInput
+  @join__type(graph: POSCLIENT)
+{
+  cashAmount: Float
+  mobileAmount: Float
+  billType: String
+  registerNumber: String
+  paidAmounts: [PaidAmountInput]
+}
+
+type OTPConfig
+  @join__type(graph: CLIENTPORTAL)
+{
+  content: String
+  codeLength: Int
+  smsTransporterType: String
+  loginWithOTP: Boolean
+  expireAfter: Int
+}
+
+input OTPConfigInput
+  @join__type(graph: CLIENTPORTAL)
+{
+  content: String
+  codeLength: Int
+  smsTransporterType: String
+  loginWithOTP: Boolean
+  expireAfter: Int
+}
+
+type PaidAmount
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  type: String
+  amount: Float
+  info: JSON
+}
+
+input PaidAmountInput
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  type: String
+  amount: Float
+  info: JSON
+}
+
+type PasswordVerificationConfig
+  @join__type(graph: CLIENTPORTAL)
+{
+  verifyByOTP: Boolean
+  emailSubject: String
+  emailContent: String
+  smsContent: String
+}
+
+type Payment
+  @join__type(graph: PAYMENT)
+{
+  _id: String!
+  name: String!
+  kind: String!
+  status: String
+  config: JSON
+  createdAt: Date
+}
+
+type PaymentConfig
+  @join__type(graph: PAYMENT)
+{
+  _id: String!
+  contentType: String!
+  contentTypeId: String!
+  contentName: String
+  paymentIds: [String]
+  payments: [Payment]
+}
+
+type PaymentConfigList
+  @join__type(graph: PAYMENT)
+{
+  list: [PaymentConfig]
+  totalCount: Int
+}
+
+type paymentsTotalCount
+  @join__type(graph: PAYMENT)
+{
+  byKind: JSON
+  byStatus: JSON
+  total: Int
+}
+
+type Permission
+  @join__type(graph: CORE)
+{
+  _id: String!
+  module: String
+  action: String
+  userId: String
+  groupId: String
+  requiredActions: [String]
+  allowed: Boolean
+  user: User
+  group: UsersGroup
+}
+
+type PermissionAction
+  @join__type(graph: CORE)
+{
+  name: String
+  description: String
+  module: String
+}
+
+type PermissionModule
+  @join__type(graph: CORE)
+{
+  name: String
+  description: String
+}
+
+type Pipeline
+  @join__type(graph: CARDS, key: "_id")
+{
+  _id: String!
+  name: String!
+  status: String
+  boardId: String!
+  tagId: String
+  visibility: String!
+  memberIds: [String]
+  departmentIds: [String]
+  members: [User]
+  bgColor: String
+  isWatched: Boolean
+  itemsTotalCount: Int
+  userId: String
+  createdUser: User
+  startDate: Date
+  endDate: Date
+  metric: String
+  hackScoringType: String
+  templateId: String
+  state: String
+  isCheckUser: Boolean
+  isCheckDepartment: Boolean
+  excludeCheckUserIds: [String]
+  numberConfig: String
+  numberSize: String
+  order: Int
+  createdAt: Date
+  type: String
+}
+
+type PipelineChangeResponse
+  @join__type(graph: CARDS)
+{
+  _id: String
+  proccessId: String
+  action: String
+  data: JSON
+}
+
+type PipelineLabel
+  @join__type(graph: CARDS, key: "_id")
+{
+  _id: String!
+  name: String!
+  colorCode: String
+  pipelineId: String
+  createdBy: String
+  createdAt: Date
+}
+
+type PipelineTemplate
+  @join__type(graph: CARDS, key: "_id")
+{
+  _id: String!
+  name: String!
+  description: String
+  type: String
+  isDefinedByErxes: Boolean
+  stages: [PipelineTemplateStage]
+  createdBy: String
+  createdAt: Date
+}
+
+type PipelineTemplateStage
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  name: String!
+  formId: String
+  order: Int
+}
+
+input PipelineTemplateStageInput
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  name: String!
+  formId: String
+}
+
+type Pos
+  @join__type(graph: POS)
+{
+  _id: String
+  createdAt: Date
+  userId: String
+  user: User
+  name: String
+  description: String
+  productDetails: [String]
+  adminIds: [String]
+  cashierIds: [String]
+  paymentIds: [String]
+  paymentTypes: [JSON]
+  isOnline: Boolean
+  onServer: Boolean
+  branchId: String
+  departmentId: String
+  allowBranchIds: [String]
+  beginNumber: String
+  maxSkipNumber: Int
+  waitingScreen: JSON
+  kitchenScreen: JSON
+  kioskMachine: JSON
+  uiOptions: JSON
+  token: String
+  erxesAppToken: String
+  ebarimtConfig: JSON
+  erkhetConfig: JSON
+  initialCategoryIds: [String]
+  kioskExcludeCategoryIds: [String]
+  kioskExcludeProductIds: [String]
+  deliveryConfig: JSON
+  cardsConfig: JSON
+  checkRemainder: Boolean
+  permissionConfig: JSON
+  allowTypes: [String]
+  catProdMappings: [CatProd]
+}
+
+type PoscCatProd
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  categoryId: String
+  code: String
+  name: String
+  productId: String
+}
+
+type PosclientSlot
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  code: String
+  name: String
+}
+
+type PosConfig
+  @join__type(graph: POSCLIENT)
+{
+  _id: String
+  name: String
+  description: String
+  userId: String
+  createdAt: Date
+  productDetails: [String]
+  adminIds: [String]
+  cashierIds: [String]
+  paymentIds: [String]
+  paymentTypes: [JSON]
+  beginNumber: String
+  maxSkipNumber: Int
+  waitingScreen: JSON
+  kioskMachine: JSON
+  kitchenScreen: JSON
+  token: String
+  erxesAppToken: String
+  uiOptions: UIOptions
+  ebarimtConfig: EbarimtConfig
+  catProdMappings: [PoscCatProd]
+  initialCategoryIds: [String]
+  kioskExcludeCategoryIds: [String]
+  kioskExcludeProductIds: [String]
+  deliveryConfig: JSON
+  branchId: String
+  departmentId: String
+  checkRemainder: Boolean
+  permissionConfig: JSON
+  allowTypes: [String]
+}
+
+type PosCover
+  @join__type(graph: POS)
+{
+  _id: String
+  posToken: String
+  beginDate: Date
+  endDate: Date
+  status: String
+  description: String
+  userId: String
+  details: [PosCoverDetail]
+  createdAt: Date
+  createdBy: String
+  modifiedAt: Date
+  modifiedBy: String
+  note: String
+  posName: String
+  user: User
+  createdUser: User
+  modifiedUser: User
+}
+
+type PosCoverDetail
+  @join__type(graph: POS)
+{
+  _id: String
+  paidType: String
+  paidSummary: [PosCoverSummary]
+  paidDetail: JSON
+}
+
+type PosCoverSummary
+  @join__type(graph: POS)
+{
+  _id: String
+  kind: String
+  kindOfVal: Float
+  value: Float
+  amount: Float
+}
+
+type PoscProduct
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  name: String
+  description: String
+  attachment: Attachment
+  code: String
+  type: String
+  sku: String
+  barcodes: [String]
+  barcodeDescription: String
+  unitPrice: Float
+  categoryId: String
+  customFieldsData: JSON
+  customFieldsDataByFieldCode: JSON
+  createdAt: Date
+  tagIds: [String]
+  vendorId: String
+  attachmentMore: [Attachment]
+  supply: String
+  productCount: Int
+  minimiumCount: Int
+  uomId: String
+  subUoms: JSON
+  category: PosProductCategory
+  remainder: Int
+}
+
+type PosCustomer
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  code: String
+  primaryPhone: String
+  firstName: String
+  primaryEmail: String
+  lastName: String
+}
+
+type PosOrder
+  @join__type(graph: POS)
+{
+  _id: String
+  createdAt: Date
+  status: String
+  paidDate: Date
+  number: String
+  customerId: String
+  customerType: String
+  cashAmount: Float
+  mobileAmount: Float
+  paidAmounts: JSON
+  totalAmount: Float
+  finalAmount: Float
+  shouldPrintEbarimt: Boolean
+  printedEbarimt: Boolean
+  billType: String
+  billId: String
+  registerNumber: String
+  oldBillId: String
+  type: String
+  userId: String
+  items: JSON
+  posToken: String
+  posName: String
+  user: User
+  customer: CustomerPos
+  syncedErkhet: Boolean
+  origin: String
+}
+
+type PosOrderDetail
+  @join__type(graph: POS)
+{
+  _id: String
+  createdAt: Date
+  status: String
+  paidDate: Date
+  number: String
+  customerId: String
+  customerType: String
+  cashAmount: Float
+  mobileAmount: Float
+  paidAmounts: JSON
+  totalAmount: Float
+  finalAmount: Float
+  shouldPrintEbarimt: Boolean
+  printedEbarimt: Boolean
+  billType: String
+  billId: String
+  registerNumber: String
+  oldBillId: String
+  type: String
+  userId: String
+  items: JSON
+  posToken: String
+  posName: String
+  user: User
+  customer: CustomerPos
+  syncedErkhet: Boolean
+  origin: String
+  syncErkhetInfo: String
+  putResponses: JSON
+  deliveryInfo: JSON
+}
+
+type PosOrderItem
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  createdAt: Date
+  productId: String!
+  count: Float!
+  orderId: String!
+  unitPrice: Float
+  discountAmount: Float
+  discountPercent: Float
+  bonusCount: Float
+  productName: String
+  isPackage: Boolean
+  isTake: Boolean
+  productImgUrl: String
+  status: String
+  manufacturedDate: String
+}
+
+type PosProduct
+  @join__type(graph: POS)
+{
+  _id: String!
+  name: String
+  code: String
+  type: String
+  sku: String
+  unitPrice: Float
+  categoryId: String
+  createdAt: Date
+  counts: JSON
+  count: Float
+  amount: Float
+  category: ProductCategory
+}
+
+type PosProductCategory
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  name: String
+  description: String
+  attachment: Attachment
+  code: String
+  parentId: String
+  meta: String
+  order: String!
+  isRoot: Boolean
+  productCount: Int
+}
+
+type PosProducts
+  @join__type(graph: POS)
+{
+  products: [PosProduct]
+  totalCount: Float
+}
+
+type PosPutResponse
+  @join__type(graph: POSCLIENT)
+{
+  createdAt: Date
+  date: String
+  contentType: String
+  contentId: String
+  amount: String
+  billType: String
+  cashAmount: String
+  nonCashAmount: String
+  customerNo: String
+  cityTax: String
+  vat: String
+  taxType: String
+  registerNo: String
+  billId: String
+  macAddress: String
+  lottery: String
+  qrData: String
+  success: String
+  customerName: String
+  modifiedAt: Date
+  sendInfo: JSON
+  internalCode: String
+  lotteryWarningMsg: String
+  errorCode: String
+  message: String
+  getInformation: String
+  returnBillId: String
+  stocks: JSON
+}
+
+type PosSlot
+  @join__type(graph: POS)
+{
+  _id: String
+  posId: String
+  code: String
+  name: String
+}
+
+type PosUser
+  @join__type(graph: POSCLIENT)
+{
+  _id: String!
+  createdAt: Date
+  username: String
+  firstName: String
+  lastName: String
+  primaryPhone: String
+  primaryEmail: String
+  email: String
+  isActive: Boolean
+  isOwner: Boolean
+  details: PosUserDetailsType
+}
+
+type PosUserDetailsType
+  @join__type(graph: POSCLIENT)
+{
+  avatar: String
+  fullName: String
+  shortName: String
+  birthDate: Date
+  position: String
+  workStartedDate: Date
+  location: String
+  description: String
+  operatorPhone: String
+}
+
+type Product
+  @join__type(graph: ECOMMERCE, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
+  @join__type(graph: PRODUCTS, key: "_id")
+{
+  _id: String!
+  name: String @join__field(graph: PRODUCTS)
+  code: String @join__field(graph: PRODUCTS)
+  type: String @join__field(graph: PRODUCTS)
+  description: String @join__field(graph: PRODUCTS)
+  sku: String @join__field(graph: PRODUCTS)
+  barcodes: [String] @join__field(graph: PRODUCTS)
+  barcodeDescription: String @join__field(graph: PRODUCTS)
+  unitPrice: Float @join__field(graph: PRODUCTS)
+  categoryId: String @join__field(graph: PRODUCTS)
+  customFieldsData: JSON @join__field(graph: PRODUCTS)
+  customFieldsDataByFieldCode: JSON @join__field(graph: PRODUCTS)
+  createdAt: Date @join__field(graph: PRODUCTS)
+  tagIds: [String] @join__field(graph: PRODUCTS)
+  attachment: Attachment @join__field(graph: PRODUCTS)
+  attachmentMore: [Attachment] @join__field(graph: PRODUCTS)
+  vendorId: String @join__field(graph: PRODUCTS)
+  supply: String @join__field(graph: PRODUCTS)
+  productCount: Int @join__field(graph: PRODUCTS)
+  minimiumCount: Int @join__field(graph: PRODUCTS)
+  uomId: String @join__field(graph: PRODUCTS)
+  subUoms: JSON @join__field(graph: PRODUCTS)
+  uom: Uom @join__field(graph: PRODUCTS)
+  category: ProductCategory @join__field(graph: PRODUCTS)
+  vendor: Company @join__field(graph: PRODUCTS)
+  taxType: String @join__field(graph: PRODUCTS)
+  taxCode: String @join__field(graph: PRODUCTS)
+}
+
+type ProductCategory
+  @join__type(graph: POS, key: "_id")
+  @join__type(graph: PRODUCTS, key: "_id")
+{
+  _id: String!
+  name: String @join__field(graph: PRODUCTS)
+  description: String @join__field(graph: PRODUCTS)
+  meta: String @join__field(graph: PRODUCTS)
+  parentId: String @join__field(graph: PRODUCTS)
+  code: String! @join__field(graph: PRODUCTS)
+  order: String! @join__field(graph: PRODUCTS)
+  attachment: Attachment @join__field(graph: PRODUCTS)
+  status: String @join__field(graph: PRODUCTS)
+  isRoot: Boolean @join__field(graph: PRODUCTS)
+  productCount: Int @join__field(graph: PRODUCTS)
+}
+
+input ProductField
+  @join__type(graph: CARDS)
+{
+  productId: String
+  quantity: Int
+}
+
+type ProductGroups
+  @join__type(graph: POS)
+{
+  _id: String
+  name: String
+  description: String
+  posId: String
+  categoryIds: [String]
+  excludedCategoryIds: [String]
+  excludedProductIds: [String]
+}
+
+type Productreview
+  @join__type(graph: ECOMMERCE)
+{
+  _id: String!
+  productId: String!
+  customerId: String
+  review: Float
+}
+
+type ProductsConfig
+  @join__type(graph: PRODUCTS)
+{
+  _id: String!
+  code: String!
+  value: JSON
+}
+
+type ProductsDataChangeResponse
+  @join__type(graph: CARDS)
+{
+  _id: String
+  proccessId: String
+  action: String
+  data: JSON
+}
+
+type PutResponse
+  @join__type(graph: EBARIMT)
+{
+  _id: String
+  createdAt: Date
+  modifiedAt: Date
+  contentType: String
+  contentId: String
+  number: String
+  success: String
+  billId: String
+  date: String
+  macAddress: String
+  internalCode: String
+  billType: String
+  lotteryWarningMsg: String
+  errorCode: String
+  message: String
+  getInformation: String
+  taxType: String
+  qrData: String
+  lottery: String
+  amount: String
+  cityTax: String
+  vat: String
+  cashAmount: String
+  nonCashAmount: String
+  returnBillId: String
+  sendInfo: JSON
+  stocks: JSON
+  registerNo: String
+  customerNo: String
+  customerName: String
+}
+
+type Query
+  @join__type(graph: CARDS)
+  @join__type(graph: CLIENTPORTAL)
+  @join__type(graph: CONTACTS)
+  @join__type(graph: CORE)
+  @join__type(graph: EBARIMT)
+  @join__type(graph: ECOMMERCE)
+  @join__type(graph: FORMS)
+  @join__type(graph: KNOWLEDGEBASE)
+  @join__type(graph: NOTIFICATIONS)
+  @join__type(graph: PAYMENT)
+  @join__type(graph: POS)
+  @join__type(graph: POSCLIENT)
+  @join__type(graph: PRODUCTS)
+{
+  boards(type: String!): [Board] @join__field(graph: CARDS)
+  boardCounts(type: String!): [BoardCount] @join__field(graph: CARDS)
+  boardGetLast(type: String!): Board @join__field(graph: CARDS)
+  boardDetail(_id: String!): Board @join__field(graph: CARDS)
+  pipelines(boardId: String, type: String, isAll: Boolean, page: Int, perPage: Int): [Pipeline] @join__field(graph: CARDS)
+  pipelineDetail(_id: String!): Pipeline @join__field(graph: CARDS)
+  pipelineAssignedUsers(_id: String!): [User] @join__field(graph: CARDS)
+  stages(isNotLost: Boolean, isAll: Boolean, pipelineId: String!, search: String, companyIds: [String], customerIds: [String], assignedUserIds: [String], labelIds: [String], extraParams: JSON, closeDateType: String, assignedToMe: String, age: Int): [Stage] @join__field(graph: CARDS)
+  stageDetail(_id: String!, search: String, companyIds: [String], customerIds: [String], assignedUserIds: [String], labelIds: [String], extraParams: JSON, closeDateType: String, assignedToMe: String, age: Int): Stage @join__field(graph: CARDS)
+  convertToInfo(conversationId: String!): ConvertTo @join__field(graph: CARDS)
+  pipelineStateCount(boardId: String, type: String): JSON @join__field(graph: CARDS)
+  archivedStages(pipelineId: String!, search: String, page: Int, perPage: Int): [Stage] @join__field(graph: CARDS)
+  archivedStagesCount(pipelineId: String!, search: String): Int @join__field(graph: CARDS)
+  itemsCountBySegments(type: String!, boardId: String, pipelineId: String): JSON @join__field(graph: CARDS)
+  itemsCountByAssignedUser(type: String!, pipelineId: String!, stackBy: String): JSON @join__field(graph: CARDS)
+  cardsFields: JSON @join__field(graph: CARDS)
+  boardContentTypeDetail(contentType: String, contentId: String): JSON @join__field(graph: CARDS)
+  boardLogs(action: String, content: JSON, contentId: String, contentType: String): JSON @join__field(graph: CARDS)
+  checkFreeTimes(pipelineId: String, intervals: [Interval]): JSON @join__field(graph: CARDS)
+  dealDetail(_id: String!): Deal @join__field(graph: CARDS)
+  checkDiscount(_id: String!, products: [ProductField]): JSON @join__field(graph: CARDS)
+  deals(initialStageId: String, stageId: String, skip: Int, limit: Int, _ids: [String], date: ItemDate, parentId: String, pipelineId: String, pipelineIds: [String], customerIds: [String], companyIds: [String], assignedUserIds: [String], productIds: [String], closeDateType: String, labelIds: [String], search: String, priority: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, stageChangedStartDate: Date, stageChangedEndDate: Date, noSkipArchive: Boolean, tagIds: [String], number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [DealListItem] @join__field(graph: CARDS)
+  dealsTotalCount(initialStageId: String, stageId: String, skip: Int, limit: Int, _ids: [String], date: ItemDate, parentId: String, pipelineId: String, pipelineIds: [String], customerIds: [String], companyIds: [String], assignedUserIds: [String], productIds: [String], closeDateType: String, labelIds: [String], search: String, priority: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, stageChangedStartDate: Date, stageChangedEndDate: Date, noSkipArchive: Boolean, tagIds: [String], number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): Int @join__field(graph: CARDS)
+  archivedDeals(page: Int, perPage: Int, pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], productIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String): [Deal] @join__field(graph: CARDS)
+  archivedDealsCount(pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], productIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String): Int @join__field(graph: CARDS)
+  dealsTotalAmounts(_ids: [String], date: ItemDate, parentId: String, pipelineId: String, pipelineIds: [String], customerIds: [String], companyIds: [String], assignedUserIds: [String], productIds: [String], closeDateType: String, labelIds: [String], search: String, priority: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, stageChangedStartDate: Date, stageChangedEndDate: Date, noSkipArchive: Boolean, tagIds: [String], number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [TotalForType] @join__field(graph: CARDS)
+  taskDetail(_id: String!): Task @join__field(graph: CARDS)
+  tasks(_ids: [String], pipelineId: String, pipelineIds: [String], parentId: String, stageId: String, customerIds: [String], companyIds: [String], date: ItemDate, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, priority: [String], labelIds: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, tagIds: [String], noSkipArchive: Boolean, number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [TaskListItem] @join__field(graph: CARDS)
+  tasksTotalCount(_ids: [String], pipelineId: String, pipelineIds: [String], parentId: String, stageId: String, customerIds: [String], companyIds: [String], date: ItemDate, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, priority: [String], labelIds: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, tagIds: [String], noSkipArchive: Boolean, number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): Int @join__field(graph: CARDS)
+  archivedTasks(page: Int, perPage: Int, pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String): [Task] @join__field(graph: CARDS)
+  archivedTasksCount(pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String): Int @join__field(graph: CARDS)
+  tasksAsLogs(contentType: String!, contentId: String!, limit: Int): [JSON] @join__field(graph: CARDS)
+  ticketDetail(_id: String!): Ticket @join__field(graph: CARDS)
+  tickets(_ids: [String], pipelineId: String, pipelineIds: [String], parentId: String, stageId: String, customerIds: [String], companyIds: [String], date: ItemDate, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, priority: [String], source: [String], labelIds: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, tagIds: [String], noSkipArchive: Boolean, number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [TicketListItem] @join__field(graph: CARDS)
+  ticketsTotalCount(_ids: [String], pipelineId: String, pipelineIds: [String], parentId: String, stageId: String, customerIds: [String], companyIds: [String], date: ItemDate, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, priority: [String], source: [String], labelIds: [String], sortField: String, sortDirection: Int, userIds: [String], segment: String, segmentData: String, assignedToMe: String, startDate: String, endDate: String, hasStartAndCloseDate: Boolean, tagIds: [String], noSkipArchive: Boolean, number: String, branchIds: [String], departmentIds: [String], conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): Int @join__field(graph: CARDS)
+  archivedTickets(page: Int, perPage: Int, pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String, sources: [String]): [Ticket] @join__field(graph: CARDS)
+  archivedTicketsCount(pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String, sources: [String]): Int @join__field(graph: CARDS)
+  growthHackDetail(_id: String!): GrowthHack @join__field(graph: CARDS)
+  growthHacks(_ids: [String], pipelineId: String, pipelineIds: [String], initialStageId: String, stageId: String, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, hackStage: [String], priority: [String], labelIds: [String], userIds: [String], assignedToMe: String, sortField: String, sortDirection: Int): [GrowthHack] @join__field(graph: CARDS)
+  growthHacksTotalCount(_ids: [String], pipelineId: String, pipelineIds: [String], initialStageId: String, stageId: String, skip: Int, limit: Int, search: String, assignedUserIds: [String], closeDateType: String, hackStage: [String], priority: [String], labelIds: [String], userIds: [String], assignedToMe: String): Int @join__field(graph: CARDS)
+  growthHacksPriorityMatrix(pipelineId: String, search: String, assignedUserIds: [String], closeDateType: String): JSON @join__field(graph: CARDS)
+  archivedGrowthHacks(page: Int, perPage: Int, pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], productIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String, hackStages: [String]): [GrowthHack] @join__field(graph: CARDS)
+  archivedGrowthHacksCount(pipelineId: String!, search: String, userIds: [String], priorities: [String], assignedUserIds: [String], labelIds: [String], productIds: [String], companyIds: [String], customerIds: [String], startDate: String, endDate: String, hackStages: [String]): Int @join__field(graph: CARDS)
+  pipelineLabels(pipelineId: String!): [PipelineLabel] @join__field(graph: CARDS)
+  pipelineLabelDetail(_id: String!): PipelineLabel @join__field(graph: CARDS)
+  pipelineTemplates(type: String!): [PipelineTemplate] @join__field(graph: CARDS)
+  pipelineTemplateDetail(_id: String!): PipelineTemplate @join__field(graph: CARDS)
+  pipelineTemplatesTotalCount: Int @join__field(graph: CARDS)
+  checklists(contentType: String, contentTypeId: String): [Checklist] @join__field(graph: CARDS)
+  checklistDetail(_id: String!): Checklist @join__field(graph: CARDS)
+  clientPortalGetConfigs(page: Int, perPage: Int): [ClientPortal] @join__field(graph: CLIENTPORTAL)
+  clientPortalGetConfig(_id: String!): ClientPortal @join__field(graph: CLIENTPORTAL)
+  clientPortalGetConfigByDomain: ClientPortal @join__field(graph: CLIENTPORTAL)
+  clientPortalGetLast: ClientPortal @join__field(graph: CLIENTPORTAL)
+  clientPortalConfigsTotalCount: Int @join__field(graph: CLIENTPORTAL)
+  clientPortalGetTaskStages: [Stage] @join__field(graph: CLIENTPORTAL)
+  clientPortalGetTasks(stageId: String!): [Task] @join__field(graph: CLIENTPORTAL)
+  clientPortalTickets: [Ticket] @join__field(graph: CLIENTPORTAL)
+  clientPortalTicket(_id: String!): Ticket @join__field(graph: CLIENTPORTAL)
+  clientPortalKnowledgeBaseTopicDetail(_id: String!): KnowledgeBaseTopic @join__field(graph: CLIENTPORTAL)
+  clientPortalKnowledgeBaseArticles(searchValue: String, categoryIds: [String], topicId: String): [KnowledgeBaseArticle] @join__field(graph: CLIENTPORTAL)
+  clientPortalCurrentUser: ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalUserDetail(_id: String!): ClientPortalUser @join__field(graph: CLIENTPORTAL)
+  clientPortalUsers(page: Int, perPage: Int, type: String, ids: [String], excludeIds: Boolean, searchValue: String, sortField: String, sortDirection: Int, cpId: String, dateFilters: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [ClientPortalUser] @join__field(graph: CLIENTPORTAL)
+  clientPortalUsersMain(page: Int, perPage: Int, type: String, ids: [String], excludeIds: Boolean, searchValue: String, sortField: String, sortDirection: Int, cpId: String, dateFilters: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): clientPortalUsersListResponse @join__field(graph: CLIENTPORTAL)
+  clientPortalUserCounts(type: String): Int @join__field(graph: CLIENTPORTAL)
+  clientPortalNotifications(limit: Int, page: Int, perPage: Int, requireRead: Boolean, notifType: NotificationType, search: String, startDate: String, endDate: String): [ClientPortalNotification] @join__field(graph: CLIENTPORTAL)
+  clientPortalNotificationCount: Int @join__field(graph: CLIENTPORTAL)
+  clientPortalNotificationDetail(_id: String!): ClientPortalNotification @join__field(graph: CLIENTPORTAL)
+  clientPortalComments(typeId: String!, type: String!): [ClientPortalComment] @join__field(graph: CLIENTPORTAL)
+  customersMain(page: Int, perPage: Int, segment: String, type: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, brand: String, integration: String, form: String, startDate: String, endDate: String, leadStatus: String, sortField: String, sortDirection: Int, sex: Int, birthDate: Date, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): CustomersListResponse @join__field(graph: CONTACTS)
+  customers(page: Int, perPage: Int, segment: String, type: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, brand: String, integration: String, form: String, startDate: String, endDate: String, leadStatus: String, sortField: String, sortDirection: Int, sex: Int, birthDate: Date, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [Customer] @join__field(graph: CONTACTS)
+  customerCounts(page: Int, perPage: Int, segment: String, type: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, brand: String, integration: String, form: String, startDate: String, endDate: String, leadStatus: String, sortField: String, sortDirection: Int, sex: Int, birthDate: Date, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean, only: String, source: String): JSON @join__field(graph: CONTACTS)
+  customerDetail(_id: String!): Customer @join__field(graph: CONTACTS)
+  contactsLogs(action: String, content: JSON, contentId: String, contentType: String): JSON @join__field(graph: CONTACTS)
+  companiesMain(page: Int, perPage: Int, segment: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, sortField: String, sortDirection: Int, brand: String, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): CompaniesListResponse @join__field(graph: CONTACTS)
+  companies(page: Int, perPage: Int, segment: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, sortField: String, sortDirection: Int, brand: String, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean): [Company] @join__field(graph: CONTACTS)
+  companyCounts(page: Int, perPage: Int, segment: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, sortField: String, sortDirection: Int, brand: String, dateFilters: String, segmentData: String, conformityMainType: String, conformityMainTypeId: String, conformityRelType: String, conformityIsRelated: Boolean, conformityIsSaved: Boolean, only: String): JSON @join__field(graph: CONTACTS)
+  companyDetail(_id: String!): Company @join__field(graph: CONTACTS)
+  users(sortField: String, sortDirection: Int, page: Int, perPage: Int, status: String, excludeIds: Boolean, searchValue: String, isActive: Boolean, requireUsername: Boolean, ids: [String], brandIds: [String], departmentId: String, branchId: String, unitId: String): [User] @join__field(graph: CORE)
+  allUsers(isActive: Boolean, ids: [String], assignedToMe: String): [User] @join__field(graph: CORE)
+  userDetail(_id: String): User @join__field(graph: CORE)
+  usersTotalCount(searchValue: String, isActive: Boolean, requireUsername: Boolean, ids: [String], brandIds: [String], departmentId: String, branchId: String, unitId: String): Int @join__field(graph: CORE)
+  currentUser: User @join__field(graph: CORE)
+  userMovements(userId: String!, contentType: String): [UserMovement] @join__field(graph: CORE)
+  allBrands: [Brand] @join__field(graph: CORE)
+  brands(page: Int, perPage: Int, searchValue: String): [Brand] @join__field(graph: CORE)
+  brandDetail(_id: String!): Brand @join__field(graph: CORE)
+  brandsTotalCount: Int @join__field(graph: CORE)
+  brandsGetLast: Brand @join__field(graph: CORE)
+  search(value: String!): [JSON] @join__field(graph: CORE)
+  configs: [Config] @join__field(graph: CORE)
+  configsGetVersion(releaseNotes: Boolean): JSON @join__field(graph: CORE)
+  configsGetEnv: ENV @join__field(graph: CORE)
+  configsConstants: JSON @join__field(graph: CORE)
+  configsCheckActivateInstallation(hostname: String!): JSON @join__field(graph: CORE)
+  configsCheckPremiumService(type: String!): Boolean @join__field(graph: CORE)
+  configsGetEmailTemplate(name: String): String @join__field(graph: CORE)
+  configsGetValue(code: String!): JSON @join__field(graph: CORE)
+  configsGetInstallationStatus(name: String!): JSON @join__field(graph: CORE)
+  enabledServices: JSON @join__field(graph: CORE)
+  permissions(module: String, action: String, userId: String, groupId: String, allowed: Boolean, page: Int, perPage: Int): [Permission] @join__field(graph: CORE)
+  permissionModules: [PermissionModule] @join__field(graph: CORE)
+  permissionActions: [PermissionAction] @join__field(graph: CORE)
+  permissionsTotalCount(module: String, action: String, userId: String, groupId: String, allowed: Boolean): Int @join__field(graph: CORE)
+  usersGroups(page: Int, perPage: Int): [UsersGroup] @join__field(graph: CORE)
+  usersGroupsTotalCount: Int @join__field(graph: CORE)
+  robotEntries(isNotified: Boolean, action: String, parentId: String): [RobotEntry] @join__field(graph: CORE)
+  onboardingStepsCompleteness(steps: [String]): JSON @join__field(graph: CORE)
+  onboardingGetAvailableFeatures: [OnboardingGetAvailableFeaturesResponse] @join__field(graph: CORE)
+  departments(ids: [String], excludeIds: Boolean, perPage: Int, page: Int, searchValue: String, status: String, withoutUserFilter: Boolean): [Department] @join__field(graph: CORE)
+  departmentsMain(ids: [String], excludeIds: Boolean, perPage: Int, page: Int, searchValue: String, status: String, withoutUserFilter: Boolean): DepartmentListQueryResponse @join__field(graph: CORE)
+  departmentDetail(_id: String!): Department @join__field(graph: CORE)
+  noDepartmentUsers(excludeId: String): [User] @join__field(graph: CORE)
+  units(searchValue: String): [Unit] @join__field(graph: CORE)
+  unitsMain(ids: [String], excludeIds: Boolean, perPage: Int, page: Int, searchValue: String, status: String): UnitListQueryResponse @join__field(graph: CORE)
+  unitDetail(_id: String!): Unit @join__field(graph: CORE)
+  branches(ids: [String], excludeIds: Boolean, perPage: Int, page: Int, searchValue: String, status: String, withoutUserFilter: Boolean): [Branch] @join__field(graph: CORE)
+  branchesMain(ids: [String], excludeIds: Boolean, perPage: Int, page: Int, searchValue: String, status: String, withoutUserFilter: Boolean): BranchListQueryResponse @join__field(graph: CORE)
+  branchDetail(_id: String!): Branch @join__field(graph: CORE)
+  structureDetail: Structure @join__field(graph: CORE)
+  apps: [App] @join__field(graph: CORE)
+  appsTotalCount: Int @join__field(graph: CORE)
+  appDetail(_id: String): App @join__field(graph: CORE)
+  putResponses(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, contentType: String, success: String, billType: String, billIdRule: String, isLast: String, orderNumber: String, dealName: String, pipelineId: String, stageId: String, createdStartDate: Date, createdEndDate: Date, paidDate: String): [PutResponse] @join__field(graph: EBARIMT)
+  putResponsesByDate(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, contentType: String, success: String, billType: String, billIdRule: String, isLast: String, orderNumber: String, dealName: String, pipelineId: String, stageId: String, createdStartDate: Date, createdEndDate: Date, paidDate: String): JSON @join__field(graph: EBARIMT)
+  putResponsesCount(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, contentType: String, success: String, billType: String, billIdRule: String, isLast: String, orderNumber: String, dealName: String, pipelineId: String, stageId: String, createdStartDate: Date, createdEndDate: Date, paidDate: String): Int @join__field(graph: EBARIMT)
+  putResponsesAmount(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, contentType: String, success: String, billType: String, billIdRule: String, isLast: String, orderNumber: String, dealName: String, pipelineId: String, stageId: String, createdStartDate: Date, createdEndDate: Date, paidDate: String): Float @join__field(graph: EBARIMT)
+  getDealLink(_id: String): String @join__field(graph: EBARIMT)
+  productreview(productId: String!): AverageReview @join__field(graph: ECOMMERCE)
+  productreviews(productIds: [String], customerId: String): [Productreview] @join__field(graph: ECOMMERCE)
+  wish(productId: String, customerId: String): Wish @join__field(graph: ECOMMERCE)
+  wishlist(customerId: String): [Wish] @join__field(graph: ECOMMERCE)
+  lastViewedItems(customerId: String!, limit: Int): [LastViewedItem] @join__field(graph: ECOMMERCE)
+  formDetail(_id: String!): Form @join__field(graph: FORMS)
+  forms: [Form] @join__field(graph: FORMS)
+  formSubmissions(tagId: String, formId: String, customerId: String, contentTypeIds: [String], filters: [SubmissionFilter], page: Int, perPage: Int): [Submission] @join__field(graph: FORMS)
+  formSubmissionsTotalCount(tagId: String, formId: String, customerId: String, contentTypeIds: [String], filters: [SubmissionFilter]): Int @join__field(graph: FORMS)
+  formSubmissionDetail(contentTypeId: String!): Submission @join__field(graph: FORMS)
+  fieldsGetTypes: [JSON] @join__field(graph: FORMS)
+  getFieldsInputTypes: [JSON] @join__field(graph: FORMS)
+  fields(contentType: String!, contentTypeId: String, isVisible: Boolean, searchable: Boolean, isVisibleToCreate: Boolean, pipelineId: String): [Field] @join__field(graph: FORMS)
+  fieldsCombinedByContentType(contentType: String!, usageType: String, excludedNames: [String], segmentId: String, config: JSON, onlyDates: Boolean): JSON @join__field(graph: FORMS)
+  fieldsDefaultColumnsConfig(contentType: String!): [ColumnConfigItem] @join__field(graph: FORMS)
+  fieldsGroups(contentType: String, isDefinedByErxes: Boolean, config: JSON): [FieldsGroup] @join__field(graph: FORMS)
+  fieldsGetDetail(_id: String, code: String): Field @join__field(graph: FORMS)
+  getSystemFieldsGroup(contentType: String): FieldsGroup @join__field(graph: FORMS)
+  knowledgeBaseTopics(page: Int, perPage: Int, brandId: String): [KnowledgeBaseTopic] @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseTopicDetail(_id: String!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseTopicsTotalCount: Int @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategories(page: Int, perPage: Int, topicIds: [String]): [KnowledgeBaseCategory] @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoryDetail(_id: String!): KnowledgeBaseCategory @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoriesTotalCount(topicIds: [String]): Int @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseCategoriesGetLast: KnowledgeBaseCategory @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticles(searchValue: String, page: Int, perPage: Int, categoryIds: [String]): [KnowledgeBaseArticle] @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticleDetail(_id: String!): KnowledgeBaseArticle @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticleDetailAndIncViewCount(_id: String!): KnowledgeBaseArticle @join__field(graph: KNOWLEDGEBASE)
+  knowledgeBaseArticlesTotalCount(categoryIds: [String]): Int @join__field(graph: KNOWLEDGEBASE)
+  notifications(limit: Int, page: Int, perPage: Int, requireRead: Boolean, notifType: String, contentTypes: [String], title: String, startDate: String, endDate: String): [Notification] @join__field(graph: NOTIFICATIONS)
+  notificationCounts(requireRead: Boolean, notifType: String, contentTypes: [String]): Int @join__field(graph: NOTIFICATIONS)
+  notificationsModules: [JSON] @join__field(graph: NOTIFICATIONS)
+  notificationsGetConfigurations: [NotificationConfiguration] @join__field(graph: NOTIFICATIONS)
+  checkInvoice(_id: String!): String @join__field(graph: PAYMENT)
+  invoices(searchValue: String, kind: String, status: String, page: Int, perPage: Int, contentType: String, contentTypeId: String): [Invoice] @join__field(graph: PAYMENT)
+  invoicesTotalCount(searchValue: String, kind: String, status: String, contentType: String, contentTypeId: String): invoicesTotalCount @join__field(graph: PAYMENT)
+  payments(status: String): [Payment] @join__field(graph: PAYMENT)
+  paymentsCountByType: paymentsTotalCount @join__field(graph: PAYMENT)
+  paymentsTotalCount(kind: String, status: String): paymentsTotalCount @join__field(graph: PAYMENT)
+  paymentsCheckMonpayCoupon(couponCode: String!, paymentId: String!): JSON @join__field(graph: PAYMENT)
+  getPaymentConfig(contentType: String!, contentTypeId: String!): PaymentConfig @join__field(graph: PAYMENT)
+  getPaymentConfigs(contentType: String, page: Int, perPage: Int): [PaymentConfig] @join__field(graph: PAYMENT)
+  paymentConfigsTotalCount: Int @join__field(graph: PAYMENT)
+  posList(page: Int, perPage: Int, isOnline: String, sortField: String, sortDirection: Int): [Pos] @join__field(graph: POS)
+  posDetail(_id: String!): Pos @join__field(graph: POS)
+  posEnv: JSON @join__field(graph: POS)
+  productGroups(posId: String!): [ProductGroups] @join__field(graph: POS)
+  posSlots(posId: String!): [PosSlot] @join__field(graph: POS)
+  ecommerceGetBranches(posToken: String): [JSON] @join__field(graph: POS)
+  posOrders(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, paidStartDate: Date, paidEndDate: Date, createdStartDate: Date, createdEndDate: Date, paidDate: String, userId: String, customerId: String, customerType: String, posId: String, posToken: String): [PosOrder] @join__field(graph: POS)
+  posOrderDetail(_id: String): PosOrderDetail @join__field(graph: POS)
+  posProducts(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, paidStartDate: Date, paidEndDate: Date, createdStartDate: Date, createdEndDate: Date, paidDate: String, userId: String, customerId: String, customerType: String, posId: String, posToken: String, categoryId: String, searchValue: String): PosProducts @join__field(graph: POS)
+  posOrdersSummary(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, paidStartDate: Date, paidEndDate: Date, createdStartDate: Date, createdEndDate: Date, paidDate: String, userId: String, customerId: String, customerType: String, posId: String, posToken: String): JSON @join__field(graph: POS)
+  posOrdersTotalCount(page: Int, perPage: Int, sortField: String, sortDirection: Int, search: String, paidStartDate: Date, paidEndDate: Date, createdStartDate: Date, createdEndDate: Date, paidDate: String, userId: String, customerId: String, customerType: String, posId: String, posToken: String): JSON @join__field(graph: POS)
+  posCovers(page: Int, perPage: Int, sortField: String, sortDirection: Int, startDate: Date, endDate: Date, userId: String, posId: String): [PosCover] @join__field(graph: POS)
+  posCoverDetail(_id: String!): PosCover @join__field(graph: POS)
+  posUsers(page: Int, perPage: Int, status: String, searchValue: String, isActive: Boolean): [PosUser] @join__field(graph: POSCLIENT)
+  posUserDetail(_id: String): PosUser @join__field(graph: POSCLIENT)
+  posCurrentUser: PosUser @join__field(graph: POSCLIENT)
+  poscProductCategories(parentId: String, searchValue: String, excludeEmpty: Boolean, meta: String, page: Int, perPage: Int, sortField: String, sortDirection: Int): [PosProductCategory] @join__field(graph: POSCLIENT)
+  poscProductCategoriesTotalCount(parentId: String, searchValue: String, excludeEmpty: Boolean, meta: String): Int @join__field(graph: POSCLIENT)
+  poscProductCategoryDetail(_id: String): PosProductCategory @join__field(graph: POSCLIENT)
+  poscProducts(type: String, categoryId: String, searchValue: String, tag: String, ids: [String], excludeIds: Boolean, segment: String, segmentData: String, page: Int, perPage: Int, sortField: String, sortDirection: Int): [PoscProduct] @join__field(graph: POSCLIENT)
+  poscProductsTotalCount(type: String, categoryId: String, searchValue: String, tag: String, ids: [String], excludeIds: Boolean, segment: String, segmentData: String): Int @join__field(graph: POSCLIENT)
+  poscProductDetail(_id: String): PoscProduct @join__field(graph: POSCLIENT)
+  getPriceInfo(productId: String!): String @join__field(graph: POSCLIENT)
+  orders(searchValue: String, page: Int, perPage: Int): [Order] @join__field(graph: POSCLIENT)
+  fullOrders(searchValue: String, statuses: [String], customerId: String, customerType: String, startDate: Date, endDate: Date, page: Int, perPage: Int, sortField: String, sortDirection: Int): [Order] @join__field(graph: POSCLIENT)
+  ordersTotalCount(searchValue: String, statuses: [String], customerId: String, customerType: String, startDate: Date, endDate: Date, page: Int, perPage: Int, sortField: String, sortDirection: Int): Int @join__field(graph: POSCLIENT)
+  orderDetail(_id: String, customerId: String): Order @join__field(graph: POSCLIENT)
+  ordersCheckCompany(registerNumber: String!): JSON @join__field(graph: POSCLIENT)
+  ordersDeliveryInfo(orderId: String!): JSON @join__field(graph: POSCLIENT)
+  fullOrderItems(searchValue: String, statuses: [String], page: Int, perPage: Int, sortField: String, sortDirection: Int): [PosOrderItem] @join__field(graph: POSCLIENT)
+  currentConfig: PosConfig @join__field(graph: POSCLIENT)
+  getBranches: JSON @join__field(graph: POSCLIENT)
+  poscSlots: [PosclientSlot] @join__field(graph: POSCLIENT)
+  posclientConfigs: [PosConfig] @join__field(graph: POSCLIENT)
+  dailyReport(posUserIds: [String], posNumber: String): DailyReport @join__field(graph: POSCLIENT)
+  poscCustomers(page: Int, perPage: Int, segment: String, type: String, tag: String, ids: [String], excludeIds: Boolean, searchValue: String, autoCompletion: Boolean, autoCompletionType: String, brand: String, integration: String, form: String, startDate: String, endDate: String, leadStatus: String, sortField: String, sortDirection: Int, sex: Int, birthDate: Date): [PosCustomer] @join__field(graph: POSCLIENT)
+  poscCustomerDetail(_id: String!, type: String): PosCustomer @join__field(graph: POSCLIENT)
+  covers(startDate: Date, endDate: Date, userId: String, page: Int, perPage: Int): [Cover] @join__field(graph: POSCLIENT)
+  coverDetail(_id: String!): Cover @join__field(graph: POSCLIENT)
+  productCategories(parentId: String, searchValue: String, status: String, meta: String): [ProductCategory] @join__field(graph: PRODUCTS)
+  productCategoriesTotalCount: Int @join__field(graph: PRODUCTS)
+  productCategoryDetail(_id: String): ProductCategory @join__field(graph: PRODUCTS)
+  products(type: String, categoryId: String, searchValue: String, tag: String, page: Int, perPage: Int, ids: [String], excludeIds: Boolean, pipelineId: String, boardId: String, segment: String, segmentData: String): [Product] @join__field(graph: PRODUCTS)
+  productsTotalCount(type: String, categoryId: String, searchValue: String, tag: String, page: Int, perPage: Int, ids: [String], excludeIds: Boolean, pipelineId: String, boardId: String, segment: String, segmentData: String): Int @join__field(graph: PRODUCTS)
+  productsGroupCounts(only: String, segment: String, segmentData: String): JSON @join__field(graph: PRODUCTS)
+  productDetail(_id: String): Product @join__field(graph: PRODUCTS)
+  productCountByTags: JSON @join__field(graph: PRODUCTS)
+  productsConfigs: [ProductsConfig] @join__field(graph: PRODUCTS)
+  uoms: [Uom] @join__field(graph: PRODUCTS)
+  uomsTotalCount: Int @join__field(graph: PRODUCTS)
+}
+
+type RobotEntry
+  @join__type(graph: CORE)
+{
+  _id: String
+  action: String
+  data: JSON
+}
+
+type Rule
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  kind: String!
+  text: String!
+  condition: String!
+  value: String
+}
+
+input SlotInput
+  @join__type(graph: POS)
+{
+  _id: String
+  posId: String!
+  code: String
+  name: String
+}
+
+type Stage
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  name: String! @join__field(graph: CARDS)
+  pipelineId: String! @join__field(graph: CARDS)
+  visibility: String @join__field(graph: CARDS)
+  code: String @join__field(graph: CARDS)
+  memberIds: [String] @join__field(graph: CARDS)
+  canMoveMemberIds: [String] @join__field(graph: CARDS)
+  canEditMemberIds: [String] @join__field(graph: CARDS)
+  members: [User] @join__field(graph: CARDS)
+  departmentIds: [String] @join__field(graph: CARDS)
+  probability: String @join__field(graph: CARDS)
+  status: String @join__field(graph: CARDS)
+  amount: JSON @join__field(graph: CARDS)
+  itemsTotalCount: Int @join__field(graph: CARDS)
+  compareNextStage: JSON @join__field(graph: CARDS)
+  stayedDealsTotalCount: Int @join__field(graph: CARDS)
+  initialDealsTotalCount: Int @join__field(graph: CARDS)
+  inProcessDealsTotalCount: Int @join__field(graph: CARDS)
+  formId: String @join__field(graph: CARDS)
+  age: Int @join__field(graph: CARDS)
+  order: Int @join__field(graph: CARDS)
+  createdAt: Date @join__field(graph: CARDS)
+  type: String @join__field(graph: CARDS)
+}
+
+type Structure
+  @join__type(graph: CORE)
+{
+  _id: String!
+  title: String
+  supervisor: User
+  description: String
+  supervisorId: String
+  code: String
+  phoneNumber: String
+  email: String
+  links: JSON
+  coordinate: Coordinate
+  image: Attachment
+}
+
+type Styles
+  @join__type(graph: CLIENTPORTAL)
+{
+  bodyColor: String
+  headerColor: String
+  footerColor: String
+  helpColor: String
+  backgroundColor: String
+  activeTabColor: String
+  baseColor: String
+  headingColor: String
+  linkColor: String
+  linkHoverColor: String
+  baseFont: String
+  headingFont: String
+  dividerColor: String
+  primaryBtnColor: String
+  secondaryBtnColor: String
+}
+
+input StylesParams
+  @join__type(graph: CLIENTPORTAL)
+{
+  bodyColor: String
+  headerColor: String
+  footerColor: String
+  helpColor: String
+  backgroundColor: String
+  activeTabColor: String
+  baseColor: String
+  headingColor: String
+  linkColor: String
+  linkHoverColor: String
+  dividerColor: String
+  primaryBtnColor: String
+  secondaryBtnColor: String
+  baseFont: String
+  headingFont: String
+}
+
+type Submission
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  contentTypeId: String
+  customerId: String
+  customer: Customer
+  createdAt: Date
+  customFieldsData: JSON
+  submissions: [FormSubmission]
+}
+
+input SubmissionFilter
+  @join__type(graph: FORMS)
+{
+  operator: String
+  value: JSON
+  formFieldId: String
+}
+
+type SuccessResult
+  @join__type(graph: CORE)
+{
+  success: Boolean
+}
+
+type Task
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  companies: [Company] @join__field(graph: CARDS)
+  customers: [Customer] @join__field(graph: CARDS)
+  name: String! @join__field(graph: CARDS)
+  order: Float @join__field(graph: CARDS)
+  createdAt: Date @join__field(graph: CARDS)
+  hasNotified: Boolean @join__field(graph: CARDS)
+  assignedUserIds: [String] @join__field(graph: CARDS)
+  branchIds: [String] @join__field(graph: CARDS)
+  departmentIds: [String] @join__field(graph: CARDS)
+  labelIds: [String] @join__field(graph: CARDS)
+  startDate: Date @join__field(graph: CARDS)
+  closeDate: Date @join__field(graph: CARDS)
+  description: String @join__field(graph: CARDS)
+  modifiedAt: Date @join__field(graph: CARDS)
+  modifiedBy: String @join__field(graph: CARDS)
+  reminderMinute: Int @join__field(graph: CARDS)
+  isComplete: Boolean @join__field(graph: CARDS)
+  isWatched: Boolean @join__field(graph: CARDS)
+  stageId: String @join__field(graph: CARDS)
+  boardId: String @join__field(graph: CARDS)
+  priority: String @join__field(graph: CARDS)
+  status: String @join__field(graph: CARDS)
+  attachments: [Attachment] @join__field(graph: CARDS)
+  userId: String @join__field(graph: CARDS)
+  tagIds: [String] @join__field(graph: CARDS)
+  assignedUsers: [User] @join__field(graph: CARDS)
+  stage: Stage @join__field(graph: CARDS)
+  labels: [PipelineLabel] @join__field(graph: CARDS)
+  pipeline: Pipeline @join__field(graph: CARDS)
+  createdUser: User @join__field(graph: CARDS)
+  customFieldsData: JSON @join__field(graph: CARDS)
+  score: Float @join__field(graph: CARDS)
+  timeTrack: TimeTrack @join__field(graph: CARDS)
+  number: String @join__field(graph: CARDS)
+  stageChangedDate: Date @join__field(graph: CARDS)
+  customProperties: JSON @join__field(graph: CARDS)
+}
+
+type TaskListItem
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  name: String
+  companies: JSON
+  customers: JSON
+  assignedUsers: JSON
+  stage: JSON
+  labels: JSON
+  isComplete: Boolean
+  isWatched: Boolean
+  relations: JSON
+  startDate: Date
+  closeDate: Date
+  createdAt: Date
+  modifiedAt: Date
+  priority: String
+  hasNotified: Boolean
+  score: Float
+  number: String
+  stageChangedDate: Date
+  tagIds: [String]
+  customProperties: JSON
+  status: String
+  branchIds: [String]
+  branches: [Branch]
+  departmentIds: [String]
+  departments: [Department]
+}
+
+type Ticket
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+{
+  _id: String!
+  source: String @join__field(graph: CARDS)
+  companies: [Company] @join__field(graph: CARDS)
+  customers: [Customer] @join__field(graph: CARDS)
+  name: String! @join__field(graph: CARDS)
+  order: Float @join__field(graph: CARDS)
+  createdAt: Date @join__field(graph: CARDS)
+  hasNotified: Boolean @join__field(graph: CARDS)
+  assignedUserIds: [String] @join__field(graph: CARDS)
+  branchIds: [String] @join__field(graph: CARDS)
+  departmentIds: [String] @join__field(graph: CARDS)
+  labelIds: [String] @join__field(graph: CARDS)
+  startDate: Date @join__field(graph: CARDS)
+  closeDate: Date @join__field(graph: CARDS)
+  description: String @join__field(graph: CARDS)
+  modifiedAt: Date @join__field(graph: CARDS)
+  modifiedBy: String @join__field(graph: CARDS)
+  reminderMinute: Int @join__field(graph: CARDS)
+  isComplete: Boolean @join__field(graph: CARDS)
+  isWatched: Boolean @join__field(graph: CARDS)
+  stageId: String @join__field(graph: CARDS)
+  boardId: String @join__field(graph: CARDS)
+  priority: String @join__field(graph: CARDS)
+  status: String @join__field(graph: CARDS)
+  attachments: [Attachment] @join__field(graph: CARDS)
+  userId: String @join__field(graph: CARDS)
+  tagIds: [String] @join__field(graph: CARDS)
+  assignedUsers: [User] @join__field(graph: CARDS)
+  stage: Stage @join__field(graph: CARDS)
+  labels: [PipelineLabel] @join__field(graph: CARDS)
+  pipeline: Pipeline @join__field(graph: CARDS)
+  createdUser: User @join__field(graph: CARDS)
+  customFieldsData: JSON @join__field(graph: CARDS)
+  score: Float @join__field(graph: CARDS)
+  timeTrack: TimeTrack @join__field(graph: CARDS)
+  number: String @join__field(graph: CARDS)
+  stageChangedDate: Date @join__field(graph: CARDS)
+  customProperties: JSON @join__field(graph: CARDS)
+}
+
+type TicketListItem
+  @join__type(graph: CARDS)
+{
+  _id: String!
+  name: String
+  companies: JSON
+  customers: JSON
+  assignedUsers: JSON
+  stage: JSON
+  labels: JSON
+  isComplete: Boolean
+  isWatched: Boolean
+  relations: JSON
+  startDate: Date
+  closeDate: Date
+  createdAt: Date
+  modifiedAt: Date
+  priority: String
+  hasNotified: Boolean
+  score: Float
+  number: String
+  stageChangedDate: Date
+  tagIds: [String]
+  customProperties: JSON
+  status: String
+  branchIds: [String]
+  branches: [Branch]
+  departmentIds: [String]
+  departments: [Department]
+}
+
+type TimeTrack
+  @join__type(graph: CARDS)
+{
+  status: String
+  timeSpent: Int
+  startDate: String
+}
+
+type TotalForType
+  @join__type(graph: CARDS)
+{
+  _id: String
+  name: String
+  currencies: [DealTotalCurrency]
+}
+
+type UIOptions
+  @join__type(graph: POSCLIENT)
+{
+  colors: JSON
+  logo: String
+  bgImage: String
+  favIcon: String
+  receiptIcon: String
+  texts: JSON
+  kioskHeaderImage: String
+  mobileAppImage: String
+  qrCodeImage: String
+}
+
+type Unit
+  @join__type(graph: CORE, key: "_id")
+{
+  _id: String!
+  title: String
+  departmentId: String
+  supervisorId: String
+  supervisor: User
+  code: String
+  description: String
+  department: Department
+  users: [User]
+  userIds: [String]
+}
+
+type UnitListQueryResponse
+  @join__type(graph: CORE)
+{
+  list: [Unit]
+  totalCount: Int
+  totalUsersCount: Int
+}
+
+type Uom
+  @join__type(graph: PRODUCTS, key: "_id")
+{
+  _id: String!
+  name: String
+  code: String
+  createdAt: Date
+}
+
+type User
+  @join__type(graph: CARDS, key: "_id")
+  @join__type(graph: CLIENTPORTAL, key: "_id")
+  @join__type(graph: CONTACTS, key: "_id")
+  @join__type(graph: CORE, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
+  @join__type(graph: KNOWLEDGEBASE, key: "_id")
+  @join__type(graph: NOTIFICATIONS, key: "_id")
+  @join__type(graph: POS, key: "_id")
+  @join__type(graph: POSCLIENT, key: "_id")
+{
+  _id: String!
+  createdAt: Date @join__field(graph: CORE)
+  username: String @join__field(graph: CORE)
+  email: String @join__field(graph: CORE)
+  isActive: Boolean @join__field(graph: CORE)
+  details: UserDetailsType @join__field(graph: CORE)
+  links: JSON @join__field(graph: CORE)
+  status: String @join__field(graph: CORE)
+  emailSignatures: JSON @join__field(graph: CORE)
+  getNotificationByEmail: Boolean @join__field(graph: CORE)
+  groupIds: [String] @join__field(graph: CORE)
+  brandIds: [String] @join__field(graph: CORE)
+  isSubscribed: String @join__field(graph: CORE)
+  isShowNotification: Boolean @join__field(graph: CORE)
+  customFieldsData: JSON @join__field(graph: CORE)
+  brands: [Brand] @join__field(graph: CORE)
+  isOwner: Boolean @join__field(graph: CORE)
+  permissionActions: JSON @join__field(graph: CORE)
+  configs: JSON @join__field(graph: CORE)
+  configsConstants: [JSON] @join__field(graph: CORE)
+  onboardingHistory: OnboardingHistory @join__field(graph: CORE)
+  department: Department @join__field(graph: CORE)
+  departmentIds: [String] @join__field(graph: CORE)
+  departments: [Department] @join__field(graph: CORE)
+  branchIds: [String] @join__field(graph: CORE)
+  branches: [Branch] @join__field(graph: CORE)
+  score: Float @join__field(graph: CORE)
+  leaderBoardPosition: Int @join__field(graph: CORE)
+  employeeId: String @join__field(graph: CORE)
+}
+
+input UserDetails
+  @join__type(graph: CORE)
+{
+  avatar: String
+  fullName: String
+  shortName: String
+  birthDate: Date
+  position: String
+  workStartedDate: Date
+  location: String
+  description: String
+  operatorPhone: String
+  firstName: String
+  middleName: String
+  lastName: String
+  employeeId: String
+}
+
+type UserDetailsType
+  @join__type(graph: CORE)
+{
+  avatar: String
+  fullName: String
+  shortName: String
+  birthDate: Date
+  position: String
+  workStartedDate: Date
+  location: String
+  description: String
+  operatorPhone: String
+  firstName: String
+  middleName: String
+  lastName: String
+  employeeId: String
+}
+
+type UserMovement
+  @join__type(graph: CORE)
+{
+  _id: String
+  createdAt: Date
+  createdBy: String
+  createdByDetail: JSON
+  userId: String
+  userDetail: JSON
+  contentType: String
+  contentTypeId: String
+  contentTypeDetail: JSON
+  status: String
+}
+
+type UserNotificationSettings
+  @join__type(graph: CLIENTPORTAL)
+{
+  receiveByEmail: Boolean
+  receiveBySms: Boolean
+  configs: [NotificationConfig]
+}
+
+type UsersGroup
+  @join__type(graph: CORE)
+{
+  _id: String!
+  name: String!
+  description: String
+  memberIds: [String]
+  members: [User]
+}
+
+type VerificationRequest
+  @join__type(graph: CLIENTPORTAL)
+{
+  status: String
+  attachments: [Attachment]
+  description: String
+  verifiedBy: String
+}
+
+type Wish
+  @join__type(graph: ECOMMERCE)
+{
+  _id: String!
+  productId: String
+  customerId: String
+  product: Product
+}
