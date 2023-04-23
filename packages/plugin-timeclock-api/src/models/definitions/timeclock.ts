@@ -436,6 +436,9 @@ export interface IUserExportReport {
 
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
+
+  totalHoursBreak?: string;
+
   totalMinsLate?: string;
 
   absenceInfo?: IUserAbsenceInfo;

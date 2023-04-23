@@ -534,6 +534,14 @@ export const timeclockReportFinal = async (
     let totalMinsLatePerUser = 0;
     let totalHoursOvernightPerUser = 0;
 
+    // calculate total break time from schedules of an user
+    const totalBreakInHours =
+      currUserSchedules.reduce(
+        (partialBreakSum, userSchedule) =>
+          userSchedule.totalBreakInMins || 0 + partialBreakSum,
+        0
+      ) / 60;
+
     if (currUserTimeclocks) {
       totalDaysWorkedPerUser = new Set(
         currUserTimeclocks.map(shift =>
@@ -597,6 +605,9 @@ export const timeclockReportFinal = async (
         }
       });
 
+      // deduct lunch break from worked hours
+      totalRegularHoursWorkedPerUser -= totalBreakInHours;
+
       // deduct overtime from worked hours
       totalRegularHoursWorkedPerUser -= totalHoursOvertimePerUser;
       totalHoursWorkedPerUser =
@@ -641,6 +652,9 @@ export const timeclockReportFinal = async (
       relatedAbsenceTypes
     );
 
+    // deduct lunch breaks from total scheduled hours
+    totalHoursScheduledPerUser -= totalBreakInHours;
+
     if (exportToXlsx) {
       usersReport[currUserId] = {
         ...usersReport[currUserId],
@@ -661,6 +675,7 @@ export const timeclockReportFinal = async (
       ...usersReport[currUserId],
       totalDaysScheduled: totalDaysScheduledPerUser,
       totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
+      totalHoursBreak: totalBreakInHours.toFixed(2),
       totalDaysWorked: totalDaysWorkedPerUser,
       totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
       totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
