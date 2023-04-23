@@ -66,6 +66,7 @@ class Wrapper extends React.Component<Props> {
         actionBar={actionBar}
         footer={footer}
         transparent={transparent || false}
+        initialOverflow={initialOverflow}
       >
         {content}
       </PageContent>
@@ -73,15 +74,21 @@ class Wrapper extends React.Component<Props> {
   }
 
   render() {
-    const { header, leftSidebar, rightSidebar, mainHead, hasBorder } =
-      this.props;
+    const {
+      header,
+      leftSidebar,
+      rightSidebar,
+      mainHead,
+      hasBorder,
+      initialOverflow,
+    } = this.props;
 
     return (
       <VerticalContent>
         {header}
         {mainHead && <MainHead>{mainHead}</MainHead>}
         <HeightedWrapper>
-          <Contents hasBorder={hasBorder}>
+          <Contents hasBorder={hasBorder} initialOverflow={initialOverflow}>
             {leftSidebar}
             {this.renderContent()}
             {rightSidebar}

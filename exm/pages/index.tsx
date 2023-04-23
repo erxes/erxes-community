@@ -8,5 +8,5 @@ export default function Home({ currentUser }) {
     return <AuthLayout content={<SignIn />} />;
   }
 
-  return <HomeContainer queryParams={{}} />;
+  return <HomeContainer queryParams={{}} currentUser={currentUser} />;
 }

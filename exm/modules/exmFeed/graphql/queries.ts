@@ -2,6 +2,7 @@ import { queries as teamQueries } from '../../common/team/graphql';
 
 const detailFields = teamQueries.detailFields;
 const allUsers = teamQueries.allUsers;
+const users = teamQueries.users;
 
 const userFields = `
   _id
@@ -108,4 +109,4 @@ const departments = `
   }
 `;
 
-export default { feed, thanks, fields, allUsers, departments };
+export default { feed, thanks, fields, users, allUsers, departments };

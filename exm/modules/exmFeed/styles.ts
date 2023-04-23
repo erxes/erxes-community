@@ -7,7 +7,6 @@ import styledTS from 'styled-components-ts';
 
 export const FeedLayout = styled.div`
   flex: 1;
-  padding: $ ${dimensions.coreSpacing}px;
 
   p {
     margin-bottom: 0;
@@ -100,6 +99,13 @@ export const NewsFeedLayout = styled.div`
       background: rgba(10, 30, 65, 0.08);
     }
   }
+`;
+
+export const OverflowWrapper = styled.div`
+  overflow: auto;
+  position: relative;
+  flex: 1;
+  max-height: 100vh;
 `;
 
 export const HeaderFeed = styled.div`
@@ -329,6 +335,11 @@ export const Card = styled.div`
     font-weight: 600;
     margin-bottom: ${dimensions.unitSpacing}px;
   }
+`;
+
+export const ContactItem = styled.div`
+  margin-bottom: ${dimensions.unitSpacing}px;
+  font-size: 14px;
 `;
 
 export const SingleEvent = styled.div`

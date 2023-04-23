@@ -38,7 +38,7 @@ const PageHeader = styled.div`
   padding-left: ${dimensions.coreSpacing * 1.5}px;
 `;
 
-const Contents = styledTS<{ hasBorder?: boolean }>(styled.div)`
+const Contents = styledTS<{ hasBorder?: boolean, initialOverflow?: boolean; }>(styled.div)`
   display: flex;
   flex: 1;
   margin: ${dimensions.unitSpacing}px 0 0 ${dimensions.unitSpacing}px;
@@ -48,7 +48,7 @@ const Contents = styledTS<{ hasBorder?: boolean }>(styled.div)`
   right: 0;
   bottom: 0;
   top: 0;
-  overflow-x: auto;
+  overflow-x: ${props => props.initialOverflow ? 'initial' : 'auto'};
   border: ${props => props.hasBorder && `1px solid ${colors.borderPrimary}`};
   border-radius: ${props => props.hasBorder && `${dimensions.unitSpacing}px`};
   margin: ${props => props.hasBorder && dimensions.unitSpacing * 2}px;
