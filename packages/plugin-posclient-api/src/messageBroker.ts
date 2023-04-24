@@ -80,6 +80,13 @@ const webbuilderReplacer = async args => {
     result = `
     <script>
       $(document).ready(() => {
+        const getLocalStorageItem = (key) => {
+          const erxesStorage = JSON.parse(localStorage.getItem("erxes") || "{}");
+          return erxesStorage[key];
+        }
+
+        const getCustomerId = () => getLocalStorageItem('customerId') || Math.random();
+
         const fetchGraph = ({ query, variables, callback }) => {
           $.ajax({
             url: "http://localhost:4000/graphql",
@@ -99,7 +106,7 @@ const webbuilderReplacer = async args => {
           fetchGraph({
             query: 'query($customerId: String, $statuses: [String]) { ordersTotalCount(customerId: $customerId, statuses: $statuses) }',
             variables: {
-              customerId: 'fdfsdfdsfds',
+              customerId: getCustomerId(),
               statuses: ['new']
             },
             callback: ({ ordersTotalCount }) => {
@@ -143,7 +150,7 @@ const webbuilderReplacer = async args => {
             query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
             variables: {
               items,
-              customerId: 'fdfsdfdsfds',
+              customerId: getCustomerId(),
               totalAmount: 100,
               branchId: "czWMik5pHMCYMNDgK",
               type: 'delivery'
@@ -188,14 +195,14 @@ const webbuilderReplacer = async args => {
 
         fetchOrders = () => {
           fetchGraph({
-            query: 'query($customerId: String) { fullOrders(customerId: $customerId) { _id, items { _id, count, unitPrice, productName, productImgUrl } } }',
+            query: 'query($customerId: String) { orders(customerId: $customerId) { _id, items { _id, count, unitPrice, productName, productImgUrl } } }',
             variables: {
-              customerId: 'fdfsdfdsfds'
+              customerId: getCustomerId()
             },
-            callback: ({ fullOrders }) => {
+            callback: ({ orders }) => {
               const firstRow = $('#checkout-order-list tbody tr:first').html();
 
-              for (const order of fullOrders) {
+              for (const order of orders) {
                 for (const item of order.items) {
                   let newRow = firstRow;
 
