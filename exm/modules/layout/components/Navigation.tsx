@@ -2,6 +2,7 @@ import { HelpBox, LeftNavigation, Sidebar } from "../styles";
 
 import Button from "../../common/Button";
 import Icon from "../../common/Icon";
+import Link from "next/link";
 import { MAIN_NAVIGATION } from "../constants";
 import React from "react";
 import { __ } from "../../../utils";
@@ -37,14 +38,15 @@ export default class LeftSidebar extends React.Component<Props, State> {
         </div>
         <Sidebar>
           {MAIN_NAVIGATION.map((item: any, i: number) => (
-            <li
-              className={item.key === activeClass ? "active" : ""}
-              key={i}
-              onClick={() => this.onClick(item.key)}
-            >
-              <Icon className={item.key} icon={item.icon} size={18} />
-              <span>{item.value}</span>
-            </li>
+            <Link key={i} href={item.url}>
+              <li
+                className={item.key === activeClass ? "active" : ""}
+                onClick={() => this.onClick(item.key)}
+              >
+                <Icon className={item.key} icon={item.icon} size={18} />
+                <span>{item.value}</span>
+              </li>
+            </Link>
           ))}
         </Sidebar>
         <HelpBox>

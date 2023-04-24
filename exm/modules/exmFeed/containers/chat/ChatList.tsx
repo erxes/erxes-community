@@ -1,4 +1,4 @@
-import ChatList from "../../components/feed/ChatList";
+import ChatList from "../../components/chat/ChatList";
 import { IUser } from "../../../auth/types";
 import gql from "graphql-tag";
 import { queries } from "../../graphql";

@@ -337,9 +337,176 @@ export const Card = styled.div`
   }
 `;
 
+export const LearnWrapper = styled.div`
+  background: ${colors.colorWhite};
+  border-radius: 12px;
+  flex: 1;
+  margin: ${dimensions.coreSpacing}px;
+  padding: ${dimensions.coreSpacing}px;
+  font-size: 14px;
+  overflow: auto;
+
+  p, span {
+    color: ${colors.colorCoreBlueGray};
+  }
+
+  h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: ${dimensions.unitSpacing - 5}px;
+  }
+`;
+
+export const OverflowRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  padding: ${dimensions.unitSpacing}px 0;
+`;
+
+export const LearnBanner = styled.div`
+  border-radius: 12px;
+  height: 250px;
+  margin-bottom: ${dimensions.coreSpacing}px;
+  overflow: hidden;
+  position: relative;
+
+  .content {
+    padding: 30px;
+    position: relative;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+
+    h5 {
+      font-weight: 600;
+    }
+
+    p {
+      font-size: 14px;
+    }
+
+    a {
+
+    }
+
+    h5, p, a {
+      color: ${rgba(colors.colorWhite, .9)};
+    }
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%);
+  }
+
+  > div {
+    background-size: cover;
+    background-size: cover;
+    height: 100%;
+    background-position: center;
+  }
+`;
+
+export const LearnItem = styled.div`
+  width: 32%;
+  margin: 0 ${dimensions.coreSpacing}px ${dimensions.coreSpacing + dimensions.coreSpacing}px 0;
+  overflow: hidden;
+
+  &:nth-child(3n) {
+    margin-right: 0;
+  }
+
+  .image-wrapper {
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    border-radius: 12px;
+
+    > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+
+    &:before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%);
+    }
+  }
+`;
+
+export const LearnItemDescription = styled.div`
+  padding: ${dimensions.coreSpacing}px ${dimensions.unitSpacing}px 0;
+  height: calc(100% - 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  span {
+    font-size: 13px;
+    margin-bottom: ${dimensions.unitSpacing}px;
+    display: block;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      background: ${colors.colorWhite};
+      color: ${colors.colorPrimaryDark} !important;
+      border-radius: 12px;
+      border: 1px solid ${colors.colorPrimaryDark};
+
+      &:hover {
+        color: ${colors.colorWhite} !important;
+      }
+
+      &:focus {
+        outline: 0;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+
+      li {
+        img {
+          width: 30px;
+          height: 30px;
+          border-radius: 15px;
+          display: inline-block;
+          border: 2px solid rgb(255, 255, 255);
+          margin-left: -10px;
+        }
+      }
+    }
+  }
+`;
+
 export const ContactItem = styled.div`
   margin-bottom: ${dimensions.unitSpacing}px;
   font-size: 14px;
+  cursor: pointer;
+  transistion: all ease .3s;
+
+  &:hover {
+    background: ${colors.bgLight};
+    border-radius: 8px;
+  }
 `;
 
 export const SingleEvent = styled.div`

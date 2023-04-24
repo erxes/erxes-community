@@ -10,7 +10,7 @@ import { MainContainer, SideContainer } from "../../layout/styles";
 import React, { useState } from "react";
 import { TabTitle, Tabs } from "../../common/tabs";
 
-import ChatList from "../containers/feed/ChatList";
+import ChatList from "../containers/chat/ChatList";
 import Form from "../containers/feed/Form";
 import { IUser } from "../../auth/types";
 import Icon from "../../common/Icon";
