@@ -1,5 +1,9 @@
 import { gql } from 'apollo-server-express';
 import {
+  attachmentInput,
+  attachmentType
+} from '@erxes/api-utils/src/commonTypeDefs';
+import {
   mutations as PosUserMutations,
   queries as PosUserQueries,
   types as PosUserTypes
@@ -42,6 +46,8 @@ const typeDefs = async () => {
       _id: String! @external
     }
 
+    ${attachmentType}
+    ${attachmentInput}
     ${ProductTypes}
     ${PosUserTypes}
     ${OrderTypes}

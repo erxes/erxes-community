@@ -1,8 +1,3 @@
-import {
-  attachmentInput,
-  attachmentType
-} from '@erxes/api-utils/src/commonTypeDefs';
-
 const commonFieldDefs = `
   _id: String!
   name: String
@@ -12,9 +7,6 @@ const commonFieldDefs = `
 `;
 
 export const types = `
-  ${attachmentType}
-  ${attachmentInput}
-
   type PosProductCategory {
     ${commonFieldDefs}
     parentId: String

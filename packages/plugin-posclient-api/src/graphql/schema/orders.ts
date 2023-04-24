@@ -34,7 +34,8 @@ const addEditParams = `
   billType: String,
   registerNumber: String,
   slotCode: String,
-  origin: String
+  origin: String,
+  dueDate: Date
 `;
 
 export const types = `
@@ -44,6 +45,8 @@ export const types = `
 
   type PosOrderItem {
     ${commonFields}
+    description: String
+    decorationAttachment: Attachment
     productId: String!
     count: Float!
     orderId: String!
@@ -96,7 +99,7 @@ export const types = `
     ${orderFields}
     ${paymentInputDefs}
     paidAmounts: [PaidAmount]
-
+    dueDate: Date
     paidDate: Date
     modifiedAt: Date
     totalAmount: Float
@@ -114,7 +117,6 @@ export const types = `
     items: [PosOrderItem]
     user: PosUser
     putResponses: [PosPutResponse]
-
     slotCode: String
   }
 
@@ -127,6 +129,8 @@ export const types = `
     isTake: Boolean
     status: String
     manufacturedDate: String
+    description: String
+    decorationAttachment: AttachmentInput
   }
 
   input PaidAmountInput {
