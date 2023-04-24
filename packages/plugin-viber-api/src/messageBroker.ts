@@ -5,6 +5,7 @@ import {
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
 import { Customers, Integrations, Messages } from './models';
+import { setWebhook } from './viber';
 
 dotenv.config();
 
@@ -18,10 +19,13 @@ export const initBroker = async cl => {
   consumeRPCQueue(
     'viber:createIntegration',
     async ({ data: { doc, integrationId } }) => {
+      const docData = JSON.parse(doc.data);
       await Integrations.create({
         inboxId: integrationId,
-        ...JSON.parse(doc.data)
+        ...docData
       });
+
+      setWebhook(docData.token, integrationId);
 
       return {
         status: 'success'

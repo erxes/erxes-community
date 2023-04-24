@@ -14,23 +14,7 @@ import * as jwt from 'jsonwebtoken';
 const { JWT_TOKEN_SECRET = '' } = process.env;
 
 const init = async (app: any): Promise<void> => {
-  console.log('Viber Init');
-
-  app.post(
-    '/set_webhook',
-    async (req: any, res: any): Promise<any> => {
-      const response = await setWebhook(req.body.webhook_url);
-      return res.json(response);
-    }
-  );
-
-  app.post(
-    '/remove_webhook',
-    async (req: any, res: any): Promise<any> => {
-      const response = await removeWebhook();
-      return res.json(response);
-    }
-  );
+  console.log('Viber plugin init');
 
   app.post(
     '/send_message',

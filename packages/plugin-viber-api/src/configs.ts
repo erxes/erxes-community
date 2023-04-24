@@ -28,8 +28,7 @@ export default {
     ]
   },
 
-  // setting webhook ur
-  postHandlers: [{ path: `/webhook`, method: receiveWebhook }],
+  postHandlers: [{ path: '/webhook/:inboxId', method: receiveWebhook }],
 
   apolloServerContext: async context => {
     return context;

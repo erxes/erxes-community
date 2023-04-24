@@ -3,15 +3,15 @@ import { ViberReceivedMessage } from '../models';
 
 export const receiveWebhook = (req: Request, res: Response) => {
   if (req.body.event === 'message') {
-    saveMessage(req.body);
+    saveMessage(req.body, req.params.inboxId);
   }
 
   res.json({ status: 'success' });
 };
 
-export const saveMessage = (message: any) => {
+export const saveMessage = (message: any, inboxId: string) => {
   const data = {
-    userId: message.userId,
+    inboxId: inboxId,
     senderId: message.sender.id,
     senderName: message.sender.name,
     sendDate: new Date(message.timestamp),

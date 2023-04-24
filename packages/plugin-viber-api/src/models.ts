@@ -92,7 +92,7 @@ export const Messages = model<any, any>('viber_messages', loadMessageClass());
 export const Accounts = model<any, any>('viber_accounts', loadAccountClass());
 
 export interface IViberReceivedMessage {
-  userId: string;
+  inboxId: string;
   senderId: string;
   senderName: string;
   sendDate: Date;
@@ -103,7 +103,7 @@ export interface IViberReceivedMessage {
 export const ViberReceivedMessageSchema: Schema = new Schema<
   IViberReceivedMessage
 >({
-  userId: { type: String, required: true },
+  inboxId: { type: String, required: true },
   senderId: { type: String, required: true },
   senderName: { type: String, required: true },
   sendDate: { type: Date, required: true },
