@@ -235,12 +235,8 @@ const timeclockMutations = {
     return models.Absences.removeAbsence(_id);
   },
 
-  async sendAbsenceRequest(
-    _root,
-    doc: IAbsence,
-    { models, docModifier }: IContext
-  ) {
-    return models.Absences.createAbsence(docModifier(doc));
+  async sendAbsenceRequest(_root, doc: IAbsence, { models }: IContext) {
+    return models.Absences.createAbsence(doc);
   },
 
   async solveAbsenceRequest(
@@ -371,14 +367,7 @@ const timeclockMutations = {
 
   async submitSchedule(
     _root,
-    {
-      branchIds,
-      departmentIds,
-      userIds,
-      shifts,
-      scheduleConfigId,
-      totalBreakInMins
-    },
+    { branchIds, departmentIds, userIds, shifts, totalBreakInMins },
     { subdomain, models }: IContext
   ) {
     if (userIds.length) {
@@ -386,7 +375,6 @@ const timeclockMutations = {
         userIds,
         shifts,
         models,
-        scheduleConfigId,
         totalBreakInMins
       );
     }
@@ -415,12 +403,7 @@ const timeclockMutations = {
       return concatBranchDept.indexOf(value) === pos;
     });
 
-    return createScheduleShiftsByUserIds(
-      unionOfUserIds,
-      shifts,
-      models,
-      scheduleConfigId
-    );
+    return createScheduleShiftsByUserIds(unionOfUserIds, shifts, models);
   },
 
   scheduleRemove(_root, { _id }, { models }: IContext) {
