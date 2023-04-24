@@ -80,13 +80,6 @@ const webbuilderReplacer = async args => {
     result = `
     <script>
       $(document).ready(() => {
-        const getLocalStorageItem = (key) => {
-          const erxesStorage = JSON.parse(localStorage.getItem("erxes") || "{}");
-          return erxesStorage[key];
-        }
-
-        const getCustomerId = () => getLocalStorageItem('customerId') || Math.random();
-
         const fetchGraph = ({ query, variables, callback }) => {
           $.ajax({
             url: "http://localhost:4000/graphql",
@@ -102,65 +95,111 @@ const webbuilderReplacer = async args => {
           })
         }
 
-        fetchCounter = () => {
+        const getLocalStorageItem = (key) => {
+          const erxesStorage = JSON.parse(localStorage.getItem("erxes") || "{}");
+          return erxesStorage[key];
+        }
+
+        const setLocalStorageItem = (key, value) => {
+          const erxesStorage = JSON.parse(localStorage.getItem("erxes") || "{}");
+          erxesStorage[key] = value;
+          localStorage.setItem("erxes", JSON.stringify(erxesStorage));
+        }
+
+        const getCustomerId = () => getLocalStorageItem('customerId') || Math.random();
+        const getOrderId = () => getLocalStorageItem('posclientOrderId');
+        const setOrderId = (id) => setLocalStorageItem('posclientOrderId', id);
+
+        let items = [];
+
+        if (getOrderId()) {
           fetchGraph({
-            query: 'query($customerId: String, $statuses: [String]) { ordersTotalCount(customerId: $customerId, statuses: $statuses) }',
+            query: 'query($_id: String!, $customerId: String,) { orderDetail(_id: $_id, customerId: $customerId) { _id, items { productId, count, unitPrice } } }',
             variables: {
+              _id: getOrderId(),
               customerId: getCustomerId(),
-              statuses: ['new']
             },
-            callback: ({ ordersTotalCount }) => {
-              $('#cart-counter').text(ordersTotalCount);
+            callback: ({ orderDetail }) => {
+              if (orderDetail) {
+                items = orderDetail.items;
+
+                refreshCounter();
+              }
             }
           });
         }
 
-        fetchCounter();
-
-        let quantity = 1;
-
-        const items = [];
-
-        function showQuantity() {
-          $("#quantity-chooser-quantity").text(quantity);
+        refreshCounter = () => {
+          $('#cart-counter').text(items.length);
         }
 
-        showQuantity();
+        if ($("#add-to-cart").length > 0) {
+          let quantity = 1;
 
-        $("#quantity-chooser-minus").click(() => {
-          if (quantity > 1) {
-            quantity--;
-            showQuantity();
+          function showQuantity() {
+            $("#quantity-chooser-quantity").text(quantity);
           }
-        });
 
-        $("#quantity-chooser-plus").click(() => {
-          quantity++;
           showQuantity();
-        });
 
-        $("#add-to-cart").click(() => {
-          items.push({
-            productId: "${query.productId}",
-            count: quantity,
-            unitPrice: 100
-          })
+          $("#quantity-chooser-minus").click(() => {
+            if (quantity > 1) {
+              quantity--;
+              showQuantity();
+            }
+          });
 
-          fetchGraph({
-            query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
-            variables: {
+          $("#quantity-chooser-plus").click(() => {
+            quantity++;
+            showQuantity();
+          });
+
+          $("#add-to-cart").click(() => {
+            items.push({
+              productId: "${query.productId}",
+              count: quantity,
+              unitPrice: 100
+            });
+
+            console.log('mmmmmmmmmmmm', items)
+
+            const orderId = getOrderId();
+
+            const variables = {
               items,
               customerId: getCustomerId(),
               totalAmount: 100,
               branchId: "czWMik5pHMCYMNDgK",
               type: 'delivery'
-            },
-            callback: () => {
-              fetchCounter();
-              alert('Success');
             }
-          })
-        });
+
+            if (orderId) {
+              fetchGraph({
+                query: 'mutation($_id: String!, $items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersEdit(_id: $_id, items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
+                variables: {
+                  _id: orderId,
+                  ...variables,
+                },
+                callback: () => {
+                  refreshCounter();
+                  alert('Success');
+                }
+              });
+            } else {
+              fetchGraph({
+                query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
+                variables,
+                callback: ({ ordersAdd }) => {
+                  refreshCounter();
+
+                  setOrderId(ordersAdd._id);
+
+                  alert('Success');
+                }
+              });
+            }
+          });
+        }
 
         const loadProducts = (categoryId, container) => {
           var productItemTemplate = \`${productItemTemplate.html}\`;
