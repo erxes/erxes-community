@@ -133,8 +133,46 @@ const webbuilderReplacer = async args => {
           });
         }
 
-        refreshCounter = () => {
+        const refreshCounter = () => {
           $('#cart-counter').text(items.length);
+        }
+
+        const saveOrder = () => {
+          const orderId = getOrderId();
+
+          const variables = {
+            items,
+            customerId: getCustomerId(),
+            totalAmount: 100,
+            branchId: "czWMik5pHMCYMNDgK",
+            type: 'delivery'
+          }
+
+          if (orderId) {
+            fetchGraph({
+              query: 'mutation($_id: String!, $items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersEdit(_id: $_id, items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
+              variables: {
+                _id: orderId,
+                ...variables,
+              },
+              callback: () => {
+                refreshCounter();
+                alert('Success');
+              }
+            });
+          } else {
+            fetchGraph({
+              query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
+              variables,
+              callback: ({ ordersAdd }) => {
+                refreshCounter();
+
+                setOrderId(ordersAdd._id);
+
+                alert('Success');
+              }
+            });
+          }
         }
 
         if ($("#add-to-cart").length > 0) {
@@ -179,41 +217,7 @@ const webbuilderReplacer = async args => {
               productImgUrl: product.attachment ? product.attachment.url : '',
             });
 
-            const orderId = getOrderId();
-
-            const variables = {
-              items,
-              customerId: getCustomerId(),
-              totalAmount: 100,
-              branchId: "czWMik5pHMCYMNDgK",
-              type: 'delivery'
-            }
-
-            if (orderId) {
-              fetchGraph({
-                query: 'mutation($_id: String!, $items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersEdit(_id: $_id, items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
-                variables: {
-                  _id: orderId,
-                  ...variables,
-                },
-                callback: () => {
-                  refreshCounter();
-                  alert('Success');
-                }
-              });
-            } else {
-              fetchGraph({
-                query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
-                variables,
-                callback: ({ ordersAdd }) => {
-                  refreshCounter();
-
-                  setOrderId(ordersAdd._id);
-
-                  alert('Success');
-                }
-              });
-            }
+            saveOrder();
           });
         }
 
@@ -259,7 +263,7 @@ const webbuilderReplacer = async args => {
             newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
             newRow = newRow.replace('{{ item.productImgUrl }}', item.productImgUrl);
 
-            $('#checkout-order-item-list tbody').append('<tr>' + newRow + '</tr');
+            $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
           }
         }
 
@@ -294,8 +298,16 @@ const webbuilderReplacer = async args => {
             }
           });
 
-          $('#checkout-proceed').click(function () {
-            alert('Proceed');
+          $('#checkout-order-item-list').on('click', '.remove', function () {
+            const productId = $(this).closest('tr').data('product-id');
+
+            $(this).closest('tr').remove();
+
+            items = items.filter(i => i.productId !== productId);
+
+            renderOrderItems();
+
+            saveOrder();
           });
         }
 
