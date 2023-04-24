@@ -114,7 +114,7 @@ const webbuilderReplacer = async args => {
 
         if (getOrderId()) {
           fetchGraph({
-            query: 'query($_id: String!, $customerId: String,) { orderDetail(_id: $_id, customerId: $customerId) { _id, items { productId, count, unitPrice } } }',
+            query: 'query($_id: String!, $customerId: String,) { orderDetail(_id: $_id, customerId: $customerId) { _id, items { productId, count, unitPrice, productName, productImgUrl } } }',
             variables: {
               _id: getOrderId(),
               customerId: getCustomerId(),
@@ -124,6 +124,10 @@ const webbuilderReplacer = async args => {
                 items = orderDetail.items;
 
                 refreshCounter();
+
+                if ($('#checkout-order-item-list').length > 0) {
+                  renderOrderItems();
+                }
               }
             }
           });
@@ -135,6 +139,18 @@ const webbuilderReplacer = async args => {
 
         if ($("#add-to-cart").length > 0) {
           let quantity = 1;
+
+          let product;
+
+          fetchGraph({
+            query: 'query($_id: String!) { poscProductDetail(_id: $_id) { _id, name, unitPrice, attachment { url } } }',
+            variables: {
+              _id: "${query.productId}",
+            },
+            callback: ({ poscProductDetail }) => {
+              product = poscProductDetail;
+            }
+          });
 
           function showQuantity() {
             $("#quantity-chooser-quantity").text(quantity);
@@ -157,11 +173,11 @@ const webbuilderReplacer = async args => {
           $("#add-to-cart").click(() => {
             items.push({
               productId: "${query.productId}",
+              productName: product.name,
               count: quantity,
-              unitPrice: 100
+              unitPrice: product.unitPrice,
+              productImgUrl: product.attachment ? product.attachment.url : '',
             });
-
-            console.log('mmmmmmmmmmmm', items)
 
             const orderId = getOrderId();
 
@@ -232,35 +248,25 @@ const webbuilderReplacer = async args => {
           loadProducts(categoryId, this);
         });
 
-        fetchOrders = () => {
-          fetchGraph({
-            query: 'query($customerId: String) { orders(customerId: $customerId) { _id, items { _id, count, unitPrice, productName, productImgUrl } } }',
-            variables: {
-              customerId: getCustomerId()
-            },
-            callback: ({ orders }) => {
-              const firstRow = $('#checkout-order-list tbody tr:first').html();
+        renderOrderItems = () => {
+          const firstRow = $('#checkout-order-item-list tbody tr:first').html();
 
-              for (const order of orders) {
-                for (const item of order.items) {
-                  let newRow = firstRow;
+          for (const item of items) {
+            let newRow = firstRow;
 
-                  newRow = newRow.replace('{{ order.productName }}', item.productName);
-                  newRow = newRow.replace('{{ order.count }}', item.count);
-                  newRow = newRow.replace('{{ order.unitPrice }}', item.unitPrice);
-                  newRow = newRow.replace('{{ order.productImgUrl }}', item.productImgUrl);
+            newRow = newRow.replace('{{ item.productName }}', item.productName);
+            newRow = newRow.replace('{{ item.count }}', item.count);
+            newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
+            newRow = newRow.replace('{{ item.productImgUrl }}', item.productImgUrl);
 
-                  $('#checkout-order-list tbody').append('<tr>' + newRow + '</tr');
-                }
-              }
-            }
-          });
+            $('#checkout-order-item-list tbody').append('<tr>' + newRow + '</tr');
+          }
         }
 
-        if ($('#checkout-order-list').length > 0) {
-          $('#checkout-order-list tbody tr:first').hide();
+        if ($('#checkout-order-item-list').length > 0) {
+          $('#checkout-order-item-list tbody tr:first').hide();
 
-          fetchOrders();
+          renderOrderItems();
 
           fetchGraph({
             query: 'mutation ( $amount: Float!  $contentType: String $contentTypeId: String $description: String $customerId: String $customerType: String $warningText: String) { generateInvoiceUrl( amount: $amount contentType: $contentType contentTypeId: $contentTypeId description: $description customerId: $customerId customerType: $customerType warningText: $warningText) }',
