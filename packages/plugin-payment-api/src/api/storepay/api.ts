@@ -2,7 +2,7 @@ import { sendRequest } from '@erxes/api-utils/src/requests';
 
 import { BaseAPI } from '../../api/base';
 import { IModels } from '../../connectionResolver';
-import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
+import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import redis from '../../redis';
 
@@ -62,8 +62,9 @@ export class StorePayAPI extends BaseAPI {
   private app_username: string;
   private app_password: string;
   private store_id: string;
+  private domain?: string;
 
-  constructor(config: IStorePayParams) {
+  constructor(config: IStorePayParams, domain?: string) {
     super(config);
 
     const {
@@ -86,6 +87,7 @@ export class StorePayAPI extends BaseAPI {
     this.app_password = appPassword;
     this.store_id = storeId;
     this.apiUrl = PAYMENTS.storepay.apiUrl;
+    this.domain = domain;
   }
 
   async getHeaders() {
@@ -148,23 +150,21 @@ export class StorePayAPI extends BaseAPI {
    * TODO: update return type
    */
   async createInvoice(invoice: IInvoiceDocument) {
-    const MAIN_API_DOMAIN = process.env.DOMAIN
-      ? `${process.env.DOMAIN}/gateway`
-      : 'http://localhost:4000';
-
     try {
       const data = {
         amount: invoice.amount,
         mobileNumber: invoice.phone,
         description: invoice.description || 'transaction',
         storeId: this.store_id,
-        callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENTS.storepay.kind}`
+        callbackUrl: `${this.domain}/pl:payment/callback/${PAYMENTS.storepay.kind}`
       };
 
       const possibleAmount = await this.checkLoanAmount(invoice.phone);
 
       if (possibleAmount < invoice.amount) {
-        throw new Error('Insufficient loan amount');
+        return {
+          error: 'Insufficient amount'
+        };
       }
 
       const res = await this.request({
@@ -177,13 +177,12 @@ export class StorePayAPI extends BaseAPI {
       if (res.status !== 'Success') {
         const error =
           res.msgList.length > 0 ? res.msgList[0].code : 'Unknown error';
-        console.error(error);
+
         return { error };
       }
 
       return { ...res, text: `Invoice has sent to ${invoice.phone}` };
     } catch (e) {
-      console.error(e);
       return { error: e.message };
     }
   }
@@ -207,7 +206,6 @@ export class StorePayAPI extends BaseAPI {
 
       return PAYMENT_STATUS.PAID;
     } catch (e) {
-      console.error(e);
       throw new Error(e.message);
     }
   }

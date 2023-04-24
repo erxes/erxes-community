@@ -32,6 +32,10 @@ export interface IAbsence {
   solved: boolean;
   status: string;
   attachment: IAttachment;
+
+  absenceTimeType: string;
+  requestDates: string[];
+  totalHoursOfAbsence: string;
 }
 export interface IAbsenceType {
   _id: string;
@@ -118,12 +122,14 @@ export interface ISchedule {
   scheduleConfigId: string;
   scheduleChecked: boolean;
   submittedByAdmin: boolean;
+  totalBreakInMins?: number;
 }
 export interface IShift {
   user?: IUser;
   date?: Date;
   shiftStart: Date;
   shiftEnd: Date;
+  scheduleConfigId: string;
 }
 
 export interface IShiftSchedule {
@@ -134,6 +140,7 @@ export interface IShiftSchedule {
 export interface IScheduleConfig {
   _id: string;
   scheduleName?: string;
+  lunchBreakInMins: number;
   shiftStart: string;
   shiftEnd: string;
   configDays: IScheduleConfigDays[];
@@ -146,12 +153,18 @@ export interface IScheduleConfigDays {
   overnightShift?: boolean;
 }
 export interface IScheduleForm {
-  [key: string]: {
-    overnightShift?: boolean;
-    shiftDate?: Date;
-    shiftStart: Date;
-    shiftEnd: Date;
-  };
+  [key: string]: IScheduleDate;
+}
+
+export interface IScheduleDate {
+  overnightShift?: boolean;
+
+  scheduleConfigId?: string;
+  lunchBreakInMins?: number;
+
+  shiftDate?: Date;
+  shiftStart: Date;
+  shiftEnd: Date;
 }
 
 export interface IDeviceConfig {
@@ -162,6 +175,10 @@ export interface IDeviceConfig {
 }
 export type TimeClockMainQueryResponse = {
   timeclocksMain: { list: ITimeclock[]; totalCount: number };
+} & QueryResponse;
+
+export type TimeClockPerUserQueryResponse = {
+  timeclocksPerUser: ITimeclock[];
 } & QueryResponse;
 
 export type TimeClockQueryResponse = {
@@ -202,7 +219,7 @@ export type DeviceConfigsQueryResponse = {
 } & QueryResponse;
 
 export type ScheduleQueryResponse = {
-  schedulesMain: { list: IShiftSchedule[]; totalCount: number };
+  schedulesMain: { list: ISchedule[]; totalCount: number };
 } & QueryResponse;
 
 export type BranchesQueryResponse = {
@@ -225,13 +242,19 @@ export type MutationVariables = {
 };
 export type AbsenceMutationVariables = {
   _id?: string;
-  startTime: Date;
-  endTime: Date;
   userId: string;
   reason: string;
+
+  absenceTypeId: string;
+  absenceTimeType: string;
+
+  totalHoursOfAbsence: string;
+
   explanation?: string;
   attachment?: IAttachment;
-  absenceTypeId?: string;
+  requestDates?: string[];
+  startTime?: Date;
+  endTime?: Date;
 };
 
 export type ScheduleMutationVariables = {
@@ -242,6 +265,7 @@ export type ScheduleMutationVariables = {
   departmentIds?: string[];
   userIds?: string[];
   scheduleConfigId?: string;
+  totalBreakInMins?: number | string;
 };
 
 export type TimeLogMutationResponse = {
@@ -259,6 +283,9 @@ export type TimeClockMutationResponse = {
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   timeclockRemove: (params: { variables: { _id: string } }) => Promise<any>;
   timeclockEditMutation: (params: {
+    variables: MutationVariables;
+  }) => Promise<any>;
+  timeclockCreateMutation: (params: {
     variables: MutationVariables;
   }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {

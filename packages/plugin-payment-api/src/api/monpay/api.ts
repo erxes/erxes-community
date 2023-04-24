@@ -1,10 +1,11 @@
 import * as QRCode from 'qrcode';
 
 import { IModels } from '../../connectionResolver';
-import { PAYMENTS, PAYMENT_STATUS } from '../../constants';
+
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { BaseAPI } from '../base';
 import { IMonpayInvoice } from '../types';
+import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 
 export const monpayCallbackHandler = async (models: IModels, data: any) => {
   const { uuid, status, amount = 0 } = data;
@@ -61,13 +62,15 @@ export class MonpayAPI extends BaseAPI {
   private username: string;
   private accountId: string;
   private headers: any;
+  private domain?: string;
 
-  constructor(config: IMonpayConfig) {
+  constructor(config: IMonpayConfig, domain?: string) {
     super(config);
 
     this.username = config.username;
     this.accountId = config.accountId;
     this.apiUrl = PAYMENTS.monpay.apiUrl;
+    this.domain = domain;
     this.headers = {
       Authorization:
         'Basic ' +
@@ -78,15 +81,11 @@ export class MonpayAPI extends BaseAPI {
   }
 
   async createInvoice(invoice: IInvoiceDocument) {
-    const MAIN_API_DOMAIN = process.env.DOMAIN
-      ? `${process.env.DOMAIN}/gateway`
-      : 'http://localhost:4000';
-
     const data: IMonpayInvoice = {
       amount: invoice.amount,
       generateUuid: true,
       displayName: invoice.description || 'monpay transaction',
-      callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENTS.monpay.kind}`
+      callbackUrl: `${this.domain}/pl:payment/callback/${PAYMENTS.monpay.kind}`
     };
 
     try {
@@ -130,6 +129,43 @@ export class MonpayAPI extends BaseAPI {
       }
     } catch (e) {
       throw new Error(e.message);
+    }
+  }
+
+  async couponCheck(couponCode: string) {
+    const loginRes = await this.request({
+      method: 'POST',
+      headers: this.headers,
+      path: PAYMENTS.monpay.actions.branchLogin,
+      data: { username: this.username, password: 'qwerty' }
+    });
+
+    let token = '';
+
+    if (loginRes.code !== 0) {
+      return { error: 'Failed to login' };
+    }
+
+    token = loginRes.result.token;
+
+    try {
+      const res = await this.request({
+        method: 'GET',
+        headers: {
+          ...this.headers,
+          Authorization: `Bearer ${token}`
+        },
+        path: PAYMENTS.monpay.actions.couponScan,
+        params: { couponCode }
+      });
+
+      if (res.code !== 0) {
+        return { error: 'Coupon is not valid' };
+      }
+
+      return { ...res.result };
+    } catch (e) {
+      return { error: e.message };
     }
   }
 }

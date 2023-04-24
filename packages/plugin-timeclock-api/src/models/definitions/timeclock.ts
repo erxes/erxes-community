@@ -39,6 +39,8 @@ export interface IAbsence {
   status?: string;
   solved?: boolean;
   absenceTypeId?: string;
+  absenceTimeType?: string;
+  totalHoursOfAbsence?: string;
 }
 export interface IAbsenceType {
   name: string;
@@ -67,6 +69,7 @@ export interface ISchedule {
   scheduleConfigId?: string;
   scheduleChecked?: boolean;
   submittedByAdmin?: boolean;
+  totalBreakInMins?: number;
 }
 
 export interface IScheduleDocument extends ISchedule, Document {
@@ -99,6 +102,7 @@ export interface IPayDateDocument extends IPayDate, Document {
 }
 export interface IScheduleConfig {
   scheduleName?: string;
+  lunchBreakInMins: number;
   shiftStart?: string;
   shiftEnd?: string;
 }
@@ -202,9 +206,15 @@ export const absenceSchema = new Schema({
   userId: field({ type: String, label: 'User', index: true }),
   startTime: field({ type: Date, label: 'Absence starting time', index: true }),
   endTime: field({ type: Date, label: 'Absence ending time', index: true }),
-  holidayName: field({ type: String, label: 'Name of a holiday' }),
+
+  requestDates: field({
+    type: [String],
+    label: 'Requested dates in string format'
+  }),
+
   reason: field({ type: String, label: 'reason for absence' }),
   explanation: field({ type: String, label: 'explanation by a team member' }),
+
   solved: field({
     type: Boolean,
     default: false,
@@ -219,9 +229,21 @@ export const absenceSchema = new Schema({
     type: Boolean,
     label: 'Whether request is check in/out request'
   }),
+
   absenceTypeId: field({
     type: String,
     label: 'id of an absence type'
+  }),
+
+  absenceTimeType: field({
+    type: String,
+    default: 'by hour',
+    label: 'absence time type either by day or by hour'
+  }),
+
+  totalHoursOfAbsence: field({
+    type: String,
+    label: 'total hours of absence request'
   })
 });
 
@@ -250,6 +272,11 @@ export const scheduleSchema = new Schema({
     type: Boolean,
     label: 'Whether schedule was submitted/assigned directly by an admin',
     default: false
+  }),
+  totalBreakInMins: field({
+    type: Number,
+    label: 'Total break time in mins',
+    default: false
   })
 });
 
@@ -277,6 +304,11 @@ export const scheduleShiftSchema = new Schema({
     label: 'to be sure of whether shift occurs overnight'
   }),
 
+  chosenScheduleConfigId: field({
+    type: String,
+    label: '_id of a chosen schedule config when creating schedule'
+  }),
+
   solved: field({
     type: Boolean,
     default: false,
@@ -300,7 +332,15 @@ export const payDateSchema = new Schema({
 
 export const scheduleConfigSchema = new Schema({
   _id: field({ pkey: true }),
-  scheduleName: field({ type: String, label: 'Name of the schedule' }),
+  scheduleName: field({
+    type: String,
+    label: 'Name of the schedule'
+  }),
+  lunchBreakInMins: field({
+    type: Number,
+    label: 'Lunch break in mins',
+    default: 30
+  }),
   shiftStart: field({
     type: String,
     label: 'starting time of shift'

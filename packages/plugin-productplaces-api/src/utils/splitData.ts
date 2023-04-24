@@ -14,7 +14,7 @@ const checkSplit = async (
 ) => {
   const product = productById[pdata.productId];
 
-  if (!product.subUoms && product.subUoms.length) {
+  if (!product.subUoms || !product.subUoms.length) {
     return;
   }
 
@@ -24,7 +24,7 @@ const checkSplit = async (
     return;
   }
 
-  const checkCount = 1 / ratio;
+  const checkCount = Math.round((1 / ratio) * 100) / 100;
 
   if (checkCount < 1) {
     return;
@@ -125,7 +125,7 @@ export const splitData = async (
       const tax = (pdata.tax / pdata.quantity) * newCount;
       const discount = (pdata.discount / pdata.quantity) * newCount;
 
-      pdatas = pdata.map(pd =>
+      pdatas = pdatas.map(pd =>
         pd._id === pdata._id
           ? {
               ...pdata,
@@ -139,6 +139,7 @@ export const splitData = async (
 
       pdatas.push({
         ...pdata,
+        _id: Math.random().toString(),
         quantity: newCount,
         amount,
         tax,

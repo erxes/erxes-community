@@ -26,6 +26,9 @@ type Props = {
   closeModal: () => void;
   onlyPreview?: boolean;
   indicatorId: string;
+  branchId: string;
+  departmentId: string;
+  operationId: string;
 };
 
 type State = {
@@ -84,25 +87,61 @@ class IndicatorForm extends React.Component<Props, State> {
     );
   }
 
+  renderField(field: IField) {
+    const { submissions } = this.state;
+    const handleChange = field => {
+      let value = field.value;
+
+      if (typeof field.value === 'object') {
+        value = JSON.stringify(field.value);
+      }
+
+      this.setState(prev => ({
+        submissions: {
+          ...prev.submissions,
+          [field._id]: { ...prev.submissions[field._id], value }
+        }
+      }));
+    };
+
+    const updateProps: any = {
+      isEditing: false,
+      key: field.key,
+      field,
+      onvolumechange: handleChange,
+      isPreview: true
+    };
+
+    if (field.type === 'file' && submissions[field._id]?.value) {
+      updateProps.defaultValue = JSON.parse(submissions[field._id].value);
+    } else {
+      updateProps.defaultValue = submissions[field._id]?.value;
+    }
+
+    return (
+      <FormWrapper key={field._id}>
+        <FormColumn>
+          <GenerateField {...updateProps} />
+        </FormColumn>
+        {this.renderDescriptionField(
+          submissions[field._id]?.description || '',
+          field._id
+        )}
+      </FormWrapper>
+    );
+  }
+
   render() {
     const {
       fields,
       submittedFields,
       closeModal,
       onlyPreview,
-      indicatorId
+      indicatorId,
+      branchId,
+      departmentId,
+      operationId
     } = this.props;
-
-    const { submissions } = this.state;
-
-    const handleChange = field => {
-      this.setState(prev => ({
-        submissions: {
-          ...prev.submissions,
-          [field._id]: { ...prev.submissions[field._id], value: field.value }
-        }
-      }));
-    };
 
     const setHistory = submissions => {
       this.setState({ submissions });
@@ -120,27 +159,13 @@ class IndicatorForm extends React.Component<Props, State> {
       <>
         <IndicatorAssessmentHistory
           indicatorId={indicatorId}
+          branchId={branchId}
+          departmentId={departmentId}
+          operationId={operationId}
           setHistory={setHistory}
         />
         <Padding horizontal>
-          {(fields || []).map(field => (
-            <FormWrapper key={field._id}>
-              <FormColumn>
-                <GenerateField
-                  isEditing={false}
-                  key={field._id}
-                  field={field}
-                  defaultValue={submissions[field._id]?.value}
-                  onValueChange={handleChange}
-                  isPreview={true}
-                />
-              </FormColumn>
-              {this.renderDescriptionField(
-                submissions[field._id]?.description || '',
-                field._id
-              )}
-            </FormWrapper>
-          ))}
+          {(fields || []).map(field => this.renderField(field))}
         </Padding>
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal}>

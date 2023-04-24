@@ -5,6 +5,7 @@ import { PaypalAPI } from './paypal/api';
 import { QpayAPI } from './qpay/api';
 import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
+import { WechatPayAPI } from './wechatpay/api';
 
 class ErxesPayment {
   public socialpay: SocialPayAPI;
@@ -12,16 +13,20 @@ class ErxesPayment {
   public qpay: QpayAPI;
   public monpay: MonpayAPI;
   public paypal: PaypalAPI;
+  public wechatpay: WechatPayAPI;
+  public domain: string;
 
   private payment: any;
 
-  constructor(payment: IPaymentDocument) {
+  constructor(payment: IPaymentDocument, domain?: string) {
     this.payment = payment;
+    this.domain = domain || '';
     this.socialpay = new SocialPayAPI(payment.config);
-    this.storepay = new StorePayAPI(payment.config);
-    this.qpay = new QpayAPI(payment.config);
-    this.monpay = new MonpayAPI(payment.config);
+    this.storepay = new StorePayAPI(payment.config, domain);
+    this.qpay = new QpayAPI(payment.config, domain);
+    this.monpay = new MonpayAPI(payment.config, domain);
     this.paypal = new PaypalAPI(payment.config);
+    this.wechatpay = new WechatPayAPI(payment.config, domain);
   }
 
   async createInvoice(invoice: IInvoiceDocument) {

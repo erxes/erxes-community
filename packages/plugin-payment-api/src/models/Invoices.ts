@@ -13,7 +13,7 @@ import ErxesPayment from '../api/ErxesPayment';
 
 export interface IInvoiceModel extends Model<IInvoiceDocument> {
   getInvoice(doc: any): IInvoiceDocument;
-  createInvoice(doc: IInvoice): Promise<IInvoiceDocument>;
+  createInvoice(doc: IInvoice & { domain: string }): Promise<IInvoiceDocument>;
   updateInvoice(_id: string, doc: any): Promise<IInvoiceDocument>;
   cancelInvoice(_id: string): Promise<string>;
   checkInvoice(_id: string): Promise<string>;
@@ -31,7 +31,7 @@ export const loadInvoiceClass = (models: IModels) => {
       return invoice;
     }
 
-    public static async createInvoice(doc: IInvoice) {
+    public static async createInvoice(doc: IInvoice & { domain: string }) {
       if (!doc.amount && doc.amount === 0) {
         throw new Error('Amount is required');
       }
@@ -47,7 +47,7 @@ export const loadInvoiceClass = (models: IModels) => {
         identifier: doc.identifier || makeInvoiceNo(32)
       });
 
-      const api = new ErxesPayment(payment.config);
+      const api = new ErxesPayment(payment.config, doc.domain);
 
       try {
         const apiResponse = await api.createInvoice(invoice);
@@ -75,13 +75,36 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Already settled');
       }
 
-      if (!invoice.selectedPaymentId) {
+      if (!invoice.selectedPaymentId && !invoice.apiResponse) {
         try {
           const payment = await models.Payments.getPayment(
             doc.selectedPaymentId
           );
 
-          const api = new ErxesPayment(payment);
+          const api = new ErxesPayment(payment, doc.domain);
+          invoice.identifier = doc.identifier || makeInvoiceNo(32);
+
+          const apiResponse = await api.createInvoice(invoice);
+          invoice.apiResponse = apiResponse;
+          invoice.paymentKind = payment.kind;
+          invoice.selectedPaymentId = payment._id;
+
+          await invoice.save();
+
+          return invoice;
+        } catch (e) {
+          throw new Error(e.message);
+        }
+      }
+
+      if (!invoice.apiResponse) {
+        await models.Invoices.updateOne({ _id }, { $set: doc });
+        try {
+          const payment = await models.Payments.getPayment(
+            doc.selectedPaymentId
+          );
+
+          const api = new ErxesPayment(payment, doc.domain);
           invoice.identifier = doc.identifier || makeInvoiceNo(32);
 
           const apiResponse = await api.createInvoice(invoice);
@@ -113,9 +136,11 @@ export const loadInvoiceClass = (models: IModels) => {
       new ErxesPayment(prevPayment).cancelInvoice(invoice);
 
       try {
-        const apiResponse = await new ErxesPayment(newPayment).createInvoice(
-          invoice
-        );
+        invoice.identifier = doc.identifier || makeInvoiceNo(32);
+        const apiResponse = await new ErxesPayment(
+          newPayment,
+          doc.domain
+        ).createInvoice(invoice);
         invoice.apiResponse = apiResponse;
         invoice.paymentKind = newPayment.kind;
         invoice.selectedPaymentId = newPayment._id;
