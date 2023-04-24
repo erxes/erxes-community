@@ -45,28 +45,18 @@ const webbuilderReplacer = async args => {
     }
   });
 
-  let product;
-  let category;
-
   if (pagename) {
     result = html;
 
     if (pagename === 'product-detail') {
-      product = await models.Products.findOne({ _id: query.productId });
+      const product = await models.Products.findOne({ _id: query.productId });
 
       if (product) {
         result = result.replace('{{ product.name }}', product.name);
-        result = result.replace('{{ product.image }}', product.image);
-
-        result += `
-          <div id="quantity-chooser">
-            <button id="quantity-chooser-minus">-<button>
-              <span id="quantity-chooser-quantity"><span>
-            <button id="quantity-chooser-plus">+</button>
-          </div>
-
-          <button id="checkout">Checkout<button>
-        `;
+        result = result.replace(
+          '{{ product.image }}',
+          product.attachment ? product.attachment.url : ''
+        );
       }
     }
   }
@@ -77,7 +67,7 @@ const webbuilderReplacer = async args => {
     if (pieces.length === 2) {
       const [categoryCode, limit] = pieces;
 
-      category = await models.ProductCategories.findOne(
+      const category = await models.ProductCategories.findOne(
         { code: categoryCode },
         { _id: 1 }
       );
@@ -90,10 +80,37 @@ const webbuilderReplacer = async args => {
     result = `
     <script>
       $(document).ready(() => {
-        let quantity = 1;
+        const fetchGraph = ({ query, variables, callback }) => {
+          $.ajax({
+            url: "http://localhost:4000/graphql",
+            method: "post",
+            contentType: "application/json",
+            data: JSON.stringify({
+              query,
+              variables
+            }),
+            success: ({ data }) => {
+              callback(data);
+            }
+          })
+        }
 
-        const product = ${product} || {};
-        const category = ${category};
+        fetchCounter = () => {
+          fetchGraph({
+            query: 'query($customerId: String, $statuses: [String]) { ordersTotalCount(customerId: $customerId, statuses: $statuses) }',
+            variables: {
+              customerId: 'fdfsdfdsfds',
+              statuses: ['new']
+            },
+            callback: ({ ordersTotalCount }) => {
+              $('#cart-counter').text(ordersTotalCount);
+            }
+          });
+        }
+
+        fetchCounter();
+
+        let quantity = 1;
 
         const items = [];
 
@@ -117,13 +134,11 @@ const webbuilderReplacer = async args => {
 
         $("#add-to-cart").click(() => {
           items.push({
-            productId: product._id,
+            productId: "${query.productId}",
             count: quantity,
-            unitPrice: product.unitPrice || 0
+            unitPrice: 100
           })
-        });
 
-        $("#checkout").click(() => {
           fetchGraph({
             query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
             variables: {
@@ -131,28 +146,14 @@ const webbuilderReplacer = async args => {
               customerId: 'fdfsdfdsfds',
               totalAmount: 100,
               branchId: "czWMik5pHMCYMNDgK",
-              type: 'take'
+              type: 'delivery'
             },
             callback: () => {
+              fetchCounter();
               alert('Success');
             }
           })
         });
-
-        const fetchGraph = ({ query, variables, callback }) => {
-          $.ajax({
-            url: "http://localhost:4000/graphql",
-            method: "post",
-            contentType: "application/json",
-            data: JSON.stringify({
-              query,
-              variables
-            }),
-            success: ({ data }) => {
-              callback(data);
-            }
-          })
-        }
 
         const loadProducts = (categoryId, container) => {
           var productItemTemplate = \`${productItemTemplate.html}\`;
@@ -184,6 +185,41 @@ const webbuilderReplacer = async args => {
 
           loadProducts(categoryId, this);
         });
+
+        fetchOrders = () => {
+          fetchGraph({
+            query: 'query($customerId: String) { fullOrders(customerId: $customerId) { _id, items { _id, count, unitPrice, productName, productImgUrl } } }',
+            variables: {
+              customerId: 'fdfsdfdsfds'
+            },
+            callback: ({ fullOrders }) => {
+              const firstRow = $('#checkout-order-list tbody tr:first').html();
+
+              for (const order of fullOrders) {
+                for (const item of order.items) {
+                  let newRow = firstRow;
+
+                  newRow = newRow.replace('{{ order.productName }}', item.productName);
+                  newRow = newRow.replace('{{ order.count }}', item.count);
+                  newRow = newRow.replace('{{ order.unitPrice }}', item.unitPrice);
+                  newRow = newRow.replace('{{ order.productImgUrl }}', item.productImgUrl);
+
+                  $('#checkout-order-list tbody').append('<tr>' + newRow + '</tr');
+                }
+              }
+            }
+          });
+        }
+
+        if ($('#checkout-order-list').length > 0) {
+          $('#checkout-order-list tbody tr:first').hide();
+
+          fetchOrders();
+
+          $('#checkout-proceed').click(function () {
+            alert('Proceed');
+          });
+        }
       });
     </script>
   `;
