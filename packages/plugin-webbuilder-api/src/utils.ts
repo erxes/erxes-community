@@ -3,13 +3,6 @@ import { sendCommonMessage } from './messageBroker';
 import { IPageDocument } from './models/definitions/pages';
 import { ISiteDocument } from './models/definitions/sites';
 
-const generateUrl = (subdomain: string, sitename: string, path: string) => {
-  return (
-    (subdomain === 'localhost' ? `/pl:webbuilder/` : `gateway/pl:webbuilder/`) +
-    `${sitename}/${path}`
-  );
-};
-
 const pathReplacer = (subdomain: string, html: any, site: ISiteDocument) => {
   const siteHolder = `{{sitename}}`;
   const path = `{{pl:webbuilder}}/`;
@@ -78,6 +71,41 @@ const entryReplacer = async (
   return subHtml;
 };
 
+const pluginReplacer = async (args: {
+  subdomain: string;
+  site: ISiteDocument;
+  content: string;
+  options;
+}) => {
+  const { subdomain, content, site, options } = args;
+
+  let html = pathReplacer(subdomain, content, site);
+
+  // regex to find plugin placeholer
+  const matches = html.matchAll(/{{plugin-(\w+):(.+)}}/g) || [];
+
+  for (const match of matches) {
+    const [holder, pluginname, action] = match;
+
+    const pluginHtml = await sendCommonMessage({
+      subdomain,
+      serviceName: pluginname,
+      action: 'webbuilder.replacer',
+      isRPC: true,
+      defaultValue: '',
+      data: {
+        sitename: site.name,
+        action,
+        ...options
+      }
+    });
+
+    html = html.replace(new RegExp(holder, 'g'), pluginHtml);
+  }
+
+  return html;
+};
+
 const pageReplacer = async (args: {
   models: IModels;
   subdomain: string;
@@ -127,33 +155,45 @@ const pageReplacer = async (args: {
     }
   }
 
-  // regex to find plugin placeholer
-  const matches = html.matchAll(/{{plugin-(\w+):(\w+)}}/g) || [];
-
-  for (const match of matches) {
-    const [holder, pluginname, action] = match;
-
-    const pluginHtml = await sendCommonMessage({
-      subdomain,
-      serviceName: pluginname,
-      action: 'webbuilder.replacer',
-      isRPC: true,
-      defaultValue: '',
-      data: {
-        sitename: site.name,
-        query,
-        params,
-        action
-      }
-    });
-
-    html = html.replace(new RegExp(holder, 'g'), pluginHtml);
-  }
+  html = await pluginReplacer({
+    subdomain,
+    site,
+    content: html,
+    options
+  });
 
   html =
     `
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
   ` + html;
+
+  const extendsmatch = html.match(/{% extends (\w+) %}/);
+
+  if (extendsmatch && extendsmatch.length > 0) {
+    const extendspagename = extendsmatch[1];
+    const extendsPage = await models.Pages.findOne({ name: extendspagename });
+
+    if (!extendsPage) {
+      throw new Error('Extends page not found');
+    }
+
+    let newhtml = await pluginReplacer({
+      subdomain,
+      site,
+      content: extendsPage.html,
+      options
+    });
+
+    newhtml = newhtml.replace('{% content %}', html);
+
+    html = `
+      ${newhtml}
+
+      <style>
+        ${extendsPage.css}
+      </style>
+    `;
+  }
 
   if (options && options.replaceCss) {
     return `

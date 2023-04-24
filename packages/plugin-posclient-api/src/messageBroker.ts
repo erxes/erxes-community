@@ -14,44 +14,17 @@ import { sendRPCMessage } from '@erxes/api-utils/src/messageBroker';
 
 let client;
 
-const webbuilderReplacer = async ({
-  models,
-  subdomain,
-  action,
-  sitename,
-  query,
-  html,
-  pagename,
-  params
-}) => {
+const webbuilderReplacer = async args => {
+  const { models, subdomain, action = '', html, pagename } = args;
+
+  const query = args.query || {};
+
   let result = '';
 
   if (action === 'productCategories') {
     result = `
       <ul id="product-categories">
       </ul>
-    `;
-  }
-
-  if (action === 'productCategoriesScript') {
-    result = `
-      <script>
-        $(document).ready(() => {
-          $.ajax({
-            url: "http://localhost:4000/pl:posclient/product-categories",
-            data: {},
-            success: (data) => {
-              var rows = '';
-
-              for (const category of data) {
-                rows += '<li><a href="${sitename}/plw/posclient/product-category-detail?categoryId='+category._id+'">' + category.name + '</a></li>';
-              }
-
-              $('#product-categories').append(rows);
-            }
-          })
-        });
-      </script>
     `;
   }
 
@@ -62,47 +35,24 @@ const webbuilderReplacer = async ({
     `;
   }
 
-  if (action === 'productsScript') {
-    const productItemTemplate = await sendCommonMessage({
-      subdomain,
-      serviceName: 'webbuilder',
-      action: 'pages.findOne',
-      isRPC: true,
-      data: {
-        name: 'posclient:product-item'
-      }
-    });
+  const productItemTemplate = await sendCommonMessage({
+    subdomain,
+    serviceName: 'webbuilder',
+    action: 'pages.findOne',
+    isRPC: true,
+    data: {
+      name: 'posclient:product-item'
+    }
+  });
 
-    result = `
-      <script>
-        $(document).ready(() => {
-          var productItemTemplate = '${productItemTemplate.html}';
-
-          $.ajax({
-            url: "http://localhost:4000/pl:posclient/products?categoryId=${query.categoryId}",
-            data: {},
-            success: (data) => {
-              var rows = '';
-
-              for (const product of data) {
-                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
-                temp = temp.replace('{{ product._id }}', product._id);
-                rows+= temp;
-              }
-
-              $('#products').append(rows);
-            }
-          })
-        });
-      </script>
-    `;
-  }
+  let product;
+  let category;
 
   if (pagename) {
     result = html;
 
     if (pagename === 'product-detail') {
-      const product = await models.Products.findOne({ _id: query.productId });
+      product = await models.Products.findOne({ _id: query.productId });
 
       if (product) {
         result = result.replace('{{ product.name }}', product.name);
@@ -116,64 +66,127 @@ const webbuilderReplacer = async ({
           </div>
 
           <button id="checkout">Checkout<button>
-
-          <script>
-            let quantity = 1;
-
-            const items = [];
-
-            function showQuantity() {
-              $("#quantity-chooser-quantity").text(quantity);
-            }
-
-            $(document).ready(() => {
-              showQuantity();
-
-              $("#quantity-chooser-minus").click(() => {
-                if (quantity > 1) {
-                  quantity--;
-                  showQuantity();
-                }
-              });
-
-              $("#quantity-chooser-plus").click(() => {
-                quantity++;
-                showQuantity();
-              });
-
-              $("#add-to-cart").click(() => {
-                items.push({
-                  productId: "${product._id}",
-                  count: quantity,
-                  unitPrice: ${product.unitPrice || 0}
-                })
-              });
-
-              $("#checkout").click(() => {
-                $.ajax({
-                  url: "http://localhost:4000/graphql",
-                  method: "post",
-                  contentType: "application/json",
-                  data: JSON.stringify({
-                    query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
-                    variables: {
-                      items,
-                      customerId: 'fdfsdfdsfds',
-                      totalAmount: 100,
-                      branchId: "czWMik5pHMCYMNDgK",
-                      type: 'take'
-                    }
-                  }),
-                  success: () => {
-                    alert('Success');
-                  }
-                })
-              });
-            });
-          </script>
         `;
       }
     }
+  }
+
+  if (action.includes('filtered_products')) {
+    const pieces = action.replace('filtered_products__', '').split('__');
+
+    if (pieces.length === 2) {
+      const [categoryCode, limit] = pieces;
+
+      category = await models.ProductCategories.findOne(
+        { code: categoryCode },
+        { _id: 1 }
+      );
+
+      result = `<div class="plugin-posclient-filtered-products" data-category-id="${category._id}" data-limit="${limit}"></div>`;
+    }
+  }
+
+  if (action === 'script') {
+    result = `
+    <script>
+      $(document).ready(() => {
+        let quantity = 1;
+
+        const product = ${product} || {};
+        const category = ${category};
+
+        const items = [];
+
+        function showQuantity() {
+          $("#quantity-chooser-quantity").text(quantity);
+        }
+
+        showQuantity();
+
+        $("#quantity-chooser-minus").click(() => {
+          if (quantity > 1) {
+            quantity--;
+            showQuantity();
+          }
+        });
+
+        $("#quantity-chooser-plus").click(() => {
+          quantity++;
+          showQuantity();
+        });
+
+        $("#add-to-cart").click(() => {
+          items.push({
+            productId: product._id,
+            count: quantity,
+            unitPrice: product.unitPrice || 0
+          })
+        });
+
+        $("#checkout").click(() => {
+          fetchGraph({
+            query: 'mutation($items: [OrderItemInput], $totalAmount: Float!, $type: String!, $customerId: String!, $branchId: String) { ordersAdd(items: $items, totalAmount: $totalAmount, type: $type, customerId: $customerId, branchId: $branchId) { _id } }',
+            variables: {
+              items,
+              customerId: 'fdfsdfdsfds',
+              totalAmount: 100,
+              branchId: "czWMik5pHMCYMNDgK",
+              type: 'take'
+            },
+            callback: () => {
+              alert('Success');
+            }
+          })
+        });
+
+        const fetchGraph = ({ query, variables, callback }) => {
+          $.ajax({
+            url: "http://localhost:4000/graphql",
+            method: "post",
+            contentType: "application/json",
+            data: JSON.stringify({
+              query,
+              variables
+            }),
+            success: ({ data }) => {
+              callback(data);
+            }
+          })
+        }
+
+        const loadProducts = (categoryId, container) => {
+          var productItemTemplate = \`${productItemTemplate.html}\`;
+
+          fetchGraph({
+            query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice } }',
+            variables: {
+              categoryId,
+            },
+            callback: ({ poscProducts }) => {
+              var rows = '';
+
+              for (const product of poscProducts) {
+                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
+                temp = temp.replace('{{ product._id }}', product._id);
+                temp = temp.replace('{{ product.image }}', product.attachment ? product.attachment.url : '');
+                temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
+
+                rows+= temp;
+              }
+
+              $(container).append(rows);
+            }
+          })
+        }
+
+        $('.plugin-posclient-filtered-products').each(function() {
+          const categoryId = $(this).data('category-id');
+
+          loadProducts(categoryId, this);
+        });
+      });
+    </script>
+  `;
   }
 
   return result;

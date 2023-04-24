@@ -106,15 +106,6 @@ export default {
       return res.json(await models.ProductCategories.find().lean());
     });
 
-    app.get('/products', async (req, res) => {
-      const subdomain = getSubdomain(req);
-      const models = await generateModels(subdomain);
-
-      return res.json(
-        await models.Products.find({ categoryId: req.query.categoryId }).lean()
-      );
-    });
-
     app.post('/add-to-cart', async (req, res) => {
       console.log('mmmmmmmm', req.body);
 
