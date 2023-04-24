@@ -30,8 +30,8 @@ const webbuilderReplacer = async args => {
 
   if (action === 'products') {
     result = `
-      <div id="products">
-      </div>
+      <ul id="plugin-posclient-products" data-category-id="${query.categoryId}">
+      </ul>
     `;
   }
 
@@ -231,6 +231,11 @@ const webbuilderReplacer = async args => {
               }
             }
           })
+        }
+
+        if ($('#plugin-posclient-products').length > 0) {
+          const categoryId = $('#plugin-posclient-products').data('category-id');
+          loadProducts(categoryId, '#plugin-posclient-products');
         }
       });
     </script>
