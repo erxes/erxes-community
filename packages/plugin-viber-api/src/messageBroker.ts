@@ -6,6 +6,7 @@ import {
 import { serviceDiscovery } from './configs';
 import { Customers, Integrations, Messages } from './models';
 import { setWebhook } from './viber';
+import { ViberAPI } from './viber/api';
 
 dotenv.config();
 
@@ -16,26 +17,41 @@ export const initBroker = async cl => {
 
   const { consumeRPCQueue } = client;
 
-  consumeRPCQueue(
-    'viber:createIntegration',
-    async ({ data: { doc, integrationId } }) => {
-      const docData = JSON.parse(doc.data);
-      await Integrations.create({
-        inboxId: integrationId,
-        ...docData
-      });
+  consumeRPCQueue('viber:createIntegration', async (args: ISendMessageArgs) => {
+    const { subdomain, data } = args;
+    const { integrationId, doc } = data;
+    const docData = JSON.parse(doc.data);
+    await Integrations.create({
+      inboxId: integrationId,
+      ...docData
+    });
 
-      setWebhook(docData.token, integrationId);
+    const api = new ViberAPI({
+      token: docData.token,
+      integrationId,
+      subdomain
+    });
 
+    try {
+      await api.registerWebhook();
+    } catch (e) {
       return {
-        status: 'success'
+        status: 'failed',
+        data: e.message
       };
     }
-  );
+
+    return {
+      status: 'success'
+    };
+  });
 
   consumeRPCQueue(
-    'viber:removeIntegration',
-    async ({ data: { integrationId } }) => {
+    'viber:removeIntegrations',
+    async (args: ISendMessageArgs) => {
+      const { subdomain, data } = args;
+      const { integrationId } = data;
+
       await Messages.remove({ inboxIntegrationId: integrationId });
       await Customers.remove({ inboxIntegrationId: integrationId });
       await Integrations.remove({ inboxId: integrationId });

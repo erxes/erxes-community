@@ -3,9 +3,9 @@ import { Schema, model } from 'mongoose';
 export const customerSchema = new Schema({
   inboxIntegrationId: String,
   contactsId: String,
-  email: { type: String, unique: true },
-  firstName: String,
-  lastName: String
+  viberId: { type: String },
+  name: String,
+  country: String
 });
 
 export const loadCustomerClass = () => {
@@ -13,6 +13,11 @@ export const loadCustomerClass = () => {
   customerSchema.loadClass(Customer);
   return customerSchema;
 };
+
+export const Customers = model<any, any>(
+  'viber_customers',
+  loadCustomerClass()
+);
 
 const emailSchema = new Schema(
   {
@@ -25,16 +30,10 @@ const emailSchema = new Schema(
 export const messageSchema = new Schema({
   inboxIntegrationId: String,
   inboxConversationId: String,
-  subject: String,
   messageId: { type: String, unique: true },
-  inReplyTo: String,
-  references: [String],
-  body: String,
-  to: [emailSchema],
-  cc: [emailSchema],
-  bcc: [emailSchema],
-  from: [emailSchema],
-  createdAt: { type: Date, index: true, default: new Date() }
+  text: String,
+  type: String,
+  userId: String
 });
 
 export const loadMessageClass = () => {
@@ -43,7 +42,8 @@ export const loadMessageClass = () => {
   return messageSchema;
 };
 
-// schema for integration document
+export const Messages = model<any, any>('viber_messages', loadMessageClass());
+
 export const integrationSchema = new Schema({
   inboxId: String,
   accountId: String,
@@ -56,7 +56,11 @@ export const loadIntegrationClass = () => {
   return integrationSchema;
 };
 
-// schema for integration account
+export const Integrations = model<any, any>(
+  'viber_integrations',
+  loadIntegrationClass()
+);
+
 export const accountSchema = new Schema({
   name: String
 });
@@ -77,62 +81,4 @@ export const loadAccountClass = () => {
   return accountSchema;
 };
 
-export const Customers = model<any, any>(
-  'viber_customers',
-  loadCustomerClass()
-);
-
-export const Integrations = model<any, any>(
-  'viber_integrations',
-  loadIntegrationClass()
-);
-
-export const Messages = model<any, any>('viber_messages', loadMessageClass());
-
 export const Accounts = model<any, any>('viber_accounts', loadAccountClass());
-
-export interface IViberReceivedMessage {
-  inboxId: string;
-  senderId: string;
-  senderName: string;
-  sendDate: Date;
-  messageText: string;
-  messageType: string;
-}
-
-export const ViberReceivedMessageSchema: Schema = new Schema<
-  IViberReceivedMessage
->({
-  inboxId: { type: String, required: true },
-  senderId: { type: String, required: true },
-  senderName: { type: String, required: true },
-  sendDate: { type: Date, required: true },
-  messageText: { type: String, required: true },
-  messageType: { type: String, required: true }
-});
-
-export const ViberReceivedMessage = model(
-  'viber_received_message',
-  ViberReceivedMessageSchema
-);
-
-export interface IViberSentMessage {
-  userId: string;
-  senderId: string;
-  receiverId: string;
-  sendDate: Date;
-  messageText: string;
-}
-
-export const ViberSentMessageSchema: Schema = new Schema<IViberSentMessage>({
-  userId: { type: String, required: true },
-  senderId: { type: String, required: true },
-  receiverId: { type: String, required: true },
-  sendDate: { type: Date, required: true },
-  messageText: { type: String, required: true }
-});
-
-export const ViberSentMessage = model(
-  'viber_sent_message',
-  ViberSentMessageSchema
-);

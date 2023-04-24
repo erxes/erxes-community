@@ -1,4 +1,4 @@
-import { sendRequest } from '@erxes/api-utils/src';
+import { getEnv, sendRequest } from '@erxes/api-utils/src';
 import { IRequestParams } from '@erxes/api-utils/src/requests';
 
 const ApiKey2: string = '50e486c1f867e4cc-faa151fa47843647-3312be901c5f82f7';
@@ -19,10 +19,15 @@ interface RequestInterface extends IRequestParams {
 }
 
 export const setWebhook = async (
+  subdomain: string,
   token: string,
   integrationId: string
 ): Promise<any> => {
-  const url = `http://localhost:4000/pl:viber/webhook/${integrationId}`;
+  const domain = getEnv({ name: 'DOMAIN', subdomain })
+    ? getEnv({ name: 'DOMAIN', subdomain }) + '/gateway'
+    : 'https://6d9d-202-21-104-34.ngrok-free.app';
+
+  const url = `${domain}/pl:viber/webhook/${integrationId}`;
 
   const payload: RequestInterface = {
     method: 'POST',

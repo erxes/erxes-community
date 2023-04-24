@@ -3,7 +3,7 @@ import resolvers from './graphql/resolvers';
 
 import { initBroker } from './messageBroker';
 import init from './controller';
-import { receiveWebhook } from './viber/webhook';
+import { webhookListener } from './viber/api';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -28,7 +28,7 @@ export default {
     ]
   },
 
-  postHandlers: [{ path: '/webhook/:inboxId', method: receiveWebhook }],
+  postHandlers: [{ path: '/webhook/:integrationId', method: webhookListener }],
 
   apolloServerContext: async context => {
     return context;

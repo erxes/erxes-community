@@ -1,4 +1,4 @@
-import { ViberSentMessage, Accounts } from '../../models';
+import { Accounts } from '../../models';
 import { IContext } from '@erxes/api-utils/src/types';
 import { sendMessage } from '../../viber';
 
@@ -16,7 +16,7 @@ const viberMutations = {
       userId: _context.user._id
     };
 
-    ViberSentMessage.create(createMessage);
+    // ViberSentMessage.create(createMessage);
 
     const payload = {
       receiver: message.receiverId,
