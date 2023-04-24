@@ -16,12 +16,12 @@ module.exports = {
   inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxIntegrationForm: './inboxIntegrationForm',
   inboxConversationDetail: './inboxConversationDetail',
-  inboxIntegration: {
+  inboxIntegrations: [{
     name: 'Viber',
     description:
       'Please write integration description on plugin config file',
     isAvailable: true,
     kind: 'viber',
     logo: '/images/integrations/viber.png'
-  }
+  }]
 };

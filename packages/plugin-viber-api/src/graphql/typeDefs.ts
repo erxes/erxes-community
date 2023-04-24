@@ -1,6 +1,14 @@
 import { gql } from 'apollo-server-express';
 
 const types = `
+  input MessageInput {
+    userId: String
+    senderId: String
+    receiverId: String
+    sendDate: Date
+    messageText: String
+  }
+
   type ApiKey {
     _id: String
     userId: String
@@ -39,8 +47,10 @@ const queries = `
 `;
 
 const mutations = `
+  viberSendMessage(message: MessageInput): JSON
+
   viberAccountRemove(_id: String!): String
-  viberSendMessageCreate: SentMessage
+  viberMessageRemove(_id: String!): String
 `;
 
 const typeDefs = gql`

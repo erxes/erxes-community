@@ -32,6 +32,17 @@ interface RequestInterface extends IRequestParams {
   body: object;
 }
 
+export const sendMessage = async (message: object): Promise<any> => {
+  const payload: RequestInterface = {
+    method: 'POST',
+    headers: authHeader,
+    url: 'https://chatapi.viber.com/pa/send_message',
+    body: message
+  };
+
+  return await sendRequest(payload);
+};
+
 export const setWebhook = async (webhookURL: string): Promise<any> => {
   const payload: RequestInterface = {
     method: 'POST',
@@ -62,17 +73,6 @@ export const removeWebhook = async (): Promise<any> => {
     headers: authHeader,
     url: 'https://chatapi.viber.com/pa/set_webhook',
     body: { url: '' }
-  };
-
-  return await sendRequest(payload);
-};
-
-export const sendMessage = async (message: object): Promise<any> => {
-  const payload: RequestInterface = {
-    method: 'POST',
-    headers: authHeader,
-    url: 'https://chatapi.viber.com/pa/send_message',
-    body: message
   };
 
   return await sendRequest(payload);

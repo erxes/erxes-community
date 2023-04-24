@@ -1,18 +1,32 @@
-import { Accounts } from '../../models';
+import { ViberSentMessage, Accounts } from '../../models';
 import { IContext } from '@erxes/api-utils/src/types';
+import { sendMessage } from '../../viber';
+import getAuthUserId from '../../getUser';
 
 const viberMutations = {
-  async viberAccountRemove(
-    _root,
-    { _id }: { _id: string },
-    _context: IContext
-  ) {
-    await Accounts.removeAccount(_id);
+  //viber bot send message to user
+  async viberSendMessage(_root, { message }: any, _context: IContext) {
+    const createMessage = {
+      ...message,
+      userId: _context.user._id
+    };
 
-    return 'deleted';
-  },
-  async viberSendMessageCreate(_root, body, _context: IContext) {
-    return 'done';
+    ViberSentMessage.create(createMessage);
+
+    const payload = {
+      receiver: message.receiverId,
+      min_api_version: 1,
+      sender: {
+        name: 'John McClane'
+      },
+      tracking_data: 'tracking data',
+      type: 'text',
+      text: message.messageText
+    };
+
+    sendMessage(payload);
+
+    return message;
   }
 };
 

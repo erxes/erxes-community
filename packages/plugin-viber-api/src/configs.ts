@@ -20,10 +20,12 @@ export default {
     };
   },
   meta: {
-    inboxIntegration: {
-      kind: 'viber',
-      label: 'Viber'
-    }
+    inboxIntegrations: [
+      {
+        kind: 'viber',
+        label: 'Viber'
+      }
+    ]
   },
 
   // setting webhook ur
