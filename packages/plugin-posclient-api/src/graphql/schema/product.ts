@@ -37,6 +37,7 @@ export const types = `
     subUoms: JSON
     category: PosProductCategory
     remainder: Int
+    remainders: [JSON]
   }
 `;
 
@@ -52,9 +53,9 @@ const productsQueryParams = `
 `;
 
 const productCategoriesParams = `
-  parentId: String, 
-  searchValue: String, 
-  excludeEmpty: Boolean, 
+  parentId: String,
+  searchValue: String,
+  excludeEmpty: Boolean,
   meta: String,
 `;
 const commonParams = `
@@ -66,7 +67,7 @@ const commonParams = `
 
 export const queries = `
   poscProductCategories(
-    ${productCategoriesParams} 
+    ${productCategoriesParams}
     ${commonParams}
   ): [PosProductCategory]
   poscProductCategoriesTotalCount(${productCategoriesParams}): Int
