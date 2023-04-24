@@ -112,38 +112,42 @@ const webbuilderReplacer = async args => {
 
         let items = [];
 
-        if (getOrderId()) {
-          fetchGraph({
-            query: 'query($_id: String!, $customerId: String,) { orderDetail(_id: $_id, customerId: $customerId) { _id, items { productId, count, unitPrice, productName, productImgUrl } } }',
-            variables: {
-              _id: getOrderId(),
-              customerId: getCustomerId(),
-            },
-            callback: ({ orderDetail }) => {
-              if (orderDetail) {
-                items = orderDetail.items;
+        renderOrderItems = () => {
+          const firstRow = $('#checkout-order-item-list tbody tr:first').html();
 
-                refreshCounter();
+          for (const item of items) {
+            let newRow = firstRow;
 
-                if ($('#checkout-order-item-list').length > 0) {
-                  renderOrderItems();
-                }
-              }
-            }
-          });
+            newRow = newRow.replace('{{ item.productName }}', item.productName);
+            newRow = newRow.replace('{{ item.count }}', item.count);
+            newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
+            newRow = newRow.replace('{{ item.productImgUrl }}', item.productImgUrl);
+
+            $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
+          }
         }
 
         const refreshCounter = () => {
           $('#cart-counter').text(items.length);
         }
 
+        const genTotalAmount = () => {
+          let total = 0;
+
+          for (const item of items) {
+            total += (item.count * item.unitPrice);
+          }
+
+          return total;
+        }
+
         const saveOrder = () => {
           const orderId = getOrderId();
 
           const variables = {
-            items,
+            items: items.map(i => ({ productId: i.productId, count: i.count, unitPrice: i.unitPrice })),
             customerId: getCustomerId(),
-            totalAmount: 100,
+            totalAmount: genTotalAmount(),
             branchId: "czWMik5pHMCYMNDgK",
             type: 'delivery'
           }
@@ -173,6 +177,31 @@ const webbuilderReplacer = async args => {
               }
             });
           }
+        }
+
+        const loadProducts = (categoryId, container) => {
+          var productItemTemplate = \`${productItemTemplate.html}\`;
+
+          fetchGraph({
+            query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice } }',
+            variables: {
+              categoryId,
+            },
+            callback: ({ poscProducts }) => {
+              var rows = '';
+
+              for (const product of poscProducts) {
+                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
+                temp = temp.replace('{{ product._id }}', product._id);
+                temp = temp.replace('{{ product.image }}', product.attachment ? product.attachment.url : '');
+                temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
+
+                rows+= temp;
+              }
+
+              $(container).append(rows);
+            }
+          })
         }
 
         if ($("#add-to-cart").length > 0) {
@@ -221,65 +250,21 @@ const webbuilderReplacer = async args => {
           });
         }
 
-        const loadProducts = (categoryId, container) => {
-          var productItemTemplate = \`${productItemTemplate.html}\`;
-
-          fetchGraph({
-            query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice } }',
-            variables: {
-              categoryId,
-            },
-            callback: ({ poscProducts }) => {
-              var rows = '';
-
-              for (const product of poscProducts) {
-                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
-                temp = temp.replace('{{ product._id }}', product._id);
-                temp = temp.replace('{{ product.image }}', product.attachment ? product.attachment.url : '');
-                temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
-
-                rows+= temp;
-              }
-
-              $(container).append(rows);
-            }
-          })
-        }
-
         $('.plugin-posclient-filtered-products').each(function() {
           const categoryId = $(this).data('category-id');
 
           loadProducts(categoryId, this);
         });
 
-        renderOrderItems = () => {
-          const firstRow = $('#checkout-order-item-list tbody tr:first').html();
-
-          for (const item of items) {
-            let newRow = firstRow;
-
-            newRow = newRow.replace('{{ item.productName }}', item.productName);
-            newRow = newRow.replace('{{ item.count }}', item.count);
-            newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
-            newRow = newRow.replace('{{ item.productImgUrl }}', item.productImgUrl);
-
-            $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
-          }
-        }
-
-        if ($('#checkout-order-item-list').length > 0) {
-          $('#checkout-order-item-list tbody tr:first').hide();
-
-          renderOrderItems();
-
+        const generatePaymentUrl = () => {
           fetchGraph({
             query: 'mutation ( $amount: Float!  $contentType: String $contentTypeId: String $description: String $customerId: String $customerType: String $warningText: String) { generateInvoiceUrl( amount: $amount contentType: $contentType contentTypeId: $contentTypeId description: $description customerId: $customerId customerType: $customerType warningText: $warningText) }',
             variables: {
-              amount: 1000,
+              amount: genTotalAmount(),
               contentType: "pos:order",
-              contentTypeId: "orderId",
+              contentTypeId: getOrderId(),
               description: "Description",
-              customerId: "customerId",
+              customerId: getCustomerId(),
               customerType: "customer",
               warningText: "Warning"
             },
@@ -297,6 +282,34 @@ const webbuilderReplacer = async args => {
               }
             }
           });
+        }
+
+        if (getOrderId()) {
+          fetchGraph({
+            query: 'query($_id: String!, $customerId: String,) { orderDetail(_id: $_id, customerId: $customerId) { _id, items { productId, count, unitPrice, productName, productImgUrl } } }',
+            variables: {
+              _id: getOrderId(),
+              customerId: getCustomerId(),
+            },
+            callback: ({ orderDetail }) => {
+              if (orderDetail) {
+                items = orderDetail.items;
+
+                refreshCounter();
+
+                if ($('#checkout-order-item-list').length > 0) {
+                  renderOrderItems();
+                  generatePaymentUrl();
+                }
+              }
+            }
+          });
+        }
+
+        if ($('#checkout-order-item-list').length > 0) {
+          $('#checkout-order-item-list tbody tr:first').hide();
+
+          renderOrderItems();
 
           $('#checkout-order-item-list').on('click', '.remove', function () {
             const productId = $(this).closest('tr').data('product-id');
