@@ -23,7 +23,7 @@ const webbuilderReplacer = async args => {
 
   if (action === 'productCategories') {
     result = `
-      <ul id="product-categories">
+      <ul id="plugin-posclient-product-categories">
       </ul>
     `;
   }
@@ -219,6 +219,18 @@ const webbuilderReplacer = async args => {
           $('#checkout-proceed').click(function () {
             alert('Proceed');
           });
+        }
+
+        if ($('#plugin-posclient-product-categories').length > 0) {
+          fetchGraph({
+            query: 'query { poscProductCategories { _id, name } }',
+            variables: {},
+            callback: ({ poscProductCategories }) => {
+              for (const category of poscProductCategories) {
+                $('#plugin-posclient-product-categories').append('<li><a href="/pl:webbuilder/ecommerce/plw/posclient/product-category-detail?categoryId=' + category._id + '">' + category.name + '</a></li>');
+              }
+            }
+          })
         }
       });
     </script>

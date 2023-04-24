@@ -96,21 +96,6 @@ export default {
     graphqlPubsub = options.pubsubClient;
 
     debug = options.debug;
-
-    const { app } = options;
-
-    app.get('/product-categories', async (req, res) => {
-      const subdomain = getSubdomain(req);
-      const models = await generateModels(subdomain);
-
-      return res.json(await models.ProductCategories.find().lean());
-    });
-
-    app.post('/add-to-cart', async (req, res) => {
-      console.log('mmmmmmmm', req.body);
-
-      return res.json({ status: 'received' });
-    });
   }
 };
 
