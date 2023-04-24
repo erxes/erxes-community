@@ -83,90 +83,88 @@ export const afterMutationHandlers = async (subdomain, params) => {
           placeConfigs[destinationStageId],
           productById
         );
-      }
 
-      if (await isEnabled('pricing')) {
-        const groupedData: any = {};
-        for (const data of pDatas) {
-          const { branchId = '', departmentId = '' } = data;
+        if (await isEnabled('pricing')) {
+          const groupedData: any = {};
+          for (const data of pDatas) {
+            const { branchId = '', departmentId = '' } = data;
 
-          if (!Object.keys(groupedData).includes(branchId)) {
-            groupedData[branchId] = {};
+            if (!Object.keys(groupedData).includes(branchId)) {
+              groupedData[branchId] = {};
+            }
+
+            if (!Object.keys(groupedData[branchId]).includes(departmentId)) {
+              groupedData[branchId][departmentId] = [];
+            }
+
+            groupedData[branchId][departmentId].push(data);
           }
 
-          if (!Object.keys(groupedData[branchId]).includes(departmentId)) {
-            groupedData[branchId][departmentId] = [];
-          }
+          let isSetPricing = false;
+          let afterPricingData = [];
 
-          groupedData[branchId][departmentId].push(data);
-        }
+          for (const branchId of Object.keys(groupedData)) {
+            for (const departmentId of Object.keys(groupedData[branchId])) {
+              const perDatas = groupedData[branchId][departmentId];
 
-        let isSetPricing = false;
-        let afterPricingData = [];
-
-        for (const branchId of Object.keys(groupedData)) {
-          for (const departmentId of Object.keys(groupedData[branchId])) {
-            const perDatas = groupedData[branchId][departmentId];
-
-            if (perDatas.length) {
-              const pricing = await sendPricingMessage({
-                subdomain,
-                action: 'checkPricing',
-                data: {
-                  prioritizeRule: 'exclude',
-                  totalAmount: perDatas.reduce(
-                    (sum, cur) => (sum + cur.amount, 0)
-                  ),
-                  departmentId: departmentId,
-                  branchId: branchId,
-                  products: [
-                    perDatas.items.map(i => ({
+              if (perDatas.length) {
+                const pricing = await sendPricingMessage({
+                  subdomain,
+                  action: 'checkPricing',
+                  data: {
+                    prioritizeRule: 'exclude',
+                    totalAmount: perDatas.reduce(
+                      (sum, cur) => (sum + cur.amount, 0)
+                    ),
+                    departmentId: departmentId,
+                    branchId: branchId,
+                    products: perDatas.map(i => ({
                       itemId: i._id,
                       productId: i.productId,
                       quantity: i.quantity,
                       price: i.unitPrice
                     }))
-                  ]
-                },
-                isRPC: true,
-                defaultValue: {}
-              });
+                  },
+                  isRPC: true,
+                  defaultValue: {}
+                });
 
-              for (const item of perDatas) {
-                const discount = pricing[item._id];
+                for (const item of perDatas) {
+                  const discount = pricing[item._id];
 
-                if (discount) {
-                  isSetPricing = true;
-                  if (discount.type === 'percentage') {
-                    item.discountPercent = parseFloat(
-                      ((discount.value / item.unitPrice) * 100).toFixed(2)
-                    );
-                    item.unitPrice -= discount.value;
-                    item.discount = discount.value * item.count;
-                    item.amount = item.unitPrice * item.quantity;
-                  } else {
-                    item.discount = discount.value * item.count;
-                    item.unitPrice -= discount.value;
-                    item.amount = item.unitPrice * item.quantity;
+                  if (discount) {
+                    isSetPricing = true;
+                    if (discount.type === 'percentage') {
+                      item.discountPercent = parseFloat(
+                        ((discount.value / item.unitPrice) * 100).toFixed(2)
+                      );
+                      item.unitPrice -= discount.value;
+                      item.discount = discount.value * item.count;
+                      item.amount = item.unitPrice * item.quantity;
+                    } else {
+                      item.discount = discount.value * item.count;
+                      item.unitPrice -= discount.value;
+                      item.amount = item.unitPrice * item.quantity;
+                    }
                   }
                 }
               }
+
+              afterPricingData = afterPricingData.concat(perDatas);
             }
-
-            afterPricingData = afterPricingData.concat(perDatas);
           }
-        }
 
-        if (isSetPricing) {
-          await sendCardsMessage({
-            subdomain,
-            action: 'deals.updateOne',
-            data: {
-              selector: { _id: deal._id },
-              modifier: { $set: { productsData: afterPricingData } }
-            },
-            isRPC: true
-          });
+          if (isSetPricing) {
+            await sendCardsMessage({
+              subdomain,
+              action: 'deals.updateOne',
+              data: {
+                selector: { _id: deal._id },
+                modifier: { $set: { productsData: afterPricingData } }
+              },
+              isRPC: true
+            });
+          }
         }
       }
     }
