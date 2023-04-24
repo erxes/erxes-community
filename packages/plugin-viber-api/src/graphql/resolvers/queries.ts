@@ -7,6 +7,10 @@ import {
 } from '../../models';
 
 const queries = {
+  viberReadSentMessage(_root, _args, _context: IContext) {
+    return ViberSentMessage.find({ userId: _context.user._id });
+  },
+
   viberAPIKey(_root, _args, _context: IContext) {
     return ViberSentMessage.find({});
   },
