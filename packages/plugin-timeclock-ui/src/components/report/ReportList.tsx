@@ -114,7 +114,7 @@ function ReportList(props: Props) {
                 {__('Schedule')}
               </th>
               <th
-                colSpan={8}
+                colSpan={7}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('Performance')}
@@ -133,7 +133,6 @@ function ReportList(props: Props) {
               <td>{__('In Device')}</td>
               <td>{__('Check Out')}</td>
               <td>{__('Out Device')}</td>
-              <td>{__('Location')}</td>
               <td>{__('Duration')}</td>
               <td>{__('Overtime')}</td>
               <td>{__('Overnight')}</td>
