@@ -84,7 +84,7 @@ export const afterMutationHandlers = async (subdomain, params) => {
           productById
         );
 
-        if (await isEnabled('pricing')) {
+        if ((await isEnabled('pricing')) && placeConfigs.checkPricing) {
           const groupedData: any = {};
           for (const data of pDatas) {
             const { branchId = '', departmentId = '' } = data;
