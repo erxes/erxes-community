@@ -216,6 +216,32 @@ const webbuilderReplacer = async args => {
 
           fetchOrders();
 
+          fetchGraph({
+            query: 'mutation ( $amount: Float!  $contentType: String $contentTypeId: String $description: String $customerId: String $customerType: String $warningText: String) { generateInvoiceUrl( amount: $amount contentType: $contentType contentTypeId: $contentTypeId description: $description customerId: $customerId customerType: $customerType warningText: $warningText) }',
+            variables: {
+              amount: 1000,
+              contentType: "pos:order",
+              contentTypeId: "orderId",
+              description: "Description",
+              customerId: "customerId",
+              customerType: "customer",
+              warningText: "Warning"
+            },
+            callback: ({ generateInvoiceUrl }) => {
+              $('#payment').attr('src', generateInvoiceUrl);
+            }
+          })
+
+          window.addEventListener("message", (event) => {
+            const { fromPayment, message, invoiceId } = event.data;
+            if (fromPayment) {
+              if (message === "paymentSuccessfull") {
+                $('#payment').attr('src', '');
+                alert(invoiceId);
+              }
+            }
+          });
+
           $('#checkout-proceed').click(function () {
             alert('Proceed');
           });
