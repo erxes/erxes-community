@@ -21,6 +21,7 @@ type Props = {
 type State = {
   accountId: string;
 };
+
 class IntegrationForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -34,12 +35,15 @@ class IntegrationForm extends React.Component<Props, State> {
     this.setState({ accountId });
   };
 
-  generateDoc = (values: { name: string; brandId: string }) => {
+  generateDoc = (values: { name: string; brandId: string; token: string }) => {
     return {
       name: values.name,
       brandId: values.brandId,
       kind: 'viber',
-      accountId: this.state.accountId
+      accountId: this.state.accountId,
+      data: {
+        token: values.token
+      }
     };
   };
 
@@ -71,7 +75,11 @@ class IntegrationForm extends React.Component<Props, State> {
 
     return (
       <>
+        <p>Please enter your Viber bot name</p>
+
         {this.renderField({ label: 'Name', fieldName: 'name', formProps })}
+
+        {this.renderField({ label: 'Token', fieldName: 'token', formProps })}
 
         <SelectBrand
           isRequired={true}

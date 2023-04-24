@@ -46,7 +46,8 @@ export const loadMessageClass = () => {
 // schema for integration document
 export const integrationSchema = new Schema({
   inboxId: String,
-  accountId: String
+  accountId: String,
+  token: String
 });
 
 export const loadIntegrationClass = () => {

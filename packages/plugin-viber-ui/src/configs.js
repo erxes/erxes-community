@@ -22,6 +22,7 @@ module.exports = {
       'Please write integration description on plugin config file',
     isAvailable: true,
     kind: 'viber',
-    logo: '/images/integrations/viber.png'
+    logo: '/images/integrations/viber.png',
+    createModal: 'viber',
   }]
 };

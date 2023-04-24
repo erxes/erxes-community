@@ -20,7 +20,7 @@ export const initBroker = async cl => {
     async ({ data: { doc, integrationId } }) => {
       await Integrations.create({
         inboxId: integrationId,
-        ...(doc || {})
+        ...JSON.parse(doc.data)
       });
 
       return {
