@@ -71,4 +71,7 @@ export class ViberAPI {
       throw e.message;
     }
   }
+
+  //TODO
+  sendMessage() {}
 }

@@ -61,6 +61,22 @@ export const initBroker = async cl => {
       };
     }
   );
+
+  consumeRPCQueue('viber:api_to_integrations', async ({ subdomain, data }) => {
+    const { action, payload } = data;
+
+    if (action.includes('reply')) {
+      console.log(payload);
+
+      //TODO message yavuulah
+      // VIBER ViberAPI class.sendMessage
+      // sendMessage()
+    }
+
+    return {
+      status: 'success'
+    };
+  });
 };
 
 export default function() {

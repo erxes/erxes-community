@@ -161,8 +161,8 @@ export interface IConversationMessages extends Document {
   conversationId: string;
   userId: string;
   customerId: string;
-  timestamp: Date;
-  messageText: string;
+  createdAt: Date;
+  content: string;
   messageType: string;
 }
 
@@ -170,8 +170,8 @@ export const conversationMessageSchema = new Schema<IConversationMessages>({
   conversationId: String,
   userId: String,
   customerId: String,
-  timestamp: Date,
-  messageText: String,
+  createdAt: Date,
+  content: String,
   messageType: String
 });
 

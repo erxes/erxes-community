@@ -1,5 +1,7 @@
 import { Customers, Conversations, ConversationMessages } from '../models';
 import { sendInboxMessage } from '../messageBroker';
+import { graphqlPubsub } from '../configs';
+
 interface IWebhookMessage {
   event: String;
   timestamp: Number;
@@ -29,10 +31,6 @@ const saveMessage = async (
     },
     subdomain
   );
-
-  console.log('#############');
-  console.log(customer);
-  console.log('#############');
 
   let conversation = await Conversations.findOne({
     senderId: message.sender.id,
@@ -85,10 +83,10 @@ const saveMessage = async (
   try {
     const conversationMessage = await ConversationMessages.create({
       conversationId: conversation._id,
-      timestamp: message.timestamp,
+      createdAt: message.timestamp,
       userId: null,
-      customerId: message.sender.id,
-      messageText: message.message.text,
+      customerId: customer.contactsId,
+      content: message.message.text,
       messageType: message.message.type
     });
 
@@ -96,14 +94,38 @@ const saveMessage = async (
       subdomain,
       action: 'conversationClientMessageInserted',
       data: {
-        userId: conversationMessage.userId,
-        conversationId: conversation.erxesApiId,
-        createdAt: message.timestamp,
-        content: conversationMessage.messageText,
-        customerId: customer.contactsId
+        ...conversationMessage.toObject(),
+        conversationId: conversation.erxesApiId
       }
     });
-    console.log('sendInboxMessage - conversationClientMessageInserted');
+    console.log(
+      'sendInboxMessage - conversationClientMessageInserted',
+      conversationMessage
+    );
+
+    graphqlPubsub.publish('conversationClientMessageInserted', {
+      conversationClientMessageInserted: {
+        ...conversationMessage.toObject(),
+        conversationId: conversation.erxesApiId
+      }
+    });
+
+    graphqlPubsub.publish('conversationMessageInserted', {
+      conversationMessageInserted: {
+        ...conversationMessage.toObject(),
+        conversationId: conversation.erxesApiId
+      }
+    });
+
+    // graphqlPubsub.publish('conversationMessageInserted', {
+    //   conversationMessageInserted: {
+    //     userId: conversationMessage.userId,
+    //     conversationId: conversation.erxesApiId,
+    //     createdAt: message.timestamp,
+    //     content: conversationMessage.messageText,
+    //     customerId: customer.contactsId
+    //   }
+    // });
   } catch (e) {
     throw new Error(e);
   }
