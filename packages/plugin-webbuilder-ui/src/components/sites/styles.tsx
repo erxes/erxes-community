@@ -309,6 +309,15 @@ export const SiteFormContainer = styledTS<{ showDarkMode?: boolean }>(
         border-right: 1px solid ${colors.colorShadowGray};
       }
 
+      .gjs-sm-field input,
+      .gjs-clm-select input,
+      .gjs-clm-field input,
+      .gjs-sm-field select,
+      .gjs-clm-select select,
+      .gjs-clm-field select {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
       .gjs-pn-commands,
       .gjs-pn-views-container {
         box-shadow: none;
