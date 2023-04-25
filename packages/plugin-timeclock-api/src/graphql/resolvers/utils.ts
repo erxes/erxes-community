@@ -75,31 +75,40 @@ export const findDepartmentUsers = async (
 
 export const createScheduleShiftsByUserIds = async (
   userIds: string[],
-  shifts,
+  scheduleShifts,
   models: IModels,
   totalBreakInMins?: number
 ) => {
+  const shiftsBulkCreateOps: any[] = [];
+
   let schedule;
-  userIds.forEach(async userId => {
+  for (const userId of userIds) {
     schedule = await models.Schedules.createSchedule({
-      userId: `${userId}`,
+      userId,
       solved: true,
       status: 'Approved',
       submittedByAdmin: true,
       totalBreakInMins
     });
 
-    shifts.forEach(shift => {
-      models.Shifts.createShift({
-        scheduleId: schedule._id,
-        shiftStart: shift.shiftStart,
-        shiftEnd: shift.shiftEnd,
-        scheduleConfigId: shift.scheduleConfigId,
-        solved: true,
-        status: 'Approved'
+    for (const shift of scheduleShifts) {
+      shiftsBulkCreateOps.push({
+        insertOne: {
+          document: {
+            scheduleId: schedule._id,
+            shiftStart: shift.shiftStart,
+            shiftEnd: shift.shiftEnd,
+            scheduleConfigId: shift.scheduleConfigId,
+            solved: true,
+            status: 'Approved'
+          }
+        }
       });
-    });
-  });
+    }
+  }
+
+  // create shifts of each schedule
+  await models.Shifts.bulkWrite(shiftsBulkCreateOps);
 
   return schedule;
 };

@@ -161,15 +161,20 @@ function AbsenceList(props: Props) {
     const absenceTimeType = absence.absenceTimeType;
 
     const calculateAbsenceHours = () => {
-      if (absenceTimeType === 'by hour') {
-        const getTimeInHours = (
-          (endTime.getTime() - startTime.getTime()) /
-          3600000
-        ).toFixed(1);
-        return getTimeInHours;
+      // if check in request or request time type is by day
+      if (
+        absence.reason.match(/Check in request/gi) ||
+        absence.reason.match(/Check out request/gi) ||
+        absenceTimeType === 'by day'
+      ) {
+        return '-';
       }
-      // by day
-      return '-';
+
+      const getTimeInHours = (
+        (endTime.getTime() - startTime.getTime()) /
+        3600000
+      ).toFixed(1);
+      return getTimeInHours;
     };
 
     const renderAbsenceDays = () => {
@@ -183,6 +188,25 @@ function AbsenceList(props: Props) {
     };
 
     const renderAbsenceTimeInfo = () => {
+      if (absence.reason.match(/Check in request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{startingTime}</td>
+            <td>{'-'}</td>
+          </>
+        );
+      }
+      if (absence.reason.match(/Check out request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{'-'}</td>
+            <td>{startingTime}</td>
+          </>
+        );
+      }
+
       if (absenceTimeType === 'by day') {
         return (
           <>
