@@ -47,6 +47,7 @@ export interface ITransaction {
     total: number;
     surplus?: number;
   };
+  reactions?: any[];
   futureDebt?: number;
   debtTenor?: number;
 }

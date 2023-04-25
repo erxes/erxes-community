@@ -293,7 +293,7 @@ const fillAmounts = async (
     doc.total = tr?.calcedInfo?.total || 0;
   }
 
-  doc.undue = (doc.undue || 0) + (tr.undue || 0);
+  doc.undue = doc.undue || 0;
   doc.didUndue = (doc.didUndue || 0) + (tr.undue || 0);
   doc.didInterestEve = (doc.didInterestEve || 0) + (tr.interestEve || 0);
   doc.didInterestNonce = (doc.didInterestNonce || 0) + (tr.interestNonce || 0);
@@ -318,7 +318,6 @@ const fillAmounts = async (
     );
     doc.balance = 0;
   }
-
   return doc;
 };
 
@@ -394,7 +393,7 @@ export const generatePendingSchedules = async (
   let interestEve = 0;
   let interestNonce = 0;
   let index = 0;
-
+  let payment = 0;
   // less pay then pendingSchedules not change current schedule status to less
   if (diff < 0) {
     // TODO debt (limit) check
@@ -416,25 +415,35 @@ export const generatePendingSchedules = async (
       return;
     }
 
-    // allowLess === true or only between less then only after schedule update
-    interestEve =
-      (updatedSchedule.interestEve || 0) -
-      (updatedSchedule.didInterestEve || 0);
-    interestNonce =
-      (updatedSchedule.interestNonce || 0) -
-      (updatedSchedule.didInterestNonce || 0);
+    const { diffEve, diffNonce } = getDatesDiffMonth(
+      preSchedule.payDate,
+      schedule.payDate
+    );
+    interestEve = calcInterest({
+      balance,
+      interestRate: contract.interestRate,
+      dayOfMonth: diffEve
+    });
 
-    let payment = (schedule.payment || 0) - (updatedSchedule.didPayment || 0);
+    interestNonce = calcInterest({
+      balance,
+      interestRate: contract.interestRate,
+      dayOfMonth: diffNonce
+    });
+    payment = schedule.payment || 0;
+    if (paymentBalance < 0) {
+      payment = payment + paymentBalance;
+      if (payment < 0) {
+        payment = 0;
+      }
+    } else balance -= payment;
 
     changeDoc = {
-      interestEve: (schedule.interestEve || 0) + interestEve,
-      interestNonce: (schedule.interestNonce || 0) + interestNonce,
-      balance: balance - payment,
-      total:
-        schedule.total +
-        interestEve +
-        interestNonce -
-        (updatedSchedule.didPayment || 0)
+      interestEve,
+      interestNonce,
+      payment,
+      balance,
+      total: payment + interestEve + interestNonce
     };
 
     trReaction.push({
@@ -520,10 +529,6 @@ export const generatePendingSchedules = async (
     };
   }> = [];
 
-  let overPaidPayment = 0;
-
-  if (paymentBalance < 0 && tr.payment) overPaidPayment = tr.payment;
-
   while (
     diff > (schedule.payment || 0) &&
     index < pendingSchedules.length - 1
@@ -546,17 +551,17 @@ export const generatePendingSchedules = async (
 
     diff = diff - (schedule.payment || 0);
 
-    let payment = schedule.payment || 0;
-    if (overPaidPayment > 0 && payment > 0) {
-      payment -= overPaidPayment;
+    payment = schedule.payment || 0;
+    if (paymentBalance < 0 && payment > 0) {
+      payment += paymentBalance;
       if (payment < 0) {
-        overPaidPayment = payment * -1;
+        paymentBalance = paymentBalance + (schedule.payment || 0);
         payment = 0;
-      } else overPaidPayment = 0;
+      } else paymentBalance = 0;
     }
 
     changeDoc = {
-      payment: payment,
+      payment,
       interestEve,
       interestNonce,
       balance,
@@ -617,7 +622,7 @@ export const generatePendingSchedules = async (
         update: { $set: { ...changeDoc } }
       }
     });
-  } else if (overPaidPayment > 0) {
+  } else {
     // diff < 0 condition
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
@@ -633,20 +638,19 @@ export const generatePendingSchedules = async (
       interestRate: contract.interestRate,
       dayOfMonth: diffNonce
     });
-    balance = balance - (schedule.payment || 0) - overPaidPayment;
+    payment = schedule.payment || 0;
+    if (paymentBalance < 0) {
+      payment = payment + paymentBalance;
+      balance = balance - payment;
+    } else balance = balance - payment;
 
     changeDoc = {
       debt: 0,
-      payment: (schedule.payment || 0) - overPaidPayment,
+      payment,
       interestEve,
       interestNonce,
       balance,
-      total:
-        interestEve +
-        interestNonce +
-        (schedule.payment || 0) -
-        overPaidPayment +
-        (schedule.insurance || 0)
+      total: interestEve + interestNonce + payment - (schedule.insurance || 0)
     };
     trReaction.push({
       scheduleId: schedule._id,
@@ -768,6 +772,9 @@ export const betweenScheduled = async (
   preSchedule: IScheduleDocument,
   pendingSchedules: IScheduleDocument[]
 ) => {
+  console.log(
+    '-----------------------------------betweenScheduled-------------------------'
+  );
   const trReaction: any = [];
   const doc = await fillAmounts(
     models,
@@ -777,9 +784,17 @@ export const betweenScheduled = async (
     true
   );
 
+  const diff =
+    (doc.payment || 0) -
+    (doc.didPayment || 0) +
+    (doc.interestEve || 0) -
+    (doc.didInterestEve || 0) +
+    (doc.interestNonce || 0) -
+    (doc.didInterestNonce || 0);
+
   doc.contractId = contract._id;
   doc.payDate = tr.payDate;
-  doc.status = SCHEDULE_STATUS.DONE;
+  doc.status = diff > 0 ? SCHEDULE_STATUS.LESS : SCHEDULE_STATUS.DONE;
 
   const updatedSchedule: any = await models.Schedules.create({
     ...doc,
@@ -814,7 +829,7 @@ export const onNextScheduled = async (
     Object.assign({}, nextSchedule),
     tr,
     preSchedule,
-    false
+    true
   );
   doc.status = SCHEDULE_STATUS.DONE;
 
@@ -873,7 +888,8 @@ export const afterNextScheduled = async (
         { payDate: { $gte: nextSchedule.payDate } },
         { payDate: { $lte: updatedSchedule.payDate } },
         { _id: { $ne: updatedSchedule._id } }
-      ]
+      ],
+      contractId: preSchedule.contractId
     },
     { _id: 1 }
   ).lean();
@@ -891,7 +907,8 @@ export const afterNextScheduled = async (
         { payDate: { $gte: nextSchedule.payDate } },
         { payDate: { $lte: updatedSchedule.payDate } },
         { _id: { $ne: updatedSchedule._id } }
-      ]
+      ],
+      contractId: preSchedule.contractId
     },
     { $set: { status: SCHEDULE_STATUS.SKIPPED } }
   );
