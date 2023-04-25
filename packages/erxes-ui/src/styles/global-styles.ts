@@ -323,6 +323,21 @@ a:hover {
   cursor: pointer;
 }
 
+/* grapejs */
+
+.gjs-field {
+  font-weight: 400;
+}
+
+.gjs-three-bg {
+  background-color: #6569df !important;
+  color: #fff;
+}
+
+.gjs-sm-label, .gjs-clm-sels-info {
+  font-weight: 600;
+}
+
 .gjs-four-color, .gjs-four-color-h:hover {
   color: #6569df !important;
 }

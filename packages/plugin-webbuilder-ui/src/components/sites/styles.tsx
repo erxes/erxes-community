@@ -290,6 +290,11 @@ export const SiteFormContainer = styledTS<{ showDarkMode?: boolean }>(
         background: ${colors.bgLight};
       }
 
+      .gjs-field {
+        background-color: #fff !important;
+        border: 1px solid #eee !important;
+      }
+
       .gjs-two-color {
         color: ${colors.colorCoreGray};
       }
