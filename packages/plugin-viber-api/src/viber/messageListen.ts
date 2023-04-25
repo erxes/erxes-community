@@ -1,5 +1,4 @@
-import { Timestamp } from 'mongodb';
-import { Conversations, ConversationMessages } from '../models';
+import { Customers, Conversations, ConversationMessages } from '../models';
 import { sendInboxMessage } from '../messageBroker';
 interface IWebhookMessage {
   event: String;
@@ -20,8 +19,23 @@ const saveMessage = async (
   integrationId: string,
   subdomain: string
 ): Promise<void> => {
+  const customer = await Customers.getOrCreate(
+    {
+      inboxIntegrationId: integrationId,
+      contactsId: null,
+      viberId: message.sender.id,
+      name: message.sender.name,
+      country: message.sender.country
+    },
+    subdomain
+  );
+
+  console.log('#############');
+  console.log(customer);
+  console.log('#############');
+
   let conversation = await Conversations.findOne({
-    recipientId: message.sender.id,
+    senderId: message.sender.id,
     integrationId: integrationId
   });
 
@@ -40,10 +54,36 @@ const saveMessage = async (
           : e
       );
     }
+
+    try {
+      const apiConversationResponse = await sendInboxMessage({
+        subdomain,
+        action: 'integrations.receive',
+        data: {
+          action: 'create-or-update-conversation',
+          payload: JSON.stringify({
+            customerId: customer.contactsId,
+            integrationId: integrationId,
+            content: message.message.text || '',
+            attachments: null,
+            conversationId: conversation.erxesApiId,
+            updatedAt: message.timestamp
+          })
+        },
+        isRPC: true
+      });
+      console.log('sendInboxMessage - create-or-update-conversation');
+      conversation.erxesApiId = apiConversationResponse._id;
+
+      await conversation.save();
+    } catch (e) {
+      // await models.Conversations.deleteOne({ _id: conversation._id });
+      throw new Error(e);
+    }
   }
 
   try {
-    ConversationMessages.create({
+    const conversationMessage = await ConversationMessages.create({
       conversationId: conversation._id,
       timestamp: message.timestamp,
       userId: null,
@@ -51,33 +91,20 @@ const saveMessage = async (
       messageText: message.message.text,
       messageType: message.message.type
     });
-  } catch (e) {
-    throw new Error(e);
-  }
 
-  try {
-    const apiConversationResponse = await sendInboxMessage({
+    await sendInboxMessage({
       subdomain,
-      action: 'integrations.receive',
+      action: 'conversationClientMessageInserted',
       data: {
-        action: 'create-or-update-conversation',
-        payload: JSON.stringify({
-          customerId: message.sender.id,
-          integrationId: integrationId,
-          content: message.message.text || '',
-          attachments: null,
-          conversationId: conversation.erxesApiId,
-          updatedAt: message.timestamp
-        })
-      },
-      isRPC: true
+        userId: conversationMessage.userId,
+        conversationId: conversation.erxesApiId,
+        createdAt: message.timestamp,
+        content: conversationMessage.messageText,
+        customerId: customer.contactsId
+      }
     });
-
-    conversation.erxesApiId = apiConversationResponse._id;
-
-    await conversation.save();
+    console.log('sendInboxMessage - conversationClientMessageInserted');
   } catch (e) {
-    // await models.Conversations.deleteOne({ _id: conversation._id });
     throw new Error(e);
   }
 };

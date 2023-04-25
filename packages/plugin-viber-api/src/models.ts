@@ -1,16 +1,64 @@
 import { Schema, model, Document, Model } from 'mongoose';
-// import { IModels } from '../connectionResolver';
+import { sendInboxMessage } from './messageBroker';
 
-export const customerSchema = new Schema({
+interface ICustomer {
+  inboxIntegrationId: string;
+  contactsId: string;
+  viberId: string;
+  name: string;
+  country: string;
+}
+
+export const customerSchema = new Schema<ICustomer>({
   inboxIntegrationId: String,
   contactsId: String,
-  viberId: { type: String },
+  viberId: String,
   name: String,
   country: String
 });
 
 export const loadCustomerClass = () => {
-  class Customer {}
+  class Customer {
+    static async getOrCreate(viberAccount: ICustomer, subdomain: string) {
+      let customer = await Customers.findOne({ viberId: viberAccount.viberId });
+
+      if (!customer) {
+        customer = await Customers.create({
+          inboxIntegrationId: viberAccount.inboxIntegrationId,
+          contactsId: null,
+          viberId: viberAccount.viberId,
+          name: viberAccount.name,
+          country: viberAccount.country
+        });
+
+        try {
+          const apiCustomerResponse = await sendInboxMessage({
+            subdomain,
+            action: 'integrations.receive',
+            data: {
+              action: 'get-create-update-customer',
+              payload: JSON.stringify({
+                integrationId: viberAccount.inboxIntegrationId,
+                firstName: viberAccount.name,
+                lastName: null,
+                avatar: null,
+                isUser: true
+              })
+            },
+            isRPC: true
+          });
+
+          customer.contactsId = apiCustomerResponse._id;
+          await customer.save();
+        } catch (e) {
+          await customer.deleteOne({ _id: customer._id });
+          throw new Error(e);
+        }
+      }
+
+      return customer;
+    }
+  }
   customerSchema.loadClass(Customer);
   return customerSchema;
 };
@@ -83,58 +131,6 @@ export const loadAccountClass = () => {
 };
 
 export const Accounts = model<any, any>('viber_accounts', loadAccountClass());
-
-// ---------------------------------------------------------------------------
-
-// export interface IConversation {
-//   erxesApiId?: string;
-//   timestamp: Date;
-//   senderId: string;
-//   recipientId: string;
-//   integrationId: string;
-//   messageText: string;
-//   messageType: string;
-// }
-
-// export interface IConversationDocument extends IConversation, Document {}
-
-// export interface IConversationModel extends Model<IConversationDocument> {
-//   getConversation(selector): Promise<IConversationDocument>;
-// }
-
-// export const conversationSchema = new Schema({
-//   erxesApiId: String,
-//   timestamp: Date,
-//   senderId: { type: String, index: true },
-//   recipientId: { type: String, index: true },
-//   integrationId: String,
-//   messageText: String,
-//   messageType: String
-// });
-
-// conversationSchema.index({ senderId: 1, recipientId: 1 }, { unique: true });
-
-// export const loadConversationClass = () => {
-//   class Conversation {
-//     static async getConversation(selector: {}) {
-//       const conversation = await Conversation.findOne(selector);
-
-//       if (!conversation) {
-//         throw new Error('Conversation not found');
-//       }
-
-//       return conversation;
-//     }
-//   }
-
-//   conversationSchema.loadClass(Conversation);
-
-//   return conversationSchema;
-// };
-
-// export const Conversation = model<any, any>('viber_conversation', loadConversationClass());
-
-// ---------------------------------------------------------------------------
 
 export interface IConversation extends Document {
   erxesApiId?: string;
