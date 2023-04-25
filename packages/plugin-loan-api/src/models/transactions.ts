@@ -303,15 +303,14 @@ export const loadTransactionClass = (models: IModels) => {
      */
     public static async removeTransactions(_ids) {
       const transactions = await models.Transactions.find({ _id: _ids })
-        .sort({ createdAt: -1 })
+        .sort({ payDate: -1 })
         .lean();
-      for (const oldTr of transactions) {
+      for await (const oldTr of transactions) {
         if (oldTr) {
           await removeTrAfterSchedule(models, oldTr);
+          await models.Transactions.deleteOne({ _id: oldTr._id });
         }
       }
-
-      return models.Transactions.deleteMany({ _id: { $in: _ids } });
     }
   }
   transactionSchema.loadClass(Transaction);
