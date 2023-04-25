@@ -665,6 +665,7 @@ export const timeclockReportFinal = async (
         ...usersReport[currUserId],
         totalDaysScheduled: totalDaysScheduledPerUser,
         totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
+        totalHoursBreak: totalBreakInHours.toFixed(2),
         totalDaysWorked: totalDaysWorkedPerUser,
         totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
         totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
@@ -874,6 +875,7 @@ export const timeclockReportPivot = async (
             scheduledStart: scheduleShiftStart,
             scheduledEnd: scheduleShiftEnd,
 
+            lunchBreakInHrs: lunchBreakInHrs.toFixed(2),
             scheduledDuration: scheduledDurationInHrs.toFixed(2),
             totalMinsLate: totalMinsLatePerShift.toFixed(2),
             totalHoursOvertime: totalHoursOvertimePerShift.toFixed(2),

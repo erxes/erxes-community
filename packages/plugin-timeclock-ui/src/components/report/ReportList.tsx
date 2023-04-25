@@ -8,7 +8,7 @@ import Select from 'react-select-plus';
 import Button from '@erxes/ui/src/components/Button';
 import ReportRow from './ReportRow';
 import { IReport } from '../../types';
-import { FilterItem, FlexRow, InlineBlock, ToggleButton } from '../../styles';
+import { FilterItem, FlexRow, ToggleButton } from '../../styles';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Icon from '@erxes/ui/src/components/Icon';
 
@@ -108,7 +108,7 @@ function ReportList(props: Props) {
               </th>
               <th>{__('Time')}</th>
               <th
-                colSpan={3}
+                colSpan={4}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('Schedule')}
@@ -124,11 +124,12 @@ function ReportList(props: Props) {
               <td>{__('Team member Id')}</td>
               <td>{__('Last Name')}</td>
               <td>{__('First Name')}</td>
-              <td>{__('Position')}</td>
+              <td style={{ textAlign: 'left' }}>{__('Position')}</td>
               <td>{__('Date')}</td>
               <td>{__('Planned Check In')}</td>
               <td>{__('Planned Check Out')}</td>
               <td>{__('Planned Duration')}</td>
+              <td>{__('Planned Break')}</td>
               <td>{__('Check In')}</td>
               <td>{__('In Device')}</td>
               <td>{__('Check Out')}</td>

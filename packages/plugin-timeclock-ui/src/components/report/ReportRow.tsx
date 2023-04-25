@@ -4,7 +4,6 @@ import { __ } from '@erxes/ui/src/utils';
 import dayjs from 'dayjs';
 import { timeFormat } from '../../constants';
 import { returnDeviceTypes } from '../../utils';
-import { TextAlignCenter } from '../../styles';
 
 type Props = {
   reportType: string;
@@ -51,16 +50,17 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
       );
 
     case 'Pivot':
-      if (!userReport.scheduleReport.length) {
+      if (!userReport.scheduleReport || !userReport.scheduleReport.length) {
         const columnsNo = 13;
         return (
           <tr key={Math.random()}>
             <td>{userReport.user.employeeId}</td>
             <td>{userReport.user.details?.lastName || '-'}</td>
             <td>{userReport.user.details?.firstName || '-'}</td>
-            <td style={{ textAlign: 'right' }}>
+            <td style={{ textAlign: 'left' }}>
               {userReport.user.details?.position || '-'}
             </td>
+            <td>{}</td>
             <td>{}</td>
             <td>{}</td>
             <td>{}</td>
@@ -89,7 +89,10 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
             <td rowSpan={userReport.scheduleReport.length + 2}>
               {userReport.user.details?.firstName || '-'}
             </td>
-            <td rowSpan={userReport.scheduleReport.length + 2}>
+            <td
+              style={{ textAlign: 'left' }}
+              rowSpan={userReport.scheduleReport.length + 2}
+            >
               {userReport.user.details?.position || '-'}
             </td>
           </tr>
@@ -106,17 +109,17 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
 };
 
 const renderScheduleShiftInfo = scheduledShift => {
-  const getInDevice = returnDeviceTypes(scheduledShift.deviceType)[0].includes(
-    'faceTerminal'
-  )
-    ? scheduledShift.deviceName
-    : '-';
+  const getInDevice =
+    returnDeviceTypes(scheduledShift.deviceType)[0] &&
+    returnDeviceTypes(scheduledShift.deviceType)[0].includes('faceTerminal')
+      ? scheduledShift.deviceName
+      : '-';
 
-  const getOutDevice = returnDeviceTypes(scheduledShift.deviceType)[1].includes(
-    'faceTerminal'
-  )
-    ? scheduledShift.deviceName
-    : '-';
+  const getOutDevice =
+    returnDeviceTypes(scheduledShift.deviceType)[1] &&
+    returnDeviceTypes(scheduledShift.deviceType)[1].includes('faceTerminal')
+      ? scheduledShift.deviceName
+      : '-';
 
   return (
     <>
@@ -132,10 +135,10 @@ const renderScheduleShiftInfo = scheduledShift => {
           ? new Date(scheduledShift.scheduledEnd).toTimeString().split(' ')[0]
           : '-'}
       </td>
-
       <td>{scheduledShift.scheduledDuration}</td>
-      <td>{dayjs(scheduledShift.timeclockStart).format(timeFormat)}</td>
+      <td>{scheduledShift.lunchBreakInHrs || 0}</td>
 
+      <td>{dayjs(scheduledShift.timeclockStart).format(timeFormat)}</td>
       <td>{getInDevice}</td>
       <td>{dayjs(scheduledShift.timeclockEnd).format(timeFormat)}</td>
       <td>{getOutDevice}</td>

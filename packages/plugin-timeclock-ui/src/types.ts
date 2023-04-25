@@ -106,6 +106,8 @@ export interface IScheduleReport {
   scheduledEnd: Date;
   scheduledDuration: number;
 
+  lunchBreakInHrs: string;
+
   totalMinsLate: number;
   totalHoursOvertime: number;
   totalHoursOvernight: number;

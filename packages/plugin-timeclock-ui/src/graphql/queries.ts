@@ -182,6 +182,8 @@ const timeclockReports = `
                 scheduledEnd
                 scheduledDuration
                 
+                lunchBreakInHrs
+
                 totalMinsLate
                 totalHoursOvertime
                 totalHoursOvernight
