@@ -1,10 +1,13 @@
 import { getEnv, sendRequest } from '@erxes/api-utils/src';
 import { Request, Response } from 'express';
 import saveMessage from './messageListen';
+import { getSubdomain } from '@erxes/api-utils/src/core';
 
 export const webhookListener = (req: Request, res: Response) => {
+  const subdomain = getSubdomain(req);
+
   if (req.body.event === 'message') {
-    saveMessage(req.body, req.params.integrationId);
+    saveMessage(req.body, req.params.integrationId, subdomain);
   }
 
   res.json({ status: 'success' });
@@ -58,7 +61,7 @@ export class ViberAPI {
 
     try {
       const response = await sendRequest(payload);
-      console.log(response);
+
       if (response.status !== 0) {
         throw new Error(response.status_message);
       }

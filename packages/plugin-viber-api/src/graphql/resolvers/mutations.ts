@@ -5,7 +5,6 @@ import { sendMessage } from '../../viber';
 const viberMutations = {
   //viber create
   async viberCreate(_root, create: any, _context: IContext) {
-    console.log(create);
     return create;
   },
 
