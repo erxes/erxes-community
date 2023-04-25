@@ -211,10 +211,10 @@ export const Labels = styledTS<{ filteredCategories?: boolean }>(styled.div)`
   }
 `;
 
-export const LeftSidebar = styledTS<{ width?: number }>(styled.div)`
+export const LeftSidebar = styledTS<{ isCollapsed?: boolean }>(styled.div)`
   overflow: auto;
   height: 100%;
-  width: 250px;
+  width: ${props => (props.isCollapsed ? '50px' : '250px')};
   border-right: 1px solid ${colors.colorShadowGray};
 
   &.darkmode {
@@ -233,6 +233,12 @@ export const CollapseLeftMenu = styled.div`
   > i,
   > div {
     cursor: pointer;
+  }
+`;
+
+export const LeftMenuItems = styled.div`
+  i {
+    margin-left: ${dimensions.unitSpacing}px;
   }
 `;
 

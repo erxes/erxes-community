@@ -2,6 +2,7 @@ import 'grapesjs/dist/css/grapes.min.css';
 
 import {
   CollapseLeftMenu,
+  LeftMenuItems,
   LeftSidebar,
   LeftSidebarContent,
   SiteFormContainer,
@@ -15,6 +16,7 @@ import { IPageDoc } from '../../types';
 import Icon from '@erxes/ui/src/components/Icon';
 import PageList from '../pages/List';
 import React from 'react';
+import Tip from '@erxes/ui/src/components/Tip';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { __ } from '@erxes/ui/src/utils';
 
@@ -31,6 +33,7 @@ type State = {
   settingsObject: any;
   showDarkMode: boolean;
   showPage: boolean;
+  collapseLeftSidebar: boolean;
   loading: boolean;
   showContentType: boolean;
   type?: string;
@@ -49,6 +52,10 @@ class SiteForm extends React.Component<Props, State> {
       settingsObject: null,
       showPage: false,
       showContentType: false,
+      collapseLeftSidebar:
+        localStorage.getItem('collapseWebbuilderMenu') === 'true'
+          ? true
+          : false || false,
       loading: false,
       showDarkMode:
         localStorage.getItem('showDarkMode') === 'true' ? true : false || false
@@ -69,31 +76,42 @@ class SiteForm extends React.Component<Props, State> {
     });
   };
 
+  handeCollapse = () => {
+    this.setState(
+      { collapseLeftSidebar: !this.state.collapseLeftSidebar },
+      () => {
+        localStorage.setItem(
+          'collapseWebbuilderMenu',
+          this.state.showDarkMode.toString()
+        );
+      }
+    );
+  };
+
   onLoad = (loading?: boolean) => {
     this.setState({ loading: loading ? loading : false });
   };
 
-  renderLeftSidebar() {
+  renderLeftSidebarContent() {
     const { pages = [], _id, queryParams } = this.props;
-    const { showDarkMode, showContentType, showPage } = this.state;
+    const {
+      showDarkMode,
+      showContentType,
+      showPage,
+      collapseLeftSidebar
+    } = this.state;
+
     const currentPageId =
       Object.keys(queryParams).length !== 0
         ? queryParams.pageId
         : (pages[0] || ({} as IPageDoc))._id;
 
-    return (
-      <LeftSidebar
-        className={`${!showDarkMode ? 'gjs-one-bg gjs-two-color' : 'darkmode'}`}
-      >
-        <CollapseLeftMenu>
-          <div>{__('Navigator')}</div>
-          <Icon
-            icon={showDarkMode ? 'sun-1' : `moon-1`}
-            size={15}
-            onClick={() => this.handleDarkMode()}
-          />
-        </CollapseLeftMenu>
+    if (collapseLeftSidebar) {
+      return null;
+    }
 
+    return (
+      <>
         <SubTitle
           className="collapses"
           onClick={() => this.toggleSubTitle('showPage', !showPage)}
@@ -140,6 +158,43 @@ class SiteForm extends React.Component<Props, State> {
             />
           </LeftSidebarContent>
         )}
+      </>
+    );
+  }
+
+  renderLeftSidebar() {
+    const { showDarkMode, collapseLeftSidebar } = this.state;
+
+    return (
+      <LeftSidebar
+        className={`${!showDarkMode ? 'gjs-one-bg gjs-two-color' : 'darkmode'}`}
+        isCollapsed={collapseLeftSidebar}
+      >
+        <CollapseLeftMenu>
+          {!collapseLeftSidebar && <div>{__('Navigator')}</div>}
+          <LeftMenuItems>
+            {!collapseLeftSidebar && (
+              <Tip text={showDarkMode ? 'Show light mode' : `Show dark mode`}>
+                <Icon
+                  icon={showDarkMode ? 'sun-1' : `moon-1`}
+                  size={15}
+                  onClick={() => this.handleDarkMode()}
+                />
+              </Tip>
+            )}
+            <Icon
+              icon={
+                collapseLeftSidebar
+                  ? 'arrow-from-right'
+                  : `left-arrow-from-left`
+              }
+              size={15}
+              onClick={() => this.handeCollapse()}
+            />
+          </LeftMenuItems>
+        </CollapseLeftMenu>
+
+        {this.renderLeftSidebarContent()}
       </LeftSidebar>
     );
   }
