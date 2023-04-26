@@ -16,45 +16,48 @@ export const initBroker = async cl => {
 
   const { consumeRPCQueue } = client;
 
-  consumeRPCQueue('viber:createIntegration', async (args: ISendMessageArgs) => {
-    const { subdomain, data } = args;
-    const { integrationId, doc } = data;
-    const docData = JSON.parse(doc.data);
+  consumeRPCQueue(
+    'viber:createIntegration',
+    async (args: ISendMessageArgs): Promise<any> => {
+      const { subdomain, data } = args;
+      const { integrationId, doc } = data;
+      const docData = JSON.parse(doc.data);
 
-    const viberIntegration = await Integrations.create({
-      inboxId: integrationId,
-      ...docData
-    });
+      const viberIntegration = await Integrations.create({
+        inboxId: integrationId,
+        ...docData
+      });
 
-    const viberApi = new ViberAPI({
-      token: docData.token,
-      integrationId,
-      subdomain
-    });
+      const viberApi: ViberAPI = new ViberAPI({
+        token: docData.token,
+        integrationId,
+        subdomain
+      });
 
-    //registering webhook
-    try {
-      await viberApi.registerWebhook();
-    } catch (e) {
-      await Integrations.deleteOne({ _id: viberIntegration._id });
+      // registering webhook
+      try {
+        await viberApi.registerWebhook();
+      } catch (e) {
+        await Integrations.deleteOne({ _id: viberIntegration._id });
+        return {
+          status: 'failed',
+          data: e.message
+        };
+      }
+
       return {
-        status: 'failed',
-        data: e.message
+        status: 'success'
       };
     }
-
-    return {
-      status: 'success'
-    };
-  });
+  );
 
   consumeRPCQueue(
     'viber:removeIntegrations',
-    async (args: ISendMessageArgs) => {
+    async (args: ISendMessageArgs): Promise<any> => {
       const { data } = args;
       const { integrationId } = data;
 
-      //TODO more data delete?
+      // TODO more data delete?
       await Messages.remove({ inboxIntegrationId: integrationId });
       await Customers.remove({ inboxIntegrationId: integrationId });
       await Integrations.remove({ inboxId: integrationId });
@@ -67,7 +70,7 @@ export const initBroker = async cl => {
 
   consumeRPCQueue(
     'viber:api_to_integrations',
-    async (args: ISendMessageArgs) => {
+    async (args: ISendMessageArgs): Promise<any> => {
       const { subdomain, data } = args;
       const payload = JSON.parse(data.payload);
       const integrationId = payload.integrationId;
@@ -85,7 +88,7 @@ export const initBroker = async cl => {
       }
 
       if (data.action.includes('reply')) {
-        const viberApi = new ViberAPI({
+        const viberApi: ViberAPI = new ViberAPI({
           token: viberIntegration.token,
           integrationId,
           subdomain
@@ -104,7 +107,6 @@ export default function() {
   return client;
 }
 
-// TODO necessary?
 export const sendContactsMessage = (args: ISendMessageArgs) => {
   return sendCommonMessage({
     client,
@@ -114,7 +116,6 @@ export const sendContactsMessage = (args: ISendMessageArgs) => {
   });
 };
 
-// TODO necessary?
 export const sendInboxMessage = (args: ISendMessageArgs) => {
   return sendCommonMessage({
     client,

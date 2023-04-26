@@ -1,18 +1,24 @@
-import { Customers, Conversations, ConversationMessages } from '../models';
+import {
+  Customers,
+  Conversations,
+  ConversationMessages,
+  IConversation,
+  IConversationMessages
+} from '../models';
 import { sendInboxMessage } from '../messageBroker';
 import { graphqlPubsub } from '../configs';
 
 interface IWebhookMessage {
-  event: String;
-  timestamp: Number;
+  event: string;
+  timestamp: number;
   sender: {
-    id: String;
-    name: String;
-    country: String;
+    id: string;
+    name: string;
+    country: string;
   };
   message: {
-    text: String;
-    type: String;
+    text: string;
+    type: string;
   };
 }
 
@@ -32,9 +38,9 @@ const messageListen = async (
     subdomain
   );
 
-  let conversation = await Conversations.findOne({
+  let conversation: IConversation | null = await Conversations.findOne({
     senderId: message.sender.id,
-    integrationId: integrationId
+    integrationId
   });
 
   if (!conversation) {
@@ -43,7 +49,7 @@ const messageListen = async (
         timestamp: message.timestamp,
         senderId: message.sender.id,
         recipientId: null,
-        integrationId: integrationId
+        integrationId
       });
     } catch (e) {
       throw new Error(
@@ -61,7 +67,7 @@ const messageListen = async (
           action: 'create-or-update-conversation',
           payload: JSON.stringify({
             customerId: customer.contactsId,
-            integrationId: integrationId,
+            integrationId,
             content: message.message.text || '',
             attachments: null,
             conversationId: conversation.erxesApiId,
@@ -80,14 +86,16 @@ const messageListen = async (
   }
 
   try {
-    const conversationMessage = await ConversationMessages.create({
-      conversationId: conversation._id,
-      createdAt: message.timestamp,
-      userId: null,
-      customerId: customer.contactsId,
-      content: message.message.text,
-      messageType: message.message.type
-    });
+    const conversationMessage: IConversationMessages = await ConversationMessages.create(
+      {
+        conversationId: conversation._id,
+        createdAt: message.timestamp,
+        userId: null,
+        customerId: customer.contactsId,
+        content: message.message.text,
+        messageType: message.message.type
+      }
+    );
 
     await sendInboxMessage({
       subdomain,

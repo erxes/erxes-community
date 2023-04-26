@@ -1,6 +1,7 @@
 import { getEnv, sendRequest } from '@erxes/api-utils/src';
-import { Conversations } from '../models';
+import { Conversations, IConversation } from '../models';
 import { sendInboxMessage } from '../messageBroker';
+import { IRequestParams } from '@erxes/api-utils/src/requests';
 
 export class ViberAPI {
   private headers: any;
@@ -15,14 +16,14 @@ export class ViberAPI {
     };
   }
 
-  async registerWebhook() {
-    const domain = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
+  async registerWebhook(): Promise<any> {
+    const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
       : 'https://0ec7-202-21-104-34.ngrok-free.app';
 
-    const url = `${domain}/pl:viber/webhook/${this.integrationId}`;
+    const url: string = `${domain}/pl:viber/webhook/${this.integrationId}`;
 
-    const payload = {
+    const payload: IRequestParams = {
       method: 'POST',
       headers: this.headers,
       url: 'https://chatapi.viber.com/pa/set_webhook',
@@ -55,8 +56,8 @@ export class ViberAPI {
     }
   }
 
-  async sendMessage(message) {
-    const conversation = await Conversations.findOne(
+  async sendMessage(message): Promise<any> {
+    const conversation: IConversation | null = await Conversations.findOne(
       { erxesApiId: message.conversationId },
       { senderId: 1 }
     );
@@ -68,7 +69,7 @@ export class ViberAPI {
     const name = await this.getName(message.integrationId);
     const plainText = this.convertRichTextToPlainText(message.content);
 
-    const requestPayload = {
+    const requestPayload: IRequestParams = {
       method: 'POST',
       headers: this.headers,
       url: 'https://chatapi.viber.com/pa/send_message',
@@ -76,7 +77,7 @@ export class ViberAPI {
         receiver: conversation.senderId,
         min_api_version: 1,
         sender: {
-          name: name,
+          name,
           avatar: null
         },
         tracking_data: 'tracking data',
@@ -97,12 +98,11 @@ export class ViberAPI {
   }
 
   convertRichTextToPlainText(richText) {
-    var plainText = richText.replace(/<[^>]+>/g, '');
-    return plainText;
+    return richText.replace(/<[^>]+>/g, '');
   }
 
   async getName(integrationId: string) {
-    let name = 'Viber';
+    const name: string = 'Viber';
 
     const inboxIntegration = await sendInboxMessage({
       subdomain: this.subdomain,
