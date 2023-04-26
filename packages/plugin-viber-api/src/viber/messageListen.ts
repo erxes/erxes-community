@@ -16,7 +16,7 @@ interface IWebhookMessage {
   };
 }
 
-const saveMessage = async (
+const messageListen = async (
   message: IWebhookMessage,
   integrationId: string,
   subdomain: string
@@ -70,12 +70,11 @@ const saveMessage = async (
         },
         isRPC: true
       });
-      console.log('sendInboxMessage - create-or-update-conversation');
+
       conversation.erxesApiId = apiConversationResponse._id;
 
       await conversation.save();
     } catch (e) {
-      // await models.Conversations.deleteOne({ _id: conversation._id });
       throw new Error(e);
     }
   }
@@ -98,10 +97,6 @@ const saveMessage = async (
         conversationId: conversation.erxesApiId
       }
     });
-    console.log(
-      'sendInboxMessage - conversationClientMessageInserted',
-      conversationMessage
-    );
 
     graphqlPubsub.publish('conversationClientMessageInserted', {
       conversationClientMessageInserted: {
@@ -116,19 +111,9 @@ const saveMessage = async (
         conversationId: conversation.erxesApiId
       }
     });
-
-    // graphqlPubsub.publish('conversationMessageInserted', {
-    //   conversationMessageInserted: {
-    //     userId: conversationMessage.userId,
-    //     conversationId: conversation.erxesApiId,
-    //     createdAt: message.timestamp,
-    //     content: conversationMessage.messageText,
-    //     customerId: customer.contactsId
-    //   }
-    // });
   } catch (e) {
     throw new Error(e);
   }
 };
 
-export default saveMessage;
+export default messageListen;

@@ -1,18 +1,5 @@
 import { getEnv, sendRequest } from '@erxes/api-utils/src';
-import { Request, Response } from 'express';
-import saveMessage from './messageListen';
-import { getSubdomain } from '@erxes/api-utils/src/core';
 import { Conversations } from '../models';
-
-export const webhookListener = async (req: Request, res: Response) => {
-  const subdomain = getSubdomain(req);
-  console.log(req.body);
-  if (req.body.event === 'message') {
-    await saveMessage(req.body, req.params.integrationId, subdomain);
-  }
-
-  res.json({ status: 'success' });
-};
 
 export class ViberAPI {
   private headers: any;
@@ -77,6 +64,8 @@ export class ViberAPI {
       throw new Error('conversation not found');
     }
 
+    const plainText = this.convertRichTextToPlainText(message.content);
+
     // TODO need to set name -> Viber
     const requestPayload = {
       method: 'POST',
@@ -91,7 +80,7 @@ export class ViberAPI {
         },
         tracking_data: 'tracking data',
         type: 'text',
-        text: message.content
+        text: plainText
       }
     };
 
@@ -104,5 +93,10 @@ export class ViberAPI {
     }
 
     return response;
+  }
+
+  convertRichTextToPlainText(richText) {
+    var plainText = richText.replace(/<[^>]+>/g, '');
+    return plainText;
   }
 }

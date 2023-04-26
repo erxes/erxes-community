@@ -9,14 +9,6 @@ const types = `
     key: String
   }
 
-  input MessageInput {
-    userId: String
-    senderId: String
-    receiverId: String
-    sendDate: Date
-    messageText: String
-  }
-
   type SentMessage {
     _id: String
     userId: String
@@ -31,8 +23,7 @@ const queries = `
 `;
 
 const mutations = `
-  viberCreate(create: createInput):JSON
-  viberSendMessage(message: MessageInput): JSON
+  viberCreate(create: createInput): JSON
 `;
 
 const typeDefs = gql`
