@@ -1,7 +1,7 @@
 import React from 'react';
 import GeneralRoutes from './generalRoutes';
 import { PluginLayout } from '@erxes/ui/src/styles/main';
-import { AppProvider } from 'coreui/appContext';
+import { AppProvider } from '@erxes/ui/src/appContext';
 
 const App = () => {
   return (

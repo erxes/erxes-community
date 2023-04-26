@@ -12,7 +12,7 @@ import {
 
 import RTG from 'react-transition-group';
 import React from 'react';
-import { __ } from 'coreui/utils';
+import { __ } from '@erxes/ui/src/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 

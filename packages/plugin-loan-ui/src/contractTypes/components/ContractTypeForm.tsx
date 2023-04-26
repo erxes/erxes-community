@@ -75,7 +75,7 @@ class ContractTypeForm extends React.Component<Props, State> {
   onChangeField = e => {
     const name = (e.target as HTMLInputElement).name;
     const value = (e.target as HTMLInputElement).value;
-    this.setState({ [name]: value } as unknown);
+    this.setState({ [name]: value } as any);
   };
 
   renderContent = (formProps: IFormProps) => {

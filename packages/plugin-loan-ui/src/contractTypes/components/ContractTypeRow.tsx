@@ -1,7 +1,6 @@
 import { Button, formatValue, FormControl, ModalTrigger } from '@erxes/ui/src';
 import _ from 'lodash';
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import ContractTypeForm from '../containers/ContractTypeForm';
 import { IContractType } from '../types';

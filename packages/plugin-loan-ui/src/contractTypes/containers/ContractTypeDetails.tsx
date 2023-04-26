@@ -80,7 +80,7 @@ const ContractTypeDetailsContainer = (props: FinalProps) => {
     remove
   };
 
-  return <ContractTypeDetails {...updatedProps} />;
+  return <ContractTypeDetails {...(updatedProps as any)} />;
 };
 
 const generateOptions = () => ({

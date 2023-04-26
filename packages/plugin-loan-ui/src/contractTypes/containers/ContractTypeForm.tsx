@@ -3,7 +3,6 @@ import { graphql } from 'react-apollo';
 import { ButtonMutate, withProps } from '@erxes/ui/src';
 import productCategoryQueries from '@erxes/ui-products/src/graphql/queries';
 import { ProductCategoriesQueryResponse } from '@erxes/ui-products/src/types';
-import { IUser } from '@erxes/ui/src/auth/types';
 import { UsersQueryResponse } from '@erxes/ui/src/auth/types';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import * as compose from 'lodash.flowright';
