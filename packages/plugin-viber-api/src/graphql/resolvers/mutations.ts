@@ -1,14 +1,14 @@
 import { Accounts } from '../../models';
 import { IContext } from '@erxes/api-utils/src/types';
-import { sendMessage } from '../../viber';
+// import { sendMessage } from '../../viber';
 
 const viberMutations = {
-  //viber create
+  // viber create
   async viberCreate(_root, create: any, _context: IContext) {
     return create;
   },
 
-  //viber bot send message to user
+  // viber bot send message to user
   async viberSendMessage(_root, { message }: any, _context: IContext) {
     const createMessage = {
       ...message,
@@ -28,7 +28,7 @@ const viberMutations = {
       text: message.messageText
     };
 
-    sendMessage(payload);
+    // sendMessage(payload);
 
     return message;
   }

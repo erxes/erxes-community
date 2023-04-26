@@ -155,8 +155,6 @@ export const Conversations = model<IConversation>(
   conversationSchema
 );
 
-// ---------------------------------------------------------------------------
-
 export interface IConversationMessages extends Document {
   conversationId: string;
   userId: string;

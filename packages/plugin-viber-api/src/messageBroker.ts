@@ -5,7 +5,6 @@ import {
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
 import { Customers, Integrations, Messages } from './models';
-import { setWebhook } from './viber';
 import { ViberAPI } from './viber/api';
 
 dotenv.config();
@@ -62,21 +61,32 @@ export const initBroker = async cl => {
     }
   );
 
-  consumeRPCQueue('viber:api_to_integrations', async ({ subdomain, data }) => {
-    const { action, payload } = data;
+  consumeRPCQueue(
+    'viber:api_to_integrations',
+    async (args: ISendMessageArgs) => {
+      const { subdomain, data } = args;
+      const payload = JSON.parse(data.payload);
+      const integrationId = payload.integrationId;
 
-    if (action.includes('reply')) {
-      console.log(payload);
+      const integration = await Integrations.findOne({
+        inboxId: integrationId
+      });
 
-      //TODO message yavuulah
-      // VIBER ViberAPI class.sendMessage
-      // sendMessage()
+      if (data.action.includes('reply')) {
+        const api = new ViberAPI({
+          token: integration.token,
+          integrationId,
+          subdomain
+        });
+
+        await api.sendMessage(payload);
+      }
+
+      return {
+        status: 'success'
+      };
     }
-
-    return {
-      status: 'success'
-    };
-  });
+  );
 };
 
 export default function() {
