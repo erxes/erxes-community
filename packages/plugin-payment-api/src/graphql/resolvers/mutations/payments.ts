@@ -5,6 +5,7 @@ import {
 
 import { IContext } from '../../../connectionResolver';
 import { IPayment } from '../../../models/definitions/payments';
+import { QpayMerchantAPI } from '../../../api/qpay/merchant';
 
 const mutations = {
   async paymentAdd(_root, doc: IPayment, { models }: IContext) {
@@ -34,6 +35,24 @@ const mutations = {
       kind,
       config
     });
+  },
+
+  async qpayRegisterMerchantCompany(_root, args, { models }: IContext) {
+    const api = new QpayMerchantAPI({
+      username: process.env.QPAY_MERCHANT_USERNAME || '',
+      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+    });
+
+    return api.createCompany(args);
+  },
+
+  async qpayCreateInvoice(_root, args, { models }: IContext) {
+    const api = new QpayMerchantAPI({
+      username: process.env.QPAY_MERCHANT_USERNAME || '',
+      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+    });
+
+    return api.createInvoice(args);
   }
 };
 
