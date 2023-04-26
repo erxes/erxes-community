@@ -1,5 +1,6 @@
 import { getEnv, sendRequest } from '@erxes/api-utils/src';
 import { Conversations } from '../models';
+import { sendInboxMessage } from '../messageBroker';
 
 export class ViberAPI {
   private headers: any;
@@ -64,9 +65,9 @@ export class ViberAPI {
       throw new Error('conversation not found');
     }
 
+    const name = await this.getName(message.integrationId);
     const plainText = this.convertRichTextToPlainText(message.content);
 
-    // TODO need to set name -> Viber
     const requestPayload = {
       method: 'POST',
       headers: this.headers,
@@ -75,7 +76,7 @@ export class ViberAPI {
         receiver: conversation.senderId,
         min_api_version: 1,
         sender: {
-          name: 'Viber',
+          name: name,
           avatar: null
         },
         tracking_data: 'tracking data',
@@ -98,5 +99,23 @@ export class ViberAPI {
   convertRichTextToPlainText(richText) {
     var plainText = richText.replace(/<[^>]+>/g, '');
     return plainText;
+  }
+
+  async getName(integrationId: string) {
+    let name = 'Viber';
+
+    const inboxIntegration = await sendInboxMessage({
+      subdomain: this.subdomain,
+      action: 'integrations.findOne',
+      data: { _id: integrationId },
+      isRPC: true,
+      defaultValue: null
+    });
+
+    if (inboxIntegration) {
+      return inboxIntegration.name;
+    }
+
+    return name;
   }
 }
