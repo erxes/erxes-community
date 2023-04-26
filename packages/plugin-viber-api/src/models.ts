@@ -68,14 +68,6 @@ export const Customers = model<any, any>(
   loadCustomerClass()
 );
 
-const emailSchema = new Schema(
-  {
-    name: String,
-    address: String
-  },
-  { _id: false }
-);
-
 export const messageSchema = new Schema({
   inboxIntegrationId: String,
   inboxConversationId: String,

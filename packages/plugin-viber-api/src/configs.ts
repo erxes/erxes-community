@@ -1,6 +1,5 @@
 import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
-
 import { initBroker } from './messageBroker';
 import init from './controller';
 import { webhookListener } from './viber/api';

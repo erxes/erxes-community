@@ -20,20 +20,23 @@ export const initBroker = async cl => {
     const { subdomain, data } = args;
     const { integrationId, doc } = data;
     const docData = JSON.parse(doc.data);
-    await Integrations.create({
+
+    const viberIntegration = await Integrations.create({
       inboxId: integrationId,
       ...docData
     });
 
-    const api = new ViberAPI({
+    const viberApi = new ViberAPI({
       token: docData.token,
       integrationId,
       subdomain
     });
 
+    //registering webhook
     try {
-      await api.registerWebhook();
+      await viberApi.registerWebhook();
     } catch (e) {
+      await Integrations.deleteOne({ _id: viberIntegration._id });
       return {
         status: 'failed',
         data: e.message
@@ -48,9 +51,10 @@ export const initBroker = async cl => {
   consumeRPCQueue(
     'viber:removeIntegrations',
     async (args: ISendMessageArgs) => {
-      const { subdomain, data } = args;
+      const { data } = args;
       const { integrationId } = data;
 
+      //TODO more data delete?
       await Messages.remove({ inboxIntegrationId: integrationId });
       await Customers.remove({ inboxIntegrationId: integrationId });
       await Integrations.remove({ inboxId: integrationId });
@@ -68,18 +72,25 @@ export const initBroker = async cl => {
       const payload = JSON.parse(data.payload);
       const integrationId = payload.integrationId;
 
-      const integration = await Integrations.findOne({
-        inboxId: integrationId
-      });
+      const viberIntegration = await Integrations.findOne(
+        { inboxId: integrationId },
+        { inboxId: 1, token: 1 }
+      );
+
+      if (!viberIntegration) {
+        return {
+          status: 'failed',
+          data: 'viber integration not found.'
+        };
+      }
 
       if (data.action.includes('reply')) {
-        const api = new ViberAPI({
-          token: integration.token,
+        const viberApi = new ViberAPI({
+          token: viberIntegration.token,
           integrationId,
           subdomain
         });
-
-        await api.sendMessage(payload);
+        await viberApi.sendMessage(payload);
       }
 
       return {
@@ -93,6 +104,7 @@ export default function() {
   return client;
 }
 
+// TODO necessary?
 export const sendContactsMessage = (args: ISendMessageArgs) => {
   return sendCommonMessage({
     client,
@@ -102,6 +114,7 @@ export const sendContactsMessage = (args: ISendMessageArgs) => {
   });
 };
 
+// TODO necessary?
 export const sendInboxMessage = (args: ISendMessageArgs) => {
   return sendCommonMessage({
     client,

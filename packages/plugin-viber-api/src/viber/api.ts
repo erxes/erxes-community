@@ -16,18 +16,12 @@ export const webhookListener = async (req: Request, res: Response) => {
 
 export class ViberAPI {
   private headers: any;
-  private apiUrl: string;
   private subdomain: string;
-  private actions: any;
   private integrationId: string;
 
   constructor(config: any) {
-    this.apiUrl = 'https://chatapi.viber.com';
     this.subdomain = config.subdomain;
     this.integrationId = config.integrationId;
-    this.actions = {
-      setWebhook: '/pa/set_webhook'
-    };
     this.headers = {
       'X-Viber-Auth-Token': config.token
     };
@@ -43,7 +37,7 @@ export class ViberAPI {
     const payload = {
       method: 'POST',
       headers: this.headers,
-      url: this.apiUrl + this.actions.setWebhook,
+      url: 'https://chatapi.viber.com/pa/set_webhook',
       body: {
         url,
         event_types: [
@@ -74,32 +68,26 @@ export class ViberAPI {
   }
 
   async sendMessage(message) {
-    // const payloadInfo = {
-    //   integrationId: 'YdnEMELp6bd7gkDBH',
-    //   conversationId: 'HSZ6ZvJjoFKwkKQaK',
-    //   content: '<p>fsdd</p>',
-    //   internal: false,
-    //   attachments: [],
-    //   userId: 'GdnT6h9EQtmknGXMY'
-    // };
-
     const conversation = await Conversations.findOne(
       { erxesApiId: message.conversationId },
       { senderId: 1 }
     );
 
-    console.log('#########', conversation?.senderId);
+    if (!conversation) {
+      throw new Error('conversation not found');
+    }
 
+    // TODO need to set name -> Viber
     const requestPayload = {
       method: 'POST',
       headers: this.headers,
       url: 'https://chatapi.viber.com/pa/send_message',
       body: {
-        receiver: conversation?.senderId,
+        receiver: conversation.senderId,
         min_api_version: 1,
         sender: {
-          name: 'John McClane',
-          avatar: 'http://avatar.example.com'
+          name: 'Viber',
+          avatar: null
         },
         tracking_data: 'tracking data',
         type: 'text',
@@ -107,6 +95,14 @@ export class ViberAPI {
       }
     };
 
-    return await sendRequest(requestPayload);
+    const response = await sendRequest(requestPayload);
+
+    if (response.status !== 0) {
+      if (!conversation) {
+        throw new Error('message not sent');
+      }
+    }
+
+    return response;
   }
 }
