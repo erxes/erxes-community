@@ -16,6 +16,23 @@ export const FILTER_PARAMS_TR = [
   'endDate'
 ];
 
+export const FILTER_PARAMS_CONTRACT = [
+  'isExpired',
+  'closeDate',
+  'repaymentDate',
+  'startStartDate',
+  'endStartDate',
+  'startCloseDate',
+  'endCloseDate',
+  'contractTypeId',
+  'customerId',
+  'companyId',
+  'leaseAmount',
+  'interestRate',
+  'tenor',
+  'repayment'
+];
+
 export const WEEKENDS = {
   0: 'Sunday',
   1: 'Monday',

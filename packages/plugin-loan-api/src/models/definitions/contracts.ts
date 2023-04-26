@@ -81,6 +81,9 @@ export interface IContract {
   closeDescription?: string;
 
   relContractId?: string;
+
+  isExpired?: boolean;
+  repaymentDate?: Date;
 }
 
 export interface IContractDocument extends IContract, Document {
@@ -291,6 +294,17 @@ export const contractSchema = schemaHooksWrapper(
       type: String,
       optional: true,
       label: 'Change condition contract'
+    }),
+    isExpired: field({
+      type: Boolean,
+      optional: true,
+      label:
+        'when contract expired of payment date then this field will be true'
+    }),
+    repaymentDate: field({
+      type: Date,
+      optional: true,
+      label: 'contract payment date of schedule'
     })
   }),
   'erxes_contractSchema'

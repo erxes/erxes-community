@@ -128,7 +128,7 @@ const undueSettings = () => {
   return <Settings components={UndueSettings}></Settings>;
 };
 
-const holidaySettings = ({ location, history }) => {
+const holidaySettings = () => {
   return <Settings components={HolidaySettings}></Settings>;
 };
 
@@ -136,7 +136,9 @@ const LoanRoutes = () => {
   return (
     <React.Fragment>
       <Route
+        key="/erxes-plugin-loan/contract-list"
         path="/erxes-plugin-loan/contract-list"
+        exact={true}
         component={contractLists}
       />
       <Route

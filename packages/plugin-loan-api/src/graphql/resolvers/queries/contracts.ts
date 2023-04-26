@@ -69,6 +69,124 @@ const generateFilter = async (models, params, commonQuerySelector) => {
     filter.contractTypeId = params.contractTypeId;
   }
 
+  if (params.isExpired === 'true') {
+    filter.isExpired = !!params.isExpired;
+  }
+
+  if (params.repaymentDate === 'today') {
+    const date = getFullDate(new Date());
+    filter.repaymentDate = {
+      $gte: date,
+      $lte: new Date(date.getTime() + 1000 * 3600 * 24)
+    };
+  }
+
+  if (!!params.closeDateType) {
+    let currentDate = new Date();
+    switch (params.closeDateType) {
+      case 'today':
+        const date = getFullDate(currentDate);
+        filter.closeDate = {
+          $gte: date,
+          $lte: new Date(date.getTime() + 1000 * 3600 * 24)
+        };
+        break;
+      case 'thisWeek':
+        let firstDayOfWeek = new Date(
+          currentDate.setDate(currentDate.getDate() - currentDate.getDay())
+        );
+        let lastDayOfWeek = new Date(
+          currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 6)
+        );
+        filter.closeDate = {
+          $gte: firstDayOfWeek,
+          $lte: lastDayOfWeek
+        };
+        break;
+      case 'thisMonth':
+        let firstDayOfMonth = new Date(
+          currentDate.setDate(currentDate.getDate() - currentDate.getDay())
+        );
+        let lastDayOfMonth = new Date(
+          currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 6)
+        );
+        filter.closeDate = {
+          $gte: firstDayOfMonth,
+          $lte: lastDayOfMonth
+        };
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  if (params.startStartDate || params.endStartDate) {
+    switch (`${!!params.startStartDate}-${!!params.endStartDate}`) {
+      case 'true-true':
+        filter.closeDate = {
+          $gte: getFullDate(params.startStartDate),
+          $lte: getFullDate(params.endStartDate)
+        };
+        break;
+      case 'false-true':
+        filter.closeDate = {
+          $lte: getFullDate(params.endStartDate)
+        };
+        break;
+      case 'true-false':
+        filter.closeDate = {
+          $gte: getFullDate(params.startStartDate)
+        };
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (params.startCloseDate || params.endCloseDate) {
+    switch (`${!!params.startCloseDate}-${!!params.endCloseDate}`) {
+      case 'true-true':
+        filter.closeDate = {
+          $gte: getFullDate(params.startCloseDate),
+          $lte: getFullDate(params.endCloseDate)
+        };
+        break;
+      case 'false-true':
+        filter.closeDate = {
+          $lte: getFullDate(params.endCloseDate)
+        };
+        break;
+      case 'true-false':
+        filter.closeDate = {
+          $gte: getFullDate(params.startCloseDate)
+        };
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (params.customerId) {
+    filter.customerId = params.customerId;
+  }
+
+  if (params.leaseAmount) {
+    filter.leaseAmount = params.leaseAmount;
+  }
+
+  if (params.interestRate) {
+    filter.interestRate = params.interestRate;
+  }
+
+  if (params.tenor) {
+    filter.tenor = params.tenor;
+  }
+
+  if (params.repayment) {
+    filter.repayment = params.repayment;
+  }
+
   return filter;
 };
 

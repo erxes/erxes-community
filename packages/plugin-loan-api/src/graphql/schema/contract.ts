@@ -117,8 +117,20 @@ const queryParams = `
   conformityMainTypeId: String
   conformityRelType: String
   conformityIsRelated: Boolean
+  isExpired: String
+  repaymentDate: String
+  startStartDate:Date
+  endStartDate:Date
+  startCloseDate:Date
+  endCloseDate:Date
+  customerId:String
+  leaseAmount: Float
+  interestRate: Float
+  tenor: Int
+  repayment: String
   conformityIsSaved: Boolean
   closeDate: Date
+  closeDateType: String
 `;
 
 export const queries = `

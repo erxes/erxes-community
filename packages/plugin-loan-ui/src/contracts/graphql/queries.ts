@@ -42,11 +42,23 @@ const listParamsDef = `
   $perPage: Int
   $ids: [String]
   $searchValue: String
+  $isExpired: String
+  $repaymentDate: String
+  $startStartDate:Date
+  $endStartDate:Date
+  $startCloseDate:Date
+  $endCloseDate:Date
+  $customerId:String
   $sortField: String
   $sortDirection: Int
   $contractTypeId: String
+  $leaseAmount: Float
+  $interestRate: Float
+  $tenor: Int
+  $repayment: String
   ${conformityQueryFields}
   $closeDate: Date
+  $closeDateType:String
 `;
 
 const listParamsValue = `
@@ -54,11 +66,23 @@ const listParamsValue = `
   perPage: $perPage
   ids: $ids
   searchValue: $searchValue
+  isExpired: $isExpired
+  repaymentDate: $repaymentDate
+  startStartDate: $startStartDate
+  endStartDate: $endStartDate
+  startCloseDate: $startCloseDate
+  endCloseDate: $endCloseDate
+  customerId: $customerId
   sortField: $sortField
   sortDirection: $sortDirection
   contractTypeId: $contractTypeId
+  leaseAmount: $leaseAmount
+  interestRate: $interestRate
+  tenor: $tenor
+  repayment: $repayment
   ${conformityQueryFieldDefs}
   closeDate: $closeDate
+  closeDateType: $closeDateType
 `;
 
 export const contracts = `
@@ -75,7 +99,6 @@ export const contractsMain = `
       list {
         ${contractFields}
       }
-
       totalCount
     }
   }

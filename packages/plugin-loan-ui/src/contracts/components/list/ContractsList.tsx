@@ -23,6 +23,7 @@ import { ContractsTableWrapper } from '../../styles';
 import { IContract } from '../../types';
 // import ContractsMerge from '../detail/ContractsMerge';
 import ContractRow from './ContractRow';
+import RightMenu from './RightMenu';
 // import Sidebar from './Sidebar';
 
 interface IProps extends IRouterProps {
@@ -42,7 +43,11 @@ interface IProps extends IRouterProps {
   ) => void;
   // mergeContracts: () => void;
   history: any;
+  onSearch: (search: string) => void;
+  onSelect: (values: string[] | string, key: string) => void;
   queryParams: any;
+  isFiltered: boolean;
+  clearFilter: () => void;
 }
 
 type State = {
@@ -106,7 +111,11 @@ class ContractsList extends React.Component<IProps, State> {
       isAllSelected,
       totalCount,
       // mergeContracts,
-      queryParams
+      queryParams,
+      onSelect,
+      onSearch,
+      isFiltered,
+      clearFilter
     } = this.props;
 
     const mainContent = (
@@ -226,6 +235,14 @@ class ContractsList extends React.Component<IProps, State> {
       return <ContractForm {...props} queryParams={queryParams} />;
     };
 
+    const rightMenuProps = {
+      onSelect,
+      onSearch,
+      isFiltered,
+      clearFilter,
+      queryParams
+    };
+
     const actionBarRight = (
       <BarItems>
         <FormControl
@@ -245,6 +262,8 @@ class ContractsList extends React.Component<IProps, State> {
           content={contractForm}
           backDrop="static"
         />
+
+        <RightMenu {...rightMenuProps} />
       </BarItems>
     );
 
@@ -263,13 +282,6 @@ class ContractsList extends React.Component<IProps, State> {
         }
         actionBar={actionBar}
         footer={<Pagination count={totalCount} />}
-        // leftSidebar={
-        //   <Sidebar
-        //     loadingMainQuery={loading}
-        //     queryParams={queryParams}
-        //     history={history}
-        //   />
-        // }
         content={
           <DataWithLoader
             data={mainContent}

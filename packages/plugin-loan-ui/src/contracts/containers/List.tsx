@@ -7,12 +7,14 @@ import { withRouter } from 'react-router-dom';
 import { IRouterProps } from '@erxes/ui/src/types';
 import ContractList from '../components/list/ContractsList';
 import { mutations, queries } from '../graphql';
+import queryString from 'query-string';
 import {
   ListQueryVariables,
   MainQueryResponse,
   RemoveMutationResponse,
   RemoveMutationVariables
 } from '../types';
+import { FILTER_PARAMS_CONTRACT } from '../../constants';
 
 type Props = {
   queryParams: any;
@@ -29,6 +31,10 @@ type State = {
   loading: boolean;
 };
 
+const generateQueryParams = ({ location }) => {
+  return queryString.parse(location.search);
+};
+
 class ContractListContainer extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
@@ -37,6 +43,41 @@ class ContractListContainer extends React.Component<FinalProps, State> {
       loading: false
     };
   }
+
+  onSearch = (searchValue: string) => {
+    if (!searchValue) {
+      return router.removeParams(this.props.history, 'searchValue');
+    }
+
+    router.setParams(this.props.history, { searchValue });
+  };
+
+  onSelect = (values: string[] | string, key: string) => {
+    const params = generateQueryParams(this.props.history);
+
+    if (params[key] === values) {
+      return router.removeParams(this.props.history, key);
+    }
+
+    return router.setParams(this.props.history, { [key]: values });
+  };
+
+  isFiltered = (): boolean => {
+    const params = generateQueryParams(this.props.history);
+
+    for (const param in params) {
+      if (FILTER_PARAMS_CONTRACT.includes(param)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  clearFilter = () => {
+    const params = generateQueryParams(this.props.history);
+    router.removeParams(this.props.history, ...Object.keys(params));
+  };
 
   render() {
     const {
@@ -85,8 +126,12 @@ class ContractListContainer extends React.Component<FinalProps, State> {
       searchValue,
       contracts: list,
       loading: contractsMainQuery.loading || this.state.loading,
-      removeContracts
-      // mergeContracts
+      queryParams: this.props.queryParams,
+      removeContracts,
+      onSelect: this.onSelect,
+      onSearch: this.onSearch,
+      isFiltered: this.isFiltered(),
+      clearFilter: this.clearFilter
     };
 
     const contractsList = props => {
@@ -101,19 +146,6 @@ class ContractListContainer extends React.Component<FinalProps, State> {
   }
 }
 
-const generateParams = ({ queryParams }) => ({
-  variables: {
-    ...router.generatePaginationParams(queryParams || {}),
-    ids: queryParams.ids,
-    searchValue: queryParams.searchValue,
-    sortField: queryParams.sortField,
-    sortDirection: queryParams.sortDirection
-      ? parseInt(queryParams.sortDirection, 10)
-      : undefined
-  },
-  fetchPolicy: 'network-only'
-});
-
 const generateOptions = () => ({
   refetchQueries: ['contractsMain']
 });
@@ -124,7 +156,41 @@ export default withProps<Props>(
       gql(queries.contractsMain),
       {
         name: 'contractsMainQuery',
-        options: { ...generateParams }
+        options: ({ queryParams }) => {
+          return {
+            variables: {
+              ...router.generatePaginationParams(queryParams || {}),
+              ids: queryParams.ids,
+              searchValue: queryParams.searchValue,
+              isExpired: queryParams.isExpired,
+              closeDateType: queryParams.closeDateType,
+              startStartDate: queryParams.startStartDate,
+              endStartDate: queryParams.endStartDate,
+              startCloseDate: queryParams.startCloseDate,
+              contractTypeId: queryParams.contractTypeId,
+              endCloseDate: queryParams.endCloseDate,
+              customerId: queryParams.customerId,
+
+              leaseAmount: !!queryParams.leaseAmount
+                ? parseFloat(queryParams.leaseAmount)
+                : undefined,
+              interestRate: !!queryParams.interestRate
+                ? parseFloat(queryParams.interestRate)
+                : undefined,
+              tenor: !!queryParams.tenor
+                ? parseInt(queryParams.tenor)
+                : undefined,
+              repayment: queryParams.repayment,
+
+              repaymentDate: queryParams.repaymentDate,
+              sortField: queryParams.sortField,
+              sortDirection: queryParams.sortDirection
+                ? parseInt(queryParams.sortDirection, 10)
+                : undefined
+            },
+            fetchPolicy: 'network-only'
+          };
+        }
       }
     ),
     // mutations
