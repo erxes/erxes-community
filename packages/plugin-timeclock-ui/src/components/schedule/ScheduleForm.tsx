@@ -69,6 +69,8 @@ function ScheduleForm(props: Props) {
     scheduleConfigs[0]._id
   );
 
+  const [lastSelectedDate, setlastSelectedDate] = useState(new Date());
+
   const [scheduleDaysLastIdx, setScheduleDaysLastIdx] = useState(0);
 
   const [defaultStartTime, setDefaultStartTime] = useState(
@@ -591,6 +593,14 @@ function ScheduleForm(props: Props) {
 
   const onDateSelectChange = dateString => {
     if (dateString) {
+      // handle click on a different month
+      if (
+        JSON.stringify(dateString).split('-')[1] !==
+        JSON.stringify(lastSelectedDate).split('-')[1]
+      ) {
+        setlastSelectedDate(new Date(dateString));
+      }
+
       const getDate = dayjs(dateString).format(dateFormat);
 
       // if date is already selected remove from schedule date
@@ -603,7 +613,6 @@ function ScheduleForm(props: Props) {
           setScheduleDates({
             ...scheduleDates
           });
-          setScheduleDaysLastIdx(scheduleDaysLastIdx - 1);
           return;
         }
       }
@@ -662,7 +671,7 @@ function ScheduleForm(props: Props) {
         {...dateTimeProps}
         className={`rdtDay ${isSelected ? 'rdtActive' : ''}`}
       >
-        w{new Date(currentDate).getDate()}
+        {new Date(currentDate).getDate()}
       </td>
     );
   };
@@ -674,6 +683,7 @@ function ScheduleForm(props: Props) {
           <Datetime
             open={true}
             input={false}
+            value={lastSelectedDate}
             renderDay={renderDay}
             closeOnSelect={false}
             timeFormat={false}

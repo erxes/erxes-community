@@ -411,8 +411,13 @@ function ScheduleList(props: Props) {
     });
 
     const totalBreakInHours = scheduleOfMember.totalBreakInMins
-      ? (scheduleOfMember.totalBreakInMins / 60).toFixed(1)
+      ? scheduleOfMember.totalBreakInMins / 60
       : 0;
+
+    if (totalHoursScheduled) {
+      totalHoursScheduled -= totalBreakInHours;
+    }
+
     return (
       <tr style={{ textAlign: 'left' }}>
         <td
@@ -455,8 +460,8 @@ function ScheduleList(props: Props) {
         <td>{name}</td>
         <td>{employeeId}</td>
         <td>{totalDaysScheduled}</td>
-        <td>{totalHoursScheduled}</td>
-        <td>{totalBreakInHours}</td>
+        <td>{totalHoursScheduled.toFixed(1)}</td>
+        <td>{totalBreakInHours.toFixed(1)}</td>
         {!isEnabled('bichil') && <td>{scheduleChecked}</td>}
         {renderScheduleShifts(scheduleOfMember.shifts, user._id)}
       </tr>
