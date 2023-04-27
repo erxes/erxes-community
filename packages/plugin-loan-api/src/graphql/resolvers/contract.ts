@@ -113,11 +113,11 @@ const Contracts = {
       const collateral = await sendMessageBroker(
         {
           subdomain,
-          action: 'product.findOne',
+          action: 'findOne',
           data: { _id: data.collateralId },
           isRPC: true
         },
-        'cards'
+        'products'
       );
       const insuranceType = await models.InsuranceTypes.findOne({
         _id: data.insuranceTypeId

@@ -53,11 +53,7 @@ class CollateralsManagerContainer extends React.Component<FinalProps, State> {
     return (
       <AppConsumer>
         {({ currentUser }) => {
-          if (!currentUser) {
-            return;
-          }
-
-          const configs = currentUser.configs || {};
+          const configs = currentUser?.configs || {};
           const extendedProps = {
             ...this.props,
             currencies: configs.dealCurrency || [],

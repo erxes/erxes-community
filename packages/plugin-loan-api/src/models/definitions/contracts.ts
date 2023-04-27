@@ -27,6 +27,10 @@ export interface ICollateralDataDoc extends ICollateralData, Document {
 export interface IContract {
   contractTypeId: string;
   number: string;
+  /**
+   * @property {status} string
+   * draft normal bad closed
+   */
   status: string;
   description: string;
   createdBy: string;
