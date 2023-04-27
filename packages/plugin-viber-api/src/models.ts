@@ -71,23 +71,6 @@ export const Customers = model<any, any>(
   loadCustomerClass()
 );
 
-export const messageSchema: Schema<any> = new Schema({
-  inboxIntegrationId: String,
-  inboxConversationId: String,
-  messageId: { type: String, unique: true },
-  text: String,
-  type: String,
-  userId: String
-});
-
-export const loadMessageClass = () => {
-  class Message {}
-  messageSchema.loadClass(Message);
-  return messageSchema;
-};
-
-export const Messages = model<any, any>('viber_messages', loadMessageClass());
-
 export const integrationSchema: Schema<any> = new Schema({
   inboxId: String,
   accountId: String,

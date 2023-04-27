@@ -4,7 +4,7 @@ import {
   sendMessage as sendCommonMessage
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
-import { Customers, Integrations, Messages } from './models';
+import { Customers, Integrations } from './models';
 import { ViberAPI } from './viber/api';
 
 dotenv.config();
@@ -57,8 +57,6 @@ export const initBroker = async cl => {
       const { data } = args;
       const { integrationId } = data;
 
-      // TODO more data delete?
-      await Messages.remove({ inboxIntegrationId: integrationId });
       await Customers.remove({ inboxIntegrationId: integrationId });
       await Integrations.remove({ inboxId: integrationId });
 
