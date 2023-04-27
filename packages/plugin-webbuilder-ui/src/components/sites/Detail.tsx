@@ -19,6 +19,7 @@ import PageForm from '../pages/PageForm';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import customPlugins from '../customPlugins';
+import gjsLorySlider from 'grapesjs-lory-slider';
 import gjsPresetWebpage from 'grapesjs-preset-webpage';
 import { readFile } from '@erxes/ui/src/utils/core';
 
@@ -76,15 +77,26 @@ class SiteDetail extends React.Component<Props, State> {
       protectedCss: '',
       container: `#editor`,
       fromElement: true,
-      plugins: [gjsPresetWebpage, customPlugins],
+      plugins: [gjsPresetWebpage, gjsLorySlider, customPlugins],
       pluginsOpts: {
+        gjsLorySlider: {
+          label: 'Slider',
+          block: {
+            category: 'basic'
+          },
+          category: 'basic'
+        },
         [customPlugins as any]: {
           pages,
           contentTypes,
           open: false
         }
       },
-      storageManager: false,
+      storageManager: {
+        id: 'editor', // Prefix identifier that will be used inside storing and loading
+        type: 'local',
+        autosave: true
+      },
       assetManager: {
         uploadFile: e => {
           const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
@@ -123,6 +135,7 @@ class SiteDetail extends React.Component<Props, State> {
     const pfx = editor.getConfig().stylePrefix;
     const modal = editor.Modal;
     const cmdm = editor.Commands;
+    const bm = editor.BlockManager;
     const htmlCodeViewer = editor.CodeManager.getViewer('CodeMirror').clone();
     const cssCodeViewer = editor.CodeManager.getViewer('CodeMirror').clone();
     const pnm = editor.Panels;

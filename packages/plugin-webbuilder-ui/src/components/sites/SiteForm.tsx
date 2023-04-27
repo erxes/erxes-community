@@ -1,5 +1,3 @@
-import 'grapesjs/dist/css/grapes.min.css';
-
 import {
   CollapseLeftMenu,
   LeftMenuItems,
