@@ -60,4 +60,5 @@ export const queries = `
 
 export const mutations = `
   regenSchedules(contractId: String!): String
+  fixSchedules(contractId: String!): String
 `;

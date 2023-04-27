@@ -131,11 +131,18 @@ const regenSchedules = `
   }
 `;
 
+const fixSchedules = `
+  mutation fixSchedules($contractId: String!) {
+    fixSchedules(contractId: $contractId)
+  }
+`;
+
 export default {
   contractsAdd,
   contractsEdit,
   contractsRemove,
   regenSchedules,
+  fixSchedules,
   contractConfirm,
   contractsClose,
   getProductsData

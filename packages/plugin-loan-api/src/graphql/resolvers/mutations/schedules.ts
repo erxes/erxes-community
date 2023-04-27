@@ -1,8 +1,12 @@
 import { SCHEDULE_STATUS } from '../../../models/definitions/constants';
-import { reGenerateSchedules } from '../../../models/utils/scheduleUtils';
+import {
+  fixSchedules,
+  reGenerateSchedules
+} from '../../../models/utils/scheduleUtils';
 import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import { sendMessageBroker } from '../../../messageBroker';
+import { getFullDate } from '../../../models/utils/utils';
 
 const scheduleMutations = {
   regenSchedules: async (
@@ -48,8 +52,44 @@ const scheduleMutations = {
     await reGenerateSchedules(models, contract, perHolidays);
 
     return 'ok';
+  },
+  fixSchedules: async (
+    _root,
+    { contractId }: { contractId: string },
+    { models, subdomain }: IContext
+  ) => {
+    const today = getFullDate(new Date());
+
+    const firstSchedules = await models.FirstSchedules.find({
+      contractId
+    }).lean();
+
+    await models.Schedules.deleteMany({ contractId });
+
+    await models.Schedules.insertMany(
+      firstSchedules.map(({ _id, ...data }) => data)
+    );
+
+    const countSchedules = await models.Schedules.countDocuments({
+      contractId: contractId,
+      payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
+      status: SCHEDULE_STATUS.PENDING,
+      balance: { $gt: 0 },
+      isDefault: true
+    });
+
+    const countTransaction = await models.Transactions.countDocuments({
+      contractId
+    });
+
+    if (!countSchedules && !countTransaction) return 'ok';
+
+    await fixSchedules(models, contractId, subdomain);
+
+    return 'ok';
   }
 };
 checkPermission(scheduleMutations, 'regenSchedules', 'saveSchedules');
+checkPermission(scheduleMutations, 'fixSchedules', 'saveSchedules');
 
 export default scheduleMutations;

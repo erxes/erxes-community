@@ -47,6 +47,12 @@ const ContractDetailsContainer = (props: FinalProps) => {
     });
   };
 
+  const fixSchedules = (contractId: string) => {
+    props.fixSchedules({ variables: { contractId } }).catch(error => {
+      Alert.error(error.message);
+    });
+  };
+
   if (contractDetailQuery.loading) {
     return <Spinner objective={true} />;
   }
@@ -65,7 +71,8 @@ const ContractDetailsContainer = (props: FinalProps) => {
     contract: contractDetail,
     currentUser,
     saveItem,
-    regenSchedules
+    regenSchedules,
+    fixSchedules
   };
 
   return <ContractDetails {...updatedProps} />;
@@ -99,6 +106,15 @@ export default withProps<Props>(
       gql(mutations.regenSchedules),
       {
         name: 'regenSchedules',
+        options: {
+          refetchQueries: ['schedules', 'scheduleYears']
+        }
+      }
+    ),
+    graphql<{}, RegenSchedulesMutationResponse, { contractId: string }>(
+      gql(mutations.fixSchedules),
+      {
+        name: 'fixSchedules',
         options: {
           refetchQueries: ['schedules', 'scheduleYears']
         }

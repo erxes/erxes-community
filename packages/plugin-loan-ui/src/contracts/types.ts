@@ -189,6 +189,7 @@ export type RegenSchedulesMutationResponse = {
   regenSchedules: (params: {
     variables: { contractId: string };
   }) => Promise<any>;
+  fixSchedules: (params: { variables: { contractId: string } }) => Promise<any>;
 };
 
 // query types

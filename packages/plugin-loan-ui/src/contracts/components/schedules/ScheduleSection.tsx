@@ -8,12 +8,25 @@ type Props = {
   contractId: string;
   isFirst: boolean;
   regenSchedules: (contractId: string) => void;
+  fixSchedules: (contractId: string) => void;
 };
 
-function ScheduleSection({ contractId, isFirst, regenSchedules }: Props) {
+function ScheduleSection({
+  contractId,
+  isFirst,
+  regenSchedules,
+  fixSchedules
+}: Props) {
   const onRegenSchedules = () =>
     confirm()
       .then(() => regenSchedules(contractId))
+      .catch(error => {
+        Alert.error(error.message);
+      });
+
+  const onFixSchedules = () =>
+    confirm()
+      .then(() => fixSchedules(contractId))
       .catch(error => {
         Alert.error(error.message);
       });
@@ -23,9 +36,14 @@ function ScheduleSection({ contractId, isFirst, regenSchedules }: Props) {
       return <></>;
     }
     return (
-      <button onClick={onRegenSchedules}>
-        <Icon icon="refresh-1" />
-      </button>
+      <>
+        <button onClick={onRegenSchedules} title="create schedule">
+          <Icon icon="refresh-1" />
+        </button>
+        <button onClick={onFixSchedules} title="fix schedule">
+          <Icon icon="refresh-1" />
+        </button>
+      </>
     );
   };
 

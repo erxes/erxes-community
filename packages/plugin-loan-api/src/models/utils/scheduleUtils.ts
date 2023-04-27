@@ -3,6 +3,7 @@ import { SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
 import { IScheduleDocument } from '../definitions/schedules';
 import { ITransactionDocument } from '../definitions/transactions';
+import { trAfterSchedule, transactionRule } from './transactionUtils';
 import {
   calcInterest,
   calcPerMonthEqual,
@@ -274,6 +275,94 @@ export const reGenerateSchedules = async (
 
   await models.FirstSchedules.deleteMany({ contractId: contract._id });
   await models.FirstSchedules.insertMany(bulkEntries);
+};
+
+export const fixSchedules = async (
+  models: IModels,
+  contractId: string,
+  subdomain: string
+) => {
+  const contract = await models.Contracts.findOne({ _id: contractId })
+    .select('startDate customerId')
+    .lean();
+
+  const today = getFullDate(new Date());
+
+  const unresolvedSchedules = await models.Schedules.find({
+    contractId: contractId,
+    payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
+    status: SCHEDULE_STATUS.PENDING,
+    balance: { $gt: 0 },
+    isDefault: true
+  }).sort({ payDate: 1 });
+
+  let prevSchedule: any = null;
+  if (unresolvedSchedules.length > 0)
+    for await (let scheduleRow of unresolvedSchedules) {
+      const transactions = await models.Transactions.find({
+        contractId,
+        payDate: {
+          $lte: scheduleRow.payDate,
+          $gt: prevSchedule?.payDate || contract?.startDate
+        }
+      })
+        .sort({ payDate: 1 })
+        .lean();
+
+      prevSchedule = scheduleRow;
+
+      for await (let { _id, ...transaction } of transactions) {
+        const trInfo = await transactionRule(models, subdomain, transaction);
+        console.log(
+          '{ ...transaction, ...trInfo }',
+          JSON.stringify({ ...transaction, ...trInfo }, null, 2)
+        );
+        await models.Transactions.updateOne(
+          { _id },
+          { $set: { ...transaction, ...trInfo } }
+        );
+        //now resolve schedules
+        await trAfterSchedule(models, { ...transaction, ...trInfo } as any);
+      }
+      if (transactions.find(a => a.payDate === scheduleRow.payDate)) continue;
+      //create empty row transaction to the schedule
+      let doc = {
+        contractId: contractId,
+        payDate: scheduleRow.payDate,
+        description: `schedule correction`,
+        total: 0,
+        customerId: contract?.customerId
+      };
+
+      //create tmp transaction
+      const trInfo = await transactionRule(models, subdomain, doc);
+      //now resolve schedules
+      await trAfterSchedule(models, { ...doc, ...trInfo } as any);
+    }
+
+  const transactions = await models.Transactions.find({
+    contractId,
+    payDate: {
+      $gt: prevSchedule?.payDate || contract?.startDate
+    }
+  })
+    .sort({ payDate: 1 })
+    .lean();
+
+  if (transactions.length > 0)
+    for await (let { _id, ...transaction } of transactions) {
+      const trInfo = await transactionRule(models, subdomain, transaction);
+      console.log(
+        '{ ...transaction, ...trInfo }',
+        JSON.stringify({ ...transaction, ...trInfo }, null, 2)
+      );
+      await models.Transactions.updateOne(
+        { _id },
+        { $set: { ...transaction, ...trInfo } }
+      );
+      //now resolve schedules
+      await trAfterSchedule(models, { ...transaction, ...trInfo } as any);
+    }
 };
 
 const fillAmounts = async (

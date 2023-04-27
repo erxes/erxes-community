@@ -35,6 +35,7 @@ type Props = {
   currentUser: IUser;
   saveItem: (doc: IContractDoc, callback?: (item) => void) => void;
   regenSchedules: (contractId: string) => void;
+  fixSchedules: (contractId: string) => void;
   loading: boolean;
 };
 
@@ -100,7 +101,7 @@ class ContractDetails extends React.Component<Props, State> {
   };
 
   render() {
-    const { contract, regenSchedules } = this.props;
+    const { contract, regenSchedules, fixSchedules } = this.props;
 
     const title = contract.number || 'Unknown';
 
@@ -128,6 +129,7 @@ class ContractDetails extends React.Component<Props, State> {
           contractId={contract._id}
           isFirst={false}
           regenSchedules={regenSchedules}
+          fixSchedules={fixSchedules}
         ></ScheduleSection>
         <ScheduleSection
           contractId={contract._id}
