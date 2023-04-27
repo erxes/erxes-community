@@ -345,12 +345,13 @@ export const generatePendingSchedules = async (
       { _id: updatedSchedule._id },
       { $set: { status: SCHEDULE_STATUS.LESS } }
     );
-    await models.Transactions.updateOne(
-      { _id: tr._id },
-      {
-        $set: { reactions: trReaction }
-      }
-    );
+    tr._id &&
+      (await models.Transactions.updateOne(
+        { _id: tr._id },
+        {
+          $set: { reactions: trReaction }
+        }
+      ));
     return;
   }
 
@@ -368,12 +369,13 @@ export const generatePendingSchedules = async (
       { _id: updatedSchedule._id },
       { $set: { status: SCHEDULE_STATUS.LESS } }
     );
-    await models.Transactions.updateOne(
-      { _id: tr._id },
-      {
-        $set: { reactions: trReaction }
-      }
-    );
+    tr._id &&
+      (await models.Transactions.updateOne(
+        { _id: tr._id },
+        {
+          $set: { reactions: trReaction }
+        }
+      ));
     return;
   }
 
@@ -406,12 +408,13 @@ export const generatePendingSchedules = async (
         { _id: updatedSchedule._id },
         { $set: { status: SCHEDULE_STATUS.LESS } }
       );
-      await models.Transactions.updateOne(
-        { _id: tr._id },
-        {
-          $set: { reactions: trReaction }
-        }
-      );
+      tr._id &&
+        (await models.Transactions.updateOne(
+          { _id: tr._id },
+          {
+            $set: { reactions: trReaction }
+          }
+        ));
       return;
     }
 
@@ -455,12 +458,13 @@ export const generatePendingSchedules = async (
       { _id: schedule._id },
       { $set: { ...changeDoc } }
     );
-    await models.Transactions.updateOne(
-      { _id: tr._id },
-      {
-        $set: { reactions: trReaction }
-      }
-    );
+    tr._id &&
+      (await models.Transactions.updateOne(
+        { _id: tr._id },
+        {
+          $set: { reactions: trReaction }
+        }
+      ));
     return;
   }
 
@@ -484,12 +488,13 @@ export const generatePendingSchedules = async (
       { _id: schedule._id },
       { $set: { ...changeDoc } }
     );
-    await models.Transactions.updateOne(
-      { _id: tr._id },
-      {
-        $set: { reactions: trReaction }
-      }
-    );
+    tr._id &&
+      (await models.Transactions.updateOne(
+        { _id: tr._id },
+        {
+          $set: { reactions: trReaction }
+        }
+      ));
     return;
   }
 
@@ -512,12 +517,13 @@ export const generatePendingSchedules = async (
         $set: { ...changeDoc }
       }
     );
-    await models.Transactions.updateOne(
-      { _id: tr._id },
-      {
-        $set: { reactions: trReaction }
-      }
-    );
+    tr._id &&
+      (await models.Transactions.updateOne(
+        { _id: tr._id },
+        {
+          $set: { reactions: trReaction }
+        }
+      ));
     return;
   }
 
@@ -696,12 +702,13 @@ export const generatePendingSchedules = async (
     });
   }
 
-  await models.Transactions.updateOne(
-    { _id: tr._id },
-    {
-      $set: { reactions: trReaction }
-    }
-  );
+  tr._id &&
+    (await models.Transactions.updateOne(
+      { _id: tr._id },
+      {
+        $set: { reactions: trReaction }
+      }
+    ));
   await models.Schedules.bulkWrite(bulkOps);
 };
 /**

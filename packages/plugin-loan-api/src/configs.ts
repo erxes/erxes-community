@@ -2,6 +2,7 @@ import typeDefs from './graphql/typeDefs';
 import resolvers from './graphql/resolvers';
 import { generateModels } from './connectionResolver';
 import { initBroker } from './messageBroker';
+import { checkContractScheduleAnd } from './cronjobs/contractCronJobs';
 
 export let debug;
 export let graphqlPubsub;
@@ -36,5 +37,9 @@ export default {
     debug = options.debug;
     graphqlPubsub = options.pubsubClient;
   },
-  meta: {}
+  meta: {
+    cronjobs: {
+      handleDailyJob: checkContractScheduleAnd
+    }
+  }
 };

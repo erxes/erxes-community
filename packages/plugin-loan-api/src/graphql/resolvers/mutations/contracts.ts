@@ -14,9 +14,11 @@ import {
 import { IContext } from '../../../connectionResolver';
 import messageBroker, {
   sendCardsMessage,
-  sendCoreMessage
+  sendCoreMessage,
+  sendMessageBroker
 } from '../../../messageBroker';
 import redis from '../../../redis';
+import { CONTRACT_STATUS } from '../../../models/definitions/constants';
 
 const contractMutations = {
   contractsAdd: async (
@@ -213,12 +215,15 @@ const contractMutations = {
     const collaterals: any = [];
 
     for (const data of collateralsData || []) {
-      const collateral = await sendCoreMessage({
-        subdomain,
-        action: 'products.findOne',
-        data: { _id: data.collateralId },
-        isRPC: true
-      });
+      const collateral = await sendMessageBroker(
+        {
+          subdomain,
+          action: 'findOne',
+          data: { _id: data.collateralId },
+          isRPC: true
+        },
+        'products'
+      );
 
       const insuranceType = await models.InsuranceTypes.findOne({
         _id: data.insuranceTypeId
@@ -259,6 +264,13 @@ const contractMutations = {
     if (!schedules || !schedules.length) {
       throw new Error('Schedules are undefined');
     }
+
+    return {
+      result: await models.Contracts.updateOne(
+        { _id: contractId },
+        { $set: { status: CONTRACT_STATUS.NORMAL } }
+      )
+    };
 
     return {
       result: await ConfirmBase(models, messageBroker, redis, contract)
