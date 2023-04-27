@@ -54,6 +54,13 @@ interface IOrderEditParams extends IOrderInput {
   registerNumber: string;
 }
 
+export interface IOrderChangeParams {
+  _id: string;
+  dueDate?: Date;
+  branchId?: string;
+  deliveryInfo?: string;
+}
+
 const getTaxInfo = (config: IConfig) => {
   return {
     hasVat: (config.ebarimtConfig && config.ebarimtConfig.hasVat) || false,
@@ -240,7 +247,12 @@ const orderMutations = {
       }
     });
 
-    if (order.type === 'delivery' && order.status === 'done') {
+    if (
+      order.type === 'delivery' &&
+      order.status === 'done' &&
+      order.deliveryInfo &&
+      order.customerId
+    ) {
       try {
         sendPosMessage({
           subdomain,
@@ -248,6 +260,63 @@ const orderMutations = {
           data: { action: 'statusToDone', order, posToken: config.token }
         });
       } catch (e) {}
+    }
+  },
+
+  async ordersChange(
+    _root,
+    params: IOrderChangeParams,
+    { models, config, subdomain }: IContext
+  ) {
+    // if online, update branch
+    // update dueDate
+    // update deliveryInfo
+    const order = await models.Orders.getOrder(params._id);
+
+    const oldBranchId = order.branchId;
+
+    if (params.dueDate && params.dueDate < new Date()) {
+      throw new Error('due date must be in future');
+    }
+
+    if (params.branchId) {
+      if (!config.isOnline) {
+        throw new Error('Can edit branch at only online pos');
+      }
+
+      if (!(config.allowBranchIds || []).includes(params.branchId)) {
+        throw new Error('not allowed branch');
+      }
+    }
+
+    const doc = { ...order };
+
+    if (params.dueDate) doc.dueDate = params.dueDate;
+
+    if (params.branchId) doc.branchId = params.branchId;
+
+    if (params.deliveryInfo) doc.deliveryInfo = params.deliveryInfo;
+
+    const changedOrder = await models.Orders.updateOrder(params._id, doc);
+
+    if (changedOrder.paidDate) {
+      try {
+        sendPosMessage({
+          subdomain,
+          action: 'createOrUpdateOrders',
+          data: {
+            posToken: config.token,
+            action: 'makePayment',
+            oldBranchId,
+            order,
+            items: await models.OrderItems.find({
+              orderId: params._id
+            }).lean()
+          }
+        });
+      } catch (e) {
+        debugError(`Error occurred while sending data to erxes: ${e.message}`);
+      }
     }
   },
 

@@ -21,6 +21,7 @@ export interface IOrder {
   modifiedAt?: Date;
   userId?: string;
   paidDate?: Date;
+  dueDate?: Date;
   number?: string;
   customerId?: string;
   customerType?: string;
@@ -41,6 +42,7 @@ export interface IOrder {
   synced?: boolean;
   origin?: string;
   posToken?: string;
+  subToken?: string;
   deliveryInfo?: any;
 
   //posSlot
@@ -78,6 +80,7 @@ export const orderSchema = schemaHooksWrapper(
       index: true
     }),
     paidDate: field({ type: Date, label: 'Paid date' }),
+    dueDate: field({ type: Date, label: 'Due date' }),
     number: field({
       type: String,
       label: 'Order number',
@@ -149,6 +152,12 @@ export const orderSchema = schemaHooksWrapper(
       label: 'synced on erxes'
     }),
     posToken: field({
+      type: String,
+      optional: true,
+      label: 'posToken',
+      index: true
+    }),
+    subToken: field({
       type: String,
       optional: true,
       label: 'If From online posToken',

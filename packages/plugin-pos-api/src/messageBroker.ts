@@ -4,6 +4,7 @@ import { generateModels } from './connectionResolver';
 import { IPosDocument } from './models/definitions/pos';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
+import { IPosOrderDocument } from './models/definitions/orders';
 
 let client;
 
@@ -20,14 +21,14 @@ export const initBroker = async cl => {
   consumeQueue('pos:createOrUpdateOrders', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
-    const { action, posToken, responses, order, items } = data;
+    const { action, posToken, responses, order, items, oldBranchId } = data;
     const pos = await models.Pos.findOne({ token: posToken }).lean();
 
     // ====== if (action === 'statusToDone')
     // if (doneOrder.type === 'delivery' && doneOrder.status === 'done') { }
     if (action === 'statusToDone') {
       // must have
-      const doneOrder = await models.PosOrders.findOne({
+      const doneOrder: IPosOrderDocument = await models.PosOrders.findOne({
         _id: order._id
       }).lean();
 
@@ -35,105 +36,134 @@ export const initBroker = async cl => {
       const deliveryInfo = doneOrder.deliveryInfo || {};
       const { marker = {}, description } = deliveryInfo;
 
-      const deal = await sendCardsMessage({
-        subdomain,
-        action: 'deals.create',
-        data: {
-          name: `Delivery: ${doneOrder.number}`,
-          startDate: doneOrder.createdAt,
-          description,
-          // {
-          //   "locationValue": {
-          //     "type": "Point",
-          //     "coordinates": [
-          //       106.936283111572,
-          //       47.920138551642
-          //     ]
-          //   },
-          //   "field": "dznoBhE3XCkCaHuBX",
-          //   "value": {
-          //     "lat": 47.920138551642,
-          //     "lng": 106.936283111572
-          //   },
-          //   "stringValue": "106.93628311157227,47.920138551642026"
-          // }
-          customFieldsData: [
-            {
-              field: deliveryConfig.mapCustomField.replace(
-                'customFieldsData.',
-                ''
-              ),
-              locationValue: {
-                type: 'Point',
-                coordinates: [
-                  marker.longitude || marker.lng,
-                  marker.latitude || marker.lat
-                ]
-              },
-              value: {
-                lat: marker.latitude || marker.lat,
-                lng: marker.longitude || marker.lng,
-                description: 'location'
-              },
-              stringValue: `${marker.longitude ||
-                marker.lng},${marker.latitude || marker.lat}`
-            }
-          ],
-          stageId: deliveryConfig.stageId,
-          assignedUserIds: deliveryConfig.assignedUserIds,
-          watchedUserIds: deliveryConfig.watchedUserIds,
-          productsData: doneOrder.items.map(i => ({
-            productId: i.productId,
-            uom: 'PC',
-            currency: 'MNT',
-            quantity: i.count,
-            unitPrice: i.unitPrice,
-            amount: i.count * i.unitPrice,
-            tickUsed: true
-          }))
-        },
-        isRPC: true,
-        defaultValue: {}
-      });
+      const dealsData = {
+        name: `Delivery: ${doneOrder.number}`,
+        startDate: doneOrder.createdAt,
+        closeDate: doneOrder.dueDate,
+        description,
+        // {
+        //   "locationValue": {
+        //     "type": "Point",
+        //     "coordinates": [
+        //       106.936283111572,
+        //       47.920138551642
+        //     ]
+        //   },
+        //   "field": "dznoBhE3XCkCaHuBX",
+        //   "value": {
+        //     "lat": 47.920138551642,
+        //     "lng": 106.936283111572
+        //   },
+        //   "stringValue": "106.93628311157227,47.920138551642026"
+        // }
+        customFieldsData: [
+          {
+            field: deliveryConfig.mapCustomField.replace(
+              'customFieldsData.',
+              ''
+            ),
+            locationValue: {
+              type: 'Point',
+              coordinates: [
+                marker.longitude || marker.lng,
+                marker.latitude || marker.lat
+              ]
+            },
+            value: {
+              lat: marker.latitude || marker.lat,
+              lng: marker.longitude || marker.lng,
+              description: 'location'
+            },
+            stringValue: `${marker.longitude || marker.lng},${marker.latitude ||
+              marker.lat}`
+          }
+        ],
+        stageId: deliveryConfig.stageId,
+        assignedUserIds: deliveryConfig.assignedUserIds,
+        watchedUserIds: deliveryConfig.watchedUserIds,
+        productsData: doneOrder.items.map(i => ({
+          productId: i.productId,
+          uom: 'PC',
+          currency: 'MNT',
+          quantity: i.count,
+          unitPrice: i.unitPrice,
+          amount: i.count * i.unitPrice,
+          tickUsed: true
+        }))
+      };
 
-      if (doneOrder.customerId && deal._id) {
-        await sendCoreMessage({
+      if ((doneOrder.deliveryInfo || {}).dealId) {
+        const deal = await sendCardsMessage({
           subdomain,
-          action: 'conformities.addConformity',
+          action: 'deals.updateOne',
           data: {
-            mainType: 'deal',
-            mainTypeId: deal._id,
-            relType: doneOrder.customerType || 'customer',
-            relTypeId: doneOrder.customerId
+            selector: { _id: doneOrder.deliveryInfo.dealId },
+            modifier: dealsData
           },
-          isRPC: true
+          isRPC: true,
+          defaultValue: {}
         });
-      }
 
-      await sendCardsMessage({
-        subdomain,
-        action: 'pipelinesChanged',
-        data: {
-          pipelineId: deliveryConfig.pipelineId,
-          action: 'itemAdd',
+        await sendCardsMessage({
+          subdomain,
+          action: 'pipelinesChanged',
           data: {
-            item: deal,
-            destinationStageId: deliveryConfig.stageId
-          }
-        }
-      });
-
-      await models.PosOrders.updateOne(
-        { _id: doneOrder },
-        {
-          $set: {
-            deliveryInfo: {
-              ...deliveryInfo,
-              dealId: deal._id
+            pipelineId: deliveryConfig.pipelineId,
+            action: 'itemUpdate',
+            data: {
+              item: deal,
+              destinationStageId: deliveryConfig.stageId
             }
           }
+        });
+      } else {
+        const deal = await sendCardsMessage({
+          subdomain,
+          action: 'deals.create',
+          data: dealsData,
+          isRPC: true,
+          defaultValue: {}
+        });
+
+        if (doneOrder.customerId && deal._id) {
+          await sendCoreMessage({
+            subdomain,
+            action: 'conformities.addConformity',
+            data: {
+              mainType: 'deal',
+              mainTypeId: deal._id,
+              relType: doneOrder.customerType || 'customer',
+              relTypeId: doneOrder.customerId
+            },
+            isRPC: true
+          });
         }
-      );
+
+        await sendCardsMessage({
+          subdomain,
+          action: 'pipelinesChanged',
+          data: {
+            pipelineId: deliveryConfig.pipelineId,
+            action: 'itemAdd',
+            data: {
+              item: deal,
+              destinationStageId: deliveryConfig.stageId
+            }
+          }
+        });
+
+        await models.PosOrders.updateOne(
+          { _id: doneOrder },
+          {
+            $set: {
+              deliveryInfo: {
+                ...deliveryInfo,
+                dealId: deal._id
+              }
+            }
+          }
+        );
+      }
 
       return {
         status: 'success'
@@ -141,7 +171,7 @@ export const initBroker = async cl => {
     }
 
     // ====== if (action === 'makePayment')
-    for (const response of responses) {
+    for (const response of responses || []) {
       if (response && response._id) {
         await sendEbarimtMessage({
           subdomain,
@@ -259,7 +289,7 @@ export const initBroker = async cl => {
       pos
     });
 
-    if (newOrder.type === 'delivery' && newOrder.branchId) {
+    if (pos.isOnline && newOrder.branchId) {
       const toPos = await models.Pos.findOne({
         branchId: newOrder.branchId
       }).lean();
@@ -270,7 +300,7 @@ export const initBroker = async cl => {
           subdomain,
           action: 'erxes-posclient-to-pos-api',
           data: {
-            order: { ...newOrder, posToken }
+            order: { ...newOrder, posToken, subToken: toPos.token }
           },
           pos: toPos
         });
@@ -303,20 +333,41 @@ export const initBroker = async cl => {
       }
     }
 
-    if (pos.checkRemainder) {
-      sendInventoriesMessage({
-        subdomain,
-        action: 'remainders.updateMany',
-        data: {
-          branchId: newOrder.branchId,
-          departmentId: newOrder.departmentId,
-          productsData: (newOrder.items || []).map(item => ({
-            productId: item.productId,
-            uomId: item.uomId,
-            diffCount: -1 * item.count
-          }))
-        }
-      });
+    if (pos.checkRemainder && newOrder.departmentId) {
+      if (
+        (!oldBranchId && newOrder.branchId) ||
+        (oldBranchId && oldBranchId !== newOrder.branchId)
+      ) {
+        sendInventoriesMessage({
+          subdomain,
+          action: 'remainders.updateMany',
+          data: {
+            branchId: newOrder.branchId,
+            departmentId: newOrder.departmentId,
+            productsData: (newOrder.items || []).map(item => ({
+              productId: item.productId,
+              uomId: item.uomId,
+              diffCount: -1 * item.count
+            }))
+          }
+        });
+      }
+
+      if (oldBranchId && oldBranchId !== newOrder.branchId) {
+        sendInventoriesMessage({
+          subdomain,
+          action: 'remainders.updateMany',
+          data: {
+            branchId: oldBranchId,
+            departmentId: newOrder.departmentId,
+            productsData: (newOrder.items || []).map(item => ({
+              productId: item.productId,
+              uomId: item.uomId,
+              diffCount: item.count
+            }))
+          }
+        });
+      }
     }
 
     return {

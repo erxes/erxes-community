@@ -27,6 +27,7 @@ export interface IPosOrder {
   createdAt: Date;
   status: string;
   paidDate?: Date;
+  dueDate?: Date;
   number: string;
   customerId?: string;
   customerType?: string;
@@ -122,6 +123,7 @@ export const posOrderSchema = schemaHooksWrapper(
     createdAt: field({ type: Date }),
     status: field({ type: String, label: 'Status of the order', index: true }),
     paidDate: field({ type: Date, label: 'Paid date' }),
+    dueDate: field({ type: Date, label: 'Due date' }),
     number: field({ type: String, label: 'Order number', index: true }),
     customerId: field({ type: String, label: 'Customer' }),
     customerType: field({ type: String, label: 'Customer type' }),
