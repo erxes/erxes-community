@@ -1,4 +1,4 @@
-import { MerchantBaseAPI } from './merchantBase';
+import { VendorBaseAPI } from './vendorBase';
 
 export type QPayMerchantConfig = {
   username: string;
@@ -21,7 +21,7 @@ export const meta = {
   }
 };
 
-export class QpayMerchantAPI extends MerchantBaseAPI {
+export class QpayMerchantAPI extends VendorBaseAPI {
   constructor(config: QPayMerchantConfig) {
     super(config);
   }
@@ -78,26 +78,6 @@ export class QpayMerchantAPI extends MerchantBaseAPI {
       }
     });
   }
-
-  //   {
-  //     "merchant_id": "8e85aaa9-aebb-43d4-ad24-f942215deffb",
-  //     "amount": 100,
-  //     "currency": "MNT",
-  //     "customer_name": "TDB",
-  //     "customer_logo": "",
-  //     "callback_url": "https://notify@test.mn/pay",
-  //     "description": "9 сарын үйлчилгээний төлбөр",
-  //     "mcc_code": "",
-  //     "bank_accounts": [
-  //         {
-  //             "default": true,
-  //             "account_bank_code": "040000",
-  //             "account_number": "490000869",
-  //             "account_name": "test account2",
-  //             "is_default": true
-  //         }
-  //     ]
-  // }
 
   async createInvoice(args: {
     merchantId: string;

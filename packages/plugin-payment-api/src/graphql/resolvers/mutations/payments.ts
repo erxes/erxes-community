@@ -5,7 +5,7 @@ import {
 
 import { IContext } from '../../../connectionResolver';
 import { IPayment } from '../../../models/definitions/payments';
-import { QpayMerchantAPI } from '../../../api/qpay/merchant';
+import { QpayMerchantAPI } from '../../../api/qpayVendor/api';
 
 const mutations = {
   async paymentAdd(_root, doc: IPayment, { models }: IContext) {

@@ -9,6 +9,22 @@ export const PAYMENTS = {
     },
     handlerMethod: 'GET'
   },
+
+  qpayVendor: {
+    title: 'Qpay',
+    kind: 'qpayVendor',
+    apiUrl: 'https://sandbox-quickqr.qpay.mn/v2',
+    actions: {
+      auth: 'auth/token',
+      refresh: 'auth/refresh',
+      createCompany: 'merchant/company',
+      createPerson: 'merchant/person',
+      getMerchant: 'merchant',
+      merchantList: 'merchant/list',
+      checkInvoice: 'payment/check',
+      invoice: 'invoice'
+    }
+  },
   socialpay: {
     title: 'Social Pay',
     kind: 'socialpay',

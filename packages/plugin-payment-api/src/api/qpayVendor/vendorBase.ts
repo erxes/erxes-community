@@ -1,8 +1,8 @@
 import { sendRequest } from '@erxes/api-utils/src/requests';
 import redis from '../../redis';
-import { meta } from './merchant';
+import { meta } from './api';
 
-export class MerchantBaseAPI {
+export class VendorBaseAPI {
   public apiUrl: string;
   private username: string;
   private password: string;
