@@ -48,6 +48,8 @@ type Props = {
   ) => void;
   removeScheduleShifts: (_id: string, type: string) => void;
 
+  checkDuplicateScheduleShifts: (values: any) => any;
+
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
   getPagination: (pagination: any) => void;
@@ -60,7 +62,6 @@ function ScheduleList(props: Props) {
     totalCount,
     queryParams,
     solveSchedule,
-    solveShift,
     removeScheduleShifts,
     getActionBar,
     showSideBar,
