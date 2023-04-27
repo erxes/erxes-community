@@ -47,6 +47,38 @@ export class QpayMerchantAPI extends MerchantBaseAPI {
     });
   }
 
+  async createCustomer(args: {
+    registerNumber: string;
+    name: string;
+    mccCode: string;
+    city: string;
+  }) {
+    return await this.makeRequest({
+      method: 'POST',
+      path: meta.paths.createPerson,
+      data: {
+        register_number: 'УЗ89122490',
+        last_name: 'Бат-Эрдэнэ',
+        first_name: 'Соёмбо',
+        mcc_code: '0110',
+        city: 'Ulaanbaatar',
+        district: 'Sukhbaatar',
+        address: '6 хороо 14-10',
+        phone: '99391924',
+        email: 'e11iot.soko@gmail.com',
+        bank_accounts: [
+          {
+            default: true,
+            account_bank_code: '040000',
+            account_number: '410054178',
+            account_name: 'Соёмбо',
+            is_default: true
+          }
+        ]
+      }
+    });
+  }
+
   //   {
   //     "merchant_id": "8e85aaa9-aebb-43d4-ad24-f942215deffb",
   //     "amount": 100,
@@ -78,7 +110,7 @@ export class QpayMerchantAPI extends MerchantBaseAPI {
       method: 'POST',
       path: meta.paths.invoice,
       data: {
-        merchant_id: 'f49b3f35-af6e-442f-b35e-52d42ea617e3',
+        merchant_id: '79e4336a-614f-43c2-bbce-09a716be2c05',
         branch_code: 'BRANCH_001',
         amount: 100,
         currency: 'MNT',
@@ -91,8 +123,8 @@ export class QpayMerchantAPI extends MerchantBaseAPI {
           {
             default: true,
             account_bank_code: '040000',
-            account_number: '490000869',
-            account_name: 'test account2',
+            account_number: '410054178',
+            account_name: 'Соёмбо',
             is_default: true
           }
         ]

@@ -60,6 +60,8 @@ export const mutations = `
     email: String
   ): JSON
 
+  qpayRegisterMerchantCustomer: JSON
+
   qpayCreateInvoice(
     merchantId: String
     amount: Int

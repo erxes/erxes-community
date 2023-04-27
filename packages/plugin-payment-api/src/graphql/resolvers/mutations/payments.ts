@@ -53,6 +53,15 @@ const mutations = {
     });
 
     return api.createInvoice(args);
+  },
+
+  async qpayRegisterMerchantCustomer(_root, args, { models }: IContext) {
+    const api = new QpayMerchantAPI({
+      username: process.env.QPAY_MERCHANT_USERNAME || '',
+      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+    });
+
+    return api.createCustomer(args);
   }
 };
 
