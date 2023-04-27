@@ -2,6 +2,7 @@ import { getEnv, sendRequest } from '@erxes/api-utils/src';
 import { Conversations, IConversation } from '../models';
 import { sendInboxMessage } from '../messageBroker';
 import { IRequestParams } from '@erxes/api-utils/src/requests';
+import { ConversationMessages } from '../models';
 
 export class ViberAPI {
   private headers: any;
@@ -19,7 +20,7 @@ export class ViberAPI {
   async registerWebhook(): Promise<any> {
     const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
-      : 'https://0ec7-202-21-104-34.ngrok-free.app';
+      : 'https://bf48-202-21-104-34.ngrok-free.app';
 
     const url: string = `${domain}/pl:viber/webhook/${this.integrationId}`;
 
@@ -67,7 +68,7 @@ export class ViberAPI {
     }
 
     const name = await this.getName(message.integrationId);
-    const plainText = this.convertRichTextToPlainText(message.content);
+    const plainText: string = this.convertRichTextToPlainText(message.content);
 
     const requestPayload: IRequestParams = {
       method: 'POST',
@@ -94,6 +95,8 @@ export class ViberAPI {
       }
     }
 
+    this.savetoDatabase(conversation, plainText, message);
+
     return response;
   }
 
@@ -102,8 +105,6 @@ export class ViberAPI {
   }
 
   async getName(integrationId: string) {
-    const name: string = 'Viber';
-
     const inboxIntegration = await sendInboxMessage({
       subdomain: this.subdomain,
       action: 'integrations.findOne',
@@ -116,6 +117,21 @@ export class ViberAPI {
       return inboxIntegration.name;
     }
 
-    return name;
+    return 'Viber';
+  }
+
+  async savetoDatabase(
+    conversation: IConversation,
+    plainText: string,
+    message: any
+  ) {
+    await ConversationMessages.create({
+      conversationId: conversation._id,
+      createdAt: new Date(),
+      userId: message.userId,
+      customerId: null,
+      content: plainText,
+      messageType: 'text'
+    });
   }
 }
