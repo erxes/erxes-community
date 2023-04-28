@@ -260,36 +260,20 @@ class TransactionForm extends React.Component<Props, State> {
             </FormColumn>
 
             <FormColumn>
-              {isEnabled('contacts') && (
-                <>
-                  <FormGroup>
-                    <ControlLabel>Company</ControlLabel>
-                    <SelectCompanies
-                      label="Choose an company"
-                      name="companyId"
-                      initialValue={this.state.companyId}
-                      onSelect={onSelect}
-                      multi={false}
-                    />
-                  </FormGroup>
-
-                  <FormGroup>
-                    <ControlLabel>Customer</ControlLabel>
-                    <SelectContractts
-                      label="Choose an customer"
-                      name="contractId"
-                      initialValue={this.state.contractId}
-                      onSelect={(v, n) => {
-                        onSelect(v, n);
-                        typeof v === 'string' &&
-                          onSelect(Contracts[v].customerId, 'customerId');
-                      }}
-                      multi={false}
-                    />
-                  </FormGroup>
-                </>
-              )}
-
+              <FormGroup>
+                <ControlLabel>Contract</ControlLabel>
+                <SelectContractts
+                  label="Choose an customer"
+                  name="contractId"
+                  initialValue={this.state.contractId}
+                  onSelect={(v, n) => {
+                    onSelect(v, n);
+                    typeof v === 'string' &&
+                      onSelect(Contracts[v].customerId, 'customerId');
+                  }}
+                  multi={false}
+                />
+              </FormGroup>
               {this.renderRowTr('total', 'total')}
             </FormColumn>
           </FormWrapper>
