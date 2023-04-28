@@ -47,20 +47,20 @@ module.exports = {
       permissions: ['manageContracts']
     }
   ],
-  // customerRightSidebarSection: [
-  //   {
-  //     text: 'customerRightSidebarSection',
-  //     component: './contractSection',
-  //     scope: 'loan',
-  //   },
-  // ],
-  // companyRightSidebarSection: [
-  //   {
-  //     text: 'companyRightSidebarSection',
-  //     component: './contractSection',
-  //     scope: 'loan',
-  //   },
-  // ],
+  customerRightSidebarSection: [
+    {
+      text: 'customerRightSidebarSection',
+      component: './contractSection',
+      scope: 'loan'
+    }
+  ],
+  companyRightSidebarSection: [
+    {
+      text: 'companyRightSidebarSection',
+      component: './contractSection',
+      scope: 'loan'
+    }
+  ],
   dealRightSidebarSection: [
     {
       text: 'dealRightSidebarSection',

@@ -187,6 +187,10 @@ const generateFilter = async (models, params, commonQuerySelector) => {
     filter.repayment = params.repayment;
   }
 
+  if (params.dealId) {
+    filter.dealId = params.dealId;
+  }
+
   return filter;
 };
 

@@ -34,6 +34,7 @@ const commonFields = `
   $riskExpertId: String
   $weekends: [Int]
   $useHoliday: Boolean
+  $dealId: String
 
   $relContractId: String
 `;
@@ -72,6 +73,7 @@ const commonVariables = `
   riskExpertId: $riskExpertId
   weekends: $weekends
   useHoliday: $useHoliday
+  dealId: $dealId
 
   relContractId: $relContractId
 `;

@@ -88,6 +88,8 @@ export interface IContract {
 
   isExpired?: boolean;
   repaymentDate?: Date;
+
+  dealId?: string;
 }
 
 export interface IContractDocument extends IContract, Document {
@@ -309,6 +311,11 @@ export const contractSchema = schemaHooksWrapper(
       type: Date,
       optional: true,
       label: 'contract payment date of schedule'
+    }),
+    dealId: field({
+      type: String,
+      optional: true,
+      label: 'contract relation of dealId'
     })
   }),
   'erxes_contractSchema'

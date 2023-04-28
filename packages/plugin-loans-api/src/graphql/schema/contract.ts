@@ -76,6 +76,7 @@ export const types = () => `
 
     relContractId: String
     relContract: RecContract
+    dealId: String
   }
 
 
@@ -123,6 +124,7 @@ const queryParams = `
   endStartDate:Date
   startCloseDate:Date
   endCloseDate:Date
+  dealId:String
   customerId:String
   leaseAmount: Float
   interestRate: Float
@@ -173,6 +175,7 @@ const commonFields = `
   weekends: [Int]
   useHoliday: Boolean
   relContractId: String
+  dealId: String
 `;
 
 export const mutations = `

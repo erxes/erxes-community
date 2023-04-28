@@ -5,22 +5,33 @@ import {
   ModalTrigger,
   MainStyleButtonRelated as ButtonRelated,
   __,
-  SectionBodyItem
+  SectionBodyItem,
+  Alert
 } from '@erxes/ui/src';
 import GetConformity from '@erxes/ui-cards/src/conformity/containers/GetConformity';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ContractChooser from '../../containers/ContractChooser';
-import { queries } from '../../graphql';
-import { IContract } from '../../types';
+import { mutations, queries } from '../../graphql';
+import {
+  EditMutationResponse,
+  IContract,
+  IContractDoc,
+  MainQueryResponse
+} from '../../types';
+import { withProps } from '@erxes/ui/src/utils/core';
+import * as compose from 'lodash.flowright';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 
 type Props = {
   name: string;
-  items?: IContract[];
+  contractsQuery?: MainQueryResponse;
   mainType?: string;
   mainTypeId?: string;
-  onSelect?: (contracts: IContract[]) => void;
+  onSelect?: (contract: IContract[]) => void;
   collapseCallback?: () => void;
+  contractsEdit: any;
   title?: string;
 };
 
@@ -28,20 +39,37 @@ function Component(
   this: any,
   {
     name,
-    items = [],
+    contractsQuery = { contractsMain: { list: [] } } as any,
     mainType = '',
     mainTypeId = '',
-    onSelect,
     collapseCallback,
-    title
+    title,
+    contractsEdit,
+    ...other
   }: Props
 ) {
+  console.log('other', other);
   const renderContractChooser = props => {
     return (
       <ContractChooser
         {...props}
-        data={{ name, contracts: items, mainType, mainTypeId }}
-        onSelect={onSelect}
+        data={{
+          name,
+          contracts: contractsQuery?.contractsMain?.list,
+          mainType,
+          mainTypeId
+        }}
+        onSelect={(contracts: IContractDoc[]) => {
+          contractsEdit({
+            variables: { ...contracts[0], dealId: mainTypeId }
+          })
+            .then(() => {
+              collapseCallback && collapseCallback();
+            })
+            .catch(e => {
+              Alert.error(e.message);
+            });
+        }}
       />
     );
   };
@@ -50,8 +78,24 @@ function Component(
     return (
       <ContractChooser
         {...props}
-        data={{ name, contracts: items, mainTypeId, mainType, isRelated: true }}
-        onSelect={onSelect}
+        data={{
+          name,
+          contracts: contractsQuery?.contractsMain?.list,
+          mainTypeId,
+          mainType,
+          isRelated: true
+        }}
+        onSelect={(contracts: IContractDoc[]) => {
+          contractsEdit({
+            variables: { ...contracts[0], dealId: mainTypeId }
+          })
+            .then(() => {
+              collapseCallback && collapseCallback();
+            })
+            .catch(e => {
+              Alert.error(e.message);
+            });
+        }}
       />
     );
   };
@@ -88,7 +132,7 @@ function Component(
 
   const content = (
     <>
-      {items.map((contract, index) => (
+      {contractsQuery?.contractsMain?.list.map((contract, index) => (
         <SectionBodyItem key={index}>
           <Link to={`/erxes-plugin-loan/contract-details/${contract._id}`}>
             <Icon icon="arrow-to-right" />
@@ -96,7 +140,9 @@ function Component(
           <span>{contract.number || 'Unknown'}</span>
         </SectionBodyItem>
       ))}
-      {items.length === 0 && <EmptyState icon="building" text="No contract" />}
+      {contractsQuery?.contractsMain?.list.length === 0 && (
+        <EmptyState icon="building" text="No contract" />
+      )}
       {mainTypeId && mainType && relQuickButtons}
     </>
   );
@@ -123,18 +169,24 @@ type IProps = {
   collapseCallback?: () => void;
 };
 
-class ContractSection extends React.Component<IProps> {
-  render() {
-    return (
-      <GetConformity
-        {...this.props}
-        relType="contract"
-        component={Component}
-        queryName="contracts"
-        itemsQuery={queries.contracts}
-        alreadyItems={this.props.contracts}
-      />
-    );
-  }
-}
-export default ContractSection;
+export default withProps<IProps>(
+  compose(
+    graphql<{ mainTypeId: any }, MainQueryResponse, any>(
+      gql(queries.contractsMain),
+      {
+        name: 'contractsQuery',
+        options: ({ mainTypeId }) => {
+          return {
+            fetchPolicy: 'network-only',
+            variables: { dealId: mainTypeId }
+          };
+        }
+      }
+    ),
+    // mutations
+    graphql<{}, EditMutationResponse, any>(gql(mutations.contractsEdit), {
+      name: 'contractsEdit',
+      options: { refetchQueries: ['contractsMain'] }
+    })
+  )(Component)
+);

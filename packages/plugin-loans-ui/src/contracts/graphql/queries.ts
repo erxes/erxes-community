@@ -48,7 +48,8 @@ const listParamsDef = `
   $endStartDate:Date
   $startCloseDate:Date
   $endCloseDate:Date
-  $customerId:String
+  $dealId: String
+  $customerId: String
   $sortField: String
   $sortDirection: Int
   $contractTypeId: String
@@ -72,6 +73,7 @@ const listParamsValue = `
   endStartDate: $endStartDate
   startCloseDate: $startCloseDate
   endCloseDate: $endCloseDate
+  dealId: $dealId
   customerId: $customerId
   sortField: $sortField
   sortDirection: $sortDirection

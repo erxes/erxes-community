@@ -1,5 +1,4 @@
-import { withProps } from '@erxes/ui/src';
-import ConformityChooser from '@erxes/ui-cards/src/conformity/containers/ConformityChooser';
+import { Chooser, withProps } from '@erxes/ui/src';
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
@@ -79,7 +78,7 @@ class ContractChooser extends React.Component<
       refetchQuery: queries.contracts
     };
 
-    return <ConformityChooser {...updatedProps} />;
+    return <Chooser limit={1} {...updatedProps} />;
   }
 }
 
