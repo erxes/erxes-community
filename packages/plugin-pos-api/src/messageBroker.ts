@@ -34,7 +34,7 @@ export const initBroker = async cl => {
 
       const { deliveryConfig = {} } = pos;
       const deliveryInfo = doneOrder.deliveryInfo || {};
-      const { marker = {}, description } = deliveryInfo;
+      const { marker = {}, description, isNewAddress } = deliveryInfo;
 
       const dealsData = {
         name: `Delivery: ${doneOrder.number}`,
@@ -163,6 +163,39 @@ export const initBroker = async cl => {
             }
           }
         );
+      }
+
+      const customerType = doneOrder.customerType || 'customer';
+      if (
+        isNewAddress &&
+        doneOrder.customerId &&
+        ['customer', 'company'].includes(customerType)
+      ) {
+        const moduleTxt =
+          customerType === 'company' ? 'companies' : 'customers';
+
+        await sendContactsMessage({
+          subdomain,
+          action: `c${moduleTxt}.updateOne`,
+          data: {
+            selector: { _id: doneOrder.customerId },
+            modifier: {
+              $push: {
+                addresses: {
+                  location: {
+                    type: 'Point',
+                    coordinates: [
+                      marker.longitude || marker.lng,
+                      marker.latitude || marker.lat
+                    ]
+                  },
+                  short: description
+                }
+              }
+            }
+          },
+          isRPC: true
+        });
       }
 
       return {

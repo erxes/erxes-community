@@ -34,7 +34,8 @@ const addEditParams = `
   billType: String,
   registerNumber: String,
   slotCode: String,
-  origin: String
+  origin: String,
+  dueDate: Date
 `;
 
 export const types = `
@@ -98,6 +99,7 @@ export const types = `
     paidAmounts: [PaidAmount]
 
     paidDate: Date
+    dueDate: Date
     modifiedAt: Date
     totalAmount: Float
     finalAmount: Float
@@ -146,6 +148,8 @@ export const ordersQueryParams = `
   customerType: String,
   startDate: Date,
   endDate: Date,
+  dateType: String,
+  isPaid: Boolean,
   page: Int,
   perPage: Int,
   sortField: String,
@@ -157,6 +161,7 @@ export const mutations = `
   ordersEdit(_id: String!, ${addEditParams}): Order
   ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse
   orderChangeStatus(_id: String!, status: String): Order
+  ordersChange(_id: String!, dueDate: Date, branchId: String, deliveryInfo: JSON): Order
   ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput] ): Order
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
@@ -164,7 +169,7 @@ export const mutations = `
 `;
 
 export const queries = `
-  orders(searchValue: String, page: Int, perPage: Int): [Order]
+  orders(${ordersQueryParams}): [Order]
   fullOrders(${ordersQueryParams}): [Order]
   ordersTotalCount(${ordersQueryParams}): Int
   orderDetail(_id: String, customerId: String): Order
