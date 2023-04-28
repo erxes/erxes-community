@@ -28,9 +28,15 @@ export const initBroker = async cl => {
     // if (doneOrder.type === 'delivery' && doneOrder.status === 'done') { }
     if (action === 'statusToDone') {
       // must have
-      const doneOrder: IPosOrderDocument = await models.PosOrders.findOne({
+      const doneOrder:
+        | IPosOrderDocument
+        | undefined = await models.PosOrders.findOne({
         _id: order._id
       }).lean();
+
+      if (!doneOrder) {
+        return {};
+      }
 
       const { deliveryConfig = {} } = pos;
       const deliveryInfo = doneOrder.deliveryInfo || {};
