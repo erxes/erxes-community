@@ -96,6 +96,15 @@ const contractsEdit = `
   }
 `;
 
+const contractsDealEdit = `
+  mutation contractsDealEdit($_id: String!, ${commonFields}) {
+    contractsEdit(_id: $_id, ${commonVariables}) {
+      _id
+      ${contractDetailFields}
+    }
+  }
+`;
+
 const contractsRemove = `
   mutation contractsRemove($contractIds: [String]) {
     contractsRemove(contractIds: $contractIds)
@@ -142,6 +151,7 @@ const fixSchedules = `
 export default {
   contractsAdd,
   contractsEdit,
+  contractsDealEdit,
   contractsRemove,
   regenSchedules,
   fixSchedules,

@@ -84,6 +84,50 @@ const contractMutations = {
 
     return updated;
   },
+  contractsDealEdit: async (
+    _root,
+    { _id, ...doc }: IContractDocument,
+    { models, user, subdomain }: IContext
+  ) => {
+    const checkOtherDeals = await models.Contracts.countDocuments({
+      dealId: doc.dealId,
+      _id: { $ne: _id }
+    });
+
+    console.log('checkOtherDeals', checkOtherDeals);
+
+    if (!!checkOtherDeals) {
+      await models.Contracts.updateMany(
+        { dealId: doc.dealId, _id: { $ne: _id } },
+        { $set: { dealId: undefined } }
+      );
+    }
+
+    const contract = await models.Contracts.getContract({ _id });
+    const updated = await models.Contracts.updateContract(_id, doc);
+
+    const logData = {
+      type: 'contract',
+      object: contract,
+      newData: { ...doc },
+      updatedDocument: updated,
+      extraParams: { models }
+    };
+
+    const descriptions = gatherDescriptions(logData);
+
+    await putUpdateLog(
+      subdomain,
+      messageBroker,
+      {
+        ...logData,
+        ...descriptions
+      },
+      user
+    );
+
+    return updated;
+  },
 
   /**
    * to close contract
@@ -280,6 +324,7 @@ const contractMutations = {
 
 checkPermission(contractMutations, 'contractsAdd', 'manageContracts');
 checkPermission(contractMutations, 'contractsEdit', 'manageContracts');
+checkPermission(contractMutations, 'contractsDealEdit', 'manageContracts');
 checkPermission(contractMutations, 'contractsClose', 'manageContracts');
 checkPermission(contractMutations, 'contractsRemove', 'manageContracts');
 checkPermission(contractMutations, 'getProductsData', 'manageContracts');

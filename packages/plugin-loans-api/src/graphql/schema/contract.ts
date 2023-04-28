@@ -181,6 +181,7 @@ const commonFields = `
 export const mutations = `
   contractsAdd(${commonFields}): Contract
   contractsEdit(_id: String!, ${commonFields}): Contract
+  contractsDealEdit(_id: String!, ${commonFields}): Contract
   contractsClose(contractId: String, closeDate: Date, closeType: String, description: String): Contract
   contractsRemove(contractIds: [String]): [String]
   getProductsData(contractId: String): CollateralsDataResponse

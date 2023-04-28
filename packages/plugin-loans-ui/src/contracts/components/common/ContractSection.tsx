@@ -30,7 +30,7 @@ type Props = {
   mainTypeId?: string;
   onSelect?: (contract: IContract[]) => void;
   collapseCallback?: () => void;
-  contractsEdit: any;
+  contractsDealEdit: any;
   title?: string;
 };
 
@@ -43,11 +43,9 @@ function Component(
     mainTypeId = '',
     collapseCallback,
     title,
-    contractsEdit,
-    ...other
+    contractsDealEdit
   }: Props
 ) {
-  console.log('other', other);
   const renderContractChooser = props => {
     return (
       <ContractChooser
@@ -59,7 +57,7 @@ function Component(
           mainTypeId
         }}
         onSelect={(contracts: IContractDoc[]) => {
-          contractsEdit({
+          contractsDealEdit({
             variables: { ...contracts[0], dealId: mainTypeId }
           })
             .then(() => {
@@ -85,7 +83,7 @@ function Component(
           isRelated: true
         }}
         onSelect={(contracts: IContractDoc[]) => {
-          contractsEdit({
+          contractsDealEdit({
             variables: { ...contracts[0], dealId: mainTypeId }
           })
             .then(() => {
@@ -183,8 +181,8 @@ export default withProps<IProps>(
       }
     ),
     // mutations
-    graphql<{}, EditMutationResponse, any>(gql(mutations.contractsEdit), {
-      name: 'contractsEdit',
+    graphql<{}, EditMutationResponse, any>(gql(mutations.contractsDealEdit), {
+      name: 'contractsDealEdit',
       options: { refetchQueries: ['contractsMain'] }
     })
   )(Component)
