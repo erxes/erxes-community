@@ -1,4 +1,3 @@
-import { getConfig } from 'erxes-api-utils';
 import {
   checkCompanyRd,
   getEbarimtData,
@@ -268,7 +267,7 @@ export const ConfirmBase = async (
   const journalConfig = (
     await models.ContractTypes.findOne({ _id: contract.contractTypeId }).lean()
   ).config;
-  const config = await getConfig(models, memoryStorage, 'ERKHET', {});
+  const config = {};
   const { customerCode, billType } = await checkCompanyRd(
     models,
     contract,

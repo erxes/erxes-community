@@ -1,17 +1,9 @@
-import { paginate } from 'erxes-api-utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import { checkPermission, paginate } from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
+import { IAdjustmentDocument } from '../../../models/definitions/adjustments';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
-
-  // if (params.searchValue) {
-  //   filter.$or = [
-  //     { name: { $in: [new RegExp(`.*${params.searchValue}.*`, 'i')] } },
-  //     { code: { $in: [new RegExp(`.*${params.searchValue}.*`, 'i')] } },
-  //     { number: { $in: [new RegExp(`.*${params.searchValue}.*`, 'i')] } },
-  //   ]
-  // }
-
   if (params.startDate) {
     filter.payDate = {
       $gte: new Date(params.startDate)
@@ -46,7 +38,7 @@ const adjustmentQueries = {
   adjustments: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.Adjustments.find(
@@ -66,7 +58,7 @@ const adjustmentQueries = {
   adjustmentsMain: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     const filter = await generateFilter(params, commonQuerySelector);
 
@@ -88,10 +80,10 @@ const adjustmentQueries = {
 
   adjustmentDetail: async (
     _root,
-    { _id },
-    { models, checkPermission, user }
+    { _id }: IAdjustmentDocument,
+    { models }: IContext
   ) => {
-    return models.Adjustments.getAdjustment(models, { _id });
+    return models.Adjustments.getAdjustment({ _id });
   }
 };
 

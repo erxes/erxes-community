@@ -1,5 +1,5 @@
-import { paginate } from 'erxes-api-utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import { checkPermission, paginate } from '@erxes/api-utils/src';
+import { IContext } from '../../../connectionResolver';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -37,7 +37,7 @@ const contractTypeQueries = {
   contractTypes: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.ContractTypes.find(
@@ -57,7 +57,7 @@ const contractTypeQueries = {
   contractTypesMain: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     const filter = await generateFilter(params, commonQuerySelector);
 
@@ -77,12 +77,8 @@ const contractTypeQueries = {
    * Get one contractType
    */
 
-  contractTypeDetail: async (
-    _root,
-    { _id },
-    { models, checkPermission, user }
-  ) => {
-    return models.ContractTypes.getContractType(models, { _id });
+  contractTypeDetail: async (_root, { _id }, { models }: IContext) => {
+    return models.ContractTypes.getContractType({ _id });
   }
 };
 

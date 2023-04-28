@@ -1,4 +1,3 @@
-import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
 import { IContext } from '../../connectionResolver';
 import { sendCoreMessage, sendMessageBroker } from '../../messageBroker';
 import { SCHEDULE_STATUS } from '../../models/definitions/constants';
@@ -43,7 +42,7 @@ const Contracts = {
   async customers(contract: IContract, {}, { subdomain }: IContext) {
     if (contract.customerType !== 'customer') return null;
 
-    const customer: ICustomer = await sendMessageBroker(
+    const customer = await sendMessageBroker(
       {
         subdomain,
         action: 'customers.findOne',

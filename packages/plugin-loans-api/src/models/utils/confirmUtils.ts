@@ -1,4 +1,4 @@
-import { sendRequest } from 'erxes-api-utils';
+import { sendRequest } from '@erxes/api-utils/src';
 
 export interface IConformity {
   mainType: string;

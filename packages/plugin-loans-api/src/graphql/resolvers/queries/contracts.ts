@@ -1,12 +1,9 @@
-import { paginate } from 'erxes-api-utils';
 import { getCloseInfo } from '../../../models/utils/closeUtils';
 import { getFullDate } from '../../../models/utils/utils';
-import { checkPermission } from '@erxes/api-utils/src';
+import { checkPermission, paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import redis from '../../../redis';
 import { sendMessageBroker } from '../../../messageBroker';
-import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
-import { ICompany } from '@erxes/ui-contacts/src/companies/types';
 
 const generateFilter = async (models, params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -213,7 +210,7 @@ const contractQueries = {
   contracts: async (
     _root,
     params,
-    { commonQuerySelector, models, checkPermission, user }
+    { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
       models.Contracts.find(
@@ -256,7 +253,7 @@ const contractQueries = {
   cpContracts: async (_root, params, { models, subdomain }: IContext) => {
     const mainType = params.cpUserType || 'customer';
     if (mainType === 'customer') {
-      const customer: ICustomer = await sendMessageBroker(
+      const customer = await sendMessageBroker(
         {
           subdomain,
           action: 'customers.findOne',
@@ -276,7 +273,7 @@ const contractQueries = {
       });
     }
 
-    var company: ICompany = await sendMessageBroker(
+    var company = await sendMessageBroker(
       {
         subdomain,
         action: 'companies.findOne',
