@@ -1,6 +1,7 @@
 const posOrderFields = contactsEnabled => `
   _id: String,
   createdAt: Date,
+  dueDate: Date,
   status: String,
   paidDate: Date,
   number: String,

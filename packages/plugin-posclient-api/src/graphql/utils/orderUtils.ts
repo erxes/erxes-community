@@ -139,6 +139,8 @@ export const updateOrderItems = async (
 
   const itemIds = oldItems.map(i => i._id);
 
+  console.log(items, 'items');
+
   for (const item of items) {
     const doc = {
       productId: item.productId,
@@ -150,7 +152,9 @@ export const updateOrderItems = async (
       bonusVoucherId: item.bonusVoucherId,
       isPackage: item.isPackage,
       isTake: item.isTake,
-      manufacturedDate: item.manufacturedDate
+      manufacturedDate: item.manufacturedDate,
+      description: item.description,
+      decorationAttachment: item.decorationAttachment
     };
 
     if (itemIds.includes(item._id)) {

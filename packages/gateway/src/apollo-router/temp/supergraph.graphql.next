@@ -119,6 +119,16 @@ enum CacheControlScope
   PRIVATE @join__enumValue(graph: CONTACTS) @join__enumValue(graph: CORE) @join__enumValue(graph: PRODUCTS)
 }
 
+type Callout
+  @join__type(graph: FORMS)
+{
+  title: String
+  body: String
+  buttonText: String
+  featuredImage: String
+  skip: Boolean
+}
+
 type CatProd
   @join__type(graph: POS)
 {
@@ -296,6 +306,14 @@ enum ClientPortalUserVerificationStatus
   pending @join__enumValue(graph: CLIENTPORTAL)
 }
 
+type ColumnConfigItem
+  @join__type(graph: FORMS)
+{
+  name: String
+  label: String
+  order: Int
+}
+
 type CompaniesListResponse
   @join__type(graph: CONTACTS)
 {
@@ -306,6 +324,7 @@ type CompaniesListResponse
 type Company
   @join__type(graph: CLIENTPORTAL, key: "_id")
   @join__type(graph: CONTACTS, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
   @join__type(graph: PRODUCTS, key: "_id")
 {
   _id: String!
@@ -415,6 +434,7 @@ type CoverSummary
 type Customer
   @join__type(graph: CLIENTPORTAL, key: "_id")
   @join__type(graph: CONTACTS, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
   @join__type(graph: POS, key: "_id")
 {
   _id: String!
@@ -497,6 +517,7 @@ scalar Date
   @join__type(graph: CLIENTPORTAL)
   @join__type(graph: CONTACTS)
   @join__type(graph: CORE)
+  @join__type(graph: FORMS)
   @join__type(graph: KNOWLEDGEBASE)
   @join__type(graph: POS)
   @join__type(graph: POSCLIENT)
@@ -558,6 +579,118 @@ type ENV
   USE_BRAND_RESTRICTIONS: String
 }
 
+type Field
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  contentType: String!
+  contentTypeId: String
+  name: String
+  isVisible: Boolean
+  isVisibleInDetail: Boolean
+  canHide: Boolean
+  groupId: String
+  lastUpdatedUser: User
+  lastUpdatedUserId: String
+  associatedField: Field
+  locationOptions: [LocationOption]
+  objectListConfigs: [ObjectListConfig]
+  optionsValues: String
+  products: [Product]
+  description: String
+  options: [String]
+  type: String
+  validation: String
+  text: String
+  content: String
+  isRequired: Boolean
+  order: Int
+  associatedFieldId: String
+  logicAction: String
+  column: Int
+  groupName: String
+  pageNumber: Int
+  code: String
+  searchable: Boolean
+  showInCard: Boolean
+  isVisibleToCreate: Boolean
+  productCategoryId: String
+  field: String
+  isDefinedByErxes: Boolean
+  logics: [Logic]
+}
+
+input FieldItem
+  @join__type(graph: FORMS)
+{
+  _id: String
+  tempFieldId: String
+  logics: [LogicInput]
+  locationOptions: [LocationOptionInput]
+  objectListConfigs: [objectListConfigInput]
+  optionsValues: String
+  description: String
+  options: [String]
+  type: String
+  validation: String
+  text: String
+  content: String
+  isRequired: Boolean
+  order: Int
+  associatedFieldId: String
+  logicAction: String
+  column: Int
+  groupName: String
+  pageNumber: Int
+  code: String
+  searchable: Boolean
+  showInCard: Boolean
+  isVisibleToCreate: Boolean
+  productCategoryId: String
+  field: String
+  isDefinedByErxes: Boolean
+}
+
+type FieldsGroup
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  name: String
+  contentType: String
+  order: Int
+  code: String
+  parentId: String
+  description: String
+  isMultiple: Boolean
+  isVisible: Boolean
+  isVisibleInDetail: Boolean
+  alwaysOpen: Boolean
+  isDefinedByErxes: Boolean
+  fields: [Field]
+  lastUpdatedUserId: String
+  lastUpdatedUser: User
+  config: JSON
+  logicAction: String
+  logics: [Logic]
+}
+
+type Form
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  title: String
+  code: String
+  type: String
+  description: String
+  buttonText: String
+  createdUserId: String
+  createdUser: User
+  createdDate: Date
+  numberOfPages: Int
+  googleMapApiKey: String
+  fields: [Field]
+}
+
 type FormCode
   @join__type(graph: KNOWLEDGEBASE)
 {
@@ -570,6 +703,26 @@ input FormCodeInput
 {
   brandId: String
   formId: String
+}
+
+type FormSubmission
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  customerId: String
+  formId: String
+  formFieldId: String
+  text: String
+  formFieldText: String
+  value: JSON
+  submittedAt: Date
+}
+
+input FormSubmissionInput
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  value: JSON
 }
 
 input GroupInput
@@ -599,8 +752,9 @@ scalar join__FieldSet
 
 enum join__Graph {
   CLIENTPORTAL @join__graph(name: "clientportal", url: "http://localhost:3301/graphql")
-  CONTACTS @join__graph(name: "contacts", url: "http://localhost:3306/graphql")
+  CONTACTS @join__graph(name: "contacts", url: "http://localhost:3307/graphql")
   CORE @join__graph(name: "core", url: "http://localhost:3300/graphql")
+  FORMS @join__graph(name: "forms", url: "http://localhost:3306/graphql")
   KNOWLEDGEBASE @join__graph(name: "knowledgebase", url: "http://localhost:3305/graphql")
   POS @join__graph(name: "pos", url: "http://localhost:3303/graphql")
   POSCLIENT @join__graph(name: "posclient", url: "http://localhost:3304/graphql")
@@ -614,6 +768,7 @@ scalar JSON
   @join__type(graph: CLIENTPORTAL)
   @join__type(graph: CONTACTS)
   @join__type(graph: CORE)
+  @join__type(graph: FORMS)
   @join__type(graph: KNOWLEDGEBASE)
   @join__type(graph: POS)
   @join__type(graph: POSCLIENT)
@@ -761,6 +916,39 @@ enum link__Purpose {
   EXECUTION
 }
 
+type LocationOption
+  @join__type(graph: FORMS)
+{
+  lat: Float
+  lng: Float
+  description: String
+}
+
+input LocationOptionInput
+  @join__type(graph: FORMS)
+{
+  lat: Float
+  lng: Float
+  description: String
+}
+
+type Logic
+  @join__type(graph: FORMS)
+{
+  fieldId: String!
+  logicOperator: String
+  logicValue: JSON
+}
+
+input LogicInput
+  @join__type(graph: FORMS)
+{
+  fieldId: String
+  tempFieldId: String
+  logicOperator: String
+  logicValue: JSON
+}
+
 type MailConfig
   @join__type(graph: CLIENTPORTAL)
 {
@@ -789,6 +977,7 @@ type Mutation
   @join__type(graph: CLIENTPORTAL)
   @join__type(graph: CONTACTS)
   @join__type(graph: CORE)
+  @join__type(graph: FORMS)
   @join__type(graph: KNOWLEDGEBASE)
   @join__type(graph: POS)
   @join__type(graph: POSCLIENT)
@@ -885,6 +1074,23 @@ type Mutation
   appsAdd(name: String, userGroupId: String, expireDate: Date): App @join__field(graph: CORE)
   appsEdit(_id: String!, name: String, userGroupId: String, expireDate: Date): App @join__field(graph: CORE)
   appsRemove(_id: String!): JSON @join__field(graph: CORE)
+  formsAdd(title: String, description: String, buttonText: String, type: String!, numberOfPages: Int, googleMapApiKey: String): Form @join__field(graph: FORMS)
+  formsEdit(_id: String!, title: String, description: String, buttonText: String, type: String!, numberOfPages: Int, googleMapApiKey: String): Form @join__field(graph: FORMS)
+  formSubmissionsSave(formId: String, contentTypeId: String, contentType: String, formSubmissions: JSON): Boolean @join__field(graph: FORMS)
+  formSubmissionsRemove(customerId: String!, contentTypeId: String!): JSON @join__field(graph: FORMS)
+  formSubmissionsEdit(contentTypeId: String!, customerId: String!, submissions: [FormSubmissionInput]): Submission @join__field(graph: FORMS)
+  fieldsAdd(contentType: String!, contentTypeId: String, type: String, validation: String, text: String, description: String, code: String, options: [String], locationOptions: [LocationOptionInput], isRequired: Boolean, order: Int, groupId: String, isVisible: Boolean, canHide: Boolean, associatedFieldId: String, logicAction: String, logics: [LogicInput], searchable: Boolean, showInCard: Boolean, objectListConfigs: [objectListConfigInput], isVisibleToCreate: Boolean): Field @join__field(graph: FORMS)
+  fieldsBulkAddAndEdit(contentType: String!, contentTypeId: String, addingFields: [FieldItem], editingFields: [FieldItem]): [Field] @join__field(graph: FORMS)
+  fieldsEdit(_id: String!, type: String, validation: String, text: String, description: String, code: String, options: [String], locationOptions: [LocationOptionInput], isRequired: Boolean, order: Int, groupId: String, isVisible: Boolean, canHide: Boolean, associatedFieldId: String, logicAction: String, logics: [LogicInput], searchable: Boolean, showInCard: Boolean, objectListConfigs: [objectListConfigInput], isVisibleToCreate: Boolean): Field @join__field(graph: FORMS)
+  fieldsRemove(_id: String!): Field @join__field(graph: FORMS)
+  fieldsUpdateOrder(orders: [OrderItem]): [Field] @join__field(graph: FORMS)
+  fieldsUpdateVisible(_id: String!, isVisible: Boolean, isVisibleInDetail: Boolean): Field @join__field(graph: FORMS)
+  fieldsUpdateSystemFields(_id: String!, isVisibleToCreate: Boolean, isRequired: Boolean): Field @join__field(graph: FORMS)
+  fieldsGroupsAdd(name: String, contentType: String, order: Int, description: String, parentId: String, code: String, isMultiple: Boolean, isVisible: Boolean, alwaysOpen: Boolean, isVisibleInDetail: Boolean, config: JSON, logicAction: String, logics: [LogicInput]): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsEdit(_id: String!, name: String, contentType: String, order: Int, description: String, parentId: String, code: String, isMultiple: Boolean, isVisible: Boolean, alwaysOpen: Boolean, isVisibleInDetail: Boolean, config: JSON, logicAction: String, logics: [LogicInput]): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsRemove(_id: String!): JSON @join__field(graph: FORMS)
+  fieldsGroupsUpdateVisible(_id: String, isVisible: Boolean, isVisibleInDetail: Boolean): FieldsGroup @join__field(graph: FORMS)
+  fieldsGroupsUpdateOrder(orders: [OrderItem]): [FieldsGroup] @join__field(graph: FORMS)
   knowledgeBaseTopicsAdd(doc: KnowledgeBaseTopicDoc!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
   knowledgeBaseTopicsEdit(_id: String!, doc: KnowledgeBaseTopicDoc!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
   knowledgeBaseTopicsRemove(_id: String!): JSON @join__field(graph: KNOWLEDGEBASE)
@@ -961,6 +1167,22 @@ enum NotificationType
   engage @join__enumValue(graph: CLIENTPORTAL)
 }
 
+type ObjectListConfig
+  @join__type(graph: FORMS)
+{
+  key: String
+  label: String
+  type: String
+}
+
+input objectListConfigInput
+  @join__type(graph: FORMS)
+{
+  key: String
+  label: String
+  type: String
+}
+
 type OnboardingGetAvailableFeaturesResponse
   @join__type(graph: CORE)
 {
@@ -1018,6 +1240,13 @@ type Order
   user: PosUser
   putResponses: [PosPutResponse]
   slotCode: String
+}
+
+input OrderItem
+  @join__type(graph: FORMS)
+{
+  _id: String!
+  order: Int!
 }
 
 input OrderItemInput
@@ -1281,6 +1510,7 @@ type PoscProduct
   subUoms: JSON
   category: PosProductCategory
   remainder: Int
+  remainders: [JSON]
 }
 
 type PosCustomer
@@ -1299,6 +1529,7 @@ type PosOrder
 {
   _id: String
   createdAt: Date
+  dueDate: Date
   status: String
   paidDate: Date
   number: String
@@ -1331,6 +1562,7 @@ type PosOrderDetail
 {
   _id: String
   createdAt: Date
+  dueDate: Date
   status: String
   paidDate: Date
   number: String
@@ -1495,35 +1727,36 @@ type PosUserDetailsType
 }
 
 type Product
+  @join__type(graph: FORMS, key: "_id")
   @join__type(graph: PRODUCTS, key: "_id")
 {
   _id: String!
-  name: String
-  code: String
-  type: String
-  description: String
-  sku: String
-  barcodes: [String]
-  barcodeDescription: String
-  unitPrice: Float
-  categoryId: String
-  customFieldsData: JSON
-  customFieldsDataByFieldCode: JSON
-  createdAt: Date
-  tagIds: [String]
-  attachment: Attachment
-  attachmentMore: [Attachment]
-  vendorId: String
-  supply: String
-  productCount: Int
-  minimiumCount: Int
-  uomId: String
-  subUoms: JSON
-  uom: Uom
-  category: ProductCategory
-  vendor: Company
-  taxType: String
-  taxCode: String
+  name: String @join__field(graph: PRODUCTS)
+  code: String @join__field(graph: PRODUCTS)
+  type: String @join__field(graph: PRODUCTS)
+  description: String @join__field(graph: PRODUCTS)
+  sku: String @join__field(graph: PRODUCTS)
+  barcodes: [String] @join__field(graph: PRODUCTS)
+  barcodeDescription: String @join__field(graph: PRODUCTS)
+  unitPrice: Float @join__field(graph: PRODUCTS)
+  categoryId: String @join__field(graph: PRODUCTS)
+  customFieldsData: JSON @join__field(graph: PRODUCTS)
+  customFieldsDataByFieldCode: JSON @join__field(graph: PRODUCTS)
+  createdAt: Date @join__field(graph: PRODUCTS)
+  tagIds: [String] @join__field(graph: PRODUCTS)
+  attachment: Attachment @join__field(graph: PRODUCTS)
+  attachmentMore: [Attachment] @join__field(graph: PRODUCTS)
+  vendorId: String @join__field(graph: PRODUCTS)
+  supply: String @join__field(graph: PRODUCTS)
+  productCount: Int @join__field(graph: PRODUCTS)
+  minimiumCount: Int @join__field(graph: PRODUCTS)
+  uomId: String @join__field(graph: PRODUCTS)
+  subUoms: JSON @join__field(graph: PRODUCTS)
+  uom: Uom @join__field(graph: PRODUCTS)
+  category: ProductCategory @join__field(graph: PRODUCTS)
+  vendor: Company @join__field(graph: PRODUCTS)
+  taxType: String @join__field(graph: PRODUCTS)
+  taxCode: String @join__field(graph: PRODUCTS)
 }
 
 type ProductCategory
@@ -1567,6 +1800,7 @@ type Query
   @join__type(graph: CLIENTPORTAL)
   @join__type(graph: CONTACTS)
   @join__type(graph: CORE)
+  @join__type(graph: FORMS)
   @join__type(graph: KNOWLEDGEBASE)
   @join__type(graph: POS)
   @join__type(graph: POSCLIENT)
@@ -1642,6 +1876,19 @@ type Query
   apps: [App] @join__field(graph: CORE)
   appsTotalCount: Int @join__field(graph: CORE)
   appDetail(_id: String): App @join__field(graph: CORE)
+  formDetail(_id: String!): Form @join__field(graph: FORMS)
+  forms: [Form] @join__field(graph: FORMS)
+  formSubmissions(tagId: String, formId: String, customerId: String, contentTypeIds: [String], filters: [SubmissionFilter], page: Int, perPage: Int): [Submission] @join__field(graph: FORMS)
+  formSubmissionsTotalCount(tagId: String, formId: String, customerId: String, contentTypeIds: [String], filters: [SubmissionFilter]): Int @join__field(graph: FORMS)
+  formSubmissionDetail(contentTypeId: String!): Submission @join__field(graph: FORMS)
+  fieldsGetTypes: [JSON] @join__field(graph: FORMS)
+  getFieldsInputTypes: [JSON] @join__field(graph: FORMS)
+  fields(contentType: String!, contentTypeId: String, isVisible: Boolean, searchable: Boolean, isVisibleToCreate: Boolean, pipelineId: String): [Field] @join__field(graph: FORMS)
+  fieldsCombinedByContentType(contentType: String!, usageType: String, excludedNames: [String], segmentId: String, config: JSON, onlyDates: Boolean): JSON @join__field(graph: FORMS)
+  fieldsDefaultColumnsConfig(contentType: String!): [ColumnConfigItem] @join__field(graph: FORMS)
+  fieldsGroups(contentType: String, isDefinedByErxes: Boolean, config: JSON): [FieldsGroup] @join__field(graph: FORMS)
+  fieldsGetDetail(_id: String, code: String): Field @join__field(graph: FORMS)
+  getSystemFieldsGroup(contentType: String): FieldsGroup @join__field(graph: FORMS)
   knowledgeBaseTopics(page: Int, perPage: Int, brandId: String): [KnowledgeBaseTopic] @join__field(graph: KNOWLEDGEBASE)
   knowledgeBaseTopicDetail(_id: String!): KnowledgeBaseTopic @join__field(graph: KNOWLEDGEBASE)
   knowledgeBaseTopicsTotalCount: Int @join__field(graph: KNOWLEDGEBASE)
@@ -1778,6 +2025,26 @@ input StylesParams
   headingFont: String
 }
 
+type Submission
+  @join__type(graph: FORMS, key: "_id")
+{
+  _id: String!
+  contentTypeId: String
+  customerId: String
+  customer: Customer
+  createdAt: Date
+  customFieldsData: JSON
+  submissions: [FormSubmission]
+}
+
+input SubmissionFilter
+  @join__type(graph: FORMS)
+{
+  operator: String
+  value: JSON
+  formFieldId: String
+}
+
 type SuccessResult
   @join__type(graph: CORE)
 {
@@ -1834,6 +2101,7 @@ type User
   @join__type(graph: CLIENTPORTAL, key: "_id")
   @join__type(graph: CONTACTS, key: "_id")
   @join__type(graph: CORE, key: "_id")
+  @join__type(graph: FORMS, key: "_id")
   @join__type(graph: KNOWLEDGEBASE, key: "_id")
   @join__type(graph: POS, key: "_id")
   @join__type(graph: POSCLIENT, key: "_id")

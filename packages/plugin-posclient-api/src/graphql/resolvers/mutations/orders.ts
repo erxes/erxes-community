@@ -1,4 +1,3 @@
-import * as Random from 'meteor-random';
 import {
   BILL_TYPES,
   ORDER_ITEM_STATUSES,
@@ -114,7 +113,9 @@ const orderMutations = {
           isPackage: item.isPackage,
           isTake: item.isTake,
           status: ORDER_ITEM_STATUSES.NEW,
-          manufacturedDate: item.manufacturedDate
+          manufacturedDate: item.manufacturedDate,
+          description: item.description,
+          decorationAttachment: item.decorationAttachment
         });
       }
 

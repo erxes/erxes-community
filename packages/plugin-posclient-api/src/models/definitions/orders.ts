@@ -19,6 +19,7 @@ export interface IOrder {
   status?: string;
   createdAt?: Date;
   modifiedAt?: Date;
+  dueDate?: Date;
   userId?: string;
   paidDate?: Date;
   number?: string;
@@ -70,6 +71,7 @@ export const orderSchema = schemaHooksWrapper(
     _id: field({ pkey: true }),
     createdAt: getDateFieldDefinition('Created at'),
     modifiedAt: getDateFieldDefinition('Modified at'),
+    dueDate: getDateFieldDefinition('Due Date'),
     status: field({
       type: String,
       label: 'Status of the order',

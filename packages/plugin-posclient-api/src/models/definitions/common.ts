@@ -8,6 +8,13 @@ export interface IRule {
   value: string;
 }
 
+export interface IAttachment {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 export interface ILink {
   [key: string]: string;
 }

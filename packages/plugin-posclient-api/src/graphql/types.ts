@@ -29,6 +29,13 @@ export interface IPosLoginParams {
   description?: string;
 }
 
+export interface IAttachment {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 export interface IOrderItemInput {
   _id: string;
   productId: string;
@@ -42,6 +49,8 @@ export interface IOrderItemInput {
   bonusCount?: number;
   bonusVoucherId?: string;
   manufacturedDate?: string; // Unix epoch number
+  description?: string;
+  decorationAttachment?: IAttachment;
 }
 
 export interface IOrderInput {

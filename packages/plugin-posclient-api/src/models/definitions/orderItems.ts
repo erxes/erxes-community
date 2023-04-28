@@ -7,6 +7,8 @@ import {
   schemaHooksWrapper
 } from './utils';
 
+import { IAttachment, attachmentSchema } from './common';
+
 export interface IOrderItem {
   createdAt?: Date;
   productId: string;
@@ -21,6 +23,8 @@ export interface IOrderItem {
   isTake?: boolean;
   status?: string;
   manufacturedDate?: string;
+  description?: string;
+  decorationAttachment?: IAttachment;
 }
 
 export interface IOrderItemDocument extends Document, IOrderItem {
@@ -32,6 +36,8 @@ export const orderItemSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     createdAt: getDateFieldDefinition('Created at'),
+    description: field({ type: String, label: 'Description' }),
+    decorationAttachment: field({ type: attachmentSchema }),
     productId: field({ type: String, label: 'Product' }),
     count: getNumberFieldDefinition({ label: 'Count', positive: true }),
     unitPrice: getNumberFieldDefinition({

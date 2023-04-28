@@ -1,6 +1,13 @@
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 
+export interface IAttachment {
+  name: string;
+  url: string;
+  type: string;
+  size: number;
+}
+
 export interface IPosOrderItem {
   createdAt?: Date;
   productId: string;
@@ -8,6 +15,8 @@ export interface IPosOrderItem {
   unitPrice?: number;
   discountAmount?: number;
   discountPercent?: number;
+  description?: string;
+  decorationAttachment: IAttachment;
   bonusCount?: number;
   bonusVoucherId?: string;
   isPackage?: boolean;
@@ -25,6 +34,7 @@ export interface IPaidAmount {
 
 export interface IPosOrder {
   createdAt: Date;
+  dueDate: Date;
   status: string;
   paidDate?: Date;
   number: string;

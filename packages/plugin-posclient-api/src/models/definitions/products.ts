@@ -1,4 +1,9 @@
-import { attachmentSchema, customFieldSchema, ICustomField } from './common';
+import {
+  attachmentSchema,
+  customFieldSchema,
+  ICustomField,
+  IAttachment
+} from './common';
 import { Document, Schema } from 'mongoose';
 import {
   field,
@@ -11,13 +16,6 @@ import {
   PRODUCT_STATUSES,
   PRODUCT_TYPES
 } from './constants';
-
-interface IAttachment {
-  url: string;
-  name: string;
-  type: string;
-  size: number;
-}
 
 export interface ISubUom {
   uomId: string;
