@@ -69,15 +69,14 @@ const timeclockQueries = {
 
     const totalCount = models.Timeclocks.count(selector);
 
-    const list = paginate(
-      models.Timeclocks.find(selector).sort({
+    const list = paginate(models.Timeclocks.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    })
+      .sort({
         shiftStart: -1
-      }),
-      {
-        perPage: queryParams.perPage,
-        page: queryParams.page
-      }
-    );
+      })
+      .limit(queryParams.perPage || 20);
 
     return { list, totalCount };
   },
@@ -109,10 +108,14 @@ const timeclockQueries = {
       return { list: [], totalCount: 0 };
     }
 
-    const list = paginate(
-      models.TimeLogs.find(selector).sort({ userId: 1, timelog: -1 }),
-      { perPage: queryParams.perPage, page: queryParams.page }
-    );
+    // console.log('asdasd', queryParams.perPage, queryParams.page);
+
+    const list = paginate(models.TimeLogs.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    })
+      .sort({ userId: 1, timelog: -1 })
+      .limit(queryParams.perPage || 20);
 
     return { list, totalCount };
   },
@@ -155,9 +158,6 @@ const timeclockQueries = {
     const getUserId = queryParams.userId || user._id;
     return models.Schedules.find({ userId: getUserId });
   },
-  // scheduleShiftsOfUser(_root, queryParams, { models }: IContext) {
-
-  // },
 
   scheduleConfigs(_root, {}, { models }: IContext) {
     return models.ScheduleConfigs.find();
@@ -187,13 +187,10 @@ const timeclockQueries = {
       return { list: [], totalCount: 0 };
     }
 
-    const list = paginate(
-      models.Absences.find(selector).sort({ startTime: -1 }),
-      {
-        perPage: queryParams.perPage,
-        page: queryParams.page
-      }
-    );
+    const list = paginate(models.Absences.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    }).sort({ startTime: -1 });
 
     return { list, totalCount };
   },
