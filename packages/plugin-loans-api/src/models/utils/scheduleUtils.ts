@@ -313,10 +313,7 @@ export const fixSchedules = async (
 
       for await (let { _id, ...transaction } of transactions) {
         const trInfo = await transactionRule(models, subdomain, transaction);
-        console.log(
-          '{ ...transaction, ...trInfo }',
-          JSON.stringify({ ...transaction, ...trInfo }, null, 2)
-        );
+
         await models.Transactions.updateOne(
           { _id },
           { $set: { ...transaction, ...trInfo } }
@@ -352,10 +349,6 @@ export const fixSchedules = async (
   if (transactions.length > 0)
     for await (let { _id, ...transaction } of transactions) {
       const trInfo = await transactionRule(models, subdomain, transaction);
-      console.log(
-        '{ ...transaction, ...trInfo }',
-        JSON.stringify({ ...transaction, ...trInfo }, null, 2)
-      );
       await models.Transactions.updateOne(
         { _id },
         { $set: { ...transaction, ...trInfo } }
@@ -868,9 +861,6 @@ export const betweenScheduled = async (
   preSchedule: IScheduleDocument,
   pendingSchedules: IScheduleDocument[]
 ) => {
-  console.log(
-    '-----------------------------------betweenScheduled-------------------------'
-  );
   const trReaction: any = [];
   const doc = await fillAmounts(
     models,
