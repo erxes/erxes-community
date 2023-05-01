@@ -36,8 +36,9 @@ module.exports = (env, args) => {
   return {
     output: {
       uniqueName: configs.name,
-      publicPath: args.mode === 'development' ? `http://localhost:${port}/` : undefined,
-      chunkFilename: '[chunkhash].js'
+      publicPath:
+        args.mode === "development" ? `http://localhost:${port}/` : undefined,
+      chunkFilename: "[chunkhash].js",
     },
 
     optimization: {
@@ -76,7 +77,7 @@ module.exports = (env, args) => {
 
     devServer: {
       port: port,
-      allowedHosts: 'all',
+      allowedHosts: "all",
       historyApiFallback: true,
     },
 
@@ -119,6 +120,7 @@ module.exports = (env, args) => {
             path.resolve(__dirname, "../../ui-internalnotes/src"),
             path.resolve(__dirname, "../../ui-leads/src"),
             path.resolve(__dirname, "../../ui-tags/src"),
+            path.resolve(__dirname, "../../ui-forum/src"),
             path.resolve(__dirname, "plugin-src"),
           ],
           use: {
@@ -151,25 +153,34 @@ module.exports = (env, args) => {
           const { REACT_APP_PUBLIC_PATH } = window.env || {};
           const remoteUrl = (REACT_APP_PUBLIC_PATH ? REACT_APP_PUBLIC_PATH : window.location.origin) + '/remoteEntry.js';
 
-          const script = document.createElement('script')
-          script.src = remoteUrl
-          script.onload = () => {
-            // the injected script has loaded and is available on window
-            // we can now resolve this Promise
-            const proxy = {
-              get: (request) => window.coreui.get(request),
-              init: (arg) => {
-                try {
-                  return window.coreui.init(arg)
-                } catch(e) {
-                  console.log('remote container already initialized')
-                }
+          const id = 'coreuiRemoteEntry';
+
+          // the injected script has loaded and is available on window
+          // we can now resolve this Promise
+          const proxy = {
+            get: (request) => window.coreui.get(request),
+            init: (arg) => {
+              try {
+                return window.coreui.init(arg)
+              } catch(e) {
+                console.log('remote container already initialized')
               }
             }
+          }
+
+          const script = document.createElement('script');
+          script.src = remoteUrl;
+          script.id = id;
+          script.onload = () => {
             resolve(proxy)
           }
-          // inject this script with the src set to the versioned remoteEntry.js
-          document.head.appendChild(script);
+
+          if (document.getElementById(id) && window.coreui) {
+            resolve(proxy)
+          } else {
+            // inject this script with the src set to the versioned remoteEntry.js
+            document.head.appendChild(script);
+          }
         })
         `,
         },
@@ -189,11 +200,13 @@ module.exports = (env, args) => {
       new HtmlWebPackPlugin({
         template: "./src/index.html",
       }),
-      args.mode === 'development' ? new MFLiveReloadPlugin({
-        port, // the port your app runs on
-        container: configs.name, // the name of your app, must be unique
-        standalone: false, // false uses chrome extention
-      }) : false,
+      args.mode === "development"
+        ? new MFLiveReloadPlugin({
+            port, // the port your app runs on
+            container: configs.name, // the name of your app, must be unique
+            standalone: false, // false uses chrome extention
+          })
+        : false,
       // new BundleAnalyzerPlugin()
     ].filter(Boolean),
   };

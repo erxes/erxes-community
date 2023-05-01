@@ -15,7 +15,9 @@ import { IPaymentDocument } from '../types';
 import QpayForm from './form/QpayForm';
 import SocialPayForm from './form/SocialPayForm';
 import MonpayForm from './form/MonpayForm';
-import { getRefetchQueries } from '../containers/utils';
+import PaypalFrom from './form/PaypalForm';
+import StorepayForm from './form/StorePayForm';
+import { getGqlString, getRefetchQueries } from '../containers/utils';
 import { PAYMENT_KINDS } from './constants';
 
 type Props = {
@@ -65,8 +67,8 @@ class IntegrationListItem extends React.Component<Props, State> {
     }: IButtonMutateProps) => {
       return (
         <ButtonMutate
-          mutation={mutations.paymentEdit}
-          variables={values}
+          mutation={getGqlString(mutations.paymentEdit)}
+          variables={{ _id: payment._id, ...values }}
           callback={callback}
           refetchQueries={getRefetchQueries()}
           isSubmitted={isSubmitted}
@@ -104,6 +106,24 @@ class IntegrationListItem extends React.Component<Props, State> {
       case PAYMENT_KINDS.MONPAY:
         content = props => (
           <MonpayForm
+            {...props}
+            payment={payment}
+            renderButton={renderButton}
+          />
+        );
+        break;
+      case PAYMENT_KINDS.STOREPAY:
+        content = props => (
+          <StorepayForm
+            {...props}
+            payment={payment}
+            renderButton={renderButton}
+          />
+        );
+        break;
+      case PAYMENT_KINDS.PAYPAL:
+        content = props => (
+          <PaypalFrom
             {...props}
             payment={payment}
             renderButton={renderButton}

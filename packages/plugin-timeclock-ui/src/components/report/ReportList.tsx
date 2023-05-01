@@ -1,5 +1,5 @@
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { router, __ } from '@erxes/ui/src/utils';
+import { loadDynamicComponent, router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import Table from '@erxes/ui/src/components/table';
 import FormGroup from '@erxes/ui/src/components/form/Group';
@@ -8,22 +8,48 @@ import Select from 'react-select-plus';
 import Button from '@erxes/ui/src/components/Button';
 import ReportRow from './ReportRow';
 import { IReport } from '../../types';
-import { FilterItem } from '../../styles';
+import { FilterItem, FlexRow, ToggleButton } from '../../styles';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import Icon from '@erxes/ui/src/components/Icon';
 
 type Props = {
   queryParams: any;
   history: any;
   reports: IReport[];
+  totalCount: number;
+
+  showSideBar: (sideBar: boolean) => void;
   getActionBar: (actionBar: any) => void;
+  getPagination: (pagination: any) => void;
+
   exportReport: () => void;
 };
 
 function ReportList(props: Props) {
-  const { history, reports, queryParams, getActionBar, exportReport } = props;
-  const [selectedType, setType] = useState(queryParams.reportType);
+  const {
+    history,
+    reports,
+    queryParams,
+    totalCount,
+    getActionBar,
+    getPagination,
+    exportReport,
+    showSideBar
+  } = props;
+
+  const [reportType, setType] = useState(queryParams.reportType);
+  const [isSideBarOpen, setIsOpen] = useState(
+    localStorage.getItem('isSideBarOpen') === 'true' ? true : false
+  );
+
+  const onToggleSidebar = () => {
+    const toggleIsOpen = !isSideBarOpen;
+    setIsOpen(toggleIsOpen);
+    localStorage.setItem('isSideBarOpen', toggleIsOpen.toString());
+  };
 
   const renderTableHead = () => {
-    switch (selectedType) {
+    switch (reportType) {
       case 'Урьдчилсан':
         return (
           <tr>
@@ -45,25 +71,30 @@ function ReportList(props: Props) {
               <th rowSpan={2}>{__('First Name')}</th>
               <th rowSpan={2}>{__('Position')}</th>
               <th colSpan={2}>{__('Scheduled time')}</th>
-              <th colSpan={6} style={{ textAlign: 'center' }}>
+              <th colSpan={8} style={{ textAlign: 'center' }}>
                 {__('Timeclock info')}
               </th>
-              <th colSpan={3} style={{ textAlign: 'center' }}>
+              <th colSpan={5} style={{ textAlign: 'center' }}>
                 {__('Absence info')}
               </th>
+              <th rowSpan={2}>{__('Checked by member')}</th>
             </tr>
             <tr>
-              <td>{__('Days')}</td>
-              <td>{__('Hours')}</td>
-              <td>{__('Worked days')}</td>
-              <td>{__('Worked hours')}</td>
-              <td>{__('Overtime')}</td>
-              <td>{__('Overnight')}</td>
-              <td>{__('Total')}</td>
-              <td>{__('Mins Late')}</td>
-              <td>{__('-')}</td>
-              <td>{__('-')}</td>
-              <td>{__('-')}</td>
+              <th>{__('Days')}</th>
+              <th>{__('Hours')}</th>
+              <th>{__('Total break')}</th>
+              <th>{__('Worked days')}</th>
+              <th>{__('Worked hours')}</th>
+              <th>{__('Overtime')}</th>
+              <th>{__('Overnight')}</th>
+              <th>{__('Total break')}</th>
+              <th>{__('Total')}</th>
+              <th>{__('Mins Late')}</th>
+              <th>{__('Shift request')}</th>
+              <th>{__('Томилолтоор ажилласан цаг')}</th>
+              <th>{__('Чөлөөтэй цаг цалинтай')}</th>
+              <th>{__('Чөлөөтэй цаг цалингүй')}</th>
+              <th>{__('Өвдсөн цаг /ХЧТАТ бодох цаг/')}</th>
             </tr>
           </>
         );
@@ -79,13 +110,13 @@ function ReportList(props: Props) {
               </th>
               <th>{__('Time')}</th>
               <th
-                colSpan={3}
+                colSpan={4}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('Schedule')}
               </th>
               <th
-                colSpan={8}
+                colSpan={7}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('Performance')}
@@ -95,38 +126,52 @@ function ReportList(props: Props) {
               <td>{__('Team member Id')}</td>
               <td>{__('Last Name')}</td>
               <td>{__('First Name')}</td>
-              <td>{__('Position')}</td>
-              <td>{__('Date')}</td>
-              <td>{__('Planned Check In')}</td>
-              <td>{__('Planned Check Out')}</td>
-              <td>{__('Planned Duration')}</td>
-              <td>{__('Device type')}</td>
-              <td>{__('Check In')}</td>
-              <td>{__('Check Out')}</td>
-              <td>{__('Location')}</td>
-              <td>{__('Duration')}</td>
-              <td>{__('Overtime')}</td>
-              <td>{__('Overnight')}</td>
-              <td>{__('Mins Late')}</td>
+              <td style={{ textAlign: 'left' }}>{__('Position')}</td>
+              <th>{__('Date')}</th>
+              <th>{__('Planned Check In')}</th>
+              <th>{__('Planned Check Out')}</th>
+              <th>{__('Planned Duration')}</th>
+              <th>{__('Planned Break')}</th>
+              <th>{__('Check In')}</th>
+              <th>{__('In Device')}</th>
+              <th>{__('Check Out')}</th>
+              <th>{__('Out Device')}</th>
+              <th>{__('Planned Break')}</th>
+              <th>{__('Overnight')}</th>
+              <th>{__('Overtime')}</th>
+              <th>{__('Duration')}</th>
+              <th>{__('Mins Late')}</th>
             </tr>
           </>
         );
     }
   };
 
-  const content = (
-    <Table>
-      <thead>{renderTableHead()}</thead>
-      {reports &&
-        reports.map(reportt => (
-          <ReportRow
-            key={Math.random()}
-            reportType={selectedType}
-            report={reportt}
-          />
-        ))}
-    </Table>
-  );
+  const content = () => {
+    // custom report for bichil-globus
+    const bichilTable = loadDynamicComponent('bichilReportTable', {
+      reportType,
+      queryParams
+    });
+
+    if (bichilTable) {
+      return bichilTable;
+    }
+
+    return (
+      <Table>
+        <thead>{renderTableHead()}</thead>
+        {reports &&
+          reports.map(reportt => (
+            <ReportRow
+              key={Math.random()}
+              reportType={reportType}
+              report={reportt}
+            />
+          ))}
+      </Table>
+    );
+  };
 
   const renderSelectionBar = () => {
     const onTypeSelect = type => {
@@ -135,12 +180,19 @@ function ReportList(props: Props) {
     };
 
     return (
-      <>
+      <FlexRow>
+        <ToggleButton
+          id="btn-inbox-channel-visible"
+          isActive={isSideBarOpen}
+          onClick={onToggleSidebar}
+        >
+          <Icon icon="subject" />
+        </ToggleButton>
         <FilterItem>
           <FormGroup>
             <ControlLabel>Select type</ControlLabel>
             <Select
-              value={selectedType}
+              value={reportType}
               onChange={onTypeSelect}
               placeholder="Select type"
               multi={false}
@@ -151,10 +203,18 @@ function ReportList(props: Props) {
             />
           </FormGroup>
         </FilterItem>
-      </>
+      </FlexRow>
     );
   };
   const renderExportBtn = () => {
+    const bichilExportReportBtn = loadDynamicComponent(
+      'bichilExportReportBtn',
+      { queryParams }
+    );
+
+    if (bichilExportReportBtn) {
+      return bichilExportReportBtn;
+    }
     return (
       <div>
         <Button onClick={exportReport}>Export</Button>
@@ -170,8 +230,11 @@ function ReportList(props: Props) {
     />
   );
 
+  getPagination(<Pagination count={totalCount} />);
+  showSideBar(isSideBarOpen);
   getActionBar(actionBar);
-  return content;
+
+  return content();
 }
 
 export default ReportList;

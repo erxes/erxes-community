@@ -1,13 +1,21 @@
-import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
-import Box from '@erxes/ui/src/components/Box';
-import { LinkButton } from '@erxes/ui/src/styles/main';
-import { renderFullName } from '@erxes/ui/src/utils/core';
-import React from 'react';
+import {
+  FieldStyle,
+  SidebarCounter,
+  SidebarList
+} from '@erxes/ui/src/layout/styles';
+import { __, renderFullName } from '@erxes/ui/src/utils/core';
 
-import { List } from '../../styles';
-import { IClientPortalUser } from '../../types';
-import DetailInfo from './DetailInfo';
+import Box from '@erxes/ui/src/components/Box';
 import CustomFieldsSection from '../../containers/CustomFieldsSection';
+import DetailInfo from './DetailInfo';
+import { IClientPortalUser } from '../../types';
+import Icon from '@erxes/ui/src/components/Icon';
+import { LinkButton } from '@erxes/ui/src/styles/main';
+import { List } from '../../styles';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import React from 'react';
+import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
+import VerificationForm from '../../containers/details/VerificationForm';
 
 type Props = {
   clientPortalUser: IClientPortalUser;
@@ -21,6 +29,66 @@ class LeftSidebar extends React.Component<Props> {
 
   renderCompany() {
     return renderFullName(this.props.clientPortalUser.company);
+  }
+
+  renderVerificationSection() {
+    const { clientPortalUser } = this.props;
+    const verificationRequest = clientPortalUser.verificationRequest || {
+      status: 'notVerified'
+    };
+
+    let verificationStatus = 'notVerified';
+
+    switch (verificationRequest.status) {
+      case 'verified':
+        verificationStatus = 'verified';
+        break;
+      case 'pending':
+        verificationStatus = 'pending';
+        break;
+      case 'notVerified':
+        verificationStatus = 'not verified';
+        break;
+      default:
+        verificationStatus = 'not Verified';
+        break;
+    }
+
+    const content = props => {
+      return (
+        <VerificationForm {...props} clientPortalUser={clientPortalUser} />
+      );
+    };
+
+    const extraButtons = (
+      <>
+        <ModalTrigger
+          title="Verification"
+          trigger={
+            <button>
+              <Icon icon="edit-3" />
+            </button>
+          }
+          content={content}
+        />
+      </>
+    );
+
+    return (
+      <Box
+        title="Verification"
+        isOpen={true}
+        name="verification"
+        extraButtons={extraButtons}
+      >
+        <SidebarList className="no-link">
+          <li>
+            <FieldStyle>{__('status')}</FieldStyle>
+            <SidebarCounter>{__(verificationStatus)}</SidebarCounter>
+          </li>
+        </SidebarList>
+      </Box>
+    );
   }
 
   render() {
@@ -38,7 +106,7 @@ class LeftSidebar extends React.Component<Props> {
     return (
       <Sidebar wide={true}>
         <DetailInfo clientPortalUser={clientPortalUser} />
-
+        {this.renderVerificationSection()}
         {!clientPortalUser.customer && !clientPortalUser.company ? null : (
           <Box
             title={
@@ -46,7 +114,7 @@ class LeftSidebar extends React.Component<Props> {
                 ? 'Customer Detail'
                 : 'Company Detail'
             }
-            name="showOthers"
+            name="showDetail"
           >
             <List>
               <LinkButton onClick={onClick}>

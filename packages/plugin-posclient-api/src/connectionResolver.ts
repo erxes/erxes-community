@@ -23,8 +23,8 @@ import {
 } from './models/Products';
 import { IPutResponseDocument } from './models/definitions/putResponses';
 import { IPutResponseModel, loadPutResponseClass } from './models/PutResponses';
-import { IQpayInvoiceDocument } from './models/definitions/qpayInvoices';
-import { IQpayInvoiceModel, loadQPayInvoiceClass } from './models/QPayInvoices';
+import { ICoverModel, loadCoverClass } from './models/Covers';
+import { ICoverDocument } from './models/definitions/covers';
 
 export interface IModels {
   Configs: IConfigModel;
@@ -33,9 +33,9 @@ export interface IModels {
   Products: IProductModel;
   ProductCategories: IProductCategoryModel;
   PutResponses: IPutResponseModel;
-  QPayInvoices: IQpayInvoiceModel;
   PosUsers: IPosUserModel;
   PosSlots: IPosSlotModel;
+  Covers: ICoverModel;
 }
 export interface IContext extends IMainContext {
   subdomain: string;
@@ -81,13 +81,13 @@ export const loadClasses = (
     'posclient_put_responses',
     loadPutResponseClass(models)
   );
-  models.QPayInvoices = db.model<IQpayInvoiceDocument, IQpayInvoiceModel>(
-    'posclient_qpay_invoices',
-    loadQPayInvoiceClass(models)
-  );
   models.PosSlots = db.model<IPosSlotDocument, IPosSlotModel>(
     'posclient_slots',
     loadPosSlotClass(models)
+  );
+  models.Covers = db.model<ICoverDocument, ICoverModel>(
+    'posclient_covers',
+    loadCoverClass(models)
   );
 
   return models;

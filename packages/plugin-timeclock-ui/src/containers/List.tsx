@@ -53,6 +53,10 @@ class ListContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
+    if (!listScheduleConfigsQuery.scheduleConfigs) {
+      listScheduleConfigsQuery.refetch();
+    }
+
     const currentUserId = currentUser._id;
 
     const updatedProps = {
@@ -78,7 +82,7 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<Props, PayDatesQueryResponse>(gql(queries.listScheduleConfig), {
+    graphql<Props, PayDatesQueryResponse>(gql(queries.scheduleConfigs), {
       name: 'listScheduleConfigsQuery',
       options: () => ({
         fetchPolicy: 'network-only'

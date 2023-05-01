@@ -45,47 +45,29 @@ const commonOrderParams = `
   $perPage: Int,
   $sortField: String,
   $sortDirection: Int,
-  $paidStartDate: Date
-  $paidEndDate: Date
-  $createdStartDate: Date
-  $createdEndDate: Date
+  $posToken: String,
+  $search: String,
+  $posId: String,
+  $userId: String,
+  $paidStartDate: Date,
+  $paidEndDate: Date,
+  $createdStartDate: Date,
+  $createdEndDate: Date,
 `;
 
 const commonOrderParamDefs = `
   page: $page,
   perPage: $perPage,
-  sortField: $sortField
-  sortDirection: $sortDirection
-  createdStartDate: $createdStartDate
-  createdEndDate: $createdEndDate
-  paidStartDate: $paidStartDate
-  paidEndDate: $paidEndDate
-`;
-
-const commonProductParams = `
-  $type: String,
-  $categoryId: String,
-  $searchValue: String,
-  $tag: String,
-  $page: Int,
-  $perPage: Int,
-  $ids: [String],
-  $excludeIds: Boolean,
-  $pipelineId: String,
-  $boardId: String
-`;
-
-const commonProductParamsDefs = `
-  type: $type,
-  categoryId: $categoryId,
-  searchValue: $searchValue,
-  tag: $tag,
-  page: $page,
-  perPage: $perPage,
-  ids: $ids,
-  excludeIds: $excludeIds,
-  pipelineId: $pipelineId,
-  boardId: $boardId
+  sortField: $sortField,
+  sortDirection: $sortDirection,
+  posToken: $posToken,
+  search: $search,
+  posId: $posId,
+  userId: $userId,
+  createdStartDate: $createdStartDate,
+  createdEndDate: $createdEndDate,
+  paidStartDate: $paidStartDate,
+  paidEndDate: $paidEndDate,
 `;
 
 const checkSyncDeals = `

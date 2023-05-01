@@ -420,14 +420,11 @@ export const loadClientPortalUserClass = (models: IModels) => {
       this.checkPassword(newPassword);
 
       // set new password
-      await models.ClientPortalUsers.findByIdAndUpdate(
-        { _id: user._id },
-        {
-          password: await this.generatePassword(newPassword),
-          resetPasswordToken: undefined,
-          resetPasswordExpires: undefined
-        }
-      );
+      await models.ClientPortalUsers.findByIdAndUpdate(user._id, {
+        password: await this.generatePassword(newPassword),
+        resetPasswordToken: undefined,
+        resetPasswordExpires: undefined
+      });
 
       return models.ClientPortalUsers.findOne({ _id: user._id });
     }
@@ -464,12 +461,9 @@ export const loadClientPortalUserClass = (models: IModels) => {
       }
 
       // set new password
-      await models.ClientPortalUsers.findByIdAndUpdate(
-        { _id: user._id },
-        {
-          password: await this.generatePassword(newPassword)
-        }
-      );
+      await models.ClientPortalUsers.findByIdAndUpdate(user._id, {
+        password: await this.generatePassword(newPassword)
+      });
 
       return models.ClientPortalUsers.findOne({ _id: user._id });
     }
@@ -481,11 +475,12 @@ export const loadClientPortalUserClass = (models: IModels) => {
     ) {
       const query: any = { clientPortalId: clientPortal._id };
 
-      let isEmail = false;
+      const isEmail = clientPortal.passwordVerificationConfig
+        ? !clientPortal.passwordVerificationConfig.verifyByOTP
+        : true;
 
       if (email) {
         query.email = email;
-        isEmail = true;
       }
 
       if (phone) {
@@ -500,13 +495,10 @@ export const loadClientPortalUserClass = (models: IModels) => {
         const token = buffer.toString('hex');
 
         // save token & expiration date
-        await models.ClientPortalUsers.findByIdAndUpdate(
-          { _id: user._id },
-          {
-            resetPasswordToken: token,
-            resetPasswordExpires: Date.now() + 86400000
-          }
-        );
+        await models.ClientPortalUsers.findByIdAndUpdate(user._id, {
+          resetPasswordToken: token,
+          resetPasswordExpires: Date.now() + 86400000
+        });
 
         return { token };
       }
@@ -517,6 +509,7 @@ export const loadClientPortalUserClass = (models: IModels) => {
           : 4,
         clientPortalId: clientPortal._id,
         phone,
+        email,
         isRessetting: true
       });
 
@@ -549,13 +542,10 @@ export const loadClientPortalUserClass = (models: IModels) => {
       this.checkPassword(password);
 
       // set new password
-      await models.ClientPortalUsers.findByIdAndUpdate(
-        { _id: user._id },
-        {
-          isPhoneVerified: true,
-          password: await this.generatePassword(password)
-        }
-      );
+      await models.ClientPortalUsers.findByIdAndUpdate(user._id, {
+        isPhoneVerified: true,
+        password: await this.generatePassword(password)
+      });
 
       return 'success';
     }
@@ -753,6 +743,28 @@ export const loadClientPortalUserClass = (models: IModels) => {
         throw new Error('User is not verified');
       }
 
+      const cp = await models.ClientPortals.getConfig(clientPortalId);
+
+      if (
+        cp.manualVerificationConfig &&
+        user.type === 'customer' &&
+        user.verificationRequest &&
+        user.verificationRequest.status !== 'verified' &&
+        cp.manualVerificationConfig.verifyCustomer
+      ) {
+        throw new Error('User is not verified');
+      }
+
+      if (
+        cp.manualVerificationConfig &&
+        user.type === 'company' &&
+        user.verificationRequest &&
+        user.verificationRequest.status !== 'verified' &&
+        cp.manualVerificationConfig.verifyCompany
+      ) {
+        throw new Error('User is not verified');
+      }
+
       const valid = await this.comparePassword(password, user.password);
 
       if (!valid) {
@@ -792,7 +804,7 @@ export const loadClientPortalUserClass = (models: IModels) => {
         this.checkPassword(password);
       }
 
-      const plainPassword = password;
+      const plainPassword = password || '';
 
       const user = await handleContacts({
         subdomain,
@@ -872,7 +884,7 @@ export const loadClientPortalUserClass = (models: IModels) => {
         throw new Error('Token is invalid or has expired');
       }
 
-      let doc: any = { isEmailVerified: true, registrationToken: undefined };
+      const doc: any = { isEmailVerified: true, registrationToken: undefined };
 
       if (password) {
         if (password !== passwordConfirmation) {

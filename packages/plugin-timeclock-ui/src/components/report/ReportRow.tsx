@@ -1,6 +1,9 @@
 import React from 'react';
 import { IReport, IUserReport } from '../../types';
 import { __ } from '@erxes/ui/src/utils';
+import dayjs from 'dayjs';
+import { timeFormat } from '../../constants';
+import { returnDeviceTypes } from '../../utils';
 
 type Props = {
   reportType: string;
@@ -31,153 +34,123 @@ const ReportRow = (userReport: IUserReport, reportType: string) => {
           <td>{userReport.user.details?.position || '-'}</td>
           <td>{userReport.totalDaysScheduled}</td>
           <td>{userReport.totalHoursScheduled}</td>
+          <td>{userReport.totalHoursBreak}</td>
           <td>{userReport.totalDaysWorked}</td>
           <td>{userReport.totalRegularHoursWorked}</td>
           <td>{userReport.totalHoursOvertime}</td>
           <td>{userReport.totalHoursOvernight}</td>
+          <td>{userReport.totalHoursBreak}</td>
           <td>{userReport.totalHoursWorked}</td>
           <td>{userReport.totalMinsLate}</td>
-          <td>{'-'}</td>
-
-          <td>{'-'}</td>
-          <td>{'-'}</td>
+          <td>{userReport.absenceInfo?.totalHoursShiftRequest}</td>
+          <td>{userReport.absenceInfo?.totalHoursWorkedAbroad}</td>
+          <td>{userReport.absenceInfo?.totalHoursPaidAbsence}</td>
+          <td>{userReport.absenceInfo?.totalHoursUnpaidAbsence}</td>
+          <td>{userReport.absenceInfo?.totalHoursSick}</td>
           <td>{'-'}</td>
         </tr>
       );
 
     case 'Pivot':
+      if (!userReport.scheduleReport || !userReport.scheduleReport.length) {
+        const columnsNo = 13;
+        return (
+          <tr key={Math.random()}>
+            <td>{userReport.user.employeeId}</td>
+            <td>{userReport.user.details?.lastName || '-'}</td>
+            <td>{userReport.user.details?.firstName || '-'}</td>
+            <td style={{ textAlign: 'left' }}>
+              {userReport.user.details?.position || '-'}
+            </td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+          </tr>
+        );
+      }
       return (
-        <tr key={Math.random()}>
-          <td>{userReport.user.employeeId}</td>
-          <td>{userReport.user.details?.lastName || '-'}</td>
-          <td>{userReport.user.details?.firstName || '-'}</td>
-          <td>{userReport.user.details?.position || '-'}</td>
-
-          {userReport.scheduleReport &&
-            renderScheduleShiftsOfReport(
-              userReport.scheduleReport.sort(
-                (a, b) =>
-                  new Date(a.timeclockStart).getTime() -
-                  new Date(b.timeclockEnd).getTime()
-              )
-            )}
-        </tr>
+        <>
+          <tr key={Math.random()}>
+            <td rowSpan={userReport.scheduleReport.length + 2}>
+              {userReport.user.employeeId}
+            </td>
+            <td rowSpan={userReport.scheduleReport.length + 2}>
+              {userReport.user.details?.lastName || '-'}
+            </td>
+            <td rowSpan={userReport.scheduleReport.length + 2}>
+              {userReport.user.details?.firstName || '-'}
+            </td>
+            <td
+              style={{ textAlign: 'left' }}
+              rowSpan={userReport.scheduleReport.length + 2}
+            >
+              {userReport.user.details?.position || '-'}
+            </td>
+          </tr>
+          {userReport.scheduleReport.map(scheduleReport => {
+            return (
+              <tr key={scheduleReport.timeclockDate}>
+                {renderScheduleShiftInfo(scheduleReport)}
+              </tr>
+            );
+          })}
+        </>
       );
   }
 };
 
-const renderScheduleShiftsOfReport = scheduleReport => {
+const renderScheduleShiftInfo = scheduledShift => {
+  const getInDevice =
+    returnDeviceTypes(scheduledShift.deviceType)[0] &&
+    returnDeviceTypes(scheduledShift.deviceType)[0].includes('faceTerminal')
+      ? scheduledShift.deviceName
+      : '-';
+
+  const getOutDevice =
+    returnDeviceTypes(scheduledShift.deviceType)[1] &&
+    returnDeviceTypes(scheduledShift.deviceType)[1].includes('faceTerminal')
+      ? scheduledShift.deviceName
+      : '-';
+
   return (
-    scheduleReport && (
-      <>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}> {schedule.timeclockDate}</div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.scheduledStart
-                  ? new Date(schedule.scheduledStart)
-                      .toTimeString()
-                      .split(' ')[0]
-                  : '-'}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.scheduledEnd
-                  ? new Date(schedule.scheduledEnd).toTimeString().split(' ')[0]
-                  : '-'}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.scheduledDuration}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}> {schedule.deviceType}</div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {new Date(schedule.timeclockStart).toTimeString().split(' ')[0]}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {new Date(schedule.timeclockEnd).toTimeString().split(' ')[0]}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}> {schedule.deviceName}</div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.timeclockDuration}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.totalHoursOvertime}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>
-                {schedule.totalHoursOvernight}
-              </div>
-            );
-          })}
-        </td>
-        <td>
-          {scheduleReport.map(schedule => {
-            return (
-              <div key={schedule.timeclockDate}>{schedule.totalMinsLate}</div>
-            );
-          })}
-        </td>
-      </>
-    )
+    <>
+      <td>{scheduledShift.timeclockDate}</td>
+      <td>
+        {scheduledShift.scheduledStart
+          ? new Date(scheduledShift.scheduledStart).toTimeString().split(' ')[0]
+          : '-'}
+      </td>
+
+      <td>
+        {scheduledShift.scheduledEnd
+          ? new Date(scheduledShift.scheduledEnd).toTimeString().split(' ')[0]
+          : '-'}
+      </td>
+      <td>{scheduledShift.scheduledDuration}</td>
+      <td>{scheduledShift.lunchBreakInHrs || 0}</td>
+
+      <td>{dayjs(scheduledShift.timeclockStart).format(timeFormat)}</td>
+      <td>{getInDevice}</td>
+      <td>{dayjs(scheduledShift.timeclockEnd).format(timeFormat)}</td>
+      <td>{getOutDevice}</td>
+      <td>{scheduledShift.lunchBreakInHrs || 0}</td>
+      <td>{scheduledShift.totalHoursOvernight}</td>
+      <td>{scheduledShift.totalHoursOvertime}</td>
+      <td>{scheduledShift.timeclockDuration}</td>
+      <td>{scheduledShift.totalMinsLate}</td>
+    </>
   );
 };
 

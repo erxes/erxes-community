@@ -1,11 +1,12 @@
 import { generatePaginationParams } from '@erxes/ui/src/utils/router';
 import dayjs from 'dayjs';
-import { ISchedule } from './types';
+import { IScheduleForm } from './types';
+import { dateFormat } from './constants';
 
 const timeFormat = 'HH:mm';
 
 export const compareStartAndEndTime = (
-  scheduleDates: ISchedule,
+  scheduleDates: IScheduleForm,
   day_key,
   newShiftStart?,
   newShiftEnd?,
@@ -52,6 +53,42 @@ export const compareStartAndEndTime = (
 
   return [correctShiftStart, correctShiftEnd, overnightShift];
 };
+export const compareStartAndEndTimeOfSingleDate = (
+  newShiftStart?,
+  newShiftEnd?,
+  shiftDate?
+) => {
+  let overnightShift = false;
+  let correctShiftEnd;
+
+  const shiftDateString = dayjs(shiftDate).format(dateFormat);
+
+  if (
+    dayjs(newShiftEnd).format(timeFormat) <
+    dayjs(newShiftStart).format(timeFormat)
+  ) {
+    correctShiftEnd = dayjs(
+      dayjs(shiftDateString)
+        .add(1, 'day')
+        .toDate()
+        .toLocaleDateString() +
+        ' ' +
+        dayjs(newShiftEnd).format(timeFormat)
+    ).toDate();
+
+    overnightShift = true;
+  } else {
+    correctShiftEnd = dayjs(
+      shiftDateString + ' ' + dayjs(newShiftEnd).format(timeFormat)
+    ).toDate();
+  }
+
+  const correctShiftStart = dayjs(
+    shiftDateString + ' ' + dayjs(newShiftStart).format(timeFormat)
+  ).toDate();
+
+  return [correctShiftStart, correctShiftEnd, overnightShift];
+};
 
 export const generateParams = queryParams => ({
   ...generatePaginationParams(queryParams || {}),
@@ -61,3 +98,21 @@ export const generateParams = queryParams => ({
   departmentIds: queryParams.departmentIds,
   branchIds: queryParams.branchIds
 });
+
+export const returnDeviceTypes = deviceType => {
+  let checkInDevice;
+  let checkOutDevice;
+  const getDeviceNames = deviceType && deviceType.split('x');
+
+  if (getDeviceNames) {
+    if (getDeviceNames.length === 2) {
+      checkInDevice = getDeviceNames[0];
+      checkOutDevice = getDeviceNames[1];
+    } else {
+      checkInDevice = getDeviceNames[0];
+      checkOutDevice = getDeviceNames[0];
+    }
+  }
+
+  return [checkInDevice, checkOutDevice];
+};

@@ -50,8 +50,13 @@ export const importUsers = async (
   }
 };
 
-export const importSlots = async (models: IModels, slots: any[]) => {
-  await models.PosSlots.deleteMany({});
+export const importSlots = async (
+  models: IModels,
+  slots: any[],
+  token: string
+) => {
+  const pos = await models.Configs.getConfig({ token });
+  await models.PosSlots.deleteMany({ posId: pos.posId });
   await models.PosSlots.insertMany(slots);
 };
 
@@ -172,6 +177,7 @@ export const importProducts = async (
             update: {
               $set: {
                 ...product,
+                [`prices.${token}`]: product.unitPrice,
                 sku: product.sku || 'ш',
                 attachment: attachmentUrlChanger(product.attachment),
                 attachmentMore: (product.attachmentMore || []).map(a =>
@@ -256,6 +262,7 @@ export const extractConfig = async (subdomain, doc) => {
     adminIds: doc.adminIds,
     cashierIds: doc.cashierIds,
     paymentIds: doc.paymentIds,
+    paymentTypes: doc.paymentTypes,
     beginNumber: doc.beginNumber,
     maxSkipNumber: doc.maxSkipNumber,
     uiOptions,
@@ -266,6 +273,7 @@ export const extractConfig = async (subdomain, doc) => {
     catProdMappings: doc.catProdMappings,
     posSlot: doc.posSlot,
     initialCategoryIds: doc.initialCategoryIds,
+    kioskExcludeCategoryIds: doc.kioskExcludeCategoryIds,
     kioskExcludeProductIds: doc.kioskExcludeProductIds,
     deliveryConfig: doc.deliveryConfig,
     posId: doc._id,
@@ -276,7 +284,8 @@ export const extractConfig = async (subdomain, doc) => {
     departmentId: doc.departmentId,
     allowBranchIds: doc.allowBranchIds,
     checkRemainder: doc.checkRemainder,
-    permissionConfig: doc.permissionConfig
+    permissionConfig: doc.permissionConfig,
+    allowTypes: doc.allowTypes
   };
 };
 
@@ -312,7 +321,7 @@ export const receiveProduct = async (models: IModels, data) => {
     const info = action === 'update' ? updatedDocument : object;
     return await models.Products.updateOne(
       { _id: object._id },
-      { ...info, tokens },
+      { ...info, [`prices.${token}`]: info.unitPrice, tokens },
       { upsert: true }
     );
   }

@@ -23,6 +23,14 @@ export const types = `
     deviceType: String
   }
 
+  type Timelog {
+    _id: String!
+    user: User
+    timelog: Date
+    deviceSerialNo: String
+    deviceName: String
+  }
+
   type Absence {
     _id: String!
     user: User
@@ -34,6 +42,10 @@ export const types = `
     solved: Boolean
     status: String
     attachment: Attachment
+    
+    absenceTimeType: String
+    requestDates: [String]
+    totalHoursOfAbsence: String
   }
 
   type AbsenceType {
@@ -42,11 +54,16 @@ export const types = `
     explRequired: Boolean
     attachRequired: Boolean
     shiftRequest: Boolean
+
+    requestType: String
+    requestTimeType: String
+    requestHoursPerDay: Float
   }
 
   
   input ShiftsRequestInput {
     _id: String
+    scheduleConfigId: String
     overnightShift: Boolean
     configName: String
     shiftStart: Date
@@ -55,6 +72,7 @@ export const types = `
 
   type ShiftsRequest{
     _id: String
+    scheduleConfigId: String
     shiftStart: Date
     shiftEnd: Date
     solved: Boolean
@@ -69,6 +87,24 @@ export const types = `
     solved: Boolean
     status: String
     scheduleConfigId: String
+    scheduleChecked: Boolean
+    submittedByAdmin: Boolean
+    totalBreakInMins: Int
+  }
+  
+  type DuplicateSchedule {
+    _id: String!
+    user: User
+    solved: Boolean
+    shifts: [ShiftsRequest]
+  }
+
+  type IUserAbsenceInfo{ 
+    totalHoursShiftRequest: Float
+    totalHoursWorkedAbroad: Float
+    totalHoursPaidAbsence: Float
+    totalHoursUnpaidAbsence: Float
+    totalHoursSick: Float
   }
 
   type ScheduleReport{
@@ -83,6 +119,8 @@ export const types = `
     scheduledStart: Date
     scheduledEnd: Date
     scheduledDuration:String
+    
+    lunchBreakInHrs: String
     
     totalMinsLate: String
     totalHoursOvertime: String
@@ -106,7 +144,8 @@ export const types = `
     totalDaysScheduled: Int
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
-    
+    totalHoursBreak: Float
+
     totalHoursOvertime: Float
     totalHoursOvernight: Float
 
@@ -114,8 +153,8 @@ export const types = `
     totalMinsLateThisMonth: Int
     totalMinsAbsenceThisMonth: Int
 
+    absenceInfo: IUserAbsenceInfo
   }
-
   
   type Report {
     groupTitle: String
@@ -135,6 +174,7 @@ export const types = `
   type ScheduleConfig {
     _id: String!
     scheduleName: String
+    lunchBreakInMins: Int
     shiftStart: String
     shiftEnd: String
     configDays: [ConfigDay]
@@ -147,6 +187,20 @@ export const types = `
     scheduleConfigId: String
     configShiftStart: String
     configShiftEnd: String
+  }
+
+  type DeviceConfig{
+    _id: String!
+    deviceName: String
+    serialNo: String
+    extractRequired: Boolean
+  }
+
+  type CheckReport{
+    _id: String!
+    userId: String
+    startDate: String
+    endDate: String
   }
 
   type TimeClocksListResponse {
@@ -169,6 +223,15 @@ export const types = `
     totalCount: Float
   }
   
+  type TimelogListResponse {
+    list: [Timelog]
+    totalCount: Float
+  }
+
+  type DeviceConfigsListResponse {
+    list: [DeviceConfig]
+    totalCount: Float
+  }
 `;
 
 const params = `
@@ -188,16 +251,21 @@ const queryParams = `
   branchIds: [String]
   departmentIds: [String]
   reportType: String
+  scheduleStatus: String
 `;
 
 const absence_params = `
     userId: String
     startTime: Date
     endTime: Date
+    requestDates: [String]
     reason: String
     explanation: String
     attachment: AttachmentInput
+    
     absenceTypeId: String
+    absenceTimeType: String
+    totalHoursOfAbsence: String
 `;
 
 const absenceType_params = `
@@ -205,47 +273,89 @@ const absenceType_params = `
     explRequired: Boolean
     attachRequired: Boolean
     shiftRequest: Boolean
+
+    requestType: String
+    requestTimeType: String
+    requestHoursPerDay: Float
+  
 `;
 
 export const queries = `
   timeclocksMain(${queryParams}): TimeClocksListResponse
   schedulesMain(${queryParams}): SchedulesListResponse
   requestsMain(${queryParams}): RequestsListResponse
-
+  timelogsMain(${queryParams}): TimelogListResponse
+  
+  timeclocksPerUser(userId: String, shiftActive: Boolean, startDate: String, endDate:String): [Timeclock]
+  timeLogsPerUser(userId: String, startDate: String, endDate: String ): [Timelog]
+  schedulesPerUser(userId: String, startDate: String, endDate: String): [Schedule]
   absenceTypes:[AbsenceType]
+  
   timeclockReports(${queryParams}): ReportsListResponse
   timeclockReportByUser(selectedUser: String): UserReport
   timeclockDetail(_id: String!): Timeclock
+  
+  timeclockActivePerUser(userId: String): Timeclock
+
   absenceDetail(_id: String!): Absence
   scheduleDetail(_id: String!): Schedule
   scheduleConfigs: [ScheduleConfig]
+  
+  deviceConfigs(${queryParams}): DeviceConfigsListResponse
   payDates: [PayDate]
   holidays: [Absence]
+
+  checkedReportsPerUser(userId: String): [CheckReport]
 `;
 
 export const mutations = `
   timeclockStart(${params}): Timeclock
   timeclockStop(${params}): Timeclock
-  timeclockRemove(_id : String): Timeclock
+  timeclockRemove(_id : String): JSON
+  timeclockCreate(userId: String, shiftStart: Date, shiftEnd: Date, shiftActive: Boolean): Timeclock
+  timeclockEdit(_id: String, shiftStart: Date, shiftEnd: Date, shiftActive: Boolean): Timeclock
+  
   absenceTypeRemove(_id: String): JSON
   absenceTypeAdd(${absenceType_params}): AbsenceType
   absenceTypeEdit(_id: String, ${absenceType_params}): AbsenceType
+  
   sendAbsenceRequest(${absence_params}): Absence
-  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String): Schedule
-  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String): Schedule
+  removeAbsenceRequest(_id: String): JSON
+
+  submitCheckInOutRequest(checkType: String,userId: String, checkTime: Date): AbsenceType
+  
+  sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
+  submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
+  checkDuplicateScheduleShifts(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], status: String): [DuplicateSchedule]
+
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule
   solveShiftRequest(_id: String, status: String): ShiftsRequest
-  scheduleConfigAdd(scheduleName: String, scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
-  scheduleConfigEdit(_id : String ,scheduleName: String, scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
+  
+  scheduleConfigAdd(scheduleName: String, lunchBreakInMins: Int,  scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
+  scheduleConfigEdit(_id : String ,scheduleName: String, lunchBreakInMins: Int,  scheduleConfig: [ShiftsRequestInput], configShiftStart: String, configShiftEnd: String): ScheduleConfig
   scheduleConfigRemove(_id : String ): JSON
+  
   payDateAdd(dateNums: [Int]): PayDate
   payDateEdit(_id: String, dateNums: [Int]): PayDate
   payDateRemove(_id: String): JSON
+  
   holidayAdd(name: String, startDate: Date, endDate: Date): Absence
   holidayEdit(_id: String, name: String, startDate: Date, endDate: Date): Absence
   holidayRemove(_id: String): JSON
+  
   scheduleRemove(_id: String): JSON
   scheduleShiftRemove(_id: String): JSON
-  extractAllDataFromMySQL(startDate: String, endDate: String): [Timeclock]
+  
+  deviceConfigAdd(deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
+  deviceConfigEdit(_id: String, deviceName: String, serialNo: String,extractRequired: Boolean): DeviceConfig
+  deviceConfigRemove(_id: String): JSON
+  
+  checkReport(userId: String, startDate: String, endDate: String): CheckReport
+  checkSchedule(scheduleId: String): JSON
+
+  createTimeClockFromLog(userId: String, timelog: Date): Timeclock
+
+  extractAllDataFromMsSQL(startDate: String, endDate: String): [Timeclock]
+  extractTimeLogsFromMsSQL(startDate: String, endDate: String): [Timelog]
 `;

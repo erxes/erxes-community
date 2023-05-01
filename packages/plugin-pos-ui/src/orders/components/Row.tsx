@@ -10,6 +10,7 @@ import { IOrder } from '../types';
 type Props = {
   order: IOrder;
   history: any;
+  otherPayTitles: string[];
   onSyncErkhet: (orderId: string) => void;
   onReturnBill: (orderId: string) => void;
 };
@@ -18,6 +19,19 @@ class PutResponseRow extends React.Component<Props> {
   displayValue(order, name) {
     const value = _.get(order, name);
     return <FinanceAmount>{(value || 0).toLocaleString()}</FinanceAmount>;
+  }
+
+  displayPaid(order, key) {
+    const { paidAmounts } = order;
+    const value = (
+      (paidAmounts || []).filter(pa => pa.title === key || pa.type === key) ||
+      []
+    ).reduce((sum, pa) => sum + pa.amount, 0);
+    return (
+      <FinanceAmount key={Math.random()}>
+        {(value || 0).toLocaleString()}
+      </FinanceAmount>
+    );
   }
 
   syncErkhet = e => {
@@ -44,7 +58,7 @@ class PutResponseRow extends React.Component<Props> {
   };
 
   render() {
-    const { order } = this.props;
+    const { order, otherPayTitles } = this.props;
 
     const onClick = e => {
       e.stopPropagation();
@@ -57,19 +71,12 @@ class PutResponseRow extends React.Component<Props> {
           {dayjs(order.paidDate || order.createdAt).format('lll')}
         </td>
         <td key={'cashAmount'}>{this.displayValue(order, 'cashAmount')}</td>
-        <td key={'receivableAmount'}>
-          {this.displayValue(order, 'receivableAmount')}
-        </td>
-        <td key={'cardAmount'}>{this.displayValue(order, 'cardAmount')}</td>
         <td key={'mobileAmount'}>{this.displayValue(order, 'mobileAmount')}</td>
+        {otherPayTitles.map(key => (
+          <td key={key}>{this.displayPaid(order, key)}</td>
+        ))}
         <td key={'totalAmount'}>{this.displayValue(order, 'totalAmount')}</td>
-        <td key={'customer'}>
-          {order.customer
-            ? order.customer.primaryEmail ||
-              order.customer.primaryPhone ||
-              order.customer.firstName
-            : ''}
-        </td>
+        <td key={'customer'}>{order.customerType}</td>
         <td key={'pos'}>
           {order.posName || ''}
           {order.origin === 'kiosk' ? '*' : ''}

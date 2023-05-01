@@ -8,6 +8,7 @@ const commonFields = `
   $adminIds: [String]
   $cashierIds: [String]
   $paymentIds: [String]
+  $paymentTypes: [JSON]
   $isOnline: Boolean
   $onServer: Boolean
   $branchId: String
@@ -24,10 +25,12 @@ const commonFields = `
   $cardsConfig: JSON
   $catProdMappings: [CatProdInput]
   $initialCategoryIds: [String]
+  $kioskExcludeCategoryIds: [String]
   $kioskExcludeProductIds: [String]
   $deliveryConfig: JSON
   $checkRemainder: Boolean
   $permissionConfig: JSON
+  $allowTypes: [String]
 `;
 
 const commonVariables = `
@@ -38,6 +41,7 @@ const commonVariables = `
   adminIds: $adminIds
   cashierIds: $cashierIds
   paymentIds: $paymentIds
+  paymentTypes: $paymentTypes
   isOnline: $isOnline
   onServer: $onServer
   branchId: $branchId
@@ -53,11 +57,13 @@ const commonVariables = `
   erkhetConfig: $erkhetConfig
   catProdMappings: $catProdMappings
   initialCategoryIds: $initialCategoryIds
+  kioskExcludeCategoryIds: $kioskExcludeCategoryIds
   kioskExcludeProductIds: $kioskExcludeProductIds
   deliveryConfig: $deliveryConfig
   cardsConfig: $cardsConfig
   checkRemainder: $checkRemainder
   permissionConfig: $permissionConfig
+  allowTypes: $allowTypes
 `;
 
 const posAdd = `

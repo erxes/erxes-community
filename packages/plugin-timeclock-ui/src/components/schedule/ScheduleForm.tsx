@@ -3,20 +3,33 @@ import React, { useState } from 'react';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 import DateRange from '../datepicker/DateRange';
 import dayjs from 'dayjs';
-import DatePicker from '../datepicker/DateTimePicker';
-import { ISchedule, IScheduleConfig } from '../../types';
+import DatePicker from '../datepicker/DatePicker';
+import { IScheduleForm, IScheduleConfig } from '../../types';
 import Select from 'react-select-plus';
 import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
-import { FlexCenter } from '../../styles';
+import {
+  FlexCenter,
+  FlexColumn,
+  FlexRow,
+  FlexRowEven,
+  MarginX,
+  MarginY
+} from '../../styles';
+
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import { PopoverButton } from '@erxes/ui/src/styles/main';
+import Icon from '@erxes/ui/src/components/Icon';
 
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
-import { CustomRangeContainer } from '../../styles';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
 import { Alert, __ } from '@erxes/ui/src/utils';
 import { compareStartAndEndTime } from '../../utils';
+import Datetime from '@nateradebaugh/react-datetime';
+import Tip from '@erxes/ui/src/components/Tip';
+import { dateFormat } from '../../constants';
 
 type Props = {
   scheduleOfMembers: any;
@@ -25,45 +38,60 @@ type Props = {
   branchesList: IBranch[];
   modalContentType: string;
   scheduleConfigs: IScheduleConfig[];
-  submitRequest: (
-    userId: any,
-    filledShifts: any,
-    selectedScheduleConfigId?: string
-  ) => void;
-  submitSchedule: (
-    branchIds: any,
-    departmentIds: any,
-    userIds: any,
-    filledShifts: any,
-    selectedScheduleConfigId?: string
-  ) => void;
+
+  checkDuplicateScheduleShifts: (values: any) => any;
+
   closeModal: any;
 };
 
 function ScheduleForm(props: Props) {
   const {
     queryParams,
-    submitRequest,
-    submitSchedule,
     closeModal,
     branchesList,
     modalContentType,
-    scheduleConfigs
+    scheduleConfigs,
+    checkDuplicateScheduleShifts
   } = props;
 
-  const [selectedScheduleConfig, setScheduleConfig] = useState('');
-  const [dateKeyCounter, setKeyCounter] = useState('');
+  if (!scheduleConfigs.length) {
+    Alert.error('Please add schedule config in configuration section!');
+  }
 
-  const timeFormat = 'HH:mm';
-  const [defaultStartTime, setDefaultStartTime] = useState('08:30:00');
-  const [defaultEndTime, setDefaultEndTime] = useState('17:00:00');
+  // prepare schedule configsObject
+  const scheduleConfigsObject = {};
+
+  scheduleConfigs.map(scheduleConfig => {
+    scheduleConfigsObject[scheduleConfig._id] = scheduleConfig;
+  });
+
+  const [selectedScheduleConfigId, setScheduleConfigId] = useState(
+    scheduleConfigs[0]._id
+  );
+
+  const [lastSelectedDate, setlastSelectedDate] = useState(new Date());
+
+  const [scheduleDaysLastIdx, setScheduleDaysLastIdx] = useState(0);
+
+  const [defaultStartTime, setDefaultStartTime] = useState(
+    scheduleConfigsObject[selectedScheduleConfigId].shiftStart
+  );
+  const [defaultEndTime, setDefaultEndTime] = useState(
+    scheduleConfigsObject[selectedScheduleConfigId].shiftEnd
+  );
+
   const [dateRangeStart, setDateStart] = useState(new Date());
   const [dateRangeEnd, setDateEnd] = useState(new Date());
-  const [scheduleDates, setScheduleDates] = useState<ISchedule>({});
+
+  const [scheduleDates, setScheduleDates] = useState<IScheduleForm>({});
+
   const [contentType, setContentType] = useState('By Date Range');
+
   const [userIds, setUserIds] = useState([]);
-  const [selectedDeptIds, setDepartments] = useState([]);
-  const [selectedBranchIds, setBranches] = useState([]);
+  const [departmentIds, setDepartmentIds] = useState([]);
+  const [branchIds, setBranchIds] = useState([]);
+
+  const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
 
   const renderBranchOptions = (branches: any[]) => {
     return branches.map(branch => ({
@@ -80,53 +108,58 @@ function ScheduleForm(props: Props) {
     }));
   };
 
-  const onScheduleConfigSelect = scheduleConfig => {
-    setScheduleConfig(scheduleConfig.value);
+  //  might use it later
+  // const onScheduleConfigSelect = scheduleConfig => {
+  //   const selectedScheduleConfidId = scheduleConfig.value;
 
-    const getScheduleConfig =
-      scheduleConfigs &&
-      scheduleConfigs.filter(config => config._id === scheduleConfig.value);
+  //   setScheduleConfigId(selectedScheduleConfidId);
 
-    setDefaultStartTime(getScheduleConfig[0].shiftStart);
-    setDefaultEndTime(getScheduleConfig[0].shiftEnd);
+  //   setDefaultStartTime(
+  //     scheduleConfigsObject[selectedScheduleConfidId].shiftStart
+  //   );
+  //   setDefaultEndTime(scheduleConfigsObject[selectedScheduleConfidId].shiftEnd);
 
-    Object.keys(scheduleDates).forEach(day_key => {
-      const shiftDay = scheduleDates[day_key].shiftDate;
+  //   Object.keys(scheduleDates).forEach(day_key => {
+  //     const shiftDay = scheduleDates[day_key].shiftDate;
 
-      const getShiftStart = dayjs(
-        shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftStart
-      ).toDate();
+  //     const getShiftStart = dayjs(
+  //       shiftDay?.toLocaleDateString() +
+  //         ' ' +
+  //         scheduleConfigsObject[selectedScheduleConfidId].shiftStart
+  //     ).toDate();
 
-      const getShiftEnd = dayjs(
-        shiftDay?.toLocaleDateString() + ' ' + getScheduleConfig[0].shiftEnd
-      ).toDate();
+  //     const getShiftEnd = dayjs(
+  //       shiftDay?.toLocaleDateString() +
+  //         ' ' +
+  //         scheduleConfigsObject[selectedScheduleConfidId].shiftEnd
+  //     ).toDate();
 
-      const [
-        getCorrectShiftStart,
-        getCorrectShiftEnd,
-        overNightShift
-      ] = compareStartAndEndTime(
-        scheduleDates,
-        day_key,
-        getShiftStart,
-        getShiftEnd
-      );
-      scheduleDates[day_key].shiftStart = getCorrectShiftStart;
-      scheduleDates[day_key].shiftEnd = getCorrectShiftEnd;
-      scheduleDates[day_key].overnightShift = overNightShift;
-    });
+  //     const [
+  //       getCorrectShiftStart,
+  //       getCorrectShiftEnd,
+  //       overNightShift
+  //     ] = compareStartAndEndTime(
+  //       scheduleDates,
+  //       day_key,
+  //       getShiftStart,
+  //       getShiftEnd
+  //     );
+  //     scheduleDates[day_key].shiftStart = getCorrectShiftStart;
+  //     scheduleDates[day_key].shiftEnd = getCorrectShiftEnd;
+  //     scheduleDates[day_key].overnightShift = overNightShift;
+  //   });
 
-    setScheduleDates({ ...scheduleDates });
-  };
+  //   setScheduleDates({ ...scheduleDates });
+  // };
 
   const onBranchSelect = selectedBranch => {
-    const branchIds: any = [];
-    branchIds.push(...selectedBranch.map(branch => branch.value));
-    setBranches(branchIds);
+    const selectedBranchIds: any = [];
+    selectedBranchIds.push(...selectedBranch.map(branch => branch.value));
+    setBranchIds(selectedBranchIds);
   };
 
   const onDepartmentSelect = dept => {
-    setDepartments(dept);
+    setDepartmentIds(dept);
   };
 
   const onRemoveDate = day_key => {
@@ -134,127 +167,110 @@ function ScheduleForm(props: Props) {
     setScheduleDates({
       ...scheduleDates
     });
-    setKeyCounter(Object.keys(scheduleDates).at(-1) || '');
+    setScheduleDaysLastIdx(scheduleDaysLastIdx - 1);
   };
 
   const onDateChange = (day_key, selectedDate) => {
-    const newShift = scheduleDates[day_key];
+    const oldShift = scheduleDates[day_key];
+    const oldShiftStart = oldShift.shiftStart;
+    const oldShiftEnd = oldShift.shiftEnd;
 
-    const oldShiftEnd = newShift.shiftEnd;
-    const oldShiftStart = newShift.shiftStart;
+    const [getShiftStart, getShiftEnd, overnight] = compareStartAndEndTime(
+      scheduleDates,
+      day_key,
+      oldShiftStart,
+      oldShiftEnd
+    );
 
-    const newDateKey = selectedDate.toLocaleDateString();
-
-    const newShiftStart = dayjs(
-      newDateKey + ' ' + dayjs(oldShiftStart).format(timeFormat)
-    ).toDate();
-    const newShiftEnd = dayjs(
-      newDateKey + ' ' + dayjs(oldShiftEnd).format(timeFormat)
-    ).toDate();
-
-    newShift.shiftDate = selectedDate;
-    newShift.shiftStart = newShiftStart;
-    newShift.shiftEnd = newShiftEnd;
+    const newShift = {
+      shiftDate: selectedDate,
+      shiftStart: getShiftStart,
+      shiftEnd: getShiftEnd,
+      overnightShift: overnight,
+      lunchBreakInMins: oldShift.lunchBreakInMins,
+      scheduleConfigId: oldShift.scheduleConfigId
+    };
 
     delete scheduleDates[day_key];
-    const newScheduleDates = { ...scheduleDates, [newDateKey]: newShift };
-
-    setScheduleDates(newScheduleDates);
-  };
-
-  const onStartTimeChange = (day_key, time) => {
-    const newShift = scheduleDates[day_key];
-    const [
-      getCorrectStartTime,
-      getCorrectEndTime,
-      overnight
-    ] = compareStartAndEndTime(scheduleDates, day_key, time, null);
-
-    newShift.shiftStart = getCorrectStartTime;
-    newShift.overnightShift = overnight;
-    newShift.shiftEnd = getCorrectEndTime;
 
     const newScheduleDates = { ...scheduleDates, [day_key]: newShift };
-    setScheduleDates(newScheduleDates);
-  };
 
-  const onEndTimeChange = (day_key, time) => {
-    const newShift = scheduleDates[day_key];
-    const [
-      getCorrectStartTime,
-      getCorrectEndTime,
-      overnight
-    ] = compareStartAndEndTime(scheduleDates, day_key, null, time);
-
-    newShift.shiftStart = getCorrectStartTime;
-    newShift.overnightShift = overnight;
-    newShift.shiftEnd = getCorrectEndTime;
-
-    const newScheduleDates = { ...scheduleDates, [day_key]: newShift };
     setScheduleDates(newScheduleDates);
   };
 
   const pickSubset = Object.values(scheduleDates).map(shift => {
-    return { shiftStart: shift.shiftStart, shiftEnd: shift.shiftEnd };
+    return {
+      shiftStart: shift.shiftStart,
+      shiftEnd: shift.shiftEnd,
+      scheduleConfigId: shift.scheduleConfigId
+    };
   });
 
-  const checkInput = (selectedUsers, shifts, branchIds?, departmentIds?) => {
-    if (
-      (!branchIds || !branchIds.length) &&
-      (!departmentIds || !departmentIds.length) &&
-      !selectedUsers.length
-    ) {
-      Alert.error('No users were given');
-    } else if (shifts.length === 0) {
-      Alert.error('No shifts were given');
-    } else {
-      return true;
+  const calculateScheduledDaysAndHours = () => {
+    const totalDays = Object.keys(scheduleDates).length;
+    let totalHours = 0;
+
+    pickSubset.forEach(shift => {
+      totalHours +=
+        (shift.shiftEnd.getTime() - shift.shiftStart.getTime()) / (1000 * 3600);
+    });
+
+    let totalBreakMins = 0;
+
+    for (const scheduledDateIdx of Object.keys(scheduleDates)) {
+      totalBreakMins += scheduleDates[scheduledDateIdx].lunchBreakInMins || 0;
     }
+
+    return [
+      totalDays,
+      (totalHours - totalBreakMins / 60).toFixed(1),
+      totalBreakMins
+    ];
   };
 
   const onSubmitClick = () => {
-    const validInput = checkInput(userIds, pickSubset);
-    if (validInput) {
-      submitRequest(
-        userIds,
-        pickSubset,
-        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
-      );
-      closeModal();
-    }
-  };
-  const onAdminSubmitClick = () => {
-    const validInput = checkInput(
+    checkDuplicateScheduleShifts({
+      branchIds,
+      departmentIds,
       userIds,
-      pickSubset,
-      selectedBranchIds,
-      selectedDeptIds
-    );
-    if (validInput) {
-      submitSchedule(
-        selectedBranchIds,
-        selectedDeptIds,
-        userIds,
-        pickSubset,
-        selectedScheduleConfig.length ? selectedScheduleConfig : undefined
-      );
-      closeModal();
-    }
+      shifts: pickSubset,
+      totalBreakInMins: calculateScheduledDaysAndHours()[2],
+      userType: 'employee',
+      closeModal
+    });
   };
+
+  const onAdminSubmitClick = () => {
+    checkDuplicateScheduleShifts({
+      branchIds,
+      departmentIds,
+      userIds,
+      shifts: pickSubset,
+      totalBreakInMins: calculateScheduledDaysAndHours()[2],
+      userType: 'admin',
+      closeModal,
+      status: 'Approved'
+    });
+  };
+
   const onUserSelect = users => {
     setUserIds(users);
   };
 
   const clearDays = () => {
     setScheduleDates({});
+    setScheduleDaysLastIdx(0);
   };
 
   const addDay = () => {
     // sort array of dates, in order to get the latest day
     let dates_arr = Object.values(scheduleDates).map(shift => shift.shiftDate);
-    dates_arr = dates_arr.sort((a, b) => b.getTime() - a.getTime());
+    dates_arr = dates_arr.sort(
+      (a, b) => (b?.getTime() || 0) - (a?.getTime() || 0)
+    );
 
-    const dates = scheduleDates;
+    const prevScheduleDates = scheduleDates;
+
     const getLatestDayKey = dates_arr.length
       ? dayjs(dates_arr[0])
           .add(1, 'day')
@@ -272,39 +288,87 @@ function ScheduleForm(props: Props) {
       new Date(getLatestDayKey + ' ' + defaultStartTime),
       new Date(getLatestDayKey + ' ' + defaultEndTime)
     );
-    dates[getLatestDayKey] = {
+
+    prevScheduleDates[scheduleDaysLastIdx] = {
       shiftDate: new Date(getLatestDayKey),
       shiftStart: getCorrectShiftStart,
       shiftEnd: getCorrectShiftEnd,
-      overnightShift: overnight
+      overnightShift: overnight,
+      scheduleConfigId: selectedScheduleConfigId,
+      lunchBreakInMins:
+        scheduleConfigsObject[selectedScheduleConfigId].lunchBreakInMins
+    };
+
+    setScheduleDaysLastIdx(scheduleDaysLastIdx + 1);
+
+    setScheduleDates({
+      ...prevScheduleDates
+    });
+  };
+
+  const onScheduleConfigChange = (
+    curr_day_key: string,
+    scheduleConfigId: string
+  ) => {
+    const prevScheduleDates = scheduleDates;
+
+    const shiftDate = dayjs(scheduleDates[curr_day_key].shiftDate).format(
+      dateFormat
+    );
+
+    const [
+      getCorrectShiftStart,
+      getCorrectShiftEnd,
+      overnight
+    ] = compareStartAndEndTime(
+      scheduleDates,
+      shiftDate,
+      new Date(
+        shiftDate + ' ' + scheduleConfigsObject[scheduleConfigId].shiftStart
+      ),
+      new Date(
+        shiftDate + ' ' + scheduleConfigsObject[scheduleConfigId].shiftEnd
+      )
+    );
+
+    prevScheduleDates[curr_day_key] = {
+      shiftDate: scheduleDates[curr_day_key].shiftDate,
+      shiftStart: getCorrectShiftStart,
+      shiftEnd: getCorrectShiftEnd,
+      overnightShift: overnight,
+      scheduleConfigId,
+      lunchBreakInMins: scheduleConfigsObject[scheduleConfigId].lunchBreakInMins
     };
 
     setScheduleDates({
-      ...dates
+      ...prevScheduleDates
     });
-    setKeyCounter(getLatestDayKey);
+
+    setScheduleConfigId(scheduleConfigId);
+    setDefaultStartTime(scheduleConfigsObject[scheduleConfigId].shiftStart);
+    setDefaultEndTime(scheduleConfigsObject[scheduleConfigId].shiftEnd);
   };
 
   const renderWeekDays = () => {
+    const datePickers: any = [];
+
     return (
-      <>
-        {Object.keys(scheduleDates).map(date_key => {
+      <FlexColumn marginNum={5}>
+        {Object.keys(scheduleDates).map(i => {
           return (
             <DatePicker
-              key={date_key}
-              startDate={scheduleDates[date_key].shiftDate}
-              startTime_value={scheduleDates[date_key].shiftStart}
-              endTime_value={scheduleDates[date_key].shiftEnd}
-              overnightShift={scheduleDates[date_key].overnightShift}
-              curr_day_key={date_key}
+              key={i}
+              scheduledDate={scheduleDates[i]}
+              selectedScheduleConfigId={scheduleDates[i].scheduleConfigId}
+              scheduleConfigOptions={renderScheduleConfigOptions()}
+              curr_day_key={i.toString()}
               changeDate={onDateChange}
               removeDate={onRemoveDate}
-              changeEndTime={onEndTimeChange}
-              changeStartTime={onStartTimeChange}
+              changeScheduleConfig={onScheduleConfigChange}
             />
           );
         })}
-      </>
+      </FlexColumn>
     );
   };
 
@@ -331,81 +395,88 @@ function ScheduleForm(props: Props) {
   };
 
   const modalContent = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+    <FlexColumn marginNum={10}>
       <SelectTeamMembers
+        customField="employeeId"
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}
         multi={false}
         name="userId"
       />
-      <Select
-        value={selectedScheduleConfig}
-        onChange={onScheduleConfigSelect}
-        placeholder="Select Schedule"
-        multi={false}
-        options={renderScheduleConfigOptions()}
-      />
+      {displayTotalDaysHoursBreakMins()}
       {renderWeekDays()}
       {actionButtons('employee')}
-    </div>
+    </FlexColumn>
   );
 
-  const adminModalContent = () => {
+  const displayTotalDaysHoursBreakMins = () => {
+    let totalBreakMins = 0;
+
+    for (const scheduledDateIdx of Object.keys(scheduleDates)) {
+      totalBreakMins += scheduleDates[scheduledDateIdx].lunchBreakInMins || 0;
+    }
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <SelectTeamMembers
-          queryParams={queryParams}
-          label={'Team member'}
-          onSelect={onUserSelect}
-          name="userId"
-        />
-        <Select
-          value={selectedScheduleConfig}
-          onChange={onScheduleConfigSelect}
-          placeholder="Select Schedule"
-          multi={false}
-          options={renderScheduleConfigOptions()}
-        />
-        {renderWeekDays()}
-        {actionButtons('admin')}
-      </div>
+      <FlexCenter>
+        <div style={{ width: '35%' }}>
+          <FlexRow>
+            <MarginX margin={20}>
+              <FlexColumn marginNum={0}>
+                <div>Total days :</div>
+                <div>Total hours :</div>
+                <div>Total break:</div>
+              </FlexColumn>
+            </MarginX>
+            <FlexColumn marginNum={0}>
+              <div>{calculateScheduledDaysAndHours()[0]}</div>
+              <div>{calculateScheduledDaysAndHours()[1]}</div>
+              <div>{(totalBreakMins / 60).toFixed(1)}</div>
+            </FlexColumn>
+          </FlexRow>
+        </div>
+      </FlexCenter>
     );
   };
-
   const adminConfigDefaultContent = () => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <FlexColumn marginNum={10}>
+        <div style={{ marginBottom: '0' }}>
+          <SelectDepartments
+            isRequired={false}
+            defaultValue={departmentIds}
+            onChange={onDepartmentSelect}
+          />
+        </div>
         <FormGroup>
-          <ControlLabel>Branches</ControlLabel>
-          <Row>
-            <Select
-              value={selectedBranchIds}
-              onChange={onBranchSelect}
-              placeholder="Select branch"
-              multi={true}
-              options={branchesList && renderBranchOptions(branchesList)}
-            />
-          </Row>
+          <div style={{ marginBottom: '0' }}>
+            <ControlLabel>Branches</ControlLabel>
+            <Row>
+              <Select
+                value={branchIds}
+                onChange={onBranchSelect}
+                placeholder="Select branch"
+                multi={true}
+                options={branchesList && renderBranchOptions(branchesList)}
+              />
+            </Row>
+          </div>
         </FormGroup>
-        <SelectDepartments
-          isRequired={false}
-          defaultValue={selectedDeptIds}
-          onChange={onDepartmentSelect}
-        />
-        <SelectTeamMembers
-          queryParams={queryParams}
-          label={'Team member'}
-          onSelect={onUserSelect}
-          name="userId"
-        />
-        <Select
-          value={selectedScheduleConfig}
-          onChange={onScheduleConfigSelect}
-          placeholder="Select Schedule"
-          multi={false}
-          options={renderScheduleConfigOptions()}
-        />
+        <FormGroup>
+          <div style={{ marginBottom: '0' }}>
+            <ControlLabel>Team members </ControlLabel>
+            <div style={{ width: '100%' }}>
+              <SelectTeamMembers
+                customField="employeeId"
+                queryParams={queryParams}
+                label={'Select team member'}
+                onSelect={onUserSelect}
+                name="userId"
+              />
+            </div>
+          </div>
+        </FormGroup>
+
         <Select
           value={contentType}
           onChange={onContentTypeSelect}
@@ -415,9 +486,11 @@ function ScheduleForm(props: Props) {
             label: __(day)
           }))}
         />
+
+        {displayTotalDaysHoursBreakMins()}
         {renderAdminConfigSwitchContent()}
         {actionButtons('admin')}
-      </div>
+      </FlexColumn>
     );
   };
 
@@ -430,10 +503,6 @@ function ScheduleForm(props: Props) {
   };
 
   const onSaveDateRange = () => {
-    const format = 'YYYY-MM-DD HH:mm';
-    const formattedStartDate = dayjs(dateRangeStart).format(format);
-    const formattedEndDate = dayjs(dateRangeEnd).format(format);
-
     const totalDatesArray: string[] = [];
 
     let temp = dayjs(dateRangeStart);
@@ -441,13 +510,27 @@ function ScheduleForm(props: Props) {
     const endRange = dayjs(dateRangeEnd);
 
     while (temp <= endRange) {
-      totalDatesArray.push(temp.toDate().toLocaleDateString());
+      totalDatesArray.push(temp.format(dateFormat));
       temp = temp.add(1, 'day');
     }
 
-    const newDatesByRange: ISchedule = scheduleDates;
+    const newDatesByRange: IScheduleForm = {};
 
-    for (const eachDay of totalDatesArray) {
+    let totalDaysAdded = 0;
+
+    // tslint:disable-next-line:prefer-for-of
+    for (let dayIdx = 0; dayIdx < totalDatesArray.length; dayIdx++) {
+      const eachDay = totalDatesArray[dayIdx];
+
+      // if date exists already
+      if (
+        Object.values(scheduleDates).find(
+          scheduleDateValues =>
+            dayjs(scheduleDateValues.shiftDate).format(dateFormat) === eachDay
+        )
+      ) {
+        continue;
+      }
       const [
         correctShiftStart,
         correctShiftEnd,
@@ -460,46 +543,79 @@ function ScheduleForm(props: Props) {
         eachDay
       );
 
-      newDatesByRange[eachDay] = {
+      newDatesByRange[scheduleDaysLastIdx + dayIdx] = {
         shiftDate: new Date(eachDay),
         shiftStart: correctShiftStart,
+        scheduleConfigId: selectedScheduleConfigId,
+        lunchBreakInMins:
+          scheduleConfigsObject[selectedScheduleConfigId].lunchBreakInMins,
         shiftEnd: correctShiftEnd,
         overnightShift: isOvernightShift
       };
 
-      setKeyCounter(eachDay);
+      totalDaysAdded += 1;
     }
 
-    const difference = Object.keys(newDatesByRange).filter(
-      x => !totalDatesArray.includes(x)
-    );
-
-    for (const removeKey of difference) {
-      delete newDatesByRange[removeKey];
-    }
-
-    setScheduleDates(newDatesByRange);
+    setScheduleDates({ ...newDatesByRange, ...scheduleDates });
+    setScheduleDaysLastIdx(scheduleDaysLastIdx + totalDaysAdded);
   };
 
+  const displayStartEndBreak = (
+    <FlexRowEven style={{ marginRight: '0.5rem', width: '32%' }}>
+      <ControlLabel>{__('Start:')} </ControlLabel>
+      <ControlLabel>{__('End:')} </ControlLabel>
+      <ControlLabel>{__('Break:')} </ControlLabel>
+      <Tip>
+        <div>{''}</div>
+      </Tip>
+    </FlexRowEven>
+  );
   const adminConfigByDateRange = () => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <DateRange
-          showTime={false}
-          startDate={dateRangeStart}
-          endDate={dateRangeEnd}
-          onChangeEnd={onDateRangeEndChange}
-          onChangeStart={onDateRangeStartChange}
-          onSaveButton={onSaveDateRange}
-        />
+      <FlexColumn marginNum={20}>
+        <FlexRow>
+          <div style={{ width: '78%', marginRight: '0.5rem' }}>
+            <DateRange
+              showTime={false}
+              startDate={dateRangeStart}
+              endDate={dateRangeEnd}
+              onChangeEnd={onDateRangeEndChange}
+              onChangeStart={onDateRangeStartChange}
+              onSaveButton={onSaveDateRange}
+            />
+          </div>
+          {displayStartEndBreak}
+        </FlexRow>
         {renderWeekDays()}
-      </div>
+      </FlexColumn>
     );
   };
 
   const onDateSelectChange = dateString => {
     if (dateString) {
-      const getDate = new Date(dateString).toLocaleDateString();
+      // handle click on a different month
+      if (
+        JSON.stringify(dateString).split('-')[1] !==
+        JSON.stringify(lastSelectedDate).split('-')[1]
+      ) {
+        setlastSelectedDate(new Date(dateString));
+      }
+
+      const getDate = dayjs(dateString).format(dateFormat);
+
+      // if date is already selected remove from schedule date
+      for (const scheduleDateIdx of Object.keys(scheduleDates)) {
+        if (
+          dayjs(scheduleDates[scheduleDateIdx].shiftDate).format(dateFormat) ===
+          getDate
+        ) {
+          delete scheduleDates[scheduleDateIdx];
+          setScheduleDates({
+            ...scheduleDates
+          });
+          return;
+        }
+      }
 
       const newDates = scheduleDates;
 
@@ -515,31 +631,97 @@ function ScheduleForm(props: Props) {
         getDate
       );
 
-      newDates[getDate] = {
+      newDates[scheduleDaysLastIdx] = {
         shiftDate: new Date(getDate),
         shiftStart: correctShiftStart,
         shiftEnd: correctShiftEnd,
-        overnightShift: isOvernightShift
+        overnightShift: isOvernightShift,
+        scheduleConfigId: selectedScheduleConfigId,
+        lunchBreakInMins:
+          scheduleConfigsObject[selectedScheduleConfigId].lunchBreakInMins
       };
 
-      setScheduleDates(newDates);
-      setKeyCounter(getDate);
+      setScheduleDaysLastIdx(scheduleDaysLastIdx + 1);
+      setScheduleDates({ ...newDates });
     }
   };
 
+  const closePopover = () => {
+    if (overlayTrigger) {
+      overlayTrigger.hide();
+    }
+  };
+
+  const renderDay = (dateTimeProps: any, currentDate) => {
+    let isSelected = false;
+
+    const getDate = dayjs(currentDate).format(dateFormat);
+
+    if (
+      Object.values(scheduleDates).find(
+        scheduleDateValues =>
+          dayjs(scheduleDateValues.shiftDate).format(dateFormat) === getDate
+      )
+    ) {
+      isSelected = true;
+    }
+
+    return (
+      <td
+        {...dateTimeProps}
+        className={`rdtDay ${isSelected ? 'rdtActive' : ''}`}
+      >
+        {new Date(currentDate).getDate()}
+      </td>
+    );
+  };
+
+  const renderDateSelection = () => {
+    return (
+      <Popover id="schedule-date-select-popover" content={true}>
+        <div style={{ position: 'relative' }}>
+          <Datetime
+            open={true}
+            input={false}
+            value={lastSelectedDate}
+            renderDay={renderDay}
+            closeOnSelect={false}
+            timeFormat={false}
+            onChange={onDateSelectChange}
+            inputProps={{ required: false }}
+          />
+          <FlexCenter>
+            <MarginY margin={10}>
+              <Button onClick={closePopover}>Close</Button>
+            </MarginY>
+          </FlexCenter>
+        </div>
+      </Popover>
+    );
+  };
+
   const adminConfigBySelect = () => (
-    <>
-      <CustomRangeContainer>
-        <DateControl
-          required={false}
-          name="startDate"
-          onChange={onDateSelectChange}
-          placeholder={'Select date'}
-          dateFormat={'YYYY-MM-DD'}
-        />
-      </CustomRangeContainer>
+    <FlexColumn marginNum={20}>
+      <FlexRow>
+        <div style={{ width: '78%', marginRight: '0.5rem' }}>
+          <OverlayTrigger
+            ref={overlay => setOverlayTrigger(overlay)}
+            placement="top-start"
+            trigger="click"
+            overlay={renderDateSelection()}
+            container={this}
+            rootClose={this}
+          >
+            <PopoverButton>
+              {__('Please select date')}
+              <Icon icon="angle-down" />
+            </PopoverButton>
+          </OverlayTrigger>
+        </div>
+        {displayStartEndBreak}
+      </FlexRow>
       {renderWeekDays()}
-    </>
+    </FlexColumn>
   );
 
   const onContentTypeSelect = contntType => {
@@ -559,8 +741,6 @@ function ScheduleForm(props: Props) {
   };
 
   switch (modalContentType) {
-    case 'admin':
-      return adminModalContent();
     case 'adminConfig':
       return adminConfigDefaultContent();
     default:

@@ -8,6 +8,7 @@ export const posCommonFields = `
   adminIds
   cashierIds
   paymentIds
+  paymentTypes
   user {
     _id
     details {
@@ -33,14 +34,18 @@ export const posCommonFields = `
   catProdMappings {
     _id
     categoryId
+    code
+    name
     productId
   }
 
   initialCategoryIds
+  kioskExcludeCategoryIds
   kioskExcludeProductIds
   deliveryConfig
   checkRemainder
   permissionConfig
+  allowTypes
 `;
 
 const commonParamDefs = `

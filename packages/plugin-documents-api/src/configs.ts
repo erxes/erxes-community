@@ -3,6 +3,7 @@ import resolvers from './graphql/resolvers';
 
 import { generateModels } from './connectionResolver';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import { getServices, getService } from '@erxes/api-utils/src/serviceDiscovery';
 import { initBroker, sendCommonMessage } from './messageBroker';
 import * as permissions from './permissions';
 
@@ -22,7 +23,6 @@ export default {
       resolvers
     };
   },
-  hasSubscriptions: true,
   segment: {},
   apolloServerContext: async (context, req) => {
     const subdomain = getSubdomain(req);
@@ -35,7 +35,7 @@ export default {
     {
       path: '/print',
       method: async (req, res, next) => {
-        const { _id, copies, width } = req.query;
+        const { _id, copies, width, itemId } = req.query;
         const subdomain = getSubdomain(req);
         const models = await generateModels(subdomain);
         const document = await models.Documents.findOne({ _id });
@@ -54,16 +54,101 @@ export default {
           return next(new Error('Permission denied'));
         }
 
-        let replacedContents = await sendCommonMessage({
-          subdomain,
-          serviceName: document.contentType,
-          action: 'documents.replaceContent',
-          isRPC: true,
-          data: {
-            ...(req.query || {}),
-            content: document.content
+        const services = await getServices();
+
+        for (const serviceName of services) {
+          const service = await getService(serviceName, true);
+          const meta = service.config?.meta || {};
+
+          if (meta && meta.documentPrintHook) {
+            try {
+              await sendCommonMessage({
+                subdomain,
+                action: 'documentPrintHook',
+                isRPC: true,
+                serviceName,
+                data: { document, userId }
+              });
+            } catch (e) {
+              return next(e);
+            }
           }
-        });
+        }
+
+        let replacedContents: any[] = [];
+
+        if (document.contentType === 'core:user') {
+          const user = await sendCommonMessage({
+            subdomain,
+            serviceName: 'core',
+            isRPC: true,
+            action: 'users.findOne',
+            data: {
+              _id: itemId
+            }
+          });
+
+          let content = document.content;
+
+          const details = user.details || {};
+
+          content = content.replace(/{{ username }}/g, user.username);
+          content = content.replace(/{{ email }}/g, user.email);
+          content = content.replace(
+            /{{ details.firstName }}/g,
+            details.firstName
+          );
+          content = content.replace(
+            /{{ details.lastName }}/g,
+            details.lastName
+          );
+          content = content.replace(
+            /{{ details.middleName }}/g,
+            details.middleName
+          );
+          content = content.replace(
+            /{{ details.position }}/g,
+            details.position
+          );
+          content = content.replace(/{{ details.avatar }}/g, details.avatar);
+          content = content.replace(
+            /{{ details.description }}/g,
+            details.description
+          );
+
+          for (const data of user.customFieldsData || []) {
+            const regex = new RegExp(
+              `{{ customFieldsData.${data.field} }}`,
+              'g'
+            );
+            content = content.replace(regex, data.stringValue);
+          }
+
+          replacedContents.push(content);
+        } else {
+          try {
+            const serviceName = document.contentType.includes(':')
+              ? document.contentType.substring(
+                  0,
+                  document.contentType.indexOf(':')
+                )
+              : document.contentType;
+
+            replacedContents = await sendCommonMessage({
+              subdomain,
+              serviceName,
+              action: 'documents.replaceContent',
+              isRPC: true,
+              data: {
+                ...(req.query || {}),
+                content: document.content
+              },
+              timeout: 50000
+            });
+          } catch (e) {
+            replacedContents = [e.message];
+          }
+        }
 
         let results: string = '';
 

@@ -3,24 +3,24 @@ import {
   ButtonMutate,
   FormControl,
   Icon,
+  Label,
   ModalTrigger,
-  Tip,
-  __
+  Tip
 } from '@erxes/ui/src';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import gql from 'graphql-tag';
 import moment from 'moment';
 import React from 'react';
+import { FormContainer } from '../../styles';
 import { RiskIndicatorsType } from '../common/types';
-import { default as Form, default as FormContainer } from '../containers/Form';
-import { generateParams } from '../containers/List';
+import { generateParams } from '../common/utils';
+import { default as Form } from '../containers/Form';
 import { mutations, queries } from '../graphql';
 
 type IProps = {
   object: RiskIndicatorsType;
   selectedValue: string[];
   onchange: (id: string) => void;
-  renderButton: (props: IButtonMutateProps) => JSX.Element;
   queryParams: any;
 };
 
@@ -72,9 +72,10 @@ class TableRow extends React.Component<IProps> {
           ...props,
           asssessmentId: object._id,
           fieldsSkip: { description: 0, name: 0 },
+          queryParams,
           renderButton
         };
-        return <FormContainer {...updatedProps} />;
+        return <Form {...updatedProps} />;
       };
 
       return (
@@ -83,6 +84,7 @@ class TableRow extends React.Component<IProps> {
           trigger={trigger}
           title="Duplicate Risk Indicator"
           dialogClassName="transform"
+          enforceFocus={false}
           size="lg"
         />
       );
@@ -98,7 +100,15 @@ class TableRow extends React.Component<IProps> {
           />
         </td>
         <td>{object.name}</td>
-        <td>{object.category?.name || '-'}</td>
+        <td>
+          <FormContainer gapBetween={5} row maxItemsRow={3}>
+            {(object?.tags || []).map(tag => (
+              <Label key={tag._id} lblColor={tag.colorCode}>
+                {tag.name}
+              </Label>
+            ))}
+          </FormContainer>
+        </td>
         <Tip
           text={moment(object.createdAt).format('MM/DD/YYYY HH:mm')}
           placement="bottom"
@@ -123,9 +133,7 @@ class TableRow extends React.Component<IProps> {
         title="Edit Risk Indicator"
         enforceFocus={false}
         trigger={trigger}
-        autoOpenKey="showListFormModal"
         content={contentForm}
-        dialogClassName="transform"
         size="lg"
       />
     );

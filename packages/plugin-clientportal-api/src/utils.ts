@@ -8,6 +8,7 @@ import { graphqlPubsub } from './configs';
 import { generateModels, IModels } from './connectionResolver';
 import { sendCoreMessage, sendCommonMessage } from './messageBroker';
 
+import * as admin from 'firebase-admin';
 export const getConfig = async (
   code: string,
   subdomain: string,
@@ -85,7 +86,7 @@ export const sendSms = async (
       );
 
       if (!MESSAGE_PRO_API_KEY || !MESSAGE_PRO_PHONE_NUMBER) {
-        throw new Error('messagin config not set properly');
+        throw new Error('messaging config not set properly');
       }
 
       try {
@@ -123,8 +124,8 @@ export const generateRandomPassword = (len: number = 10) => {
     min: number,
     max: number
   ) => {
-    let n,
-      chars = '';
+    let n;
+    let chars = '';
 
     if (max === undefined) {
       n = min;
@@ -148,11 +149,11 @@ export const generateRandomPassword = (len: number = 10) => {
 
   const shuffle = (string: string) => {
     const array = string.split('');
-    let tmp,
-      current,
-      top = array.length;
+    let tmp;
+    let current;
+    let top = array.length;
 
-    if (top)
+    if (top) {
       while (--top) {
         current = Math.floor(Math.random() * (top + 1));
         tmp = array[current];
@@ -160,7 +161,8 @@ export const generateRandomPassword = (len: number = 10) => {
         array[top] = tmp;
       }
 
-    return array.join('');
+      return array.join('');
+    }
   };
 
   let password = '';
@@ -171,6 +173,36 @@ export const generateRandomPassword = (len: number = 10) => {
   password += pick(password, numbers, 3, 3);
 
   return shuffle(password);
+};
+
+export const initFirebase = async (subdomain: string): Promise<void> => {
+  const config = await sendCoreMessage({
+    subdomain,
+    action: 'configs.findOne',
+    data: {
+      query: {
+        code: 'GOOGLE_APPLICATION_CREDENTIALS_JSON'
+      }
+    },
+    isRPC: true,
+    defaultValue: null
+  });
+
+  if (!config) {
+    return;
+  }
+
+  const codeString = config.value || 'value';
+
+  if (codeString[0] === '{' && codeString[codeString.length - 1] === '}') {
+    const serviceAccount = JSON.parse(codeString);
+
+    if (serviceAccount.private_key) {
+      await admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+    }
+  }
 };
 
 interface ISendNotification {
@@ -199,7 +231,7 @@ export const sendNotification = async (
     eventData
   } = doc;
 
-  let link = doc.link;
+  const link = doc.link;
 
   // remove duplicated ids
   const receiverIds = [...Array.from(new Set(receivers))];
@@ -269,6 +301,10 @@ export const sendNotification = async (
   });
 
   if (isMobile) {
+    if (!admin.apps.length) {
+      await initFirebase(subdomain);
+    }
+    const transporter = admin.messaging();
     const deviceTokens: string[] = [];
 
     for (const recipient of recipients) {
@@ -277,15 +313,26 @@ export const sendNotification = async (
       }
     }
 
-    sendCoreMessage({
-      subdomain: subdomain,
-      action: 'sendMobileNotification',
-      data: {
-        title,
-        body: content,
-        deviceTokens: [...Array.from(new Set(deviceTokens))]
+    const expiredTokens = [''];
+    for (const token of deviceTokens) {
+      try {
+        await transporter.send({
+          token,
+          notification: { title, body: content },
+          data: eventData || {}
+        });
+      } catch (e) {
+        debugError(`Error occurred during firebase send: ${e.message}`);
+        expiredTokens.push(token);
       }
-    });
+    }
+
+    if (expiredTokens.length > 0) {
+      await models.ClientPortalUsers.updateMany(
+        {},
+        { $pull: { deviceTokens: { $in: expiredTokens } } }
+      );
+    }
   }
 };
 

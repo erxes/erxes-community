@@ -148,6 +148,7 @@ const generateQueryParams = queryParams => {
     parentId: queryParams?.parentId,
     searchValue: queryParams?.searchValue,
     type: queryParams?.type,
+    irregular: Boolean(queryParams?.irregular),
     ...generatePaginationParams(queryParams || {})
   };
 };
@@ -192,6 +193,12 @@ export default withProps<Props>(
     }),
     graphql(gql(mutations.assetsMerge), {
       name: 'assetsMerge'
+    }),
+    graphql(gql(mutations.assetsRemove), {
+      name: 'assetsRemove',
+      options: () => ({
+        refetchQueries: getRefetchQueries()
+      })
     }),
     graphql(gql(mutations.assetsAssignKbArticles), {
       name: 'assetsAssignKbArticles',

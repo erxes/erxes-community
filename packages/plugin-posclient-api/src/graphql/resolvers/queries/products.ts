@@ -3,12 +3,17 @@ import { IContext } from '../../types';
 import { IModels } from '../../../connectionResolver';
 import { IProductCategoryDocument } from '../../../models/definitions/products';
 import { PRODUCT_STATUSES } from '../../../models/definitions/constants';
-import { sendInventoriesMessage } from '../../../messageBroker';
-import { sendRequest } from '@erxes/api-utils/src/requests';
-import { debugError } from '@erxes/api-utils/src/debuggers';
+import { sendPricingMessage } from '../../../messageBroker';
 import { Builder } from '../../../utils';
+import { checkRemainders } from '../../utils/products';
 
-interface IProductParams {
+interface ICommonParams {
+  sortField?: string;
+  sortDirection?: number;
+  page?: number;
+  perPage?: number;
+}
+interface IProductParams extends ICommonParams {
   ids?: string[];
   excludeIds?: boolean;
   type?: string;
@@ -20,16 +25,13 @@ interface IProductParams {
   boardId?: string;
   segment?: string;
   segmentData?: string;
-  sortField?: string;
-  sortDirection?: number;
-  page?: number;
-  perPage?: number;
 }
 
-interface ICategoryParams {
+interface ICategoryParams extends ICommonParams {
   parentId: string;
   searchValue: string;
   excludeEmpty?: boolean;
+  meta?: string;
 }
 
 const generateFilter = async (
@@ -106,12 +108,20 @@ const generateFilter = async (
   return filter;
 };
 
-const generateFilterCat = ({ token, parentId, searchValue }) => {
+const generateFilterCat = ({ token, parentId, searchValue, meta }) => {
   const filter: any = { tokens: { $in: [token] } };
   filter.status = { $nin: ['disabled', 'archived'] };
 
   if (parentId) {
     filter.parentId = parentId;
+  }
+
+  if (meta) {
+    if (!isNaN(meta)) {
+      filter.meta = { $lte: Number(meta) };
+    } else {
+      filter.meta = meta;
+    }
   }
 
   if (searchValue) {
@@ -145,7 +155,8 @@ const productQueries = {
     let filter = await generateFilter(subdomain, models, config.token, {
       type,
       categoryId,
-      searchValue
+      searchValue,
+      ids
     });
 
     let sortParams: any = { code: 1 };
@@ -161,98 +172,12 @@ const productQueries = {
       paginationArgs
     );
 
-    const latestBranchId = config.isOnline ? branchId : config.branchId;
-    if (latestBranchId) {
-      if (config.checkRemainder) {
-        try {
-          const productIds = paginatedProducts.map(p => p._id);
-
-          const inventoryResponse = await sendInventoriesMessage({
-            subdomain,
-            action: 'remainders',
-            data: {
-              productIds,
-              departmentId: config.departmentId,
-              branchId: latestBranchId
-            },
-            isRPC: true,
-            defaultValue: []
-          });
-
-          const remainderByProductId = {};
-          for (const rem of inventoryResponse) {
-            remainderByProductId[rem.productId] = rem;
-          }
-
-          paginatedProducts.map((item: any) => {
-            item.remainder = remainderByProductId[item._id]
-              ? remainderByProductId[item._id].count
-              : undefined;
-            return item;
-          });
-        } catch (e) {
-          debugError(`fetch remainder from inventories, Error: ${e.message}`);
-        }
-      }
-
-      if (config.erkhetConfig && config.erkhetConfig.getRemainder) {
-        const configs = config.erkhetConfig;
-        if (
-          configs &&
-          configs.getRemainderApiUrl &&
-          configs.apiKey &&
-          configs.apiSecret
-        ) {
-          try {
-            let account = configs.account;
-            let location = configs.location;
-
-            if (config.isOnline && branchId) {
-              const accLocConf = configs[branchId];
-
-              if (accLocConf) {
-                account = accLocConf.account;
-                location = accLocConf.location;
-              }
-            }
-
-            if (account && location) {
-              const response = await sendRequest({
-                url: configs.getRemainderApiUrl,
-                method: 'GET',
-                params: {
-                  kind: 'remainder',
-                  api_key: configs.apiKey,
-                  api_secret: configs.apiSecret,
-                  check_relate: paginatedProducts.length < 4 ? '1' : '',
-                  accounts: account,
-                  locations: location,
-                  inventories: paginatedProducts.map(p => p.code).join(',')
-                }
-              });
-
-              const jsonRes = JSON.parse(response);
-
-              let responseByCode = jsonRes;
-
-              responseByCode =
-                (jsonRes[account] && jsonRes[account][location]) || {};
-
-              paginatedProducts.map((item: any) => {
-                item.remainder = responseByCode[item.code]
-                  ? responseByCode[item.code]
-                  : undefined;
-                return item;
-              });
-            }
-          } catch (e) {
-            debugError(`fetch remainder from erkhet, Error: ${e.message}`);
-          }
-        }
-      }
-    }
-
-    return paginatedProducts;
+    return checkRemainders(
+      subdomain,
+      config,
+      paginatedProducts,
+      branchId || ''
+    );
   },
 
   /**
@@ -274,18 +199,36 @@ const productQueries = {
 
   async poscProductCategories(
     _root,
-    { parentId, searchValue, excludeEmpty }: ICategoryParams,
+    {
+      parentId,
+      searchValue,
+      excludeEmpty,
+      meta,
+      sortDirection,
+      sortField,
+      ...paginationArgs
+    }: ICategoryParams,
     { models, config }: IContext
   ) {
     const filter = generateFilterCat({
       token: config.token,
       parentId,
-      searchValue
+      searchValue,
+      meta
     });
 
-    const categories = await models.ProductCategories.find(filter).sort({
-      order: 1
-    });
+    let sortParams: any = { order: 1 };
+
+    if (sortField) {
+      sortParams = { [sortField]: sortDirection };
+    }
+
+    const categories = await paginate(
+      models.ProductCategories.find(filter)
+        .sort(sortParams)
+        .lean(),
+      paginationArgs
+    );
     const list: IProductCategoryDocument[] = [];
 
     if (excludeEmpty) {
@@ -308,19 +251,37 @@ const productQueries = {
 
   async poscProductCategoriesTotalCount(
     _root,
-    { parentId, searchValue }: { parentId: string; searchValue: string },
+    {
+      parentId,
+      searchValue,
+      meta
+    }: { parentId: string; searchValue: string; meta: string },
     { models, config }: IContext
   ) {
     const filter = await generateFilterCat({
       token: config.token,
       parentId,
-      searchValue
+      searchValue,
+      meta
     });
     return models.ProductCategories.find(filter).countDocuments();
   },
 
-  poscProductDetail(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.Products.findOne({ _id }).lean();
+  async poscProductDetail(
+    _root,
+    { _id, branchId }: { _id: string; branchId?: string },
+    { subdomain, models, config }: IContext
+  ) {
+    const product = await models.Products.getProduct({ _id });
+
+    const result = await checkRemainders(
+      subdomain,
+      config,
+      [product],
+      branchId
+    );
+
+    return result[0];
   },
 
   poscProductCategoryDetail(
@@ -329,6 +290,30 @@ const productQueries = {
     { models }: IContext
   ) {
     return models.ProductCategories.findOne({ _id }).lean();
+  },
+
+  async getPriceInfo(
+    _root,
+    { productId }: { productId: string },
+    { models, subdomain, config }: IContext
+  ) {
+    const product = await models.Products.getProduct({ _id: productId });
+
+    const d = await sendPricingMessage({
+      subdomain,
+      action: 'getQuanityRules',
+      data: {
+        departmentId: config.departmentId,
+        branchId: config.branchId,
+        products: [
+          { ...product, unitPrice: (product.prices || {})[config.token] }
+        ]
+      },
+      isRPC: true,
+      defaultValue: {}
+    });
+
+    return JSON.stringify(d);
   }
 };
 

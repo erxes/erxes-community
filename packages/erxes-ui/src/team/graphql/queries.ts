@@ -6,23 +6,27 @@ const nameFields = `
   lastName
 `;
 
-const commonStructureParamsDef = `
+export const commonStructureParamsDef = `
+    $ids: [String]
+    $excludeIds: Boolean,
     $perPage: Int,
-    $page: Int 
+    $page: Int
     $searchValue: String,
     $status:String,
 `;
 
-const commonStructureParamsValue = `
+export const commonStructureParamsValue = `
+    ids: $ids
+    excludeIds: $excludeIds,
     perPage: $perPage,
-    page: $page 
-    searchValue:$searchValue
-    status:$status
+    page: $page
+    searchValue: $searchValue
+    status: $status
 `;
 
 const allUsers = `
-  query allUsers($isActive: Boolean) {
-    allUsers(isActive: $isActive) {
+  query allUsers($isActive: Boolean,$ids:[String],$assignedToMe: String) {
+    allUsers(isActive: $isActive,ids:$ids,assignedToMe: $assignedToMe) {
       _id
       email
       username
@@ -161,7 +165,7 @@ const departmentsMain = `
   }
 `;
 
-const unitField = `
+export const unitField = `
   _id
   title
   description
@@ -238,17 +242,17 @@ export const branchField = `
 `;
 
 const branches = `
-  query branches(${commonStructureParamsDef},$withoutUserFilter:Boolean) {
-    branches (${commonStructureParamsValue},withoutUserFilter:$withoutUserFilter){
+  query branches(${commonStructureParamsDef}, $withoutUserFilter: Boolean) {
+    branches (${commonStructureParamsValue}, withoutUserFilter: $withoutUserFilter){
       ${branchField}
-        parent {${branchField}}
+      parent {${branchField}}
     }
   }
 `;
 
 const branchesMain = `
-  query branchesMain(${commonStructureParamsDef},$withoutUserFilter:Boolean) {
-    branchesMain (${commonStructureParamsValue},withoutUserFilter:$withoutUserFilter){
+  query branchesMain(${commonStructureParamsDef}, $withoutUserFilter: Boolean) {
+    branchesMain (${commonStructureParamsValue}, withoutUserFilter: $withoutUserFilter){
       list {
         ${branchField}
         parent {${branchField}}
@@ -280,6 +284,7 @@ const userDetail = `
       customFieldsData
       score
       employeeId
+      brandIds
     }
   }
 `;
@@ -440,6 +445,8 @@ const fieldsGroups = `
     fieldsGroups(contentType: $contentType, isDefinedByErxes: $isDefinedByErxes, config: $config) {
       name
       ${genericFields}
+      isMultiple
+      parentId
       config
       logicAction
       logics {

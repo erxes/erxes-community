@@ -97,7 +97,6 @@ class Form extends React.Component<Props, State> {
     const items = variables.map(
       ({
         assetId,
-        assetName,
         branchId,
         departmentId,
         customerId,
@@ -105,7 +104,6 @@ class Form extends React.Component<Props, State> {
         teamMemberId
       }) => ({
         assetId,
-        assetName,
         branchId,
         departmentId,
         customerId,
@@ -135,7 +133,10 @@ class Form extends React.Component<Props, State> {
 
           const selectedItems = datas.map(data => ({
             assetId: data._id,
-            assetName: data.name
+            assetDetail: {
+              _id: data._id,
+              name: data.name
+            }
           }));
 
           const newVariables = selectedItems.map(selectedItem => {

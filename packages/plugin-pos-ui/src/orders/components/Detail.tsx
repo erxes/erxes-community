@@ -14,34 +14,46 @@ import { Alert } from '@erxes/ui/src/utils';
 import { DetailRow, FinanceAmount, FlexRow } from '../../styles';
 import { IOrderDet } from '../types';
 import { ICustomer } from '@erxes/ui-contacts/src/customers/types';
+import { IPos } from '../../types';
 
 type Props = {
   onChangePayments: (
     _id: string,
     cashAmount: number,
-    receivableAmount: number,
-    cardAmount: number,
-    mobileAmount: number
+    mobileAmount: number,
+    paidAmounts: any[]
   ) => void;
   order: IOrderDet;
+  pos: IPos;
 };
 
 type State = {
   cashAmount: number;
-  receivableAmount: number;
-  cardAmount: number;
   mobileAmount: number;
+  paidAmounts: any[];
 };
 
 class PutResponseDetail extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { order } = this.props;
+    const { order, pos } = this.props;
+    const paidAmounts = order.paidAmounts;
+    const paidKeys: string[] = paidAmounts.map(pa => pa.type);
+
+    for (const emptyType of (pos.paymentTypes || []).filter(
+      pt => !paidKeys.includes(pt.type)
+    )) {
+      paidAmounts.push({
+        _id: Math.random().toString(),
+        amount: 0,
+        type: emptyType.type
+      });
+    }
+
     this.state = {
+      paidAmounts,
       cashAmount: order.cashAmount,
-      receivableAmount: order.receivableAmount,
-      cardAmount: order.cardAmount,
       mobileAmount: order.mobileAmount
     };
   }
@@ -77,6 +89,48 @@ class PutResponseDetail extends React.Component<Props, State> {
     );
   }
 
+  onChangePaidAmount = e => {
+    const { paidAmounts } = this.state;
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      paidAmounts: paidAmounts.map(pa =>
+        pa._id === name ? { ...pa, amount: value } : pa
+      )
+    });
+  };
+
+  renderEditPaid() {
+    const { paidAmounts } = this.state;
+    return paidAmounts.map(paidAmount => {
+      const { pos } = this.props;
+      const { paymentTypes } = pos;
+
+      return (
+        <li key={paidAmount._id}>
+          <FlexRow key={paidAmount._id}>
+            <FieldStyle>
+              {__(
+                `${(
+                  (paymentTypes || []).find(
+                    pt => pt.type === paidAmount.type
+                  ) || {}
+                ).title || paidAmount.type}`
+              )}
+              :
+            </FieldStyle>
+            <FormControl
+              type="number"
+              name={paidAmount._id}
+              onChange={this.onChangePaidAmount}
+              value={paidAmount.amount || 0}
+            />
+          </FlexRow>
+        </li>
+      );
+    });
+  }
+
   renderDeliveryInfo() {
     const { order } = this.props;
     const { deliveryInfo } = order;
@@ -90,15 +144,15 @@ class PutResponseDetail extends React.Component<Props, State> {
   save = () => {
     const { order } = this.props;
     const { totalAmount } = order;
-    const {
-      cashAmount,
-      receivableAmount,
-      cardAmount,
-      mobileAmount
-    } = this.state;
+    const { paidAmounts, cashAmount, mobileAmount } = this.state;
 
     if (
-      cashAmount + receivableAmount + cardAmount + mobileAmount !==
+      cashAmount +
+        mobileAmount +
+        (paidAmounts || []).reduce(
+          (sum, i) => Number(sum) + Number(i.amount),
+          0
+        ) !==
       totalAmount
     ) {
       Alert.error('Is not balanced');
@@ -108,9 +162,8 @@ class PutResponseDetail extends React.Component<Props, State> {
     this.props.onChangePayments(
       this.props.order._id,
       cashAmount,
-      receivableAmount,
-      cardAmount,
-      mobileAmount
+      mobileAmount,
+      (paidAmounts || []).filter(pa => Number(pa.amount) !== 0)
     );
   };
 
@@ -135,10 +188,11 @@ class PutResponseDetail extends React.Component<Props, State> {
 
   render() {
     const { order } = this.props;
+
     return (
       <SidebarList>
         {this.renderRow(
-          'Customer',
+          `${(order.customerType || 'Customer').toLocaleUpperCase()}`,
           order.customer ? this.generateLabel(order.customer) : ''
         )}
         {this.renderRow('Bill Number', order.number)}
@@ -153,7 +207,7 @@ class PutResponseDetail extends React.Component<Props, State> {
         <>
           {(order.putResponses || []).map(p => {
             return (
-              <DetailRow>
+              <DetailRow key={Math.random()}>
                 {this.renderRow('Bill ID', p.billId)}
                 {this.renderRow('Ebarimt Date', dayjs(p.date).format('lll'))}
               </DetailRow>
@@ -189,9 +243,8 @@ class PutResponseDetail extends React.Component<Props, State> {
 
         <ul>
           {this.renderEditRow('Cash Amount', 'cashAmount')}
-          {this.renderEditRow('Card Amount', 'cardAmount')}
           {this.renderEditRow('Mobile Amount', 'mobileAmount')}
-          {this.renderEditRow('Receivable Amount', 'receivableAmount')}
+          {this.renderEditPaid()}
         </ul>
 
         <Button btnStyle="success" size="small" onClick={this.save} icon="edit">

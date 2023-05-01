@@ -10,7 +10,7 @@ import {
   IAbsenceDocument,
   IScheduleDocument,
   scheduleSchema,
-  timeSchema,
+  timeclockSchema,
   absenceSchema,
   absenceTypeSchema,
   scheduleShiftSchema,
@@ -22,7 +22,16 @@ import {
   payDateSchema,
   IScheduleConfigDocument,
   IScheduleConfig,
-  scheduleConfigSchema
+  scheduleConfigSchema,
+  IDeviceConfigDocument,
+  IDeviceConfig,
+  deviceConfigSchema,
+  ITimeLogDocument,
+  ITimeLog,
+  timeLogSchema,
+  IReportCheck,
+  IReportCheckDocument,
+  reportCheckSchema
 } from './definitions/timeclock';
 
 export interface ITimeModel extends Model<ITimeClockDocument> {
@@ -64,9 +73,52 @@ export const loadTimeClass = (models: IModels) => {
     }
   }
 
-  timeSchema.loadClass(Time);
+  timeclockSchema.loadClass(Time);
 
-  return timeSchema;
+  return timeclockSchema;
+};
+export interface ITimeLogModel extends Model<ITimeLogDocument> {
+  getTimeLog(_id: string): Promise<ITimeLogDocument>;
+  createTimeLog(doc: ITimeLog): Promise<ITimeLogDocument>;
+  updateTimeLog(_id: string, doc: ITimeLog): Promise<ITimeLogDocument>;
+  removeTimeLog(_id: string): void;
+}
+
+export const loadTimeLogClass = (models: IModels) => {
+  class TimeLog {
+    // get
+    public static async getTimeLog(_id: string) {
+      const timelog = await models.TimeLogs.findOne({ _id });
+      if (!timelog) {
+        throw new Error('TimeLog not found');
+      }
+      return timelog;
+    }
+
+    // create
+    public static async createTimeLog(doc: ITimeLog) {
+      return models.TimeLogs.create({
+        ...doc
+      });
+    }
+
+    // update
+    public static async updateTimeLog(_id: string, doc: ITimeLog) {
+      await models.TimeLogs.updateOne({ _id }, { $set: { ...doc } }).then(err =>
+        console.error(err)
+      );
+    }
+
+    // remove
+    public static async removeTimeLog(_id: string) {
+      const timeLog = await models.TimeLogs.getTimeLog(_id);
+      return models.TimeLogs.deleteOne({ _id });
+    }
+  }
+
+  timeLogSchema.loadClass(TimeLog);
+
+  return timeLogSchema;
 };
 
 export interface IAbsenceModel extends Model<IAbsenceDocument> {
@@ -207,6 +259,7 @@ export interface IShiftModel extends Model<IShiftDocument> {
 }
 
 export const loadShiftClass = (models: IModels) => {
+  // tslint:disable-next-line:max-classes-per-file
   class Shift {
     // get
     public static async getShift(_id: string) {
@@ -295,7 +348,7 @@ export const loadScheduleConfigClass = (models: IModels) => {
     // get
     public static async getScheduleConfig(_id: string) {
       const scheduleConfig = await models.ScheduleConfigs.findOne({ _id });
-      if (!ScheduleConfig) {
+      if (!scheduleConfig) {
         throw new Error('ScheduleConfig not found');
       }
       return scheduleConfig;
@@ -325,4 +378,94 @@ export const loadScheduleConfigClass = (models: IModels) => {
   scheduleConfigSchema.loadClass(ScheduleConfig);
 
   return scheduleConfigSchema;
+};
+
+export interface IDeviceConfigModel extends Model<IDeviceConfigDocument> {
+  getDeviceConfig(_id: string): Promise<IDeviceConfigDocument>;
+  createDeviceConfig(doc: IDeviceConfig): Promise<IDeviceConfigDocument>;
+  updateDeviceConfig(
+    _id: string,
+    doc: IDeviceConfig
+  ): Promise<IDeviceConfigDocument>;
+  removeDeviceConfig(_id: string): void;
+}
+
+export const loadDeviceConfigClass = (models: IModels) => {
+  // tslint:disable-next-line:max-classes-per-file
+  class DeviceConfig {
+    // get
+    public static async getDeviceConfig(_id: string) {
+      const deviceConfig = await models.DeviceConfigs.findOne({ _id });
+      if (!deviceConfig) {
+        throw new Error('deviceConfig not found');
+      }
+      return deviceConfig;
+    }
+    // create
+    public static async createDeviceConfig(doc: IDeviceConfig) {
+      return models.DeviceConfigs.create({
+        ...doc
+      });
+    }
+    // update
+    public static async updateDeviceConfig(_id: string, doc: IDeviceConfig) {
+      await models.DeviceConfigs.updateOne(
+        { _id },
+        { $set: { ...doc } }
+      ).then(err => console.error(err));
+    }
+    // remove
+    public static async removeDeviceConfig(_id: string) {
+      return models.DeviceConfigs.deleteOne({ _id });
+    }
+  }
+
+  deviceConfigSchema.loadClass(DeviceConfig);
+
+  return deviceConfigSchema;
+};
+
+export interface IReportCheckModel extends Model<IReportCheckDocument> {
+  getReportCheck(_id: string): Promise<IReportCheckDocument>;
+  createReportCheck(doc: IReportCheck): Promise<IReportCheckDocument>;
+  updateReportCheck(
+    _id: string,
+    doc: IReportCheck
+  ): Promise<IReportCheckDocument>;
+  removeReportCheck(_id: string): void;
+}
+
+export const loadReportCheckClass = (models: IModels) => {
+  // tslint:disable-next-line:max-classes-per-file
+  class ReportCheck {
+    // get
+    public static async getReportCheck(_id: string) {
+      const reportCheck = await models.ReportChecks.findOne({ _id });
+      if (!reportCheck) {
+        throw new Error('Report check not found');
+      }
+      return reportCheck;
+    }
+    // create
+    public static async createReportCheck(doc: IReportCheck) {
+      return models.ReportChecks.create({
+        ...doc
+      });
+    }
+    // update
+    public static async updateReportCheck(_id: string, doc: IReportCheck) {
+      await models.ReportChecks.updateOne(
+        { _id },
+        { $set: { ...doc } }
+      ).then(err => console.error(err));
+    }
+    // remove
+    public static async removeReportCheck(_id: string) {
+      return models.ReportChecks.deleteOne({ _id });
+    }
+  }
+
+  reportCheckSchema.loadClass(ReportCheck);
+
+  return reportCheckSchema;
 };

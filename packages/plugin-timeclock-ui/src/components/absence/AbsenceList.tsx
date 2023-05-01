@@ -1,6 +1,6 @@
 import { __ } from '@erxes/ui/src/utils';
 import Button from '@erxes/ui/src/components/Button';
-import React from 'react';
+import React, { useState } from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
@@ -9,7 +9,11 @@ import { IAttachment } from '@erxes/ui/src/types';
 import AbsenceForm from './AbsenceForm';
 import Attachment from '@erxes/ui/src/components/Attachment';
 import dayjs from 'dayjs';
-import { dateFormat } from '../../constants';
+import { dateAndTimeFormat, dateFormat, timeFormat } from '../../constants';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
+import CheckInOutForm from '../../containers/absence/CheckInOutForm';
+import Tip from '@erxes/ui/src/components/Tip';
+import Icon from '@erxes/ui/src/components/Icon';
 
 type Props = {
   absences: IAbsence[];
@@ -18,19 +22,42 @@ type Props = {
   history: any;
   startTime?: Date;
   loading?: boolean;
+  totalCount: number;
+
   solveAbsence: (absenceId: string, status: string) => void;
   submitRequest: (
     userId: string,
+    reason: string,
     explanation: string,
     attachment: IAttachment,
-    dateRange: any,
-    absenceTypeId: string
+    submitTime: any,
+    absenceTypeId: string,
+    absenceTimeType: string,
+    totalHoursOfAbsence: string
   ) => void;
+
+  submitCheckInOut: (type: string, userId: string, dateVal: Date) => void;
+  removeAbsence: (absenceId: string) => void;
+
   getActionBar: (actionBar: any) => void;
+  getPagination: (pagination: any) => void;
+  showSideBar: (sideBar: boolean) => void;
 };
 
 function AbsenceList(props: Props) {
-  const { absences, solveAbsence, getActionBar } = props;
+  const {
+    absences,
+    solveAbsence,
+    removeAbsence,
+    getActionBar,
+    showSideBar,
+    getPagination,
+    totalCount
+  } = props;
+
+  const [seeDates, setSeeDates] = useState(
+    JSON.parse(localStorage.getItem('seeDates') || 'false')
+  );
 
   const trigger = (
     <Button id="timeClockButton2" btnStyle="success" icon="plus-circle">
@@ -38,6 +65,11 @@ function AbsenceList(props: Props) {
     </Button>
   );
 
+  const checkInTrigger = (
+    <Button id="timeClockButton2" btnStyle="primary" icon="plus-circle">
+      Create Check In/Out Request
+    </Button>
+  );
   const modalContent = contentProps => {
     const updatedProps = {
       ...props,
@@ -46,12 +78,61 @@ function AbsenceList(props: Props) {
     return <AbsenceForm {...updatedProps} />;
   };
 
+  const checkInModalContent = contentProps => {
+    const updatedProps = {
+      ...props,
+      checkInOutRequest: true,
+      contentProps
+    };
+    return <AbsenceForm {...updatedProps} />;
+  };
+
+  const checkInOutFormBtn = <Button btnStyle="primary">Approve</Button>;
+
+  const openCheckInOutForm = (
+    contentProps: any,
+    absence: IAbsence,
+    absenceReason: string
+  ) => {
+    const dateTime = absence.startTime;
+    const userId = absence.user._id;
+
+    const startDate = dayjs(dateTime)
+      .add(-16, 'hour')
+      .format(dateAndTimeFormat);
+    const endDate = dayjs(dateTime)
+      .add(16, 'hour')
+      .format(dateAndTimeFormat);
+
+    // either check in or check out
+    const timeType = absenceReason.split('request')[0].toLocaleLowerCase();
+
+    return (
+      <CheckInOutForm
+        userId={userId}
+        timeType={timeType}
+        contentProps={contentProps}
+        startDate={startDate}
+        endDate={endDate}
+        absenceRequest={absence}
+      />
+    );
+  };
+
   const actionBarRight = (
-    <ModalTrigger
-      title={__('Absence Config')}
-      trigger={trigger}
-      content={modalContent}
-    />
+    <>
+      <ModalTrigger
+        title={__('Create Request')}
+        trigger={trigger}
+        content={modalContent}
+      />
+
+      <ModalTrigger
+        title={__('Create Check In/Out Request')}
+        trigger={checkInTrigger}
+        content={checkInModalContent}
+      />
+    </>
   );
 
   const actionBar = (
@@ -62,30 +143,103 @@ function AbsenceList(props: Props) {
     />
   );
 
-  const ListAbsenceContent = absence => {
+  const toggleSeeDates = () => {
+    localStorage.setItem('seeDates', JSON.stringify(!seeDates));
+    setSeeDates(!seeDates);
+  };
+
+  const ListAbsenceContent = (absence: IAbsence) => {
     const startTime = new Date(absence.startTime);
     const endTime = new Date(absence.endTime);
-    const startingDate =
-      new Date(startTime).toDateString().split(' ')[0] +
-      '\t' +
-      dayjs(startTime).format(dateFormat);
 
-    const startingTime = startTime.toLocaleTimeString();
-    const endingDate =
-      new Date(endTime).toDateString().split(' ')[0] +
-      '\t' +
-      dayjs(endTime).format(dateFormat);
-    const endingTime = endTime.toLocaleTimeString();
+    const startingDate = dayjs(startTime).format(dateFormat);
+    const startingTime = dayjs(startTime).format(timeFormat);
+
+    const endingDate = dayjs(endTime).format(dateFormat);
+    const endingTime = dayjs(endTime).format(timeFormat);
+
+    const absenceTimeType = absence.absenceTimeType;
+
+    const calculateAbsenceHours = () => {
+      // if check in request or request time type is by day
+      if (
+        absence.reason.match(/Check in request/gi) ||
+        absence.reason.match(/Check out request/gi) ||
+        absenceTimeType === 'by day'
+      ) {
+        return '-';
+      }
+
+      const getTimeInHours = (
+        (endTime.getTime() - startTime.getTime()) /
+        3600000
+      ).toFixed(1);
+      return getTimeInHours;
+    };
+
+    const renderAbsenceDays = () => {
+      if (absenceTimeType === 'by day' && seeDates) {
+        return absence.requestDates.map(requestDate => (
+          <div key={requestDate}>{requestDate}</div>
+        ));
+      }
+
+      return <div>{'-'}</div>;
+    };
+
+    const renderAbsenceTimeInfo = () => {
+      if (absence.reason.match(/Check in request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{startingTime}</td>
+            <td>{'-'}</td>
+          </>
+        );
+      }
+      if (absence.reason.match(/Check out request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{'-'}</td>
+            <td>{startingTime}</td>
+          </>
+        );
+      }
+
+      if (absenceTimeType === 'by day') {
+        return (
+          <>
+            <td>{'-'}</td>
+            <td>{startingDate}</td>
+            <td>{endingDate}</td>
+          </>
+        );
+      }
+      // by hour
+      return (
+        <>
+          <td>{startingDate}</td>
+          <td>{startingTime}</td>
+          <td>{endingTime}</td>
+        </>
+      );
+    };
 
     return (
       <tr>
         <td>
-          {absence.user && absence.user.details.fullName
+          {absence.user && absence.user.details
             ? absence.user.details.fullName
-            : absence.user.email}
+              ? absence.user.details.fullName
+              : absence.user.email
+              ? absence.user.email
+              : '-'
+            : '-'}
         </td>
-        <td>{startingTime + ', ' + startingDate || '-'}</td>
-        <td>{endingTime + ', ' + endingDate || '-'}</td>
+        {renderAbsenceTimeInfo()}
+        <td>{absence.totalHoursOfAbsence || calculateAbsenceHours()}</td>
+        <td>{renderAbsenceDays()}</td>
         <td>{absence.reason || '-'}</td>
         <td>{absence.explanation || '-'}</td>
         <td>
@@ -98,6 +252,24 @@ function AbsenceList(props: Props) {
         <td>
           {absence.solved ? (
             __(absence.status)
+          ) : absence.reason.toLowerCase().includes('check') ? (
+            <>
+              <ModalTrigger
+                size="lg"
+                title="Approve Request"
+                trigger={checkInOutFormBtn}
+                content={contentProps =>
+                  openCheckInOutForm(contentProps, absence, absence.reason)
+                }
+              />
+
+              <Button
+                btnStyle="danger"
+                onClick={() => solveAbsence(absence._id, 'Rejected')}
+              >
+                Reject
+              </Button>
+            </>
           ) : (
             <>
               <Button
@@ -115,6 +287,15 @@ function AbsenceList(props: Props) {
             </>
           )}
         </td>
+        <td>
+          <Tip text={__('Delete')} placement="top">
+            <Button
+              btnStyle="link"
+              onClick={() => removeAbsence(absence._id)}
+              icon="times-circle"
+            />
+          </Tip>
+        </td>
       </tr>
     );
   };
@@ -123,13 +304,22 @@ function AbsenceList(props: Props) {
     <Table>
       <thead>
         <tr>
-          <th>{__('Team member')}</th>
+          <th rowSpan={2}>{__('Team member')}</th>
+          <th>{__('Date')}</th>
           <th>{__('From')}</th>
           <th>{__('To')}</th>
-          <th>{__('Reason')}</th>
-          <th>{__('Explanation')}</th>
-          <th>{__('Attachment')}</th>
-          <th>{__('Status')}</th>
+          <th>{__('Total hours ')}</th>
+          <th onClick={toggleSeeDates} style={{ cursor: 'pointer' }}>
+            <div style={{ display: 'flex', flex: 'row', alignItems: 'center' }}>
+              <div>{__('See dates')}</div>
+              <Icon icon={seeDates ? 'angle-down' : 'angle-right'} size={16} />
+            </div>
+          </th>
+          <th rowSpan={2}>{__('Reason')}</th>
+          <th rowSpan={2}>{__('Explanation')}</th>
+          <th rowSpan={2}>{__('Attachment')}</th>
+          <th rowSpan={2}>{__('Status')}</th>
+          <th rowSpan={2}>{__('Action')}</th>
         </tr>
       </thead>
       <tbody>
@@ -141,6 +331,9 @@ function AbsenceList(props: Props) {
   );
 
   getActionBar(actionBar);
+  showSideBar(true);
+  getPagination(<Pagination count={totalCount} />);
+
   return content;
 }
 

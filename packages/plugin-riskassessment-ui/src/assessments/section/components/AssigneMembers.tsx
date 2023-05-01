@@ -1,24 +1,30 @@
 import {
-  EmptyState,
-  NameCard,
-  SectionBodyItem,
   Box,
-  Icon,
   Button,
+  colors,
+  EmptyState,
+  Icon,
   ModalTrigger,
-  colors
+  NameCard,
+  SectionBodyItem
 } from '@erxes/ui/src';
 import { IUser } from '@erxes/ui/src/auth/types';
+import ErrorBoundary from '@erxes/ui/src/components/ErrorBoundary';
 import React from 'react';
-import { FormContainer, ProductName } from '../../../styles';
+import { ProductName } from '../../../styles';
+import {
+  RiskAssessmentAssignedMembers,
+  RiskAssessmentTypes
+} from '../../common/types';
 import RiskAssessmentForm from '../containers/RiskAssessmentForm';
+import MultipleAssessment from './MultipleAssessmentForm';
 
 type Props = {
-  assignedMembers: any[];
+  assignedMembers: RiskAssessmentAssignedMembers[];
   currentUser: IUser;
   cardId: string;
   cardType: string;
-  riskAssessmentId: string;
+  riskAssessments: RiskAssessmentTypes[];
 };
 
 class AssignedMembers extends React.Component<Props> {
@@ -27,7 +33,7 @@ class AssignedMembers extends React.Component<Props> {
   }
 
   renderSubmitForm({ userId, submitStatus }) {
-    const { currentUser, cardId, cardType, riskAssessmentId } = this.props;
+    const { currentUser, cardId, cardType, riskAssessments } = this.props;
     const renderStatusIcon = () => {
       if (currentUser._id === userId) {
         switch (submitStatus) {
@@ -59,13 +65,35 @@ class AssignedMembers extends React.Component<Props> {
     const content = props => {
       const updatedProps = {
         ...props,
-        cardId,
-        cardType,
-        riskAssessmentId,
-        userId: currentUser._id
+        filters: {
+          cardId,
+          cardType,
+          userId: currentUser._id
+        },
+
+        onlyPreview: currentUser._id !== userId
       };
 
-      return <RiskAssessmentForm {...updatedProps} />;
+      if (riskAssessments.length > 1) {
+        return (
+          <MultipleAssessment
+            {...updatedProps}
+            riskAssessments={riskAssessments}
+          />
+        );
+      }
+
+      return (
+        <RiskAssessmentForm
+          {...{
+            ...updatedProps,
+            filters: {
+              ...updatedProps.filters,
+              riskAssessmentId: riskAssessments[0]._id
+            }
+          }}
+        />
+      );
     };
 
     return (
@@ -74,6 +102,8 @@ class AssignedMembers extends React.Component<Props> {
         trigger={trigger}
         title="Risk Indicators Submit Form"
         size="xl"
+        enforceFocus={false}
+        style={{ overflow: 'auto' }}
       />
     );
   }
@@ -93,18 +123,20 @@ class AssignedMembers extends React.Component<Props> {
     }
 
     return (
-      <Box title="Risk Assessment Assigned Members">
-        {assignedMembers.map(assignedMember => (
-          <SectionBodyItem key={assignedMember._id}>
-            <ProductName>
-              <NameCard user={assignedMember} />
-              {this.renderSubmitForm({
-                userId: assignedMember._id,
-                submitStatus: assignedMember?.submitStatus
-              })}
-            </ProductName>
-          </SectionBodyItem>
-        ))}
+      <Box title="Risk Assessment Assigned Members" name="assignedMembers">
+        <ErrorBoundary>
+          {assignedMembers.map(assignedMember => (
+            <SectionBodyItem key={assignedMember._id}>
+              <ProductName>
+                <NameCard user={assignedMember} />
+                {this.renderSubmitForm({
+                  userId: assignedMember._id,
+                  submitStatus: assignedMember?.submitStatus
+                })}
+              </ProductName>
+            </SectionBodyItem>
+          ))}
+        </ErrorBoundary>
       </Box>
     );
   }

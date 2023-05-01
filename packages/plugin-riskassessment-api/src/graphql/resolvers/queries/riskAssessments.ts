@@ -1,25 +1,29 @@
-import { paginate } from '@erxes/api-utils/src';
-import { IContext } from '../../../connectionResolver';
+import { checkPermission, paginate } from '@erxes/api-utils/src';
+import { IContext, IModels } from '../../../connectionResolver';
 import { statusColors } from '../../../constants';
-import { riskAssessment } from '../../../permissions';
+import { RiskAssessmentGroupParams } from '../types';
 
-const generateFilter = async (params, models) => {
+const generateFilter = async (params, models: IModels) => {
   let filter: any = {};
 
-  if (params.searchValue) {
-    filter.name = { $regex: new RegExp(params.searchValue, 'i') };
+  if (params.cardType) {
+    filter.cardType = params.cardType;
+  }
+
+  if (params.groupIds) {
+    filter.groupId = { $in: params.groupIds };
   }
 
   if (params.operationIds) {
-    filter.operationIds = { $in: params.operationIds };
+    filter.operationId = { $in: params.operationIds };
   }
 
   if (params.branchIds) {
-    filter.branchIds = { $in: params.branchIds };
+    filter.branchId = { $in: params.branchIds };
   }
 
   if (params.departmentIds) {
-    filter.departmentIds = { $in: params.departmentId };
+    filter.departmentId = { $in: params.departmentIds };
   }
   if (params.riskIndicatorIds) {
     const groupIds = (
@@ -38,6 +42,21 @@ const generateFilter = async (params, models) => {
         { indicatorId: { $in: params.riskIndicatorIds } }
       ];
     }
+  }
+
+  if (params.tagIds) {
+    const indicatorIds = (
+      await models.RiskIndicators.find({ tagIds: { $in: params.tagIds } })
+    ).map(indicator => indicator._id);
+
+    const groupIds = (
+      await models.IndicatorsGroups.find({ tagIds: { $in: params.tagIds } })
+    ).map(group => group._id);
+
+    filter.$or = [
+      { groupId: { $in: groupIds } },
+      { indicatorId: { $in: indicatorIds } }
+    ];
   }
 
   if (params.createdAtFrom) {
@@ -60,14 +79,24 @@ const generateFilter = async (params, models) => {
   return filter;
 };
 
+const generateSort = (sortField, sortDirection) => {
+  let sort: any = { createdAt: -1 };
+
+  if (sortField && sortDirection) {
+    sort = {};
+    sort = { [sortField]: sortDirection };
+  }
+  return sort;
+};
+
 const RiskAssessmentQueries = {
   async riskAssessments(_root, params, { models }: IContext) {
     const filter = await generateFilter(params, models);
 
-    return paginate(
-      models.RiskAssessments.find(filter).sort({ createdAt: -1 }),
-      params
-    );
+    const { sortField, sortDirection } = params;
+    const sort = generateSort(sortField, sortDirection);
+
+    return paginate(models.RiskAssessments.find(filter).sort(sort), params);
   },
 
   async riskAssessmentsTotalCount(_root, params, { models }: IContext) {
@@ -78,20 +107,35 @@ const RiskAssessmentQueries = {
     return models.RiskAssessments.riskAssessmentDetail(id);
   },
   async riskAssessment(_root, { cardId, cardType }, { models }: IContext) {
-    return await models.RiskAssessments.findOne({
+    return await models.RiskAssessments.find({
       cardId,
       cardType
     });
   },
+
+  async riskAssessmentGroups(
+    _root,
+    { riskAssessmentId, groupIds }: RiskAssessmentGroupParams,
+    { models }: IContext
+  ) {
+    if (!groupIds.length) {
+      throw new Error('Please provide some group id');
+    }
+
+    return await models.RiskAssessmentGroups.find({
+      assessmentId: riskAssessmentId,
+      groupId: { $in: groupIds }
+    });
+  },
+
   async riskAssessmentAssignedMembers(
     _root,
-    { cardId, cardType, riskAssessmentId },
+    { cardId, cardType },
     { models }: IContext
   ) {
     return models.RiskAssessments.riskAssessmentAssignedMembers(
       cardId,
-      cardType,
-      riskAssessmentId
+      cardType
     );
   },
   async riskAssessmentSubmitForm(
@@ -118,5 +162,33 @@ const RiskAssessmentQueries = {
     );
   }
 };
+
+checkPermission(RiskAssessmentQueries, 'riskAssessments', 'showRiskAssessment');
+checkPermission(
+  RiskAssessmentQueries,
+  'riskAssessmentsTotalCount',
+  'showRiskAssessment'
+);
+checkPermission(
+  RiskAssessmentQueries,
+  'riskAssessmentDetail',
+  'showRiskAssessment'
+);
+checkPermission(RiskAssessmentQueries, 'riskAssessment', 'showRiskAssessment');
+checkPermission(
+  RiskAssessmentQueries,
+  'riskAssessmentAssignedMembers',
+  'showRiskAssessment'
+);
+checkPermission(
+  RiskAssessmentQueries,
+  'riskAssessmentSubmitForm',
+  'showRiskAssessment'
+);
+checkPermission(
+  RiskAssessmentQueries,
+  'riskAssessmentIndicatorForm',
+  'showRiskAssessment'
+);
 
 export default RiskAssessmentQueries;

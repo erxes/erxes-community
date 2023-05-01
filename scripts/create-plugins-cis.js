@@ -37,7 +37,6 @@ var plugins = [
   { name: 'webhooks', ui: true, api: true },
   { name: 'pos', ui: true, api: true },
   { name: 'products', ui: true, api: true },
-  { name: 'qpay', ui: true, api: true },
   { name: 'reactions', api: true },
   { name: 'segments', ui: true, api: true },
   { name: 'syncerkhet', ui: true, api: true },
@@ -57,7 +56,11 @@ var plugins = [
   { name: 'pricing', ui: true, api: true },
   { name: 'timeclock', ui: true, api: true },
   { name: 'zalo', ui: true, api: true },
-  { name: 'facebook', ui: true, api: true }
+  { name: 'facebook', ui: true, api: true },
+  { name: 'filemanager', ui: true, api: true },
+  { name: 'khanbank', ui: true, api: true },
+  { name: 'productplaces', ui: true, api: true },
+  { name: 'ecommerce', api: true },
 ];
 
 const pluginsMap = {};

@@ -30,10 +30,22 @@ const isInProduct = async (
 ) => {
   const groups = await models.ProductGroups.groups(pos._id);
 
-  let allProductIds: string[] = [];
+  const followProductIds: string[] = [];
 
   if (pos.deliveryConfig && pos.deliveryConfig.productId) {
-    allProductIds.push(pos.deliveryConfig.productId);
+    followProductIds.push(pos.deliveryConfig.productId);
+  }
+
+  if (pos.catProdMappings && pos.catProdMappings.length) {
+    for (const map of pos.catProdMappings) {
+      if (!followProductIds.includes(map.productId)) {
+        followProductIds.push(map.productId);
+      }
+    }
+  }
+
+  if (followProductIds.includes(productId)) {
+    return true;
   }
 
   let allExcludedProductIds: string[] = [];
@@ -141,6 +153,9 @@ export const afterMutationHandlers = async (subdomain, params) => {
     for (const pos of poss) {
       if (await isInProduct(subdomain, models, pos, params.object._id)) {
         const item = params.updatedDocument || params.object;
+        const firstUnitPrice = params.updatedDocument
+          ? params.updatedDocument.unitPrice
+          : params.object.unitPrice;
 
         const pricing = await sendPricingMessage({
           subdomain,
@@ -152,6 +167,7 @@ export const afterMutationHandlers = async (subdomain, params) => {
             branchId: pos.branchId,
             products: [
               {
+                itemId: item._id,
                 productId: item._id,
                 quantity: 1,
                 price: item.unitPrice
@@ -178,6 +194,12 @@ export const afterMutationHandlers = async (subdomain, params) => {
         }
 
         await handler(subdomain, { ...params }, action, 'product', pos);
+
+        if (params.updatedDocument) {
+          params.updatedDocument.unitPrice = firstUnitPrice;
+        } else {
+          params.object.unitPrice = firstUnitPrice;
+        }
       }
     }
     return;

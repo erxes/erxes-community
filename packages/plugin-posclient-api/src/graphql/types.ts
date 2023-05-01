@@ -41,7 +41,7 @@ export interface IOrderItemInput {
   discountAmount?: number;
   bonusCount?: number;
   bonusVoucherId?: string;
-  manufacturedDate?: number; // Unix epoch number
+  manufacturedDate?: string; // Unix epoch number
 }
 
 export interface IOrderInput {
@@ -49,6 +49,7 @@ export interface IOrderInput {
   totalAmount: number;
   type: string;
   customerId?: string;
+  customerType?: string;
   branchId?: string;
   deliveryInfo?: any;
   origin?: string;

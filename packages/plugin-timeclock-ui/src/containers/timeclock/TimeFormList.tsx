@@ -78,7 +78,7 @@ const ListContainer = (props: FinalProps) => {
 
 export default withProps<Props>(
   compose(
-    graphql<Props, TimeClockMutationResponse>(gql(mutations.clockStart), {
+    graphql<Props, TimeClockMutationResponse>(gql(mutations.timeclockStart), {
       name: 'startTimeMutation',
       options: ({ userId, longitude, latitude }) => ({
         variables: {
@@ -86,11 +86,11 @@ export default withProps<Props>(
           longitude: `${longitude}`,
           latitude: `${latitude}`
         },
-        refetchQueries: ['listTimeclocksQuery']
+        refetchQueries: ['timeclocksMain']
       })
     }),
 
-    graphql<Props, TimeClockMutationResponse>(gql(mutations.clockStop), {
+    graphql<Props, TimeClockMutationResponse>(gql(mutations.timeclockStop), {
       name: 'stopTimeMutation',
       options: ({ userId, timeId, longitude, latitude }) => ({
         variables: {
@@ -99,7 +99,7 @@ export default withProps<Props>(
           longitude: `${longitude}`,
           latitude: `${latitude}`
         },
-        refetchQueries: ['listTimeclocksQuery']
+        refetchQueries: ['timeclocksMain']
       })
     })
   )(ListContainer)

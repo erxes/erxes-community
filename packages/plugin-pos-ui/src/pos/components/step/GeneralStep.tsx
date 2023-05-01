@@ -1,4 +1,5 @@
 import Modal from 'react-bootstrap/Modal';
+import Select from 'react-select-plus';
 import PosSlotItem from '../productGroup/PosSlotItem';
 import React from 'react';
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
@@ -8,6 +9,7 @@ import {
   ControlLabel,
   FormControl,
   FormGroup,
+  Icon,
   ModalTrigger,
   Toggle
 } from '@erxes/ui/src';
@@ -20,44 +22,39 @@ import {
   DomainRow,
   FlexColumn,
   FlexItem,
+  FlexRow,
   PosSlotAddButton
 } from '../../../styles';
 import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
-import { loadDynamicComponent } from '@erxes/ui/src/utils/core';
+import styled from 'styled-components';
+import { ALLOW_TYPES } from '../../../constants';
+
+export const SelectValue = styled.div`
+  display: flex;
+  justify-content: left;
+  align-items: baseline;
+  margin-left: -7px;
+  padding-left: 25px;
+`;
+
+const content = (option): React.ReactNode => (
+  <>
+    <Icon icon={option.avatar} />
+    &nbsp;&nbsp;{option.label}
+  </>
+);
 
 type Props = {
-  onChange: (name: 'pos' | 'slots', value: any) => void;
+  onChange: (name: 'pos' | 'slots' | 'allowTypes', value: any) => void;
   pos: IPos;
   posSlots: ISlot[];
+  allowTypes: string[];
   envs: any;
 };
 
 type State = {
   slots: ISlot[];
-};
-
-export const generateTree = (
-  list,
-  parentId,
-  callback,
-  level = -1,
-  parentKey = 'parentId'
-) => {
-  const filtered = list.filter(c => c[parentKey] === parentId);
-
-  if (filtered.length > 0) {
-    level++;
-  } else {
-    level--;
-  }
-
-  return filtered.reduce((tree, node) => {
-    return [
-      ...tree,
-      callback(node, level),
-      ...generateTree(list, node._id, callback, level, parentKey)
-    ];
-  }, []);
+  allowTypes: string[];
 };
 
 class GeneralStep extends React.Component<Props, State> {
@@ -65,7 +62,8 @@ class GeneralStep extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      slots: props.posSlots || []
+      slots: props.posSlots || [],
+      allowTypes: props.allowTypes
     };
   }
 
@@ -80,9 +78,9 @@ class GeneralStep extends React.Component<Props, State> {
     };
 
     const onChange = (changedSlot: ISlot) => {
-      const excluded = slots.filter(m => m._id !== changedSlot._id);
-
-      const updated = [...excluded, changedSlot];
+      const updated = slots.map(s =>
+        s._id === changedSlot._id ? { ...s, ...changedSlot } : s
+      );
       this.setState({ slots: updated });
       this.props.onChange('slots', updated);
     };
@@ -125,6 +123,16 @@ class GeneralStep extends React.Component<Props, State> {
             Add
           </Button>
         </PosSlotAddButton>
+        <Block>
+          <FlexRow key={Math.random()}>
+            <FormGroup>
+              <FormControl value={'CODE'} />
+            </FormGroup>
+            <FormGroup>
+              <FormControl value={'NAME'} />
+            </FormGroup>
+          </FlexRow>
+        </Block>
         {slots.map(s => this.renderMapping(s, props))}
         <Modal.Footer>
           <Button
@@ -463,6 +471,42 @@ class GeneralStep extends React.Component<Props, State> {
     );
   }
 
+  renderToggleType() {
+    const { allowTypes } = this.state;
+
+    const onChange = (i: number, option) => {
+      const preChosenInd = allowTypes.indexOf(option.value);
+      if (preChosenInd >= 0) {
+        allowTypes[preChosenInd] = '';
+      }
+
+      allowTypes[i] = option.value;
+      this.setState({ allowTypes }, () => {
+        this.props.onChange('allowTypes', allowTypes);
+      });
+    };
+
+    const chosenTypes: string[] = [];
+    const result: any[] = [];
+    for (var i = 0; i < ALLOW_TYPES.length; i++) {
+      const currentCh = (allowTypes || [])[i] || '';
+
+      result.push(
+        <Select
+          key={i}
+          index={i}
+          options={(i !== 0 ? [{ value: '', label: 'Null' }] : []).concat(
+            ALLOW_TYPES.filter(at => !chosenTypes.includes(at.value))
+          )}
+          value={currentCh}
+          onChange={onChange.bind(this, i)}
+        />
+      );
+      chosenTypes.push(currentCh);
+    }
+    return result;
+  }
+
   render() {
     const { pos, envs } = this.props;
 
@@ -532,24 +576,14 @@ class GeneralStep extends React.Component<Props, State> {
                 <FormGroup>{this.renderPosSlotForm(slotTrigger)}</FormGroup>
               </BlockRow>
             </Block>
-
-            {loadDynamicComponent('extendFormOptions', {
-              defaultValue: pos.paymentIds || [],
-              onChange: (ids: string[]) => this.onChangePayments(ids)
-            })}
-
             <Block>
-              <FormGroup>
-                <ControlLabel>Erxes App Token:</ControlLabel>
-                <FormControl
-                  id="erxesAppToken"
-                  type="text"
-                  value={pos.erxesAppToken || ''}
-                  onChange={this.onChangeInput}
-                />
-              </FormGroup>
+              <BlockRow>
+                <FormGroup>
+                  <ControlLabel>Types:</ControlLabel>
+                </FormGroup>
+              </BlockRow>
+              <BlockRow>{this.renderToggleType()}</BlockRow>
             </Block>
-
             <Block>
               <BlockRow>
                 <FormGroup>

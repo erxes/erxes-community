@@ -6,14 +6,18 @@ import Absence from './absence';
 import Timeclock from './timeclock';
 import UserReport from './report';
 import ScheduleConfig from './scheduleConfig';
+import Timelog from './timelog';
+import DuplicateSchedule from './duplicateSchedule';
 
 const resolvers: any = async serviceDiscovery => ({
   ...customScalars,
   UserReport,
   Schedule,
+  DuplicateSchedule,
   Absence,
   Timeclock,
   ScheduleConfig,
+  Timelog,
   Mutation: {
     ...mutations
   },

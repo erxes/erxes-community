@@ -39,7 +39,6 @@ const configMutations = {
           adminUsers = [],
           cashiers = [],
           productGroups = [],
-          qpayConfig,
           slots = []
         } = response;
 
@@ -47,13 +46,12 @@ const configMutations = {
 
         await models.Configs.updateConfig(config._id, {
           ...(await extractConfig(subdomain, pos)),
-          qpayConfig,
           token
         });
 
         await importUsers(models, cashiers, token);
         await importUsers(models, adminUsers, token, true);
-        await importSlots(models, slots);
+        await importSlots(models, slots, token);
         await importProducts(subdomain, models, token, productGroups);
       } else {
         await models.Configs.deleteOne({ token });
@@ -101,29 +99,24 @@ const configMutations = {
 
     switch (type) {
       case 'config':
-        const {
-          pos = {},
-          adminUsers = [],
-          cashiers = [],
-          slots = [],
-          qpayConfig
-        } = response;
-
+        const { pos = {}, adminUsers = [], cashiers = [] } = response;
         await models.Configs.updateConfig(config._id, {
           ...(await extractConfig(subdomain, pos)),
-          qpayConfig,
           token: config.token
         });
 
         await importUsers(models, cashiers, config.token);
         await importUsers(models, adminUsers, config.token, true);
-        await importSlots(models, slots);
 
         break;
       case 'products':
         const { productGroups = [] } = response;
         await preImportProducts(models, token, productGroups);
         await importProducts(subdomain, models, token, productGroups);
+        break;
+      case 'slots':
+        const { slots = [] } = response;
+        await importSlots(models, slots, token);
         break;
     }
     return 'success';

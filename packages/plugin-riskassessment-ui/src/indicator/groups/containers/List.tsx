@@ -1,14 +1,14 @@
-import React from 'react';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-import * as compose from 'lodash.flowright';
+import { Alert, confirm, EmptyState, Spinner } from '@erxes/ui/src';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { withProps } from '@erxes/ui/src/utils/core';
-import { mutations, queries } from '../graphql';
-import { Alert, confirm, Spinner } from '@erxes/ui/src';
+import gql from 'graphql-tag';
+import * as compose from 'lodash.flowright';
+import React from 'react';
+import { graphql } from 'react-apollo';
 import { IIndicatorsGroupsQueryResponse } from '../common/types';
+import { generateParams, refetchQueries } from '../common/utilss';
 import ListComponent from '../components/List';
-import { generatePaginationParams } from '@erxes/ui/src/utils/router';
+import { mutations, queries } from '../graphql';
 
 type Props = {
   queryParams: any;
@@ -25,10 +25,14 @@ class List extends React.Component<FinalProps> {
   }
 
   render() {
-    const { listQuery, removeGroups } = this.props;
+    const { listQuery, removeGroups, queryParams } = this.props;
 
     if (listQuery.loading) {
       return <Spinner />;
+    }
+
+    if (listQuery.error) {
+      return <EmptyState text={listQuery.error} icon="info-circle" />;
     }
 
     const { riskIndicatorsGroups, riskIndicatorsGroupsTotalCount } = listQuery;
@@ -49,17 +53,13 @@ class List extends React.Component<FinalProps> {
       ...this.props,
       list: riskIndicatorsGroups,
       totalCount: riskIndicatorsGroupsTotalCount,
+      queryParams,
       remove
     };
 
     return <ListComponent {...updatedProps} />;
   }
 }
-
-const generateParams = queryParams => ({
-  ...generatePaginationParams(queryParams || []),
-  searchValue: queryParams?.searchValue
-});
 
 export default withProps(
   compose(
@@ -70,7 +70,10 @@ export default withProps(
       })
     }),
     graphql<Props>(gql(mutations.removeGroups), {
-      name: 'removeGroups'
+      name: 'removeGroups',
+      options: ({ queryParams }) => ({
+        refetchQueries: refetchQueries(queryParams)
+      })
     })
   )(List)
 );

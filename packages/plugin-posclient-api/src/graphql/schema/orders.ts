@@ -9,13 +9,18 @@ const orderFields = `
   number: String
 `;
 
+const PaidAmountDefs = `
+  _id: String
+  type: String
+  amount: Float
+  info: JSON
+`;
+
 const paymentInputDefs = `
   cashAmount: Float
-  receivableAmount: Float
+  mobileAmount: Float
   billType: String
   registerNumber: String
-  mobileAmount: Float
-  cardAmount: Float
 `;
 
 const addEditParams = `
@@ -24,6 +29,7 @@ const addEditParams = `
   type: String!,
   branchId: String,
   customerId: String,
+  customerType: String,
   deliveryInfo: JSON,
   billType: String,
   registerNumber: String,
@@ -32,10 +38,14 @@ const addEditParams = `
 `;
 
 export const types = `
+  type PaidAmount {
+    ${PaidAmountDefs}
+  }
+
   type PosOrderItem {
     ${commonFields}
     productId: String!
-    count: Int!
+    count: Float!
     orderId: String!
     unitPrice: Float
     discountAmount: Float
@@ -46,6 +56,7 @@ export const types = `
     isTake: Boolean
     productImgUrl: String
     status: String
+    manufacturedDate: String
   }
 
   type PosPutResponse {
@@ -76,12 +87,7 @@ export const types = `
     message: String
     getInformation: String
     returnBillId: String
-  }
-
-  type CardPayment {
-    _id: String
-    amount: Float
-    cardInfo: JSON
+    stocks: JSON
   }
 
 
@@ -89,6 +95,7 @@ export const types = `
     ${commonFields}
     ${orderFields}
     ${paymentInputDefs}
+    paidAmounts: [PaidAmount]
 
     paidDate: Date
     modifiedAt: Date
@@ -101,15 +108,12 @@ export const types = `
     type: String
     branchId: String
     deliveryInfo: JSON
-    cardPaymentInfo: String
-    cardPayments: [CardPayment]
     origin: String
     customer: PosCustomer
+    customerType: String,
     items: [PosOrderItem]
     user: PosUser
     putResponses: [PosPutResponse]
-    qpayInvoice: QPayInvoice
-    qpayInvoices: [QPayInvoice]
 
     slotCode: String
   }
@@ -117,7 +121,7 @@ export const types = `
   input OrderItemInput {
     _id: String
     productId: String!
-    count: Int!
+    count: Float!
     unitPrice: Float!
     isPackage: Boolean
     isTake: Boolean
@@ -125,8 +129,13 @@ export const types = `
     manufacturedDate: String
   }
 
+  input PaidAmountInput {
+    ${PaidAmountDefs}
+  }
+
   input OrderPaymentInput {
     ${paymentInputDefs}
+    paidAmounts: [PaidAmountInput]
   }
 `;
 
@@ -134,6 +143,7 @@ export const ordersQueryParams = `
   searchValue: String,
   statuses: [String],
   customerId: String,
+  customerType: String,
   startDate: Date,
   endDate: Date,
   page: Int,
@@ -147,7 +157,7 @@ export const mutations = `
   ordersEdit(_id: String!, ${addEditParams}): Order
   ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse
   orderChangeStatus(_id: String!, status: String): Order
-  ordersAddPayment(_id: String!, cashAmount: Float, receivableAmount: Float, cardAmount: Float, mobileAmount: Float, cardInfo: JSON): Order
+  ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput] ): Order
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
   orderItemChangeStatus(_id: String!, status: String): PosOrderItem

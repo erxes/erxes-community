@@ -1,3 +1,9 @@
+export const menuPos = [
+  { title: 'Pos Orders', link: '/pos-orders' },
+  { title: 'Pos Covers', link: '/pos-covers' },
+  { title: 'Pos Items', link: '/pos-order-items' }
+];
+
 export const TEXT_COLORS = [
   '#fff',
   '#fefefe',
@@ -9,6 +15,12 @@ export const TEXT_COLORS = [
   '#333',
   '#222',
   '#000'
+];
+
+export const ALLOW_TYPES = [
+  { value: 'eat', label: 'Eat' },
+  { value: 'take', label: 'Take' },
+  { value: 'delivery', label: 'Delivery' }
 ];
 
 export const DISTRICTS = [
@@ -47,6 +59,7 @@ export const DISTRICTS = [
 export const FILTER_PARAMS = [
   'search',
   'customerId',
+  'customerType',
   'billType',
   'registerNumber',
   'type',
@@ -59,4 +72,37 @@ export const FILTER_PARAMS = [
   'paidDate',
   'userId',
   'hasntUser'
+];
+
+export const PAYMENT_TYPE_ICONS = [
+  'sign-alt',
+  'trees',
+  'food',
+  'fast-mail',
+  'euro',
+  'dollar-alt',
+  'dollar-sign',
+  'calcualtor',
+  'at',
+  'briefcase-alt',
+  'atm-card',
+  'hold',
+  'shoppingcart',
+  'scale',
+  'piggybank',
+  'pencil',
+  'clicker',
+  'alarm',
+  'diamond',
+  'medal',
+  'bell',
+  'capsule',
+  'cart',
+  'coffee',
+  'attach',
+  'pound',
+  'usd-circle',
+  'yen',
+  'ticket',
+  'sync'
 ];
