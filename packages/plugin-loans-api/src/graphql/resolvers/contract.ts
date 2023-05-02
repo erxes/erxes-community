@@ -178,6 +178,11 @@ const Contracts = {
     }
 
     return models.Contracts.findOne({ _id: contract.relContractId });
+  },
+  hasTransaction(contract: IContractDocument, {}, { models }: IContext) {
+    return !!models.Transactions.countDocuments({
+      contractId: contract._id
+    });
   }
 };
 

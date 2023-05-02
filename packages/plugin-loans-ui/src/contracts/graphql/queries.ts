@@ -34,6 +34,7 @@ const contractFields = `
   weekends
   useHoliday
   relContractId
+  dealId
 `;
 
 const listParamsDef = `
@@ -146,6 +147,7 @@ export const contractDetailFields = `
     closeDate
     closeType
   }
+  hasTransaction
 `;
 
 export const contractDetail = `

@@ -7,6 +7,7 @@ import { __ } from '@erxes/ui/src/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import dayjs from 'dayjs';
 import { isEnabled } from '@erxes/ui/src/utils/core';
+import DealSection from './DealSection';
 
 const CompanySection = asyncComponent(
   () =>
@@ -49,19 +50,24 @@ export default class RightSidebar extends React.Component<Props> {
       <Sidebar>
         {isEnabled('contacts') && (
           <>
-            <CustomerSection
-              mainType="contract"
-              mainTypeId={contract._id}
-              title={'Primary Customers'}
-              name={'Contract'}
-            />
+            {contract.customerType === 'customer' && (
+              <CustomerSection
+                mainType="contract"
+                mainTypeId={contract._id}
+                title={'Primary Customers'}
+                name={'Contract'}
+              />
+            )}
             <CustomerSection
               mainType="contractSub"
               mainTypeId={contract._id}
               title={'Collectively Customers'}
               name={'Contract'}
             />
-            <CompanySection mainType="contract" mainTypeId={contract._id} />
+            {contract.customerType === 'company' && (
+              <CompanySection mainType="contract" mainTypeId={contract._id} />
+            )}
+            <DealSection contract={contract} />
           </>
         )}
 

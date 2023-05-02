@@ -68,6 +68,8 @@ export interface IContract {
   contractType?: IContractTypeDoc;
   weekends: number[];
   useHoliday: boolean;
+  dealId?: string;
+  hasTransaction?: boolean;
 }
 
 export interface IContractDoc extends IContract {

@@ -77,6 +77,7 @@ export const types = () => `
     relContractId: String
     relContract: RecContract
     dealId: String
+    hasTransaction:Boolean
   }
 
 

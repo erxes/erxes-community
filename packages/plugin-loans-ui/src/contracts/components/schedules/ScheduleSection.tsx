@@ -9,13 +9,15 @@ type Props = {
   isFirst: boolean;
   regenSchedules: (contractId: string) => void;
   fixSchedules?: (contractId: string) => void;
+  hasTransaction?: boolean;
 };
 
 function ScheduleSection({
   contractId,
   isFirst,
   regenSchedules,
-  fixSchedules
+  fixSchedules,
+  hasTransaction
 }: Props) {
   const onRegenSchedules = () =>
     confirm()
@@ -35,15 +37,16 @@ function ScheduleSection({
     if (isFirst) {
       return <></>;
     }
+
+    if (hasTransaction)
+      <button onClick={onFixSchedules} title={'fix schedule'}>
+        <Icon icon="refresh-1" />
+      </button>;
+
     return (
-      <>
-        <button onClick={onRegenSchedules} title="create schedule">
-          <a>Recreate Schedule</a>
-        </button>
-        <button onClick={onFixSchedules} title={'fix schedule'}>
-          <Icon icon="refresh-1" />
-        </button>
-      </>
+      <button onClick={onRegenSchedules} title="create schedule">
+        <Icon icon="refresh-1" />
+      </button>
     );
   };
 
