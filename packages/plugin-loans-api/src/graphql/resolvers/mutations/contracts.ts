@@ -94,8 +94,6 @@ const contractMutations = {
       _id: { $ne: _id }
     });
 
-    console.log('checkOtherDeals', checkOtherDeals);
-
     if (!!checkOtherDeals) {
       await models.Contracts.updateMany(
         { dealId: doc.dealId, _id: { $ne: _id } },

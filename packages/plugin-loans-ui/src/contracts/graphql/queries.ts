@@ -33,7 +33,6 @@ const contractFields = `
   riskExpertId
   weekends
   useHoliday
-
   relContractId
 `;
 
@@ -218,11 +217,23 @@ export const closeInfo = `
   }
 `;
 
+const documents = `
+  query documents($page: Int, $perPage: Int, $contentType: String) {
+    documents(page: $page, perPage: $perPage, contentType: $contentType) {
+      _id
+      contentType
+      name
+      createdAt
+    }
+  }
+`;
+
 export default {
   contracts,
   contractsMain,
   contractDetail,
   schedules,
   scheduleYears,
-  closeInfo
+  closeInfo,
+  documents
 };

@@ -178,7 +178,7 @@ export type CloseMutationResponse = {
 export type CloseInfoQueryResponse = {
   closeInfo: ICloseInfo;
   loading: boolean;
-  refetch: ({ date: Date }) => void;
+  refetch: (data: { date: Date }) => void;
 };
 
 export type AddMutationResponse = {
@@ -219,7 +219,7 @@ export type MainQueryResponse = {
 export type SchedulesQueryResponse = {
   schedules: ISchedule[];
   loading: boolean;
-  refetch: ({ year: number }) => void;
+  refetch: (data: { year: number }) => void;
 };
 
 export type ScheduleYearsQueryResponse = {

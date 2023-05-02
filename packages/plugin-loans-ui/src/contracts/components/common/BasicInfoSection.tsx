@@ -16,8 +16,11 @@ import ContractForm from '../../containers/ContractForm';
 import CloseForm from '../../containers/detail/CloseForm';
 import { Action, Name } from '../../styles';
 import { IContract } from '../../types';
-import ContractPrint from './ContractPrint';
 import DetailInfo from './DetailInfo';
+import { getEnv } from '@erxes/ui/src/utils';
+import client from '@erxes/ui/src/apolloClient';
+import gql from 'graphql-tag';
+import { queries } from '../../graphql';
 
 type Props = {
   contract: IContract;
@@ -25,33 +28,19 @@ type Props = {
   toConfirm: () => void;
 };
 
-class BasicInfoSection extends React.Component<Props> {
-  onPrint = () => {
-    const { contract } = this.props;
+type State = {
+  documents: any[];
+  loading: boolean;
+};
 
-    const content = ContractPrint(contract);
-
-    const printDiv = () => {
-      const newWin = window.open('', 'Print-Window');
-      newWin.document.open();
-      newWin.document.write(
-        '<html><body onload="window.print()">' + content + '</body></html>'
-      );
-      newWin.document.close();
+class BasicInfoSection extends React.Component<Props, State> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      documents: [],
+      loading: false
     };
-
-    printDiv();
-  };
-
-  toConfirmLending = () => {
-    const { toConfirm } = this.props;
-
-    confirm(__('Are you sure to Confirm Lending? This cannot be undone.'))
-      .then(() => toConfirm())
-      .catch(error => {
-        Alert.error(error.message);
-      });
-  };
+  }
 
   renderAction() {
     const { remove, contract } = this.props;
@@ -63,11 +52,35 @@ class BasicInfoSection extends React.Component<Props> {
           Alert.error(error.message);
         });
 
+    const onOpen = () => {
+      this.setState({ loading: true });
+      client
+        .mutate({
+          mutation: gql(queries.documents),
+          variables: { contentType: 'loans' }
+        })
+        .then(({ data }) => {
+          this.setState({ documents: data.documents });
+          this.setState({ loading: false });
+        })
+        .catch(() => {
+          this.setState({ loading: false });
+        });
+    };
+
+    const onPrint = mur => {
+      window.open(
+        `${getEnv().REACT_APP_API_URL}/pl:documents/print?_id=${
+          mur._id
+        }&contractId=${contract?._id}`
+      );
+    };
+
     const closeForm = props => <CloseForm {...props} contract={contract} />;
 
     return (
       <Action>
-        <Dropdown>
+        <Dropdown onToggle={isShown => isShown && onOpen()}>
           <Dropdown.Toggle as={DropdownToggle} id="dropdown-info">
             <Button btnStyle="simple" size="medium">
               {__('Action')}
@@ -75,16 +88,15 @@ class BasicInfoSection extends React.Component<Props> {
             </Button>
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <li>
-              <a href="#print" onClick={this.onPrint}>
-                {__('Print Contract')}
-              </a>
-            </li>
-            <li>
-              <a href="#delete" onClick={this.toConfirmLending}>
-                {__('To Confirm Lending')}
-              </a>
-            </li>
+            {this.state.documents?.map(mur => {
+              return (
+                <li key={mur._id}>
+                  <a href="#print" onClick={() => onPrint(mur)}>
+                    {__('Print ' + mur.name)}
+                  </a>
+                </li>
+              );
+            })}
             <li>
               <ModalTrigger
                 title="To Close Contract"

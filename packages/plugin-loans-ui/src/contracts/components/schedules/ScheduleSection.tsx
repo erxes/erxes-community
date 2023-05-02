@@ -8,7 +8,7 @@ type Props = {
   contractId: string;
   isFirst: boolean;
   regenSchedules: (contractId: string) => void;
-  fixSchedules: (contractId: string) => void;
+  fixSchedules?: (contractId: string) => void;
 };
 
 function ScheduleSection({
@@ -26,7 +26,7 @@ function ScheduleSection({
 
   const onFixSchedules = () =>
     confirm()
-      .then(() => fixSchedules(contractId))
+      .then(() => fixSchedules && fixSchedules(contractId))
       .catch(error => {
         Alert.error(error.message);
       });

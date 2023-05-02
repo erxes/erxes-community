@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import Box from '@erxes/ui/src/components/Box';
 import { IContract } from '../../types';
 import { List } from '../../styles';
