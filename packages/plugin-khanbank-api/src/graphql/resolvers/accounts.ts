@@ -35,6 +35,14 @@ const KhanbankAccount = {
     } catch (_e) {
       return null;
     }
+  },
+
+  async accountConfig(account: any, _params, { models }: IContext) {
+    const config = await models.KhanbankAccounts.findOne({
+      accountNumber: account.number
+    });
+
+    return config;
   }
 };
 

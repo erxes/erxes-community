@@ -1,15 +1,21 @@
+import { IContext as IMainContext } from '@erxes/api-utils/src';
+import { createGenerateModels } from '@erxes/api-utils/src/core';
+import * as mongoose from 'mongoose';
+
+import {
+  IKhanbankAccountConfigModel,
+  loadKhanbankAccountClass
+} from './models/KhanbankAccounts';
 import {
   IKhanbankConfigModel,
   loadKhanbankConfigClass
 } from './models/KhanbankConfigs';
-import { IContext as IMainContext } from '@erxes/api-utils/src';
-import { createGenerateModels } from '@erxes/api-utils/src/core';
-import * as mongoose from 'mongoose';
+import { IKhanbankAccountConfigDocument } from './models/definitions/khanbankAccounts';
 import { IKhanbankConfigDocument } from './models/definitions/khanbankConfigs';
-import Khanbank from './khanbank/khanbank';
 
 export interface IModels {
   KhanbankConfigs: IKhanbankConfigModel;
+  KhanbankAccounts: IKhanbankAccountConfigModel;
 }
 
 export interface IContext extends IMainContext {
@@ -26,6 +32,11 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     IKhanbankConfigDocument,
     IKhanbankConfigModel
   >('khanbank_configs', loadKhanbankConfigClass(models));
+
+  models.KhanbankAccounts = db.model<
+    IKhanbankAccountConfigDocument,
+    IKhanbankAccountConfigModel
+  >('khanbank_accounts', loadKhanbankAccountClass(models));
 
   return models;
 };

@@ -6,6 +6,16 @@ type KhanbankAccountHolder {
   custLastName: String
 }
 
+type KhanbankAccountConfig {
+  _id: String
+  accountNumber: String
+  pollingInterval: Int
+  notifyUsers: [String]
+  isDefault: Boolean
+  isActive: Boolean
+  configId: String
+}
+
   type KhanbankAccount {
     number: String
     type: String
@@ -30,6 +40,8 @@ type KhanbankAccountHolder {
     addr1: String
 
     holderInfo(configId: String!, accountNumber: String!): KhanbankAccountHolder
+
+    accountConfig: KhanbankAccountConfig
   }
 
   type KhanbankTransaction {
@@ -92,4 +104,22 @@ export const queries = `
 
   khanbankStatements(configId: String!, accountNumber: String!, ${paginationParams} ${dateParams} ): KhanbankStatement
   khanbankStatementsAfterRecord(configId: String!, accountNumber: String!, record: Int! ${paginationParams}): KhanbankStatement
+
+  khanbankAccountConfigs: [KhanbankAccountConfig]
+  khanbankGetDefaultAccountNumber: String
+`;
+
+export const mutations = `
+  khanbankAccountConfigUpsert(
+    _id: String
+    configId: String!
+    accountNumber: String!
+    pollingInterval: Int!
+    notifyUsers: [String]
+    isDefault: Boolean
+    isActive: Boolean
+  ): KhanbankAccountConfig
+
+  khanbankAccountConfigChangeStatus(_id: String!): KhanbankAccountConfig
+  khanbankAccountConfigMakeDefault(_id: String!): KhanbankAccountConfig
 `;

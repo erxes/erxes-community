@@ -8,6 +8,7 @@ import {
 
 import {
   queries as accountQueries,
+  mutations as accountMutations,
   types as accountTypes
 } from './schema/accounts';
 
@@ -74,6 +75,7 @@ const typeDefs = async () => {
       ${configMutations}
       ${transferMutations}
       ${taxMutations}
+      ${accountMutations}
     }
   `;
 };
