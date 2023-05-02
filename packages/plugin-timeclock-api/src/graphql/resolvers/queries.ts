@@ -13,12 +13,14 @@ import {
   generateFilter
 } from '../../utils';
 import { IReport } from '../../models/definitions/timeclock';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
+import { checkPermission } from '@erxes/api-utils/src';
 import { fixDate, paginate } from '@erxes/api-utils/src';
 
 const timeclockQueries = {
-  async absences(_root, queryParams, { models, subdomain }: IContext) {
+  async absences(_root, queryParams, { models, subdomain, user }: IContext) {
     return models.Absences.find(
-      await generateFilter(queryParams, subdomain, 'absence')
+      await generateFilter(queryParams, subdomain, 'absence', user)
     );
   },
 
@@ -55,11 +57,16 @@ const timeclockQueries = {
     return models.Timeclocks.find({ $and: [{ userId }, timeField] });
   },
 
-  async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
+  async timeclocksMain(
+    _root,
+    queryParams,
+    { subdomain, models, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'timeclock'
+      'timeclock',
+      user
     );
 
     // if there's no common user, return empty list
@@ -95,11 +102,16 @@ const timeclockQueries = {
     return getActiveTimeclock.pop();
   },
 
-  async timelogsMain(_root, queryParams, { subdomain, models }: IContext) {
+  async timelogsMain(
+    _root,
+    queryParams,
+    { subdomain, models, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'timelog'
+      'timelog',
+      user
     );
     const totalCount = models.TimeLogs.count(selector);
 
@@ -133,11 +145,16 @@ const timeclockQueries = {
     }).sort({ timelog: 1 });
   },
 
-  async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {
+  async schedulesMain(
+    _root,
+    queryParams,
+    { models, subdomain, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'schedule'
+      'schedule',
+      user
     );
     const totalCount = models.Schedules.count(selector);
 
@@ -174,11 +191,16 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
-  async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
+  async requestsMain(
+    _root,
+    queryParams,
+    { models, subdomain, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'absence'
+      'absence',
+      user
     );
     const totalCount = models.Absences.count(selector);
 
@@ -322,6 +344,7 @@ const timeclockQueries = {
   }
 };
 
-// moduleRequireLogin(timeclockQueries);
+moduleRequireLogin(timeclockQueries);
+checkPermission(timeclockQueries, 'timeclocksMain', 'showTimeclocks');
 
 export default timeclockQueries;

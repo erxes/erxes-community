@@ -509,7 +509,6 @@ export const timeclockReportFinal = async (
     _id: { $in: requests.map(request => request.absenceTypeId) }
   });
 
-  console.log('requests ', requests);
   // get all related absences
   const relatedAbsences = await returnTotalAbsences(requests, models);
 
@@ -564,15 +563,17 @@ export const timeclockReportFinal = async (
       schedule => schedule.userId === currUserId
     );
 
+    const currUserScheduleIds = currUserSchedules.map(schedule => schedule._id);
+
     // get shifts of schedule
     const currUserScheduleShifts: any = [];
-    currUserSchedules.forEach(userSchedule => {
+    for (const userSchedule of currUserSchedules) {
       currUserScheduleShifts.push(
         ...shiftsOfSchedule.filter(
           scheduleShift => scheduleShift.scheduleId === userSchedule._id
         )
       );
-    });
+    }
 
     let totalDaysWorkedPerUser = 0;
     let totalRegularHoursWorkedPerUser = 0;
@@ -585,6 +586,7 @@ export const timeclockReportFinal = async (
     let totalMinsLatePerUser = 0;
     let totalHoursOvernightPerUser = 0;
 
+    console.log('schedule ', schedulesObj);
     // calculate total break time from schedules of an user
     const totalBreakInHours =
       currUserSchedules.reduce(

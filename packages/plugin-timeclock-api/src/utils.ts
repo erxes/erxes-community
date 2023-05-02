@@ -18,6 +18,7 @@ import {
   findBranchUsers,
   findDepartmentUsers
 } from './graphql/resolvers/utils';
+import { IUser, IUserDocument } from '@erxes/api-utils/src/types';
 
 const customFixDate = (date?: Date) => {
   // get date, return date with 23:59:59
@@ -849,15 +850,29 @@ const createTeamMembersObject = async (subdomain: string) => {
   return teamMembersObject;
 };
 
-const generateFilter = async (params: any, subdomain: string, type: string) => {
-  const {
-    branchIds,
-    departmentIds,
-    userIds,
-    startDate,
-    endDate,
-    scheduleStatus
-  } = params;
+const generateFilter = async (
+  params: any,
+  subdomain: string,
+  type: string,
+  user: IUserDocument
+) => {
+  const { branchIds, userIds, startDate, endDate, scheduleStatus } = params;
+
+  const departmentIds = user.departmentIds || [];
+
+  const ids = (
+    await sendCoreMessage({
+      subdomain,
+      action: `departments.find`,
+      data: {
+        supervisorId: user._id
+      },
+      isRPC: true,
+      defaultValue: []
+    })
+  ).map(item => item._id);
+
+  departmentIds.push(...ids);
 
   const totalUserIds: string[] = await generateCommonUserIds(
     subdomain,
