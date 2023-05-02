@@ -1,26 +1,64 @@
+import { IContext } from '../../connectionResolver';
+import { sendMessageBroker } from '../../messageBroker';
+import { ICollateralDataDoc } from '../../models/definitions/contracts';
+
 const Collaterals = {
-  category(collateral) {
-    async ({ models }) => {
-      const product = await models.Products.findOne({
-        _id: collateral.collateralsData.collateralId
-      });
-      return models.ProductCategories.findOne({ _id: product.categoryId });
-    };
+  async category(collateral: ICollateralDataDoc, {}, { subdomain }: IContext) {
+    const product: any = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'findOne',
+        data: { _id: collateral.collateralId },
+        isRPC: true
+      },
+      'products'
+    );
+
+    const categories = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'categories.findOne',
+        data: { _id: product.categoryId },
+        isRPC: true
+      },
+      'products'
+    );
+    return categories;
   },
-  vendor(collateral) {
-    async ({ models }) => {
-      const product = await models.Products.findOne({
-        _id: collateral.collateralsData.collateralId
-      });
-      return models.Companies.findOne({ _id: product.vendorId });
-    };
+  async vendor(collateral: ICollateralDataDoc, {}, { subdomain }: IContext) {
+    const product: any = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'findOne',
+        data: { _id: collateral.collateralId },
+        isRPC: true
+      },
+      'products'
+    );
+
+    const company = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        data: { _id: product.vendorId },
+        isRPC: true
+      },
+      'contacts'
+    );
+
+    return company;
   },
-  product(collateral) {
-    async ({ models }) => {
-      return models.Products.findOne({
-        _id: collateral.collateralsData.collateralId
-      });
-    };
+  async product(collateral: ICollateralDataDoc, {}, { subdomain }: IContext) {
+    const product: any = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'findOne',
+        data: { _id: collateral.collateralId },
+        isRPC: true
+      },
+      'products'
+    );
+    return product;
   },
   collateralData(collateral) {
     return collateral.collateralsData;
