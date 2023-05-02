@@ -75,8 +75,7 @@ export default {
         'contacts'
       );
 
-      contract.customerName = company.name;
-      contract.customerLastName = company.lastName;
+      contract.customerName = company.primaryName;
     }
 
     var printContent = content;
