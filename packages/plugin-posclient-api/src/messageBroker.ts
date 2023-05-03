@@ -1,6 +1,5 @@
-import { generateModels } from './connectionResolver';
-import { graphqlPubsub, serviceDiscovery } from './configs';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
+import { graphqlPubsub, serviceDiscovery } from './configs';
 import {
   importProducts,
   importSlots,
@@ -10,6 +9,8 @@ import {
   receiveProductCategory,
   receiveUser
 } from './graphql/utils/syncUtils';
+
+import { generateModels } from './connectionResolver';
 import { sendRPCMessage } from '@erxes/api-utils/src/messageBroker';
 
 let client;
@@ -20,7 +21,7 @@ const webbuilderReplacer = async args => {
   const query = args.query || {};
 
   let result = '';
-
+  console.log('aaaaa', action);
   if (action === 'productCategories') {
     result = `
       <ul id="plugin-posclient-product-categories">

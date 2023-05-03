@@ -307,6 +307,7 @@ export const SiteFormContainer = styledTS<{ showDarkMode?: boolean }>(
 
       .gjs-pn-options {
         border-right: 1px solid ${colors.colorShadowGray};
+        right: 21%;
       }
 
       .gjs-sm-field input,

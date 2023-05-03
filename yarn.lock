@@ -12596,6 +12596,11 @@ grapesjs-component-countdown@^0.1.2:
   resolved "https://registry.yarnpkg.com/grapesjs-component-countdown/-/grapesjs-component-countdown-0.1.3.tgz#7df54b2a6c0bdf3275370f974ac9bd732188aae3"
   integrity sha512-TmxDETedUDv1jGqNLn6E768iyp+xAK/XcTId5WpLrmKPFB6aCuWqfTowhtSvyRJJs83OAFMiQIwIu+tEtSWOeA==
 
+grapesjs-lory-slider@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/grapesjs-lory-slider/-/grapesjs-lory-slider-0.1.5.tgz#9dbd42a0d2b10b8d848b9d74275c74e807853549"
+  integrity sha512-l5GYJtptAJXt5y3hOO9Boj1q+t1hOtSb3ODc0n0v8KycLE54tjh1XFrohmoj44wI36AyjH9W14tKx7iT5L7wDg==
+
 grapesjs-navbar@^0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/grapesjs-navbar/-/grapesjs-navbar-0.1.5.tgz#62e35eca0f391f94d455e96c206b74b5f495fa6e"

@@ -92,11 +92,7 @@ class SiteDetail extends React.Component<Props, State> {
           open: false
         }
       },
-      storageManager: {
-        id: 'editor', // Prefix identifier that will be used inside storing and loading
-        type: 'local',
-        autosave: true
-      },
+      storageManager: false,
       assetManager: {
         uploadFile: e => {
           const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
