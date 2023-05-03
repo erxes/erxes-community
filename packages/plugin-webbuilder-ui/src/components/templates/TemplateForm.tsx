@@ -1,5 +1,3 @@
-import 'grapesjs/dist/css/grapes.min.css';
-
 import { ISite, ISiteDoc } from '../../types';
 
 import Button from '@erxes/ui/src/components/Button';

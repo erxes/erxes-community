@@ -616,42 +616,49 @@ const findAndUpdateUnfinishedShifts = async (
       return;
     }
 
-    const [getShiftStartIdx, getShiftEndReverseIdx] = getShiftStartAndEndIdx(
-      empSchedulesObj[teamMemberId][getScheduledDay],
-      getScheduledDay,
-      newEmpData,
-      empId,
-      shiftStart
-    );
-
-    // if shift end is found
-    if (getShiftEndReverseIdx !== -1) {
-      getShiftEndIdx = newEmpData.length - 1 - getShiftEndReverseIdx;
-
-      const getShiftEnd = dayjs(
-        newEmpData[getShiftEndIdx].authDateTime
-      ).toDate();
-
-      const getDeviceName =
-        devicesDictionary[newEmpData[getShiftEndIdx].deviceSerialNo] ||
-        newEmpData[getShiftEndIdx].deviceName;
-
-      const updateTimeClock = {
-        shiftStart: unfinishedShift.shiftStart,
-        shiftEnd: getShiftEnd,
-        userId: teamMemberId,
-        shiftActive: false,
-        deviceName: getDeviceName,
-        deviceType: unfinishedShift.deviceType + ' x faceTerminal'
-      };
-
-      await models.Timeclocks.updateTimeClock(
-        unfinishedShift._id,
-        updateTimeClock
+    // for each config of a scheduled day shift
+    for (const empScheduledayObj of empSchedulesObj[teamMemberId][
+      getScheduledDay
+    ]) {
+      const [getShiftStartIdx, getShiftEndReverseIdx] = getShiftStartAndEndIdx(
+        empScheduledayObj,
+        getScheduledDay,
+        newEmpData,
+        empId,
+        shiftStart
       );
 
-      const deleteCount = getShiftEndIdx - getShiftStartIdx + 1;
-      await newEmpData.splice(getShiftStartIdx, deleteCount);
+      // if shift end is found
+      if (getShiftEndReverseIdx !== -1) {
+        getShiftEndIdx = newEmpData.length - 1 - getShiftEndReverseIdx;
+
+        const getShiftEnd = dayjs(
+          newEmpData[getShiftEndIdx].authDateTime
+        ).toDate();
+
+        const getDeviceName =
+          devicesDictionary[newEmpData[getShiftEndIdx].deviceSerialNo] ||
+          newEmpData[getShiftEndIdx].deviceName;
+
+        const updateTimeClock = {
+          shiftStart: unfinishedShift.shiftStart,
+          shiftEnd: getShiftEnd,
+          userId: teamMemberId,
+          shiftActive: false,
+          deviceName: getDeviceName,
+          deviceType: unfinishedShift.deviceType + ' x faceTerminal'
+        };
+
+        await models.Timeclocks.updateTimeClock(
+          unfinishedShift._id,
+          updateTimeClock
+        );
+
+        const deleteCount = getShiftEndIdx - getShiftStartIdx + 1;
+        await newEmpData.splice(getShiftStartIdx, deleteCount);
+
+        break;
+      }
     }
   });
 
@@ -862,6 +869,10 @@ const generateFilter = async (params: any, subdomain: string, type: string) => {
   const models = await generateModels(subdomain);
 
   let scheduleFilter;
+
+  if (type === 'schedule' && !scheduleStatus) {
+    return [scheduleFilter, false];
+  }
 
   if (scheduleStatus) {
     if (scheduleStatus.toLowerCase() === 'pending') {

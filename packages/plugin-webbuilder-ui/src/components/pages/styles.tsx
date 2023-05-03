@@ -37,7 +37,9 @@ export const List = styledTS<{ showDarkMode: boolean }>(styled.ul)`
       }
 
       &.active {
-        color: ${colors.colorSecondary};
+        color: ${props =>
+          props.showDarkMode ? colors.colorWhite : colors.colorSecondary};
+        font-weight: 600;
       }
 
       > i {
@@ -57,8 +59,10 @@ export const List = styledTS<{ showDarkMode: boolean }>(styled.ul)`
     }
 
     &: hover {
-      color: ${colors.textPrimary};
-      background: ${colors.bgActive};
+      color: ${props =>
+        props.showDarkMode ? colors.colorWhite : colors.textPrimary};
+      background: ${props =>
+        props.showDarkMode ? `rgba(255,255,255,.4)` : colors.bgActive};
 
       &.link {
         background: none;

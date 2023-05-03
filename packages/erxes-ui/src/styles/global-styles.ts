@@ -323,8 +323,45 @@ a:hover {
   cursor: pointer;
 }
 
+/* grapejs */
+
+.gjs-field {
+  font-weight: 400;
+}
+
+.gjs-three-bg {
+  background-color: #6569df !important;
+  color: #fff;
+}
+
+.gjs-sm-label, .gjs-clm-sels-info {
+  font-weight: 600;
+}
+
 .gjs-four-color, .gjs-four-color-h:hover {
   color: #6569df !important;
+}
+
+.gjs-pn-views {
+  width: 20% !important;
+}
+
+.gjs-pn-views-container {
+  width: 20% !important;
+  height: calc(100% - 45px) !important;
+}
+
+.gjs-cv-canvas {
+  width: 80% !important;
+}
+
+.gjs-sm-field input, .gjs-clm-select input, .gjs-clm-field input, .gjs-sm-field select, .gjs-clm-select select, .gjs-clm-field select {
+  color: #444 !important;
+}
+
+.gjs-editor-cont .sp-container {
+  right: 0 !important;
+  left: auto !important;
 }
 
 /* tooltip */

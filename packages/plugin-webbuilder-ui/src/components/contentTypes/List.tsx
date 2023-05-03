@@ -1,5 +1,3 @@
-import 'grapesjs/dist/css/grapes.min.css';
-
 import { ContentTypeItem } from './styles';
 import { FlexCenter } from '@erxes/ui/src/styles/main';
 import { IContentTypeDoc } from '../../types';

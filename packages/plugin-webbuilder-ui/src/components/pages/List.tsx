@@ -1,5 +1,3 @@
-import 'grapesjs/dist/css/grapes.min.css';
-
 import { IPageDoc } from '../../types';
 import Icon from '@erxes/ui/src/components/Icon';
 import { Link } from 'react-router-dom';
