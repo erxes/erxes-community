@@ -51,14 +51,14 @@ module.exports = {
     {
       text: 'customerRightSidebarSection',
       component: './contractSection',
-      scope: 'loan'
+      scope: 'loans'
     }
   ],
   companyRightSidebarSection: [
     {
       text: 'companyRightSidebarSection',
       component: './contractSection',
-      scope: 'loan'
+      scope: 'loans'
     }
   ],
   dealRightSidebarSection: [

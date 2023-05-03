@@ -21,6 +21,7 @@ import { getEnv } from '@erxes/ui/src/utils';
 import client from '@erxes/ui/src/apolloClient';
 import gql from 'graphql-tag';
 import { queries } from '../../graphql';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
   contract: IContract;
@@ -53,6 +54,7 @@ class BasicInfoSection extends React.Component<Props, State> {
         });
 
     const onOpen = () => {
+      if (!isEnabled('forum')) return;
       this.setState({ loading: true });
       client
         .mutate({

@@ -168,11 +168,16 @@ type IProps = {
 
 export default withProps<IProps>(
   compose(
-    graphql<{ mainTypeId: any }, MainQueryResponse, any>(
+    graphql<{ mainTypeId: any; mainType: any }, MainQueryResponse, any>(
       gql(queries.contractsMain),
       {
         name: 'contractsQuery',
-        options: ({ mainTypeId }) => {
+        options: ({ mainTypeId, mainType }) => {
+          if (mainType === 'customer' || mainType === 'company')
+            return {
+              fetchPolicy: 'network-only',
+              variables: { customerId: mainTypeId }
+            };
           return {
             fetchPolicy: 'network-only',
             variables: { dealId: mainTypeId }

@@ -8,18 +8,24 @@ import { queries } from '@erxes/ui-cards/src/deals/graphql';
 import Items from '@erxes/ui-cards/src/boards/components/portable/Items';
 import options from '@erxes/ui-cards/src/deals/options';
 import { IDeal } from '@erxes/ui-cards/src/deals/types';
+import client from '@erxes/ui/src/apolloClient';
+import { mutations as contractMutation } from '../../graphql';
 
 interface Props {
   contract: IContract;
-  dealsData?: { deals: IDeal[] };
+  dealsData?: { deals: IDeal[]; refetch: () => void };
 }
 
 function DealSection(props: Props) {
+  const onChange: any = () => {
+    console.log('onChange');
+  };
+
   return (
     <Items
       items={props.dealsData?.deals || []}
       data={{ options: options }}
-      onChangeItem={() => console.log('changed')}
+      onChangeItem={onChange}
     />
   );
 }
