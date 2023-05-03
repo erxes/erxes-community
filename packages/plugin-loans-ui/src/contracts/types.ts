@@ -158,15 +158,6 @@ export type RemoveMutationResponse = {
   }) => Promise<any>;
 };
 
-export type ConfirmMutationVariables = {
-  contractId: string;
-};
-export type ConfirmMutationResponse = {
-  contractConfirm: (params: {
-    variables: ConfirmMutationVariables;
-  }) => Promise<any>;
-};
-
 export type CloseMutationVariables = {
   contractId: string;
   closeType: string;

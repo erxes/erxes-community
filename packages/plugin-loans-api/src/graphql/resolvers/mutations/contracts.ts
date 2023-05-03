@@ -4,7 +4,6 @@ import {
   IContractDocument
 } from '../../../models/definitions/contracts';
 import { gatherDescriptions } from '../../../utils';
-import { ConfirmBase } from '../../../models/utils/confirmContractUtils';
 import {
   checkPermission,
   putCreateLog,
@@ -281,42 +280,6 @@ const contractMutations = {
     // return collaterals;
 
     return { collateralsData: collaterals };
-  },
-
-  /**
-   * Confirm lending of contracts
-   */
-
-  contractConfirm: async (
-    _root,
-    { contractId }: { contractId: string },
-    { models }: IContext
-  ) => {
-    const contract: IContractDocument = await models.Contracts.getContract({
-      _id: contractId
-    });
-
-    if (!contract.number) {
-      throw new Error('Number is required');
-    }
-
-    const schedules = await models.Schedules.find({
-      contractId
-    }).lean();
-    if (!schedules || !schedules.length) {
-      throw new Error('Schedules are undefined');
-    }
-
-    return {
-      result: await models.Contracts.updateOne(
-        { _id: contractId },
-        { $set: { status: CONTRACT_STATUS.NORMAL } }
-      )
-    };
-
-    return {
-      result: await ConfirmBase(models, messageBroker, redis, contract)
-    };
   }
 };
 
@@ -326,6 +289,5 @@ checkPermission(contractMutations, 'contractsDealEdit', 'manageContracts');
 checkPermission(contractMutations, 'contractsClose', 'manageContracts');
 checkPermission(contractMutations, 'contractsRemove', 'manageContracts');
 checkPermission(contractMutations, 'getProductsData', 'manageContracts');
-checkPermission(contractMutations, 'contractConfirm', 'manageContracts');
 
 export default contractMutations;

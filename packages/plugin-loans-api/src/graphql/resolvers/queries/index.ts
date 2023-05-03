@@ -6,7 +6,6 @@ import invoiceQueries from './invoices';
 import scheduleQueries from './schedules';
 import transactionQueries from './transactions';
 import collateralQueries from './collaterals';
-import erkhetResponseQueries from './erkhetResponses';
 
 export default {
   ...adjustmentQueries,
@@ -16,6 +15,5 @@ export default {
   ...invoiceQueries,
   ...scheduleQueries,
   ...transactionQueries,
-  ...collateralQueries,
-  ...erkhetResponseQueries
+  ...collateralQueries
 };

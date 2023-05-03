@@ -119,14 +119,6 @@ const getProductsData = `
   }
 `;
 
-const contractConfirm = `
-  mutation contractConfirm($contractId: String) {
-    contractConfirm(contractId: $contractId) {
-      result
-    }
-  }
-`;
-
 const contractsClose = `
   mutation contractsClose($contractId: String, $closeDate: Date, $closeType: String, $description: String) {
     contractsClose(contractId: $contractId, closeDate: $closeDate, closeType: $closeType, description: $description) {
@@ -155,7 +147,6 @@ export default {
   contractsRemove,
   regenSchedules,
   fixSchedules,
-  contractConfirm,
   contractsClose,
   getProductsData
 };

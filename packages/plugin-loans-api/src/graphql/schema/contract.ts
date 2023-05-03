@@ -81,11 +81,6 @@ export const types = () => `
   }
 
 
-
-  type ConfirmResponse {
-    result: JSON
-  }
-
   type CollateralsDataResponse {
     collateralsData: [JSON]
   }
@@ -186,5 +181,4 @@ export const mutations = `
   contractsClose(contractId: String, closeDate: Date, closeType: String, description: String): Contract
   contractsRemove(contractIds: [String]): [String]
   getProductsData(contractId: String): CollateralsDataResponse
-  contractConfirm(contractId: String): ConfirmResponse
 `;

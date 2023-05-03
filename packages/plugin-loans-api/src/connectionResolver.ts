@@ -4,7 +4,6 @@ import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { IAdjustmentDocument } from './models/definitions/adjustments';
 import { IContractDocument } from './models/definitions/contracts';
 import { IContractTypeDocument } from './models/definitions/contractTypes';
-import { IErkhetResponseDocument } from './models/definitions/erkhetResponses';
 import { IInsuranceTypeDocument } from './models/definitions/insuranceTypes';
 import { IInvoiceDocument } from './models/definitions/invoices';
 import { IScheduleDocument } from './models/definitions/schedules';
@@ -15,10 +14,6 @@ import {
   loadContractTypeClass,
   IContractTypeModel
 } from './models/contractTypes';
-import {
-  loadErkhetResponseClass,
-  IErkhetResponseModel
-} from './models/erkhetResponses';
 import {
   loadInsuranceTypeClass,
   IInsuranceTypeModel
@@ -31,7 +26,6 @@ export interface IModels {
   Adjustments: IAdjustmentModel;
   Contracts: IContractModel;
   ContractTypes: IContractTypeModel;
-  ErkhetResponses: IErkhetResponseModel;
   InsuranceTypes: IInsuranceTypeModel;
   Invoices: IInvoiceModel;
   Schedules: IScheduleModel;
@@ -75,11 +69,6 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     'loan_contract_types',
     loadContractTypeClass(models)
   );
-
-  models.ErkhetResponses = db.model<
-    IErkhetResponseDocument,
-    IErkhetResponseModel
-  >('loan_erkhet_responses', loadErkhetResponseClass(models));
 
   models.InsuranceTypes = db.model<IInsuranceTypeDocument, IInsuranceTypeModel>(
     'loan_insurance_types',

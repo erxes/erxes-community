@@ -26,7 +26,6 @@ import { isEnabled } from '@erxes/ui/src/utils/core';
 type Props = {
   contract: IContract;
   remove: () => void;
-  toConfirm: () => void;
 };
 
 type State = {

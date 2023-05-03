@@ -26,6 +26,7 @@ function DealSection(props: Props) {
       items={props.dealsData?.deals || []}
       data={{ options: options }}
       onChangeItem={onChange}
+      hideQuickButtons
     />
   );
 }

@@ -1,5 +1,4 @@
 import { ITransaction, transactionSchema } from './definitions/transactions';
-import { ConfirmTrBase } from './utils/confirmTrUtils';
 import { INVOICE_STATUS, SCHEDULE_STATUS } from './definitions/constants';
 import { findContractOfTr } from './utils/findUtils';
 import { generatePendingSchedules } from './utils/scheduleUtils';
@@ -82,8 +81,6 @@ export const loadTransactionClass = (models: IModels) => {
 
       await trAfterSchedule(models, tr);
 
-      //ConfirmTrBase(models, messageBroker, memoryStorage, contract, tr);
-
       return tr;
     }
 
@@ -131,7 +128,6 @@ export const loadTransactionClass = (models: IModels) => {
 
       await trAfterSchedule(models, newTr);
 
-      ConfirmTrBase(models, messageBroker, memoryStorage, contract, newTr);
       return newTr;
     }
 
@@ -294,7 +290,6 @@ export const loadTransactionClass = (models: IModels) => {
         );
       }
 
-      ConfirmTrBase(models, messageBroker, memoryStorage, contract, newTr);
       return newTr;
     }
 

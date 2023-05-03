@@ -22,10 +22,6 @@ import {
   types as contractTypeTypes
 } from './contractType';
 import {
-  queries as erkhetResponseQueries,
-  types as erkhetResponseTypes
-} from './erkhetResponse';
-import {
   mutations as insuranceTypeMutations,
   queries as insuranceTypeQueries,
   types as insuranceTypeTypes
@@ -73,7 +69,6 @@ export const types = `
   ${insuranceTypeTypes()},
   ${invoiceTypes},
   ${transactionTypes},
-  ${erkhetResponseTypes()},
   ${scheduleTypes()},
  
 
@@ -88,7 +83,6 @@ export const queries = `
   ${invoiceQueries},
   ${scheduleQueries},
   ${transactionQueries},
-  ${erkhetResponseQueries},
 `;
 
 export const mutations = `

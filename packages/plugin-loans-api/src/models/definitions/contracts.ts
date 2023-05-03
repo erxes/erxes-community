@@ -145,7 +145,7 @@ export const contractSchema = schemaHooksWrapper(
       label: 'Status',
       enum: CONTRACT_STATUS.ALL,
       required: true,
-      default: CONTRACT_STATUS.DRAFT
+      default: CONTRACT_STATUS.NORMAL
     }),
     description: field({
       type: String,
