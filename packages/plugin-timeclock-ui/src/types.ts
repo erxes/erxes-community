@@ -76,7 +76,9 @@ export interface IUserReport {
 
   totalHoursOvertime?: number;
   totalHoursOvernight?: number;
-  totalHoursBreak?: number;
+
+  totalHoursBreakScheduled?: number;
+  totalHoursBreakActual?: number;
 
   totalMinsLate?: number;
   totalMinsLateToday?: number;
@@ -87,6 +89,7 @@ export interface IUserReport {
 }
 
 export interface IUserAbsenceInfo {
+  totalHoursShiftRequest?: number;
   totalHoursWorkedAbroad?: number;
   totalHoursPaidAbsence?: number;
   totalHoursUnpaidAbsence?: number;

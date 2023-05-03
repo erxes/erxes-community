@@ -228,13 +228,16 @@ const timeclockReports = `
 
               totalHoursOvertime
               totalHoursOvernight
-              totalHoursBreak
+            
+              totalHoursBreakScheduled
+              totalHoursBreakActual
             
               totalMinsScheduledThisMonth
               totalDaysScheduled
               totalHoursScheduled
           
               absenceInfo {
+                totalHoursShiftRequest
                 totalHoursWorkedAbroad
                 totalHoursPaidAbsence
                 totalHoursUnpaidAbsence

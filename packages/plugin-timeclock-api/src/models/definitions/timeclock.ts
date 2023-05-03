@@ -41,6 +41,8 @@ export interface IAbsence {
   absenceTypeId?: string;
   absenceTimeType?: string;
   totalHoursOfAbsence?: string;
+
+  requestDates?: string[];
 }
 export interface IAbsenceType {
   name: string;
@@ -442,7 +444,8 @@ export interface IUserExportReport {
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
 
-  totalHoursBreak?: string;
+  totalHoursBreakScheduled?: string;
+  totalHoursBreakActual?: string;
 
   totalMinsLate?: string;
 
@@ -452,6 +455,7 @@ export interface IUserExportReport {
 }
 
 export interface IUserAbsenceInfo {
+  totalHoursShiftRequest?: number;
   totalHoursWorkedAbroad?: number;
   totalHoursPaidAbsence?: number;
   totalHoursUnpaidAbsence?: number;

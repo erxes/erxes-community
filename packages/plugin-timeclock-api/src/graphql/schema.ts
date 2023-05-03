@@ -100,6 +100,7 @@ export const types = `
   }
 
   type IUserAbsenceInfo{ 
+    totalHoursShiftRequest: Float
     totalHoursWorkedAbroad: Float
     totalHoursPaidAbsence: Float
     totalHoursUnpaidAbsence: Float
@@ -143,7 +144,9 @@ export const types = `
     totalDaysScheduled: Int
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
-    totalHoursBreak: Float
+    
+    totalHoursBreakScheduled: Float
+    totalHoursBreakActual: Float
 
     totalHoursOvertime: Float
     totalHoursOvernight: Float
