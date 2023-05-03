@@ -180,7 +180,9 @@ const webbuilderReplacer = async args => {
         }
 
         const loadProducts = (categoryId, container) => {
-          var productItemTemplate = \`${productItemTemplate.html}\`;
+          var productItemTemplate = \`${
+            productItemTemplate ? productItemTemplate.html : ''
+          }\`;
 
           fetchGraph({
             query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice } }',
