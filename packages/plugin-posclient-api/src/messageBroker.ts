@@ -21,7 +21,7 @@ const webbuilderReplacer = async args => {
   const query = args.query || {};
 
   let result = '';
-  console.log('aaaaa', action);
+
   if (action === 'productCategories') {
     result = `
       <ul id="plugin-posclient-product-categories">

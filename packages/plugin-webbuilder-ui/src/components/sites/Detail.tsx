@@ -1,4 +1,5 @@
 import 'grapesjs/dist/css/grapes.min.css';
+import 'grapesjs-component-code-editor/dist/grapesjs-component-code-editor.min.css';
 
 import {
   CustomButtonWrapper,
@@ -19,6 +20,7 @@ import PageForm from '../pages/PageForm';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import customPlugins from '../customPlugins';
+import gjsCodeEditor from 'grapesjs-component-code-editor';
 import gjsLorySlider from 'grapesjs-lory-slider';
 import gjsPresetWebpage from 'grapesjs-preset-webpage';
 import gjsTabs from 'grapesjs-tabs';
@@ -78,7 +80,13 @@ class SiteDetail extends React.Component<Props, State> {
       protectedCss: '',
       container: `#editor`,
       fromElement: true,
-      plugins: [gjsPresetWebpage, gjsLorySlider, gjsTabs, customPlugins],
+      plugins: [
+        gjsPresetWebpage,
+        gjsLorySlider,
+        gjsCodeEditor,
+        gjsTabs,
+        customPlugins
+      ],
       pluginsOpts: {
         [gjsLorySlider]: {
           sliderBlock: {
@@ -90,6 +98,7 @@ class SiteDetail extends React.Component<Props, State> {
             category: 'Extra'
           }
         },
+        [gjsCodeEditor]: {},
         [customPlugins as any]: {
           pages,
           contentTypes,
@@ -178,6 +187,22 @@ class SiteDetail extends React.Component<Props, State> {
 
       modal.close();
     };
+
+    const panelViews = pnm.addPanel({
+      id: 'views'
+    });
+
+    panelViews.get('buttons').add([
+      {
+        attributes: {
+          title: 'Open Code'
+        },
+        className: 'fa fa-file-code-o',
+        command: 'open-code',
+        togglable: false,
+        id: 'open-code'
+      }
+    ]);
 
     // don't move this block
     if (page && page.html) {
