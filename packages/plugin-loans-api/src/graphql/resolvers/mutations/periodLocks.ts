@@ -8,22 +8,22 @@ import {
 import { IContext } from '../../../connectionResolver';
 import messageBroker from '../../../messageBroker';
 import {
-  IAdjustment,
-  IAdjustmentDocument
-} from '../../../models/definitions/adjustments';
+  IPeriodLock,
+  IPeriodLockDocument
+} from '../../../models/definitions/periodLocks';
 
-const adjustmentMutations = {
-  adjustmentsAdd: async (
+const periodLockMutations = {
+  periodLocksAdd: async (
     _root,
-    doc: IAdjustment,
-    { user, docModifier, models, subdomain }: IContext
+    doc: IPeriodLock,
+    { user, models, subdomain }: IContext
   ) => {
     doc.createdBy = user._id;
-    const adjustment = models.Adjustments.createAdjustment(docModifier(doc));
+    const periodLock = models.PeriodLocks.createPeriodLock(doc);
 
     const logData = {
-      type: 'adjustment',
-      object: adjustment,
+      type: 'periodLock',
+      object: periodLock,
       extraParams: { models }
     };
 
@@ -40,22 +40,22 @@ const adjustmentMutations = {
       user
     );
 
-    return adjustment;
+    return periodLock;
   },
   /**
-   * Updates a adjustment
+   * Updates a periodLock
    */
-  adjustmentsEdit: async (
+  periodLocksEdit: async (
     _root,
-    { _id, ...doc }: IAdjustmentDocument,
+    { _id, ...doc }: IPeriodLockDocument,
     { models, user, subdomain }: IContext
   ) => {
-    const adjustment = await models.Adjustments.getAdjustment({ _id });
-    const updated = await models.Adjustments.updateAdjustment(_id, doc);
+    const periodLock = await models.PeriodLocks.getPeriodLock({ _id });
+    const updated = await models.PeriodLocks.updatePeriodLock(_id, doc);
 
     const logData = {
-      type: 'adjustment',
-      object: adjustment,
+      type: 'periodLock',
+      object: periodLock,
       extraParams: { models }
     };
 
@@ -77,25 +77,25 @@ const adjustmentMutations = {
   },
 
   /**
-   * Removes adjustments
+   * Removes periodLocks
    */
 
-  adjustmentsRemove: async (
+  periodLocksRemove: async (
     _root,
-    { adjustmentIds }: { adjustmentIds: string[] },
+    { periodLockIds }: { periodLockIds: string[] },
     { models, user, subdomain }: IContext
   ) => {
     // TODO: contracts check
-    const adjustments = await models.Adjustments.find({
-      _id: { $in: adjustmentIds }
+    const periodLocks = await models.PeriodLocks.find({
+      _id: { $in: periodLockIds }
     }).lean();
 
-    await models.Adjustments.removeAdjustments(adjustmentIds);
+    await models.PeriodLocks.removePeriodLocks(periodLockIds);
 
-    for (const adjustment of adjustments) {
+    for (const periodLock of periodLocks) {
       const logData = {
-        type: 'adjustment',
-        object: adjustment,
+        type: 'periodLock',
+        object: periodLock,
         extraParams: { models }
       };
 
@@ -111,12 +111,12 @@ const adjustmentMutations = {
       );
     }
 
-    return adjustmentIds;
+    return periodLockIds;
   }
 };
 
-checkPermission(adjustmentMutations, 'adjustmentsAdd', 'manageContracts');
-checkPermission(adjustmentMutations, 'adjustmentsEdit', 'manageContracts');
-checkPermission(adjustmentMutations, 'adjustmentsRemove', 'manageContracts');
+checkPermission(periodLockMutations, 'periodLocksAdd', 'manageContracts');
+checkPermission(periodLockMutations, 'periodLocksEdit', 'manageContracts');
+checkPermission(periodLockMutations, 'periodLocksRemove', 'manageContracts');
 
-export default adjustmentMutations;
+export default periodLockMutations;

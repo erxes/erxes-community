@@ -18,24 +18,24 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import { menuContracts } from '../../constants';
 
-import AdjustmentForm from '../containers/AdjustmentForm';
-import { AdjustmentsTableWrapper } from '../styles';
-import { IAdjustment } from '../types';
-import AdjustmentRow from './AdjustmentRow';
+import PeriodLockForm from '../containers/PeriodLockForm';
+import { PeriodLocksTableWrapper } from '../styles';
+import { IPeriodLock } from '../types';
+import PeriodLockRow from './PeriodLockRow';
 
 interface IProps extends IRouterProps {
-  adjustments: IAdjustment[];
+  periodLocks: IPeriodLock[];
   loading: boolean;
   searchValue: string;
   totalCount: number;
   // TODO: check is below line not throwing error ?
   toggleBulk: () => void;
-  toggleAll: (targets: IAdjustment[], containerId: string) => void;
+  toggleAll: (targets: IPeriodLock[], containerId: string) => void;
   bulk: any[];
   isAllSelected: boolean;
   emptyBulk: () => void;
-  removeAdjustments: (
-    doc: { adjustmentIds: string[] },
+  removePeriodLocks: (
+    doc: { periodLockIds: string[] },
     emptyBulk: () => void
   ) => void;
   history: any;
@@ -46,7 +46,7 @@ type State = {
   searchValue?: string;
 };
 
-class AdjustmentsList extends React.Component<IProps, State> {
+class PeriodLocksList extends React.Component<IProps, State> {
   private timer?: NodeJS.Timer = undefined;
 
   constructor(props) {
@@ -58,8 +58,8 @@ class AdjustmentsList extends React.Component<IProps, State> {
   }
 
   onChange = () => {
-    const { toggleAll, adjustments } = this.props;
-    toggleAll(adjustments, 'adjustments');
+    const { toggleAll, periodLocks } = this.props;
+    toggleAll(periodLocks, 'periodLocks');
   };
 
   search = e => {
@@ -77,14 +77,14 @@ class AdjustmentsList extends React.Component<IProps, State> {
     }, 500);
   };
 
-  removeAdjustments = adjustments => {
-    const adjustmentIds: string[] = [];
+  removePeriodLocks = periodLocks => {
+    const periodLockIds: string[] = [];
 
-    adjustments.forEach(adjustment => {
-      adjustmentIds.push(adjustment._id);
+    periodLocks.forEach(periodLock => {
+      periodLockIds.push(periodLock._id);
     });
 
-    this.props.removeAdjustments({ adjustmentIds }, this.props.emptyBulk);
+    this.props.removePeriodLocks({ periodLockIds }, this.props.emptyBulk);
   };
 
   moveCursorAtTheEnd = e => {
@@ -95,7 +95,7 @@ class AdjustmentsList extends React.Component<IProps, State> {
 
   render() {
     const {
-      adjustments,
+      periodLocks,
       history,
       loading,
       toggleBulk,
@@ -106,7 +106,7 @@ class AdjustmentsList extends React.Component<IProps, State> {
     } = this.props;
 
     const mainContent = (
-      <AdjustmentsTableWrapper>
+      <PeriodLocksTableWrapper>
         <Table whiteSpace="nowrap" bordered={true} hover={true}>
           <thead>
             <tr>
@@ -123,24 +123,24 @@ class AdjustmentsList extends React.Component<IProps, State> {
               <th></th>
             </tr>
           </thead>
-          <tbody id="adjustments">
-            {adjustments.map(adjustment => (
-              <AdjustmentRow
-                adjustment={adjustment}
-                isChecked={bulk.includes(adjustment)}
-                key={adjustment._id}
+          <tbody id="periodLocks">
+            {periodLocks.map(periodLock => (
+              <PeriodLockRow
+                periodLock={periodLock}
+                isChecked={bulk.includes(periodLock)}
+                key={periodLock._id}
                 history={history}
                 toggleBulk={toggleBulk}
               />
             ))}
           </tbody>
         </Table>
-      </AdjustmentsTableWrapper>
+      </PeriodLocksTableWrapper>
     );
 
     const addTrigger = (
       <Button btnStyle="success" size="small" icon="plus-circle">
-        Add adjustment
+        Add periodLock
       </Button>
     );
 
@@ -150,7 +150,7 @@ class AdjustmentsList extends React.Component<IProps, State> {
       const onClick = () =>
         confirm()
           .then(() => {
-            this.removeAdjustments(bulk);
+            this.removePeriodLocks(bulk);
           })
           .catch(error => {
             Alert.error(error.message);
@@ -170,8 +170,8 @@ class AdjustmentsList extends React.Component<IProps, State> {
       );
     }
 
-    const adjustmentForm = props => {
-      return <AdjustmentForm {...props} queryParams={queryParams} />;
+    const periodLockForm = props => {
+      return <PeriodLockForm {...props} queryParams={queryParams} />;
     };
 
     const actionBarRight = (
@@ -186,10 +186,10 @@ class AdjustmentsList extends React.Component<IProps, State> {
         />
 
         <ModalTrigger
-          title="New adjustment"
+          title="New periodLock"
           trigger={addTrigger}
-          autoOpenKey="showAdjustmentModal"
-          content={adjustmentForm}
+          autoOpenKey="showPeriodLockModal"
+          content={periodLockForm}
           backDrop="static"
         />
       </BarItems>
@@ -214,8 +214,8 @@ class AdjustmentsList extends React.Component<IProps, State> {
           <DataWithLoader
             data={mainContent}
             loading={loading}
-            count={adjustments.length}
-            emptyText="Add in your first adjustment!"
+            count={periodLocks.length}
+            emptyText="Add in your first periodLock!"
             emptyImage="/images/actions/1.svg"
           />
         }
@@ -224,4 +224,4 @@ class AdjustmentsList extends React.Component<IProps, State> {
   }
 }
 
-export default withRouter<IRouterProps>(AdjustmentsList);
+export default withRouter<IRouterProps>(PeriodLocksList);

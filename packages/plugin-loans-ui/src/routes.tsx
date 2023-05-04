@@ -15,11 +15,12 @@ const ContractDetails = asyncComponent(() =>
     /* webpackChunkName: "ContractDetails" */ './contracts/containers/detail/ContractDetails'
   )
 );
-// const AdjustmentDetails = asyncComponent(() =>
-//   import(
-//     /* webpackChunkName: "AdjustmentDetails" */ './Adjustments/containers/AdjustmentDetails'
-//   )
-// );
+const PeriodLockDetails = asyncComponent(() =>
+  import(
+    /* webpackChunkName: "PeriodLockDetails" */ './PeriodLocks/containers/PeriodLockDetails'
+  )
+);
+
 const CollateralList = asyncComponent(() =>
   import(
     /* webpackChunkName: "CollateralList" */ './collaterals/containers/CollateralsList'
@@ -31,9 +32,9 @@ const TransactionList = asyncComponent(() =>
     /* webpackChunkName: "TransactionList" */ './transactions/containers/TransactionsList'
   )
 );
-const AdjustmentList = asyncComponent(() =>
+const PeriodLockList = asyncComponent(() =>
   import(
-    /* webpackChunkName: "AdjustmentList" */ './adjustments/containers/AdjustmentsList'
+    /* webpackChunkName: "PeriodLockList" */ './periodLocks/containers/PeriodLocksList'
   )
 );
 const InsuranceTypesList = asyncComponent(() =>
@@ -67,10 +68,10 @@ const detailsOfContract = ({ match }) => {
   return <ContractDetails id={id} />;
 };
 
-// const adjustmentDetail = ({ match }) => {
+// const periodLockDetail = ({ match }) => {
 //   const id = match.params.id;
 
-//   return <AdjustmentDetails id={id} />;
+//   return <PeriodLockDetails id={id} />;
 // };
 
 const collateralLists = ({ location, history }) => {
@@ -91,9 +92,9 @@ const transactionLists = ({ location, history }) => {
   );
 };
 
-const adjustmentLists = ({ location, history }) => {
+const periodLockLists = ({ location, history }) => {
   return (
-    <AdjustmentList
+    <PeriodLockList
       queryParams={queryString.parse(location.search)}
       history={history}
     />
@@ -174,10 +175,10 @@ const LoanRoutes = () => {
         component={holidaySettings}
       />
       <Route
-        path="/erxes-plugin-loan/adjustment-list"
-        component={adjustmentLists}
+        path="/erxes-plugin-loan/periodLock-list"
+        component={periodLockLists}
       />
-      {/* <Route path="/adjustment-details/:id" component={adjustmentDetail} /> */}
+      <Route path="/periodLock-details/:id" component={PeriodLockDetails} />
     </React.Fragment>
   );
 };

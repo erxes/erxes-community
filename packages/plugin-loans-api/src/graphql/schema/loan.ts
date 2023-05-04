@@ -3,10 +3,10 @@ import {
   attachmentType
 } from '@erxes/api-utils/src/commonTypeDefs';
 import {
-  mutations as adjustmentMutations,
-  queries as adjustmentQueries,
-  types as adjustmentTypes
-} from './adjustment';
+  mutations as periodLockMutations,
+  queries as periodLockQueries,
+  types as periodLockTypes
+} from './periodLock';
 import {
   queries as collateralQueries,
   types as collateralTypes
@@ -62,7 +62,7 @@ export const types = `
     _id: String! @external
   }
   
-  ${adjustmentTypes()},
+  ${periodLockTypes()},
   ${contractTypes()},
   ${collateralTypes()}
   ${contractTypeTypes()},
@@ -75,7 +75,7 @@ export const types = `
 `;
 
 export const queries = `
-  ${adjustmentQueries},
+  ${periodLockQueries},
   ${contractQueries},
   ${collateralQueries}
   ${contractTypeQueries},
@@ -86,7 +86,7 @@ export const queries = `
 `;
 
 export const mutations = `
-  ${adjustmentMutations}
+  ${periodLockMutations}
   ${contractMutations},
   ${contractTypeMutations},
   ${insuranceTypeMutations},

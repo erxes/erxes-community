@@ -3,13 +3,13 @@ import { __, Wrapper } from '@erxes/ui/src';
 import { IUser } from '@erxes/ui/src/auth/types';
 import React from 'react';
 
-import { IAdjustmentDetail } from '../types';
-import DetailInfo from './AdjustmentDetailInfo';
+import { IPeriodLockDetail } from '../types';
+import DetailInfo from './PeriodLockDetailInfo';
 
 type Props = {
-  adjustment: IAdjustmentDetail;
+  periodLock: IPeriodLockDetail;
   currentUser: IUser;
-  saveItem: (doc: IAdjustmentDetail, callback?: (item) => void) => void;
+  saveItem: (doc: IPeriodLockDetail, callback?: (item) => void) => void;
 };
 
 type State = {};
@@ -18,7 +18,7 @@ class ContractDetails extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const adjustment = props.adjustment;
+    const periodLock = props.periodLock;
 
     this.state = {};
   }
@@ -28,15 +28,15 @@ class ContractDetails extends React.Component<Props, State> {
   };
 
   render() {
-    const { adjustment, saveItem } = this.props;
+    const { periodLock, saveItem } = this.props;
 
     const title =
-      dayjs(adjustment.date)
+      dayjs(periodLock.date)
         .format('ll')
         .toString() || 'Unknown';
 
     const breadcrumb = [
-      { title: __('Adjustments'), link: '/erxes-plugin-loan/adjustment-list' },
+      { title: __('PeriodLocks'), link: '/erxes-plugin-loan/periodLock-list' },
       { title }
     ];
 

@@ -1,17 +1,18 @@
 import { field, schemaHooksWrapper } from './utils';
 import { Document, Schema } from 'mongoose';
 
-export interface IAdjustment {
+export interface IPeriodLock {
   createdBy: string;
   createdAt: Date;
   date: Date;
+  excludeContracts: string[];
 }
 
-export interface IAdjustmentDocument extends IAdjustment, Document {
+export interface IPeriodLockDocument extends IPeriodLock, Document {
   _id: string;
 }
 
-export const adjustmentSchema = schemaHooksWrapper(
+export const periodLockSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     createdBy: field({ type: String, label: 'Created By' }),
@@ -20,8 +21,11 @@ export const adjustmentSchema = schemaHooksWrapper(
       default: new Date(),
       label: 'Created at'
     }),
-
-    date: field({ type: Date, label: 'Adustment Date' })
+    date: field({ type: Date, label: 'Lock Date' }),
+    excludeContracts: field({
+      type: [String],
+      label: 'Exclude contracts from Lock'
+    })
   }),
-  'erxes_adjustmentSchema'
+  'erxes_periodLockSchema'
 );

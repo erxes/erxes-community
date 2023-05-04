@@ -1,4 +1,4 @@
-import adjustments from './adjustments';
+import periodLocks from './periodLocks';
 import contractMutations from './contracts';
 import contractTypeMutations from './contractTypes';
 import insuranceTypeMutations from './insuranceTypes';
@@ -7,7 +7,7 @@ import scheduleMutations from './schedules';
 import transactionMutations from './transactions';
 
 export default {
-  ...adjustments,
+  ...periodLocks,
   ...contractTypeMutations,
   ...contractMutations,
   ...insuranceTypeMutations,

@@ -6,7 +6,7 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import { withRouter } from 'react-router-dom';
 
-import AdjustmentsList from '../components/AdjustmentsList';
+import PeriodLocksList from '../components/PeriodLocksList';
 import { mutations, queries } from '../graphql';
 import {
   ListQueryVariables,
@@ -21,7 +21,7 @@ type Props = {
 };
 
 type FinalProps = {
-  adjustmentsMainQuery: MainQueryResponse;
+  periodLocksMainQuery: MainQueryResponse;
 } & Props &
   IRouterProps &
   RemoveMutationResponse;
@@ -30,7 +30,7 @@ type State = {
   loading: boolean;
 };
 
-class AdjustmentListContainer extends React.Component<FinalProps, State> {
+class PeriodLockListContainer extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
 
@@ -40,15 +40,15 @@ class AdjustmentListContainer extends React.Component<FinalProps, State> {
   }
 
   render() {
-    const { adjustmentsMainQuery, adjustmentsRemove } = this.props;
+    const { periodLocksMainQuery, periodLocksRemove } = this.props;
 
-    const removeAdjustments = ({ adjustmentIds }, emptyBulk) => {
-      adjustmentsRemove({
-        variables: { adjustmentIds }
+    const removePeriodLocks = ({ periodLockIds }, emptyBulk) => {
+      periodLocksRemove({
+        variables: { periodLockIds }
       })
         .then(() => {
           emptyBulk();
-          Alert.success('You successfully deleted a adjustment');
+          Alert.success('You successfully deleted a periodLock');
         })
         .catch(e => {
           Alert.error(e.message);
@@ -57,26 +57,26 @@ class AdjustmentListContainer extends React.Component<FinalProps, State> {
 
     const searchValue = this.props.queryParams.searchValue || '';
     const { list = [], totalCount = 0 } =
-      adjustmentsMainQuery.adjustmentsMain || {};
+      periodLocksMainQuery.periodLocksMain || {};
 
     const updatedProps = {
       ...this.props,
       totalCount,
       searchValue,
-      adjustments: list,
-      loading: adjustmentsMainQuery.loading || this.state.loading,
-      removeAdjustments
+      periodLocks: list,
+      loading: periodLocksMainQuery.loading || this.state.loading,
+      removePeriodLocks
     };
 
-    const adjustmentsList = props => {
-      return <AdjustmentsList {...updatedProps} {...props} />;
+    const periodLocksList = props => {
+      return <PeriodLocksList {...updatedProps} {...props} />;
     };
 
     const refetch = () => {
-      this.props.adjustmentsMainQuery.refetch();
+      this.props.periodLocksMainQuery.refetch();
     };
 
-    return <Bulk content={adjustmentsList} refetch={refetch} />;
+    return <Bulk content={periodLocksList} refetch={refetch} />;
   }
 }
 
@@ -94,25 +94,25 @@ const generateParams = ({ queryParams }) => ({
 });
 
 const generateOptions = () => ({
-  refetchQueries: ['adjustmentsMain']
+  refetchQueries: ['periodLocksMain']
 });
 
 export default withProps<Props>(
   compose(
     graphql<{ queryParams: any }, MainQueryResponse, ListQueryVariables>(
-      gql(queries.adjustmentsMain),
+      gql(queries.periodLocksMain),
       {
-        name: 'adjustmentsMainQuery',
+        name: 'periodLocksMainQuery',
         options: { ...generateParams }
       }
     ),
     // mutations
     graphql<{}, RemoveMutationResponse, RemoveMutationVariables>(
-      gql(mutations.adjustmentsRemove),
+      gql(mutations.periodLocksRemove),
       {
-        name: 'adjustmentsRemove',
+        name: 'periodLocksRemove',
         options: generateOptions
       }
     )
-  )(withRouter<IRouterProps>(AdjustmentListContainer))
+  )(withRouter<IRouterProps>(PeriodLockListContainer))
 );

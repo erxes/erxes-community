@@ -1,6 +1,6 @@
 import { checkPermission, paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import { IAdjustmentDocument } from '../../../models/definitions/adjustments';
+import { IPeriodLockDocument } from '../../../models/definitions/periodLocks';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -30,18 +30,18 @@ export const sortBuilder = params => {
   return {};
 };
 
-const adjustmentQueries = {
+const periodLockQueries = {
   /**
-   * Adjustments list
+   * PeriodLocks list
    */
 
-  adjustments: async (
+  periodLocks: async (
     _root,
     params,
     { commonQuerySelector, models }: IContext
   ) => {
     return paginate(
-      models.Adjustments.find(
+      models.PeriodLocks.find(
         await generateFilter(params, commonQuerySelector)
       ),
       {
@@ -52,10 +52,10 @@ const adjustmentQueries = {
   },
 
   /**
-   * Adjustments for only main list
+   * PeriodLocks for only main list
    */
 
-  adjustmentsMain: async (
+  periodLocksMain: async (
     _root,
     params,
     { commonQuerySelector, models }: IContext
@@ -64,31 +64,31 @@ const adjustmentQueries = {
 
     return {
       list: paginate(
-        models.Adjustments.find(filter).sort(sortBuilder(params)),
+        models.PeriodLocks.find(filter).sort(sortBuilder(params)),
         {
           page: params.page,
           perPage: params.perPage
         }
       ),
-      totalCount: models.Adjustments.find(filter).count()
+      totalCount: models.PeriodLocks.find(filter).count()
     };
   },
 
   /**
-   * Get one adjustment
+   * Get one periodLock
    */
 
-  adjustmentDetail: async (
+  periodLockDetail: async (
     _root,
-    { _id }: IAdjustmentDocument,
+    { _id }: IPeriodLockDocument,
     { models }: IContext
   ) => {
-    return models.Adjustments.getAdjustment({ _id });
+    return models.PeriodLocks.getPeriodLock({ _id });
   }
 };
 
-checkPermission(adjustmentQueries, 'adjustments', 'showContracts');
-checkPermission(adjustmentQueries, 'adjustmentsMain', 'showContracts');
-checkPermission(adjustmentQueries, 'adjustmentDetail', 'showContracts');
+checkPermission(periodLockQueries, 'periodLocks', 'showContracts');
+checkPermission(periodLockQueries, 'periodLocksMain', 'showContracts');
+checkPermission(periodLockQueries, 'periodLockDetail', 'showContracts');
 
-export default adjustmentQueries;
+export default periodLockQueries;

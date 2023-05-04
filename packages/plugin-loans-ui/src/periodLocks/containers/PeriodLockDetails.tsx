@@ -6,12 +6,12 @@ import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { withRouter } from 'react-router-dom';
-import AdjustmentDetails from '../components/AdjustmentDetails';
+import PeriodLockDetails from '../components/PeriodLockDetails';
 import { mutations, queries } from '../graphql';
 import {
   DetailQueryResponse,
   EditMutationResponse,
-  IAdjustment,
+  IPeriodLock,
   RemoveMutationResponse,
   RemoveMutationVariables
 } from '../types';
@@ -21,23 +21,23 @@ type Props = {
 };
 
 type FinalProps = {
-  adjustmentDetailQuery: DetailQueryResponse;
+  periodLockDetailQuery: DetailQueryResponse;
   currentUser: IUser;
 } & Props &
   IRouterProps &
   EditMutationResponse &
   RemoveMutationResponse;
 
-const AdjustmentDetailsContainer = (props: FinalProps) => {
-  const { adjustmentDetailQuery, currentUser, history } = props;
+const PeriodLockDetailsContainer = (props: FinalProps) => {
+  const { periodLockDetailQuery, currentUser } = props;
 
-  const saveItem = (doc: IAdjustment, callback: (item) => void) => {
-    const { adjustmentsEdit } = props;
+  const saveItem = (doc: IPeriodLock, callback: (item) => void) => {
+    const { periodLocksEdit } = props;
 
-    adjustmentsEdit({ variables: { ...doc } })
+    periodLocksEdit({ variables: { ...doc } })
       .then(({ data }) => {
         if (callback) {
-          callback(data.adjustmentsEdit);
+          callback(data.periodLocksEdit);
         }
         Alert.success('You successfully updated contract type');
       })
@@ -47,9 +47,9 @@ const AdjustmentDetailsContainer = (props: FinalProps) => {
   };
 
   const remove = () => {
-    const { id, adjustmentsRemove, history } = props;
+    const { id, periodLocksRemove, history } = props;
 
-    adjustmentsRemove({ variables: { adjustmentIds: [id] } })
+    periodLocksRemove({ variables: { periodLockIds: [id] } })
       .then(() => {
         Alert.success('You successfully deleted a contract');
         history.push('/erxes-plugin-loan/contract-types');
@@ -59,43 +59,43 @@ const AdjustmentDetailsContainer = (props: FinalProps) => {
       });
   };
 
-  if (adjustmentDetailQuery.loading) {
+  if (periodLockDetailQuery.loading) {
     return <Spinner objective={true} />;
   }
 
-  if (!adjustmentDetailQuery.adjustmentDetail) {
+  if (!periodLockDetailQuery.periodLockDetail) {
     return (
       <EmptyState text="Contract not found" image="/images/actions/24.svg" />
     );
   }
 
-  const adjustmentDetail = adjustmentDetailQuery.adjustmentDetail;
+  const periodLockDetail = periodLockDetailQuery.periodLockDetail;
 
   const updatedProps = {
     ...props,
-    loading: adjustmentDetailQuery.loading,
-    adjustment: adjustmentDetail,
+    loading: periodLockDetailQuery.loading,
+    periodLock: periodLockDetail,
     currentUser,
     saveItem,
     remove
   };
 
-  return <AdjustmentDetails {...updatedProps} />;
+  return <PeriodLockDetails {...(updatedProps as any)} />;
 };
 
 const generateOptions = () => ({
-  refetchQueries: ['adjustmentDetail']
+  refetchQueries: ['periodLockDetail']
 });
 const removeOptions = () => ({
-  refetchQueries: ['adjustmentsMain']
+  refetchQueries: ['periodLocksMain']
 });
 
 export default withProps<Props>(
   compose(
     graphql<Props, DetailQueryResponse, { _id: string }>(
-      gql(queries.adjustmentDetail),
+      gql(queries.periodLockDetail),
       {
-        name: 'adjustmentDetailQuery',
+        name: 'periodLockDetailQuery',
         options: ({ id }) => ({
           variables: {
             _id: id
@@ -104,19 +104,19 @@ export default withProps<Props>(
         })
       }
     ),
-    graphql<{}, EditMutationResponse, IAdjustment>(
-      gql(mutations.adjustmentsEdit),
+    graphql<{}, EditMutationResponse, IPeriodLock>(
+      gql(mutations.periodLocksEdit),
       {
-        name: 'adjustmentsEdit',
+        name: 'periodLocksEdit',
         options: generateOptions
       }
     ),
     graphql<{}, RemoveMutationResponse, RemoveMutationVariables>(
-      gql(mutations.adjustmentsRemove),
+      gql(mutations.periodLocksRemove),
       {
-        name: 'adjustmentsRemove',
+        name: 'periodLocksRemove',
         options: removeOptions
       }
     )
-  )(withRouter<FinalProps>(AdjustmentDetailsContainer))
+  )(withRouter<FinalProps>(PeriodLockDetailsContainer))
 );

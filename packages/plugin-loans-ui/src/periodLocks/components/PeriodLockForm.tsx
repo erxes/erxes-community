@@ -14,11 +14,11 @@ import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
 
-import { IAdjustment, IAdjustmentDoc } from '../types';
+import { IPeriodLock, IPeriodLockDoc } from '../types';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
-  adjustment: IAdjustment;
+  periodLock: IPeriodLock;
   closeModal: () => void;
 };
 
@@ -26,24 +26,24 @@ type State = {
   date: Date;
 };
 
-class AdjustmentForm extends React.Component<Props, State> {
+class PeriodLockForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { adjustment = {} } = props;
+    const { periodLock = {} } = props;
 
     this.state = {
-      date: adjustment.date || new Date()
+      date: periodLock.date || new Date()
     };
   }
 
-  generateDoc = (values: { _id: string } & IAdjustmentDoc) => {
-    const { adjustment } = this.props;
+  generateDoc = (values: { _id: string } & IPeriodLockDoc) => {
+    const { periodLock } = this.props;
 
     const finalValues = values;
 
-    if (adjustment) {
-      finalValues._id = adjustment._id;
+    if (periodLock) {
+      finalValues._id = periodLock._id;
     }
 
     return {
@@ -63,7 +63,7 @@ class AdjustmentForm extends React.Component<Props, State> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const adjustment = this.props.adjustment || ({} as IAdjustment);
+    const periodLock = this.props.periodLock || ({} as IPeriodLock);
     const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -96,10 +96,10 @@ class AdjustmentForm extends React.Component<Props, State> {
           </Button>
 
           {renderButton({
-            name: 'adjustment',
+            name: 'periodLock',
             values: this.generateDoc(values),
             isSubmitted,
-            object: this.props.adjustment
+            object: this.props.periodLock
           })}
         </ModalFooter>
       </>
@@ -111,4 +111,4 @@ class AdjustmentForm extends React.Component<Props, State> {
   }
 }
 
-export default AdjustmentForm;
+export default PeriodLockForm;

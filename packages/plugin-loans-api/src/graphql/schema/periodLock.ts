@@ -1,5 +1,5 @@
 export const types = () => `
-  type Adjustment {
+  type PeriodLock {
     _id: String!
     createdAt: Date
     createdBy: String 
@@ -8,8 +8,8 @@ export const types = () => `
     user: User
   }
 
-  type AdjustmentsListResponse {
-    list: [Adjustment],
+  type PeriodLocksListResponse {
+    list: [PeriodLock],
     totalCount: Float,
   }
 `;
@@ -25,9 +25,9 @@ const queryParams = `
 `;
 
 export const queries = `
-  adjustmentsMain(${queryParams}): AdjustmentsListResponse
-  adjustments(${queryParams}): [Adjustment]
-  adjustmentDetail(_id: String!): Adjustment
+  periodLocksMain(${queryParams}): PeriodLocksListResponse
+  periodLocks(${queryParams}): [PeriodLock]
+  periodLockDetail(_id: String!): PeriodLock
 `;
 
 const commonFields = `
@@ -35,7 +35,7 @@ const commonFields = `
 `;
 
 export const mutations = `
-  adjustmentsAdd(${commonFields}): Adjustment
-  adjustmentsEdit(_id: String!, ${commonFields}): Adjustment
-  adjustmentsRemove(adjustmentIds: [String]): [String]
+  periodLocksAdd(${commonFields}): PeriodLock
+  periodLocksEdit(_id: String!, ${commonFields}): PeriodLock
+  periodLocksRemove(periodLockIds: [String]): [String]
 `;

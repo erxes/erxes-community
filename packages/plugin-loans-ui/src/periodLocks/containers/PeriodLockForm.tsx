@@ -4,13 +4,13 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 
-import AdjustmentForm from '../components/AdjustmentForm';
+import PeriodLockForm from '../components/PeriodLockForm';
 import { mutations } from '../graphql';
-import { IAdjustment } from '../types';
+import { IPeriodLock } from '../types';
 
 type Props = {
-  adjustment: IAdjustment;
-  getAssociatedAdjustment?: (adjustmentId: string) => void;
+  periodLock: IPeriodLock;
+  getAssociatedPeriodLock?: (periodLockId: string) => void;
   closeModal: () => void;
 };
 
@@ -18,7 +18,7 @@ type FinalProps = {
   usersQuery: UsersQueryResponse;
 } & Props;
 
-class AdjustmentFromContainer extends React.Component<FinalProps> {
+class PeriodLockFromContainer extends React.Component<FinalProps> {
   render() {
     const renderButton = ({
       name,
@@ -26,20 +26,20 @@ class AdjustmentFromContainer extends React.Component<FinalProps> {
       isSubmitted,
       object
     }: IButtonMutateProps) => {
-      const { closeModal, getAssociatedAdjustment } = this.props;
+      const { closeModal, getAssociatedPeriodLock } = this.props;
 
       const afterSave = data => {
         closeModal();
 
-        if (getAssociatedAdjustment) {
-          getAssociatedAdjustment(data.adjustmentsAdd);
+        if (getAssociatedPeriodLock) {
+          getAssociatedPeriodLock(data.periodLocksAdd);
         }
       };
 
       return (
         <ButtonMutate
           mutation={
-            object ? mutations.adjustmentsEdit : mutations.adjustmentsAdd
+            object ? mutations.periodLocksEdit : mutations.periodLocksAdd
           }
           variables={values}
           callback={afterSave}
@@ -57,12 +57,12 @@ class AdjustmentFromContainer extends React.Component<FinalProps> {
       ...this.props,
       renderButton
     };
-    return <AdjustmentForm {...updatedProps} />;
+    return <PeriodLockForm {...updatedProps} />;
   }
 }
 
 const getRefetchQueries = () => {
-  return ['adjustmentsMain', 'adjustmentDetail', 'adjustments'];
+  return ['periodLocksMain', 'periodLockDetail', 'periodLocks'];
 };
 
-export default withProps<Props>(compose()(AdjustmentFromContainer));
+export default withProps<Props>(compose()(PeriodLockFromContainer));

@@ -1,33 +1,33 @@
-export interface IAdjustmentDoc {
+export interface IPeriodLockDoc {
   date: Date;
   createdBy: string;
   createdAt: Date;
 }
 
-export interface IAdjustment extends IAdjustmentDoc {
+export interface IPeriodLock extends IPeriodLockDoc {
   _id: string;
 }
 
-export interface IAdjustmentDetail extends IAdjustment {}
+export interface IPeriodLockDetail extends IPeriodLock {}
 
 // mutation types
 
 export type EditMutationResponse = {
-  adjustmentsEdit: (params: { variables: IAdjustment }) => Promise<any>;
+  periodLocksEdit: (params: { variables: IPeriodLock }) => Promise<any>;
 };
 
 export type RemoveMutationVariables = {
-  adjustmentIds: string[];
+  periodLockIds: string[];
 };
 
 export type RemoveMutationResponse = {
-  adjustmentsRemove: (params: {
+  periodLocksRemove: (params: {
     variables: RemoveMutationVariables;
   }) => Promise<any>;
 };
 
 export type AddMutationResponse = {
-  adjustmentsAdd: (params: { variables: IAdjustmentDoc }) => Promise<any>;
+  periodLocksAdd: (params: { variables: IPeriodLockDoc }) => Promise<any>;
 };
 
 // query types
@@ -49,13 +49,13 @@ type ListConfig = {
 };
 
 export type MainQueryResponse = {
-  adjustmentsMain: { list: IAdjustment[]; totalCount: number };
+  periodLocksMain: { list: IPeriodLock[]; totalCount: number };
   loading: boolean;
   refetch: () => void;
 };
 
-export type AdjustmentsQueryResponse = {
-  adjustments: IAdjustment[];
+export type PeriodLocksQueryResponse = {
+  periodLocks: IPeriodLock[];
   loading: boolean;
   refetch: () => void;
 };
@@ -66,7 +66,7 @@ export type ListConfigQueryResponse = {
 };
 
 export type DetailQueryResponse = {
-  adjustmentDetail: IAdjustmentDetail;
+  periodLockDetail: IPeriodLockDetail;
   loading: boolean;
 };
 

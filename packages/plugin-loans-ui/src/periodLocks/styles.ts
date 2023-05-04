@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const AdjustmentsTableWrapper = styled.div`
+const PeriodLocksTableWrapper = styled.div`
   td {
     max-width: 250px;
     overflow: hidden;
@@ -9,4 +9,4 @@ const AdjustmentsTableWrapper = styled.div`
   }
 `;
 
-export { AdjustmentsTableWrapper };
+export { PeriodLocksTableWrapper };

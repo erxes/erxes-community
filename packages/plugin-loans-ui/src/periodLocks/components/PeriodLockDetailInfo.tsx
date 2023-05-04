@@ -17,11 +17,11 @@ import React from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import { Action, Name } from '../../contracts/styles';
-import AdjustmentForm from '../containers/AdjustmentForm';
-import { IAdjustmentDetail } from '../types';
+import PeriodLockForm from '../containers/PeriodLockForm';
+import { IPeriodLockDetail } from '../types';
 
 type Props = {
-  adjustment: IAdjustmentDetail;
+  periodLock: IPeriodLockDetail;
   remove?: () => void;
 };
 
@@ -67,18 +67,18 @@ class DetailInfo extends React.Component<Props> {
   }
 
   render() {
-    const { adjustment } = this.props;
+    const { periodLock } = this.props;
     const { Section } = Sidebar;
 
     const content = props => (
-      <AdjustmentForm {...props} adjustment={adjustment} />
+      <PeriodLockForm {...props} periodLock={periodLock} />
     );
 
     return (
       <Sidebar wide={true}>
         <Sidebar.Section>
           <InfoWrapper>
-            <Name>{dayjs(adjustment.date).format('ll')}</Name>
+            <Name>{dayjs(periodLock.date).format('ll')}</Name>
             <ModalTrigger
               title="Edit basic info"
               trigger={<Icon icon="edit" />}

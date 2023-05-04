@@ -1,14 +1,14 @@
 import * as mongoose from 'mongoose';
 import { mainDb } from './configs';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
-import { IAdjustmentDocument } from './models/definitions/adjustments';
+import { IPeriodLockDocument } from './models/definitions/periodLocks';
 import { IContractDocument } from './models/definitions/contracts';
 import { IContractTypeDocument } from './models/definitions/contractTypes';
 import { IInsuranceTypeDocument } from './models/definitions/insuranceTypes';
 import { IInvoiceDocument } from './models/definitions/invoices';
 import { IScheduleDocument } from './models/definitions/schedules';
 import { ITransactionDocument } from './models/definitions/transactions';
-import { loadAdjustmentClass, IAdjustmentModel } from './models/adjustments';
+import { loadPeriodLockClass, IPeriodLockModel } from './models/periodLock';
 import { loadContractClass, IContractModel } from './models/contracts';
 import {
   loadContractTypeClass,
@@ -23,7 +23,7 @@ import { loadScheduleClass, IScheduleModel } from './models/schedules';
 import { loadTransactionClass, ITransactionModel } from './models/transactions';
 
 export interface IModels {
-  Adjustments: IAdjustmentModel;
+  PeriodLocks: IPeriodLockModel;
   Contracts: IContractModel;
   ContractTypes: IContractTypeModel;
   InsuranceTypes: IInsuranceTypeModel;
@@ -55,9 +55,9 @@ export const generateModels = async (
 export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
 
-  models.Adjustments = db.model<IAdjustmentDocument, IAdjustmentModel>(
-    'loan_adjustments',
-    loadAdjustmentClass(models)
+  models.PeriodLocks = db.model<IPeriodLockDocument, IPeriodLockModel>(
+    'loan_period_locks',
+    loadPeriodLockClass(models)
   );
 
   models.Contracts = db.model<IContractDocument, IContractModel>(

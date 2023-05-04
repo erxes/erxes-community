@@ -1,4 +1,4 @@
-import adjustmentQueries from './adjustments';
+import periodLockQueries from './periodLocks';
 import contractQueries from './contracts';
 import contractTypeQueries from './contractTypes';
 import insuranceTypeQueries from './insuranceTypes';
@@ -8,7 +8,7 @@ import transactionQueries from './transactions';
 import collateralQueries from './collaterals';
 
 export default {
-  ...adjustmentQueries,
+  ...periodLockQueries,
   ...contractTypeQueries,
   ...contractQueries,
   ...insuranceTypeQueries,
