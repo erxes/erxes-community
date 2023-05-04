@@ -21,6 +21,7 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import customPlugins from '../customPlugins';
 import gjsLorySlider from 'grapesjs-lory-slider';
 import gjsPresetWebpage from 'grapesjs-preset-webpage';
+import gjsTabs from 'grapesjs-tabs';
 import { readFile } from '@erxes/ui/src/utils/core';
 
 type Props = {
@@ -77,14 +78,17 @@ class SiteDetail extends React.Component<Props, State> {
       protectedCss: '',
       container: `#editor`,
       fromElement: true,
-      plugins: [gjsPresetWebpage, gjsLorySlider, customPlugins],
+      plugins: [gjsPresetWebpage, gjsLorySlider, gjsTabs, customPlugins],
       pluginsOpts: {
-        gjsLorySlider: {
-          label: 'Slider',
-          block: {
-            category: 'basic'
-          },
-          category: 'basic'
+        [gjsLorySlider]: {
+          sliderBlock: {
+            category: 'Extra'
+          }
+        },
+        [gjsTabs]: {
+          tabsBlock: {
+            category: 'Extra'
+          }
         },
         [customPlugins as any]: {
           pages,
@@ -182,6 +186,36 @@ class SiteDetail extends React.Component<Props, State> {
       editor.setComponents(html);
       editor.setStyle(css.trim());
     }
+
+    editor.DomComponents.addType('input', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('select', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('checkbox', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('radio', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('button', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
 
     cmdm.add('html-edit', {
       run: (editr, sender) => {

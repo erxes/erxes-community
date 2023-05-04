@@ -364,6 +364,14 @@ a:hover {
   left: auto !important;
 }
 
+.gjs-block__media {
+  max-height: 50px !important;
+}
+
+.gjs-block__media svg {
+  max-height: 55px !important;
+}
+
 /* tooltip */
 
 .tooltip {

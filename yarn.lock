@@ -12637,6 +12637,11 @@ grapesjs-preset-webpage@^0.1.11:
     grapesjs-plugin-filestack "^0.1.1"
     grapesjs-plugin-forms "^0.3.5"
 
+grapesjs-tabs@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/grapesjs-tabs/-/grapesjs-tabs-1.0.6.tgz#d45377935c04e043325a65ddc695b0cd8fd0b9b6"
+  integrity sha512-Xmdte7jMvmGDHIL29t8jlGWL/oSmXOEgswmlKSaYKc7z4ZJEfF0Vr+YTfF6MZq/FFYjzk+0kOad6dnS3TDgZ5Q==
+
 grapesjs@^0.19.4:
   version "0.19.4"
   resolved "https://registry.yarnpkg.com/grapesjs/-/grapesjs-0.19.4.tgz#c2ac585812a46d531c0d7dbab37b7f2c41e4a4a8"
