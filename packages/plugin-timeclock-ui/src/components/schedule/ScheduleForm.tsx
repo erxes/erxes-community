@@ -26,12 +26,14 @@ import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row } from '../../styles';
 import { IBranch } from '@erxes/ui/src/team/types';
 import { Alert, __ } from '@erxes/ui/src/utils';
-import { compareStartAndEndTime } from '../../utils';
+import { compareStartAndEndTime, prepareCurrentUserOption } from '../../utils';
 import Datetime from '@nateradebaugh/react-datetime';
 import Tip from '@erxes/ui/src/components/Tip';
 import { dateFormat } from '../../constants';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
   scheduleOfMembers: any;
   queryParams: any;
   history: any;
@@ -46,6 +48,7 @@ type Props = {
 
 function ScheduleForm(props: Props) {
   const {
+    currentUser,
     queryParams,
     closeModal,
     branchesList,
@@ -398,6 +401,7 @@ function ScheduleForm(props: Props) {
     <FlexColumn marginNum={10}>
       <SelectTeamMembers
         customField="employeeId"
+        customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}
@@ -468,6 +472,7 @@ function ScheduleForm(props: Props) {
             <div style={{ width: '100%' }}>
               <SelectTeamMembers
                 customField="employeeId"
+                customOption={prepareCurrentUserOption(currentUser)}
                 queryParams={queryParams}
                 label={'Select team member'}
                 onSelect={onUserSelect}

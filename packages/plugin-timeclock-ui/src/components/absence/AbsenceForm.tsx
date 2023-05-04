@@ -24,9 +24,15 @@ import { PopoverButton } from '@erxes/ui/src/styles/main';
 import Icon from '@erxes/ui/src/components/Icon';
 import { dateFormat } from '../../constants';
 import * as dayjs from 'dayjs';
-import { compareStartAndEndTimeOfSingleDate } from '../../utils';
+import {
+  compareStartAndEndTimeOfSingleDate,
+  prepareCurrentUserOption
+} from '../../utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
+
   absenceTypes: IAbsenceType[];
   history: any;
   queryParams: any;
@@ -58,6 +64,7 @@ type RequestDates = {
 
 export default (props: Props) => {
   const {
+    currentUser,
     absenceTypes,
     queryParams,
     submitRequest,
@@ -208,6 +215,7 @@ export default (props: Props) => {
 
         <SelectTeamMembers
           queryParams={queryParams}
+          customOption={prepareCurrentUserOption(currentUser)}
           customField="employeeId"
           label={'Team member'}
           onSelect={onUserSelect}
@@ -449,6 +457,7 @@ export default (props: Props) => {
       </FlexRow>
     );
   };
+
   return (
     <FlexColumn marginNum={10}>
       <ToggleDisplay display={requestTimeByDay}>
@@ -480,6 +489,7 @@ export default (props: Props) => {
       </MarginY>
       <SelectTeamMembers
         customField="employeeId"
+        customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}

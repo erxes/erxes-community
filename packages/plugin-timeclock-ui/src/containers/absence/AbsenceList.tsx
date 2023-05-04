@@ -14,8 +14,11 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import { Alert, confirm } from '@erxes/ui/src/utils';
 import { IAttachment } from '@erxes/ui/src/types';
 import { generateParams } from '../../utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
+
   history: any;
   queryParams: any;
   explanation?: string;

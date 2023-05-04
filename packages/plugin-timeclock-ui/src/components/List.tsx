@@ -10,11 +10,14 @@ import AbsenceList from '../containers/absence/AbsenceList';
 import ReportList from '../containers/report/ReportList';
 import ScheduleList from '../containers/schedule/ScheduleList';
 import LogsList from '../containers/logs/LogsList';
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { IScheduleConfig } from '../types';
 import { isEnabled } from '@erxes/ui/src/utils/core';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
+
   currentDate?: string;
   queryParams: any;
   history: any;
@@ -22,6 +25,7 @@ type Props = {
   startTime?: Date;
   loading: boolean;
   branchesList: IBranch[];
+  departments: IDepartment[];
   scheduleConfigs: IScheduleConfig[];
   searchFilter: string;
 };
@@ -140,11 +144,7 @@ function List(props: Props) {
       }
       leftSidebar={
         showSideBar && (
-          <SideBarList
-            branchesList={branchesList}
-            queryParams={queryParams}
-            history={history}
-          />
+          <SideBarList {...props} queryParams={queryParams} history={history} />
         )
       }
       transparent={true}

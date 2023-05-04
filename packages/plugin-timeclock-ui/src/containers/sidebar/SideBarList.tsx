@@ -1,12 +1,13 @@
 import SideBar from '../../components/sidebar/SideBar';
 import React from 'react';
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
   history: any;
   currentDate?: string;
   queryParams: any;
   branchesList: IBranch[];
+  departments: IDepartment[];
 };
 
 const TypesListContainer = (props: Props) => {

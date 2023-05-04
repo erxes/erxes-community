@@ -850,29 +850,68 @@ const createTeamMembersObject = async (subdomain: string) => {
   return teamMembersObject;
 };
 
+const checkPermission = async (
+  currentUser: IUserDocument,
+  subdomain: string
+) => {
+  const userId = currentUser._id;
+
+  const supervisedDepartmentIds = (
+    await sendCoreMessage({
+      subdomain,
+      action: `departments.find`,
+      data: {
+        supervisorId: userId
+      },
+      isRPC: true,
+      defaultValue: []
+    })
+  ).map(dept => dept._id);
+
+  const supervisedBranchIds = (
+    await sendCoreMessage({
+      subdomain,
+      action: `branches.find`,
+      data: {
+        supervisorId: userId
+      },
+      isRPC: true,
+      defaultValue: []
+    })
+  ).map(branch => branch._id);
+};
+
 const generateFilter = async (
   params: any,
   subdomain: string,
   type: string,
   user: IUserDocument
 ) => {
-  const { branchIds, userIds, startDate, endDate, scheduleStatus } = params;
+  const {
+    departmentIds,
+    branchIds,
+    userIds,
+    startDate,
+    endDate,
+    scheduleStatus
+  } = params;
 
-  const departmentIds = user.departmentIds || [];
+  // const userGroup =
+  // const departmentIds = user.departmentIds || [];
 
-  const ids = (
-    await sendCoreMessage({
-      subdomain,
-      action: `departments.find`,
-      data: {
-        supervisorId: user._id
-      },
-      isRPC: true,
-      defaultValue: []
-    })
-  ).map(item => item._id);
+  // const ids = (
+  //   await sendCoreMessage({
+  //     subdomain,
+  //     action: `departments.find`,
+  //     data: {
+  //       supervisorId: user._id
+  //     },
+  //     isRPC: true,
+  //     defaultValue: []
+  //   })
+  // ).map(item => item._id);
 
-  departmentIds.push(...ids);
+  // departmentIds.push(...ids);
 
   const totalUserIds: string[] = await generateCommonUserIds(
     subdomain,

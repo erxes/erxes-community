@@ -16,6 +16,7 @@ import { IReport } from '../../models/definitions/timeclock';
 import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 import { checkPermission } from '@erxes/api-utils/src';
 import { fixDate, paginate } from '@erxes/api-utils/src';
+import { sendCoreMessage } from '../../messageBroker';
 
 const timeclockQueries = {
   async absences(_root, queryParams, { models, subdomain, user }: IContext) {
@@ -30,6 +31,31 @@ const timeclockQueries = {
 
   holidays(_root, {}, { models }: IContext) {
     return models.Absences.find({ status: 'Holiday' });
+  },
+
+  // show supervisod branches, departments, users of those only
+  timeclockBranches(_root, {}, { subdomain, user }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: `branches.find`,
+      data: {
+        supervisorId: user._id
+      },
+      isRPC: true,
+      defaultValue: []
+    });
+  },
+
+  timeclockDepartments(_root, {}, { subdomain, user }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: `departments.find`,
+      data: {
+        supervisorId: user._id
+      },
+      isRPC: true,
+      defaultValue: []
+    });
   },
 
   timeclocksPerUser(
@@ -119,8 +145,6 @@ const timeclockQueries = {
     if (!commonUserFound) {
       return { list: [], totalCount: 0 };
     }
-
-    // console.log('asdasd', queryParams.perPage, queryParams.page);
 
     const list = paginate(models.TimeLogs.find(selector), {
       perPage: queryParams.perPage,

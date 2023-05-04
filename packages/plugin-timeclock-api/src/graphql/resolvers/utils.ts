@@ -586,7 +586,6 @@ export const timeclockReportFinal = async (
     let totalMinsLatePerUser = 0;
     let totalHoursOvernightPerUser = 0;
 
-    console.log('schedule ', schedulesObj);
     // calculate total break time from schedules of an user
     const totalBreakInHours =
       currUserSchedules.reduce(

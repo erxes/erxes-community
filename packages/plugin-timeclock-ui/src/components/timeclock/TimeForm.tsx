@@ -6,8 +6,12 @@ import Button from '@erxes/ui/src/components/Button';
 import React, { useEffect, useState } from 'react';
 import { ControlLabel, FormGroup } from '@erxes/ui/src/components/form';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
+import { prepareCurrentUserOption } from '../../utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
+
   queryParams: any;
   selectedUserId: string;
   closeModal: () => void;
@@ -19,6 +23,7 @@ type Props = {
 };
 
 const FormComponent = ({
+  currentUser,
   startClockTime,
   stopClockTime,
   selectedUserId,
@@ -80,6 +85,7 @@ const FormComponent = ({
           <FormGroup>
             <ControlLabel>Team member</ControlLabel>
             <SelectTeamMembers
+              customOption={prepareCurrentUserOption(currentUser)}
               label="Choose a team member"
               name="userId"
               customField="employeeId"

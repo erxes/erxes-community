@@ -329,6 +329,24 @@ const timeLogsPerUser = `
   }
 `;
 
+const timeclockBranches = `
+query timeclockBranches($searchValue: String){
+  timeclockBranches(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
+const timeclockDepartments = `
+query timeclockDepartments($searchValue: String){
+  timeclockDepartments(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
 export default {
   timeclockReports,
   branches,
@@ -348,5 +366,8 @@ export default {
   holidays,
 
   scheduleConfigs,
-  deviceConfigs
+  deviceConfigs,
+
+  timeclockBranches,
+  timeclockDepartments
 };

@@ -14,8 +14,10 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import { mutations } from '../../graphql';
 import dayjs from 'dayjs';
 import { generateParams } from '../../utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
+  currentUser: IUser;
   queryParams: any;
   history: any;
   timeclockUser?: string;

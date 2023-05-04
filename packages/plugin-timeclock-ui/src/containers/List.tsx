@@ -16,6 +16,7 @@ import { IUser } from '@erxes/ui/src/auth/types';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';
 import { removeParams } from '@erxes/ui/src/utils/router';
 import { queries } from '../graphql';
+import { DepartmentsQueryResponse } from '@erxes/ui-settings/src/departments/types';
 
 type Props = {
   currentUser: IUser;
@@ -28,28 +29,44 @@ type Props = {
   timeId: string;
   userId: string;
   searchFilter: string;
+  checkUserPermission?: boolean;
 };
 
 type FinalProps = {
+  listDepartmentsQuery: DepartmentsQueryResponse;
   listBranchesQuery: BranchesQueryResponse;
   listScheduleConfigsQuery: ScheduleConfigQueryResponse;
 } & Props &
   TimeClockMutationResponse;
 
+let isCurrentUserAdmin;
+
 class ListContainer extends React.Component<FinalProps> {
+  constructor(props) {
+    super(props);
+  }
+
   componentDidUpdate(prevProps): void {
     if (prevProps.route !== this.props.route) {
       removeParams(this.props.history, 'page', 'perPage');
     }
   }
+
   render() {
+    isCurrentUserAdmin =
+      (this.props.currentUser.permissionActions &&
+        this.props.currentUser.permissionActions.showTimeclocks &&
+        this.props.currentUser.permissionActions.manageTimeclocks) ||
+      false;
+
     const {
       listBranchesQuery,
       listScheduleConfigsQuery,
+      listDepartmentsQuery,
       currentUser
     } = this.props;
 
-    if (listBranchesQuery.loading) {
+    if (listBranchesQuery && listBranchesQuery.loading) {
       return <Spinner />;
     }
 
@@ -64,8 +81,10 @@ class ListContainer extends React.Component<FinalProps> {
       currentUserId,
       scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs || [],
       branchesList: listBranchesQuery.branches || [],
+      departments: listDepartmentsQuery.timeclockDepartments || [],
       loading: listBranchesQuery.loading
     };
+
     return <List {...updatedProps} />;
   }
 }
@@ -76,12 +95,32 @@ export default withProps<Props>(
       gql(erxesQuery.branches),
       {
         name: 'listBranchesQuery',
+        skip: !isCurrentUserAdmin,
         options: ({ searchValue }) => ({
           variables: { searchValue },
           fetchPolicy: 'network-only'
         })
       }
     ),
+
+    graphql<Props, PayDatesQueryResponse>(gql(queries.timeclockBranches), {
+      name: 'listBranchesQuery',
+      skip: isCurrentUserAdmin,
+      options: ({ searchValue }) => ({
+        variables: { searchValue },
+        fetchPolicy: 'network-only'
+      })
+    }),
+
+    graphql<Props, PayDatesQueryResponse>(gql(queries.timeclockDepartments), {
+      name: 'listDepartmentsQuery',
+      skip: isCurrentUserAdmin,
+      options: ({ searchValue }) => ({
+        variables: { searchValue },
+        fetchPolicy: 'network-only'
+      })
+    }),
+
     graphql<Props, PayDatesQueryResponse>(gql(queries.scheduleConfigs), {
       name: 'listScheduleConfigsQuery',
       options: () => ({
