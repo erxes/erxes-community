@@ -13,3 +13,5 @@ export const rcfaQuestionsSchema = new Schema({
   _id: field({ pkey: true }),
   title: field({ type: String, label: 'Title' })
 });
+
+// title, status, createdAt, parentId
