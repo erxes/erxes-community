@@ -7,5 +7,5 @@ export const queries = `
 `;
 
 export const mutations = `
-    addRcfaQuestions(name:String):JSON
+    addRcfaQuestions(title:String):JSON
 `;

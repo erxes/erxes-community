@@ -1,18 +1,15 @@
-import { IContext } from '@erxes/api-utils/src';
-import { generateModels, IModels } from '../../connectionResolver';
-import mod from '../../graphql';
+import {generateModels, IModels} from '../../connectionResolver';
+import {IRCFAQuestionsDocument} from "@packages/plugin-rcfa-api/src/models/definitions/rcfa";
 
 const RCFAMutations = {
-  async addRcfaQuestions(_root, { name }, { user }: IContext) {
-    console.log(user);
+  async addRcfaQuestions(_root, { title }, context: any) {
+    const model:IModels = await generateModels(context.subdomain);
 
-    const model = await generateModels('subdomain');
-
-    const newQuestion = await model.RCFAQuestions.create({
-      title: name,
+    const newQuestion:IRCFAQuestionsDocument = await model.RCFAQuestions.create({
+      title,
       status: 'created',
       createdAt: new Date(),
-      createdUser: user._id
+      createdUser: context.user._id
     });
 
     return newQuestion;
