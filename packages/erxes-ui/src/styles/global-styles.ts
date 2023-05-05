@@ -355,6 +355,15 @@ a:hover {
   width: 80% !important;
 }
 
+.gjs-pn-panel .code-panel section .codepanel-separator, .gjs-pn-panel .cm-s-hopscotch.CodeMirror {
+  align-items: center;
+  font-size: 14px;
+}
+
+.gjs-pn-panel .code-panel section .codepanel-label {
+  margin: 0;
+}
+
 .gjs-sm-field input, .gjs-clm-select input, .gjs-clm-field input, .gjs-sm-field select, .gjs-clm-select select, .gjs-clm-field select {
   color: #444 !important;
 }
