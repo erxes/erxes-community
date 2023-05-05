@@ -38,7 +38,14 @@ export const initBroker = async cl => {
 
       const { deliveryConfig = {} } = pos;
       const deliveryInfo = doneOrder.deliveryInfo || {};
-      const { marker = {}, description, isNewAddress } = deliveryInfo;
+      const {
+        marker = {},
+        address,
+        description,
+        phone,
+        email,
+        saveInfo
+      } = deliveryInfo;
 
       const dealsData = {
         name: `Delivery: ${doneOrder.number}`,
@@ -171,35 +178,52 @@ export const initBroker = async cl => {
 
       const customerType = doneOrder.customerType || 'customer';
       if (
-        isNewAddress &&
+        saveInfo &&
         doneOrder.customerId &&
         ['customer', 'company'].includes(customerType)
       ) {
         const moduleTxt =
           customerType === 'company' ? 'companies' : 'customers';
 
-        await sendContactsMessage({
-          subdomain,
-          action: `c${moduleTxt}.updateOne`,
-          data: {
-            selector: { _id: doneOrder.customerId },
-            modifier: {
-              $push: {
-                addresses: {
-                  location: {
-                    type: 'Point',
-                    coordinates: [
-                      marker.longitude || marker.lng,
-                      marker.latitude || marker.lat
-                    ]
-                  },
-                  short: description
-                }
+        const pushInfo: any = {};
+
+        if ((marker && marker.longitude, marker.latitude)) {
+          pushInfo.addresses = {
+            id: `${marker.longitude || marker.lng}_${marker.latitude ||
+              marker.lat}`,
+            location: {
+              type: 'Point',
+              coordinates: [
+                marker.longitude || marker.lng,
+                marker.latitude || marker.lat
+              ]
+            },
+            address,
+            short: description
+          };
+        }
+
+        if (phone) {
+          pushInfo.phones = phone;
+        }
+
+        if (email) {
+          pushInfo.emails = email;
+        }
+
+        if (Object.keys(pushInfo).length) {
+          await sendContactsMessage({
+            subdomain,
+            action: `${moduleTxt}.updateOne`,
+            data: {
+              selector: { _id: doneOrder.customerId },
+              modifier: {
+                $addToSet: pushInfo
               }
-            }
-          },
-          isRPC: true
-        });
+            },
+            isRPC: true
+          });
+        }
       }
 
       return {

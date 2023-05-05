@@ -30,6 +30,7 @@ export interface IVisitorContact {
 export interface IVisitorContactDocument extends IVisitorContact, Document {}
 
 export interface IAddress {
+  id: string; // lng_lat || random
   location: {
     type: string;
     coordinates: number[];
