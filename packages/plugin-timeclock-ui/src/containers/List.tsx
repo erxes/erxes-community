@@ -80,8 +80,10 @@ class ListContainer extends React.Component<FinalProps> {
       ...this.props,
       currentUserId,
       scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs || [],
-      branchesList: listBranchesQuery.branches || [],
+
+      branches: listBranchesQuery.branches || [],
       departments: listDepartmentsQuery.timeclockDepartments || [],
+
       loading: listBranchesQuery.loading
     };
 

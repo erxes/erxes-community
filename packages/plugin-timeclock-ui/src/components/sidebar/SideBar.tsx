@@ -17,7 +17,7 @@ type Props = {
 
   queryParams: any;
   history: any;
-  branchesList: IBranch[];
+  branches: IBranch[];
   departments: IDepartment[];
 };
 // get 1st of the next Month
@@ -27,13 +27,7 @@ const startOfNextMonth = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 1);
 const startOfThisMonth = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
 
 const LeftSideBar = (props: Props) => {
-  const {
-    history,
-    branchesList,
-    queryParams,
-    departments,
-    currentUser
-  } = props;
+  const { history, branches, queryParams, departments, currentUser } = props;
 
   const [currUserIds, setUserIds] = useState(queryParams.userIds);
 
@@ -95,8 +89,8 @@ const LeftSideBar = (props: Props) => {
     }));
   };
 
-  const renderBranchOptions = (branches: IBranch[]) => {
-    return branches.map(branch => ({
+  const renderBranchOptions = (branchesList: IBranch[]) => {
+    return branchesList.map(branch => ({
       value: branch._id,
       label: branch.title,
       userIds: branch.userIds
@@ -190,7 +184,7 @@ const LeftSideBar = (props: Props) => {
             onChange={onBranchSelect}
             placeholder="Select branches"
             multi={true}
-            options={branchesList && renderBranchOptions(branchesList)}
+            options={branches && renderBranchOptions(branches)}
           />
         </div>
         <div>
@@ -202,7 +196,10 @@ const LeftSideBar = (props: Props) => {
             label="Select team member"
             name="userIds"
             filterParams={{
-              ids: departments && departments[0].userIds,
+              ids:
+                departments && departments.length
+                  ? departments[0].userIds
+                  : [currentUser._id],
               excludeIds: false
             }}
             queryParams={queryParams}

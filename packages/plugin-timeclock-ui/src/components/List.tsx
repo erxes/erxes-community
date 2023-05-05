@@ -17,6 +17,7 @@ import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   currentUser: IUser;
+  branches: IBranch[];
 
   currentDate?: string;
   queryParams: any;
@@ -24,14 +25,13 @@ type Props = {
   route?: string;
   startTime?: Date;
   loading: boolean;
-  branchesList: IBranch[];
   departments: IDepartment[];
   scheduleConfigs: IScheduleConfig[];
   searchFilter: string;
 };
 
 function List(props: Props) {
-  const { branchesList, queryParams, history, route, searchFilter } = props;
+  const { queryParams, history, route, searchFilter } = props;
   const [showSideBar, setShowSideBar] = useState(true);
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);

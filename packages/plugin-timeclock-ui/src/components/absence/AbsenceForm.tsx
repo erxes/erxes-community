@@ -29,6 +29,7 @@ import {
   prepareCurrentUserOption
 } from '../../utils';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
   currentUser: IUser;
@@ -51,6 +52,9 @@ type Props = {
     totalHoursOfAbsence: string
   ) => void;
   contentProps: any;
+
+  departments: IDepartment[];
+  branches: IBranch[];
 };
 
 type TimeRange = {
@@ -65,6 +69,10 @@ type RequestDates = {
 export default (props: Props) => {
   const {
     currentUser,
+
+    departments,
+    branches,
+
     absenceTypes,
     queryParams,
     submitRequest,
@@ -215,6 +223,13 @@ export default (props: Props) => {
 
         <SelectTeamMembers
           queryParams={queryParams}
+          filterParams={{
+            ids:
+              departments && departments.length
+                ? departments[0].userIds
+                : [currentUser._id],
+            excludeIds: false
+          }}
           customOption={prepareCurrentUserOption(currentUser)}
           customField="employeeId"
           label={'Team member'}

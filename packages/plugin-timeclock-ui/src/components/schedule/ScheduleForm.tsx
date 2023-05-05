@@ -37,7 +37,7 @@ type Props = {
   scheduleOfMembers: any;
   queryParams: any;
   history: any;
-  branchesList: IBranch[];
+  branches: IBranch[];
   modalContentType: string;
   scheduleConfigs: IScheduleConfig[];
 
@@ -51,7 +51,7 @@ function ScheduleForm(props: Props) {
     currentUser,
     queryParams,
     closeModal,
-    branchesList,
+    branches,
     modalContentType,
     scheduleConfigs,
     checkDuplicateScheduleShifts
@@ -461,7 +461,7 @@ function ScheduleForm(props: Props) {
                 onChange={onBranchSelect}
                 placeholder="Select branch"
                 multi={true}
-                options={branchesList && renderBranchOptions(branchesList)}
+                options={branches && renderBranchOptions(branches)}
               />
             </Row>
           </div>

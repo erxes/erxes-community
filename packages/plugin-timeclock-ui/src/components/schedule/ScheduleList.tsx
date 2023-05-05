@@ -27,7 +27,7 @@ type Props = {
   scheduleOfMembers: ISchedule[];
   queryParams: any;
   history: any;
-  branchesList: IBranch[];
+  branches: IBranch[];
   scheduleConfigs: IScheduleConfig[];
   totalCount: number;
   solveSchedule: (scheduleId: string, status: string) => void;

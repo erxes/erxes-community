@@ -850,13 +850,13 @@ const createTeamMembersObject = async (subdomain: string) => {
   return teamMembersObject;
 };
 
-const checkPermission = async (
+const returnSupervisedUsers = async (
   currentUser: IUserDocument,
   subdomain: string
 ) => {
   const userId = currentUser._id;
 
-  const supervisedDepartmentIds = (
+  const supervisedDepartmenIds = (
     await sendCoreMessage({
       subdomain,
       action: `departments.find`,
@@ -879,6 +879,17 @@ const checkPermission = async (
       defaultValue: []
     })
   ).map(branch => branch._id);
+
+  const findTotalSupervisedUsers: string[] = [];
+
+  findTotalSupervisedUsers.push(
+    ...(await findDepartmentUsers(subdomain, supervisedDepartmenIds)).map(
+      departmentUser => departmentUser._id,
+      currentUser._id
+    )
+  );
+
+  console.log('total users  ', findTotalSupervisedUsers);
 };
 
 const generateFilter = async (
@@ -1145,5 +1156,6 @@ export {
   generateCommonUserIds,
   findAllTeamMembersWithEmpId,
   createTeamMembersObject,
-  customFixDate
+  customFixDate,
+  returnSupervisedUsers
 };

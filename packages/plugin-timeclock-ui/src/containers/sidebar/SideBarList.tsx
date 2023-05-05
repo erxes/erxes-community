@@ -6,7 +6,7 @@ type Props = {
   history: any;
   currentDate?: string;
   queryParams: any;
-  branchesList: IBranch[];
+  branches: IBranch[];
   departments: IDepartment[];
 };
 

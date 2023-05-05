@@ -10,7 +10,8 @@ import {
   customFixDate,
   findAllTeamMembersWithEmpId,
   generateCommonUserIds,
-  generateFilter
+  generateFilter,
+  returnSupervisedUsers
 } from '../../utils';
 import { IReport } from '../../models/definitions/timeclock';
 import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
@@ -95,6 +96,7 @@ const timeclockQueries = {
       user
     );
 
+    await returnSupervisedUsers(user, subdomain);
     // if there's no common user, return empty list
     if (!commonUserFound) {
       return { list: [], totalCount: 0 };

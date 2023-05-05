@@ -33,7 +33,7 @@ type Props = {
   requestedShifts?: IShift[];
   scheduleConfigs: IScheduleConfig[];
 
-  branchesList: IBranch[];
+  branches: IBranch[];
 
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
