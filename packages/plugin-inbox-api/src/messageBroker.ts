@@ -83,6 +83,24 @@ export const initBroker = cl => {
   );
 
   consumeRPCQueue(
+    'inbox:createOnlyMessage',
+    async ({
+      subdomain,
+      data: { conversationId, content, userId, customerId }
+    }) => {
+      const models = await generateModels(subdomain);
+
+      return models.ConversationMessages.createMessage({
+        conversationId,
+        internal: true,
+        userId,
+        customerId,
+        content
+      });
+    }
+  );
+
+  consumeRPCQueue(
     'inbox:integrations.receive',
     async ({ subdomain, data }) => await receiveRpcMessage(subdomain, data)
   );

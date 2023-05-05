@@ -178,6 +178,7 @@ export const mutations = `
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
   orderItemChangeStatus(_id: String!, status: String): PosOrderItem
   ordersConvertToDeal(_id: String!): Order
+  afterFormSubmit(_id: String!, conversationId: String!): Order
 `;
 
 export const queries = `

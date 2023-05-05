@@ -3,6 +3,7 @@ import { graphqlPubsub } from '../../../configs';
 import {
   sendCardsMessage,
   sendCoreMessage,
+  sendInboxMessage,
   sendPosMessage
 } from '../../../messageBroker';
 import { IConfig } from '../../../models/definitions/configs';
@@ -734,6 +735,38 @@ const orderMutations = {
       { $set: { convertDealId: deal._id } }
     );
     return models.Orders.getOrder(order._id);
+  },
+
+  async afterFormSubmit(
+    _root,
+    { _id, conversationId }: { _id: string; conversationId: string },
+    { models, subdomain, config }: IContext
+  ) {
+    const order = await models.Orders.getOrder(_id);
+
+    await sendInboxMessage({
+      subdomain,
+      action: 'createOnlyMessage',
+      data: {
+        conversationId,
+        internal: true,
+        customerId:
+          order.customerType || 'customer' === 'customer'
+            ? order.customerId
+            : '',
+        userId: '',
+        content: `
+          Pos order:
+            paid link: <a href="/pos-orders?posId=${config.posId}&search=${
+          order.number
+        }">${order.number}</a> <br />
+            posclient link: <a href="${config.pdomain || '/'}?orderId=${
+          order._id
+        }">${order.number}</a> <br />
+        `
+      },
+      isRPC: true
+    });
   }
 };
 

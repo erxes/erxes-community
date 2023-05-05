@@ -258,6 +258,7 @@ export const extractConfig = async (subdomain, doc) => {
   return {
     name: doc.name,
     description: doc.description,
+    pdomain: doc.pdomain,
     productDetails: doc.productDetails,
     adminIds: doc.adminIds,
     cashierIds: doc.cashierIds,
