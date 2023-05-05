@@ -1,5 +1,14 @@
 import React from 'react';
-import { BarItems, Box, Icon, ModalTrigger, Button } from '@erxes/ui/src/';
+import {
+  BarItems,
+  Box,
+  Icon,
+  ModalTrigger,
+  Button,
+  FormControl,
+  FormGroup,
+  ControlLabel
+} from '@erxes/ui/src/';
 
 type Props = {};
 
@@ -20,13 +29,17 @@ class List extends React.Component<Props, State> {
       </Button>
     );
 
+    const saveQuestion = () => {};
+
     const content = props => {
       return (
         <div>
-          test
-          <p>input bna</p>
-          <p>2button bna Done, Why </p>
-          <p>done -darval save hiigeed modal haagdana</p>
+          <FormGroup>
+            <ControlLabel>Асуумж</ControlLabel>
+            <FormControl type="text"></FormControl>
+          </FormGroup>
+          <Button btnStyle="simple">Done</Button>
+          <Button onClick={saveQuestion}>Why</Button>
         </div>
       );
     };
@@ -38,17 +51,15 @@ class List extends React.Component<Props, State> {
     const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
 
     return (
-      <>
-        <div className="">
-          <Box title="RCFA" name="name" extraButtons={extraButtons}>
-            <p>
-              Larry the Bird. Larry Joe Bird (born December 7, 1956) is an
-              American former professional basketball player, coach and
-              executive in the National Basketball Association (NBA).
-            </p>
-          </Box>
-        </div>
-      </>
+      <div className="">
+        <Box title="RCFA" name="name" extraButtons={extraButtons}>
+          <p>
+            Larry the Bird. Larry Joe Bird (born December 7, 1956) is an
+            American former professional basketball player, coach and executive
+            in the National Basketball Association (NBA).
+          </p>
+        </Box>
+      </div>
     );
   }
 }

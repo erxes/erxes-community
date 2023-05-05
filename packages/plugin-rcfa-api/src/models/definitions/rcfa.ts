@@ -3,6 +3,10 @@ import { field } from './utils';
 
 export interface IRCFAQuestions {
   title: string;
+  status: string;
+  createdAt: Date;
+  createdUser: string;
+  parentId?: string;
 }
 
 export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
@@ -11,7 +15,9 @@ export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
 
 export const rcfaQuestionsSchema = new Schema({
   _id: field({ pkey: true }),
-  title: field({ type: String, label: 'Title' })
+  title: field({ type: String, label: 'Title' }),
+  status: field({ type: String }),
+  createdAt: field({ type: Date }),
+  createdUser: field({ type: String, required: false }),
+  parentId: field({ type: String, required: false })
 });
-
-// title, status, createdAt, parentId
