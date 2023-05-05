@@ -16,5 +16,5 @@ export interface IDepartment extends IStructureCommon {
 }
 
 export type DepartmentsQueryResponse = {
-  timeclockDepartments: IDepartment[];
+  departments: IDepartment[];
 } & QueryResponse;
