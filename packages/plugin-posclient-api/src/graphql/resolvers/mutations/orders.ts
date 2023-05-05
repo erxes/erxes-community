@@ -1,6 +1,10 @@
 import { debugError } from '@erxes/api-utils/src/debuggers';
 import { graphqlPubsub } from '../../../configs';
-import { sendCardsMessage, sendPosMessage } from '../../../messageBroker';
+import {
+  sendCardsMessage,
+  sendCoreMessage,
+  sendPosMessage
+} from '../../../messageBroker';
 import { IConfig } from '../../../models/definitions/configs';
 import {
   BILL_TYPES,
@@ -703,6 +707,26 @@ const orderMutations = {
       isRPC: true,
       defaultValue: {}
     });
+
+    if (order.customerId) {
+      if (
+        order.customerId &&
+        deal._id &&
+        ['customer', 'company'].includes(order.customerType || 'customer')
+      ) {
+        await sendCoreMessage({
+          subdomain,
+          action: 'conformities.addConformity',
+          data: {
+            mainType: 'deal',
+            mainTypeId: deal._id,
+            relType: order.customerType || 'customer',
+            relTypeId: order.customerId
+          },
+          isRPC: true
+        });
+      }
+    }
 
     await models.Orders.updateOne(
       { _id: order._id },

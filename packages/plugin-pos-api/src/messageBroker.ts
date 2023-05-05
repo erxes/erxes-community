@@ -136,7 +136,11 @@ export const initBroker = async cl => {
           defaultValue: {}
         });
 
-        if (doneOrder.customerId && deal._id) {
+        if (
+          doneOrder.customerId &&
+          deal._id &&
+          ['customer', 'company'].includes(doneOrder.customerType || 'customer')
+        ) {
           await sendCoreMessage({
             subdomain,
             action: 'conformities.addConformity',
