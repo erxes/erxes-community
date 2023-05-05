@@ -125,6 +125,7 @@ export const ORDER_STATUSES = {
   REDOING: 'reDoing',
   DONE: 'done',
   COMPLETE: 'complete',
+  PENDING: 'pinding',
 
   ALL: ['new', 'doing', 'done', 'complete', 'reDoing', 'pending'],
   FULL: ['paid', 'done', 'complete']

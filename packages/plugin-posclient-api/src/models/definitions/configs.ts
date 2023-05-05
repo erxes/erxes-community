@@ -61,6 +61,7 @@ export interface IConfig {
   kioskExcludeCategoryIds?: string[];
   kioskExcludeProductIds?: string[];
   deliveryConfig?: any;
+  cardsConfig?: any;
   posId: string;
   isOnline?: boolean;
   onServer?: boolean;
@@ -140,9 +141,8 @@ export const configSchema = new Schema({
     type: [String],
     label: 'kiosk Exclude Products'
   }),
-  deliveryConfig: field({
-    type: Object
-  }),
+  deliveryConfig: field({ type: Object }),
+  cardsConfig: field({ type: Object }),
   posId: field({ type: String, label: 'Pos id' }),
   isOnline: field({ type: Boolean, optional: true }),
   onServer: field({ type: Boolean, optional: true }),

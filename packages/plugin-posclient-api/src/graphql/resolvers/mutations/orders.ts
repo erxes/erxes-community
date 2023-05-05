@@ -1,11 +1,15 @@
-import * as Random from 'meteor-random';
+import { debugError } from '@erxes/api-utils/src/debuggers';
+import { graphqlPubsub } from '../../../configs';
+import { sendCardsMessage, sendPosMessage } from '../../../messageBroker';
+import { IConfig } from '../../../models/definitions/configs';
 import {
   BILL_TYPES,
   ORDER_ITEM_STATUSES,
   ORDER_STATUSES
 } from '../../../models/definitions/constants';
+import { IPaidAmount } from '../../../models/definitions/orders';
+import { IContext, IOrderInput } from '../../types';
 import { checkLoyalties } from '../../utils/loyalties';
-import { checkPricing } from '../../utils/pricing';
 import {
   checkOrderAmount,
   checkOrderStatus,
@@ -20,13 +24,7 @@ import {
   validateOrder,
   validateOrderPayment
 } from '../../utils/orderUtils';
-import { debugError } from '@erxes/api-utils/src/debuggers';
-import { graphqlPubsub } from '../../../configs';
-import { IConfig } from '../../../models/definitions/configs';
-import { IContext } from '../../types';
-import { IOrderInput } from '../../types';
-import { sendPosMessage } from '../../../messageBroker';
-import { IPaidAmount } from '../../../models/definitions/orders';
+import { checkPricing } from '../../utils/pricing';
 
 interface IPaymentBase {
   billType: string;
@@ -275,10 +273,15 @@ const orderMutations = {
     params: IOrderChangeParams,
     { models, config, subdomain }: IContext
   ) {
+    // after paid then edit order some field
     // if online, update branch
     // update dueDate
     // update deliveryInfo
     const order = await models.Orders.getOrder(params._id);
+
+    if (!order.paidDate) {
+      throw new Error('Can not change cause: order is not paid');
+    }
 
     const oldBranchId = order.branchId;
 
@@ -609,7 +612,104 @@ const orderMutations = {
 
       return e;
     }
-  } // end ordersSettlePayment()
+  }, // end ordersSettlePayment()
+
+  async ordersConvertToDeal(
+    _root,
+    params,
+    { models, subdomain, posUser, config }: IContext
+  ) {
+    const order = await models.Orders.getOrder(params._id);
+    if (!order.branchId) {
+      throw new Error(`First choose orders branch`);
+    }
+
+    if (!config.cardsConfig || config.cardsConfig.length) {
+      throw new Error(`No matching cards settings found`);
+    }
+
+    const cardConfig = config.cardsConfig[order.branchId];
+    if (!cardConfig) {
+      throw new Error(`No matching cards settings found in orders branch`);
+    }
+
+    if (order.convertDealId) {
+      const deal = await sendCardsMessage({
+        subdomain,
+        action: 'deals.findOne',
+        data: { _id: order.convertDealId },
+        isRPC: true
+      });
+      if (deal) {
+        const dealLink = await sendCardsMessage({
+          subdomain,
+          action: 'getLink',
+          data: { _id: order.convertDealId, type: 'deal' },
+          isRPC: true
+        });
+
+        throw new Error(`Already converted: ${dealLink}`);
+      }
+    }
+
+    const items = await models.OrderItems.find({ orderId: order._id });
+
+    const dealData: any = {
+      name: `Converted from pos: ${order.number}`,
+      startDate: order.createdAt,
+      closeDate: order.dueDate,
+      stageId: cardConfig.stageId,
+      assignedUserIds: [posUser._id],
+      watchedUserIds: [posUser._id],
+      productsData: items.map(i => ({
+        productId: i.productId,
+        uom: 'PC',
+        currency: 'MNT',
+        quantity: i.count,
+        unitPrice: i.unitPrice,
+        amount: i.count * (i.unitPrice || 0),
+        tickUsed: true
+      }))
+    };
+
+    if (order.deliveryInfo && cardConfig.deliveryMapField) {
+      const { description, marker } = order.deliveryInfo;
+      dealData.description = description;
+      dealData.customFieldsData = [
+        {
+          field: cardConfig.deliveryMapField.replace('customFieldsData.', ''),
+          locationValue: {
+            type: 'Point',
+            coordinates: [
+              marker.longitude || marker.lng,
+              marker.latitude || marker.lat
+            ]
+          },
+          value: {
+            lat: marker.latitude || marker.lat,
+            lng: marker.longitude || marker.lng,
+            description: 'location'
+          },
+          stringValue: `${marker.longitude || marker.lng},${marker.latitude ||
+            marker.lat}`
+        }
+      ];
+    }
+
+    const deal = await sendCardsMessage({
+      subdomain,
+      action: 'deals.create',
+      data: dealData,
+      isRPC: true,
+      defaultValue: {}
+    });
+
+    await models.Orders.updateOne(
+      { _id: order._id },
+      { $set: { convertDealId: deal._id } }
+    );
+    return models.Orders.getOrder(order._id);
+  }
 };
 
 export default orderMutations;

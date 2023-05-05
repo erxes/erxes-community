@@ -23,10 +23,38 @@ const paymentInputDefs = `
   registerNumber: String
 `;
 
+const orderTypeFields = `
+  ${commonFields}
+  ${orderFields}
+  ${paymentInputDefs}
+  paidAmounts: [PaidAmount]
+
+  paidDate: Date
+  dueDate: Date
+  modifiedAt: Date
+  totalAmount: Float
+  finalAmount: Float
+  shouldPrintEbarimt: Boolean
+  printedEbarimt: Boolean
+  billId: String
+  oldBillId: String
+  type: String
+  branchId: String
+  deliveryInfo: JSON
+  origin: String
+  customer: PosCustomer
+  customerType: String,
+  items: [PosOrderItem]
+  user: PosUser
+  putResponses: [PosPutResponse]
+
+  slotCode: String
+`;
+
 const addEditParams = `
   items: [OrderItemInput],
-  totalAmount: Float!,
-  type: String!,
+  totalAmount: Float,
+  type: String,
   branchId: String,
   customerId: String,
   customerType: String,
@@ -93,31 +121,13 @@ export const types = `
 
 
   type Order {
-    ${commonFields}
-    ${orderFields}
-    ${paymentInputDefs}
-    paidAmounts: [PaidAmount]
+    ${orderTypeFields}
+  }
 
-    paidDate: Date
-    dueDate: Date
-    modifiedAt: Date
-    totalAmount: Float
-    finalAmount: Float
-    shouldPrintEbarimt: Boolean
-    printedEbarimt: Boolean
-    billId: String
-    oldBillId: String
-    type: String
-    branchId: String
-    deliveryInfo: JSON
-    origin: String
-    customer: PosCustomer
-    customerType: String,
-    items: [PosOrderItem]
-    user: PosUser
-    putResponses: [PosPutResponse]
-
-    slotCode: String
+  type OrderDetail {
+    ${orderTypeFields}
+    deal: JSON
+    dealLink: String
   }
 
   input OrderItemInput {
@@ -166,14 +176,16 @@ export const mutations = `
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
   orderItemChangeStatus(_id: String!, status: String): PosOrderItem
+  ordersConvertToDeal(_id: String!): Order
 `;
 
 export const queries = `
   orders(${ordersQueryParams}): [Order]
   fullOrders(${ordersQueryParams}): [Order]
   ordersTotalCount(${ordersQueryParams}): Int
-  orderDetail(_id: String, customerId: String): Order
+  orderDetail(_id: String, customerId: String): OrderDetail
   ordersCheckCompany(registerNumber: String!): JSON
   ordersDeliveryInfo(orderId: String!): JSON
   fullOrderItems(searchValue: String, statuses: [String], page: Int, perPage: Int, sortField: String, sortDirection: Int): [PosOrderItem]
+  convertedDealLink(_id: String!): JSON
 `;

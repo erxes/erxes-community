@@ -52,6 +52,7 @@ export interface IPosOrder {
   deliveryInfo?: any;
   origin?: string;
   taxInfo?: any;
+  convertDealId?: string;
 }
 export interface IPosOrderDocument extends IPosOrder, Document {
   _id: string;
@@ -174,7 +175,12 @@ export const posOrderSchema = schemaHooksWrapper(
       label: 'Delivery Info, address, map, etc'
     }),
     origin: field({ type: String, optional: true, label: 'origin' }),
-    taxInfo: field({ type: Object, optional: true })
+    taxInfo: field({ type: Object, optional: true }),
+    convertDealId: field({
+      type: String,
+      optional: true,
+      label: 'Converted Deal'
+    })
   }),
   'erxes_posOrders'
 );

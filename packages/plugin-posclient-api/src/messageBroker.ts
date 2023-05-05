@@ -257,6 +257,12 @@ export const sendContactsMessage = async (
   return sendMessageWrapper('contacts', args);
 };
 
+export const sendCardsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('cards', args);
+};
+
 export const sendLoyaltiesMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
