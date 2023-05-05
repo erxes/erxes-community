@@ -270,6 +270,7 @@ const orderMutations = {
         });
       } catch (e) {}
     }
+    return await models.Orders.getOrder(_id);
   },
 
   async ordersChange(
