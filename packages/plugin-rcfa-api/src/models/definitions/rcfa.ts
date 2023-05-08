@@ -2,11 +2,13 @@ import { Schema, Document } from 'mongoose';
 import { field } from './utils';
 
 export interface IRCFAQuestions {
+  _id?: string;
   title: string;
   status: string;
-  createdAt: Date;
+  createdAt: Date | string;
   createdUser: string;
   parentId?: string;
+  __v?: number;
 }
 
 export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {

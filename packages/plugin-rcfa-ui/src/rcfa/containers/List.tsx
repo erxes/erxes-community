@@ -8,8 +8,12 @@ type Props = {
   history: any;
   type?: string;
 };
+
 type FinalProps = {} & Props;
+
 class ListContainer extends React.Component<FinalProps> {
+  state: {};
+
   constructor(props) {
     super(props);
     this.state = {};

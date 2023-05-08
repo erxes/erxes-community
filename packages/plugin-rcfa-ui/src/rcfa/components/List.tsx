@@ -17,6 +17,8 @@ type State = {
 };
 
 class List extends React.Component<Props, State> {
+  state: {};
+
   constructor(props) {
     super(props);
     this.state = {};
