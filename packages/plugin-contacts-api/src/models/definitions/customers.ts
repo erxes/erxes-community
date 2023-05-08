@@ -211,12 +211,6 @@ export const customerSchema = schemaWrapper(
       optional: true
     }),
     phones: field({ type: [String], optional: true, label: 'Phones' }),
-    primaryAddress: field({
-      type: Object,
-      label: 'Primary Address',
-      optional: true
-    }),
-    addresses: field({ type: [Object], optional: true, label: 'Addresses' }),
 
     primaryAddress: field({
       type: Object,
