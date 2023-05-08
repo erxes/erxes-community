@@ -11,6 +11,7 @@
     "grapejs": "^2.1.2",
     "grapesjs": "^0.19.4",
     "grapesjs-component-code-editor": "^1.0.20",
+    "grapesjs-custom-code": "^1.0.1",
     "grapesjs-lory-slider": "^0.1.5",
     "grapesjs-preset-webpage": "^0.1.11",
     "grapesjs-tabs": "^1.0.6",

@@ -19,6 +19,7 @@ import GrapesJS from 'grapesjs';
 import PageForm from '../pages/PageForm';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import customCodePlugin from 'grapesjs-custom-code';
 import customPlugins from '../customPlugins';
 import gjsCodeEditor from 'grapesjs-component-code-editor';
 import gjsLorySlider from 'grapesjs-lory-slider';
@@ -85,6 +86,7 @@ class SiteDetail extends React.Component<Props, State> {
         gjsLorySlider,
         gjsCodeEditor,
         gjsTabs,
+        customCodePlugin,
         customPlugins
       ],
       pluginsOpts: {
@@ -95,6 +97,11 @@ class SiteDetail extends React.Component<Props, State> {
         },
         [gjsTabs]: {
           tabsBlock: {
+            category: 'Extra'
+          }
+        },
+        [customCodePlugin as any]: {
+          blockCustomCode: {
             category: 'Extra'
           }
         },
@@ -309,7 +316,7 @@ class SiteDetail extends React.Component<Props, State> {
     if (prevProps.page !== this.props.page) {
       setTimeout(() => {
         this.fetchPage();
-      }, 1000);
+      }, 500);
     }
   }
 
