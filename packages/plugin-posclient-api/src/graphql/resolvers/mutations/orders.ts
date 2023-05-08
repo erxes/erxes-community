@@ -754,7 +754,10 @@ const orderMutations = {
           order.customerType || 'customer' === 'customer'
             ? order.customerId
             : '',
-        userId: '',
+        userId:
+          (config.adminIds && config.adminIds.length && config.adminIds[0]) ||
+          (config.cashierIds && config.cashierIds[0]) ||
+          '',
         content: `
           Pos order:
             paid link: <a href="/pos-orders?posId=${config.posId}&search=${
