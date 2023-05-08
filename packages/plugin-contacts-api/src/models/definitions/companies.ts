@@ -24,6 +24,8 @@ export interface ICompany {
   primaryAddress?: IAddress;
   addresses?: IAddress[];
   emails?: string[];
+  primaryAddress?: IAddress;
+  addresses?: IAddress[];
 
   ownerId?: string;
 

@@ -218,6 +218,13 @@ export const customerSchema = schemaWrapper(
     }),
     addresses: field({ type: [Object], optional: true, label: 'Addresses' }),
 
+    primaryAddress: field({
+      type: Object,
+      label: 'Primary Address',
+      optional: true
+    }),
+    addresses: field({ type: [Object], optional: true, label: 'Addresses' }),
+
     phoneValidationStatus: field({
       type: String,
       enum: getEnum('PHONE_VALIDATION_STATUSES'),
