@@ -90,13 +90,16 @@ export const initBroker = cl => {
     }) => {
       const models = await generateModels(subdomain);
 
-      return models.ConversationMessages.createMessage({
-        conversationId,
-        internal: true,
-        userId,
-        customerId,
-        content
-      });
+      return {
+        status: 'success',
+        data: await models.ConversationMessages.createMessage({
+          conversationId,
+          internal: true,
+          userId,
+          customerId,
+          content
+        })
+      };
     }
   );
 
