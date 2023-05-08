@@ -1,8 +1,4 @@
-import {
-  checkPermission,
-  requireLogin,
-  paginate,
-} from '@erxes/api-utils/src';
+import { checkPermission, requireLogin, paginate } from '@erxes/api-utils/src';
 
 import { IContext } from '../../connectionResolver';
 
@@ -30,7 +26,7 @@ const knowledgeBaseQueries = {
       selector.$or = [
         { title: { $regex: `.*${searchValue.trim()}.*`, $options: 'i' } },
         { content: { $regex: `.*${searchValue.trim()}.*`, $options: 'i' } },
-        { summary: { $regex: `.*${searchValue.trim()}.*`, $options: 'i' } },
+        { summary: { $regex: `.*${searchValue.trim()}.*`, $options: 'i' } }
       ];
     }
 
@@ -39,7 +35,7 @@ const knowledgeBaseQueries = {
     }
 
     const articles = models.KnowledgeBaseArticles.find(selector).sort({
-      createdDate: -1,
+      createdDate: -1
     });
 
     return paginate(articles, pageArgs);
@@ -48,14 +44,22 @@ const knowledgeBaseQueries = {
   /**
    * Article detail
    */
-  knowledgeBaseArticleDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+  knowledgeBaseArticleDetail(
+    _root,
+    { _id }: { _id: string },
+    { models }: IContext
+  ) {
     return models.KnowledgeBaseArticles.findOne({ _id });
   },
 
   /**
    * Article detail anc increase a view count
    */
-  knowledgeBaseArticleDetailAndIncViewCount(_root, { _id }: { _id: string }, { models }: IContext) {
+  knowledgeBaseArticleDetailAndIncViewCount(
+    _root,
+    { _id }: { _id: string },
+    { models }: IContext
+  ) {
     return models.KnowledgeBaseArticles.findOneAndUpdate(
       { _id },
       { $inc: { viewCount: 1 } },
@@ -68,10 +72,11 @@ const knowledgeBaseQueries = {
    */
   async knowledgeBaseArticlesTotalCount(
     _root,
-    args: { categoryIds: string[] }, { models }: IContext
+    args: { categoryIds: string[] },
+    { models }: IContext
   ) {
     return models.KnowledgeBaseArticles.find({
-      categoryId: { $in: args.categoryIds },
+      categoryId: { $in: args.categoryIds }
     }).countDocuments();
   },
 
@@ -83,13 +88,14 @@ const knowledgeBaseQueries = {
     {
       page,
       perPage,
-      topicIds,
-    }: { page: number; perPage: number; topicIds: string[] }, { models }: IContext
+      topicIds
+    }: { page: number; perPage: number; topicIds: string[] },
+    { models }: IContext
   ) {
     const categories = models.KnowledgeBaseCategories.find({
-      topicId: { $in: topicIds },
+      topicId: { $in: topicIds }
     }).sort({
-      title: 1,
+      title: 1
     });
 
     if (!page && !perPage) {
@@ -102,8 +108,12 @@ const knowledgeBaseQueries = {
   /**
    * Category detail
    */
-  knowledgeBaseCategoryDetail(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.KnowledgeBaseCategories.findOne({ _id }).then((category) => {
+  knowledgeBaseCategoryDetail(
+    _root,
+    { _id }: { _id: string },
+    { models }: IContext
+  ) {
+    return models.KnowledgeBaseCategories.findOne({ _id }).then(category => {
       return category;
     });
   },
@@ -111,9 +121,13 @@ const knowledgeBaseQueries = {
   /**
    * Category total count
    */
-  async knowledgeBaseCategoriesTotalCount(_root, args: { topicIds: string[] }, { models }: IContext) {
+  async knowledgeBaseCategoriesTotalCount(
+    _root,
+    args: { topicIds: string[] },
+    { models }: IContext
+  ) {
     return models.KnowledgeBaseCategories.find({
-      topicId: { $in: args.topicIds },
+      topicId: { $in: args.topicIds }
     }).countDocuments();
   },
 
@@ -126,21 +140,21 @@ const knowledgeBaseQueries = {
     { commonQuerySelector, models }: IContext
   ) {
     return models.KnowledgeBaseCategories.findOne(commonQuerySelector).sort({
-      createdDate: -1,
+      createdDate: -1
     });
   },
 
   /**
    * Topic list
    */
-  knowledgeBaseTopics(
+  async knowledgeBaseTopics(
     _root,
     args: { page: number; perPage: number; brandId: string },
     { commonQuerySelector, models }: IContext
   ) {
     const topics = models.KnowledgeBaseTopics.find({
       ...(args.brandId ? { brandId: args.brandId } : {}),
-      ...commonQuerySelector,
+      ...commonQuerySelector
     }).sort({ modifiedDate: -1 });
 
     return paginate(topics, args);
@@ -149,7 +163,11 @@ const knowledgeBaseQueries = {
   /**
    * Topic detail
    */
-  knowledgeBaseTopicDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+  knowledgeBaseTopicDetail(
+    _root,
+    { _id }: { _id: string },
+    { models }: IContext
+  ) {
     return models.KnowledgeBaseTopics.findOne({ _id });
   },
 
@@ -161,8 +179,10 @@ const knowledgeBaseQueries = {
     _args,
     { commonQuerySelector, models }: IContext
   ) {
-    return models.KnowledgeBaseTopics.find(commonQuerySelector).countDocuments();
-  },
+    return models.KnowledgeBaseTopics.find(
+      commonQuerySelector
+    ).countDocuments();
+  }
 };
 
 requireLogin(knowledgeBaseQueries, 'knowledgeBaseArticlesTotalCount');

@@ -5,7 +5,7 @@ export default {
   __resolveReference({ _id }, { models }: IContext) {
     return models.KnowledgeBaseTopics.findOne({ _id });
   },
-  
+
   brand(topic: ITopicDocument) {
     return (
       topic.brandId && {
@@ -13,12 +13,12 @@ export default {
         _id: topic.brandId
       }
     );
-
   },
 
   categories(topic: ITopicDocument, _args, { models }: IContext) {
+    console.log('nice22');
     return models.KnowledgeBaseCategories.find({ topicId: topic._id }).sort({
-      title: 1,
+      title: 1
     });
   },
 
@@ -28,14 +28,14 @@ export default {
       $or: [
         { parentCategoryId: null },
         { parentCategoryId: { $exists: false } },
-        { parentCategoryId: '' },
-      ],
+        { parentCategoryId: '' }
+      ]
     }).sort({
-      title: 1,
+      title: 1
     });
   },
 
   color(topic: ITopicDocument) {
     return topic.color || '';
-  },
+  }
 };

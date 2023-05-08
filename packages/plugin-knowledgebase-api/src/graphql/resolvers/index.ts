@@ -5,7 +5,7 @@ import KnowledgeBaseTopic from './knowledgeBaseTopic';
 import KnowledgeBaseArticle from './knowledgeBaseArticle';
 import {
   KnowledgeBaseCategory,
-  KnowledgeBaseParentCategory,
+  KnowledgeBaseParentCategory
 } from './knowledgeBaseCategory';
 
 const resolvers: any = {
@@ -15,11 +15,11 @@ const resolvers: any = {
   KnowledgeBaseParentCategory,
   KnowledgeBaseArticle,
   Mutation: {
-    ...knowledgeBaseMutations,
+    ...knowledgeBaseMutations
   },
   Query: {
-    ...knowledgeBaseQueries,
-  },
+    ...knowledgeBaseQueries
+  }
 };
 
 export default resolvers;
