@@ -253,7 +253,7 @@ export class AppProvider extends React.Component<{}, IState> {
           isSubmitting: false,
           currentStatus: {
             status,
-            errors,
+            errors
           },
         });
       },
