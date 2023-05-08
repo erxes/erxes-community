@@ -36,6 +36,7 @@ const listParamsDef = `
   $departmentIds: [String]
   $reportType: String
   $scheduleStatus: String
+  $isCurrentUserAdmin: Boolean
 `;
 
 const listParamsValue = `
@@ -48,6 +49,7 @@ const listParamsValue = `
   departmentIds: $departmentIds
   reportType: $reportType
   scheduleStatus: $scheduleStatus
+  isCurrentUserAdmin: $isCurrentUserAdmin
 `;
 
 const timelogsMain = `

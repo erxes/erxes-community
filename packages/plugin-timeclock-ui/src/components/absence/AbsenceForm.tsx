@@ -95,6 +95,12 @@ export default (props: Props) => {
     byTime: RequestByTime;
   };
 
+  const totalUserOptions: string[] = [];
+
+  for (const dept of departments) {
+    totalUserOptions.push(...dept.userIds);
+  }
+
   const { closeModal } = contentProps;
 
   const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
@@ -224,10 +230,7 @@ export default (props: Props) => {
         <SelectTeamMembers
           queryParams={queryParams}
           filterParams={{
-            ids:
-              departments && departments.length
-                ? departments[0].userIds
-                : [currentUser._id],
+            ids: totalUserOptions,
             excludeIds: false
           }}
           customOption={prepareCurrentUserOption(currentUser)}
@@ -504,6 +507,10 @@ export default (props: Props) => {
       </MarginY>
       <SelectTeamMembers
         customField="employeeId"
+        filterParams={{
+          ids: totalUserOptions,
+          excludeIds: false
+        }}
         customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}

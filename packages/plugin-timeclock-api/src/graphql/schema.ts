@@ -259,6 +259,7 @@ const queryParams = `
   departmentIds: [String]
   reportType: String
   scheduleStatus: String
+  isCurrentUserAdmin: Boolean
 `;
 
 const commonParams = `

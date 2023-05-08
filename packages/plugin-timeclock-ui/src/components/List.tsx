@@ -18,6 +18,9 @@ import { IUser } from '@erxes/ui/src/auth/types';
 type Props = {
   currentUser: IUser;
   branches: IBranch[];
+  departments: IDepartment[];
+
+  isCurrentUserAdmin: boolean;
 
   currentDate?: string;
   queryParams: any;
@@ -25,7 +28,6 @@ type Props = {
   route?: string;
   startTime?: Date;
   loading: boolean;
-  departments: IDepartment[];
   scheduleConfigs: IScheduleConfig[];
   searchFilter: string;
 };

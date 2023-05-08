@@ -8,14 +8,12 @@ import {
 } from './utils';
 import {
   customFixDate,
-  findAllTeamMembersWithEmpId,
   generateCommonUserIds,
   generateFilter,
   returnSupervisedUsers
 } from '../../utils';
 import { IReport } from '../../models/definitions/timeclock';
 import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
-import { checkPermission } from '@erxes/api-utils/src';
 import { fixDate, paginate } from '@erxes/api-utils/src';
 import { sendCoreMessage } from '../../messageBroker';
 
@@ -96,7 +94,6 @@ const timeclockQueries = {
       user
     );
 
-    await returnSupervisedUsers(user, subdomain);
     // if there's no common user, return empty list
     if (!commonUserFound) {
       return { list: [], totalCount: 0 };
@@ -283,9 +280,10 @@ const timeclockQueries = {
       endDate,
       page,
       perPage,
-      reportType
+      reportType,
+      isCurrentUserAdmin
     },
-    { subdomain }: IContext
+    { subdomain, user }: IContext
   ) {
     let filterGiven = false;
     if (userIds || branchIds || departmentIds) {
@@ -300,20 +298,15 @@ const timeclockQueries = {
 
     const returnReport: IReport[] = [];
 
-    const teamMembersWithIds = await findAllTeamMembersWithEmpId(subdomain);
-    const teamMemberIds: string[] = [];
+    const totalSupervisedUserIds = await returnSupervisedUsers(
+      user._id,
+      subdomain
+    );
 
-    for (const teamMember of teamMembersWithIds) {
-      if (!teamMember.employeeId) {
-        continue;
-      }
-
-      teamMemberIds.push(teamMember._id);
-    }
     const totalTeamMemberIds =
       teamMemberIdsFromFilter.length || filterGiven
         ? teamMemberIdsFromFilter
-        : teamMemberIds;
+        : totalSupervisedUserIds;
 
     switch (reportType) {
       case 'Урьдчилсан' || 'Preliminary':
@@ -371,6 +364,6 @@ const timeclockQueries = {
 };
 
 moduleRequireLogin(timeclockQueries);
-checkPermission(timeclockQueries, 'timeclocksMain', 'showTimeclocks');
+// checkPermission(timeclockQueries, 'timeclocksMain', 'showTimeclocks');
 
 export default timeclockQueries;

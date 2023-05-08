@@ -12,7 +12,11 @@ import {
   timeclockReportPreliminary
 } from './graphql/resolvers/utils';
 import { IUserReport } from './models/definitions/timeclock';
-import { createTeamMembersObject, generateCommonUserIds } from './utils';
+import {
+  createTeamMembersObject,
+  generateCommonUserIds,
+  returnSupervisedUsers
+} from './utils';
 
 const dateFormat = 'YYYY-MM-DD';
 /**
@@ -301,6 +305,8 @@ export const buildFile = async (
       ? query.departmentIds
       : [query.departmentIds];
 
+  const { currentUserId } = query;
+
   const startDate = query.startDate;
   const endDate = query.endDate;
 
@@ -309,9 +315,10 @@ export const buildFile = async (
 
   const { workbook, sheet } = await createXlsFile();
 
-  const teamMembersObject = await createTeamMembersObject(subdomain);
-
-  const teamMemberIds = Object.keys(teamMembersObject);
+  const totalSupervisedUserIds = await returnSupervisedUsers(
+    currentUserId,
+    subdomain
+  );
 
   const teamMemberIdsFromFilter = await generateCommonUserIds(
     subdomain,
@@ -328,7 +335,12 @@ export const buildFile = async (
   const totalTeamMemberIds =
     teamMemberIdsFromFilter.length || filterGiven
       ? teamMemberIdsFromFilter
-      : teamMemberIds;
+      : totalSupervisedUserIds;
+
+  const teamMembersObject = await createTeamMembersObject(
+    subdomain,
+    totalTeamMemberIds
+  );
 
   let report;
 
@@ -371,7 +383,7 @@ export const buildFile = async (
 
   extractAndAddIntoSheet(
     Object.values(report),
-    teamMemberIds,
+    totalSupervisedUserIds,
     sheet,
     reportType
   );

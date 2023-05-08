@@ -36,6 +36,12 @@ const LeftSideBar = (props: Props) => {
     queryParams.departmentIds
   );
 
+  const totalUserOptions: string[] = [];
+
+  for (const dept of departments) {
+    totalUserOptions.push(...dept.userIds);
+  }
+
   const [startDate, setStartDate] = useState(
     queryParams.startDate || startOfThisMonth
   );
@@ -196,10 +202,7 @@ const LeftSideBar = (props: Props) => {
             label="Select team member"
             name="userIds"
             filterParams={{
-              ids:
-                departments && departments.length
-                  ? departments[0].userIds
-                  : [currentUser._id],
+              ids: totalUserOptions,
               excludeIds: false
             }}
             queryParams={queryParams}

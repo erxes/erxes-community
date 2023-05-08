@@ -18,7 +18,7 @@ import {
   findBranchUsers,
   findDepartmentUsers
 } from './graphql/resolvers/utils';
-import { IUser, IUserDocument } from '@erxes/api-utils/src/types';
+import { IUserDocument } from '@erxes/api-utils/src/types';
 
 const customFixDate = (date?: Date) => {
   // get date, return date with 23:59:59
@@ -829,12 +829,20 @@ const createScheduleObjOfMembers = async (
   return totalEmployeesSchedulesObject;
 };
 
-const createTeamMembersObject = async (subdomain: string) => {
-  const teamMembersWithEmpId = await findAllTeamMembersWithEmpId(subdomain);
-
+const createTeamMembersObject = async (subdomain: any, userIds: string[]) => {
   const teamMembersObject = {};
 
-  for (const teamMember of teamMembersWithEmpId) {
+  const teamMembers = await sendCoreMessage({
+    subdomain,
+    action: 'users.find',
+    data: {
+      query: { _id: { $in: userIds } }
+    },
+    isRPC: true,
+    defaultValue: []
+  });
+
+  for (const teamMember of teamMembers) {
     if (!teamMember.employeeId) {
       continue;
     }
@@ -851,17 +859,15 @@ const createTeamMembersObject = async (subdomain: string) => {
 };
 
 const returnSupervisedUsers = async (
-  currentUser: IUserDocument,
+  currentUserId: string,
   subdomain: string
 ) => {
-  const userId = currentUser._id;
-
   const supervisedDepartmenIds = (
     await sendCoreMessage({
       subdomain,
       action: `departments.find`,
       data: {
-        supervisorId: userId
+        supervisorId: currentUserId
       },
       isRPC: true,
       defaultValue: []
@@ -873,7 +879,7 @@ const returnSupervisedUsers = async (
       subdomain,
       action: `branches.find`,
       data: {
-        supervisorId: userId
+        supervisorId: currentUserId
       },
       isRPC: true,
       defaultValue: []
@@ -884,12 +890,12 @@ const returnSupervisedUsers = async (
 
   findTotalSupervisedUsers.push(
     ...(await findDepartmentUsers(subdomain, supervisedDepartmenIds)).map(
-      departmentUser => departmentUser._id,
-      currentUser._id
-    )
+      departmentUser => departmentUser._id
+    ),
+    currentUserId
   );
 
-  console.log('total users  ', findTotalSupervisedUsers);
+  return findTotalSupervisedUsers;
 };
 
 const generateFilter = async (
@@ -904,25 +910,9 @@ const generateFilter = async (
     userIds,
     startDate,
     endDate,
-    scheduleStatus
+    scheduleStatus,
+    isCurrentUserAdmin
   } = params;
-
-  // const userGroup =
-  // const departmentIds = user.departmentIds || [];
-
-  // const ids = (
-  //   await sendCoreMessage({
-  //     subdomain,
-  //     action: `departments.find`,
-  //     data: {
-  //       supervisorId: user._id
-  //     },
-  //     isRPC: true,
-  //     defaultValue: []
-  //   })
-  // ).map(item => item._id);
-
-  // departmentIds.push(...ids);
 
   const totalUserIds: string[] = await generateCommonUserIds(
     subdomain,
@@ -935,20 +925,29 @@ const generateFilter = async (
 
   let scheduleFilter;
 
+  const totalSupervisedUsers =
+    !isCurrentUserAdmin && (await returnSupervisedUsers(user._id, subdomain));
+
+  if (!isCurrentUserAdmin) {
+    scheduleFilter = {
+      userId: { $in: totalSupervisedUsers }
+    };
+  }
+
   if (type === 'schedule' && !scheduleStatus) {
     return [scheduleFilter, false];
   }
 
   if (scheduleStatus) {
     if (scheduleStatus.toLowerCase() === 'pending') {
-      scheduleFilter = { solved: false };
+      scheduleFilter = { ...scheduleFilter, solved: false };
     }
 
     if (
       scheduleStatus.toLowerCase() === 'approved' ||
       scheduleStatus.toLowerCase() === 'rejected'
     ) {
-      scheduleFilter = { status: scheduleStatus };
+      scheduleFilter = { ...scheduleFilter, status: scheduleStatus };
     }
   }
   const scheduleShiftSelector = {
@@ -990,7 +989,9 @@ const generateFilter = async (
   }
 
   if (!userIdsGiven && type !== 'schedule') {
-    returnFilter = { $or: timeFields };
+    returnFilter = {
+      $and: [{ $or: timeFields }, { userId: { $in: totalSupervisedUsers } }]
+    };
   }
 
   // user Ids given but no related data was found

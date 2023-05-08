@@ -7,7 +7,8 @@ import {
   TimeClockMutationResponse,
   BranchesQueryResponse,
   PayDatesQueryResponse,
-  ScheduleConfigQueryResponse
+  ScheduleConfigQueryResponse,
+  DepartmentsQueryResponse
 } from '../types';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
@@ -16,12 +17,12 @@ import { IUser } from '@erxes/ui/src/auth/types';
 import erxesQuery from '@erxes/ui/src/team/graphql/queries';
 import { removeParams } from '@erxes/ui/src/utils/router';
 import { queries } from '../graphql';
-import { DepartmentsQueryResponse } from '@erxes/ui-settings/src/departments/types';
 
 type Props = {
   currentUser: IUser;
   queryParams: any;
   searchValue: string;
+
   route?: string;
   history: any;
   startTime: Date;
@@ -39,8 +40,6 @@ type FinalProps = {
 } & Props &
   TimeClockMutationResponse;
 
-let isCurrentUserAdmin;
-
 class ListContainer extends React.Component<FinalProps> {
   constructor(props) {
     super(props);
@@ -53,12 +52,6 @@ class ListContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    isCurrentUserAdmin =
-      (this.props.currentUser.permissionActions &&
-        this.props.currentUser.permissionActions.showTimeclocks &&
-        this.props.currentUser.permissionActions.manageTimeclocks) ||
-      false;
-
     const {
       listBranchesQuery,
       listScheduleConfigsQuery,
@@ -78,11 +71,18 @@ class ListContainer extends React.Component<FinalProps> {
 
     const updatedProps = {
       ...this.props,
+      isCurrentUserAdmin: isCurrentUserAdmin(this.props),
       currentUserId,
       scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs || [],
 
-      branches: listBranchesQuery.branches || [],
-      departments: listDepartmentsQuery.timeclockDepartments || [],
+      branches:
+        (isCurrentUserAdmin(this.props)
+          ? listBranchesQuery.branches
+          : listBranchesQuery.timeclockBranches) || [],
+      departments:
+        (isCurrentUserAdmin(this.props)
+          ? listDepartmentsQuery.departments
+          : listDepartmentsQuery.timeclockDepartments) || [],
 
       loading: listBranchesQuery.loading
     };
@@ -91,13 +91,34 @@ class ListContainer extends React.Component<FinalProps> {
   }
 }
 
+const isCurrentUserAdmin = (props: any) => {
+  return (
+    (props.currentUser.permissionActions &&
+      props.currentUser.permissionActions.showTimeclocks &&
+      props.currentUser.permissionActions.manageTimeclocks) ||
+    false
+  );
+};
+
 export default withProps<Props>(
   compose(
     graphql<Props, BranchesQueryResponse, { searchValue: string }>(
       gql(erxesQuery.branches),
       {
         name: 'listBranchesQuery',
-        skip: !isCurrentUserAdmin,
+        skip: props => !isCurrentUserAdmin(props),
+        options: ({ searchValue }) => ({
+          variables: { searchValue },
+          fetchPolicy: 'network-only'
+        })
+      }
+    ),
+
+    graphql<Props, BranchesQueryResponse, { searchValue: string }>(
+      gql(erxesQuery.departments),
+      {
+        name: 'listDepartmentsQuery',
+        skip: props => !isCurrentUserAdmin(props),
         options: ({ searchValue }) => ({
           variables: { searchValue },
           fetchPolicy: 'network-only'
@@ -107,7 +128,7 @@ export default withProps<Props>(
 
     graphql<Props, PayDatesQueryResponse>(gql(queries.timeclockBranches), {
       name: 'listBranchesQuery',
-      skip: isCurrentUserAdmin,
+      skip: props => isCurrentUserAdmin(props),
       options: ({ searchValue }) => ({
         variables: { searchValue },
         fetchPolicy: 'network-only'
@@ -116,7 +137,7 @@ export default withProps<Props>(
 
     graphql<Props, PayDatesQueryResponse>(gql(queries.timeclockDepartments), {
       name: 'listDepartmentsQuery',
-      skip: isCurrentUserAdmin,
+      skip: props => isCurrentUserAdmin(props),
       options: ({ searchValue }) => ({
         variables: { searchValue },
         fetchPolicy: 'network-only'
