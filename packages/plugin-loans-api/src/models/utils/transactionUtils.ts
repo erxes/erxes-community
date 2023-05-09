@@ -44,7 +44,13 @@ export const getAOESchedules = async (
 
   return { preSchedule, nextSchedule };
 };
-
+/**
+ * this method generate loan payment data
+ * @param models
+ * @param subdomain
+ * @param doc
+ * @returns {undue: number; interestEve: number;   interestNonce: number;   total: number;   insurance: number;   debt: number;   payment: number;   preSchedule: any;}
+ */
 export const getCalcedAmounts = async (
   models: IModels,
   subdomain: string,
@@ -80,7 +86,10 @@ export const getCalcedAmounts = async (
   const contract = await models.Contracts.getContract({
     _id: doc.contractId
   });
-
+  /**
+   * @property preSchedule /schedule of done or less payed/
+   * @property nextSchedule /schedule of pending/
+   */
   let { preSchedule, nextSchedule } = await getAOESchedules(models, contract);
 
   if (!preSchedule && !nextSchedule) {
@@ -93,6 +102,7 @@ export const getCalcedAmounts = async (
     return result;
   }
 
+  //there will be first payment
   if (!preSchedule) {
     preSchedule = {
       balance: contract.leaseAmount,
@@ -139,6 +149,7 @@ export const getCalcedAmounts = async (
 
   // one day two pay
   if (getDiffDay(trDate, prePayDate) === 0) {
+    //when less payed prev schedule there will be must add amount's of
     if (preSchedule.status === SCHEDULE_STATUS.LESS) {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
       result.interestEve =
@@ -191,26 +202,35 @@ export const getCalcedAmounts = async (
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);
+
       result.interestNonce =
         (preSchedule.interestNonce || 0) - (preSchedule.didInterestNonce || 0);
+
       result.payment =
         (preSchedule.payment || 0) - (preSchedule.didPayment || 0);
+
       if (result.payment < 0) result.payment = 0;
+
       result.debt = (preSchedule.debt || 0) - (preSchedule.didDebt || 0);
     }
+
     if (!preSchedule) result.debt += nextSchedule.debt;
 
+    /** calculating interest eve and nonce from prev date to transaction date */
     const { diffEve, diffNonce } = getDatesDiffMonth(prePayDate, trDate);
+
     result.interestEve += calcInterest({
       balance: preSchedule.balance,
       interestRate: contract.interestRate,
       dayOfMonth: diffEve
     });
+
     result.interestNonce += calcInterest({
       balance: preSchedule.balance,
       interestRate: contract.interestRate,
       dayOfMonth: diffNonce
     });
+
     if (preSchedule.status === 'less') {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
       const unduePercent =
@@ -231,23 +251,27 @@ export const getCalcedAmounts = async (
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);
+
       result.interestNonce =
         (preSchedule.interestNonce || 0) - (preSchedule.didInterestNonce || 0);
+
       result.debt = (preSchedule.debt || 0) - (preSchedule.didDebt || 0);
+
       result.payment =
         (preSchedule.payment || 0) - (preSchedule.didPayment || 0);
+
       if (result.payment < 0) result.payment = 0;
     }
 
-    result.interestEve += nextSchedule.interestEve;
+    result.interestEve += nextSchedule.interestEve || 0;
 
-    result.interestNonce += nextSchedule.interestNonce;
-    result.insurance = nextSchedule.insurance;
+    result.interestNonce += nextSchedule.interestNonce || 0;
+    result.insurance = nextSchedule.insurance || 0;
 
-    result.debt += nextSchedule.debt;
+    result.debt += nextSchedule.debt || 0;
 
-    result.payment += nextSchedule.payment;
-    if (preSchedule.status === 'less') {
+    result.payment += nextSchedule.payment || 0;
+    if (preSchedule.status === 'less' && preSchedule.isDefault === true) {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
       const unduePercent =
         (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||

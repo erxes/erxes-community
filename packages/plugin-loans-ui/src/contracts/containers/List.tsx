@@ -99,23 +99,6 @@ class ContractListContainer extends React.Component<FinalProps, State> {
         });
     };
 
-    // const mergeContracts = ({ ids, data, callback }) => {
-    //   contractsMerge({
-    //     variables: {
-    //       contractIds: ids,
-    //       contractFields: data
-    //     }
-    //   })
-    //     .then(response => {
-    //       Alert.success('You successfully merged contracts');
-    //       callback();
-    //       history.push(`/erxes-plugin-contract/details/${response.data.contractsMerge._id}`);
-    //     })
-    //     .catch(e => {
-    //       Alert.error(e.message);
-    //     });
-    // };
-
     const searchValue = this.props.queryParams.searchValue || '';
     const { list = [], totalCount = 0 } =
       contractsMainQuery.contractsMain || {};

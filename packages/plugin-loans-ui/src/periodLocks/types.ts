@@ -2,6 +2,7 @@ export interface IPeriodLockDoc {
   date: Date;
   createdBy: string;
   createdAt: Date;
+  excludeContracts: string[];
 }
 
 export interface IPeriodLock extends IPeriodLockDoc {

@@ -132,7 +132,7 @@ export const loadContractClass = (models: IModels) => {
      * Close Contract
      */
     public static async closeContract(
-      messageBroker,
+      subdomain,
       memoryStorage,
       doc: ICloseVariable
     ) {
@@ -152,11 +152,7 @@ export const loadContractClass = (models: IModels) => {
         description: doc.description,
         total: closeInfo.total
       };
-      await models.Transactions.createTransaction(
-        messageBroker,
-        memoryStorage,
-        trDoc
-      );
+      await models.Transactions.createTransaction(subdomain, trDoc);
 
       await models.Contracts.updateOne(
         { _id: doc.contractId },

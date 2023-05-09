@@ -13,7 +13,8 @@ import { getFullDate } from '../models/utils/utils';
 
 export async function checkContractScheduleAnd(subdomain: string) {
   const models: IModels = await generateModels(subdomain);
-  const today = getFullDate(new Date());
+  const today = getFullDate(new Date('2024-01-01'));
+
   //find not changed schedules
   const contractIds = await models.Schedules.find({
     payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
@@ -41,7 +42,9 @@ export async function checkContractScheduleAnd(subdomain: string) {
     //get unresolved schedules
     const unresolvedSchedules = await models.Schedules.find({
       contractId: contract._id,
-      payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
+      payDate: {
+        $lte: new Date(today.getTime() + 1000 * 3600 * 24)
+      },
       status: SCHEDULE_STATUS.PENDING,
       balance: { $gt: 0 },
       isDefault: true

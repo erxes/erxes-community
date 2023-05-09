@@ -186,17 +186,7 @@ class ContractsList extends React.Component<IProps, State> {
       </Button>
     );
 
-    // const mergeButton = (
-    //   <Button btnStyle="primary" size="small" icon="merge">
-    //     Merge
-    //   </Button>
-    // );
-
     let actionBarLeft: React.ReactNode;
-
-    // const contractsMerge = props => {
-    //   return <ContractsMerge {...props} objects={bulk} save={mergeContracts} />;
-    // };
 
     if (bulk.length > 0) {
       const onClick = () =>
@@ -210,15 +200,6 @@ class ContractsList extends React.Component<IProps, State> {
 
       actionBarLeft = (
         <BarItems>
-          {/* {bulk.length === 2 && (
-            <ModalTrigger
-              title="Merge Contracts"
-              size="lg"
-              trigger={mergeButton}
-              content={contractsMerge}
-            />
-          )} */}
-
           <Button
             btnStyle="danger"
             size="small"

@@ -19,8 +19,7 @@ const transactionMutations = {
     doc: ITransaction,
     { user, models, subdomain }: IContext
   ) => {
-    const transaction = models.Transactions.createTransaction(
-      messageBroker,
+    const transaction = await models.Transactions.createTransaction(
       subdomain,
       doc
     );
@@ -61,7 +60,6 @@ const transactionMutations = {
     });
 
     const updated = await models.Transactions.updateTransaction(
-      messageBroker,
       redis,
       _id,
       doc
@@ -103,12 +101,7 @@ const transactionMutations = {
       _id
     });
 
-    const updated = await models.Transactions.changeTransaction(
-      messageBroker,
-      redis,
-      _id,
-      doc
-    );
+    const updated = await models.Transactions.changeTransaction(_id, doc);
 
     const logData = {
       type: 'transaction',

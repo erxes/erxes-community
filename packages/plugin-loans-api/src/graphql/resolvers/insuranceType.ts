@@ -3,10 +3,14 @@ import { sendMessageBroker } from '../../messageBroker';
 import { IInsuranceTypeDocument } from '../../models/definitions/insuranceTypes';
 
 const InsuranceTypes = {
-  company(insuranceType: IInsuranceTypeDocument, {}, { subdomain }: IContext) {
+  async company(
+    insuranceType: IInsuranceTypeDocument,
+    {},
+    { subdomain }: IContext
+  ) {
     if (!insuranceType.companyId) return null;
 
-    return sendMessageBroker(
+    return await sendMessageBroker(
       {
         subdomain,
         data: { _id: insuranceType.companyId },
@@ -17,7 +21,7 @@ const InsuranceTypes = {
     );
   },
   yearPercents(insuranceType: IInsuranceTypeDocument) {
-    return insuranceType.yearPercents.join(', ');
+    return insuranceType.yearPercents;
   }
 };
 

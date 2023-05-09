@@ -7,8 +7,7 @@ import {
   FormControl,
   FormGroup,
   MainStyleFormWrapper as FormWrapper,
-  MainStyleModalFooter as ModalFooter,
-  MainStyleScrollWrapper as ScrollWrapper
+  MainStyleModalFooter as ModalFooter
 } from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -16,14 +15,31 @@ import React from 'react';
 
 import { IPeriodLock, IPeriodLockDoc } from '../types';
 
+import { withProps } from '@erxes/ui/src/utils/core';
+import * as compose from 'lodash.flowright';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import { queries } from '../../contracts/graphql';
+import SelectContract from '../../contracts/components/common/SelectContract';
+import styled from 'styled-components';
+
+const ContractContainer = styled.div`
+  img {
+    height: 20px;
+    width: 20px;
+  }
+`;
+
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   periodLock: IPeriodLock;
   closeModal: () => void;
+  contractsData: any;
 };
 
 type State = {
   date: Date;
+  excludeContracts: string[];
 };
 
 class PeriodLockForm extends React.Component<Props, State> {
@@ -33,7 +49,8 @@ class PeriodLockForm extends React.Component<Props, State> {
     const { periodLock = {} } = props;
 
     this.state = {
-      date: periodLock.date || new Date()
+      date: periodLock.date || new Date(),
+      excludeContracts: periodLock.excludeContracts || []
     };
   }
 
@@ -63,7 +80,6 @@ class PeriodLockForm extends React.Component<Props, State> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const periodLock = this.props.periodLock || ({} as IPeriodLock);
     const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -71,25 +87,38 @@ class PeriodLockForm extends React.Component<Props, State> {
       this.setState({ date: value });
     };
 
+    const onChangeExcludeContracts = value => {
+      this.setState({ excludeContracts: value });
+    };
+
     return (
       <>
-        <ScrollWrapper>
-          <FormWrapper>
-            <FormGroup>
-              <ControlLabel required={true}>Date</ControlLabel>
-              <DateContainer>
-                <DateControl
-                  {...formProps}
-                  required={false}
-                  name="date"
-                  value={this.state.date}
-                  onChange={onChangeStartDate}
-                />
-              </DateContainer>
-            </FormGroup>
-          </FormWrapper>
-        </ScrollWrapper>
-
+        <FormWrapper>
+          <FormGroup>
+            <ControlLabel required={true}>Date</ControlLabel>
+            <DateContainer>
+              <DateControl
+                {...formProps}
+                required={false}
+                name="date"
+                value={this.state.date}
+                onChange={onChangeStartDate}
+              />
+            </DateContainer>
+          </FormGroup>
+        </FormWrapper>
+        <FormGroup>
+          <ControlLabel>Exclude Contracts</ControlLabel>
+          <ContractContainer>
+            <SelectContract
+              onSelect={onChangeExcludeContracts}
+              label="Contracts"
+              name="excludeContracts"
+              initialValue={this.props.periodLock?.excludeContracts}
+              multi={true}
+            />
+          </ContractContainer>
+        </FormGroup>
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
             Close
@@ -111,4 +140,10 @@ class PeriodLockForm extends React.Component<Props, State> {
   }
 }
 
-export default PeriodLockForm;
+export default withProps<Props>(
+  compose(
+    graphql<{}, any, any>(gql(queries.contracts), {
+      name: 'contractsData'
+    })
+  )(PeriodLockForm)
+);

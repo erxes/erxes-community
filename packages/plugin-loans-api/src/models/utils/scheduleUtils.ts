@@ -286,11 +286,18 @@ export const fixSchedules = async (
     .select('startDate customerId')
     .lean();
 
+  const periodLock = await models.PeriodLocks.findOne()
+    .sort({ date: -1 })
+    .lean();
+
   const today = getFullDate(new Date());
 
   const unresolvedSchedules = await models.Schedules.find({
     contractId: contractId,
-    payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
+    payDate: {
+      $lte: new Date(today.getTime() + 1000 * 3600 * 24),
+      $gt: periodLock?.date
+    },
     status: SCHEDULE_STATUS.PENDING,
     balance: { $gt: 0 },
     isDefault: true

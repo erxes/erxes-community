@@ -40,7 +40,7 @@ class DetailInfo extends React.Component<Props> {
 
     const onDelete = () =>
       confirm()
-        .then(() => remove())
+        .then(() => remove && remove())
         .catch(error => {
           Alert.error(error.message);
         });

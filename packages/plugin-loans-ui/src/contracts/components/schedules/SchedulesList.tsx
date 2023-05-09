@@ -17,8 +17,6 @@ interface IProps extends IRouterProps {
 }
 
 class SchedulesList extends React.Component<IProps> {
-  private timer?: NodeJS.Timer = undefined;
-
   constructor(props) {
     super(props);
 

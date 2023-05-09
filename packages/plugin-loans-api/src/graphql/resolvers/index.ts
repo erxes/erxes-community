@@ -20,7 +20,6 @@ const resolvers: any = async () => ({
   Invoice,
   Schedule,
   Transaction,
-
   Mutation,
   Query
 });

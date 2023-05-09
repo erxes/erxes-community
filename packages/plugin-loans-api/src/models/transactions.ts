@@ -15,19 +15,12 @@ import { IContractDocument } from './definitions/contracts';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
-  createTransaction(messageBroker: any, subdomain: string, doc: ITransaction);
-  updateTransaction(
-    messageBroker: any,
-    memoryStorage: any,
-    _id: string,
+  createTransaction(
+    subdomain: string,
     doc: ITransaction
-  );
-  changeTransaction(
-    messageBroker: any,
-    memoryStorage: any,
-    _id: string,
-    doc: ITransaction
-  );
+  ): Promise<ITransactionDocument>;
+  updateTransaction(memoryStorage: any, _id: string, doc: ITransaction);
+  changeTransaction(_id: string, doc: ITransaction);
   removeTransactions(_ids: string[]);
 }
 export const loadTransactionClass = (models: IModels) => {
@@ -53,12 +46,23 @@ export const loadTransactionClass = (models: IModels) => {
      * Create a transaction
      */
     public static async createTransaction(
-      messageBroker: any,
       subdomain: string,
       doc: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
+      const periodLock = await models.PeriodLocks.findOne({
+        date: { $gte: doc.payDate }
+      })
+        .sort({ date: -1 })
+        .lean();
+
+      if (periodLock && !periodLock?.excludeContracts.includes(doc.contractId))
+        throw new Error(
+          'At this moment transaction can not been created because this date closed'
+        );
+
+      console.log('doc', doc);
       const contract = await models.Contracts.findOne({
         _id: doc.contractId
       }).lean<IContractDocument>();
@@ -77,8 +81,9 @@ export const loadTransactionClass = (models: IModels) => {
       const trInfo = await transactionRule(models, subdomain, {
         ...doc
       });
+      console.log('{ ...doc, ...trInfo }', { ...doc, ...trInfo });
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
-
+      console.log(tr);
       await trAfterSchedule(models, tr);
 
       return tr;
@@ -88,12 +93,22 @@ export const loadTransactionClass = (models: IModels) => {
      * Update Transaction
      */
     public static async updateTransaction(
-      messageBroker,
       memoryStorage,
       _id: string,
       doc: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
+
+      const periodLock = await models.PeriodLocks.findOne({
+        date: { $gte: doc.payDate }
+      })
+        .sort({ date: -1 })
+        .lean();
+
+      if (periodLock && !periodLock?.excludeContracts.includes(doc.contractId))
+        throw new Error(
+          'At this moment transaction can not been created because this date closed'
+        );
 
       const oldTr = await models.Transactions.getTransaction({
         _id
@@ -134,19 +149,29 @@ export const loadTransactionClass = (models: IModels) => {
     /**
      * ReConfig amounts or change Transaction
      */
-    public static async changeTransaction(
-      messageBroker,
-      memoryStorage,
-      _id: string,
-      doc
-    ) {
+    public static async changeTransaction(_id: string, doc) {
       const oldTr = await models.Transactions.getTransaction({
         _id
       });
 
+      const periodLock = await models.PeriodLocks.findOne({
+        date: { $gte: oldTr.payDate }
+      })
+        .sort({ date: -1 })
+        .lean();
+
+      if (
+        periodLock &&
+        !periodLock?.excludeContracts.includes(oldTr.contractId)
+      )
+        throw new Error(
+          'At this moment transaction can not been created because this date closed'
+        );
+
       const contract = await models.Contracts.findOne({
         _id: oldTr.contractId
       }).lean();
+
       if (!contract || !contract._id) {
         await models.Transactions.updateOne({ _id }, { $set: { ...doc } });
         return models.Transactions.getTransaction({ _id });
@@ -300,8 +325,22 @@ export const loadTransactionClass = (models: IModels) => {
       const transactions = await models.Transactions.find({ _id: _ids })
         .sort({ payDate: -1 })
         .lean();
+
       for await (const oldTr of transactions) {
         if (oldTr) {
+          const periodLock = await models.PeriodLocks.findOne({
+            date: { $gte: oldTr.payDate }
+          })
+            .sort({ date: -1 })
+            .lean();
+
+          if (
+            periodLock &&
+            !periodLock?.excludeContracts.includes(oldTr.contractId)
+          )
+            throw new Error(
+              'At this moment transaction can not been created because this date closed'
+            );
           await removeTrAfterSchedule(models, oldTr);
           await models.Transactions.deleteOne({ _id: oldTr._id });
         }

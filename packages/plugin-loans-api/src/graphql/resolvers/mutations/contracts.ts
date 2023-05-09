@@ -134,11 +134,7 @@ const contractMutations = {
     const contract = await models.Contracts.getContract({
       _id: doc.contractId
     });
-    const updated = await models.Contracts.closeContract(
-      messageBroker,
-      redis,
-      doc
-    );
+    const updated = await models.Contracts.closeContract(subdomain, redis, doc);
 
     const logData = {
       type: 'contract',

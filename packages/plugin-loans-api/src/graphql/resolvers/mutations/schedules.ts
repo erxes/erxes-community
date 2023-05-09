@@ -59,12 +59,19 @@ const scheduleMutations = {
     { models, subdomain }: IContext
   ) => {
     const today = getFullDate(new Date());
+    const periodLock = await models.PeriodLocks.findOne()
+      .sort({ date: -1 })
+      .lean();
 
     const firstSchedules = await models.FirstSchedules.find({
-      contractId
+      contractId,
+      payDate: { $gt: periodLock?.date }
     }).lean();
 
-    await models.Schedules.deleteMany({ contractId });
+    await models.Schedules.deleteMany({
+      contractId,
+      payDate: { $gt: periodLock?.date }
+    });
 
     await models.Schedules.insertMany(
       firstSchedules.map(({ _id, ...data }) => data)
@@ -72,14 +79,18 @@ const scheduleMutations = {
 
     const countSchedules = await models.Schedules.countDocuments({
       contractId: contractId,
-      payDate: { $lte: new Date(today.getTime() + 1000 * 3600 * 24) },
+      payDate: {
+        $lte: new Date(today.getTime() + 1000 * 3600 * 24),
+        $gt: periodLock?.date
+      },
       status: SCHEDULE_STATUS.PENDING,
       balance: { $gt: 0 },
       isDefault: true
     });
 
     const countTransaction = await models.Transactions.countDocuments({
-      contractId
+      contractId,
+      payDate: { $gt: periodLock?.date }
     });
 
     if (!countSchedules && !countTransaction) return 'ok';

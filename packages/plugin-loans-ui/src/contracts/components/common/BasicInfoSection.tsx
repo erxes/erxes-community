@@ -53,7 +53,7 @@ class BasicInfoSection extends React.Component<Props, State> {
         });
 
     const onOpen = () => {
-      if (!isEnabled('forum')) return;
+      if (!isEnabled('documents')) return;
       this.setState({ loading: true });
       client
         .mutate({

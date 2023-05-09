@@ -39,9 +39,11 @@ function ScheduleSection({
     }
 
     if (hasTransaction)
-      <button onClick={onFixSchedules} title={'fix schedule'}>
-        <Icon icon="refresh-1" />
-      </button>;
+      return (
+        <button onClick={onFixSchedules} title={'fix schedule'}>
+          <Icon icon="refresh-1" />
+        </button>
+      );
 
     return (
       <button onClick={onRegenSchedules} title="create schedule">

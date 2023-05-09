@@ -179,10 +179,12 @@ const Contracts = {
 
     return models.Contracts.findOne({ _id: contract.relContractId });
   },
-  hasTransaction(contract: IContractDocument, {}, { models }: IContext) {
-    return !!models.Transactions.countDocuments({
-      contractId: contract._id
-    });
+  async hasTransaction(contract: IContractDocument, {}, { models }: IContext) {
+    return (
+      (await models.Transactions.countDocuments({
+        contractId: contract._id
+      })) > 0
+    );
   }
 };
 

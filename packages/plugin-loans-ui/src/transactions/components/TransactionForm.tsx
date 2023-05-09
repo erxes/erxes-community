@@ -257,9 +257,7 @@ class TransactionForm extends React.Component<Props, State> {
                   onClick={this.onFieldClick}
                 />
               </FormGroup>
-            </FormColumn>
 
-            <FormColumn>
               <FormGroup>
                 <ControlLabel>Contract</ControlLabel>
                 <SelectContractts
