@@ -62,7 +62,6 @@ export const loadTransactionClass = (models: IModels) => {
           'At this moment transaction can not been created because this date closed'
         );
 
-      console.log('doc', doc);
       const contract = await models.Contracts.findOne({
         _id: doc.contractId
       }).lean<IContractDocument>();
@@ -81,9 +80,7 @@ export const loadTransactionClass = (models: IModels) => {
       const trInfo = await transactionRule(models, subdomain, {
         ...doc
       });
-      console.log('{ ...doc, ...trInfo }', { ...doc, ...trInfo });
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
-      console.log(tr);
       await trAfterSchedule(models, tr);
 
       return tr;
