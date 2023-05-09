@@ -95,11 +95,19 @@ export default (props: Props) => {
     byTime: RequestByTime;
   };
 
-  const totalUserOptions: string[] = [];
+  const returnTotalUserOptions = () => {
+    const totalUserOptions: string[] = [];
 
-  for (const dept of departments) {
-    totalUserOptions.push(...dept.userIds);
-  }
+    for (const dept of departments) {
+      totalUserOptions.push(...dept.userIds);
+    }
+
+    for (const branch of branches) {
+      totalUserOptions.push(...branch.userIds);
+    }
+
+    return totalUserOptions;
+  };
 
   const { closeModal } = contentProps;
 
@@ -232,7 +240,7 @@ export default (props: Props) => {
         <SelectTeamMembers
           queryParams={queryParams}
           filterParams={{
-            ids: totalUserOptions,
+            ids: returnTotalUserOptions(),
             excludeIds: false
           }}
           customOption={prepareCurrentUserOption(currentUser)}
@@ -523,7 +531,7 @@ export default (props: Props) => {
       <SelectTeamMembers
         customField="employeeId"
         filterParams={{
-          ids: totalUserOptions,
+          ids: returnTotalUserOptions(),
           excludeIds: false
         }}
         customOption={prepareCurrentUserOption(currentUser)}

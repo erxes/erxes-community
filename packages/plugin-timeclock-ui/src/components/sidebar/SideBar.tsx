@@ -36,11 +36,19 @@ const LeftSideBar = (props: Props) => {
     queryParams.departmentIds
   );
 
-  const totalUserOptions: string[] = [];
+  const returnTotalUserOptions = () => {
+    const totalUserOptions: string[] = [];
 
-  for (const dept of departments) {
-    totalUserOptions.push(...dept.userIds);
-  }
+    for (const dept of departments) {
+      totalUserOptions.push(...dept.userIds);
+    }
+
+    for (const branch of branches) {
+      totalUserOptions.push(...branch.userIds);
+    }
+
+    return totalUserOptions;
+  };
 
   const [startDate, setStartDate] = useState(
     queryParams.startDate || startOfThisMonth
@@ -202,7 +210,7 @@ const LeftSideBar = (props: Props) => {
             label="Select team member"
             name="userIds"
             filterParams={{
-              ids: totalUserOptions,
+              ids: returnTotalUserOptions(),
               excludeIds: false
             }}
             queryParams={queryParams}

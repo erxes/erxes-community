@@ -27,6 +27,8 @@ type Props = {
   loading: boolean;
   totalCount: number;
 
+  isCurrentUserAdmin: boolean;
+
   startClockTime?: (userId: string) => void;
   extractAllMsSqlData: (startDate: Date, endDate: Date) => void;
   removeTimeclock: (_id: string) => void;
@@ -38,6 +40,8 @@ type Props = {
 
 function List(props: Props) {
   const {
+    isCurrentUserAdmin,
+
     timeclocks,
     totalCount,
     startClockTime,
@@ -61,7 +65,11 @@ function List(props: Props) {
     new Date(localStorage.getItem('endDate') || Date.now())
   );
 
-  const extractTrigger = <Button icon="plus-circle">Extract all data</Button>;
+  const extractTrigger = isCurrentUserAdmin ? (
+    <Button icon="plus-circle">Extract all data</Button>
+  ) : (
+    <></>
+  );
 
   const modalContent = contenProps => (
     <TimeForm

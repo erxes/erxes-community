@@ -923,10 +923,11 @@ const generateFilter = async (
 
   const models = await generateModels(subdomain);
 
-  let scheduleFilter;
+  let scheduleFilter = {};
 
-  const totalSupervisedUsers =
-    !isCurrentUserAdmin && (await returnSupervisedUsers(user._id, subdomain));
+  const totalSupervisedUsers = !isCurrentUserAdmin
+    ? await returnSupervisedUsers(user._id, subdomain)
+    : [];
 
   if (!isCurrentUserAdmin) {
     scheduleFilter = {
@@ -989,8 +990,13 @@ const generateFilter = async (
   }
 
   if (!userIdsGiven && type !== 'schedule') {
+    returnFilter = {};
+    if (!isCurrentUserAdmin) {
+      returnFilter = { userId: { $in: totalSupervisedUsers } };
+    }
     returnFilter = {
-      $and: [{ $or: timeFields }, { userId: { $in: totalSupervisedUsers } }]
+      ...returnFilter,
+      $or: timeFields
     };
   }
 

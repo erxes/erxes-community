@@ -71,9 +71,12 @@ class ListContainer extends React.Component<FinalProps> {
 
     const updatedProps = {
       ...this.props,
-      isCurrentUserAdmin: isCurrentUserAdmin(this.props),
-      currentUserId,
       scheduleConfigs: listScheduleConfigsQuery.scheduleConfigs || [],
+      isCurrentUserAdmin: isCurrentUserAdmin(this.props),
+      isCurrentUserSupervisor:
+        this.props.currentUser.permissionActions &&
+        this.props.currentUser.permissionActions.manageTimeclocks,
+      currentUserId,
 
       branches:
         (isCurrentUserAdmin(this.props)

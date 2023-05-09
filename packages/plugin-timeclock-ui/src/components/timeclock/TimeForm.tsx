@@ -37,11 +37,19 @@ const FormComponent = ({
   shiftStarted,
   closeModal
 }: Props) => {
-  const totalUserOptions: string[] = [];
+  const returnTotalUserOptions = () => {
+    const totalUserOptions: string[] = [];
 
-  for (const dept of departments) {
-    totalUserOptions.push(...dept.userIds);
-  }
+    for (const dept of departments) {
+      totalUserOptions.push(...dept.userIds);
+    }
+
+    for (const branch of branches) {
+      totalUserOptions.push(...branch.userIds);
+    }
+
+    return totalUserOptions;
+  };
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userId, setUserId] = useState(selectedUserId);
@@ -99,7 +107,7 @@ const FormComponent = ({
             <SelectTeamMembers
               customOption={prepareCurrentUserOption(currentUser)}
               filterParams={{
-                ids: totalUserOptions,
+                ids: returnTotalUserOptions(),
                 excludeIds: false
               }}
               label="Choose a team member"

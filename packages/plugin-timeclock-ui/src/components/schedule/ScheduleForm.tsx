@@ -62,11 +62,19 @@ function ScheduleForm(props: Props) {
     checkDuplicateScheduleShifts
   } = props;
 
-  const totalUserOptions: string[] = [];
+  const returnTotalUserOptions = () => {
+    const totalUserOptions: string[] = [];
 
-  for (const dept of departments) {
-    totalUserOptions.push(...dept.userIds);
-  }
+    for (const dept of departments) {
+      totalUserOptions.push(...dept.userIds);
+    }
+
+    for (const branch of branches) {
+      totalUserOptions.push(...branch.userIds);
+    }
+
+    return totalUserOptions;
+  };
 
   if (!scheduleConfigs.length) {
     Alert.error('Please add schedule config in configuration section!');
@@ -408,12 +416,30 @@ function ScheduleForm(props: Props) {
     );
   };
 
+  const dateSelection = () => (
+    <div style={{ width: '78%', marginRight: '0.5rem' }}>
+      <OverlayTrigger
+        ref={overlay => setOverlayTrigger(overlay)}
+        placement="top-start"
+        trigger="click"
+        overlay={renderDateSelection()}
+        container={this}
+        rootClose={this}
+      >
+        <PopoverButton>
+          {__('Please select date')}
+          <Icon icon="angle-down" />
+        </PopoverButton>
+      </OverlayTrigger>
+    </div>
+  );
+
   const modalContent = () => (
     <FlexColumn marginNum={10}>
       <SelectTeamMembers
         customField="employeeId"
         filterParams={{
-          ids: totalUserOptions,
+          ids: returnTotalUserOptions(),
           excludeIds: false
         }}
         customOption={prepareCurrentUserOption(currentUser)}
@@ -424,6 +450,7 @@ function ScheduleForm(props: Props) {
         name="userId"
       />
       {displayTotalDaysHoursBreakMins()}
+      {dateSelection()}
       {renderWeekDays()}
       {actionButtons('employee')}
     </FlexColumn>
@@ -488,7 +515,7 @@ function ScheduleForm(props: Props) {
               <SelectTeamMembers
                 customField="employeeId"
                 filterParams={{
-                  ids: totalUserOptions,
+                  ids: returnTotalUserOptions(),
                   excludeIds: false
                 }}
                 customOption={prepareCurrentUserOption(currentUser)}

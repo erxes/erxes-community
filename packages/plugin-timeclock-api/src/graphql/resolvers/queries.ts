@@ -38,7 +38,9 @@ const timeclockQueries = {
       subdomain,
       action: `branches.find`,
       data: {
-        supervisorId: user._id
+        query: {
+          supervisorId: user._id
+        }
       },
       isRPC: true,
       defaultValue: []

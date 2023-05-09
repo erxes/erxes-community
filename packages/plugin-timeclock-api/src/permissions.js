@@ -10,8 +10,7 @@ module.exports = {
       },
       {
         name: 'manageTimeclocks',
-        description: 'Manage timeclocks',
-        use: ['showTimeclocks']
+        description: 'Manage timeclocks'
       },
       {
         name: 'showTimeclocks',

@@ -21,6 +21,7 @@ type Props = {
   departments: IDepartment[];
 
   isCurrentUserAdmin: boolean;
+  isCurrentUserSupervisor?: boolean;
 
   currentDate?: string;
   queryParams: any;
@@ -28,12 +29,21 @@ type Props = {
   route?: string;
   startTime?: Date;
   loading: boolean;
+
   scheduleConfigs: IScheduleConfig[];
   searchFilter: string;
 };
 
 function List(props: Props) {
-  const { queryParams, history, route, searchFilter } = props;
+  const {
+    queryParams,
+    isCurrentUserAdmin,
+    history,
+    route,
+    searchFilter,
+    isCurrentUserSupervisor
+  } = props;
+
   const [showSideBar, setShowSideBar] = useState(true);
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
@@ -43,16 +53,18 @@ function List(props: Props) {
   useEffect(() => {
     switch (route) {
       case 'config':
-        setModalComponent(
-          <ConfigList
-            {...props}
-            getPagination={setPagination}
-            showSideBar={setShowSideBar}
-            getActionBar={setRightActionBar}
-            queryParams={queryParams}
-            history={history}
-          />
-        );
+        if (isCurrentUserAdmin) {
+          setModalComponent(
+            <ConfigList
+              {...props}
+              getPagination={setPagination}
+              showSideBar={setShowSideBar}
+              getActionBar={setRightActionBar}
+              queryParams={queryParams}
+              history={history}
+            />
+          );
+        }
         setLoading(false);
         break;
       case 'report':
@@ -131,7 +143,7 @@ function List(props: Props) {
       header={
         <Wrapper.Header
           title={__('Timeclocks')}
-          submenu={menuTimeClock(searchFilter)}
+          submenu={menuTimeClock(searchFilter, isCurrentUserAdmin)}
         />
       }
       actionBar={rightActionBar}
