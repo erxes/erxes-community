@@ -15,11 +15,6 @@ import React from 'react';
 
 import { IPeriodLock, IPeriodLockDoc } from '../types';
 
-import { withProps } from '@erxes/ui/src/utils/core';
-import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-import { queries } from '../../contracts/graphql';
 import SelectContract from '../../contracts/components/common/SelectContract';
 import styled from 'styled-components';
 
@@ -34,7 +29,6 @@ type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   periodLock: IPeriodLock;
   closeModal: () => void;
-  contractsData: any;
 };
 
 type State = {
@@ -140,10 +134,4 @@ class PeriodLockForm extends React.Component<Props, State> {
   }
 }
 
-export default withProps<Props>(
-  compose(
-    graphql<{}, any, any>(gql(queries.contracts), {
-      name: 'contractsData'
-    })
-  )(PeriodLockForm)
-);
+export default PeriodLockForm;
