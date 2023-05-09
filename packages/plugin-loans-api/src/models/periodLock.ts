@@ -28,6 +28,15 @@ export const loadPeriodLockClass = (models: IModels) => {
      * Create a periodLock
      */
     public static async createPeriodLock(doc: IPeriodLock) {
+      const nextLock = await models.PeriodLocks.findOne({
+        date: { $gte: doc.date }
+      })
+        .sort({ date: -1 })
+        .lean();
+      if (!!nextLock)
+        throw new Error(
+          `Can't lock period at this time because already locked`
+        );
       return models.PeriodLocks.create(doc);
     }
 

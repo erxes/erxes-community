@@ -19,7 +19,7 @@ const periodLockMutations = {
     { user, models, subdomain }: IContext
   ) => {
     doc.createdBy = user._id;
-    const periodLock = models.PeriodLocks.createPeriodLock(doc);
+    const periodLock = await models.PeriodLocks.createPeriodLock(doc);
 
     const logData = {
       type: 'periodLock',
