@@ -17,7 +17,6 @@ import messageBroker, {
   sendMessageBroker
 } from '../../../messageBroker';
 import redis from '../../../redis';
-import { CONTRACT_STATUS } from '../../../models/definitions/constants';
 
 const contractMutations = {
   contractsAdd: async (
@@ -25,7 +24,7 @@ const contractMutations = {
     doc: IContract,
     { user, models, subdomain }: IContext
   ) => {
-    const contract = models.Contracts.createContract(doc);
+    const contract = await models.Contracts.createContract(doc);
 
     const logData = {
       type: 'contract',

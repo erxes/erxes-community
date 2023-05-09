@@ -22,7 +22,7 @@ const invoiceMutations = {
       throw new Error('must choose customer or company');
     }
 
-    const invoice = models.Invoices.createInvoice(doc);
+    const invoice = await models.Invoices.createInvoice(doc);
 
     const logData = {
       type: 'invoice',
@@ -30,6 +30,7 @@ const invoiceMutations = {
       object: invoice,
       extraParams: { models }
     };
+
     const descriptions = gatherDescriptions(logData);
 
     await putCreateLog(

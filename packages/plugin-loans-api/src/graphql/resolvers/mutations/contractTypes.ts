@@ -18,7 +18,7 @@ const contractTypeMutations = {
     doc: IContractType,
     { user, models, subdomain }: IContext
   ) => {
-    const contractType = models.ContractTypes.createContractType(doc);
+    const contractType = await models.ContractTypes.createContractType(doc);
 
     const logData = {
       type: 'contractType',

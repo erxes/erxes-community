@@ -16,7 +16,7 @@ const insuranceTypeMutations = {
   insuranceTypesAdd: async (
     _root,
     doc: IInsuranceType & { yearPercents: string | number[] },
-    { user, docModifier, models, subdomain }: IContext
+    { user, models, subdomain }: IContext
   ) => {
     doc.yearPercents =
       typeof doc.yearPercents === 'string'
@@ -24,9 +24,7 @@ const insuranceTypeMutations = {
         : [];
 
     //TODO check this method
-    const insuranceType = models.InsuranceTypes.createInsuranceType(
-      docModifier(doc)
-    );
+    const insuranceType = await models.InsuranceTypes.createInsuranceType(doc);
 
     const logData = {
       type: 'insuranceType',
