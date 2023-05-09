@@ -105,6 +105,8 @@ export default (props: Props) => {
 
   const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
 
+  const [lastSelectedDate, setlastSelectedDate] = useState(new Date());
+
   const [request, setRequest] = useState<Request>({
     byDay: { requestDates: [] },
     byTime: { date: new Date(), startTime: new Date(), endTime: new Date() }
@@ -270,6 +272,14 @@ export default (props: Props) => {
 
   const onDateSelectChange = date => {
     if (date) {
+      // handle click on a different month
+      if (
+        JSON.stringify(date).split('-')[1] !==
+        JSON.stringify(lastSelectedDate).split('-')[1]
+      ) {
+        setlastSelectedDate(new Date(date));
+      }
+
       const dateString = dayjs(date).format(dateFormat);
 
       const oldRequestDates = request.byDay.requestDates;
@@ -313,6 +323,7 @@ export default (props: Props) => {
             open={true}
             input={false}
             renderDay={renderDay}
+            value={lastSelectedDate}
             closeOnSelect={false}
             timeFormat={false}
             onChange={onDateSelectChange}
@@ -328,7 +339,7 @@ export default (props: Props) => {
     );
   };
 
-  const onDateChange = (day_key, selectedDate) => {
+  const onDateChange = selectedDate => {
     const [
       getCorrectStartTime,
       getCorrectEndTime
@@ -420,7 +431,11 @@ export default (props: Props) => {
     <FlexRowEven>
       <FlexColumn marginNum={2}>
         <div>Date:</div>
-        <Datetime value={request.byTime.date} timeFormat={false} />
+        <Datetime
+          value={request.byTime.date}
+          timeFormat={false}
+          onChange={onDateChange}
+        />
       </FlexColumn>
 
       <FlexColumn marginNum={2}>
