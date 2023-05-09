@@ -1,4 +1,4 @@
-import { Alert, EmptyState, Spinner, withProps } from '@erxes/ui/src';
+import { Alert, EmptyState, Spinner, router, withProps } from '@erxes/ui/src';
 import { IUser } from '@erxes/ui/src/auth/types';
 import { IRouterProps } from '@erxes/ui/src/types';
 import gql from 'graphql-tag';
@@ -65,7 +65,7 @@ const PeriodLockDetailsContainer = (props: FinalProps) => {
 
   if (!periodLockDetailQuery.periodLockDetail) {
     return (
-      <EmptyState text="Contract not found" image="/images/actions/24.svg" />
+      <EmptyState text="Period Lock not found" image="/images/actions/24.svg" />
     );
   }
 
@@ -92,16 +92,18 @@ const removeOptions = () => ({
 
 export default withProps<Props>(
   compose(
-    graphql<Props, DetailQueryResponse, { _id: string }>(
+    graphql<any, DetailQueryResponse, { _id: string }>(
       gql(queries.periodLockDetail),
       {
         name: 'periodLockDetailQuery',
-        options: ({ id }) => ({
-          variables: {
-            _id: id
-          },
-          fetchPolicy: 'network-only'
-        })
+        options: ({ id }) => {
+          return {
+            variables: {
+              _id: id
+            },
+            fetchPolicy: 'network-only'
+          };
+        }
       }
     ),
     graphql<{}, EditMutationResponse, IPeriodLock>(

@@ -15,11 +15,11 @@ const ContractDetails = asyncComponent(() =>
     /* webpackChunkName: "ContractDetails" */ './contracts/containers/detail/ContractDetails'
   )
 );
-// const PeriodLockDetails = asyncComponent(() =>
-//   import(
-//     /* webpackChunkName: "PeriodLockDetails" */ './PeriodLocks/containers/PeriodLockDetails'
-//   )
-// );
+const PeriodLockDetails = asyncComponent(() =>
+  import(
+    /* webpackChunkName: "PeriodLockDetails" */ './periodLocks/containers/PeriodLockDetails'
+  )
+);
 
 const CollateralList = asyncComponent(() =>
   import(
@@ -68,11 +68,11 @@ const detailsOfContract = ({ match }) => {
   return <ContractDetails id={id} />;
 };
 
-// const periodLockDetail = ({ match }) => {
-//   const id = match.params.id;
+const periodLockDetail = ({ match }) => {
+  const id = match.params.id;
 
-//   return <PeriodLockDetails id={id} />;
-// };
+  return <PeriodLockDetails id={id} />;
+};
 
 const collateralLists = ({ location, history }) => {
   return (
@@ -178,7 +178,10 @@ const LoanRoutes = () => {
         path="/erxes-plugin-loan/periodLock-list"
         component={periodLockLists}
       />
-      {/* <Route path="/periodLock-details/:id" component={PeriodLockDetails} /> */}
+      <Route
+        path="/erxes-plugin-loan/periodLock-details/:id"
+        component={periodLockDetail}
+      />
     </React.Fragment>
   );
 };

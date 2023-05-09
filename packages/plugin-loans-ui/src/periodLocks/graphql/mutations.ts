@@ -2,10 +2,12 @@ import { periodLockDetailFields } from './queries';
 
 const commonFields = `
   $date: Date,
+  $excludeContracts: [String]
 `;
 
 const commonVariables = `
   date: $date,
+  excludeContracts:$excludeContracts
 `;
 
 const periodLocksAdd = `

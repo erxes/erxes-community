@@ -3,6 +3,7 @@ const periodLockFields = `
   createdBy
   createdAt
   date
+  excludeContracts
 `;
 
 const listParamsDef = `

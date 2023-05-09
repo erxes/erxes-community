@@ -4,7 +4,7 @@ export const types = () => `
     createdAt: Date
     createdBy: String 
     date: Date
-
+    excludeContracts:[String]
     user: User
   }
 
@@ -32,6 +32,7 @@ export const queries = `
 
 const commonFields = `
   date: Date
+  excludeContracts:[String]
 `;
 
 export const mutations = `
