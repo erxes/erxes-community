@@ -17,8 +17,12 @@ import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitio
 
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
+import { StyledContent } from '../../styles';
 
-type Props = {};
+type Props = {
+  ticketId: string;
+  questions: IRCFAQuestions[];
+};
 
 type State = {
   questions: IRCFAQuestions[];
@@ -45,23 +49,7 @@ class Section extends React.Component<Props, State> {
   };
 
   getQuestions = () => {
-    console.log('**********************************');
-    const questions: any = queries.getQuestions;
-    console.log(questions);
-    console.log('**********************************');
-
-    const result: IRCFAQuestions[] = [
-      {
-        _id: 'bQZMT7FtTLc3twrC5',
-        title: 'test',
-        status: 'created',
-        createdAt: '2023-05-05T08:38:39.043Z',
-        createdUser: 'EHPWejW9Jpz33YNuf',
-        __v: 0
-      }
-    ];
-
-    this.setState({ questions: result });
+    this.setState({ questions: [] });
   };
 
   renderForm() {
@@ -96,11 +84,13 @@ class Section extends React.Component<Props, State> {
     return (
       <div className="">
         <Box title="RCFA" name="name" extraButtons={extraButtons}>
-          {this.state.questions.length > 0 ? (
-            <p>{this.state.questions[0]?.title}</p>
-          ) : (
-            <p>No questions there.</p>
-          )}
+          <StyledContent>
+            {this.props.questions.length > 0 ? (
+              <p>{this.props.questions[0]?.title}</p>
+            ) : (
+              <p>No questions there.</p>
+            )}
+          </StyledContent>
         </Box>
       </div>
     );

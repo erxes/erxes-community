@@ -9,6 +9,8 @@ export interface IRCFAQuestions {
   createdUser: string;
   parentId?: string;
   __v?: number;
+  ticketId: string;
+  mainType: string;
 }
 
 export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
