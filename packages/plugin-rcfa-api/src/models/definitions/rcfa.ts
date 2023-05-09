@@ -3,14 +3,14 @@ import { field } from './utils';
 
 export interface IRCFAQuestions {
   _id?: string;
+  mainType: string;
+  mainTypeId: string;
   title: string;
   status: string;
   createdAt: Date | string;
   createdUser: string;
   parentId?: string;
   __v?: number;
-  ticketId: string;
-  mainType: string;
 }
 
 export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
@@ -19,6 +19,8 @@ export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
 
 export const rcfaQuestionsSchema = new Schema({
   _id: field({ pkey: true }),
+  mainType: field({ type: String }),
+  mainTypeId: field({ type: String }),
   title: field({ type: String, label: 'Title' }),
   status: field({ type: String }),
   createdAt: field({ type: Date }),

@@ -1,6 +1,6 @@
 const getQuestions = `
-  query Query {
-    rcfaQuestions
+  query Query($mainType: String, $mainTypeId: String) {
+    rcfaQuestions(mainType: $mainType, mainTypeId: $mainTypeId)
   }
 `;
 

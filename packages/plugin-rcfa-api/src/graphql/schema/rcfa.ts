@@ -2,10 +2,9 @@ export const types = `
 `;
 
 export const queries = `
-  rcfaQuestions: JSON
-  rcfaQuestionsTotalCount: JSON
+  rcfaQuestions(mainType:String, mainTypeId:String): JSON
 `;
 
 export const mutations = `
-    addRcfaQuestions(title:String):JSON
+    addRcfaQuestions(title:String, mainType:String, mainTypeId:String):JSON
 `;

@@ -1,4 +1,3 @@
-import * as compose from 'lodash.flowright';
 import React from 'react';
 import {
   BarItems,
@@ -11,17 +10,13 @@ import {
   ControlLabel,
   __
 } from '@erxes/ui/src/';
-import { ButtonMutate } from '@erxes/ui/src';
-import { mutations, queries } from '../graphql';
 import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
-
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
 import { StyledContent } from '../../styles';
 
 type Props = {
   ticketId: string;
   questions: IRCFAQuestions[];
+  createQuestion: (doc: any) => void;
 };
 
 type State = {
@@ -43,9 +38,7 @@ class Section extends React.Component<Props, State> {
   }
 
   saveQuestion = () => {
-    const savedQuestion = gql(queries.getQuestions);
-    console.log({ savedQuestion });
-    // mutations.createQuestion(this.state.questions[0]);
+    this.props.createQuestion('my title');
   };
 
   getQuestions = () => {
