@@ -40,7 +40,7 @@ export default {
   },
   meta: {
     cronjobs: {
-      handleMinutelyJob: checkContractScheduleAnd
+      handleDailyJob: checkContractScheduleAnd
     },
     documents
   }

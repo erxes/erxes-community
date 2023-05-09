@@ -13,7 +13,7 @@ import { getFullDate } from '../models/utils/utils';
 
 export async function checkContractScheduleAnd(subdomain: string) {
   const models: IModels = await generateModels(subdomain);
-  const today = getFullDate(new Date('2024-01-01'));
+  const today = getFullDate(new Date());
 
   //find not changed schedules
   const contractIds = await models.Schedules.find({
