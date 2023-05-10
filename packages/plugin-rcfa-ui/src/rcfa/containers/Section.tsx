@@ -5,6 +5,7 @@ import Section from '../components/Section';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
+import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 
 type Props = {
   mainTypeId: string;
@@ -16,6 +17,8 @@ type Props = {
 type FinalProps = {
   getQuestions: any;
   addRcfaQuestions: any;
+  editRcfaQuestions: any;
+  deleteRcfaQuestions: any;
 } & Props;
 
 class SectionContainer extends React.Component<FinalProps> {
@@ -23,14 +26,18 @@ class SectionContainer extends React.Component<FinalProps> {
 
   constructor(props) {
     super(props);
-    console.log(props);
     this.state = {
       id: props.id
     };
   }
 
   render() {
-    const { getQuestions, addRcfaQuestions } = this.props;
+    const {
+      getQuestions,
+      addRcfaQuestions,
+      editRcfaQuestions,
+      deleteRcfaQuestions
+    } = this.props;
 
     let questions = [];
     if (!getQuestions.loading) {
@@ -43,16 +50,23 @@ class SectionContainer extends React.Component<FinalProps> {
         mainType: 'ticket',
         mainTypeId: this.props.mainTypeId
       };
-      console.log('^^^', payload);
+      addRcfaQuestions({ variables: payload });
+    };
 
-      addRcfaQuestions(payload);
+    const editQuestion = (id: string, title: string) => {
+      editRcfaQuestions({ variables: { id, title } });
+    };
+
+    const deleteQuestion = (_id: string) => {
+      deleteRcfaQuestions({ variables: { _id } });
     };
 
     return (
       <Section
-        ticketId={this.state.id}
         questions={questions}
         createQuestion={createQuestion}
+        editQuestion={editQuestion}
+        deleteQuestion={deleteQuestion}
       />
     );
   }
@@ -79,8 +93,14 @@ export default withProps<Props>(
         }
       })
     }),
-    graphql<Props>(gql(mutations.add), {
+    graphql<Props>(gql(mutations.addQuestion), {
       name: 'addRcfaQuestions'
+    }),
+    graphql<Props>(gql(mutations.editQuestion), {
+      name: 'editRcfaQuestions'
+    }),
+    graphql<Props>(gql(mutations.deleteQuestion), {
+      name: 'deleteRcfaQuestions'
     })
   )(SectionContainer)
 );

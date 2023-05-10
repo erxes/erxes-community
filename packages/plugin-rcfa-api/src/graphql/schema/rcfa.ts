@@ -7,4 +7,6 @@ export const queries = `
 
 export const mutations = `
     addRcfaQuestions(title:String, mainType:String, mainTypeId:String):JSON
+    editRcfaQuestions(_id:String, title:String):JSON
+    deleteRcfaQuestions(_id:String):JSON
 `;

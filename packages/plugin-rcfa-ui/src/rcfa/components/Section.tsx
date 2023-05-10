@@ -14,9 +14,10 @@ import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitio
 import { StyledContent } from '../../styles';
 
 type Props = {
-  ticketId: string;
   questions: IRCFAQuestions[];
   createQuestion: (doc: any) => void;
+  editQuestion: (_id: string, title: string) => void;
+  deleteQuestion: (_id: string) => void;
 };
 
 type State = {
@@ -33,16 +34,38 @@ class Section extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.getQuestions();
+  componentWillReceiveProps(prevProps) {
+    this.setState({ questions: prevProps.questions });
   }
 
   saveQuestion = () => {
-    this.props.createQuestion('my title');
+    this.props.createQuestion('title');
   };
 
-  getQuestions = () => {
-    this.setState({ questions: [] });
+  addQuestion = () => {
+    if (this.props.questions.length >= 5) {
+      console.log('reached max questions');
+      return;
+    }
+  };
+
+  writeQuestion = (index: number) => event => {
+    console.log(index, event.target.value);
+    let questList = this.state.questions;
+    questList[index].title = event.target.value;
+    this.setState({ questions: questList });
+  };
+
+  editQuestion = (_id: string | undefined) => () => {
+    if (_id) {
+      this.props.editQuestion(_id, 'hello world');
+    }
+  };
+
+  deleteQuestion = (_id: string | undefined) => () => {
+    if (_id) {
+      this.props.deleteQuestion(_id);
+    }
   };
 
   renderForm() {
@@ -52,18 +75,48 @@ class Section extends React.Component<Props, State> {
       </Button>
     );
 
-    const content = props => {
+    const content = () => {
       return (
         <div>
-          <FormGroup>
-            <ControlLabel>{__('Question 1')}</ControlLabel>
-            <FormControl type="text"></FormControl>
-          </FormGroup>
+          {this.state.questions.map((question, index) => (
+            <div key={index}>
+              <FormGroup>
+                <ControlLabel>
+                  {__('Question')} {index + 1}
+                </ControlLabel>
+                <FormControl
+                  type="text"
+                  value={question.title}
+                  onChange={this.writeQuestion(index)}
+                />
+                <br />
+                <Button
+                  btnStyle="simple"
+                  size="small"
+                  onClick={this.editQuestion(question._id)}
+                >
+                  Save
+                </Button>
+                <Button
+                  btnStyle="danger"
+                  size="small"
+                  onClick={this.deleteQuestion(question._id)}
+                >
+                  Delete
+                </Button>
+              </FormGroup>
+            </div>
+          ))}
 
           <Button btnStyle="simple" onClick={this.saveQuestion}>
             Done
           </Button>
-          <Button onClick={this.saveQuestion}>Why</Button>
+          <Button
+            onClick={this.addQuestion}
+            disabled={this.state.questions.length >= 5}
+          >
+            Add Question
+          </Button>
         </div>
       );
     };
@@ -75,17 +128,15 @@ class Section extends React.Component<Props, State> {
     const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
 
     return (
-      <div className="">
-        <Box title="RCFA" name="name" extraButtons={extraButtons}>
-          <StyledContent>
-            {this.props.questions.length > 0 ? (
-              <p>{this.props.questions[0]?.title}</p>
-            ) : (
-              <p>No questions there.</p>
-            )}
-          </StyledContent>
-        </Box>
-      </div>
+      <Box title="RCFA" name="name" extraButtons={extraButtons}>
+        <StyledContent>
+          {this.props.questions.length > 0 ? (
+            <p>{this.props.questions[0]?.title}</p>
+          ) : (
+            <p>No questions there.</p>
+          )}
+        </StyledContent>
+      </Box>
     );
   }
 }
