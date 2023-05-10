@@ -160,6 +160,11 @@ export const contractSchema = schemaHooksWrapper(
       required: true,
       default: CONTRACT_CLASSIFICATION.NORMAL
     }),
+    branchId: field({
+      type: String,
+      optional: true,
+      label: 'Branch Id'
+    }),
     description: field({
       type: String,
       optional: true,

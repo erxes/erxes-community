@@ -3,6 +3,7 @@ import { contractDetailFields } from './queries';
 const commonFields = `
   $contractTypeId: String,
   $number: String,
+  $branchId: String,
   $status: String,
   $description: String,
   $createdBy: String,
@@ -42,6 +43,7 @@ const commonFields = `
 const commonVariables = `
   contractTypeId: $contractTypeId,
   number: $number,
+  branchId: $branchId,
   status: $status,
   description: $description,
   createdBy: $createdBy,

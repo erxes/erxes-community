@@ -38,6 +38,8 @@ export interface IContract {
   _id: string;
   contractTypeId: string;
   number: string;
+  branchId: string;
+  classification: string;
   status: string;
   description: string;
   createdBy: string;

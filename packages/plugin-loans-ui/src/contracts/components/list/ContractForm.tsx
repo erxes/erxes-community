@@ -24,6 +24,7 @@ import SelectContract, { ContractById } from '../../containers/SelectContract';
 import { IContract, IContractDoc } from '../../types';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -73,6 +74,7 @@ class ContractForm extends React.Component<Props, State | any> {
     this.state = {
       contractTypeId: contract.contractTypeId || '',
       status: contract.status,
+      branchId: contract.branchId,
       description: contract.description || '',
       marginAmount: contract.marginAmount || 0,
       leaseAmount: contract.leaseAmount || 0,
@@ -116,6 +118,7 @@ class ContractForm extends React.Component<Props, State | any> {
       _id: finalValues._id,
       ...this.state,
       contractTypeId: this.state.contractTypeId,
+      branchId: this.state.branchId,
       // number: this.state.number,
       status: this.state.status,
       description: this.state.description,
@@ -323,6 +326,10 @@ class ContractForm extends React.Component<Props, State | any> {
       this.setState({ startDate: value });
     };
 
+    const onChangeBranchId = value => {
+      this.setState({ branchId: value });
+    };
+
     return (
       <>
         <ScrollWrapper>
@@ -453,6 +460,16 @@ class ContractForm extends React.Component<Props, State | any> {
               </FormGroup>
             </FormColumn>
             <FormColumn>
+              <FormGroup>
+                <ControlLabel>{__('Branches')}</ControlLabel>
+                <SelectBranches
+                  name="branchId"
+                  label="Choose branch"
+                  initialValue={this.state?.branchId}
+                  onSelect={onChangeBranchId}
+                  multi={false}
+                />
+              </FormGroup>
               <FormGroup>
                 <ControlLabel required={true}>Start Date</ControlLabel>
                 <DateContainer>

@@ -27,6 +27,8 @@ export const types = () => `
     _id: String!
     contractTypeId: String
     number: String
+    branchId:String
+    classification:String
     status: String
     description: String
     createdBy: String
@@ -143,6 +145,8 @@ export const queries = `
 const commonFields = `
   contractTypeId: String
   number: String
+  branchId:String
+  classification:String
   status: String
   description: String
   createdBy: String

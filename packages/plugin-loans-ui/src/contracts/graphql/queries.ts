@@ -107,6 +107,8 @@ export const contractsMain = `
 `;
 
 export const contractDetailFields = `
+  branchId
+  classification
   contractType {
     code
     name
