@@ -316,7 +316,7 @@ class SiteDetail extends React.Component<Props, State> {
     if (prevProps.page !== this.props.page) {
       setTimeout(() => {
         this.fetchPage();
-      }, 500);
+      }, 1000);
     }
   }
 
