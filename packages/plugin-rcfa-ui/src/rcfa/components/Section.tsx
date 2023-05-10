@@ -11,7 +11,7 @@ import {
   __
 } from '@erxes/ui/src/';
 import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
-import { StyledContent } from '../../styles';
+import { StyledContent, StyledQuestionItem } from '../../styles';
 
 type Props = {
   questions: IRCFAQuestions[];
@@ -68,6 +68,19 @@ class Section extends React.Component<Props, State> {
     }
   };
 
+  deleteModalContent = props => {
+    return (
+      <div>
+        <h4>Are you sure delete?</h4>
+        {/* <p>{props.title}</p>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button btnStyle="simple">Cancel</Button>
+          <Button btnStyle="danger">Delete</Button>
+        </div> */}
+      </div>
+    );
+  };
+
   renderForm() {
     const trigger = (
       <Button btnStyle="simple">
@@ -75,51 +88,55 @@ class Section extends React.Component<Props, State> {
       </Button>
     );
 
+    const deleteModalTrigger = (_id: string | undefined, title: string) => (
+      <Button btnStyle="danger" size="small">
+        <Icon icon="times-circle" /> Delete
+      </Button>
+    );
+
     const content = () => {
       return (
         <div>
           {this.state.questions.map((question, index) => (
-            <div key={index}>
-              <FormGroup>
-                <ControlLabel>
-                  {__('Question')} {index + 1}
-                </ControlLabel>
-                <FormControl
-                  type="text"
-                  value={question.title}
-                  onChange={this.writeQuestion(index)}
-                />
-                <br />
-                <Button
-                  btnStyle="simple"
-                  size="small"
-                  onClick={this.editQuestion(question._id)}
-                >
-                  Save
-                </Button>
-                <Button
-                  btnStyle="danger"
-                  size="small"
-                  onClick={this.deleteQuestion(question._id)}
-                >
-                  Delete
-                </Button>
-              </FormGroup>
-            </div>
+            <StyledQuestionItem key={index}>
+              <p>
+                {__('Question')} {index + 1}:
+              </p>
+              <p>{question.title}</p>
+
+              <Button
+                btnStyle="simple"
+                size="small"
+                onClick={this.editQuestion(question._id)}
+              >
+                <Icon icon="edit-alt" /> Edit
+              </Button>
+
+              {deleteModalTrigger(question._id, question.title)}
+            </StyledQuestionItem>
           ))}
 
-          <Button btnStyle="simple" onClick={this.saveQuestion}>
-            Done
-          </Button>
-          <Button
-            onClick={this.addQuestion}
-            disabled={this.state.questions.length >= 5}
-          >
-            Add Question
-          </Button>
+          <div style={{ textAlign: 'right' }}>
+            <Button
+              btnStyle="simple"
+              onClick={this.addQuestion}
+              disabled={this.state.questions.length >= 5}
+            >
+              <Icon icon="plus-circle" /> Add question
+            </Button>
+            <Button onClick={this.saveQuestion}>
+              <Icon icon="check-circle" /> Done
+            </Button>
+          </div>
         </div>
       );
     };
+
+    <ModalTrigger
+      title="delete question"
+      trigger={deleteModalTrigger}
+      content={this.deleteModalContent}
+    />;
 
     return <ModalTrigger title="RCFA" trigger={trigger} content={content} />;
   }
@@ -128,7 +145,7 @@ class Section extends React.Component<Props, State> {
     const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
 
     return (
-      <Box title="RCFA" name="name" extraButtons={extraButtons}>
+      <Box title="RCFA" name="name" extraButtons={extraButtons} isOpen>
         <StyledContent>
           {this.props.questions.length > 0 ? (
             <p>{this.props.questions[0]?.title}</p>

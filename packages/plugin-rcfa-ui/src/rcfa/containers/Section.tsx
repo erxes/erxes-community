@@ -5,7 +5,6 @@ import Section from '../components/Section';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
-import { IRCFAQuestions } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 
 type Props = {
   mainTypeId: string;
@@ -22,13 +21,8 @@ type FinalProps = {
 } & Props;
 
 class SectionContainer extends React.Component<FinalProps> {
-  state: any = {};
-
   constructor(props) {
     super(props);
-    this.state = {
-      id: props.id
-    };
   }
 
   render() {
@@ -57,8 +51,8 @@ class SectionContainer extends React.Component<FinalProps> {
       editRcfaQuestions({ variables: { id, title } });
     };
 
-    const deleteQuestion = (_id: string) => {
-      deleteRcfaQuestions({ variables: { _id } });
+    const deleteQuestion = (id: string) => {
+      deleteRcfaQuestions({ variables: { id } });
     };
 
     return (
@@ -72,7 +66,7 @@ class SectionContainer extends React.Component<FinalProps> {
   }
 }
 
-export const refetchQueries = ({ mainTypeId }) => [
+const refetchQueries = ({ mainTypeId }) => [
   {
     query: gql(queries.getQuestions),
     variables: {
@@ -94,13 +88,16 @@ export default withProps<Props>(
       })
     }),
     graphql<Props>(gql(mutations.addQuestion), {
-      name: 'addRcfaQuestions'
+      name: 'addRcfaQuestions',
+      options: props => ({ refetchQueries: refetchQueries(props) })
     }),
     graphql<Props>(gql(mutations.editQuestion), {
-      name: 'editRcfaQuestions'
+      name: 'editRcfaQuestions',
+      options: props => ({ refetchQueries: refetchQueries(props) })
     }),
     graphql<Props>(gql(mutations.deleteQuestion), {
-      name: 'deleteRcfaQuestions'
+      name: 'deleteRcfaQuestions',
+      options: props => ({ refetchQueries: refetchQueries(props) })
     })
   )(SectionContainer)
 );
