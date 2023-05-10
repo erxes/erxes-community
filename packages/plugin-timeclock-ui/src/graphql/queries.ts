@@ -36,6 +36,7 @@ const listParamsDef = `
   $departmentIds: [String]
   $reportType: String
   $scheduleStatus: String
+  $isCurrentUserAdmin: Boolean
 `;
 
 const listParamsValue = `
@@ -48,6 +49,7 @@ const listParamsValue = `
   departmentIds: $departmentIds
   reportType: $reportType
   scheduleStatus: $scheduleStatus
+  isCurrentUserAdmin: $isCurrentUserAdmin
 `;
 
 const timelogsMain = `
@@ -101,6 +103,34 @@ const timeclocksPerUser = `
 const schedulesMain = `
   query schedulesMain(${listParamsDef}) {
     schedulesMain(${listParamsValue}) {
+      list {
+          _id
+          shifts{
+            _id
+            shiftStart
+            shiftEnd
+            solved
+            status
+            scheduleConfigId
+          }
+          scheduleConfigId
+          solved
+          status
+          user {
+            ${userFields}
+          }
+          scheduleChecked
+          submittedByAdmin
+          totalBreakInMins
+        }
+        totalCount
+  }
+}
+`;
+
+const checkDuplicateScheduleShifts = `
+  query checkDuplicateScheduleShifts(${listParamsDef}) {
+    checkDuplicateScheduleShifts(${listParamsValue}) {
       list {
           _id
           shifts{
@@ -182,6 +212,8 @@ const timeclockReports = `
                 scheduledEnd
                 scheduledDuration
                 
+                lunchBreakInHrs
+
                 totalMinsLate
                 totalHoursOvertime
                 totalHoursOvernight
@@ -199,11 +231,15 @@ const timeclockReports = `
               totalHoursOvertime
               totalHoursOvernight
             
+              totalHoursBreakScheduled
+              totalHoursBreakActual
+            
               totalMinsScheduledThisMonth
               totalDaysScheduled
               totalHoursScheduled
           
               absenceInfo {
+                totalHoursShiftRequest
                 totalHoursWorkedAbroad
                 totalHoursPaidAbsence
                 totalHoursUnpaidAbsence
@@ -298,6 +334,24 @@ const timeLogsPerUser = `
   }
 `;
 
+const timeclockBranches = `
+query timeclockBranches($searchValue: String){
+  timeclockBranches(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
+const timeclockDepartments = `
+query timeclockDepartments($searchValue: String){
+  timeclockDepartments(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
 export default {
   timeclockReports,
   branches,
@@ -310,11 +364,15 @@ export default {
 
   schedulesMain,
   requestsMain,
+  checkDuplicateScheduleShifts,
 
   absenceTypes,
   payDates,
   holidays,
 
   scheduleConfigs,
-  deviceConfigs
+  deviceConfigs,
+
+  timeclockBranches,
+  timeclockDepartments
 };

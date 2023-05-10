@@ -1,5 +1,7 @@
 import { IContext } from '../../connectionResolver';
 import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
+import { checkPermission } from '@erxes/api-utils/src';
+
 import {
   IAbsence,
   ISchedule,
@@ -12,15 +14,15 @@ import {
 import {
   createScheduleShiftsByUserIds,
   findBranches,
-  findBranchUsers,
-  findDepartmentUsers,
-  findUser
+  findUser,
+  returnUnionOfUserIds
 } from './utils';
 import dayjs = require('dayjs');
 import {
   connectAndQueryFromMsSql,
   connectAndQueryTimeLogsFromMsSql
 } from '../../utils';
+import { fixDate } from '@erxes/api-utils/src';
 
 interface ITimeClockEdit extends ITimeClock {
   _id: string;
@@ -251,6 +253,19 @@ const timeclockMutations = {
       ...doc
     });
 
+    const findUserSchedules = await models.Schedules.find({
+      userId: shiftRequest.userId
+    });
+
+    const findUserScheduleShifts = await models.Shifts.find({
+      scheduleId: {
+        $in: findUserSchedules.map(schedule => schedule._id)
+      },
+      shiftStart: {
+        $gte: fixDate(shiftRequest.startTime)
+      }
+    });
+
     if (!shiftRequest.checkInOutRequest) {
       const findAbsenceType = await models.AbsenceTypes.getAbsenceType(
         shiftRequest.absenceTypeId || ''
@@ -264,6 +279,83 @@ const timeclockMutations = {
         });
         // if shift request is approved
         if (status === 'Approved') {
+          if (findAbsenceType.requestTimeType === 'by day') {
+            const requestDates = shiftRequest.requestDates || [];
+
+            const schedule = await models.Schedules.createSchedule({
+              userId: shiftRequest.userId,
+              solved: true,
+              status: 'Approved'
+            });
+
+            const scheduleShiftsWriteOps: any[] = [];
+            const scheduleShiftUpdateOps: any[] = [];
+            const timeclockBulkWriteOps: any[] = [];
+
+            for (const requestDate of requestDates) {
+              const requestStartTime = new Date(requestDate + ' 09:00:00');
+              const requestEndTime = dayjs(requestStartTime)
+                .add(findAbsenceType.requestHoursPerDay, 'hour')
+                .toDate();
+
+              timeclockBulkWriteOps.push({
+                userId: shiftRequest.userId,
+                shiftStart: requestStartTime,
+                shiftEnd: requestEndTime,
+                shiftActive: false,
+                deviceType: 'Shift request'
+              });
+
+              const findOverrideShift = findUserScheduleShifts.find(
+                shift =>
+                  dayjs(new Date(shift.shiftStart || '')).format(
+                    'MM/DD/YYYY'
+                  ) === requestDate
+              );
+              if (findOverrideShift) {
+                scheduleShiftUpdateOps.push({
+                  updateOne: {
+                    filter: {
+                      _id: findOverrideShift._id
+                    },
+                    update: {
+                      $set: {
+                        scheduleId: schedule._id,
+                        shiftStart: requestStartTime,
+                        shiftEnd: requestEndTime,
+                        solved: true,
+                        status: 'Approved'
+                      }
+                    }
+                  }
+                });
+
+                continue;
+              }
+
+              scheduleShiftsWriteOps.push({
+                insertOne: {
+                  document: {
+                    scheduleId: schedule._id,
+                    shiftStart: requestStartTime,
+                    shiftEnd: requestEndTime,
+                    solved: true,
+                    status: 'Approved'
+                  }
+                }
+              });
+            }
+
+            if (scheduleShiftsWriteOps.length) {
+              await models.Shifts.bulkWrite(scheduleShiftsWriteOps);
+            }
+            if (scheduleShiftUpdateOps.length) {
+              await models.Shifts.bulkWrite(scheduleShiftUpdateOps);
+            }
+            await models.Timeclocks.insertMany(timeclockBulkWriteOps);
+            return;
+          }
+
           const newSchedule = await models.Schedules.createSchedule({
             userId: shiftRequest.userId,
             solved: true,
@@ -358,52 +450,94 @@ const timeclockMutations = {
       models.Shifts.createShift({
         scheduleId: schedule._id,
         shiftStart: shift.shiftStart,
-        shiftEnd: shift.shiftEnd
+        shiftEnd: shift.shiftEnd,
+        scheduleConfigId: shift.scheduleConfigId
       });
     });
 
     return schedule;
   },
+  async checkDuplicateScheduleShifts(
+    _root,
+    { branchIds, departmentIds, userIds, shifts, status },
+    { models, subdomain }: IContext
+  ) {
+    const scheduledUserIds = await returnUnionOfUserIds(
+      branchIds,
+      departmentIds,
+      userIds,
+      subdomain
+    );
 
+    const filterApprovedSchedules = status ? { status, solved: true } : {};
+
+    const totalSchedules = await models.Schedules.find({
+      userId: { $in: scheduledUserIds },
+      ...filterApprovedSchedules
+    });
+
+    if (!totalSchedules.length) {
+      return [];
+    }
+
+    const totalScheduleIds = totalSchedules.map(schedule => schedule._id);
+
+    const findManyOps: any[] = [];
+
+    for (const shift of shifts) {
+      const shiftDuplicateCases = [
+        {
+          shiftStart: { $gte: shift.shiftStart },
+          shiftEnd: { $lte: shift.shiftEnd }
+        },
+        {
+          shiftEnd: { $gte: shift.shiftStart, $lte: shift.shiftEnd }
+        },
+        { shiftStart: { $gte: shift.shiftStart, $lte: shift.shiftEnd } },
+        {
+          shiftStart: {
+            $lte: shift.shiftEnd
+          },
+          shiftEnd: {
+            $gte: shift.shiftStart
+          }
+        }
+      ];
+
+      findManyOps.push(...shiftDuplicateCases);
+    }
+
+    const duplicateShifts = await models.Shifts.find({
+      $and: [
+        { scheduleId: { $in: totalScheduleIds } },
+        {
+          $or: findManyOps
+        }
+      ]
+    });
+
+    const duplicateScheduleIds = duplicateShifts.map(shift => shift.scheduleId);
+    const duplicateSchedules = totalSchedules.filter(schedule =>
+      duplicateScheduleIds.includes(schedule._id)
+    );
+
+    for (const schedule of duplicateSchedules) {
+      schedule.shiftIds = duplicateShifts.map(shift => shift._id);
+    }
+
+    return duplicateSchedules;
+  },
   async submitSchedule(
     _root,
     { branchIds, departmentIds, userIds, shifts, totalBreakInMins },
     { subdomain, models }: IContext
   ) {
-    if (userIds.length) {
-      return createScheduleShiftsByUserIds(
-        userIds,
-        shifts,
-        models,
-        totalBreakInMins
-      );
-    }
-
-    const concatBranchDept: string[] = [];
-
-    if (branchIds) {
-      const branchUsers = await findBranchUsers(subdomain, branchIds);
-      const branchUserIds = branchUsers.map(branchUser => branchUser._id);
-      concatBranchDept.push(...branchUserIds);
-    }
-    if (departmentIds) {
-      const departmentUsers = await findDepartmentUsers(
-        subdomain,
-        departmentIds
-      );
-      const departmentUserIds = departmentUsers.map(
-        departmentUser => departmentUser._id
-      );
-      concatBranchDept.push(...departmentUserIds);
-    }
-
-    // prevent creating double schedule for common users
-    const sorted = concatBranchDept.sort();
-    const unionOfUserIds = sorted.filter((value, pos) => {
-      return concatBranchDept.indexOf(value) === pos;
-    });
-
-    return createScheduleShiftsByUserIds(unionOfUserIds, shifts, models);
+    return createScheduleShiftsByUserIds(
+      await returnUnionOfUserIds(branchIds, departmentIds, userIds, subdomain),
+      shifts,
+      models,
+      totalBreakInMins
+    );
   },
 
   scheduleRemove(_root, { _id }, { models }: IContext) {
@@ -617,6 +751,56 @@ const timeclockMutations = {
   }
 };
 
-// moduleRequireLogin(timeclockMutations);
+moduleRequireLogin(timeclockMutations);
+
+// extract from mssql
+checkPermission(
+  timeclockMutations,
+  'extractAllDataFromMsSQL',
+  'manageTimeclocks'
+);
+checkPermission(
+  timeclockMutations,
+  'extractTimeLogsFromMsSQL',
+  'manageTimeclocks'
+);
+
+checkPermission(timeclockMutations, 'solveScheduleRequest', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'scheduleRemove', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'submitSchedule', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'solveAbsenceRequest', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'removeAbsenceRequest', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'timeclockRemove', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'timeclockEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'timeclockCreate', 'manageTimeclocks');
+
+checkPermission(
+  timeclockMutations,
+  'createTimeClockFromLog',
+  'manageTimeclocks'
+);
+
+// configs
+checkPermission(timeclockMutations, 'scheduleConfigAdd', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'scheduleConfigEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'scheduleConfigRemove', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'absenceTypeAdd', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'absenceTypeEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'absenceTypeRemove', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'payDateAdd', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'payDateEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'payDateRemove', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'holidayAdd', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'holidayEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'holidayRemove', 'manageTimeclocks');
+
+checkPermission(timeclockMutations, 'deviceConfigAdd', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'deviceConfigEdit', 'manageTimeclocks');
+checkPermission(timeclockMutations, 'deviceConfigRemove', 'manageTimeclocks');
 
 export default timeclockMutations;
