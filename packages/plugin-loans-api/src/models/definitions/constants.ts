@@ -11,6 +11,15 @@ export const CONTRACT_STATUS = {
   ALL: ['draft', 'normal', 'bad', 'closed']
 };
 
+export const CONTRACT_CLASSIFICATION = {
+  NORMAL: 'NORMAL',
+  EXPIRED: 'EXPIRED',
+  ABNORMAL: 'ABNORMAL',
+  DOUBTFUL: 'DOUBTFUL',
+  BAD: 'BAD',
+  ALL: ['NORMAL', 'EXPIRED', 'ABNORMAL', 'DOUBTFUL', 'BAD']
+};
+
 export const COLLATERAL_STATUS = {
   ACTIVE: 'active',
   ARCHIVE: 'archive',

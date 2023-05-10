@@ -22,7 +22,8 @@ import {
 
 export const getAOESchedules = async (
   models: IModels,
-  contract
+  contract,
+  trDate
 ): Promise<{
   preSchedule: IScheduleDocument & any;
   nextSchedule: IScheduleDocument & any;
@@ -30,14 +31,18 @@ export const getAOESchedules = async (
   // with skipped of done
   const preSchedule: any = await models.Schedules.findOne({
     contractId: contract._id,
-    status: { $in: [SCHEDULE_STATUS.DONE, SCHEDULE_STATUS.LESS] }
+    $or: [
+      { payDate: { $lt: trDate } },
+      { status: { $in: [SCHEDULE_STATUS.DONE, SCHEDULE_STATUS.LESS] } }
+    ]
   })
     .sort({ payDate: -1 })
     .lean<IScheduleDocument & any>();
 
   const nextSchedule = await models.Schedules.findOne({
     contractId: contract._id,
-    status: { $in: [SCHEDULE_STATUS.PENDING] }
+    status: { $in: [SCHEDULE_STATUS.PENDING] },
+    payDate: { $gte: trDate }
   })
     .sort({ payDate: 1 })
     .lean<IScheduleDocument & any>();
@@ -90,7 +95,11 @@ export const getCalcedAmounts = async (
    * @property preSchedule /schedule of done or less payed/
    * @property nextSchedule /schedule of pending/
    */
-  let { preSchedule, nextSchedule } = await getAOESchedules(models, contract);
+  let { preSchedule, nextSchedule } = await getAOESchedules(
+    models,
+    contract,
+    trDate
+  );
 
   if (!preSchedule && !nextSchedule) {
     return result;
@@ -149,6 +158,10 @@ export const getCalcedAmounts = async (
 
   // one day two pay
   if (getDiffDay(trDate, prePayDate) === 0) {
+    console.log(
+      'getDiffDay(trDate, prePayDate) === 0',
+      getDiffDay(trDate, prePayDate) === 0
+    );
     //when less payed prev schedule there will be must add amount's of
     if (preSchedule.status === SCHEDULE_STATUS.LESS) {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
@@ -199,6 +212,7 @@ export const getCalcedAmounts = async (
 
   // between prepay
   if (trDate < nextPayDate) {
+    console.log('trDate < nextPayDate', trDate < nextPayDate);
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);
@@ -248,6 +262,10 @@ export const getCalcedAmounts = async (
 
   // scheduled
   if (getDiffDay(trDate, nextPayDate) === 0) {
+    console.log(
+      'getDiffDay(trDate, nextPayDate) === 0',
+      getDiffDay(trDate, nextPayDate) === 0
+    );
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);
@@ -372,6 +390,8 @@ export const transactionRule = async (
     payDate: doc.payDate
   });
 
+  console.log('result.calcedInfo', result.calcedInfo);
+
   const {
     payment = 0,
     undue = 0,
@@ -383,6 +403,7 @@ export const transactionRule = async (
   } = result.calcedInfo;
   result.calcedInfo.total =
     payment + undue + interestEve + interestNonce + insurance + debt;
+
   delete result.calcedInfo.preSchedule;
 
   let mainAmount = doc.total;

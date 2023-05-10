@@ -64,8 +64,7 @@ const generateParams = ({ queryParams }) => ({
     sortDirection: queryParams.sortDirection
       ? parseInt(queryParams.sortDirection, 10)
       : undefined
-  },
-  fetchPolicy: 'network-only'
+  }
 });
 
 export default withProps<Props>(
@@ -74,7 +73,9 @@ export default withProps<Props>(
       gql(queries.collateralsMain),
       {
         name: 'collateralsMainQuery',
-        options: { ...generateParams }
+        options: ({ queryParams }) => {
+          return generateParams({ queryParams });
+        }
       }
     )
   )(withRouter<IRouterProps>(CollateralListContainer))

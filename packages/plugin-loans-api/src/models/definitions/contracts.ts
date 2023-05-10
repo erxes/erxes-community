@@ -1,4 +1,8 @@
-import { CONTRACT_STATUS, REPAYMENT_TYPE } from './constants';
+import {
+  CONTRACT_CLASSIFICATION,
+  CONTRACT_STATUS,
+  REPAYMENT_TYPE
+} from './constants';
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 
@@ -32,6 +36,8 @@ export interface IContract {
    * draft normal bad closed
    */
   status: string;
+  classification: string;
+  branchId: string;
   description: string;
   createdBy: string;
   createdAt: Date;
@@ -146,6 +152,13 @@ export const contractSchema = schemaHooksWrapper(
       enum: CONTRACT_STATUS.ALL,
       required: true,
       default: CONTRACT_STATUS.NORMAL
+    }),
+    classification: field({
+      type: String,
+      label: 'Classification',
+      enum: CONTRACT_CLASSIFICATION.ALL,
+      required: true,
+      default: CONTRACT_CLASSIFICATION.NORMAL
     }),
     description: field({
       type: String,
