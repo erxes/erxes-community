@@ -65,7 +65,7 @@ function renderCreate(kind: string) {
 
   const trigger = <button>+ {__('Add')}</button>;
 
-  const meta = PAYMENTCONFIGS.find(p => p.kind === kind);
+  const meta: any = PAYMENTCONFIGS.find(p => p.kind === kind);
 
   const title = meta ? `Add ${meta.name}` : 'Add payment config';
 
@@ -79,7 +79,16 @@ function renderCreate(kind: string) {
     <Component {...props} renderButton={renderButton} />
   );
 
-  return <ModalTrigger title={title} trigger={trigger} content={formContent} />;
+  const size = meta.modalSize || 'sm';
+
+  return (
+    <ModalTrigger
+      title={title}
+      trigger={trigger}
+      size={size}
+      content={formContent}
+    />
+  );
 }
 
 function Entry({ payment, getClassName, toggleBox, paymentsCount }: Props) {

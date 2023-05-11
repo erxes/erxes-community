@@ -8,9 +8,9 @@ export class VendorBaseAPI {
   private password: string;
   private accessToken: string;
 
-  constructor(config) {
-    this.username = config.username;
-    this.password = config.password;
+  constructor() {
+    this.username = 'ERXES_MONGOLIA';
+    this.password = 'mkVeYADo';
     this.apiUrl = meta.apiUrl + '/' + meta.apiVersion;
     this.accessToken = '';
   }
@@ -19,7 +19,7 @@ export class VendorBaseAPI {
     try {
       const authResponse = await sendRequest({
         method: 'POST',
-        path: meta.paths.auth,
+        url: this.apiUrl + '/' + meta.paths.auth,
         body: { terminal_id: '95000059' },
         headers: {
           Authorization:
@@ -61,7 +61,7 @@ export class VendorBaseAPI {
     try {
       const authResponse = await sendRequest({
         method: 'POST',
-        path: meta.paths.refresh,
+        path: this.apiUrl + '/' + meta.paths.refresh,
         body: { terminal_id: '95000059' },
         headers: {
           Authorization: 'Bearer ' + token
@@ -135,11 +135,7 @@ export class VendorBaseAPI {
         body: data
       };
 
-      console.log('requestOptions', requestOptions);
-
       const response = await sendRequest(requestOptions);
-
-      console.log('response', response);
 
       return response;
     } catch (e) {

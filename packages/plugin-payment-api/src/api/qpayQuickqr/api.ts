@@ -1,3 +1,6 @@
+import { IModels, generateModels } from '../../connectionResolver';
+import { IInvoiceDocument } from '../../models/definitions/invoices';
+import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 import { VendorBaseAPI } from './vendorBase';
 
 export type QPayMerchantConfig = {
@@ -5,8 +8,19 @@ export type QPayMerchantConfig = {
   password: string;
 };
 
+type MerchantCommonParams = {
+  registerNumber: string;
+  mccCode: string;
+  city: string;
+  district: string;
+  address: string;
+  phone: string;
+  email: string;
+};
+
 export const meta = {
-  apiUrl: 'https://sandbox-quickqr.qpay.mn',
+  // apiUrl: 'https://sandbox-quickqr.qpay.mn',
+  apiUrl: 'https://quickqr.qpay.mn',
   apiVersion: 'v2',
 
   paths: {
@@ -16,26 +30,66 @@ export const meta = {
     createPerson: 'merchant/person',
     getMerchant: 'merchant',
     merchantList: 'merchant/list',
+    checkInvoice: 'payment/check',
 
     invoice: 'invoice'
   }
 };
 
-export class QpayMerchantAPI extends VendorBaseAPI {
-  constructor(config: QPayMerchantConfig) {
-    super(config);
+export const quickQrCallbackHandler = async (models: IModels, data: any) => {
+  const { identifier } = data;
+
+  if (!identifier) {
+    throw new Error('Invoice id is required');
   }
 
-  async createCompany(args: {
-    registerNumber: string;
-    name: string;
-    mccCode: string;
-    city: string;
-    district: string;
-    address: string;
-    phone: string;
-    email: string;
-  }) {
+  const invoice = await models.Invoices.getInvoice({
+    identifier
+  });
+
+  const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
+
+  if (payment.kind !== PAYMENTS.qpayQuickqr.kind) {
+    throw new Error('Payment config type is mismatched');
+  }
+
+  try {
+    const api = new QPayQuickQrAPI(payment.config);
+    const status = await api.checkInvoice(invoice);
+
+    if (status !== PAYMENT_STATUS.PAID) {
+      return invoice;
+    }
+
+    await models.Invoices.updateOne(
+      { _id: invoice._id },
+      {
+        $set: {
+          status,
+          resolvedAt: new Date()
+        }
+      }
+    );
+
+    invoice.status = status;
+
+    return invoice;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
+
+export class QPayQuickQrAPI extends VendorBaseAPI {
+  private domain: string;
+  private config: any;
+
+  constructor(config?: any, domain?: string) {
+    super();
+    this.domain = domain || '';
+    this.config = config;
+  }
+
+  async createCompany(args: MerchantCommonParams & { name: string }) {
     return await this.makeRequest({
       method: 'POST',
       path: meta.paths.createCompany,
@@ -47,51 +101,66 @@ export class QpayMerchantAPI extends VendorBaseAPI {
     });
   }
 
-  async createCustomer(args: {
-    registerNumber: string;
-    name: string;
-    mccCode: string;
-    city: string;
-  }) {
+  async createCustomer(
+    args: MerchantCommonParams & { firstName: string; lastName: string }
+  ) {
     return await this.makeRequest({
       method: 'POST',
       path: meta.paths.createPerson,
       data: {
-        register_number: 'УЗ89122490',
-        last_name: 'Бат-Эрдэнэ',
-        first_name: 'Соёмбо',
-        mcc_code: '0110',
-        city: 'Ulaanbaatar',
-        district: 'Sukhbaatar',
-        address: '6 хороо 14-10',
-        phone: '99391924',
-        email: 'e11iot.soko@gmail.com'
+        ...args,
+        register_number: args.registerNumber,
+        mcc_code: args.mccCode,
+        first_name: args.firstName,
+        last_name: args.lastName
       }
     });
   }
 
-  async createInvoice(args: {
-    merchantId: string;
-    amount: number;
-    mccCode: string;
-    description: string;
-    callbackUrl: string;
-  }) {
+  async createInvoice(invoice: IInvoiceDocument) {
     return await this.makeRequest({
       method: 'POST',
       path: meta.paths.invoice,
       data: {
-        merchant_id: '79e4336a-614f-43c2-bbce-09a716be2c05',
-        branch_code: 'BRANCH_001',
-        amount: 100,
+        merchant_id: this.config.merchantId,
+        amount: invoice.amount,
         currency: 'MNT',
-        customer_name: 'TDB',
-        customer_logo: '',
-        callback_url: 'https://notify@test.mn/pay',
-        description: '9 сарын үйлчилгээний төлбөр',
-        mcc_code: ''
+        // customer_name: 'TDB',
+        // customer_logo: '',
+        callback_url: `${this.domain}/pl:payment/callback/${PAYMENTS.qpayQuickqr.kind}?identifier=${invoice.identifier}`,
+        description: invoice.description || 'Гүйлгээ',
+        mcc_code: this.config.mccCode,
+        bank_accounts: [
+          {
+            default: true,
+            account_bank_code: this.config.bankCode,
+            account_number: this.config.bankAccount,
+            account_name: this.config.bankAccountName,
+            is_default: true
+          }
+        ]
       }
     });
+  }
+
+  async checkInvoice(invoice: IInvoiceDocument) {
+    try {
+      const res = await this.makeRequest({
+        method: 'POST',
+        path: meta.paths.checkInvoice,
+        data: {
+          invoice_id: invoice.apiResponse.id
+        }
+      });
+
+      if (res.invoice_status === 'PAID') {
+        return PAYMENT_STATUS.PAID;
+      }
+
+      return PAYMENT_STATUS.PENDING;
+    } catch (e) {
+      throw new Error(e.message);
+    }
   }
 
   async get(_id: string) {

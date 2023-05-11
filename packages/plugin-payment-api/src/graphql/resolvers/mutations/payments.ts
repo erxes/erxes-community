@@ -5,10 +5,31 @@ import {
 
 import { IContext } from '../../../connectionResolver';
 import { IPayment } from '../../../models/definitions/payments';
-import { QpayMerchantAPI } from '../../../api/qpayQuickqr/api';
+import { QPayQuickQrAPI } from '../../../api/qpayQuickqr/api';
 
 const mutations = {
   async paymentAdd(_root, doc: IPayment, { models }: IContext) {
+    if (doc.kind === 'qpayQuickqr') {
+      const api = new QPayQuickQrAPI();
+
+      const { isCompany } = doc.config;
+
+      let apiResponse;
+      try {
+        if (isCompany) {
+          apiResponse = await api.createCompany(doc.config);
+        } else {
+          apiResponse = await api.createCustomer(doc.config);
+        }
+
+        const { id } = apiResponse;
+
+        doc.config.merchantId = id;
+      } catch (e) {
+        throw new Error(e.message);
+      }
+    }
+
     return models.Payments.createPayment(doc);
   },
 
@@ -38,7 +59,7 @@ const mutations = {
   },
 
   async qpayRegisterMerchantCompany(_root, args, { models }: IContext) {
-    const api = new QpayMerchantAPI({
+    const api = new QPayQuickQrAPI({
       username: process.env.QPAY_MERCHANT_USERNAME || '',
       password: process.env.QPAY_MERCHANT_PASSWORD || ''
     });
@@ -47,7 +68,7 @@ const mutations = {
   },
 
   async qpayCreateInvoice(_root, args, { models }: IContext) {
-    const api = new QpayMerchantAPI({
+    const api = new QPayQuickQrAPI({
       username: process.env.QPAY_MERCHANT_USERNAME || '',
       password: process.env.QPAY_MERCHANT_PASSWORD || ''
     });
@@ -56,7 +77,7 @@ const mutations = {
   },
 
   async qpayRegisterMerchantCustomer(_root, args, { models }: IContext) {
-    const api = new QpayMerchantAPI({
+    const api = new QPayQuickQrAPI({
       username: process.env.QPAY_MERCHANT_USERNAME || '',
       password: process.env.QPAY_MERCHANT_PASSWORD || ''
     });

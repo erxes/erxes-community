@@ -9,6 +9,7 @@ import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
 import { PAYMENTS, PAYMENT_STATUS } from './api/constants';
 import redisUtils from './redisUtils';
+import { quickQrCallbackHandler } from './api/qpayQuickqr/api';
 
 export const callbackHandler = async (req, res) => {
   const { route, body, query } = req;
@@ -47,6 +48,9 @@ export const callbackHandler = async (req, res) => {
         break;
       case PAYMENTS.paypal.kind:
         invoiceDoc = await paypalCallbackHandler(models, data);
+        break;
+      case PAYMENTS.qpayQuickqr.kind:
+        invoiceDoc = await quickQrCallbackHandler(models, data);
         break;
       default:
         return res.status(400).send('Invalid kind');

@@ -16,8 +16,6 @@ export class BaseAPI {
   }) {
     const { method, path, params, data, headers } = args;
 
-    console.log('url is', `${this.apiUrl}/${path}`);
-
     try {
       const requestOptions = {
         url: `${this.apiUrl}/${path}`,

@@ -6,7 +6,7 @@ import {
 import { IContext } from '../../../connectionResolver';
 import { MonpayAPI } from '../../../api/monpay/api';
 import { PAYMENTS } from '../../../api/constants';
-import { QpayMerchantAPI } from '../../../api/qpayQuickqr/api';
+import { QPayQuickQrAPI } from '../../../api/qpayQuickqr/api';
 
 interface IParam {
   searchValue?: string;
@@ -113,7 +113,7 @@ const queries = {
   },
 
   async qpayGetMerchant(_root, args, { models }: IContext) {
-    const api = new QpayMerchantAPI({
+    const api = new QPayQuickQrAPI({
       username: process.env.QPAY_MERCHANT_USERNAME || '',
       password: process.env.QPAY_MERCHANT_PASSWORD || ''
     });
