@@ -131,6 +131,7 @@ const queryParams = `
   conformityIsSaved: Boolean
   closeDate: Date
   closeDateType: String
+  branchId: String
 `;
 
 export const queries = `

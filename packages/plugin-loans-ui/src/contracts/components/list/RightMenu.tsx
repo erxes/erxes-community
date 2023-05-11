@@ -14,6 +14,7 @@ import { __ } from '@erxes/ui/src/utils';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 import SelectContractType from '../../../contractTypes/containers/SelectContractType';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
 
 const SelectCompanies = asyncComponent(
   () =>
@@ -136,6 +137,14 @@ export default class RightMenu extends React.Component<Props, State> {
         <SelectCustomers
           label="Filter by customer"
           name="customerId"
+          queryParams={queryParams}
+          onSelect={onSelect}
+          multi={false}
+        />
+
+        <SelectBranches
+          label="Filter by branch"
+          name="branchId"
           queryParams={queryParams}
           onSelect={onSelect}
           multi={false}

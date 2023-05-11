@@ -153,6 +153,7 @@ export default withProps<Props>(
               contractTypeId: queryParams.contractTypeId,
               endCloseDate: queryParams.endCloseDate,
               customerId: queryParams.customerId,
+              branchId: queryParams.branchId,
 
               leaseAmount: !!queryParams.leaseAmount
                 ? parseFloat(queryParams.leaseAmount)

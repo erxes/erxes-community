@@ -167,6 +167,9 @@ const generateFilter = async (models, params, commonQuerySelector) => {
   if (params.customerId) {
     filter.customerId = params.customerId;
   }
+  if (params.branchId) {
+    filter.branchId = params.branchId;
+  }
 
   if (params.leaseAmount) {
     filter.leaseAmount = params.leaseAmount;

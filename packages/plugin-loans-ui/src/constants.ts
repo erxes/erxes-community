@@ -30,7 +30,8 @@ export const FILTER_PARAMS_CONTRACT = [
   'leaseAmount',
   'interestRate',
   'tenor',
-  'repayment'
+  'repayment',
+  'branchId'
 ];
 
 export const WEEKENDS = {

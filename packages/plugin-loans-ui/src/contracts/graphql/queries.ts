@@ -60,6 +60,7 @@ const listParamsDef = `
   ${conformityQueryFields}
   $closeDate: Date
   $closeDateType:String
+  $branchId:String
 `;
 
 const listParamsValue = `
@@ -85,6 +86,7 @@ const listParamsValue = `
   ${conformityQueryFieldDefs}
   closeDate: $closeDate
   closeDateType: $closeDateType
+  branchId: $branchId
 `;
 
 export const contracts = `
