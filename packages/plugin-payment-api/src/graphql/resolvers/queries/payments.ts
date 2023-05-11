@@ -6,7 +6,7 @@ import {
 import { IContext } from '../../../connectionResolver';
 import { MonpayAPI } from '../../../api/monpay/api';
 import { PAYMENTS } from '../../../api/constants';
-import { QpayMerchantAPI } from '../../../api/qpayVendor/api';
+import { QpayMerchantAPI } from '../../../api/qpayQuickqr/api';
 
 interface IParam {
   searchValue?: string;

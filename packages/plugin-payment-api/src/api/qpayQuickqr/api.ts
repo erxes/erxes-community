@@ -65,16 +65,7 @@ export class QpayMerchantAPI extends VendorBaseAPI {
         district: 'Sukhbaatar',
         address: '6 хороо 14-10',
         phone: '99391924',
-        email: 'e11iot.soko@gmail.com',
-        bank_accounts: [
-          {
-            default: true,
-            account_bank_code: '040000',
-            account_number: '410054178',
-            account_name: 'Соёмбо',
-            is_default: true
-          }
-        ]
+        email: 'e11iot.soko@gmail.com'
       }
     });
   }
@@ -98,16 +89,7 @@ export class QpayMerchantAPI extends VendorBaseAPI {
         customer_logo: '',
         callback_url: 'https://notify@test.mn/pay',
         description: '9 сарын үйлчилгээний төлбөр',
-        mcc_code: '',
-        bank_accounts: [
-          {
-            default: true,
-            account_bank_code: '040000',
-            account_number: '410054178',
-            account_name: 'Соёмбо',
-            is_default: true
-          }
-        ]
+        mcc_code: ''
       }
     });
   }

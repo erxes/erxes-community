@@ -1,3 +1,9 @@
+import MonpayForm from './form/MonpayForm';
+import PaypalForm from './form/PaypalForm';
+import QpayForm from './form/QpayForm';
+import SocialPayForm from './form/SocialPayForm';
+import StorepayForm from './form/StorePayForm';
+
 export const PAYMENTCONFIGS = [
   {
     name: 'QPay',
@@ -6,19 +12,19 @@ export const PAYMENTCONFIGS = [
     isAvailable: true,
     kind: 'qpay',
     logo: 'images/payments/qpay.png',
-    createModal: 'qpay',
+    createModal: QpayForm,
     createUrl: '/settings/payments/createQpay',
     category: 'Payment method',
     link: 'https://www.qpay.mn'
   },
   {
-    name: 'QPay',
+    name: 'QPay Quick QR',
     description:
-      "If you don't have a QPay account, You can register for a QPay account and use this payment method to receive payments in Mongolia.",
+      "If you don't have a QPay account, you can directly register for QPay here and receive payments in Mongolia using this payment method.",
     isAvailable: true,
-    kind: 'qpayVendor',
+    kind: 'qpayQuickqr',
     logo: 'images/payments/qpay.png',
-    createModal: 'qpayVendor',
+    createModal: QpayForm,
     createUrl: '/settings/payments/createQpay',
     category: 'Payment method'
   },
@@ -29,7 +35,7 @@ export const PAYMENTCONFIGS = [
     isAvailable: true,
     kind: 'socialpay',
     logo: 'images/payments/socialpay.png',
-    createModal: 'socialpay',
+    createModal: SocialPayForm,
     createUrl: '/settings/payments/createSocialPay',
     category: 'Payment method',
     link: 'https://www.golomtbank.com/retail/digital-bank/socialpay'
@@ -40,7 +46,7 @@ export const PAYMENTCONFIGS = [
     isAvailable: true,
     kind: 'monpay',
     logo: 'images/payments/monpay.png',
-    createModal: 'monPay',
+    createModal: MonpayForm,
     createUrl: '/settings/payments/createMonPay',
     category: 'Payment method',
     link:
@@ -53,7 +59,7 @@ export const PAYMENTCONFIGS = [
     isAvailable: true,
     kind: 'storepay',
     logo: 'images/payments/storepay.png',
-    createModal: 'storepay',
+    createModal: StorepayForm,
     createUrl: '/settings/payments/createStorePay',
     category: 'Payment method'
   },
@@ -63,7 +69,7 @@ export const PAYMENTCONFIGS = [
     isAvailable: false,
     kind: 'wechatpay',
     logo: 'images/payments/wechatpay.png',
-    createModal: 'wechatpay',
+    createModal: '',
     createUrl: '/settings/payments/createWechatpay',
     category: 'Payment method'
   },
@@ -73,7 +79,7 @@ export const PAYMENTCONFIGS = [
     isAvailable: false,
     kind: 'paypal',
     logo: 'images/payments/paypal.png',
-    createModal: 'paypal',
+    createModal: PaypalForm,
     createUrl: '/settings/payments/createPaypal',
     category: 'Payment method'
   }
@@ -81,13 +87,22 @@ export const PAYMENTCONFIGS = [
 
 export const PAYMENT_KINDS = {
   QPAY: 'qpay',
+  QPAY_QUICK_QR: 'qpayQuickqr',
   SOCIALPAY: 'socialpay',
   MONPAY: 'monpay',
   STOREPAY: 'storepay',
   WECHATPAY: 'wechatpay',
   PAYPAL: 'paypal',
 
-  ALL: ['qpay', 'socialpay', 'monpay', 'storepay', 'wechatpay', 'paypal']
+  ALL: [
+    'qpay',
+    'socialpay',
+    'monpay',
+    'storepay',
+    'wechatpay',
+    'paypal',
+    'qpayQuickqr'
+  ]
 };
 
 export const PAYMENT_STATUS = {

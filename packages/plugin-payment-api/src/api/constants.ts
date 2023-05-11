@@ -12,7 +12,7 @@ export const PAYMENTS = {
 
   qpayVendor: {
     title: 'Qpay',
-    kind: 'qpayVendor',
+    kind: 'qpayQuickqr',
     apiUrl: 'https://sandbox-quickqr.qpay.mn/v2',
     actions: {
       auth: 'auth/token',
