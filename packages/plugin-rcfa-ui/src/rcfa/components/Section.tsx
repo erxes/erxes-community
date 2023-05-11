@@ -6,9 +6,8 @@ import {
   ModalTrigger,
   Button,
   FormControl,
-  FormGroup,
-  ControlLabel,
-  __
+  __,
+  confirm
 } from '@erxes/ui/src/';
 import { IRCFAQuestions as IRFCA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 import { StyledContent, StyledQuestionItem } from '../../styles';
@@ -26,16 +25,18 @@ type Props = {
 
 type State = {
   questions: IRCFAQuestions[];
+  showQuestion: boolean;
 };
 
 class Section extends React.Component<Props, State> {
-  state: { questions: IRCFAQuestions[]; changeQuestion: '' };
+  state: { questions: IRCFAQuestions[]; showQuestion: false; newQuestion: '' };
 
   constructor(props) {
     super(props);
     this.state = {
       questions: [],
-      changeQuestion: ''
+      showQuestion: false,
+      newQuestion: ''
     };
   }
 
@@ -47,14 +48,12 @@ class Section extends React.Component<Props, State> {
     this.setState({ questions: questions });
   }
 
-  saveQuestion = () => {
-    this.props.createQuestion('title');
-  };
-
   addQuestion = () => {
     if (this.props.questions.length >= 5) {
       console.log('reached max questions');
       return;
+    } else {
+      this.setState({ showQuestion: true });
     }
   };
 
@@ -76,25 +75,6 @@ class Section extends React.Component<Props, State> {
     this.props.editQuestion(question._id as string, question.title);
   };
 
-  deleteQuestion = (_id: string | undefined) => () => {
-    if (_id) {
-      this.props.deleteQuestion(_id);
-    }
-  };
-
-  deleteModalContent = props => {
-    return (
-      <div>
-        <h4>Are you sure delete?</h4>
-        {/* <p>{props.title}</p>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button btnStyle="simple">Cancel</Button>
-          <Button btnStyle="danger">Delete</Button>
-        </div> */}
-      </div>
-    );
-  };
-
   onChangeQuestion = (index: number) => (event: any) => {
     let questList = this.state.questions;
     questList[index].title = event.target.value;
@@ -108,21 +88,25 @@ class Section extends React.Component<Props, State> {
     this.setState({ questions: questList });
   };
 
+  deleteModalTrigger = (_id: string) => () => {
+    confirm().then(() => {
+      this.props.deleteQuestion(_id);
+    });
+  };
+
+  createQuestion = () => {
+    if (this.state.newQuestion) {
+      this.props.createQuestion(this.state.newQuestion);
+      this.setState({ showQuestion: false });
+    }
+  };
+
   renderForm() {
     const trigger = (
       <Button btnStyle="simple">
         <Icon icon="plus-circle" />
       </Button>
     );
-
-    const deleteModalTrigger = (_id: string | undefined, title: string) => {
-      console.log('aa');
-      return (
-        <Button btnStyle="danger" size="small">
-          <Icon icon="times-circle" /> Delete
-        </Button>
-      );
-    };
 
     const content = () => {
       return (
@@ -147,7 +131,7 @@ class Section extends React.Component<Props, State> {
                   {question.title}
                 </p>
               )}
-              <div style={{ textAlign: 'right' }}>
+              <div>
                 {question.editing ? (
                   <div>
                     <Button
@@ -173,35 +157,74 @@ class Section extends React.Component<Props, State> {
                     >
                       <Icon icon="edit-alt" /> Edit
                     </Button>
-                    {deleteModalTrigger(question._id, question.title)}
+                    <Button
+                      btnStyle="danger"
+                      size="small"
+                      onClick={this.deleteModalTrigger(question._id as string)}
+                    >
+                      <Icon icon="times-circle" /> Delete
+                    </Button>
                   </div>
                 )}
               </div>
             </StyledQuestionItem>
           ))}
 
+          {this.state.showQuestion ? (
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <p>
+                  {__('Question')} {this.props.questions.length + 1}:
+                </p>
+                <Icon
+                  icon="times"
+                  style={{ cursor: 'pointer' }}
+                  onClick={event => {
+                    this.setState({ showQuestion: false });
+                  }}
+                />
+              </div>
+
+              <FormControl
+                type="text"
+                onChange={(event: any) => {
+                  const val = event.target.value as string;
+                  this.setState({ newQuestion: event.target.value });
+                }}
+              />
+              <Button
+                btnStyle="simple"
+                size="small"
+                style={{ marginTop: '0.5rem' }}
+                onClick={this.createQuestion}
+              >
+                <Icon icon="edit-alt" /> Save
+              </Button>
+            </div>
+          ) : (
+            ''
+          )}
+
           <div style={{ textAlign: 'right' }}>
-            <Button
-              btnStyle="simple"
-              onClick={this.addQuestion}
-              disabled={this.state.questions.length >= 5}
-            >
-              <Icon icon="plus-circle" /> Add question
-            </Button>
-            <Button onClick={this.saveQuestion}>
+            {!this.state.showQuestion || this.state.questions.length >= 5 ? (
+              <Button
+                btnStyle="simple"
+                onClick={this.addQuestion}
+                disabled={this.state.questions.length >= 5}
+              >
+                <Icon icon="plus-circle" /> Add question
+              </Button>
+            ) : (
+              ''
+            )}
+
+            <Button>
               <Icon icon="check-circle" /> Done
             </Button>
           </div>
         </div>
       );
     };
-
-    <ModalTrigger
-      title="delete question"
-      trigger={deleteModalTrigger}
-      content={this.deleteModalContent}
-      isOpen
-    />;
 
     return <ModalTrigger title="RCFA" trigger={trigger} content={content} />;
   }
