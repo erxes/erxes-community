@@ -1,5 +1,6 @@
 import { checkPermission, paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -82,8 +83,6 @@ const contractTypeQueries = {
   }
 };
 
-checkPermission(contractTypeQueries, 'contractTypes', 'showContracts');
-checkPermission(contractTypeQueries, 'contractTypesMain', 'showContracts');
-checkPermission(contractTypeQueries, 'contractTypeDetail', 'showContracts');
+moduleRequireLogin(contractTypeQueries);
 
 export default contractTypeQueries;

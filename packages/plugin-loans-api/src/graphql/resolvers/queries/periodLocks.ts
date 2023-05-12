@@ -87,8 +87,8 @@ const periodLockQueries = {
   }
 };
 
-checkPermission(periodLockQueries, 'periodLocks', 'showContracts');
-checkPermission(periodLockQueries, 'periodLocksMain', 'showContracts');
-checkPermission(periodLockQueries, 'periodLockDetail', 'showContracts');
+checkPermission(periodLockQueries, 'periodLocks', 'showPeriodLocks');
+checkPermission(periodLockQueries, 'periodLocksMain', 'showPeriodLocks');
+checkPermission(periodLockQueries, 'periodLockDetail', 'showPeriodLocks');
 
 export default periodLockQueries;

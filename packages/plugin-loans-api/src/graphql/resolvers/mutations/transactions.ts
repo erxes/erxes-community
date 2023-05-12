@@ -173,7 +173,7 @@ checkPermission(
 checkPermission(
   transactionMutations,
   'transactionsRemove',
-  'manageTransactions'
+  'transactionsRemove'
 );
 
 export default transactionMutations;

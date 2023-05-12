@@ -212,7 +212,6 @@ export const getCalcedAmounts = async (
 
   // between prepay
   if (trDate < nextPayDate) {
-    console.log('trDate < nextPayDate', trDate < nextPayDate);
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);

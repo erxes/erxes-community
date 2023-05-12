@@ -1,5 +1,6 @@
 import { checkPermission, paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 
 const generateFilter = async (params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -79,16 +80,6 @@ const insuranceTypeQueries = {
   }
 };
 
-checkPermission(insuranceTypeQueries, 'insuranceTypes', 'showInsuranceTypes');
-checkPermission(
-  insuranceTypeQueries,
-  'insuranceTypesMain',
-  'showInsuranceTypes'
-);
-checkPermission(
-  insuranceTypeQueries,
-  'insuranceTypeDetail',
-  'showInsuranceTypes'
-);
+moduleRequireLogin(insuranceTypeQueries);
 
 export default insuranceTypeQueries;

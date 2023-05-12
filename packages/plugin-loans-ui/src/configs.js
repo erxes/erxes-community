@@ -17,7 +17,7 @@ module.exports = {
       url: '/erxes-plugin-loan/contract-list',
       icon: 'icon-medal',
       location: 'mainNavigation',
-      permission: 'showContracts'
+      permissions: ['manageContracts']
     },
     {
       text: 'Contract types',
@@ -35,7 +35,7 @@ module.exports = {
       action: 'loanConfig',
       scope: 'loans',
       location: 'settings',
-      permissions: ['manageContracts']
+      permissions: ['manageInsuranceTypes']
     },
     {
       text: 'Loan config',
@@ -45,6 +45,15 @@ module.exports = {
       scope: 'loans',
       location: 'settings',
       permissions: ['manageContracts']
+    },
+    {
+      text: 'Transaction',
+      image: '/images/icons/erxes-16.svg',
+      to: '/erxes-plugin-loan/transaction-list',
+      action: 'transaction',
+      scope: 'loans',
+      location: 'transaction-list',
+      permissions: ['manageTransactions']
     }
   ],
   customerRightSidebarSection: [

@@ -100,7 +100,7 @@ const scheduleMutations = {
     return 'ok';
   }
 };
-checkPermission(scheduleMutations, 'regenSchedules', 'saveSchedules');
-checkPermission(scheduleMutations, 'fixSchedules', 'saveSchedules');
+checkPermission(scheduleMutations, 'regenSchedules', 'manageSchedule');
+checkPermission(scheduleMutations, 'fixSchedules', 'manageSchedule');
 
 export default scheduleMutations;

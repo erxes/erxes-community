@@ -3,6 +3,7 @@ import resolvers from './graphql/resolvers';
 import { generateModels } from './connectionResolver';
 import { initBroker } from './messageBroker';
 import documents from './documents';
+import * as permissions from './permissions';
 import { checkContractScheduleAnd } from './cronjobs/contractCronJobs';
 
 export let debug;
@@ -12,6 +13,7 @@ export let serviceDiscovery;
 
 export default {
   name: 'loans',
+  permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
 

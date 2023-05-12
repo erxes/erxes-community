@@ -115,8 +115,8 @@ const periodLockMutations = {
   }
 };
 
-checkPermission(periodLockMutations, 'periodLocksAdd', 'manageContracts');
-checkPermission(periodLockMutations, 'periodLocksEdit', 'manageContracts');
-checkPermission(periodLockMutations, 'periodLocksRemove', 'manageContracts');
+checkPermission(periodLockMutations, 'periodLocksAdd', 'managePeriodLocks');
+checkPermission(periodLockMutations, 'periodLocksEdit', 'managePeriodLocks');
+checkPermission(periodLockMutations, 'periodLocksRemove', 'managePeriodLocks');
 
 export default periodLockMutations;

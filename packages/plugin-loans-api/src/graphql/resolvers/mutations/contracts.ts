@@ -278,11 +278,10 @@ const contractMutations = {
   }
 };
 
-checkPermission(contractMutations, 'contractsAdd', 'manageContracts');
-checkPermission(contractMutations, 'contractsEdit', 'manageContracts');
-checkPermission(contractMutations, 'contractsDealEdit', 'manageContracts');
-checkPermission(contractMutations, 'contractsClose', 'manageContracts');
-checkPermission(contractMutations, 'contractsRemove', 'manageContracts');
-checkPermission(contractMutations, 'getProductsData', 'manageContracts');
+checkPermission(contractMutations, 'contractsAdd', 'contractsAdd');
+checkPermission(contractMutations, 'contractsEdit', 'contractsEdit');
+checkPermission(contractMutations, 'contractsDealEdit', 'contractsDealEdit');
+checkPermission(contractMutations, 'contractsClose', 'contractsClose');
+checkPermission(contractMutations, 'contractsRemove', 'contractsRemove');
 
 export default contractMutations;

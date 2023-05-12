@@ -63,6 +63,7 @@ const collateralQueries = {
     };
   }
 };
+
 checkPermission(collateralQueries, 'collateralsMain', 'showCollaterals');
 
 export default collateralQueries;
