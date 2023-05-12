@@ -26,6 +26,7 @@ type Props = {
 type State = {
   questions: IRCFAQuestions[];
   showQuestion: boolean;
+  newQuestion: string;
 };
 
 class Section extends React.Component<Props, State> {
@@ -113,7 +114,7 @@ class Section extends React.Component<Props, State> {
         <div>
           {this.state.questions.map((question, index) => (
             <StyledQuestionItem key={index}>
-              <p>
+              <p style={{ marginBottom: 0 }}>
                 {__('Question')} {index + 1}:
               </p>
               {question.editing ? (
@@ -126,7 +127,7 @@ class Section extends React.Component<Props, State> {
                 </div>
               ) : (
                 <p
-                  style={{ marginTop: '1.0625rem', marginBottom: '0.9375rem' }}
+                  style={{ marginTop: '0.4375rem', marginBottom: '0.9375rem' }}
                 >
                   {question.title}
                 </p>
@@ -173,13 +174,13 @@ class Section extends React.Component<Props, State> {
           {this.state.showQuestion ? (
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <p>
+                <p style={{ marginBottom: 0 }}>
                   {__('Question')} {this.props.questions.length + 1}:
                 </p>
                 <Icon
                   icon="times"
                   style={{ cursor: 'pointer' }}
-                  onClick={event => {
+                  onClick={() => {
                     this.setState({ showQuestion: false });
                   }}
                 />
@@ -188,7 +189,6 @@ class Section extends React.Component<Props, State> {
               <FormControl
                 type="text"
                 onChange={(event: any) => {
-                  const val = event.target.value as string;
                   this.setState({ newQuestion: event.target.value });
                 }}
               />
