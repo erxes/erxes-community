@@ -80,6 +80,10 @@ export const types = () => `
     relContract: RecContract
     dealId: String
     hasTransaction:Boolean
+    nextPaymentDate:Date
+    nextPayment:Float
+    payedAmountSum:Float
+    loanAmount:Float
   }
 
 

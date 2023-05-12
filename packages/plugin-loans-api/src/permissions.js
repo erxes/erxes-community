@@ -85,6 +85,10 @@ module.exports = {
       //#endregion
       //insurance
       {
+        name: 'manageLoanConfigs',
+        description: 'Manage Loan Configs'
+      },
+      {
         name: 'manageInsuranceTypes',
         description: 'Manage Insurance Config'
       },

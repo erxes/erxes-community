@@ -3,7 +3,12 @@ import { sendCoreMessage, sendMessageBroker } from '../../messageBroker';
 import { SCHEDULE_STATUS } from '../../models/definitions/constants';
 import { IContractDocument } from '../../models/definitions/contracts';
 import { IContract } from '../../models/definitions/contracts';
-import { getDiffDay, getNextMonthDay } from '../../models/utils/utils';
+import { getCalcedAmounts } from '../../models/utils/transactionUtils';
+import {
+  getDiffDay,
+  getFullDate,
+  getNextMonthDay
+} from '../../models/utils/utils';
 
 const Contracts = {
   contractType(contract: IContract, {}, { models }: IContext) {
@@ -185,6 +190,51 @@ const Contracts = {
         contractId: contract._id
       })) > 0
     );
+  },
+  async loanAmount(contract: IContractDocument, {}, { models }: IContext) {
+    const today = getFullDate(new Date());
+    return await models.Schedules.findOne({
+      contractId: contract._id,
+      payDate: { $lte: today }
+    }).sort({ payDate: -1 });
+  },
+  async payedAmountSum(contract: IContractDocument, {}, { models }: IContext) {
+    const today = getFullDate(new Date());
+    const schedules = await models.Schedules.find({
+      contractId: contract._id,
+      payDate: { $lte: today }
+    }).lean();
+
+    return schedules.reduce((a, b) => a + b.didPayment, 0);
+  },
+  async nextPayment(
+    contract: IContractDocument,
+    {},
+    { models, subdomain }: IContext
+  ) {
+    const today = getFullDate(new Date());
+
+    const nextSchedule = await models.Schedules.findOne({
+      contractId: contract._id,
+      payDate: { $gte: today }
+    }).lean();
+
+    const calcedInfo = await getCalcedAmounts(models, subdomain, {
+      contractId: contract._id,
+      payDate: nextSchedule?.payDate || today
+    });
+
+    return calcedInfo.total;
+  },
+  async nextPaymentDate(contract: IContractDocument, {}, { models }: IContext) {
+    const today = getFullDate(new Date());
+
+    const nextSchedule = await models.Schedules.findOne({
+      contractId: contract._id,
+      payDate: { $gte: today }
+    }).lean();
+
+    return nextSchedule?.payDate;
   }
 };
 
