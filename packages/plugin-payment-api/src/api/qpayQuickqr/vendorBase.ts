@@ -9,8 +9,8 @@ export class VendorBaseAPI {
   private accessToken: string;
 
   constructor() {
-    this.username = 'ERXES_MONGOLIA';
-    this.password = 'mkVeYADo';
+    this.username = process.env.QUICK_QR_USERNAME || '';
+    this.password = process.env.QUICK_QR_PASSWORD || '';
     this.apiUrl = meta.apiUrl + '/' + meta.apiVersion;
     this.accessToken = '';
   }

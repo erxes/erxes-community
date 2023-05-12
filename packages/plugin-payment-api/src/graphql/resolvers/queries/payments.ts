@@ -114,8 +114,8 @@ const queries = {
 
   async qpayGetMerchant(_root, args, { models }: IContext) {
     const api = new QPayQuickQrAPI({
-      username: process.env.QPAY_MERCHANT_USERNAME || '',
-      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+      username: process.env.QUICK_QR_USERNAME || '',
+      password: process.env.QUICK_QR_PASSWORD || ''
     });
 
     return api.get(args._id);

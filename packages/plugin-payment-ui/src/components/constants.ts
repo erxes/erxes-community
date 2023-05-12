@@ -16,7 +16,8 @@ export const PAYMENTCONFIGS = [
     createModal: QpayForm,
     createUrl: '/settings/payments/createQpay',
     category: 'Payment method',
-    link: 'https://www.qpay.mn'
+    link:
+      'mailto:%20info@qpay.mn?subject=QPay%20Registration&body=Dear%20QPay%20Team,%0D%0A%0D%0AI%20would%20like%20to%20'
   },
   {
     name: 'QPay Quick QR',
@@ -52,7 +53,7 @@ export const PAYMENTCONFIGS = [
     createUrl: '/settings/payments/createMonPay',
     category: 'Payment method',
     link:
-      'mailto:%20Merchantservice@mobifinance.mn?subject=MonPay%20Merchant%20Registration&body=Dear%20MonPay%20Team,%0D%0A%0D%0AI%20would%20like%20to%2'
+      'mailto:%20Merchantservice@mobifinance.mn?subject=MonPay%20Merchant%20Registration&body=Dear%20MonPay%20Team,%0D%0A%0D%0AI%20would%20like%20to%20'
   },
   {
     name: 'Storepay',

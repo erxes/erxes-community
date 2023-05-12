@@ -16,11 +16,12 @@ type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
   payment?: IPaymentDocument;
+  metaData?: any;
 };
 
 type State = {
   paymentName: string;
-  isCompany: boolean;
+  type: 'company' | 'person' | undefined;
   registerNumber: string;
   name: string;
 
@@ -58,7 +59,7 @@ const QuickQrForm = (props: Props) => {
       kind: PAYMENT_KINDS.QPAY_QUICK_QR,
       status: 'active',
       config: {
-        isCompany: state.isCompany,
+        isCompany: state.type === 'company',
         registerNumber: state.registerNumber,
         name: state.companyName,
         mccCode: state.mccCode,
@@ -84,10 +85,6 @@ const QuickQrForm = (props: Props) => {
     setState({ ...state, [code]: e.target.value });
   };
 
-  const onChangeToggle = (value: boolean) => {
-    setState({ ...state, isCompany: value });
-  };
-
   const renderItem = (
     key: string,
     title: string,
@@ -110,72 +107,92 @@ const QuickQrForm = (props: Props) => {
     );
   };
 
+  const renderInputs = formProps => {
+    if (!state.type) {
+      return null;
+    }
+
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '20px'
+        }}
+      >
+        {state.type === 'company' &&
+          renderItem('companyName', __('Company Name'))}
+        {state.type === 'person' && renderItem('firstName', __('First Name'))}
+        {state.type === 'person' && renderItem('lastName', __('Last Name'))}
+
+        {renderItem('registerNumber', __('Register Number'))}
+        {renderItem('mccCode', __('MCC Code'))}
+        {renderItem('city', __('City'))}
+        {renderItem('district', __('District'))}
+        {renderItem('address', __('Address'))}
+        {renderItem('phone', __('Phone'))}
+        {renderItem('email', __('Email'))}
+
+        {renderItem(
+          'bankAccount',
+          __('Account Number'),
+          __('The account number to receive payments')
+        )}
+        <FormGroup>
+          <ControlLabel required={true}>Bank</ControlLabel>
+          <p>{__('The bank of the account number to receive payments')}</p>
+          <FormControl
+            {...formProps}
+            id="toBank"
+            name="toBank"
+            componentClass="select"
+            required={true}
+            defaultValue={state.bankCode}
+            onChange={onChangeConfig.bind(this, 'bankCode')}
+            errors={formProps.errors}
+          >
+            <option value="">{__('Select a bank')}</option>
+            {BANK_CODES.map(bank => (
+              <option key={bank.value} value={bank.value}>
+                {bank.label}
+              </option>
+            ))}
+          </FormControl>
+        </FormGroup>
+        {renderItem(
+          'bankAccountName',
+          __('Account Name'),
+          __('Account holder name')
+        )}
+      </div>
+    );
+  };
+
   const renderContent = (formProps: IFormProps) => {
     const { isSubmitted } = formProps;
 
     return (
       <>
         <SettingsContent title={__('General settings')}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '20px'
-            }}
-          >
-            {renderItem('name', __('Name'))}
+          {renderItem('name', __('Name'))}
 
-            <FormGroup>
-              <ControlLabel>{__('Type')}</ControlLabel>
-              <p>
-                {__('If you are registering as a company, please leave it on')}
-              </p>
-              <Toggle
-                checked={state.isCompany}
-                onChange={() => onChangeToggle(!state.isCompany)}
-                icons={{
-                  checked: <span>Yes</span>,
-                  unchecked: <span>No</span>
-                }}
-              />
-            </FormGroup>
+          <FormGroup>
+            <ControlLabel>{__('Type')}</ControlLabel>
+            <FormControl
+              {...formProps}
+              componentClass="select"
+              required={true}
+              defaultValue={state.type}
+              onChange={onChangeConfig.bind(this, 'type')}
+              errors={formProps.errors}
+            >
+              <option>{__('Please select a type')}</option>
+              <option value={'company'}>{__('Company')}</option>
+              <option value={'person'}>{__('Individual')}</option>
+            </FormControl>
+          </FormGroup>
 
-            {state.isCompany && renderItem('companyName', __('Company Name'))}
-            {!state.isCompany && renderItem('firstName', __('First Name'))}
-            {!state.isCompany && renderItem('lastName', __('Last Name'))}
-
-            {renderItem('registerNumber', __('Register Number'))}
-            {renderItem('mccCode', __('MCC Code'))}
-            {renderItem('city', __('City'))}
-            {renderItem('district', __('District'))}
-            {renderItem('address', __('Address'))}
-            {renderItem('phone', __('Phone'))}
-            {renderItem('email', __('Email'))}
-
-            <FormGroup>
-              <ControlLabel required={true}>Bank</ControlLabel>
-              <FormControl
-                {...formProps}
-                id="toBank"
-                name="toBank"
-                componentClass="select"
-                required={true}
-                defaultValue={state.bankCode}
-                onChange={onChangeConfig.bind(this, 'bankCode')}
-                errors={formProps.errors}
-              >
-                <option value="">{__('Select a bank')}</option>
-                {BANK_CODES.map(bank => (
-                  <option key={bank.value} value={bank.value}>
-                    {bank.label}
-                  </option>
-                ))}
-              </FormControl>
-            </FormGroup>
-
-            {renderItem('bankAccount', __('Account Number'))}
-            {renderItem('bankAccountName', __('Account Name'))}
-          </div>
+          {renderInputs(formProps)}
         </SettingsContent>
 
         <ModalFooter>

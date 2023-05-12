@@ -76,7 +76,7 @@ function renderCreate(kind: string) {
   const Component = meta.createModal;
 
   const formContent = props => (
-    <Component {...props} renderButton={renderButton} />
+    <Component {...props} renderButton={renderButton} metaData={meta} />
   );
 
   const size = meta.modalSize || 'sm';

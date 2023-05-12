@@ -60,8 +60,8 @@ const mutations = {
 
   async qpayRegisterMerchantCompany(_root, args, { models }: IContext) {
     const api = new QPayQuickQrAPI({
-      username: process.env.QPAY_MERCHANT_USERNAME || '',
-      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+      username: process.env.QUICK_QR_USERNAME || '',
+      password: process.env.QUICK_QR_PASSWORD || ''
     });
 
     return api.createCompany(args);
@@ -69,8 +69,8 @@ const mutations = {
 
   async qpayCreateInvoice(_root, args, { models }: IContext) {
     const api = new QPayQuickQrAPI({
-      username: process.env.QPAY_MERCHANT_USERNAME || '',
-      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+      username: process.env.QUICK_QR_USERNAME || '',
+      password: process.env.QUICK_QR_PASSWORD || ''
     });
 
     return api.createInvoice(args);
@@ -78,8 +78,8 @@ const mutations = {
 
   async qpayRegisterMerchantCustomer(_root, args, { models }: IContext) {
     const api = new QPayQuickQrAPI({
-      username: process.env.QPAY_MERCHANT_USERNAME || '',
-      password: process.env.QPAY_MERCHANT_PASSWORD || ''
+      username: process.env.QUICK_QR_USERNAME || '',
+      password: process.env.QUICK_QR_PASSWORD || ''
     });
 
     return api.createCustomer(args);
