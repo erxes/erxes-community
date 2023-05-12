@@ -191,12 +191,17 @@ const Contracts = {
       })) > 0
     );
   },
-  async loanAmount(contract: IContractDocument, {}, { models }: IContext) {
+  async loanBalanceAmount(
+    contract: IContractDocument,
+    {},
+    { models }: IContext
+  ) {
     const today = getFullDate(new Date());
-    return await models.Schedules.findOne({
+    const prevSchedule = await models.Schedules.findOne({
       contractId: contract._id,
       payDate: { $lte: today }
     }).sort({ payDate: -1 });
+    return prevSchedule?.balance || 0;
   },
   async payedAmountSum(contract: IContractDocument, {}, { models }: IContext) {
     const today = getFullDate(new Date());
