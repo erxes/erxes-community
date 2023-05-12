@@ -11,6 +11,7 @@ import {
 } from '@erxes/ui/src/';
 import { IRCFAQuestions as IRFCA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 import { StyledContent, StyledQuestionItem } from '../../styles';
+import CreateTaskModal from './CreateTaskModal';
 
 interface IRCFAQuestions extends IRFCA {
   editing: boolean;
@@ -59,7 +60,6 @@ class Section extends React.Component<Props, State> {
   };
 
   writeQuestion = (index: number) => event => {
-    console.log(index, event.target.value);
     let questList = this.state.questions;
     questList[index].title = event.target.value;
     this.setState({ questions: questList });
@@ -218,9 +218,7 @@ class Section extends React.Component<Props, State> {
               ''
             )}
 
-            <Button>
-              <Icon icon="check-circle" /> Done
-            </Button>
+            {this.createTask()}
           </div>
         </div>
       );
@@ -242,6 +240,23 @@ class Section extends React.Component<Props, State> {
           )}
         </StyledContent>
       </Box>
+    );
+  }
+
+  triggerNew = (<Button>Done</Button>);
+
+  createTask() {
+    const content = () => {
+      return <CreateTaskModal />;
+    };
+
+    return (
+      <ModalTrigger
+        title="Create related card"
+        content={content}
+        style={{ overflow: 'auto' }}
+        trigger={this.triggerNew}
+      />
     );
   }
 }
