@@ -355,6 +355,15 @@ a:hover {
   width: 80% !important;
 }
 
+.gjs-pn-panel .code-panel section .codepanel-separator, .gjs-pn-panel .cm-s-hopscotch.CodeMirror {
+  align-items: center;
+  font-size: 14px;
+}
+
+.gjs-pn-panel .code-panel section .codepanel-label {
+  margin: 0;
+}
+
 .gjs-sm-field input, .gjs-clm-select input, .gjs-clm-field input, .gjs-sm-field select, .gjs-clm-select select, .gjs-clm-field select {
   color: #444 !important;
 }
@@ -362,6 +371,14 @@ a:hover {
 .gjs-editor-cont .sp-container {
   right: 0 !important;
   left: auto !important;
+}
+
+.gjs-block__media {
+  max-height: 50px !important;
+}
+
+.gjs-block__media svg {
+  max-height: 55px !important;
 }
 
 /* tooltip */
@@ -512,6 +529,21 @@ a:hover {
 .notification-popover {
   right: 15px;
   max-width: 360px;
+}
+
+.call-popover {
+  right: 15px;
+  left: auto !important;
+  width: 360px;
+  max-width: 360px;
+  position: fixed !important;
+  bottom: 10px;
+  top: auto !important;
+  transform: none !important;
+}
+
+.call-popover .arrow {
+  display: none !important;
 }
 
 /* select  */

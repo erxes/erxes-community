@@ -9,6 +9,14 @@ export const types = `
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
+  
+  extend type Department @key(fields: "_id") {
+    _id: String! @external
+  }
+
+  extend type Branch @key(fields: "_id") {
+    _id: String! @external
+  }
 
   type Timeclock {
     _id: String!
@@ -91,8 +99,16 @@ export const types = `
     submittedByAdmin: Boolean
     totalBreakInMins: Int
   }
+  
+  type DuplicateSchedule {
+    _id: String!
+    user: User
+    solved: Boolean
+    shifts: [ShiftsRequest]
+  }
 
   type IUserAbsenceInfo{ 
+    totalHoursShiftRequest: Float
     totalHoursWorkedAbroad: Float
     totalHoursPaidAbsence: Float
     totalHoursUnpaidAbsence: Float
@@ -111,6 +127,8 @@ export const types = `
     scheduledStart: Date
     scheduledEnd: Date
     scheduledDuration:String
+    
+    lunchBreakInHrs: String
     
     totalMinsLate: String
     totalHoursOvertime: String
@@ -135,6 +153,9 @@ export const types = `
     totalMinsScheduledToday: Int
     totalMinsScheduledThisMonth: Int
     
+    totalHoursBreakScheduled: Float
+    totalHoursBreakActual: Float
+
     totalHoursOvertime: Float
     totalHoursOvernight: Float
 
@@ -241,6 +262,16 @@ const queryParams = `
   departmentIds: [String]
   reportType: String
   scheduleStatus: String
+  isCurrentUserAdmin: Boolean
+`;
+
+const commonParams = `
+    ids: [String]
+    excludeIds: Boolean
+    perPage: Int
+    page: Int
+    searchValue: String,
+    status: String,
 `;
 
 const absence_params = `
@@ -275,6 +306,9 @@ export const queries = `
   requestsMain(${queryParams}): RequestsListResponse
   timelogsMain(${queryParams}): TimelogListResponse
   
+  timeclockBranches(${commonParams}):[Branch]
+  timeclockDepartments(${commonParams}):[Department]
+
   timeclocksPerUser(userId: String, shiftActive: Boolean, startDate: String, endDate:String): [Timeclock]
   timeLogsPerUser(userId: String, startDate: String, endDate: String ): [Timelog]
   schedulesPerUser(userId: String, startDate: String, endDate: String): [Schedule]
@@ -315,7 +349,8 @@ export const mutations = `
   
   sendScheduleRequest(userId: String, shifts: [ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
   submitSchedule(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], scheduleConfigId: String, totalBreakInMins: Int): Schedule
-  
+  checkDuplicateScheduleShifts(branchIds:[String],departmentIds:[String], userIds: [String], shifts:[ShiftsRequestInput], status: String): [DuplicateSchedule]
+
   solveAbsenceRequest(_id: String, status: String): Absence
   solveScheduleRequest(_id: String, status: String): Schedule
   solveShiftRequest(_id: String, status: String): ShiftsRequest

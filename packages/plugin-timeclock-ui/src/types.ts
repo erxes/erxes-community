@@ -1,5 +1,5 @@
 import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { IAttachment, QueryResponse } from '@erxes/ui/src/types';
 
 export interface ITimeclock {
@@ -77,6 +77,9 @@ export interface IUserReport {
   totalHoursOvertime?: number;
   totalHoursOvernight?: number;
 
+  totalHoursBreakScheduled?: number;
+  totalHoursBreakActual?: number;
+
   totalMinsLate?: number;
   totalMinsLateToday?: number;
   totalMinsLateThisMonth?: number;
@@ -86,6 +89,7 @@ export interface IUserReport {
 }
 
 export interface IUserAbsenceInfo {
+  totalHoursShiftRequest?: number;
   totalHoursWorkedAbroad?: number;
   totalHoursPaidAbsence?: number;
   totalHoursUnpaidAbsence?: number;
@@ -104,6 +108,8 @@ export interface IScheduleReport {
   scheduledStart: Date;
   scheduledEnd: Date;
   scheduledDuration: number;
+
+  lunchBreakInHrs: string;
 
   totalMinsLate: number;
   totalHoursOvertime: number;
@@ -214,6 +220,10 @@ export type ScheduleConfigQueryResponse = {
   scheduleConfigs: IScheduleConfig[];
 } & QueryResponse;
 
+export type DepartmentsQueryResponse = {
+  timeclockDepartments: IDepartment[];
+  departments: IDepartment[];
+};
 export type DeviceConfigsQueryResponse = {
   deviceConfigs: { list: IDeviceConfig[]; totalCount: number };
 } & QueryResponse;
@@ -224,6 +234,7 @@ export type ScheduleQueryResponse = {
 
 export type BranchesQueryResponse = {
   branches: IBranch[];
+  timeclockBranches: IBranch[];
 } & QueryResponse;
 
 export type ReportsQueryResponse = {
@@ -266,6 +277,7 @@ export type ScheduleMutationVariables = {
   userIds?: string[];
   scheduleConfigId?: string;
   totalBreakInMins?: number | string;
+  status?: string;
 };
 
 export type TimeLogMutationResponse = {
@@ -410,5 +422,9 @@ export type ScheduleMutationResponse = {
 
   removeScheduleShiftMutation: (params: {
     variables: { _id: string };
+  }) => Promise<any>;
+
+  checkDuplicateScheduleShiftsMutation: (params: {
+    variables: ScheduleMutationVariables;
   }) => Promise<any>;
 };

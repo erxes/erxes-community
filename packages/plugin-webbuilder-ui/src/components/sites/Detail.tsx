@@ -1,4 +1,5 @@
 import 'grapesjs/dist/css/grapes.min.css';
+import 'grapesjs-component-code-editor/dist/grapesjs-component-code-editor.min.css';
 
 import {
   CustomButtonWrapper,
@@ -18,9 +19,12 @@ import GrapesJS from 'grapesjs';
 import PageForm from '../pages/PageForm';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
+import customCodePlugin from 'grapesjs-custom-code';
 import customPlugins from '../customPlugins';
+import gjsCodeEditor from 'grapesjs-component-code-editor';
 import gjsLorySlider from 'grapesjs-lory-slider';
 import gjsPresetWebpage from 'grapesjs-preset-webpage';
+import gjsTabs from 'grapesjs-tabs';
 import { readFile } from '@erxes/ui/src/utils/core';
 
 type Props = {
@@ -77,26 +81,38 @@ class SiteDetail extends React.Component<Props, State> {
       protectedCss: '',
       container: `#editor`,
       fromElement: true,
-      plugins: [gjsPresetWebpage, gjsLorySlider, customPlugins],
+      plugins: [
+        gjsPresetWebpage,
+        gjsLorySlider,
+        gjsCodeEditor,
+        gjsTabs,
+        customCodePlugin,
+        customPlugins
+      ],
       pluginsOpts: {
-        gjsLorySlider: {
-          label: 'Slider',
-          block: {
-            category: 'basic'
-          },
-          category: 'basic'
+        [gjsLorySlider]: {
+          sliderBlock: {
+            category: 'Extra'
+          }
         },
+        [gjsTabs]: {
+          tabsBlock: {
+            category: 'Extra'
+          }
+        },
+        [customCodePlugin as any]: {
+          blockCustomCode: {
+            category: 'Extra'
+          }
+        },
+        [gjsCodeEditor]: {},
         [customPlugins as any]: {
           pages,
           contentTypes,
           open: false
         }
       },
-      storageManager: {
-        id: 'editor', // Prefix identifier that will be used inside storing and loading
-        type: 'local',
-        autosave: true
-      },
+      storageManager: false,
       assetManager: {
         uploadFile: e => {
           const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
@@ -179,6 +195,22 @@ class SiteDetail extends React.Component<Props, State> {
       modal.close();
     };
 
+    const panelViews = pnm.addPanel({
+      id: 'views'
+    });
+
+    panelViews.get('buttons').add([
+      {
+        attributes: {
+          title: 'Open Code'
+        },
+        className: 'fa fa-file-code-o',
+        command: 'open-code',
+        togglable: false,
+        id: 'open-code'
+      }
+    ]);
+
     // don't move this block
     if (page && page.html) {
       const { html, css } = page;
@@ -186,6 +218,36 @@ class SiteDetail extends React.Component<Props, State> {
       editor.setComponents(html);
       editor.setStyle(css.trim());
     }
+
+    editor.DomComponents.addType('input', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('select', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('checkbox', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('radio', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
+
+    editor.DomComponents.addType('button', {
+      model: {
+        defaults: { draggable: true }
+      }
+    });
 
     cmdm.add('html-edit', {
       run: (editr, sender) => {

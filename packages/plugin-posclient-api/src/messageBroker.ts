@@ -1,6 +1,5 @@
-import { generateModels } from './connectionResolver';
-import { graphqlPubsub, serviceDiscovery } from './configs';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
+import { graphqlPubsub, serviceDiscovery } from './configs';
 import {
   importProducts,
   importSlots,
@@ -10,6 +9,8 @@ import {
   receiveProductCategory,
   receiveUser
 } from './graphql/utils/syncUtils';
+
+import { generateModels } from './connectionResolver';
 import { sendRPCMessage } from '@erxes/api-utils/src/messageBroker';
 
 let client;
@@ -603,6 +604,18 @@ export const sendContactsMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
   return sendMessageWrapper('contacts', args);
+};
+
+export const sendCardsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('cards', args);
+};
+
+export const sendInboxMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('inbox', args);
 };
 
 export const sendLoyaltiesMessage = async (
