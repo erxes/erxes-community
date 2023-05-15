@@ -201,6 +201,7 @@ const Contracts = {
       contractId: contract._id,
       payDate: { $lte: today }
     }).sort({ payDate: -1 });
+    if (!prevSchedule) return contract.leaseAmount;
     return prevSchedule?.balance || 0;
   },
   async payedAmountSum(contract: IContractDocument, {}, { models }: IContext) {
@@ -221,8 +222,11 @@ const Contracts = {
 
     const nextSchedule = await models.Schedules.findOne({
       contractId: contract._id,
-      payDate: { $gte: today }
-    }).lean();
+      payDate: { $gte: today },
+      isDefault: true
+    })
+      .sort({ payDate: 1 })
+      .lean();
 
     const calcedInfo = await getCalcedAmounts(models, subdomain, {
       contractId: contract._id,
@@ -237,7 +241,9 @@ const Contracts = {
     const nextSchedule = await models.Schedules.findOne({
       contractId: contract._id,
       payDate: { $gte: today }
-    }).lean();
+    })
+      .sort({ payDate: 1 })
+      .lean();
 
     return nextSchedule?.payDate;
   }
