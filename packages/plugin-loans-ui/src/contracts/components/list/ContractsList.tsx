@@ -24,6 +24,9 @@ import { IContract } from '../../types';
 // import ContractsMerge from '../detail/ContractsMerge';
 import ContractRow from './ContractRow';
 import RightMenu from './RightMenu';
+import { can } from '@erxes/ui/src/utils/core';
+import withConsumer from '../../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 // import Sidebar from './Sidebar';
 
 interface IProps extends IRouterProps {
@@ -48,6 +51,7 @@ interface IProps extends IRouterProps {
   queryParams: any;
   isFiltered: boolean;
   clearFilter: () => void;
+  currentUser: IUser;
 }
 
 type State = {
@@ -115,7 +119,8 @@ class ContractsList extends React.Component<IProps, State> {
       onSelect,
       onSearch,
       isFiltered,
-      clearFilter
+      clearFilter,
+      currentUser
     } = this.props;
 
     const mainContent = (
@@ -200,14 +205,16 @@ class ContractsList extends React.Component<IProps, State> {
 
       actionBarLeft = (
         <BarItems>
-          <Button
-            btnStyle="danger"
-            size="small"
-            icon="cancel-1"
-            onClick={onClick}
-          >
-            Delete
-          </Button>
+          {can('contractsRemove', currentUser) && (
+            <Button
+              btnStyle="danger"
+              size="small"
+              icon="cancel-1"
+              onClick={onClick}
+            >
+              Delete
+            </Button>
+          )}
         </BarItems>
       );
     }
@@ -234,16 +241,16 @@ class ContractsList extends React.Component<IProps, State> {
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
-
-        <ModalTrigger
-          title={`${__('New contract')}`}
-          trigger={addTrigger}
-          autoOpenKey="showContractModal"
-          size="lg"
-          content={contractForm}
-          backDrop="static"
-        />
-
+        {can('contractsAdd', currentUser) && (
+          <ModalTrigger
+            title={`${__('New contract')}`}
+            trigger={addTrigger}
+            autoOpenKey="showContractModal"
+            size="lg"
+            content={contractForm}
+            backDrop="static"
+          />
+        )}
         <RightMenu {...rightMenuProps} />
       </BarItems>
     );
@@ -258,7 +265,9 @@ class ContractsList extends React.Component<IProps, State> {
           <Wrapper.Header
             title={__(`Contracts`) + ` (${totalCount})`}
             queryParams={queryParams}
-            submenu={menuContracts}
+            submenu={menuContracts.filter(row =>
+              can(row.permission, currentUser)
+            )}
           />
         }
         actionBar={actionBar}
@@ -277,4 +286,4 @@ class ContractsList extends React.Component<IProps, State> {
   }
 }
 
-export default withRouter<IRouterProps>(ContractsList);
+export default withRouter<IRouterProps>(withConsumer(ContractsList));

@@ -7,7 +7,6 @@ import {
   FormControl,
   ModalTrigger,
   Pagination,
-  router,
   SortHandler,
   Table,
   Wrapper,
@@ -23,6 +22,9 @@ import { ContractsTableWrapper } from '../../contracts/styles';
 import { ITransaction } from '../types';
 import TransactionRow from './TransactionRow';
 import RightMenu from './RightMenu';
+import { can } from '@erxes/ui/src/utils/core';
+import withConsumer from '../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 interface IProps extends IRouterProps {
   transactions: ITransaction[];
@@ -44,6 +46,7 @@ interface IProps extends IRouterProps {
   queryParams: any;
   isFiltered: boolean;
   clearFilter: () => void;
+  currentUser: IUser;
 }
 
 class TransactionsList extends React.Component<IProps> {
@@ -81,7 +84,8 @@ class TransactionsList extends React.Component<IProps> {
       onSelect,
       onSearch,
       isFiltered,
-      clearFilter
+      clearFilter,
+      currentUser
     } = this.props;
 
     const mainContent = (
@@ -173,14 +177,16 @@ class TransactionsList extends React.Component<IProps> {
 
       actionBarLeft = (
         <BarItems>
-          <Button
-            btnStyle="danger"
-            size="small"
-            icon="cancel-1"
-            onClick={onClick}
-          >
-            Delete
-          </Button>
+          {can('transactionsRemove', currentUser) && (
+            <Button
+              btnStyle="danger"
+              size="small"
+              icon="cancel-1"
+              onClick={onClick}
+            >
+              Delete
+            </Button>
+          )}
         </BarItems>
       );
     }
@@ -199,15 +205,16 @@ class TransactionsList extends React.Component<IProps> {
 
     const actionBarRight = (
       <BarItems>
-        <ModalTrigger
-          title={`${__('New transaction')}`}
-          trigger={addTrigger}
-          autoOpenKey="showTransactionModal"
-          size="lg"
-          content={transactionForm}
-          backDrop="static"
-        />
-
+        {can('manageTransactions', currentUser) && (
+          <ModalTrigger
+            title={`${__('New transaction')}`}
+            trigger={addTrigger}
+            autoOpenKey="showTransactionModal"
+            size="lg"
+            content={transactionForm}
+            backDrop="static"
+          />
+        )}
         <RightMenu {...rightMenuProps} />
       </BarItems>
     );
@@ -222,7 +229,9 @@ class TransactionsList extends React.Component<IProps> {
           <Wrapper.Header
             title={__(`Transactions`) + ` (${totalCount})`}
             queryParams={queryParams}
-            submenu={menuContracts}
+            submenu={menuContracts.filter(row =>
+              can(row.permission, currentUser)
+            )}
           />
         }
         actionBar={actionBar}
@@ -241,4 +250,4 @@ class TransactionsList extends React.Component<IProps> {
   }
 }
 
-export default withRouter<IRouterProps>(TransactionsList);
+export default withRouter<IRouterProps>(withConsumer(TransactionsList));

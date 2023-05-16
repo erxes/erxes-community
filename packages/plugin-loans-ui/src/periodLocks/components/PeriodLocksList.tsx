@@ -22,6 +22,9 @@ import PeriodLockForm from '../containers/PeriodLockForm';
 import { PeriodLocksTableWrapper } from '../styles';
 import { IPeriodLock } from '../types';
 import PeriodLockRow from './PeriodLockRow';
+import { can } from '@erxes/ui/src/utils/core';
+import withConsumer from '../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 interface IProps extends IRouterProps {
   periodLocks: IPeriodLock[];
@@ -40,6 +43,7 @@ interface IProps extends IRouterProps {
   ) => void;
   history: any;
   queryParams: any;
+  currentUser: IUser;
 }
 
 type State = {
@@ -102,7 +106,8 @@ class PeriodLocksList extends React.Component<IProps, State> {
       bulk,
       isAllSelected,
       totalCount,
-      queryParams
+      queryParams,
+      currentUser
     } = this.props;
 
     const mainContent = (
@@ -158,14 +163,16 @@ class PeriodLocksList extends React.Component<IProps, State> {
 
       actionBarLeft = (
         <BarItems>
-          <Button
-            btnStyle="danger"
-            size="small"
-            icon="cancel-1"
-            onClick={onClick}
-          >
-            Delete
-          </Button>
+          {can('managePeriodLocks', currentUser) && (
+            <Button
+              btnStyle="danger"
+              size="small"
+              icon="cancel-1"
+              onClick={onClick}
+            >
+              Delete
+            </Button>
+          )}
         </BarItems>
       );
     }
@@ -184,14 +191,15 @@ class PeriodLocksList extends React.Component<IProps, State> {
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
-
-        <ModalTrigger
-          title="New periodLock"
-          trigger={addTrigger}
-          autoOpenKey="showPeriodLockModal"
-          content={periodLockForm}
-          backDrop="static"
-        />
+        {can('managePeriodLocks', currentUser) && (
+          <ModalTrigger
+            title="New periodLock"
+            trigger={addTrigger}
+            autoOpenKey="showPeriodLockModal"
+            content={periodLockForm}
+            backDrop="static"
+          />
+        )}
       </BarItems>
     );
 
@@ -203,9 +211,11 @@ class PeriodLocksList extends React.Component<IProps, State> {
       <Wrapper
         header={
           <Wrapper.Header
-            title={__(`Contracts`) + ` (${totalCount})`}
+            title={__(`Period Locks`) + ` (${totalCount})`}
             queryParams={queryParams}
-            submenu={menuContracts}
+            submenu={menuContracts.filter(row =>
+              can(row.permission, currentUser)
+            )}
           />
         }
         actionBar={actionBar}
@@ -224,4 +234,4 @@ class PeriodLocksList extends React.Component<IProps, State> {
   }
 }
 
-export default withRouter<IRouterProps>(PeriodLocksList);
+export default withRouter<IRouterProps>(withConsumer(PeriodLocksList));

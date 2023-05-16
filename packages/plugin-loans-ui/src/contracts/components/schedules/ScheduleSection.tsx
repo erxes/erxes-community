@@ -3,6 +3,9 @@ import React from 'react';
 
 import SchedulesList from '../../containers/Schedules';
 import { ScrollTableColls } from '../../styles';
+import withConsumer from '../../../withConsumer';
+import { can } from '@erxes/ui/src/utils/core';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   contractId: string;
@@ -10,6 +13,7 @@ type Props = {
   regenSchedules: (contractId: string) => void;
   fixSchedules?: (contractId: string) => void;
   hasTransaction?: boolean;
+  currentUser: IUser;
 };
 
 function ScheduleSection({
@@ -17,17 +21,18 @@ function ScheduleSection({
   isFirst,
   regenSchedules,
   fixSchedules,
-  hasTransaction
+  hasTransaction,
+  currentUser
 }: Props) {
   const onRegenSchedules = () =>
-    confirm()
+    confirm('Are you sure Regenerate Schedule?')
       .then(() => regenSchedules(contractId))
       .catch(error => {
         Alert.error(error.message);
       });
 
   const onFixSchedules = () =>
-    confirm()
+    confirm('Are you sure Fix Schedule?')
       .then(() => fixSchedules && fixSchedules(contractId))
       .catch(error => {
         Alert.error(error.message);
@@ -57,7 +62,7 @@ function ScheduleSection({
       title={__(`${(isFirst && 'First ') || ''}Schedules`)}
       name="showSchedules"
       isOpen={!isFirst}
-      extraButtons={renderExtraButton()}
+      extraButtons={can('manageSchedule', currentUser) && renderExtraButton()}
     >
       <ScrollTableColls>
         <SchedulesList
@@ -69,4 +74,4 @@ function ScheduleSection({
   );
 }
 
-export default ScheduleSection;
+export default withConsumer(ScheduleSection);

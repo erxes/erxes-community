@@ -21,10 +21,13 @@ import { getEnv } from '@erxes/ui/src/utils';
 import client from '@erxes/ui/src/apolloClient';
 import gql from 'graphql-tag';
 import { queries } from '../../graphql';
-import { isEnabled } from '@erxes/ui/src/utils/core';
+import { can, isEnabled } from '@erxes/ui/src/utils/core';
+import withConsumer from '../../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   contract: IContract;
+  currentUser: IUser;
   remove: () => void;
 };
 
@@ -43,7 +46,7 @@ class BasicInfoSection extends React.Component<Props, State> {
   }
 
   renderAction() {
-    const { remove, contract } = this.props;
+    const { remove, contract, currentUser } = this.props;
 
     const onDelete = () =>
       confirm()
@@ -88,6 +91,7 @@ class BasicInfoSection extends React.Component<Props, State> {
               <Icon icon="angle-down" />
             </Button>
           </Dropdown.Toggle>
+
           <Dropdown.Menu>
             {this.state.documents?.map(mur => {
               return (
@@ -98,24 +102,23 @@ class BasicInfoSection extends React.Component<Props, State> {
                 </li>
               );
             })}
-            <li>
-              <ModalTrigger
-                title="To Close Contract"
-                trigger={<a href="#toClose">{__('To Close Contract')}</a>}
-                size="lg"
-                content={closeForm}
-              />
-            </li>
-            <li>
-              <a href="#delete" onClick={onDelete}>
-                {__('Archive')}
-              </a>
-            </li>
-            <li>
-              <a href="#delete" onClick={onDelete}>
-                {__('Delete')}
-              </a>
-            </li>
+            {can('contractsClose', currentUser) && (
+              <li>
+                <ModalTrigger
+                  title="To Close Contract"
+                  trigger={<a href="#toClose">{__('To Close Contract')}</a>}
+                  size="lg"
+                  content={closeForm}
+                />
+              </li>
+            )}
+            {can('contractsRemove', currentUser) && (
+              <li>
+                <a href="#delete" onClick={onDelete}>
+                  {__('Delete')}
+                </a>
+              </li>
+            )}
           </Dropdown.Menu>
         </Dropdown>
       </Action>
@@ -124,7 +127,7 @@ class BasicInfoSection extends React.Component<Props, State> {
 
   render() {
     const { Section } = Sidebar;
-    const { contract } = this.props;
+    const { contract, currentUser } = this.props;
 
     const contractForm = props => (
       <ContractForm {...props} contract={contract} />
@@ -134,12 +137,14 @@ class BasicInfoSection extends React.Component<Props, State> {
       <Sidebar.Section>
         <InfoWrapper>
           <Name>{contract.number}</Name>
-          <ModalTrigger
-            title="Edit basic info"
-            trigger={<Icon icon="edit" />}
-            size="lg"
-            content={contractForm}
-          />
+          {can('contractsEdit', currentUser) && (
+            <ModalTrigger
+              title="Edit basic info"
+              trigger={<Icon icon="edit" />}
+              size="lg"
+              content={contractForm}
+            />
+          )}
         </InfoWrapper>
 
         {this.renderAction()}
@@ -152,4 +157,4 @@ class BasicInfoSection extends React.Component<Props, State> {
   }
 }
 
-export default BasicInfoSection;
+export default withConsumer(BasicInfoSection);

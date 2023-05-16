@@ -13,12 +13,14 @@ import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 import { IRouterProps } from '@erxes/ui/src/types';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-
 import { menuContracts } from '../../constants';
 import { CollateralsTableWrapper } from '../styles';
 import { ICollateral } from '../types';
 import CollateralRow from './CollateralRow';
 import Sidebar from './Sidebar';
+import { can } from '@erxes/ui/src/utils/core';
+import withConsumer from '../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 interface IProps extends IRouterProps {
   collaterals: ICollateral[];
@@ -28,6 +30,7 @@ interface IProps extends IRouterProps {
   totalCount: number;
   history: any;
   queryParams: any;
+  currentUser: IUser;
 }
 
 type State = {
@@ -82,7 +85,8 @@ class CollateralsList extends React.Component<IProps, State> {
       history,
       loading,
       totalCount,
-      queryParams
+      queryParams,
+      currentUser
     } = this.props;
 
     const mainContent = (
@@ -166,7 +170,9 @@ class CollateralsList extends React.Component<IProps, State> {
           <Wrapper.Header
             title={__(`Collaterals`) + ` (${totalCount})`}
             queryParams={queryParams}
-            submenu={menuContracts}
+            submenu={menuContracts.filter(row =>
+              can(row.permission, currentUser)
+            )}
           />
         }
         actionBar={actionBar}
@@ -192,4 +198,4 @@ class CollateralsList extends React.Component<IProps, State> {
   }
 }
 
-export default withRouter<IRouterProps>(CollateralsList);
+export default withRouter<IRouterProps>(withConsumer(CollateralsList));

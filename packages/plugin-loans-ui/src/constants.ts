@@ -1,8 +1,24 @@
 export const menuContracts = [
-  { title: 'Contracts', link: '/erxes-plugin-loan/contract-list' },
-  { title: 'Collaterals', link: '/erxes-plugin-loan/collateral-list' },
-  { title: 'Transactions', link: '/erxes-plugin-loan/transaction-list' },
-  { title: 'PeriodLocks', link: '/erxes-plugin-loan/periodLock-list' }
+  {
+    title: 'Contracts',
+    link: '/erxes-plugin-loan/contract-list',
+    permission: 'showContracts'
+  },
+  {
+    title: 'Collaterals',
+    link: '/erxes-plugin-loan/collateral-list',
+    permission: 'showCollaterals'
+  },
+  {
+    title: 'Transactions',
+    link: '/erxes-plugin-loan/transaction-list',
+    permission: 'showTransactions'
+  },
+  {
+    title: 'PeriodLocks',
+    link: '/erxes-plugin-loan/periodLock-list',
+    permission: 'showPeriodLocks'
+  }
 ];
 
 export const FILTER_PARAMS_TR = [

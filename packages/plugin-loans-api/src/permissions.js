@@ -15,14 +15,16 @@ module.exports = {
           'showContracts',
           'manageSchedule',
           'showCollaterals',
-          'manageTransactions',
-          'showTransactions',
-          'transactionsRemove',
-          'showPeriodLocks',
-          'managePeriodLocks',
+          'manageLoanConfigs',
           'manageInsuranceTypes',
           'manageInvoices',
-          'showInvoices'
+          'showInvoices',
+          'manageTransactions',
+          'showTransactions',
+          'transactionsEdit',
+          'transactionsRemove',
+          'showPeriodLocks',
+          'managePeriodLocks'
         ]
       },
       {
@@ -42,7 +44,12 @@ module.exports = {
       {
         name: 'loansTransactionsAll',
         description: 'Manage All Loan Transaction',
-        use: ['manageTransactions', 'showTransactions', 'transactionsRemove']
+        use: [
+          'manageTransactions',
+          'showTransactions',
+          'transactionsEdit',
+          'transactionsRemove'
+        ]
       },
       {
         name: 'loansPeriodLocksAll',
@@ -108,6 +115,10 @@ module.exports = {
       {
         name: 'showTransactions',
         description: 'Show Transactions'
+      },
+      {
+        name: 'transactionsEdit',
+        description: 'Edit Transactions'
       },
       {
         name: 'transactionsRemove',
