@@ -89,6 +89,9 @@ const commonQueryParams = `
   number: String
   branchIds: [String]
   departmentIds: [String]
+  boardIds: [String]
+  stageCodes: [String]
+  dateRangeFilters:JSON
 `;
 
 const listQueryParams = `
