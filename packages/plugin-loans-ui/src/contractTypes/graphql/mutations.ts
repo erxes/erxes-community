@@ -7,6 +7,7 @@ const commonFields = `
   $status: String,
   $number: String,
   $vacancy: Float,
+  $unduePercent: Float,
   $leaseType: String
   $createdAt: Date,
   $productCategoryIds: [String],
@@ -20,6 +21,7 @@ const commonVariables = `
   status: $status,
   number: $number,
   vacancy: $vacancy,
+  unduePercent: $unduePercent
   leaseType: $leaseType
   createdAt: $createdAt,
   productCategoryIds: $productCategoryIds,

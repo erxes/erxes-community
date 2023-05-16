@@ -7,6 +7,7 @@ export const types = () => `
     status: String
     number: String
     vacancy: Float
+    unduePercent: Float
     leaseType: String
     createdAt: Date
     productCategoryIds: [String]
@@ -43,6 +44,7 @@ const commonFields = `
   status: String
   number: String
   vacancy: Float
+  unduePercent: Float 
   leaseType: String
   createdAt: Date
   productCategoryIds: [String]

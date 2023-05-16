@@ -45,6 +45,7 @@ export interface IContractType {
   status: string;
   number: string;
   vacancy: number;
+  unduePercent: number;
   leaseType: string;
   createdAt: Date;
   productCategoryIds: string[];
@@ -69,6 +70,13 @@ export const contractTypeSchema = schemaHooksWrapper(
       max: 10,
       label: 'Vacancy',
       required: true
+    }),
+    unduePercent: field({
+      type: Number,
+      min: 0,
+      max: 100,
+      label: 'Undue Percent',
+      optional: true
     }),
     leaseType: field({
       type: String,

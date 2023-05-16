@@ -8,6 +8,7 @@ export const contractTypeFields = `
   vacancy
   leaseType
   createdAt
+  unduePercent
   productCategoryIds
   config
 `;

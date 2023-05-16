@@ -57,6 +57,7 @@ class ContractTypeForm extends React.Component<Props, State> {
       name: finalValues.name,
       number: finalValues.number,
       vacancy: Number(finalValues.vacancy),
+      unduePercent: Number(finalValues.unduePercent),
       leaseType: this.state.leaseType,
       productCategoryIds: this.state.productCategoryIds,
       description: finalValues.description
@@ -111,9 +112,14 @@ class ContractTypeForm extends React.Component<Props, State> {
                 ...formProps,
                 name: 'vacancy',
                 type: 'number',
-                defaultValue: contractType.vacancy || 0
+                defaultValue: contractType.vacancy || 0,
+                max: 20
               })}
-
+              {this.renderFormGroup('Undue Percent', {
+                ...formProps,
+                name: 'unduePercent',
+                defaultValue: contractType.unduePercent || ''
+              })}
               <FormGroup>
                 <ControlLabel>{__('Lease Type')}:</ControlLabel>
 

@@ -1,5 +1,4 @@
 import { __, Wrapper } from '@erxes/ui/src';
-import { IUser } from '@erxes/ui/src/auth/types';
 import React from 'react';
 
 import { IContractTypeDetail } from '../types';
@@ -8,7 +7,6 @@ import JournalsSettings from './JournalsSettings';
 
 type Props = {
   contractType: IContractTypeDetail;
-  currentUser: IUser;
   saveItem: (doc: IContractTypeDetail, callback?: (item) => void) => void;
 };
 
@@ -17,9 +15,6 @@ type State = {};
 class ContractDetails extends React.Component<Props, State> {
   constructor(props) {
     super(props);
-
-    const contractType = props.contractType;
-
     this.state = {};
   }
 

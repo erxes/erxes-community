@@ -29,7 +29,7 @@ type FinalProps = {
   RemoveMutationResponse;
 
 const ContractTypeDetailsContainer = (props: FinalProps) => {
-  const { contractTypeDetailQuery, currentUser, history } = props;
+  const { contractTypeDetailQuery, currentUser } = props;
 
   const saveItem = (doc: IContractType, callback: (item) => void) => {
     const { contractTypesEdit } = props;

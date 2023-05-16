@@ -45,6 +45,7 @@ export interface IContractTypeDoc {
   createdAt: Date;
   productCategoryIds: string[];
   config: IContractConfig;
+  unduePercent: number;
 }
 
 export interface IContractType extends IContractTypeDoc {

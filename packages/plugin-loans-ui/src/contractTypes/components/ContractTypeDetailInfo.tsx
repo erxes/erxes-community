@@ -98,6 +98,11 @@ class DetailInfo extends React.Component<Props> {
                 'After vacancy',
                 (contractType.vacancy || 0).toLocaleString()
               )}
+              {this.renderRow(
+                'Undue percent',
+                (contractType.unduePercent || 0).toLocaleString()
+              )}
+
               {this.renderRow('Leasing Type', contractType.leaseType)}
               <li>
                 <FieldStyle>{__(`Allow categories`)}</FieldStyle>
