@@ -1,21 +1,28 @@
 import React from 'react';
 import BoardSelect from '@erxes/ui-cards/src/boards/containers/BoardSelect';
-import { ControlLabel, FormGroup } from '@erxes/ui/src/components/form';
+import {
+  ControlLabel,
+  FormControl,
+  FormGroup
+} from '@erxes/ui/src/components/form';
 import Select from 'react-select-plus';
-import TicketConvertTrigger from '@erxes/ui-cards/src/tickets/components/TicketConvertTrigger';
-import DealConvertTrigger from '@erxes/ui-cards/src/deals/components/DealConvertTrigger';
-import TaskConvertTrigger from '@erxes/ui-cards/src/tasks/components/TaskConvertTrigger';
+import Button from '@erxes/ui/src/components/Button';
+import { withProps } from '@erxes/ui/src/utils/core';
+import { graphql } from 'react-apollo';
+import { mutations, queries } from '../graphql';
+import * as compose from 'lodash.flowright';
+import gql from 'graphql-tag';
 
-// sample
-// import ConvertTo from '../../../../plugin-inbox-ui/src/inbox/components/conversationDetail/workarea/ConvertTo';
-
-type Props = {};
+type Props = {
+  rcfaCreateRelatedTask: Function;
+};
 
 type State = {
   type: string;
   stageId: string;
   pipelineId: string;
   boardId: string;
+  name: string;
   onChangeStage?: ((stageId: string) => void) | undefined;
   onChangePipeline: ((pipelineId: string, stages: any) => void) | undefined;
   onChangeBoard: ((boardId: string) => void) | undefined;
@@ -27,6 +34,7 @@ class CreateTaskModal extends React.Component<Props, State> {
     stageId: string;
     pipelineId: string;
     boardId: string;
+    name: string;
     onChangeStage?: (stageId: string) => void;
     onChangePipeline: (pipelineId: string, stages: any) => void;
     onChangeBoard: (boardId: string) => void;
@@ -40,6 +48,7 @@ class CreateTaskModal extends React.Component<Props, State> {
       stageId: '',
       pipelineId: '',
       boardId: '',
+      name: '',
       onChangeBoard(boardId: string): void {},
       onChangePipeline(pipelineId: string, stages: any): void {},
       onChangeStage(stageId: string): void {}
@@ -47,6 +56,8 @@ class CreateTaskModal extends React.Component<Props, State> {
   }
 
   render() {
+    const { rcfaCreateRelatedTask } = this.props;
+
     const options = [
       { value: 'task', label: 'Task' },
       { value: 'deal', label: 'Deal' }
@@ -57,32 +68,39 @@ class CreateTaskModal extends React.Component<Props, State> {
     };
 
     const onChangeBoard = (boardId: string) => {
-      console.log('onChangeBoard', boardId);
       this.setState({ boardId: boardId });
     };
 
     const onChangePipeline = (value: any) => {
-      console.log('onChangePipeline', value);
       this.setState({ pipelineId: value });
     };
 
     const onChangeStage = (stageId: string) => {
-      console.log('onChangeStage', stageId);
       this.setState({ stageId: stageId });
     };
 
-    const refetch = (): void => {};
+    const create = async () => {
+      const stageId = this.state.stageId;
+      const pipelineId = this.state.pipelineId;
+      const boardId = this.state.boardId;
+      const name = this.state.name;
 
-    const triggerProps: any = {
-      assignedUserIds: 'id',
-      relTypeIds: 'customerIds',
-      relType: 'customer',
-      sourceConversationId: 'id',
-      subject: '',
-      refetch: refetch
+      if (!stageId || !pipelineId || !boardId || !name) {
+        console.log('NULL VALUE DETECTED');
+        return;
+      }
+
+      const payload = {
+        type: this.state.type,
+        sourceType: 'task',
+        itemId: 'id',
+        name: this.state.name,
+        stageId: this.state.stageId
+      };
+
+      const response = await rcfaCreateRelatedTask({ variables: payload });
+      console.log(response);
     };
-
-    const url = 'url';
 
     return (
       <>
@@ -108,15 +126,69 @@ class CreateTaskModal extends React.Component<Props, State> {
           onChangeBoard={onChangeBoard}
         />
 
-        {this.state.type === 'task' ? (
-          <TaskConvertTrigger {...triggerProps} />
-        ) : (
-          <DealConvertTrigger {...triggerProps} bookingProductId={url} />
-        )}
-        {/* <TicketConvertTrigger relType="" refetch={refetch} /> */}
+        <FormGroup>
+          <ControlLabel>Name</ControlLabel>
+          <FormControl
+            type="text"
+            required
+            onChange={(e: any) => {
+              this.setState({ name: e.target.value });
+            }}
+          />
+        </FormGroup>
+
+        <Button onClick={create}>Done</Button>
       </>
     );
   }
 }
 
-export default CreateTaskModal;
+export default withProps<Props>(
+  compose(
+    graphql<Props>(gql(mutations.rcfaCreateRelatedTask), {
+      name: 'rcfaCreateRelatedTask'
+    })
+  )(CreateTaskModal)
+);
+
+// plugin-grants-api/src/utils/
+//   if (action === 'changeCardType') {
+//   await sendCardsMessage({
+//     subdomain,
+//     action: 'createRelatedItem',
+//     data,
+//     isRPC: true
+//   });
+
+//   return 'success';
+// }
+
+//plugin-cards-api/src/messagebrokers/
+// consumeRPCQueue('cards:createRelatedItem', async ({ subdomain, data }) => {
+//   const models = await generateModels(subdomain);
+
+//   const { type, sourceType, itemId, name, stageId } = data;
+
+//   const relatedCard = await createBoardItem(
+//     models,
+//     subdomain,
+//     { name, stageId },
+//     type
+//   );
+
+//   await sendCoreMessage({
+//     subdomain,
+//     action: 'conformities.addConformity',
+//     data: {
+//       mainType: sourceType,
+//       mainTypeId: itemId,
+//       relType: type,
+//       relTypeId: relatedCard._id
+//     }
+//   });
+
+//   return {
+//     status: 'success',
+//     data: relatedCard
+//   };
+// });
