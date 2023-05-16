@@ -4,7 +4,6 @@ import { generateModels, IModels } from '../../connectionResolver';
 import { sendCoreMessage } from '../../messageBroker';
 import {
   IAbsence,
-  IAbsenceType,
   IAbsenceTypeDocument,
   IScheduleDocument,
   IShiftDocument,
@@ -74,33 +73,74 @@ export const findDepartmentUsers = async (
   return deptUsers;
 };
 
+export const returnUnionOfUserIds = async (
+  branchIds: string[],
+  departmentIds: string[],
+  userIds: string[],
+  subdomain: any
+) => {
+  if (userIds.length) {
+    return userIds;
+  }
+  const concatBranchDept: string[] = [];
+
+  if (branchIds) {
+    const branchUsers = await findBranchUsers(subdomain, branchIds);
+    const branchUserIds = branchUsers.map(branchUser => branchUser._id);
+    concatBranchDept.push(...branchUserIds);
+  }
+  if (departmentIds) {
+    const departmentUsers = await findDepartmentUsers(subdomain, departmentIds);
+    const departmentUserIds = departmentUsers.map(
+      departmentUser => departmentUser._id
+    );
+    concatBranchDept.push(...departmentUserIds);
+  }
+
+  // prevent inserting common users twice
+  const sorted = concatBranchDept.sort();
+  const unionOfUserIds = sorted.filter((value, pos) => {
+    return concatBranchDept.indexOf(value) === pos;
+  });
+
+  return unionOfUserIds;
+};
 export const createScheduleShiftsByUserIds = async (
   userIds: string[],
-  shifts,
+  scheduleShifts,
   models: IModels,
   totalBreakInMins?: number
 ) => {
+  const shiftsBulkCreateOps: any[] = [];
+
   let schedule;
-  userIds.forEach(async userId => {
+  for (const userId of userIds) {
     schedule = await models.Schedules.createSchedule({
-      userId: `${userId}`,
+      userId,
       solved: true,
       status: 'Approved',
       submittedByAdmin: true,
       totalBreakInMins
     });
 
-    shifts.forEach(shift => {
-      models.Shifts.createShift({
-        scheduleId: schedule._id,
-        shiftStart: shift.shiftStart,
-        shiftEnd: shift.shiftEnd,
-        scheduleConfigId: shift.scheduleConfigId,
-        solved: true,
-        status: 'Approved'
+    for (const shift of scheduleShifts) {
+      shiftsBulkCreateOps.push({
+        insertOne: {
+          document: {
+            scheduleId: schedule._id,
+            shiftStart: shift.shiftStart,
+            shiftEnd: shift.shiftEnd,
+            scheduleConfigId: shift.scheduleConfigId,
+            solved: true,
+            status: 'Approved'
+          }
+        }
       });
-    });
-  });
+    }
+  }
+
+  // create shifts of each schedule
+  await models.Shifts.bulkWrite(shiftsBulkCreateOps);
 
   return schedule;
 };
@@ -115,8 +155,10 @@ export const timeclockReportByUser = async (
 
   let report: IUserReport = {
     scheduleReport: [],
-    userId: `${userId}`,
-    totalMinsScheduledThisMonth: 0
+    userId,
+    totalMinsScheduledThisMonth: 0,
+    totalMinsWorkedToday: 0,
+    totalMinsScheduledToday: 0
   };
   const shiftsOfSchedule: any = [];
 
@@ -130,7 +172,14 @@ export const timeclockReportByUser = async (
   const endTime = endDate ? endDate : startOfNextMonth;
 
   // get the schedule data of this month
-  const schedules = models.Schedules.find({ userId });
+  const schedules = await models.Schedules.find({
+    userId,
+    status: 'Approved',
+    solved: true
+  });
+
+  const scheduleIds = schedules.map(schedule => schedule._id);
+
   const timeclocks = models.Timeclocks.find({
     $and: [
       { userId },
@@ -158,18 +207,16 @@ export const timeclockReportByUser = async (
     }
   });
 
-  for (const { _id } of await schedules) {
-    shiftsOfSchedule.push(
-      ...(await models.Shifts.find({
-        scheduleId: _id,
-        status: 'Approved',
-        shiftStart: {
-          $gte: fixDate(startTime),
-          $lte: fixDate(endTime)
-        }
-      }))
-    );
-  }
+  shiftsOfSchedule.push(
+    ...(await models.Shifts.find({
+      scheduleId: { $in: scheduleIds },
+      status: 'Approved',
+      shiftStart: {
+        $gte: fixDate(startTime),
+        $lte: fixDate(endTime)
+      }
+    }))
+  );
 
   // if any of the schemas is not empty
   if (
@@ -440,9 +487,11 @@ export const timeclockReportFinal = async (
   const usersReport: IUsersReport = {};
   const shiftsOfSchedule: any = [];
 
-  // get the schedule data of this month
+  // get the schedule data of time interval
   const schedules = await models.Schedules.find({
-    userId: { $in: userIds }
+    userId: { $in: userIds },
+    solved: true,
+    status: { $regex: /Approved/gi }
   }).sort({
     userId: 1
   });
@@ -451,8 +500,23 @@ export const timeclockReportFinal = async (
 
   // get all approved absence requests
   const requests = await models.Absences.find({
+    userId: { $in: userIds },
     solved: true,
-    status: /approved/gi
+    status: /approved/gi,
+    $or: [
+      {
+        startTime: {
+          $gte: fixDate(startDate),
+          $lte: customFixDate(endDate)
+        }
+      },
+      {
+        endTime: {
+          $gte: fixDate(startDate),
+          $lte: customFixDate(endDate)
+        }
+      }
+    ]
   });
 
   const relatedAbsenceTypes = await models.AbsenceTypes.find({
@@ -496,7 +560,27 @@ export const timeclockReportFinal = async (
     }))
   );
 
-  const schedulesObj = createSchedulesObj(userIds, schedules, shiftsOfSchedule);
+  const shiftsOfScheduleConfigIds = shiftsOfSchedule.map(
+    scheduleShift => scheduleShift.scheduleConfigId
+  );
+  const scheduleShiftsConfigs = await models.ScheduleConfigs.find({
+    _id: { $in: shiftsOfScheduleConfigIds }
+  });
+
+  const scheduleShiftConfigsMap: { [scheduleConfigId: string]: number } = {};
+
+  scheduleShiftsConfigs.map(
+    scheduleConfig =>
+      (scheduleShiftConfigsMap[scheduleConfig._id] =
+        scheduleConfig.lunchBreakInMins)
+  );
+
+  const schedulesObj = createSchedulesObj(
+    userIds,
+    schedules,
+    shiftsOfSchedule,
+    scheduleShiftConfigsMap
+  );
 
   userIds.forEach(async currUserId => {
     // assign team member info from teamMembersObj
@@ -513,15 +597,17 @@ export const timeclockReportFinal = async (
       schedule => schedule.userId === currUserId
     );
 
+    const currUserScheduleIds = currUserSchedules.map(schedule => schedule._id);
+
     // get shifts of schedule
     const currUserScheduleShifts: any = [];
-    currUserSchedules.forEach(userSchedule => {
+    for (const userSchedule of currUserSchedules) {
       currUserScheduleShifts.push(
         ...shiftsOfSchedule.filter(
           scheduleShift => scheduleShift.scheduleId === userSchedule._id
         )
       );
-    });
+    }
 
     let totalDaysWorkedPerUser = 0;
     let totalRegularHoursWorkedPerUser = 0;
@@ -533,6 +619,16 @@ export const timeclockReportFinal = async (
     let totalHoursOvertimePerUser = 0;
     let totalMinsLatePerUser = 0;
     let totalHoursOvernightPerUser = 0;
+
+    let totalBreakOfTimeclocksInHrs = 0;
+
+    // calculate total break time from schedules of an user
+    const totalBreakOfSchedulesInHrs =
+      currUserSchedules.reduce(
+        (partialBreakSum, userSchedule) =>
+          partialBreakSum + (userSchedule.totalBreakInMins || 0),
+        0
+      ) / 60;
 
     if (currUserTimeclocks) {
       totalDaysWorkedPerUser = new Set(
@@ -552,6 +648,20 @@ export const timeclockReportFinal = async (
           // make sure shift end is later than shift start
           if (totalHoursWorkedPerShift > 0) {
             totalRegularHoursWorkedPerUser += totalHoursWorkedPerShift;
+          }
+          // deduct break time from timeclock
+          if (
+            !currUserTimeclock.deviceType?.match(/shift request/gi) &&
+            currUserId in schedulesObj &&
+            shiftStart.toLocaleDateString() in schedulesObj[currUserId]
+          ) {
+            const getScheduleOfTheDay =
+              schedulesObj[currUserId][shiftStart.toLocaleDateString()];
+
+            const lunchBreakOfShiftInHrs =
+              getScheduleOfTheDay.lunchBreakInMins / 60;
+
+            totalBreakOfTimeclocksInHrs += lunchBreakOfShiftInHrs;
           }
 
           totalHoursOvernightPerUser += returnOvernightHours(
@@ -597,6 +707,8 @@ export const timeclockReportFinal = async (
         }
       });
 
+      // deduct lunch break from worked hours
+      totalRegularHoursWorkedPerUser -= totalBreakOfTimeclocksInHrs;
       // deduct overtime from worked hours
       totalRegularHoursWorkedPerUser -= totalHoursOvertimePerUser;
       totalHoursWorkedPerUser =
@@ -625,6 +737,9 @@ export const timeclockReportFinal = async (
 
     const userAbsenceInfo: IUserAbsenceInfo = await returnUserAbsenceInfo(
       {
+        requestsShiftRequest: relatedAbsences.requestsShiftRequest.filter(
+          absence => absence.userId === currUserId
+        ),
         requestsWorkedAbroad: relatedAbsences.requestsWorkedAbroad.filter(
           absence => absence.userId === currUserId
         ),
@@ -641,15 +756,22 @@ export const timeclockReportFinal = async (
       relatedAbsenceTypes
     );
 
+    // deduct lunch breaks from total scheduled hours
+    if (totalHoursScheduledPerUser) {
+      totalHoursScheduledPerUser -= totalBreakOfSchedulesInHrs;
+    }
+
     if (exportToXlsx) {
       usersReport[currUserId] = {
         ...usersReport[currUserId],
         totalDaysScheduled: totalDaysScheduledPerUser,
         totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
+        totalHoursBreakScheduled: totalBreakOfSchedulesInHrs.toFixed(2),
         totalDaysWorked: totalDaysWorkedPerUser,
         totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
         totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
         totalHoursOvernight: totalHoursOvernightPerUser.toFixed(2),
+        totalHoursBreakActual: totalBreakOfTimeclocksInHrs.toFixed(2),
         totalHoursWorked: totalHoursWorkedPerUser.toFixed(2),
         totalMinsLate: totalMinsLatePerUser.toFixed(2),
         ...userAbsenceInfo
@@ -661,6 +783,8 @@ export const timeclockReportFinal = async (
       ...usersReport[currUserId],
       totalDaysScheduled: totalDaysScheduledPerUser,
       totalHoursScheduled: totalHoursScheduledPerUser.toFixed(2),
+      totalHoursBreakScheduled: totalBreakOfSchedulesInHrs.toFixed(2),
+      totalHoursBreakActual: totalBreakOfTimeclocksInHrs.toFixed(2),
       totalDaysWorked: totalDaysWorkedPerUser,
       totalRegularHoursWorked: totalRegularHoursWorkedPerUser.toFixed(2),
       totalHoursOvertime: totalHoursOvertimePerUser.toFixed(2),
@@ -728,7 +852,27 @@ export const timeclockReportPivot = async (
     }))
   );
 
-  const schedulesObj = createSchedulesObj(userIds, schedules, shiftsOfSchedule);
+  const shiftsOfScheduleConfigIds = shiftsOfSchedule.map(
+    scheduleShift => scheduleShift.scheduleConfigId
+  );
+  const scheduleShiftsConfigs = await models.ScheduleConfigs.find({
+    _id: { $in: shiftsOfScheduleConfigIds }
+  });
+
+  const scheduleShiftConfigsMap: { [scheduleConfigId: string]: number } = {};
+
+  scheduleShiftsConfigs.map(
+    scheduleConfig =>
+      (scheduleShiftConfigsMap[scheduleConfig._id] =
+        scheduleConfig.lunchBreakInMins)
+  );
+
+  const schedulesObj = createSchedulesObj(
+    userIds,
+    schedules,
+    shiftsOfSchedule,
+    scheduleShiftConfigsMap
+  );
 
   userIds.forEach(async currUserId => {
     // assign team member info from teamMembersObj
@@ -779,6 +923,7 @@ export const timeclockReportPivot = async (
           let scheduleShiftStart;
           let scheduleShiftEnd;
           let getScheduleDuration: number = 0;
+          let lunchBreakInHrs = 0;
           if (
             currUserId in schedulesObj &&
             scheduledDay in schedulesObj[currUserId]
@@ -787,6 +932,7 @@ export const timeclockReportPivot = async (
 
             scheduleShiftStart = getScheduleOfTheDay.shiftStart;
             scheduleShiftEnd = getScheduleOfTheDay.shiftEnd;
+            lunchBreakInHrs = getScheduleOfTheDay.lunchBreakInMins / 60;
 
             getScheduleDuration = Math.abs(
               scheduleShiftEnd.getTime() - scheduleShiftStart.getTime()
@@ -810,11 +956,21 @@ export const timeclockReportPivot = async (
             }
           }
 
+          let timeclockDurationinHrs = getTimeClockDuration / MMSTOHRS;
+          let scheduledDurationInHrs = getScheduleDuration / MMSTOHRS;
+
+          if (timeclockDurationinHrs) {
+            timeclockDurationinHrs -= lunchBreakInHrs;
+          }
+          if (scheduledDurationInHrs) {
+            scheduledDurationInHrs -= lunchBreakInHrs;
+          }
+
           totalShiftsOfUser.push({
             timeclockDate: scheduledDay,
             timeclockStart: shiftStart,
             timeclockEnd: shiftEnd,
-            timeclockDuration: (getTimeClockDuration / MMSTOHRS).toFixed(2),
+            timeclockDuration: timeclockDurationinHrs.toFixed(2),
 
             deviceType: currUserTimeclock.deviceType,
             deviceName: currUserTimeclock.deviceName,
@@ -822,7 +978,8 @@ export const timeclockReportPivot = async (
             scheduledStart: scheduleShiftStart,
             scheduledEnd: scheduleShiftEnd,
 
-            scheduledDuration: (getScheduleDuration / MMSTOHRS).toFixed(2),
+            lunchBreakInHrs: lunchBreakInHrs.toFixed(2),
+            scheduledDuration: scheduledDurationInHrs.toFixed(2),
             totalMinsLate: totalMinsLatePerShift.toFixed(2),
             totalHoursOvertime: totalHoursOvertimePerShift.toFixed(2),
             totalHoursOvernight: totalHoursOvernightPerShift.toFixed(2)
@@ -848,6 +1005,7 @@ const returnTotalAbsences = async (
   totalRequests: IAbsence[],
   models: IModels
 ): Promise<{
+  requestsShiftRequest: IAbsence[];
   requestsWorkedAbroad: IAbsence[];
   requestsPaidAbsence: IAbsence[];
   requestsUnpaidAbsence: IAbsence[];
@@ -863,6 +1021,14 @@ const returnTotalAbsences = async (
     paidAbsence => paidAbsence._id
   );
 
+  const shiftRequestAbsenceTypes = await models.AbsenceTypes.find({
+    requestType: 'shift request'
+  });
+
+  const shiftRequestAbsenceTypeIds = shiftRequestAbsenceTypes.map(
+    absenceType => absenceType._id
+  );
+
   // get all unpaid absence types' ids
   const unpaidAbsenceTypes = await models.AbsenceTypes.find({
     requestType: 'unpaid absence'
@@ -873,6 +1039,10 @@ const returnTotalAbsences = async (
   );
 
   // find Absences
+  const requestsShiftRequest = totalRequests.filter(request =>
+    shiftRequestAbsenceTypeIds.includes(request.absenceTypeId || '')
+  );
+
   const requestsWorkedAbroad = totalRequests.filter(request =>
     request.reason.toLocaleLowerCase().includes('томилолт')
   );
@@ -890,6 +1060,7 @@ const returnTotalAbsences = async (
   );
 
   return {
+    requestsShiftRequest,
     requestsWorkedAbroad,
     requestsPaidAbsence,
     requestsUnpaidAbsence,
@@ -901,10 +1072,16 @@ const returnUserAbsenceInfo = (
   relatedAbsences: any,
   relatedAbsenceTypes: IAbsenceTypeDocument[]
 ): IUserAbsenceInfo => {
+  let totalHoursShiftRequest = 0;
   let totalHoursWorkedAbroad = 0;
   let totalHoursPaidAbsence = 0;
   let totalHoursUnpaidAbsence = 0;
   let totalHoursSick = 0;
+
+  relatedAbsences.requestsShiftRequest.forEach(request => {
+    totalHoursShiftRequest +=
+      (request.endTime.getTime() - request.startTime.getTime()) / MMSTOHRS;
+  });
 
   relatedAbsences.requestsWorkedAbroad.forEach(request => {
     totalHoursWorkedAbroad +=
@@ -917,12 +1094,13 @@ const returnUserAbsenceInfo = (
     );
 
     if (absenceType && absenceType.requestTimeType === 'by day') {
-      const getTotalDays = Math.ceil(
-        (request.endTime.getTime() - request.startTime.getTime()) /
-          (1000 * 3600 * 24)
-      );
+      const getTotalDays = request.requestDates
+        ? request.requestDates.length
+        : Math.ceil(
+            (request.endTime.getTime() - request.startTime.getTime()) /
+              (1000 * 3600 * 24)
+          );
       totalHoursPaidAbsence += getTotalDays * absenceType.requestHoursPerDay;
-
       return;
     }
     totalHoursPaidAbsence +=
@@ -939,6 +1117,7 @@ const returnUserAbsenceInfo = (
   });
 
   return {
+    totalHoursShiftRequest,
     totalHoursWorkedAbroad,
     totalHoursPaidAbsence,
     totalHoursUnpaidAbsence,
@@ -977,7 +1156,8 @@ const returnOvernightHours = (shiftStart: Date, shiftEnd: Date) => {
 const createSchedulesObj = (
   userIds: string[],
   totalSchedules: IScheduleDocument[],
-  totalScheduleShifts: IShiftDocument[]
+  totalScheduleShifts: IShiftDocument[],
+  scheduleShiftsConfigsMap?: { [scheduleConfigId: string]: number }
 ) => {
   const returnObject = {};
 
@@ -996,7 +1176,16 @@ const createSchedulesObj = (
 
       currEmpScheduleShifts.forEach(currEmpScheduleShift => {
         const date_key = currEmpScheduleShift.shiftStart?.toLocaleDateString();
+
+        const getScheduleConfigId = currEmpScheduleShift.scheduleConfigId;
+
+        const lunchBreakInMins =
+          scheduleShiftsConfigsMap && getScheduleConfigId
+            ? scheduleShiftsConfigsMap[getScheduleConfigId]
+            : 0;
+
         returnObject[userId][date_key] = {
+          lunchBreakInMins,
           shiftStart: currEmpScheduleShift.shiftStart,
           shiftEnd: currEmpScheduleShift.shiftEnd
         };

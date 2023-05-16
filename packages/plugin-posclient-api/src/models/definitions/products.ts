@@ -89,6 +89,11 @@ export const productSchema = schemaWrapper(
       label: 'Barcodes',
       index: true
     }),
+    barcodeDescription: field({
+      type: String,
+      optional: true,
+      label: 'Barcode Description'
+    }),
     description: field({ type: String, optional: true, label: 'Description' }),
     attachment: field({ type: attachmentSchema }),
     createdAt: getDateFieldDefinition('Created at'),

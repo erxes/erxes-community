@@ -33,6 +33,7 @@ const posOrderFields = contactsEnabled => `
   }
   syncedErkhet: Boolean,
   origin: String
+  convertDealId: String
 `;
 
 export const types = ({ contactsEnabled, productsEnabled }) => `
@@ -54,6 +55,8 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     syncErkhetInfo: String
     putResponses: JSON
     deliveryInfo: JSON
+    deal: JSON
+    dealLink: String
   }
 
   type PosProduct {

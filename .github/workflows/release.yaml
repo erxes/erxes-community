@@ -5,7 +5,7 @@ on:
       - "*"
 jobs:
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Get release version
@@ -309,6 +309,126 @@ jobs:
           docker tag erxes/plugin-documents-api:dev erxes/plugin-documents-api:${GITHUB_REF#refs/tags/} 
 
           docker push erxes/plugin-documents-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-chats-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-chats-api:dev 
+
+          docker tag erxes/plugin-chats-api:dev erxes/plugin-chats-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-chats-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-ebarimt-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-ebarimt-api:dev 
+
+          docker tag erxes/plugin-ebarimt-api:dev erxes/plugin-ebarimt-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-ebarimt-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-exm-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-exm-api:dev 
+
+          docker tag erxes/plugin-exm-api:dev erxes/plugin-exm-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-exm-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-exmfeed-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-exmfeed-api:dev 
+
+          docker tag erxes/plugin-exmfeed-api:dev erxes/plugin-exmfeed-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-exmfeed-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-pos-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-pos-api:dev 
+
+          docker tag erxes/plugin-pos-api:dev erxes/plugin-pos-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-pos-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-reactions-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-reactions-api:dev 
+
+          docker tag erxes/plugin-reactions-api:dev erxes/plugin-reactions-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-reactions-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-syncerkhet-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-syncerkhet-api:dev 
+
+          docker tag erxes/plugin-syncerkhet-api:dev erxes/plugin-syncerkhet-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-syncerkhet-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-salesplans-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-salesplans-api:dev 
+
+          docker tag erxes/plugin-salesplans-api:dev erxes/plugin-salesplans-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-salesplans-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-processes-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-processes-api:dev 
+
+          docker tag erxes/plugin-processes-api:dev erxes/plugin-processes-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-processes-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-inventories-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-inventories-api:dev 
+
+          docker tag erxes/plugin-inventories-api:dev erxes/plugin-inventories-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-inventories-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-posclient-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-posclient-api:dev 
+
+          docker tag erxes/plugin-posclient-api:dev erxes/plugin-posclient-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-posclient-api:${GITHUB_REF#refs/tags/} 
+      - name: plugin-imap-api
+        run: >
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{
+          secrets.DOCKERHUB_USERNAME }} --password-stdin 
+
+          docker image pull erxes/plugin-imap-api:dev 
+
+          docker tag erxes/plugin-imap-api:dev erxes/plugin-imap-api:${GITHUB_REF#refs/tags/} 
+
+          docker push erxes/plugin-imap-api:${GITHUB_REF#refs/tags/} 
       - name: inbox ui
         run: aws s3 sync s3://erxes-dev-plugins/uis/plugin-inbox-ui
           s3://erxes-release-plugins/uis/plugin-inbox-ui/${GITHUB_REF#refs/tags/}/
@@ -384,9 +504,6 @@ jobs:
       - name: pos ui
         run: aws s3 sync s3://erxes-dev-plugins/uis/plugin-pos-ui
           s3://erxes-release-plugins/uis/plugin-pos-ui/${GITHUB_REF#refs/tags/}/
-      - name: qpay ui
-        run: aws s3 sync s3://erxes-dev-plugins/uis/plugin-qpay-ui
-          s3://erxes-release-plugins/uis/plugin-qpay-ui/${GITHUB_REF#refs/tags/}/
       - name: syncerkhet ui
         run: aws s3 sync s3://erxes-dev-plugins/uis/plugin-syncerkhet-ui
           s3://erxes-release-plugins/uis/plugin-syncerkhet-ui/${GITHUB_REF#refs/tags/}/

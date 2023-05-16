@@ -1,4 +1,4 @@
-import dayjs = require('dayjs');
+import * as dayjs from 'dayjs';
 import * as xlsxPopulate from 'xlsx-populate';
 import { IModels } from './connectionResolver';
 import {
@@ -12,7 +12,11 @@ import {
   timeclockReportPreliminary
 } from './graphql/resolvers/utils';
 import { IUserReport } from './models/definitions/timeclock';
-import { createTeamMembersObject, generateCommonUserIds } from './utils';
+import {
+  createTeamMembersObject,
+  generateCommonUserIds,
+  returnSupervisedUsers
+} from './utils';
 
 const dateFormat = 'YYYY-MM-DD';
 /**
@@ -97,15 +101,18 @@ const prepareHeader = async (sheet: any, reportType: string) => {
       addIntoSheet([final_headers[0][0]], 'A1', 'E1', sheet, reportType, true);
       addIntoSheet([final_headers[0][1]], 'A2', 'E2', sheet, reportType);
 
-      addIntoSheet([final_headers[1][0]], 'F1', 'G1', sheet, reportType, true);
-      addIntoSheet([final_headers[1][1]], 'F2', 'G2', sheet, reportType);
-      addIntoSheet([final_headers[2][0]], 'H1', 'M1', sheet, reportType, true);
-      addIntoSheet([final_headers[2][1]], 'H2', 'M2', sheet, reportType);
-      addIntoSheet([final_headers[3][0]], 'N1', 'N1', sheet, reportType, true);
-      addIntoSheet([final_headers[3][1]], 'N2', 'N2', sheet, reportType);
+      addIntoSheet([final_headers[1][0]], 'F1', 'H1', sheet, reportType, true);
+      addIntoSheet([final_headers[1][1]], 'F2', 'H2', sheet, reportType);
+
+      addIntoSheet([final_headers[2][0]], 'I1', 'O1', sheet, reportType, true);
+      addIntoSheet([final_headers[2][1]], 'I2', 'O2', sheet, reportType);
+
+      addIntoSheet([final_headers[3][0]], 'P1', 'Q1', sheet, reportType, true);
+      addIntoSheet([final_headers[3][1]], 'P2', 'Q2', sheet, reportType);
+
       // absence info
-      addIntoSheet([final_headers[4][0]], 'O1', 'Q1', sheet, reportType, true);
-      addIntoSheet([final_headers[4][1]], 'O2', 'Q2', sheet, reportType);
+      addIntoSheet([final_headers[4][0]], 'R1', 'T1', sheet, reportType, true);
+      addIntoSheet([final_headers[4][1]], 'R2', 'T2', sheet, reportType);
       break;
 
     case 'Pivot':
@@ -117,11 +124,11 @@ const prepareHeader = async (sheet: any, reportType: string) => {
       addIntoSheet([pivot_headers[1][0]], 'F1', 'F1', sheet, reportType, true);
       addIntoSheet([pivot_headers[1][1]], 'F2', 'F2', sheet, reportType);
 
-      addIntoSheet([pivot_headers[2][0]], 'G1', 'I1', sheet, reportType, true);
-      addIntoSheet([pivot_headers[2][1]], 'G2', 'I2', sheet, reportType);
+      addIntoSheet([pivot_headers[2][0]], 'G1', 'J1', sheet, reportType, true);
+      addIntoSheet([pivot_headers[2][1]], 'G2', 'J2', sheet, reportType);
 
-      addIntoSheet([pivot_headers[3][0]], 'J1', 'R1', sheet, reportType, true);
-      addIntoSheet([pivot_headers[3][1]], 'J2', 'R2', sheet, reportType);
+      addIntoSheet([pivot_headers[3][0]], 'K1', 'S1', sheet, reportType, true);
+      addIntoSheet([pivot_headers[3][1]], 'K2', 'S2', sheet, reportType);
 
       break;
   }
@@ -139,7 +146,7 @@ const extractAndAddIntoSheet = (
 
   let startRowIdx = 2;
 
-  const endRowIdx = teamMemberIds.length + 1;
+  const endRowIdx = teamMemberIds.length + 2;
 
   switch (reportType) {
     case 'Урьдчилсан' || 'Preliminary':
@@ -170,7 +177,7 @@ const extractAndAddIntoSheet = (
       addIntoSheet(
         extractValuesIntoArr,
         `A${startRowIdx}`,
-        `Q${endRowIdx}`,
+        `T${endRowIdx}`,
         sheet,
         reportType
       );
@@ -201,11 +208,23 @@ const extractAndAddIntoSheet = (
 
             if (getDeviceNames) {
               if (getDeviceNames.length === 2) {
-                checkInDevice = getDeviceNames[0];
-                checkOutDevice = getDeviceNames[1];
+                // checkInDevice = getDeviceNames[0];
+                // checkOutDevice = getDeviceNames[1];
+                if (
+                  getDeviceNames[0] &&
+                  getDeviceNames[0].includes('faceTerminal')
+                ) {
+                  checkInDevice = scheduleShift.deviceName || '-';
+                }
+                if (
+                  getDeviceNames[1] &&
+                  getDeviceNames[1].includes('faceTerminal')
+                ) {
+                  checkOutDevice = scheduleShift.deviceName || '-';
+                }
               } else {
-                checkInDevice = getDeviceNames[0];
-                checkOutDevice = getDeviceNames[0];
+                checkInDevice = scheduleShift.deviceName || '-';
+                checkOutDevice = scheduleShift.deviceName || '-';
               }
             }
             const shiftInfo: any = [];
@@ -233,21 +252,22 @@ const extractAndAddIntoSheet = (
               scheduledStart,
               scheduledEnd,
               scheduleShift.scheduledDuration,
+              scheduleShift.lunchBreakInHrs,
               shiftStart,
               checkInDevice,
               shiftEnd,
               checkOutDevice,
-              scheduleShift.deviceName,
-              scheduleShift.timeclockDuration,
-              scheduleShift.totalHoursOvertime,
+              scheduleShift.lunchBreakInHrs,
               scheduleShift.totalHoursOvernight,
+              scheduleShift.totalHoursOvertime,
+              scheduleShift.timeclockDuration,
               scheduleShift.totalMinsLate
             );
 
             addIntoSheet(
               [shiftInfo],
               `B${rowNum}`,
-              `Q${rowNum}`,
+              `S${rowNum}`,
               sheet,
               reportType
             );
@@ -286,6 +306,8 @@ export const buildFile = async (
       ? query.departmentIds
       : [query.departmentIds];
 
+  const { currentUserId } = query;
+
   const startDate = query.startDate;
   const endDate = query.endDate;
 
@@ -294,9 +316,10 @@ export const buildFile = async (
 
   const { workbook, sheet } = await createXlsFile();
 
-  const teamMembersObject = await createTeamMembersObject(subdomain);
-
-  const teamMemberIds = Object.keys(teamMembersObject);
+  const totalSupervisedUserIds = await returnSupervisedUsers(
+    currentUserId,
+    subdomain
+  );
 
   const teamMemberIdsFromFilter = await generateCommonUserIds(
     subdomain,
@@ -313,7 +336,12 @@ export const buildFile = async (
   const totalTeamMemberIds =
     teamMemberIdsFromFilter.length || filterGiven
       ? teamMemberIdsFromFilter
-      : teamMemberIds;
+      : totalSupervisedUserIds;
+
+  const teamMembersObject = await createTeamMembersObject(
+    subdomain,
+    totalTeamMemberIds
+  );
 
   let report;
 
@@ -356,7 +384,7 @@ export const buildFile = async (
 
   extractAndAddIntoSheet(
     Object.values(report),
-    teamMemberIds,
+    totalTeamMemberIds,
     sheet,
     reportType
   );

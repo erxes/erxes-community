@@ -236,7 +236,8 @@ export const generateParams = ({ queryParams }) => ({
   customerId: queryParams?.customerId,
   assetId: queryParams?.assetId,
   parentId: queryParams?.parentId,
-  searchValue: queryParams?.searchValue
+  searchValue: queryParams?.searchValue,
+  onlyCurrent: !!queryParams?.onlyCurrent
 });
 
 export const SelectWithAssets = ({
@@ -361,4 +362,14 @@ export const SelectWithAssetCategory = ({
       multi={multi}
     />
   );
+};
+
+export const generateParamsIds = ids => {
+  if (!ids?.length) {
+    return undefined;
+  }
+  if (typeof ids === 'string') {
+    return [ids];
+  }
+  return ids;
 };
