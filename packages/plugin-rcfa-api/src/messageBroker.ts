@@ -17,6 +17,26 @@ export const initBroker = async cl => {
       data: await models.RCFAQuestions.find(data).lean()
     };
   });
+
+  // plugin-cards-api/src/messagebrokers/   - createRelatedItem
+  consumeRPCQueue('cards:createRelatedItem', async ({ subdomain, data }) => {
+    const { type, sourceType, itemId, name, stageId } = data;
+
+    await sendCoreMessage({
+      subdomain,
+      action: 'conformities.addConformity',
+      data: {
+        mainType: sourceType,
+        mainTypeId: itemId,
+        relType: type,
+        relTypeId: 'relatedCard._id'
+      }
+    });
+
+    return {
+      status: 'success'
+    };
+  });
 };
 
 export const sendContactsMessage = (args: ISendMessageArgs): Promise<any> => {
