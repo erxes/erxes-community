@@ -18,10 +18,12 @@ import {
   IContractDoc,
   MainQueryResponse
 } from '../../types';
-import { withProps } from '@erxes/ui/src/utils/core';
+import { can, withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import withConsumer from '../../../withConsumer';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   name: string;
@@ -32,6 +34,7 @@ type Props = {
   collapseCallback?: () => void;
   contractsDealEdit: any;
   title?: string;
+  currentUser: IUser;
 };
 
 function Component(
@@ -43,7 +46,8 @@ function Component(
     mainTypeId = '',
     collapseCallback,
     title,
-    contractsDealEdit
+    contractsDealEdit,
+    currentUser
   }: Props
 ) {
   const renderContractChooser = props => {
@@ -109,7 +113,7 @@ function Component(
     </ButtonRelated>
   );
 
-  const quickButtons = (
+  const quickButtons = can('contractsDealEdit', currentUser) && (
     <ModalTrigger
       title="Associate"
       trigger={contractTrigger}
@@ -190,5 +194,5 @@ export default withProps<IProps>(
       name: 'contractsDealEdit',
       options: { refetchQueries: ['contractsMain'] }
     })
-  )(Component)
+  )(withConsumer(Component))
 );
