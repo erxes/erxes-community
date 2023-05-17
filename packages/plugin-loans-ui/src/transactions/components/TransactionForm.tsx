@@ -20,19 +20,13 @@ import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IInvoice } from '../../invoices/types';
 import React from 'react';
 import { __ } from '@erxes/ui/src/utils';
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
-import { isEnabled } from '@erxes/ui/src/utils/core';
-import SelectContractts, {
+import SelectContracts, {
   Contracts
 } from '../../contracts/components/common/SelectContract';
-
-const SelectCompanies = asyncComponent(
-  () =>
-    isEnabled('contacts') &&
-    import(
-      /* webpackChunkName: 'SelectCompanies' */ '@erxes/ui-contacts/src/companies/containers/SelectCompanies'
-    )
-);
+import dayjs from 'dayjs';
+import client from '@erxes/ui/src/apolloClient';
+import gql from 'graphql-tag';
+import { queries } from '../graphql';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -50,6 +44,7 @@ type State = {
   payDate: Date;
   description: string;
   total: number;
+  paymentInfo: any;
 };
 
 class TransactionForm extends React.Component<Props, State> {
@@ -69,7 +64,8 @@ class TransactionForm extends React.Component<Props, State> {
       companyId: transaction.companyId || (invoice && invoice.companyId) || '',
       customerId:
         transaction.customerId || (invoice && invoice.customerId) || '',
-      invoice: invoice || transaction.invoice || null
+      invoice: invoice || transaction.invoice || null,
+      paymentInfo: null
     };
   }
 
@@ -127,10 +123,14 @@ class TransactionForm extends React.Component<Props, State> {
     );
   };
 
-  renderRowTr = (label, fieldName) => {
+  renderRowTr = (label, fieldName, isFromState) => {
     const { transaction } = this.props;
+    const { paymentInfo } = this.state;
+    let trVal = '';
 
-    const trVal = this.state[fieldName] || transaction[fieldName] || 0;
+    if (isFromState) {
+      trVal = this.state[fieldName];
+    } else trVal = paymentInfo?.[fieldName] || transaction[fieldName] || 0;
 
     return (
       <FormWrapper>
@@ -196,7 +196,6 @@ class TransactionForm extends React.Component<Props, State> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const transaction = this.props.transaction || ({} as ITransaction);
     const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -204,7 +203,25 @@ class TransactionForm extends React.Component<Props, State> {
       this.setState({ [name]: value } as any);
     };
 
+    const getPaymentInfo = (
+      contractId,
+      payDate = dayjs()
+        .locale('en')
+        .format('MMM, D YYYY')
+    ) => {
+      client
+        .mutate({
+          mutation: gql(queries.getPaymentInfo),
+          variables: { id: contractId, payDate: payDate }
+        })
+        .then(({ data }) => {
+          this.setState({ paymentInfo: data.getPaymentInfo });
+        });
+    };
+
     const onChangePayDate = value => {
+      if (this.state.contractId && this.state.payDate !== value)
+        getPaymentInfo(this.state.contractId, value);
       this.setState({ payDate: value });
     };
 
@@ -260,7 +277,7 @@ class TransactionForm extends React.Component<Props, State> {
 
               <FormGroup>
                 <ControlLabel>Contract</ControlLabel>
-                <SelectContractts
+                <SelectContracts
                   label="Choose an customer"
                   name="contractId"
                   initialValue={this.state.contractId}
@@ -268,11 +285,13 @@ class TransactionForm extends React.Component<Props, State> {
                     onSelect(v, n);
                     typeof v === 'string' &&
                       onSelect(Contracts[v].customerId, 'customerId');
+                    if (this.state.contractId !== v)
+                      getPaymentInfo(v, values.payDate);
                   }}
                   multi={false}
                 />
               </FormGroup>
-              {this.renderRowTr('total', 'total')}
+              {this.renderRowTr('total', 'total', true)}
             </FormColumn>
           </FormWrapper>
 

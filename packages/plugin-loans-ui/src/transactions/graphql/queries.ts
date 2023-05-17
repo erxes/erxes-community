@@ -136,12 +136,21 @@ export const transactionDetail = `
   }
 `;
 
-export const getTransactionPreInfo = `
-  query getTransactionPreInfo($contractId: String!, $payDate: String) {
-    getTransactionPreInfo(contractId: $contractId, payDate: $payDate) {
-      ${transactionPreInfo}
-    }
+export const getPaymentInfo = `
+query GetPaymentInfo($id: String!, $payDate: Date) {
+  getPaymentInfo(id: $id,payDate: $payDate) {
+    number
+    contractId
+    payDate
+    payment
+    interestEve
+    interestNonce
+    undue
+    insurance
+    debt
+    total
   }
+}
 `;
 
 export default {
@@ -149,5 +158,5 @@ export default {
   transactionsMain,
   transactionCounts,
   transactionDetail,
-  getTransactionPreInfo
+  getPaymentInfo
 };

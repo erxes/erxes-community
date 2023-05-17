@@ -80,6 +80,7 @@ class ContractForm extends React.Component<Props, State | any> {
       leaseAmount: contract.leaseAmount || 0,
       feeAmount: contract.feeAmount || 0,
       tenor: contract.tenor || 0,
+      unduePercent: contract.unduePercent || 0,
       interestRate: contract.interestRate || 0,
       interestMonth: (contract.interestRate || 0) / 12,
       repayment: contract.repayment || 'fixed',
@@ -96,7 +97,7 @@ class ContractForm extends React.Component<Props, State | any> {
       leasingExpertId: contract.leasingExpertId || '',
       riskExpertId: contract.riskExpertId || '',
       customerId: contract.customerId || '',
-      customerType: contract.customerType || '',
+      customerType: contract.customerType || 'customer',
       leaseType:
         (contract.contractType && contract.contractType.leaseType) || 'finance',
       weekends: contract.weekends || [],
@@ -128,6 +129,7 @@ class ContractForm extends React.Component<Props, State | any> {
       leaseAmount: Number(this.state.leaseAmount),
       feeAmount: Number(this.state.feeAmount),
       tenor: Number(this.state.tenor),
+      unduePercent: Number(this.state.unduePercent),
       interestRate: Number(this.state.interestRate),
       repayment: this.state.repayment,
       startDate: this.state.startDate,
@@ -191,6 +193,15 @@ class ContractForm extends React.Component<Props, State | any> {
     this.setState({
       interestRate: Number((Number(value || 0) * 12).toFixed(2)),
       interestMonth: Number(value || 0)
+    });
+    return;
+  };
+
+  onChangeUnduePercent = e => {
+    const value = (e.target as HTMLInputElement).value;
+    // unduePercent
+    this.setState({
+      unduePercent: Number(value || 0)
     });
     return;
   };
@@ -278,26 +289,25 @@ class ContractForm extends React.Component<Props, State | any> {
     this.setState({ [name]: value } as any);
   };
 
-  onSelectContractType = (value, name) => {
+  onSelectContractType = value => {
     const contractTypeObj = ContractTypeById[value];
 
     this.setState({
       contractTypeId: value,
-      leaseType: (contractTypeObj && contractTypeObj.leaseType) || 'finance'
+      leaseType: (contractTypeObj && contractTypeObj.leaseType) || 'finance',
+      unduePercent: contractTypeObj?.unduePercent
     });
   };
 
   onSelectCustomer = value => {
     this.setState({
-      customerId: value,
-      customerType: 'customer'
+      customerId: value
     });
   };
 
-  onSelectCompany = value => {
+  onCheckCustomerType = e => {
     this.setState({
-      customerId: value,
-      customerType: 'company'
+      customerType: e.target.checked ? 'company' : 'customer'
     });
   };
 
@@ -318,7 +328,6 @@ class ContractForm extends React.Component<Props, State | any> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const contract = this.props.contract || ({} as IContract);
     const { closeModal, renderButton } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -357,35 +366,40 @@ class ContractForm extends React.Component<Props, State | any> {
                   multi={false}
                 ></SelectContractType>
               </FormGroup>
-              <FormGroup>
-                <ControlLabel required={true}>Customer</ControlLabel>
-                <SelectCustomers
-                  label="Choose customer"
-                  name="customerId"
-                  initialValue={
-                    (this.state.customerType === 'customer' &&
-                      this.state.customerId) ||
-                    ''
-                  }
-                  onSelect={this.onSelectCustomer}
-                  multi={false}
-                />
-              </FormGroup>
+              {this.renderFormGroup('Is Organization', {
+                ...formProps,
+                className: 'flex-item',
+                type: 'checkbox',
+                componentClass: 'checkbox',
+                name: 'customerType',
+                checked: this.state.customerType === 'company',
+                onChange: this.onCheckCustomerType
+              })}
+              {this.state.customerType === 'customer' && (
+                <FormGroup>
+                  <ControlLabel required={true}>Customer</ControlLabel>
+                  <SelectCustomers
+                    label="Choose customer"
+                    name="customerId"
+                    initialValue={this.state.customerId}
+                    onSelect={this.onSelectCustomer}
+                    multi={false}
+                  />
+                </FormGroup>
+              )}
 
-              <FormGroup>
-                <ControlLabel required={true}>Company</ControlLabel>
-                <SelectCompanies
-                  label="Choose company"
-                  name="customerId"
-                  initialValue={
-                    (this.state.customerType === 'company' &&
-                      this.state.customerId) ||
-                    ''
-                  }
-                  onSelect={this.onSelectCompany}
-                  multi={false}
-                />
-              </FormGroup>
+              {this.state.customerType === 'company' && (
+                <FormGroup>
+                  <ControlLabel required={true}>Company</ControlLabel>
+                  <SelectCompanies
+                    label="Choose company"
+                    name="customerId"
+                    initialValue={this.state.customerId}
+                    onSelect={this.onSelectCustomer}
+                    multi={false}
+                  />
+                </FormGroup>
+              )}
 
               {this.renderFormGroup('margin Amount', {
                 ...formProps,
@@ -438,6 +452,15 @@ class ContractForm extends React.Component<Props, State | any> {
                 name: 'interestRate',
                 value: this.state.interestRate || 0,
                 onChange: this.onChangeInterest,
+                onClick: this.onFieldClick
+              })}
+
+              {this.renderFormGroup('Undue Percent', {
+                ...formProps,
+                type: 'number',
+                name: 'unduePercent',
+                value: this.state.unduePercent || 0,
+                onChange: this.onChangeUnduePercent,
                 onClick: this.onFieldClick
               })}
 

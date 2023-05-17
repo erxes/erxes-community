@@ -393,6 +393,7 @@ const fillAmounts = async (
   doc.surplus = (doc.surplus || 0) + (tr.surplus || 0);
 
   doc.balance = (preSchedule.balance || 0) - (tr.payment || 0);
+
   doc.payDate = tr.payDate;
   doc.transactionIds = doc.transactionIds
     ? doc.transactionIds.concat([tr._id])
@@ -421,7 +422,6 @@ export const generatePendingSchedules = async (
 ) => {
   let changeDoc = {};
 
-  console.log('updatedSchedule', updatedSchedule);
   /**when didDebt less than debt then only change status */
   if (
     !!updatedSchedule.didDebt &&
@@ -493,10 +493,8 @@ export const generatePendingSchedules = async (
     paymentBalance < (tr.payment || 0) * -1
   )
     paymentBalance = (tr.payment || 0) * -1;
-  console.log('tr.payment', tr.payment, paymentBalance);
   // less pay then pendingSchedules not change current schedule status to less
   if (diff < 0) {
-    console.log('diff < 0', diff < 0);
     // TODO debt (limit) check
     if (!allowLess) {
       trReaction.push({
@@ -571,7 +569,6 @@ export const generatePendingSchedules = async (
     !!updatedSchedule.insurance &&
     updatedSchedule.didInsurance < updatedSchedule.insurance
   ) {
-    console.log('566----');
     const insurance = updatedSchedule.insurance - updatedSchedule.didInsurance;
     changeDoc = {
       insurance: (schedule.insurance || 0) + insurance,
@@ -602,7 +599,6 @@ export const generatePendingSchedules = async (
     !!updatedSchedule.debt &&
     updatedSchedule.didDebt < updatedSchedule.debt
   ) {
-    console.log('597----');
     // debt less then next schedule debt up and not change other fields
     const debt = updatedSchedule.debt - updatedSchedule.didDebt;
 
@@ -639,10 +635,6 @@ export const generatePendingSchedules = async (
     diff > (schedule.payment || 0) &&
     index < pendingSchedules.length - 1
   ) {
-    console.log(
-      'diff > (schedule.payment || 0) && index < pendingSchedules.length - 1',
-      diff > (schedule.payment || 0) && index < pendingSchedules.length - 1
-    );
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
       schedule.payDate
@@ -696,7 +688,6 @@ export const generatePendingSchedules = async (
 
   // on lastSchedule
   if (index === pendingSchedules.length - 1) {
-    console.log('687----');
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
       schedule.payDate
@@ -734,11 +725,6 @@ export const generatePendingSchedules = async (
       }
     });
   } else {
-    console.log('725----');
-    // diff < 0 condition
-    console.log('preSchedule.payDate=-====>', preSchedule.payDate);
-    console.log('schedule.payDate=-====>', schedule.payDate);
-
     const { diffEve, diffNonce } = getDatesDiffMonth(
       preSchedule.payDate,
       schedule.payDate
@@ -767,8 +753,6 @@ export const generatePendingSchedules = async (
       balance,
       total: interestEve + interestNonce + payment - (schedule.insurance || 0)
     };
-
-    console.log('changeDoc', changeDoc);
 
     trReaction.push({
       scheduleId: schedule._id,
@@ -988,7 +972,6 @@ export const afterNextScheduled = async (
     preSchedule,
     true
   );
-  console.log('doc', doc);
 
   const updatedSchedule = await models.Schedules.create({
     ...doc,

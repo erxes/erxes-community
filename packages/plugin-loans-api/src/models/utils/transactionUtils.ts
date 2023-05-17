@@ -126,10 +126,13 @@ export const getCalcedAmounts = async (
 
   // closed contract
   if (!nextSchedule) {
-    const unduePercent =
-      (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
-      contract.unduePercent ||
-      0.2;
+    const unduePercent = await getUnduePercent(
+      models,
+      subdomain,
+      preSchedule.payDate,
+      contract
+    );
+
     result.undue = Math.round(
       ((preSchedule.balance * contract.interestRate) / 100 / 365) *
         unduePercent *
@@ -150,7 +153,6 @@ export const getCalcedAmounts = async (
     result.payment = preSchedule.balance;
     return result;
   }
-
   // correct run
   if (trDate < prePayDate) {
     return result;
@@ -158,10 +160,6 @@ export const getCalcedAmounts = async (
 
   // one day two pay
   if (getDiffDay(trDate, prePayDate) === 0) {
-    console.log(
-      'getDiffDay(trDate, prePayDate) === 0',
-      getDiffDay(trDate, prePayDate) === 0
-    );
     //when less payed prev schedule there will be must add amount's of
     if (preSchedule.status === SCHEDULE_STATUS.LESS) {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
@@ -246,10 +244,13 @@ export const getCalcedAmounts = async (
 
     if (preSchedule.status === 'less') {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
-      const unduePercent =
-        (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
-        contract.unduePercent ||
-        0.2;
+      const unduePercent = await getUnduePercent(
+        models,
+        subdomain,
+        preSchedule.payDate,
+        contract
+      );
+
       result.undue += Math.round(
         ((preSchedule.balance * contract.interestRate) / 100 / 365) *
           unduePercent *
@@ -261,10 +262,6 @@ export const getCalcedAmounts = async (
 
   // scheduled
   if (getDiffDay(trDate, nextPayDate) === 0) {
-    console.log(
-      'getDiffDay(trDate, nextPayDate) === 0',
-      getDiffDay(trDate, nextPayDate) === 0
-    );
     if (trDate > prePayDate && startDate < prePayDate) {
       result.interestEve =
         (preSchedule.interestEve || 0) - (preSchedule.didInterestEve || 0);
@@ -290,10 +287,13 @@ export const getCalcedAmounts = async (
     result.payment += nextSchedule.payment || 0;
     if (preSchedule.status === 'less' && preSchedule.isDefault === true) {
       result.undue = (preSchedule.undue || 0) - (preSchedule.didUndue || 0);
-      const unduePercent =
-        (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
-        contract.unduePercent ||
-        0.2;
+      const unduePercent = await getUnduePercent(
+        models,
+        subdomain,
+        preSchedule.payDate,
+        contract
+      );
+
       result.undue += Math.round(
         ((preSchedule.balance * contract.interestRate) / 100 / 365) *
           unduePercent *
@@ -307,10 +307,12 @@ export const getCalcedAmounts = async (
   }
 
   // after
-  const unduePercent =
-    (await getUnduePercent(models, subdomain, preSchedule.payDate)) ||
-    contract.unduePercent ||
-    0.2;
+  const unduePercent = await getUnduePercent(
+    models,
+    subdomain,
+    preSchedule.payDate,
+    contract
+  );
 
   result.undue = Math.round(
     ((preSchedule.balance * contract.interestRate) / 100 / 365) *
@@ -388,8 +390,6 @@ export const transactionRule = async (
     contractId: doc.contractId,
     payDate: doc.payDate
   });
-
-  console.log('result.calcedInfo', result.calcedInfo);
 
   const {
     payment = 0,

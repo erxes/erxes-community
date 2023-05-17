@@ -15,6 +15,7 @@ const contractFields = `
   leaseAmount
   feeAmount
   tenor
+  unduePercent
   interestRate
   repayment
   startDate

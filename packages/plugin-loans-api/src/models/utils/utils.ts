@@ -289,9 +289,10 @@ export const getNumber = async (models: IModels, contractTypeId: string) => {
 };
 
 export const getUnduePercent = async (
-  models,
-  subdomain,
-  date
+  models: IModels,
+  subdomain: string,
+  date: Date,
+  contract: IContractDocument
 ): Promise<number> => {
   const holidayConfig: any = await sendMessageBroker(
     {
@@ -326,7 +327,15 @@ export const getUnduePercent = async (
   if (!!ruledUndueConfigs && ruledUndueConfigs.length > 0) {
     return ruledUndueConfigs[0].percent;
   }
-  return 0;
+
+  if (contract.unduePercent > 0) return contract.unduePercent / 100;
+
+  const contractType = await models.ContractTypes.findOne({
+    _id: contract.contractTypeId
+  }).lean();
+
+  if (contractType?.unduePercent > 0) return contractType?.unduePercent / 100;
+  return 0.2;
 };
 
 export const getChanged = (old, anew) => {

@@ -37,6 +37,7 @@ export const types = () => `
     leaseAmount: Float
     feeAmount: Float
     tenor: Float
+    unduePercent: Float
     interestRate: Float
     repayment: String
     startDate: Date
@@ -160,6 +161,7 @@ const commonFields = `
   leaseAmount: Float
   feeAmount: Float
   tenor: Float
+  unduePercent: Float
   interestRate: Float
   repayment: String
   startDate: Date
