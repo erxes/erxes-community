@@ -22,6 +22,7 @@ type Props = {
   createQuestion: (doc: any) => void;
   editQuestion: (_id: string, title: string) => void;
   deleteQuestion: (_id: string) => void;
+  ticketId: string;
 };
 
 type State = {
@@ -33,7 +34,7 @@ type State = {
 class Section extends React.Component<Props, State> {
   state: { questions: IRCFAQuestions[]; showQuestion: false; newQuestion: '' };
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {
       questions: [],
@@ -52,7 +53,6 @@ class Section extends React.Component<Props, State> {
 
   addQuestion = () => {
     if (this.props.questions.length >= 5) {
-      console.log('reached max questions');
       return;
     } else {
       this.setState({ showQuestion: true });
@@ -109,7 +109,7 @@ class Section extends React.Component<Props, State> {
       </Button>
     );
 
-    const content = () => {
+    const content = ({ closeModal }) => {
       return (
         <div>
           {this.state.questions.map((question, index) => (
@@ -246,8 +246,14 @@ class Section extends React.Component<Props, State> {
   triggerNew = (<Button>Done</Button>);
 
   createTask() {
-    const content = () => {
-      return <CreateTaskModal />;
+    const content = ({ closeModal }) => {
+      return (
+        <CreateTaskModal
+          ticketId={this.props.ticketId}
+          rcfaCreateRelatedTask={() => {}}
+          closeModal={closeModal}
+        />
+      );
     };
 
     return (

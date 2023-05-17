@@ -9,12 +9,14 @@ import Select from 'react-select-plus';
 import Button from '@erxes/ui/src/components/Button';
 import { withProps } from '@erxes/ui/src/utils/core';
 import { graphql } from 'react-apollo';
-import { mutations, queries } from '../graphql';
+import { mutations } from '../graphql';
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';
 
 type Props = {
   rcfaCreateRelatedTask: Function;
+  ticketId: string;
+  closeModal: Function;
 };
 
 type State = {
@@ -28,7 +30,7 @@ type State = {
   onChangeBoard: ((boardId: string) => void) | undefined;
 };
 
-class CreateTaskModal extends React.Component<Props, State> {
+class rcfaCreateTaskModal extends React.Component<Props, State> {
   state: {
     type: string;
     stageId: string;
@@ -86,20 +88,20 @@ class CreateTaskModal extends React.Component<Props, State> {
       const name = this.state.name;
 
       if (!stageId || !pipelineId || !boardId || !name) {
-        console.log('NULL VALUE DETECTED');
         return;
       }
 
       const payload = {
         type: this.state.type,
-        sourceType: 'task',
-        itemId: 'id',
+        sourceType: 'ticket',
+        itemId: this.props.ticketId,
         name: this.state.name,
         stageId: this.state.stageId
       };
 
-      const response = await rcfaCreateRelatedTask({ variables: payload });
-      console.log(response);
+      await rcfaCreateRelatedTask({ variables: payload });
+
+      this.props.closeModal();
     };
 
     return (
@@ -148,5 +150,5 @@ export default withProps<Props>(
     graphql<Props>(gql(mutations.rcfaCreateRelatedTask), {
       name: 'rcfaCreateRelatedTask'
     })
-  )(CreateTaskModal)
+  )(rcfaCreateTaskModal)
 );

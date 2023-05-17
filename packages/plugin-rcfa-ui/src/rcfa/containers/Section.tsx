@@ -21,7 +21,7 @@ type FinalProps = {
 } & Props;
 
 class SectionContainer extends React.Component<FinalProps> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
   }
 
@@ -61,6 +61,7 @@ class SectionContainer extends React.Component<FinalProps> {
         createQuestion={createQuestion}
         editQuestion={editQuestion}
         deleteQuestion={deleteQuestion}
+        ticketId={this.props.mainTypeId}
       />
     );
   }

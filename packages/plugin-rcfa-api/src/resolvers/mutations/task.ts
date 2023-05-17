@@ -8,10 +8,12 @@ interface IQuestionContext extends IContext {
 
 interface IRCFATask {
   type: string;
-  stageId: string;
-  pipelineId: string;
-  boardId: string;
   name: string;
+  stageId: string;
+  sourceType: string;
+  itemId: string;
+  pipelineId?: string;
+  boardId?: string;
 }
 
 const TaskMutations = {
@@ -20,10 +22,18 @@ const TaskMutations = {
     data: IRCFATask,
     context: IQuestionContext
   ) {
+    const payload = {
+      type: data.type,
+      sourceType: data.sourceType,
+      itemId: data.itemId,
+      name: data.name,
+      stageId: data.stageId
+    };
+
     await sendCardsMessage({
       subdomain: context.subdomain,
       action: 'createRelatedItem',
-      data,
+      data: payload,
       isRPC: true
     });
 
@@ -32,14 +42,3 @@ const TaskMutations = {
 };
 
 export default TaskMutations;
-
-// plugin-grants-api/src/utils/
-//   if (action === 'changeCardType') {
-//   await sendCardsMessage({
-//     subdomain,
-//     action: 'createRelatedItem',
-//     data,
-//     isRPC: true
-//   });
-//   return 'success';
-// }
