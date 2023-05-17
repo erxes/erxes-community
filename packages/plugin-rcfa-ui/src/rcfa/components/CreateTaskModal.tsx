@@ -140,6 +140,14 @@ class rcfaCreateTaskModal extends React.Component<Props, State> {
         </FormGroup>
 
         <Button onClick={create}>Done</Button>
+        <Button
+          onClick={() => {
+            this.props.closeModal();
+          }}
+          btnStyle="simple"
+        >
+          Cancel
+        </Button>
       </>
     );
   }

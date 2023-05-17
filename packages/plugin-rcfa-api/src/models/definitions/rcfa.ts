@@ -10,6 +10,7 @@ export interface IRCFAQuestions {
   createdAt: Date | string;
   createdUser: string;
   parentId?: string;
+  rcfaId?: string;
   __v?: number;
 }
 
@@ -25,5 +26,6 @@ export const rcfaQuestionsSchema = new Schema({
   status: field({ type: String }),
   createdAt: field({ type: Date }),
   createdUser: field({ type: String, required: false }),
-  parentId: field({ type: String, required: false })
+  parentId: field({ type: String, required: false }),
+  rcfaId: field({ type: String, required: false })
 });

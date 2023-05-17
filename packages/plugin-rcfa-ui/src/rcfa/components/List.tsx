@@ -55,11 +55,7 @@ class List extends React.Component<Props, State> {
     return (
       <div className="">
         <Box title="RCFA" name="name" extraButtons={extraButtons}>
-          <p>
-            Larry the Bird. Larry Joe Bird (born December 7, 1956) is an
-            American former professional basketball player, coach and executive
-            in the National Basketball Association (NBA).
-          </p>
+          <p></p>
         </Box>
       </div>
     );
