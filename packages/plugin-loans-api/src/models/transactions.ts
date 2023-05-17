@@ -3,6 +3,7 @@ import { INVOICE_STATUS, SCHEDULE_STATUS } from './definitions/constants';
 import { findContractOfTr } from './utils/findUtils';
 import { generatePendingSchedules } from './utils/scheduleUtils';
 import {
+  getCalcedAmounts,
   removeTrAfterSchedule,
   trAfterSchedule,
   transactionRule
@@ -12,6 +13,7 @@ import { ITransactionDocument } from './definitions/transactions';
 import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
 import { IContractDocument } from './definitions/contracts';
+import { getPureDate } from '@erxes/api-utils/src';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
@@ -22,6 +24,7 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
   updateTransaction(memoryStorage: any, _id: string, doc: ITransaction);
   changeTransaction(_id: string, doc: ITransaction);
   removeTransactions(_ids: string[]);
+  getPaymentInfo(id: string, payDate: Date, subdomain: string);
 }
 export const loadTransactionClass = (models: IModels) => {
   class Transaction {
@@ -80,7 +83,9 @@ export const loadTransactionClass = (models: IModels) => {
       const trInfo = await transactionRule(models, subdomain, {
         ...doc
       });
+
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
+
       await trAfterSchedule(models, tr);
 
       return tr;
@@ -342,6 +347,29 @@ export const loadTransactionClass = (models: IModels) => {
           await models.Transactions.deleteOne({ _id: oldTr._id });
         }
       }
+    }
+
+    public static async getPaymentInfo(id, payDate, subdomain) {
+      const today = getPureDate(new Date(payDate));
+
+      const paymentInfo = await getCalcedAmounts(models, subdomain, {
+        contractId: id,
+        payDate: today
+      });
+
+      const {
+        payment = 0,
+        undue = 0,
+        interestEve = 0,
+        interestNonce = 0,
+        insurance = 0,
+        debt = 0
+      } = paymentInfo;
+
+      paymentInfo.total =
+        payment + undue + interestEve + interestNonce + insurance + debt;
+
+      return paymentInfo;
     }
   }
   transactionSchema.loadClass(Transaction);

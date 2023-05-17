@@ -71,7 +71,7 @@ export const queries = `
   transactionsMain(${queryParams}): TransactionsListResponse
   transactions(${queryParams}): [Transaction]
   transactionDetail(_id: String!): Transaction
-  getTransactionPreInfo(contractId: String!, payDate: String): TransactionPreInfo
+  getPaymentInfo(id: String!, payDate: Date): TransactionPreInfo
 `;
 
 const commonFields = `
