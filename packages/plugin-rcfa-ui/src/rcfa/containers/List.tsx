@@ -20,7 +20,15 @@ class ListContainer extends React.Component<FinalProps> {
   }
 
   render() {
-    return <List />;
+    const { queryParams, history } = this.props;
+
+    const updatedProps = {
+      queryParams,
+      history,
+      list: []
+    };
+
+    return <List {...updatedProps} />;
   }
 }
 

@@ -1,3 +1,4 @@
+import { colors, dimensions } from '@erxes/ui/src';
 import styled from 'styled-components';
 
 export const StyledContent = styled.div`
@@ -6,4 +7,9 @@ export const StyledContent = styled.div`
 
 export const StyledQuestionItem = styled.div`
   padding-bottom 2rem;
+`;
+export const SidebarHeader = styled.h5`
+  margin-bottom: ${dimensions.coreSpacing}px;
+  color: ${colors.colorPrimary};
+  padding-left: 10px;
 `;

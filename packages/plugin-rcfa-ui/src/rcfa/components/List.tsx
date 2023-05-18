@@ -1,64 +1,75 @@
 import React from 'react';
-import {
-  BarItems,
-  Box,
-  Icon,
-  ModalTrigger,
-  Button,
-  FormControl,
-  FormGroup,
-  ControlLabel
-} from '@erxes/ui/src/';
+import { HeaderDescription, Table, __ } from '@erxes/ui/src/';
+import { DefaultWrapper } from '../../common/utils';
+import SideBar from './Sidebar';
 
-type Props = {};
+import Row from './Row';
+
+type Props = {
+  list: any[];
+  history: any;
+  queryParams: any;
+};
 
 type State = {
   searchValue?: string;
 };
 
 class List extends React.Component<Props, State> {
-  state: {};
-
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  renderForm() {
-    const trigger = (
-      <Button btnStyle="simple">
-        <Icon icon="add" />
-      </Button>
-    );
-
-    const saveQuestion = () => {};
-
-    const content = props => {
-      return (
-        <div>
-          <FormGroup>
-            <ControlLabel>Асуумж</ControlLabel>
-            <FormControl type="text"></FormControl>
-          </FormGroup>
-          <Button btnStyle="simple">Done</Button>
-          <Button onClick={saveQuestion}>Why</Button>
-        </div>
-      );
+  renderRow(item) {
+    const updatedProps = {
+      item
     };
 
-    return <ModalTrigger title="RCFA" trigger={trigger} content={content} />;
+    return <Row {...updatedProps} />;
+  }
+
+  renderContent() {
+    const { list, history, queryParams } = this.props;
+
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>{__('Source Type')}</th>
+            <th>{__('Source Name')}</th>
+            <th>{__('Type')}</th>
+            <th>{__('Name')}</th>
+            <th>{__('Created at')}</th>
+            <th>{__('Closed at')}</th>
+            {/* <th>{__('Action')}</th> */}
+          </tr>
+        </thead>
+        <tbody>{list.map(item => this.renderRow(item))}</tbody>
+      </Table>
+    );
   }
 
   render() {
-    const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
+    const { history, queryParams } = this.props;
 
-    return (
-      <div className="">
-        <Box title="RCFA" name="name" extraButtons={extraButtons}>
-          <p></p>
-        </Box>
-      </div>
+    const leftActionBar = (
+      <HeaderDescription
+        title="RCFA List"
+        icon="/images/actions/8.svg"
+        description=""
+      />
     );
+
+    const updatedProps = {
+      title: 'RCFA list',
+      leftActionBar,
+      totalCount: 0,
+      sidebar: <SideBar history={history} queryParams={queryParams} />,
+      content: this.renderContent()
+    };
+
+    return <DefaultWrapper {...updatedProps} />;
   }
 }
 
