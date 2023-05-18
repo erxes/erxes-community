@@ -1,3 +1,3 @@
-import RCFA from './rcfa';
+import rfcaQuestionQueries from './rcfaQuestion';
 
-export { RCFA };
+export { rfcaQuestionQueries };

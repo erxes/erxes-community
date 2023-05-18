@@ -1,6 +1,6 @@
 import * as Random from 'meteor-random';
 
-export const field = options => {
+export const field = (options: any) => {
   const { pkey, type, optional } = options;
 
   if (type === String && !pkey && !optional) {

@@ -1,9 +1,6 @@
-const commonParamDefs = `$title: String, $mainType: String, $mainTypeId: String`;
-const commonParams = `title: $title, mainType: $mainType, mainTypeId: $mainTypeId`;
-
 const addQuestion = `
-  mutation addRcfaQuestions(${commonParamDefs}) {
-    addRcfaQuestions(${commonParams})
+  mutation addRcfaQuestions($title: String, $parentId: String, $mainType: String, $mainTypeId: String) {
+    addRcfaQuestions(title: $title, parentId: $parentId, mainType: $mainType, mainTypeId: $mainTypeId)
   }
 `;
 

@@ -38,9 +38,10 @@ class SectionContainer extends React.Component<FinalProps> {
       questions = getQuestions.rcfaQuestions;
     }
 
-    const createQuestion = (title: string) => {
+    const createQuestion = (title: string, parentId: string | null) => {
       const payload = {
         title,
+        parentId,
         mainType: 'ticket',
         mainTypeId: this.props.mainTypeId
       };

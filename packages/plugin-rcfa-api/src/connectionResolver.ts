@@ -1,11 +1,11 @@
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { createGenerateModels } from '@erxes/api-utils/src/core';
 import * as mongoose from 'mongoose';
-import { IRCFAModel, loadRCFAClass } from './models/RCFA';
-import { IRCFAQuestionsDocument } from './models/definitions/rcfa';
+import { IRCFAQuestionModel, loadRCFAClass } from './models/rcfaQuestionModel';
+import { IRCFAQuestionsDocument } from './models/definitions/question';
 
 export interface IModels {
-  RCFAQuestions: IRCFAModel;
+  RCFAQuestions: IRCFAQuestionModel;
 }
 
 export interface IContext extends IMainContext {
@@ -21,7 +21,7 @@ export const loadClasses = (
 ): IModels => {
   models = {} as IModels;
 
-  models.RCFAQuestions = db.model<IRCFAQuestionsDocument, IRCFAModel>(
+  models.RCFAQuestions = db.model<IRCFAQuestionsDocument, IRCFAQuestionModel>(
     'rcfa_questions',
     loadRCFAClass(models, subdomain)
   );

@@ -16,7 +16,7 @@ interface IRCFATask {
   boardId?: string;
 }
 
-const TaskMutations = {
+const relatedTaskMutations = {
   async rcfaCreateRelatedTask(
     _root,
     data: IRCFATask,
@@ -41,4 +41,4 @@ const TaskMutations = {
   }
 };
 
-export default TaskMutations;
+export default relatedTaskMutations;

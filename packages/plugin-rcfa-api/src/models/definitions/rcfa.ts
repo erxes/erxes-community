@@ -1,31 +1,30 @@
 import { Schema, Document } from 'mongoose';
 import { field } from './utils';
 
-export interface IRCFAQuestions {
+export interface IRCFA {
   _id?: string;
   mainType: string;
   mainTypeId: string;
-  title: string;
+  relType: string;
+  relTypeId?: string;
   status: string;
-  createdAt: Date | string;
+  createdAt: Date;
   createdUser: string;
-  parentId?: string;
-  rcfaId?: string;
-  __v?: number;
+  closedAt?: Date;
 }
 
-export interface IRCFAQuestionsDocument extends IRCFAQuestions, Document {
+export interface IRCFADocument extends IRCFA, Document {
   _id: string;
 }
 
-export const rcfaQuestionsSchema = new Schema({
+export const rcfaSchema = new Schema({
   _id: field({ pkey: true }),
   mainType: field({ type: String }),
   mainTypeId: field({ type: String }),
-  title: field({ type: String, label: 'Title' }),
+  relType: field({ type: String }),
+  relTypeId: field({ type: String, required: false }),
   status: field({ type: String }),
   createdAt: field({ type: Date }),
   createdUser: field({ type: String, required: false }),
-  parentId: field({ type: String, required: false }),
-  rcfaId: field({ type: String, required: false })
+  closedAt: field({ type: Date, required: false })
 });

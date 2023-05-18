@@ -1,15 +1,20 @@
 import customScalars from '@erxes/api-utils/src/customScalars';
-import { RCFA as RCFAMutations, Task as TaskMutations } from './mutations';
-import { RCFA as RCFAQueries } from './queries';
+import {
+  rfcaMutations,
+  rfcaQuestionMutations,
+  relatedTaskMutations
+} from './mutations';
+import { rfcaQuestionQueries } from './queries';
 
-const resolvers: any = async serviceDiscovery => ({
+const resolvers: any = async (serviceDiscovery: any) => ({
   ...customScalars,
   Mutation: {
-    ...RCFAMutations,
-    ...TaskMutations
+    ...rfcaMutations,
+    ...rfcaQuestionMutations,
+    ...relatedTaskMutations
   },
   Query: {
-    ...RCFAQueries
+    ...rfcaQuestionQueries
   }
 });
 
