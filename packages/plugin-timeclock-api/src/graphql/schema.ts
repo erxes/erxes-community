@@ -9,6 +9,14 @@ export const types = `
   extend type User @key(fields: "_id") {
     _id: String! @external
   }
+  
+  extend type Department @key(fields: "_id") {
+    _id: String! @external
+  }
+
+  extend type Branch @key(fields: "_id") {
+    _id: String! @external
+  }
 
   type Timeclock {
     _id: String!
@@ -17,8 +25,8 @@ export const types = `
     shiftEnd: Date
     shiftActive: Boolean
     employeeUserName: String
-    branchName: String
     deviceName: String
+    branchName: String
     employeeId: String
     deviceType: String
   }
@@ -133,8 +141,6 @@ export const types = `
     totalMinsLate: Float
     totalAbsenceMins: Int
     totalMinsWorked: Int
-    totalMinsWorkedToday: Int
-    totalMinsWorkedThisMonth: Int
     totalRegularHoursWorked: Float
     totalHoursWorked: Float
     totalDaysWorked:Int
@@ -142,8 +148,6 @@ export const types = `
     totalMinsScheduled: Int
     totalHoursScheduled: Float
     totalDaysScheduled: Int
-    totalMinsScheduledToday: Int
-    totalMinsScheduledThisMonth: Int
     
     totalHoursBreakScheduled: Float
     totalHoursBreakActual: Float
@@ -151,11 +155,23 @@ export const types = `
     totalHoursOvertime: Float
     totalHoursOvernight: Float
 
-    totalMinsLateToday: Int
-    totalMinsLateThisMonth: Int
-    totalMinsAbsenceThisMonth: Int
-
     absenceInfo: IUserAbsenceInfo
+
+    totalHoursWorkedSelectedDay: Float
+    totalHoursScheduledSelectedDay: Float
+    totalMinsLateSelectedDay: Float
+    
+    totalHoursWorkedSelectedMonth: Float
+    totalDaysWorkedSelectedMonth: Int
+    totalHoursScheduledSelectedMonth: Float
+    totalDaysScheduledSelectedMonth:Int
+    totalMinsLateSelectedMonth: Float
+    
+    totalHoursWorkedOutsideSchedule: Float
+    totalDaysWorkedOutsideSchedule: Int
+    
+    totalHoursNotWorked: Float
+    totalDaysNotWorked: Int
   }
   
   type Report {
@@ -254,6 +270,16 @@ const queryParams = `
   departmentIds: [String]
   reportType: String
   scheduleStatus: String
+  isCurrentUserAdmin: Boolean
+`;
+
+const commonParams = `
+    ids: [String]
+    excludeIds: Boolean
+    perPage: Int
+    page: Int
+    searchValue: String,
+    status: String,
 `;
 
 const absence_params = `
@@ -288,13 +314,20 @@ export const queries = `
   requestsMain(${queryParams}): RequestsListResponse
   timelogsMain(${queryParams}): TimelogListResponse
   
+  timeclockBranches(${commonParams}):[Branch]
+  timeclockDepartments(${commonParams}):[Department]
+
   timeclocksPerUser(userId: String, shiftActive: Boolean, startDate: String, endDate:String): [Timeclock]
   timeLogsPerUser(userId: String, startDate: String, endDate: String ): [Timelog]
   schedulesPerUser(userId: String, startDate: String, endDate: String): [Schedule]
   absenceTypes:[AbsenceType]
   
   timeclockReports(${queryParams}): ReportsListResponse
-  timeclockReportByUser(selectedUser: String): UserReport
+
+  
+  timeclockReportByUser(selectedUser: String, selectedMonth: String, selectedYear: String, selectedDate:String): UserReport
+  
+  
   timeclockDetail(_id: String!): Timeclock
   
   timeclockActivePerUser(userId: String): Timeclock
