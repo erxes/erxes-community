@@ -246,7 +246,7 @@ class ContractsList extends React.Component<IProps, State> {
             title={`${__('New contract')}`}
             trigger={addTrigger}
             autoOpenKey="showContractModal"
-            size="lg"
+            size="xl"
             content={contractForm}
             backDrop="static"
           />
