@@ -345,18 +345,6 @@ class ContractForm extends React.Component<Props, State | any> {
           <FormWrapper>
             <FormColumn>
               <FormGroup>
-                <ControlLabel>Closed Contract</ControlLabel>
-                <SelectContract
-                  label="Choose closed contract"
-                  name="relContractId"
-                  value={this.state.relContractId || ''}
-                  onSelect={this.onSelectRelContract}
-                  multi={false}
-                  filterParams={{ closeDate: this.state.startDate }}
-                  customOption={{ label: ' ', value: '' }}
-                ></SelectContract>
-              </FormGroup>
-              <FormGroup>
                 <ControlLabel required={true}>Contract Type</ControlLabel>
                 <SelectContractType
                   label="Choose type"
@@ -366,15 +354,31 @@ class ContractForm extends React.Component<Props, State | any> {
                   multi={false}
                 ></SelectContractType>
               </FormGroup>
-              {this.renderFormGroup('Is Organization', {
-                ...formProps,
-                className: 'flex-item',
-                type: 'checkbox',
-                componentClass: 'checkbox',
-                name: 'customerType',
-                checked: this.state.customerType === 'company',
-                onChange: this.onCheckCustomerType
-              })}
+
+              <FormGroup>
+                <ControlLabel required={true}>Start Date</ControlLabel>
+                <DateContainer>
+                  <DateControl
+                    {...formProps}
+                    required={false}
+                    name="startDate"
+                    value={this.state.startDate}
+                    onChange={onChangeStartDate}
+                  />
+                </DateContainer>
+              </FormGroup>
+
+              <div style={{ paddingBottom: '13px', paddingTop: '20px' }}>
+                {this.renderFormGroup('Is Organization', {
+                  ...formProps,
+                  className: 'flex-item',
+                  type: 'checkbox',
+                  componentClass: 'checkbox',
+                  name: 'customerType',
+                  checked: this.state.customerType === 'company',
+                  onChange: this.onCheckCustomerType
+                })}
+              </div>
               {this.state.customerType === 'customer' && (
                 <FormGroup>
                   <ControlLabel required={true}>Customer</ControlLabel>
@@ -436,7 +440,8 @@ class ContractForm extends React.Component<Props, State | any> {
                 onChange: this.onChangeField,
                 onClick: this.onFieldClick
               })}
-
+            </FormColumn>
+            <FormColumn>
               {this.renderFormGroup('interest Month', {
                 ...formProps,
                 type: 'number',
@@ -481,30 +486,6 @@ class ContractForm extends React.Component<Props, State | any> {
                   ))}
                 </FormControl>
               </FormGroup>
-            </FormColumn>
-            <FormColumn>
-              <FormGroup>
-                <ControlLabel>{__('Branches')}</ControlLabel>
-                <SelectBranches
-                  name="branchId"
-                  label="Choose branch"
-                  initialValue={this.state?.branchId}
-                  onSelect={onChangeBranchId}
-                  multi={false}
-                />
-              </FormGroup>
-              <FormGroup>
-                <ControlLabel required={true}>Start Date</ControlLabel>
-                <DateContainer>
-                  <DateControl
-                    {...formProps}
-                    required={false}
-                    name="startDate"
-                    value={this.state.startDate}
-                    onChange={onChangeStartDate}
-                  />
-                </DateContainer>
-              </FormGroup>
 
               {this.renderFormGroup('schedule Day', {
                 ...formProps,
@@ -515,6 +496,57 @@ class ContractForm extends React.Component<Props, State | any> {
                 onClick: this.onFieldClick
               })}
 
+              {this.renderFormGroup('debt', {
+                ...formProps,
+                type: 'number',
+                name: 'debt',
+                value: this.state.debt || 0,
+                onChange: this.onChangeField,
+                onClick: this.onFieldClick
+              })}
+              {this.renderFormGroup('debt Tenor', {
+                ...formProps,
+                type: 'number',
+                name: 'debtTenor',
+                value: this.state.debtTenor || 0,
+                onChange: this.onChangeField,
+                onClick: this.onFieldClick
+              })}
+
+              {this.renderFormGroup('debt Limit', {
+                ...formProps,
+                type: 'number',
+                name: 'debtLimit',
+                value: this.state.debtLimit || 0,
+                onChange: this.onChangeField,
+                onClick: this.onFieldClick
+              })}
+
+              {this.renderSalvage(formProps)}
+            </FormColumn>
+            <FormColumn>
+              <FormGroup>
+                <ControlLabel>Closed Contract</ControlLabel>
+                <SelectContract
+                  label="Choose closed contract"
+                  name="relContractId"
+                  value={this.state.relContractId || ''}
+                  onSelect={this.onSelectRelContract}
+                  multi={false}
+                  filterParams={{ closeDate: this.state.startDate }}
+                  customOption={{ label: ' ', value: '' }}
+                ></SelectContract>
+              </FormGroup>
+              <FormGroup>
+                <ControlLabel>{__('Branches')}</ControlLabel>
+                <SelectBranches
+                  name="branchId"
+                  label="Choose branch"
+                  initialValue={this.state?.branchId}
+                  onSelect={onChangeBranchId}
+                  multi={false}
+                />
+              </FormGroup>
               <FormGroup>
                 <ControlLabel>Relation Expert</ControlLabel>
                 <SelectTeamMembers
@@ -571,32 +603,6 @@ class ContractForm extends React.Component<Props, State | any> {
                 name: 'useHoliday',
                 checked: this.state.useHoliday || false,
                 onChange: this.onChangeCheckbox
-              })}
-
-              {this.renderFormGroup('debt', {
-                ...formProps,
-                type: 'number',
-                name: 'debt',
-                value: this.state.debt || 0,
-                onChange: this.onChangeField,
-                onClick: this.onFieldClick
-              })}
-              {this.renderFormGroup('debt Tenor', {
-                ...formProps,
-                type: 'number',
-                name: 'debtTenor',
-                value: this.state.debtTenor || 0,
-                onChange: this.onChangeField,
-                onClick: this.onFieldClick
-              })}
-
-              {this.renderFormGroup('debt Limit', {
-                ...formProps,
-                type: 'number',
-                name: 'debtLimit',
-                value: this.state.debtLimit || 0,
-                onChange: this.onChangeField,
-                onClick: this.onFieldClick
               })}
 
               {this.renderSalvage(formProps)}
