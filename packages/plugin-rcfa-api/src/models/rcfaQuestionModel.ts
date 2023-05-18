@@ -9,7 +9,7 @@ export interface IRCFAQuestionModel extends Model<IRCFAQuestionsDocument> {
   addRCFA(doc: any): Promise<IRCFAQuestionsDocument>;
 }
 
-export const loadRCFAClass = (models: IModels, subdomain: string) => {
+export const loadRCFAQuestionClass = (models: IModels, subdomain: string) => {
   class RCFA {
     addRCFA(doc: any) {
       return '';

@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { IRCFADocument, rcfaSchema } from './definitions/rcfa';
 import { IModels } from '../connectionResolver';
 
-export interface IRCFAQuestionModel extends Model<IRCFADocument> {
+export interface IRCFAModel extends Model<IRCFADocument> {
   addRCFA(doc: any): Promise<IRCFADocument>;
 }
 
