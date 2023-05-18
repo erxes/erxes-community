@@ -22,6 +22,7 @@ type Props = {
   createQuestion: (doc: any) => void;
   editQuestion: (_id: string, title: string) => void;
   deleteQuestion: (_id: string) => void;
+  ticketId: string;
 };
 
 type State = {
@@ -30,14 +31,14 @@ type State = {
   newQuestion: string;
 };
 
-class Section extends React.Component<Props, State> {
-  state: { questions: IRCFAQuestions[]; showQuestion: false; newQuestion: '' };
+class RCFASection extends React.Component<Props, State> {
+  state: { questions: IRCFAQuestions[]; showQuestion: true; newQuestion: '' };
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {
       questions: [],
-      showQuestion: false,
+      showQuestion: true,
       newQuestion: ''
     };
   }
@@ -52,7 +53,6 @@ class Section extends React.Component<Props, State> {
 
   addQuestion = () => {
     if (this.props.questions.length >= 5) {
-      console.log('reached max questions');
       return;
     } else {
       this.setState({ showQuestion: true });
@@ -93,6 +93,7 @@ class Section extends React.Component<Props, State> {
     confirm().then(() => {
       this.props.deleteQuestion(_id);
     });
+    this.setState({ newQuestion: '' });
   };
 
   createQuestion = () => {
@@ -109,7 +110,7 @@ class Section extends React.Component<Props, State> {
       </Button>
     );
 
-    const content = () => {
+    const content = ({ closeModal }) => {
       return (
         <div>
           {this.state.questions.map((question, index) => (
@@ -171,19 +172,23 @@ class Section extends React.Component<Props, State> {
             </StyledQuestionItem>
           ))}
 
-          {this.state.showQuestion ? (
+          {this.state.showQuestion || this.state.questions.length === 0 ? (
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <p style={{ marginBottom: 0 }}>
                   {__('Question')} {this.props.questions.length + 1}:
                 </p>
-                <Icon
-                  icon="times"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => {
-                    this.setState({ showQuestion: false });
-                  }}
-                />
+                {this.state.questions.length !== 0 ? (
+                  <Icon
+                    icon="times"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      this.setState({ showQuestion: false });
+                    }}
+                  />
+                ) : (
+                  ''
+                )}
               </div>
 
               <FormControl
@@ -219,6 +224,11 @@ class Section extends React.Component<Props, State> {
             )}
 
             {this.createTask()}
+            {this.state.questions.length === 0 ? (
+              <Button onClick={closeModal}>Done</Button>
+            ) : (
+              ''
+            )}
           </div>
         </div>
       );
@@ -243,22 +253,34 @@ class Section extends React.Component<Props, State> {
     );
   }
 
-  triggerNew = (<Button>Done</Button>);
+  triggerNew() {
+    if (this.state.questions.length > 0) {
+      return <Button>Done</Button>;
+    } else {
+      return <></>;
+    }
+  }
 
   createTask() {
-    const content = () => {
-      return <CreateTaskModal />;
+    const taskContent = ({ closeModal }) => {
+      return (
+        <CreateTaskModal
+          ticketId={this.props.ticketId}
+          rcfaCreateRelatedTask={() => {}}
+          closeModal={closeModal}
+        />
+      );
     };
 
     return (
       <ModalTrigger
         title="Create related card"
-        content={content}
+        content={taskContent}
         style={{ overflow: 'auto' }}
-        trigger={this.triggerNew}
+        trigger={this.triggerNew()}
       />
     );
   }
 }
 
-export default Section;
+export default RCFASection;

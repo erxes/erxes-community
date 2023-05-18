@@ -19,8 +19,15 @@ const deleteQuestion = `
   }
 `;
 
+const rcfaCreateRelatedTask = `
+  mutation RcfaCreateRelatedTask($type: String, $sourceType: String, $itemId: String, $name: String, $stageId: String) {
+    rcfaCreateRelatedTask(type: $type, sourceType: $sourceType, itemId: $itemId, name: $name, stageId: $stageId)
+  }
+`;
+
 export default {
   addQuestion,
   editQuestion,
-  deleteQuestion
+  deleteQuestion,
+  rcfaCreateRelatedTask
 };

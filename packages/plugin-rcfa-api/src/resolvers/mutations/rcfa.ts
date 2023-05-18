@@ -10,7 +10,7 @@ interface IQuestionContext extends IContext {
 
 const RCFAMutations = {
   async addRcfaQuestions(
-    _root,
+    _root: any,
     data: IRCFAQuestions,
     context: IQuestionContext
   ) {
