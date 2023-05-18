@@ -2,16 +2,16 @@ import { Model } from 'mongoose';
 import {
   IRCFAQuestionsDocument,
   rcfaQuestionsSchema
-} from './definitions/rcfa';
+} from './definitions/question';
 import { IModels } from '../connectionResolver';
 
-export interface IRCFAModel extends Model<IRCFAQuestionsDocument> {
+export interface IRCFAQuestionModel extends Model<IRCFAQuestionsDocument> {
   addRCFA(doc: any): Promise<IRCFAQuestionsDocument>;
 }
 
 export const loadRCFAClass = (models: IModels, subdomain: string) => {
   class RCFA {
-    addRCFA(doc) {
+    addRCFA(doc: any) {
       return '';
     }
   }

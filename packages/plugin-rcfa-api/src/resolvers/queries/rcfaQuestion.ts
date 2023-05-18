@@ -5,7 +5,7 @@ interface IQuestionContext extends IContext {
   subdomain: string;
 }
 
-const RCFAQueries = {
+const RCFAQuestionQueries = {
   async rcfaQuestions(_root, args, context: IQuestionContext) {
     const model: IModels = await generateModels(context.subdomain);
     return model.RCFAQuestions.find({
@@ -15,4 +15,4 @@ const RCFAQueries = {
   }
 };
 
-export default RCFAQueries;
+export default RCFAQuestionQueries;

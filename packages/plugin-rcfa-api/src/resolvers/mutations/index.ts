@@ -1,4 +1,5 @@
-import RCFA from './rcfa';
-import Task from './task';
+import rfcaMutations from './rcfa';
+import rfcaQuestionMutations from './rcfaQuestion';
+import relatedTaskMutations from './relatedTask';
 
-export { RCFA, Task };
+export { rfcaMutations, rfcaQuestionMutations, relatedTaskMutations };

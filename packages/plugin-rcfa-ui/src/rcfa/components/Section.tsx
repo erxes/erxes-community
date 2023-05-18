@@ -19,7 +19,7 @@ interface IRCFAQuestions extends IRFCA {
 
 type Props = {
   questions: IRCFAQuestions[];
-  createQuestion: (doc: any) => void;
+  createQuestion: (title: string, parentId: string | null) => void;
   editQuestion: (_id: string, title: string) => void;
   deleteQuestion: (_id: string) => void;
   ticketId: string;
@@ -98,7 +98,15 @@ class RCFASection extends React.Component<Props, State> {
 
   createQuestion = () => {
     if (this.state.newQuestion) {
-      this.props.createQuestion(this.state.newQuestion);
+      let parentId: string | null = null;
+
+      const questions = this.state.questions;
+
+      if (this.state.questions.length > 0) {
+        parentId = questions[questions.length - 1]._id as string;
+      }
+
+      this.props.createQuestion(this.state.newQuestion, parentId);
       this.setState({ showQuestion: false });
     }
   };
