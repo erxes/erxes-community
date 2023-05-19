@@ -16,12 +16,14 @@ class Row extends React.Component<Props> {
 
     const trigger = (
       <tr>
-        <td>{item?.sourceType || '-'}</td>
+        <td>{item.mainType || '-'}</td>
+        {/* <td>{item?.sourceType || '-'}</td>
         <td>{item?.source?.name || '-'}</td>
         <td>{item?.type || '-'}</td>
-        <td>{item?.name || '-'}</td>
-        <td>{moment(item?.createdAt).format('ll HH:mm') || '-'}</td>
-        <td>{moment(item?.closedAt).format('ll HH:mm') || '-'}</td>
+        <td>{item?.name || '-'}</td> */}
+
+        {/* <td>{moment(item?.createdAt).format('ll HH:mm') || '-'}</td> */}
+        {/* <td>{moment(item?.closedAt).format('ll HH:mm') || '-'}</td> */}
       </tr>
     );
 

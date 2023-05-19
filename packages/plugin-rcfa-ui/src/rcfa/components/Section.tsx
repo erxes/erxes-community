@@ -20,8 +20,8 @@ interface IRCFAQuestions extends IRCFA {
 
 type Props = {
   questions: IRCFAQuestions[];
-  createQuestion: (title: string, parentId: string | null) => void;
-  editQuestion: (_id: string, title: string) => void;
+  createQuestion: (question: string, parentId: string | null) => void;
+  editQuestion: (_id: string, question: string) => void;
   deleteQuestion: (_id: string) => void;
   ticketId: string;
 };
@@ -234,7 +234,7 @@ class RCFASection extends React.Component<Props, State> {
 
             {this.createTask()}
             {this.state.questions.length === 0 ? (
-              <Button onClick={closeModal}>Done</Button>
+              <Button onClick={closeModal}>Done1</Button>
             ) : (
               ''
             )}
@@ -264,7 +264,7 @@ class RCFASection extends React.Component<Props, State> {
 
   triggerNew() {
     if (this.state.questions.length > 0) {
-      return <Button>Done</Button>;
+      return <Button>Done2</Button>;
     } else {
       return <></>;
     }

@@ -8,6 +8,13 @@ interface IQuestionContext extends IContext {
 const RCFAQueries = {
   async rcfaList(_root, args, context: IQuestionContext) {
     const model: IModels = await generateModels(context.subdomain);
+    const rcfa = await model.RCFA.find({});
+
+    return rcfa;
+  },
+
+  async rcfaDetail(_root, args, context: IQuestionContext) {
+    const model: IModels = await generateModels(context.subdomain);
     const rcfaItem = await model.RCFA.findOne({
       mainType: args.mainType,
       mainTypeId: args.mainTypeId

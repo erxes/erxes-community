@@ -14,7 +14,7 @@ type Props = {
 };
 
 type FinalProps = {
-  rcfaList: any;
+  rcfaDetail: any;
   addRcfaQuestions: any;
   editRcfaQuestions: any;
   deleteRcfaQuestions: any;
@@ -27,24 +27,24 @@ class SectionContainer extends React.Component<FinalProps> {
 
   render() {
     const {
-      rcfaList,
+      rcfaDetail,
       addRcfaQuestions,
       editRcfaQuestions,
       deleteRcfaQuestions
     } = this.props;
     let questions = [];
 
-    if (!rcfaList.loading) {
-      if (rcfaList.rcfaList) {
-        questions = rcfaList.rcfaList.questions;
+    if (!rcfaDetail.loading) {
+      if (rcfaDetail.rcfaDetail) {
+        questions = rcfaDetail.rcfaDetail.questions;
       } else {
-        questions = rcfaList.rcfaList;
+        questions = rcfaDetail.rcfaDetail;
       }
     }
 
-    const createQuestion = (title: string, parentId: string | null) => {
+    const createQuestion = (question: string, parentId: string | null) => {
       const payload = {
-        title,
+        question,
         parentId,
         mainType: 'ticket',
         mainTypeId: this.props.mainTypeId
@@ -52,8 +52,8 @@ class SectionContainer extends React.Component<FinalProps> {
       addRcfaQuestions({ variables: payload });
     };
 
-    const editQuestion = (id: string, title: string) => {
-      editRcfaQuestions({ variables: { id, title } });
+    const editQuestion = (id: string, question: string) => {
+      editRcfaQuestions({ variables: { id, question } });
     };
 
     const deleteQuestion = (id: string) => {
@@ -85,7 +85,7 @@ const refetchQueries = ({ mainTypeId }) => [
 export default withProps<Props>(
   compose(
     graphql<Props>(gql(queries.rcfa), {
-      name: 'rcfaList',
+      name: 'rcfaDetail',
       options: (props: any) => ({
         variables: {
           mainType: 'ticket',

@@ -15,38 +15,44 @@ type State = {
   searchValue?: string;
 };
 
-class List extends React.Component<Props, State> {
+class rcfaTable extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  renderRow(item) {
+  renderRow(item, key: number) {
     const updatedProps = {
-      item
+      item,
+      key
     };
 
-    return <Row {...updatedProps} />;
+    return <Row {...updatedProps} key={key} />;
   }
 
   renderContent() {
     const { list, history, queryParams } = this.props;
 
     return (
-      <Table>
-        <thead>
-          <tr>
-            <th>{__('Source Type')}</th>
-            <th>{__('Source Name')}</th>
-            <th>{__('Type')}</th>
-            <th>{__('Name')}</th>
-            <th>{__('Created at')}</th>
-            <th>{__('Closed at')}</th>
-            {/* <th>{__('Action')}</th> */}
-          </tr>
-        </thead>
-        <tbody>{list.map(item => this.renderRow(item))}</tbody>
-      </Table>
+      <div>
+        <p></p>
+        <Table>
+          <thead>
+            <tr>
+              <th>{__('Source Type')}</th>
+              <th>{__('Source Name')}</th>
+              <th>{__('Type')}</th>
+              <th>{__('Name')}</th>
+              <th>{__('Created at')}</th>
+              <th>{__('Closed at')}</th>
+              {/* <th>{__('Action')}</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((item, index) => this.renderRow(item, index))}
+          </tbody>
+        </Table>
+      </div>
     );
   }
 
@@ -73,4 +79,4 @@ class List extends React.Component<Props, State> {
   }
 }
 
-export default List;
+export default rcfaTable;

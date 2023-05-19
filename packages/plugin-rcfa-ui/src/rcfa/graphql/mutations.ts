@@ -1,12 +1,12 @@
 const addQuestion = `
-  mutation addRcfaQuestions($title: String, $parentId: String, $mainType: String, $mainTypeId: String) {
-    addRcfaQuestions(title: $title, parentId: $parentId, mainType: $mainType, mainTypeId: $mainTypeId)
+  mutation AddRcfaQuestions($question: String, $parentId: String, $mainType: String, $mainTypeId: String) {
+    addRcfaQuestions(question: $question, parentId: $parentId, mainType: $mainType, mainTypeId: $mainTypeId)
   }
 `;
 
 const editQuestion = `
-  mutation EditRcfaQuestions($id: String, $title: String) {
-    editRcfaQuestions(_id: $id, title: $title)
+  mutation EditRcfaQuestions($id: String, $question: String) {
+    editRcfaQuestions(_id: $id, question: $question)
   }
 `;
 
