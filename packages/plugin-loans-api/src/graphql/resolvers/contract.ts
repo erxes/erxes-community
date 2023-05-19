@@ -151,7 +151,7 @@ const Contracts = {
         let data: any = contract;
         data.untilDay = getDiffDay(
           new Date(),
-          getNextMonthDay(contract.startDate, contract.scheduleDay)
+          getNextMonthDay(contract.startDate, contract.scheduleDays)
         );
         data.donePercent = 0;
         return data;

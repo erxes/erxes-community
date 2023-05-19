@@ -15,7 +15,7 @@ const collateralFields = `
   interestRate
   repayment
   startDate
-  scheduleDay
+  scheduleDays
   collateralsData
 
   collateralData {
