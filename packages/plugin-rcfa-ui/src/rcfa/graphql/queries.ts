@@ -1,9 +1,9 @@
-const getQuestions = `
+const rcfa = `
   query Query($mainType: String, $mainTypeId: String) {
-    rcfaQuestions(mainType: $mainType, mainTypeId: $mainTypeId)
+    rcfaList(mainType: $mainType, mainTypeId: $mainTypeId)
   }
 `;
 
 export default {
-  getQuestions
+  rcfa
 };

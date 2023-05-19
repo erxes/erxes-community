@@ -15,6 +15,7 @@ export interface IRCFA {
 
 export interface IRCFADocument extends IRCFA, Document {
   _id: string;
+  questions?: any;
 }
 
 export const rcfaSchema = new Schema({

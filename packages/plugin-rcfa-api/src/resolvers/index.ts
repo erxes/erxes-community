@@ -4,7 +4,7 @@ import {
   rfcaQuestionMutations,
   relatedTaskMutations
 } from './mutations';
-import { rfcaQuestionQueries } from './queries';
+import { rfcaQueries, rfcaQuestionQueries } from './queries';
 
 const resolvers: any = async (serviceDiscovery: any) => ({
   ...customScalars,
@@ -14,6 +14,7 @@ const resolvers: any = async (serviceDiscovery: any) => ({
     ...relatedTaskMutations
   },
   Query: {
+    ...rfcaQueries,
     ...rfcaQuestionQueries
   }
 });

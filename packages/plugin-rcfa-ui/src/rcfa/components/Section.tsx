@@ -9,12 +9,13 @@ import {
   __,
   confirm
 } from '@erxes/ui/src/';
-import { IRCFAQuestions as IRFCA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
+import { IRCFA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 import { StyledContent, StyledQuestionItem } from '../../styles';
 import CreateTaskModal from './CreateTaskModal';
 
-interface IRCFAQuestions extends IRFCA {
+interface IRCFAQuestions extends IRCFA {
   editing: boolean;
+  question: string;
 }
 
 type Props = {
@@ -61,7 +62,7 @@ class RCFASection extends React.Component<Props, State> {
 
   writeQuestion = (index: number) => event => {
     let questList = this.state.questions;
-    questList[index].title = event.target.value;
+    questList[index].question = event.target.value;
     this.setState({ questions: questList });
   };
 
@@ -73,18 +74,18 @@ class RCFASection extends React.Component<Props, State> {
 
   saveEditedQuestion = (index: number) => () => {
     let question = this.state.questions[index];
-    this.props.editQuestion(question._id as string, question.title);
+    this.props.editQuestion(question._id as string, question.question);
   };
 
   onChangeQuestion = (index: number) => (event: any) => {
     let questList = this.state.questions;
-    questList[index].title = event.target.value;
+    questList[index].question = event.target.value;
     this.setState({ questions: questList });
   };
 
   cancelEdit = (index: number) => () => {
     let questList = this.state.questions;
-    questList[index].title = this.props.questions[index].title;
+    questList[index].question = this.props.questions[index].question;
     questList[index].editing = false;
     this.setState({ questions: questList });
   };
@@ -130,7 +131,7 @@ class RCFASection extends React.Component<Props, State> {
                 <div style={{ marginBottom: '0.5rem' }}>
                   <FormControl
                     type="text"
-                    value={question.title}
+                    value={question.question}
                     onChange={this.onChangeQuestion(index)}
                   />
                 </div>
@@ -138,7 +139,7 @@ class RCFASection extends React.Component<Props, State> {
                 <p
                   style={{ marginTop: '0.4375rem', marginBottom: '0.9375rem' }}
                 >
-                  {question.title}
+                  {question.question}
                 </p>
               )}
               <div>
@@ -252,7 +253,7 @@ class RCFASection extends React.Component<Props, State> {
       <Box title="RCFA" name="name" extraButtons={extraButtons} isOpen>
         <StyledContent>
           {this.props.questions.length > 0 ? (
-            <p>{this.props.questions[0]?.title}</p>
+            <p>{this.props.questions[0]?.question}</p>
           ) : (
             <p>No questions there.</p>
           )}
