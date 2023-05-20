@@ -133,8 +133,6 @@ export default {
       );
     }
 
-    console.log('printContent', printContent);
-
     return printContent;
   }
 };
