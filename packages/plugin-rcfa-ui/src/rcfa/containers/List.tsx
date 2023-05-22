@@ -11,6 +11,8 @@ type Props = {
   history: any;
   type?: string;
   rcfaList: any;
+  page: number;
+  pageSize: number;
 };
 
 type FinalProps = {} & Props;
@@ -25,16 +27,20 @@ class ListContainer extends React.Component<FinalProps> {
 
   render() {
     const { queryParams, history, rcfaList } = this.props;
-    let rcfa = [];
+    let rcfa: any = [];
+    let totalCount: number = 0;
 
     if (!rcfaList.loading) {
-      rcfa = rcfaList.rcfaList;
+      rcfa = rcfaList.rcfaList.list;
+      const count = rcfaList.rcfaList.totalCount;
+      totalCount = count;
     }
 
     const updatedProps = {
       queryParams,
       history,
-      list: rcfa
+      list: rcfa,
+      totalCount
     };
 
     return <List {...updatedProps} />;
@@ -44,7 +50,15 @@ class ListContainer extends React.Component<FinalProps> {
 export default withProps<Props>(
   compose(
     graphql<Props>(gql(queries.rcfaList), {
-      name: 'rcfaList'
+      name: 'rcfaList',
+      options: (props: any) => ({
+        variables: {
+          mainType: props.mainType,
+          searchValue: props.searchValue,
+          page: props.page,
+          perPage: props.perPage
+        }
+      })
     })
   )(ListContainer)
 );

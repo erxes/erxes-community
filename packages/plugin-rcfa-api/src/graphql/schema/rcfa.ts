@@ -1,8 +1,24 @@
 export const types = `
+  type rcfaType {
+    _id: String
+    mainType: String
+    mainTypeId: String
+    relType: String
+    relTypeId: String
+    status: String
+    createdAt: Date
+    createdUser: String
+    closedAt: Date
+  }
+
+  type rcfaListQueryResponse {
+    list: [rcfaType]
+    totalCount: Int
+  }
 `;
 
 export const queries = `
-  rcfaList(mainType:String): JSON
+  rcfaList(perPage:Int, page:Int, searchValue:String, mainType:String): rcfaListQueryResponse
   rcfaDetail(mainType:String, mainTypeId:String): JSON
 `;
 

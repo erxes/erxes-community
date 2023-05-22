@@ -7,6 +7,7 @@ import Row from './Row';
 
 type Props = {
   list: any[];
+  totalCount: number;
   history: any;
   queryParams: any;
 };
@@ -21,12 +22,11 @@ class rcfaTable extends React.Component<Props, State> {
     this.state = {};
   }
 
-  renderRow(item, key: number) {
+  renderRow(item: any, key: number) {
     const updatedProps = {
       item,
       key
     };
-
     return <Row {...updatedProps} key={key} />;
   }
 
@@ -35,7 +35,6 @@ class rcfaTable extends React.Component<Props, State> {
 
     return (
       <div>
-        <p></p>
         <Table>
           <thead>
             <tr>
@@ -70,7 +69,7 @@ class rcfaTable extends React.Component<Props, State> {
     const updatedProps = {
       title: 'RCFA list',
       leftActionBar,
-      totalCount: 0,
+      totalCount: this.props.totalCount,
       sidebar: <SideBar history={history} queryParams={queryParams} />,
       content: this.renderContent()
     };

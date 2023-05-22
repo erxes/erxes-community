@@ -7,7 +7,7 @@ type Props = {
 };
 
 class Row extends React.Component<Props> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
   }
 
@@ -17,13 +17,16 @@ class Row extends React.Component<Props> {
     const trigger = (
       <tr>
         <td>{item.mainType || '-'}</td>
-        {/* <td>{item?.sourceType || '-'}</td>
+        <td>{item?.sourceType || '-'}</td>
         <td>{item?.source?.name || '-'}</td>
         <td>{item?.type || '-'}</td>
-        <td>{item?.name || '-'}</td> */}
-
-        {/* <td>{moment(item?.createdAt).format('ll HH:mm') || '-'}</td> */}
-        {/* <td>{moment(item?.closedAt).format('ll HH:mm') || '-'}</td> */}
+        {/* <td>{item?.name || '-'}</td> */}
+        <td>{moment(item?.createdAt).format('ll HH:mm') || '-'}</td>
+        <td>
+          {item.closedAt
+            ? moment(item.closedAt).format('ll HH:mm') || '-'
+            : '-'}
+        </td>
       </tr>
     );
 
