@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { ModalTrigger } from '@erxes/ui/src';
+import TableDetail from './TableDetail';
 
 type Props = {
   item: any;
@@ -30,12 +31,12 @@ class Row extends React.Component<Props> {
       </tr>
     );
 
+    const content = () => {
+      return <TableDetail item={item} />;
+    };
+
     return (
-      <ModalTrigger
-        title="Detail RCFA"
-        content={() => <></>}
-        trigger={trigger}
-      />
+      <ModalTrigger title="Detail RCFA" content={content} trigger={trigger} />
     );
   }
 }

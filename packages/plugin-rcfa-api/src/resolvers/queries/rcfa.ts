@@ -43,13 +43,11 @@ const RCFAQueries = {
 
   async rcfaDetail(_root, args, context: IQuestionContext) {
     const model: IModels = await generateModels(context.subdomain);
-    const rcfaItem = await model.RCFA.findOne({
-      mainType: args.mainType,
-      mainTypeId: args.mainTypeId
-    });
+
+    const rcfaItem = await model.RCFA.findOne(args);
 
     if (!rcfaItem) {
-      return [];
+      return {};
     }
 
     const payload = {

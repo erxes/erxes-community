@@ -19,7 +19,7 @@ export const types = `
 
 export const queries = `
   rcfaList(perPage:Int, page:Int, searchValue:String, mainType:String): rcfaListQueryResponse
-  rcfaDetail(mainType:String, mainTypeId:String): JSON
+  rcfaDetail(_id:String, mainType:String, mainTypeId:String): JSON
 `;
 
 export const mutations = `

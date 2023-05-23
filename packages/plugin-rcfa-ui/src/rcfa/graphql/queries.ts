@@ -1,6 +1,6 @@
 const rcfa = `
-  query rcfaDetail($mainType: String, $mainTypeId: String) {
-    rcfaDetail(mainType: $mainType, mainTypeId: $mainTypeId)
+  query rcfaDetail($_id: String, $mainType: String, $mainTypeId: String) {
+    rcfaDetail(_id: $_id, mainType: $mainType, mainTypeId: $mainTypeId)
   }
 `;
 
