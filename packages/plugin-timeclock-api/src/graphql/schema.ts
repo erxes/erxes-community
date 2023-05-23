@@ -149,9 +149,6 @@ export const types = `
     totalHoursScheduled: Float
     totalDaysScheduled: Int
     
-    totalHoursBreakScheduled: Float
-    totalHoursBreakActual: Float
-
     totalHoursOvertime: Float
     totalHoursOvernight: Float
 
@@ -172,6 +169,10 @@ export const types = `
     
     totalHoursNotWorked: Float
     totalDaysNotWorked: Int
+
+    totalHoursBreakTaken: Float
+    totalHoursBreakScheduled: Float
+    totalHoursBreakSelecteDay:Float
   }
   
   type Report {
@@ -320,6 +321,8 @@ export const queries = `
   timeclocksPerUser(userId: String, shiftActive: Boolean, startDate: String, endDate:String): [Timeclock]
   timeLogsPerUser(userId: String, startDate: String, endDate: String ): [Timelog]
   schedulesPerUser(userId: String, startDate: String, endDate: String): [Schedule]
+
+  
   absenceTypes:[AbsenceType]
   
   timeclockReports(${queryParams}): ReportsListResponse
@@ -344,6 +347,7 @@ export const queries = `
 `;
 
 export const mutations = `
+  replaceDuplcateTimeclocks: JSON
   timeclockStart(${params}): Timeclock
   timeclockStop(${params}): Timeclock
   timeclockRemove(_id : String): JSON

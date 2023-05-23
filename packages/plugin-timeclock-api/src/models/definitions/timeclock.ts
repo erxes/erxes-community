@@ -2,7 +2,7 @@ import { Document, Schema } from 'mongoose';
 import { field } from './utils';
 
 export interface ITimeClock {
-  userId?: string;
+  userId: string;
   shiftStart: Date;
   shiftEnd?: Date;
   shiftActive?: boolean;
@@ -454,7 +454,7 @@ export interface IUserExportReport {
   totalHoursOvernight?: string;
 
   totalHoursBreakScheduled?: string;
-  totalHoursBreakActual?: string;
+  totalHoursBreakTaken?: string;
 
   totalMinsLate?: string;
 
