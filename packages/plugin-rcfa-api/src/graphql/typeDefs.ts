@@ -9,12 +9,7 @@ import {
   mutations as rcfaQuestionMutations,
   queries as rcfaQuestionQueries,
   types as rcfaQuestionTypes
-} from './schema/question';
-import {
-  mutations as rcfaRelatedTaskMutations,
-  queries as rcfaRelatedTaskQueries,
-  types as rcfaRelatedTaskTypes
-} from './schema/relatedTask';
+} from './schema/issues';
 
 const typeDefs = async (serviceDiscovery: any) => {
   return gql`
@@ -34,18 +29,15 @@ const typeDefs = async (serviceDiscovery: any) => {
 
     ${rcfaTypes}
     ${rcfaQuestionTypes}
-    ${rcfaRelatedTaskTypes}
 
     extend type Query {
       ${rcfaQueries}
       ${rcfaQuestionQueries}
-      ${rcfaRelatedTaskQueries}
     }
     
     extend type Mutation {
       ${rcfaMutations}
       ${rcfaQuestionMutations}
-      ${rcfaRelatedTaskMutations}
     }
   `;
 };

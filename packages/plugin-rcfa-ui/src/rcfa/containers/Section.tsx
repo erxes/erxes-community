@@ -5,6 +5,7 @@ import Section from '../components/Section';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
+import { Spinner } from '@erxes/ui/src';
 
 type Props = {
   mainTypeId: string;
@@ -32,14 +33,15 @@ class SectionContainer extends React.Component<FinalProps> {
       editRcfaQuestions,
       deleteRcfaQuestions
     } = this.props;
-    let questions = [];
+    let issues = [];
 
-    if (!rcfaDetail.loading) {
-      if (rcfaDetail.rcfaDetail) {
-        questions = rcfaDetail.rcfaDetail.questions;
-      } else {
-        questions = rcfaDetail.rcfaDetail;
-      }
+    if (rcfaDetail.loading) {
+      return <Spinner />;
+    }
+    if (rcfaDetail.rcfaDetail) {
+      issues = rcfaDetail.rcfaDetail.questions;
+    } else {
+      issues = rcfaDetail.rcfaDetail;
     }
 
     const createQuestion = (question: string, parentId: string | null) => {
@@ -62,7 +64,7 @@ class SectionContainer extends React.Component<FinalProps> {
 
     return (
       <Section
-        questions={questions}
+        issues={issues}
         createQuestion={createQuestion}
         editQuestion={editQuestion}
         deleteQuestion={deleteQuestion}

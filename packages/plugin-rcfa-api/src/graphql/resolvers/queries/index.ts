@@ -1,4 +1,4 @@
 import rfcaQueries from './rcfa';
-import rfcaQuestionQueries from './rcfaQuestion';
+import rfcaQuestionQueries from './rcfaIssues';
 
 export { rfcaQueries, rfcaQuestionQueries };

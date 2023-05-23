@@ -14,7 +14,7 @@ export const initBroker = async cl => {
 
     return {
       status: 'success',
-      data: await models.RCFAQuestions.find(data).lean()
+      data: await models.RCFA.find(data).lean()
     };
   });
 };

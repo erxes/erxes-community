@@ -9,7 +9,7 @@ export interface IRCFA {
   relTypeId?: string;
   status: string;
   createdAt: Date;
-  createdUser: string;
+  userId: string;
   closedAt?: Date;
 }
 
@@ -22,10 +22,14 @@ export const rcfaSchema = new Schema({
   _id: field({ pkey: true }),
   mainType: field({ type: String }),
   mainTypeId: field({ type: String }),
-  relType: field({ type: String }),
-  relTypeId: field({ type: String, required: false }),
-  status: field({ type: String }),
-  createdAt: field({ type: Date }),
-  createdUser: field({ type: String, required: false }),
-  closedAt: field({ type: Date, required: false })
+  relType: field({ type: String, optional: true }),
+  relTypeId: field({ type: String, optional: true }),
+  status: field({
+    type: String,
+    enum: ['inProgress', 'resolved'],
+    default: 'inProgress'
+  }),
+  createdAt: field({ type: Date, default: Date.now }),
+  userId: field({ type: String, optional: true }),
+  closedAt: field({ type: Date, optional: true })
 });

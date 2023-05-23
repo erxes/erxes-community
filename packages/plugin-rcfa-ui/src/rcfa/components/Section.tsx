@@ -7,19 +7,27 @@ import {
   Button,
   FormControl,
   __,
-  confirm
+  confirm,
+  FormGroup,
+  ControlLabel,
+  colors
 } from '@erxes/ui/src/';
 import { IRCFA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
-import { StyledContent, StyledQuestionItem } from '../../styles';
+import {
+  StyledContent,
+  StyledQuestionItem,
+  ListItem,
+  ItemBtn
+} from '../../styles';
 import CreateTaskModal from './CreateTaskModal';
 
 interface IRCFAQuestions extends IRCFA {
-  editing: boolean;
-  question: string;
+  editing?: boolean;
+  issue: string;
 }
 
 type Props = {
-  questions: IRCFAQuestions[];
+  issues: IRCFAQuestions[];
   createQuestion: (question: string, parentId: string | null) => void;
   editQuestion: (_id: string, question: string) => void;
   deleteQuestion: (_id: string) => void;
@@ -27,92 +35,113 @@ type Props = {
 };
 
 type State = {
-  questions: IRCFAQuestions[];
+  issues: any[];
   showQuestion: boolean;
   newQuestion: string;
 };
 
 class RCFASection extends React.Component<Props, State> {
-  state: { questions: IRCFAQuestions[]; showQuestion: true; newQuestion: '' };
+  // state: { questions: IRCFAQuestions[]; showQuestion: true; newQuestion: '' };
 
-  constructor(props: any) {
+  constructor(props) {
     super(props);
+
+    console.log({ issues: props.issues });
+
     this.state = {
-      questions: [],
+      // questions: props.questions || [],
+      issues: props.issues || [],
       showQuestion: true,
       newQuestion: ''
     };
   }
 
-  componentWillReceiveProps(prevProps) {
-    const questions: any = [];
-    for (const question of prevProps.questions) {
-      questions.push({ editing: false, ...question });
+  // componentWillReceiveProps(prevProps) {
+  //   const questions: any = [];
+  //   for (const question of prevProps.questions) {
+  //     questions.push({ editing: false, ...question });
+  //   }
+  //   this.setState({ questions: questions });
+  // }
+
+  componentDidMount() {
+    if (!this.state?.issues?.length) {
+      this.setState({
+        issues: [{ value: '', _id: Math.random(), editing: true }]
+      });
     }
-    this.setState({ questions: questions });
   }
 
-  addQuestion = () => {
-    if (this.props.questions.length >= 5) {
-      return;
-    } else {
-      this.setState({ showQuestion: true });
-    }
-  };
+  // addQuestion = () => {
+  //   const { issues } = this.state;
 
-  writeQuestion = (index: number) => event => {
-    let questList = this.state.questions;
-    questList[index].question = event.target.value;
-    this.setState({ questions: questList });
-  };
+  //   if (issues.length >= 5) {
+  //     return;
+  //   } else {
+  //     this.setState({ showQuestion: true });
+  //   }
+  // };
 
-  editQuestion = (_id: string | undefined, index: number) => () => {
-    let questList = this.state.questions;
-    questList[index].editing = !questList[index].editing;
-    this.setState({ questions: questList });
-  };
+  // writeQuestion = (index: number) => event => {
+  //   const {issues} = this.state;
+  //   issues[index].issue = event.target.value;
+  //   this.setState({ issues });
+  // };
+
+  // editQuestion = (_id: string | undefined, index: number) => () => {
+  //   const { issues } = this.state
+  //   issues[index].editing = !issues[index].editing;
+  //   this.setState({ issues });
+  // };
 
   saveEditedQuestion = (index: number) => () => {
-    let question = this.state.questions[index];
-    this.props.editQuestion(question._id as string, question.question);
+    let question = this.state.issues[index];
+    this.props.editQuestion(question._id as string, question.issue);
   };
 
-  onChangeQuestion = (index: number) => (event: any) => {
-    let questList = this.state.questions;
-    questList[index].question = event.target.value;
-    this.setState({ questions: questList });
-  };
+  // onChangeQuestion = (index: number) => (event: any) => {
+  //   let questList = this.state.questions;
+  //   questList[index].issue = event.target.value;
+  //   this.setState({ questions: questList });
+  // };
 
-  cancelEdit = (index: number) => () => {
-    let questList = this.state.questions;
-    questList[index].question = this.props.questions[index].question;
-    questList[index].editing = false;
-    this.setState({ questions: questList });
-  };
+  // cancelEdit = (index: number) => () => {
+  //   const { questions } = this.state;
 
-  deleteModalTrigger = (_id: string) => () => {
-    confirm().then(() => {
-      this.props.deleteQuestion(_id);
-    });
-    this.setState({ newQuestion: '' });
-  };
+  //   let questList = this.state.questions;
+  //   questList[index].issue = questions[index].issue;
+  //   questList[index].editing = false;
+  //   this.setState({ questions: questList });
+  // };
 
-  createQuestion = () => {
-    if (this.state.newQuestion) {
-      let parentId: string | null = null;
+  // deleteModalTrigger = (_id: string) => () => {
+  //   confirm().then(() => {
+  //     this.props.deleteQuestion(_id);
+  //   });
+  //   this.setState({ newQuestion: '' });
+  // };
 
-      const questions = this.state.questions;
+  createQuestion = (_id, value) => {
+    // const parentId = this
 
-      if (this.state.questions.length > 0) {
-        parentId = questions[questions.length - 1]._id as string;
-      }
+    this.props.createQuestion(value, null);
+    // if (this.state.newQuestion) {
+    //   let parentId: string | null = null;
 
-      this.props.createQuestion(this.state.newQuestion, parentId);
-      this.setState({ showQuestion: false });
-    }
+    //   const questions = this.state.questions;
+
+    //   if (this.state.questions.length > 0) {
+    //     parentId = questions[questions.length - 1]._id as string;
+    //   }
+
+    //   this.props.createQuestion(this.state.newQuestion, parentId);
+    //   this.setState({ showQuestion: false });
+    // }
   };
 
   renderForm() {
+    const { issues } = this.state;
+
     const trigger = (
       <Button btnStyle="simple">
         <Icon icon="plus-circle" />
@@ -120,26 +149,74 @@ class RCFASection extends React.Component<Props, State> {
     );
 
     const content = ({ closeModal }) => {
+      const { issues } = this.state;
+
+      const onChangeIssue = (e, _id) => {
+        const { value } = e.currentTarget as HTMLInputElement;
+
+        const updateIssues = issues.map(issue =>
+          issue._id === _id ? { ...issue, value } : issue
+        );
+
+        this.setState({ issues: updateIssues });
+      };
+
+      const handleSaveIssue = (e, _id) => {
+        if (e.key === 'Enter') {
+          const { value } = e.currentTarget as HTMLInputElement;
+
+          const updatedIssues = issues.map(issue =>
+            issue._id === _id ? { ...issue, editing: !issue.editing } : issue
+          );
+
+          this.setState({ issues: updatedIssues });
+          this.createQuestion(_id, value);
+          // this.props.onSearch(target.value || '');
+        }
+      };
+
       return (
         <div>
-          {this.state.questions.map((question, index) => (
+          {issues.map((issue, index) => (
             <StyledQuestionItem key={index}>
-              <p style={{ marginBottom: 0 }}>
-                {__('Question')} {index + 1}:
-              </p>
-              {question.editing ? (
-                <div style={{ marginBottom: '0.5rem' }}>
+              <FormGroup>
+                <ControlLabel>{`Issue ${index + 1}`}</ControlLabel>
+                {issue.editing ? (
                   <FormControl
                     type="text"
-                    value={question.question}
-                    onChange={this.onChangeQuestion(index)}
+                    value={issue?.value}
+                    onChange={e => onChangeIssue(e, issue._id)}
+                    onKeyPress={e => handleSaveIssue(e, issue._id)}
                   />
-                </div>
+                ) : (
+                  <ListItem>
+                    <ControlLabel>{issue.value}</ControlLabel>
+                    <BarItems>
+                      <ItemBtn color={colors.colorCoreGray}>
+                        <Icon icon="edit" />
+                      </ItemBtn>
+                      <ItemBtn color={colors.colorCoreRed}>
+                        <Icon icon="times-circle" />
+                      </ItemBtn>
+                    </BarItems>
+                  </ListItem>
+                )}
+              </FormGroup>
+              {/* {question.editing ? (
+                <FormGroup>
+                  <ControlLabel>{`Issue ${index +1}`}</ControlLabel>
+                  <FormControl
+                    type="text"
+                    value={question.issue}
+                    onChange={this.onChangeQuestion(index)}
+                    onKeyPress={e => console.log(e)}
+                  />
+                </FormGroup>
               ) : (
                 <p
                   style={{ marginTop: '0.4375rem', marginBottom: '0.9375rem' }}
                 >
-                  {question.question}
+                  {question.issue}
                 </p>
               )}
               <div>
@@ -177,17 +254,17 @@ class RCFASection extends React.Component<Props, State> {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
             </StyledQuestionItem>
           ))}
 
-          {this.state.showQuestion || this.state.questions.length === 0 ? (
+          {/* {this.state.showQuestion || questions.length === 0 ? (
             <div style={{ marginBottom: '1rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <p style={{ marginBottom: 0 }}>
-                  {__('Question')} {this.props.questions.length + 1}:
+                  {__('Question')} {questions.length + 1}:
                 </p>
-                {this.state.questions.length !== 0 ? (
+                {questions.length !== 0 ? (
                   <Icon
                     icon="times"
                     style={{ cursor: 'pointer' }}
@@ -217,14 +294,14 @@ class RCFASection extends React.Component<Props, State> {
             </div>
           ) : (
             ''
-          )}
+          )} */}
 
-          <div style={{ textAlign: 'right' }}>
-            {!this.state.showQuestion || this.state.questions.length >= 5 ? (
+          {/* <div style={{ textAlign: 'right' }}>
+            {!this.state.showQuestion || questions.length >= 5 ? (
               <Button
                 btnStyle="simple"
                 onClick={this.addQuestion}
-                disabled={this.state.questions.length >= 5}
+                disabled={questions.length >= 5}
               >
                 <Icon icon="plus-circle" /> Add question
               </Button>
@@ -233,12 +310,12 @@ class RCFASection extends React.Component<Props, State> {
             )}
 
             {this.createTask()}
-            {this.state.questions.length === 0 ? (
+            {questions.length === 0 ? (
               <Button onClick={closeModal}>Done1</Button>
             ) : (
               ''
             )}
-          </div>
+          </div> */}
         </div>
       );
     };
@@ -247,13 +324,15 @@ class RCFASection extends React.Component<Props, State> {
   }
 
   render() {
+    const { issues } = this.state;
+
     const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
 
     return (
       <Box title="RCFA" name="name" extraButtons={extraButtons} isOpen>
         <StyledContent>
-          {this.props.questions.length > 0 ? (
-            <p>{this.props.questions[0]?.question}</p>
+          {issues.length > 0 ? (
+            <p>{issues[0]?.value}</p>
           ) : (
             <p>No questions there.</p>
           )}
@@ -263,7 +342,7 @@ class RCFASection extends React.Component<Props, State> {
   }
 
   triggerNew() {
-    if (this.state.questions.length > 0) {
+    if (this.state.issues.length > 0) {
       return <Button>Done2</Button>;
     } else {
       return <></>;

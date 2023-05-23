@@ -7,8 +7,10 @@ export const types = `
     relTypeId: String
     status: String
     createdAt: Date
-    createdUser: String
+    userId: String
     closedAt: Date
+
+    issues:[RCFAIssue]
   }
 
   type rcfaListQueryResponse {
@@ -22,5 +24,13 @@ export const queries = `
   rcfaDetail(_id:String, mainType:String, mainTypeId:String): JSON
 `;
 
+const commonMutationParams = `
+  mainType:String,
+  mainTypeId:String,
+  destinationType:String,
+  destinationStageId:String
+`;
+
 export const mutations = `
+  resolveRCFA(${commonMutationParams}):rcfaType
 `;
