@@ -1,20 +1,84 @@
-import { ContactItem } from "../../styles";
 import { IUser } from "../../../auth/types";
-import NameCard from "../../../common/nameCard/NameCard";
 import React from "react";
+import { __ } from "../../../../utils";
+import ChatItem from "../../containers/chat/ChatItem";
+import ModalTrigger from "../../../common/ModalTrigger";
+import Icon from "../../../common/Icon";
+import CreateGroupChat from "../../containers/chat/CreateGroupChat";
+import { IconButton } from "../../styles";
 
 type Props = {
   users: IUser[];
+  chats: any[];
+  currentUser: IUser;
+  handleActive?: (chatId: string) => void;
 };
 
-export default function ChatList({ users }: Props) {
-  const onChatItem = (user) => {
-    console.log("cc", user);
-  };
+export default function ChatList({
+  users,
+  chats,
+  currentUser,
+  handleActive,
+}: Props) {
+  const contactedUsers = chats.map(
+    (c) => c.type === "direct" && c.participantUsers[0]._id
+  );
 
-  return users.map((user) => (
-    <ContactItem key={user._id} onClick={() => onChatItem(user)}>
-      <NameCard user={user} avatarSize={40} singleLine={true} />
-    </ContactItem>
-  ));
+  return (
+    <>
+      <label>
+        {__("Your group")}
+        <ModalTrigger
+          title="Create a group chat"
+          trigger={
+            <IconButton>
+              <Icon icon="users" size={12} />
+            </IconButton>
+          }
+          content={(props) => <CreateGroupChat {...props} />}
+          hideHeader={true}
+        />
+      </label>
+      {chats.map((c) => {
+        if (c.type === "group") {
+          return (
+            <ChatItem
+              chat={c}
+              currentUser={currentUser}
+              handleClickItem={() => handleActive(c._id)}
+            />
+          );
+        }
+        return null;
+      })}
+      <label>{__("Contacts")}</label>
+      {chats.map((chat) => {
+        if (chat.type === "direct") {
+          return (
+            <ChatItem
+              currentUser={currentUser}
+              chat={chat}
+              handleClickItem={() => handleActive(chat._id)}
+            />
+          );
+        }
+
+        return null;
+      })}
+      {users.map((user) => {
+        if (!contactedUsers.includes(user._id)) {
+          return (
+            <ChatItem
+              key={user._id}
+              currentUser={currentUser}
+              notContactUser={user}
+              hasOptions={true}
+            />
+          );
+        }
+
+        return null;
+      })}
+    </>
+  );
 }

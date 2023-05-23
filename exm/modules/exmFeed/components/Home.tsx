@@ -5,6 +5,7 @@ import {
   Row,
   SingleEvent,
   TabContent,
+  WidgetChatWrapper,
 } from "../styles";
 import { MainContainer, SideContainer } from "../../layout/styles";
 import React, { useState } from "react";
@@ -19,18 +20,42 @@ import ThankForm from "../containers/feed/ThankForm";
 import ThankList from "../containers/feed/ThankList";
 import { Wrapper } from "../../layout";
 import { __ } from "../../../utils";
+import WidgetChatWindow from '../containers/chat/WidgetChatWindow';
 
 type Props = {
   queryParams: any;
   currentUser: IUser;
 };
 
+const LOCALSTORAGE_KEY = 'erxes_active_chats';
+
 export default function Home(props: Props) {
   const [currentTab, setCurrentTab] = useState("post");
-  const { queryParams } = props;
-
+  const { queryParams, currentUser } = props;
+  const [activeChatIds, setActiveChatIds] = useState<any[]>(
+    JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]')
+  );
+  
   const onClickTab = (type: string) => {
     setCurrentTab(type);
+  };
+
+  const handleActive = (_chatId: string) => {
+    if (checkActive(_chatId)) {
+      updateActive(activeChatIds.filter(c => c !== _chatId));
+    } else {
+      updateActive([...activeChatIds, _chatId]);
+    }
+  };
+
+  const updateActive = (_chats: any[]) => {
+    setActiveChatIds(_chats);
+
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(_chats));
+  };
+
+  const checkActive = (_chatId: string) => {
+    return activeChatIds.indexOf(_chatId) !== -1;
   };
 
   const renderTabContent = () => {
@@ -76,15 +101,14 @@ export default function Home(props: Props) {
           </SingleEvent>
         </Card>
         <Card>
-          <label>{__("Contacts")}</label>
-          <ChatList currentUser={props.currentUser} />
+          <ChatList handleActive={_chatId => handleActive(_chatId)} currentUser={props.currentUser} />
         </Card>
       </>
     );
   };
 
   const renderContent = () => {
-    return (
+    return (<>
       <FeedLayout>
         <Row>
           <MainContainer>
@@ -123,7 +147,17 @@ export default function Home(props: Props) {
           </SideContainer>
         </Row>
       </FeedLayout>
-    );
+      <WidgetChatWrapper>
+        {activeChatIds.map(c => (
+          <WidgetChatWindow
+            key={c._id}
+            chatId={c}
+            handleActive={handleActive}
+            currentUser={currentUser}
+          />
+        ))}
+      </WidgetChatWrapper>
+    </>);
   };
 
   return (

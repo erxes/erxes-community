@@ -84,6 +84,34 @@ const deleteThank = `
   }
 `;
 
+const chatAdd = `
+  mutation chatAdd($name: String, $type: ChatType!, $participantIds: [String]) {
+    chatAdd(name: $name, type: $type, participantIds: $participantIds) {
+      _id
+    }
+  }
+`;
+
+const chatRemove = `
+  mutation chatRemove($id: String!) {
+    chatRemove(_id: $id)
+  }
+`;
+
+const chatMarkAsRead = `
+  mutation chatMarkAsRead($id: String!) {
+    chatMarkAsRead(_id: $id)
+  }
+`;
+
+const chatMessageAdd = `
+  mutation chatMessageAdd($chatId: String!, $content: String!, $relatedId: String, $attachments: [JSON]) {
+    chatMessageAdd(chatId: $chatId, content: $content, relatedId: $relatedId, attachments: $attachments) {
+      _id
+    }
+  }
+`;
+
 export default {
   addFeed,
   editFeed,
@@ -91,5 +119,9 @@ export default {
   addThank,
   editThank,
   deleteThank,
-  pinFeed
+  pinFeed,
+  chatAdd,
+  chatRemove,
+  chatMarkAsRead,
+  chatMessageAdd,
 };
