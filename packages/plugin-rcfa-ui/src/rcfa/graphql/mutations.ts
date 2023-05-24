@@ -1,30 +1,48 @@
-const addQuestion = `
-  mutation AddRcfaQuestions($question: String, $parentId: String, $mainType: String, $mainTypeId: String) {
-    addRcfaQuestions(question: $question, parentId: $parentId, mainType: $mainType, mainTypeId: $mainTypeId)
+const commonTypes = `
+    _id
+    rcfaId
+    issue
+    parentId
+    createdAt
+`;
+
+const addIssue = `
+mutation AddRcfaIssue($issue: String, $mainType: String, $mainTypeId: String) {
+  addRcfaIssue(issue: $issue, mainType: $mainType, mainTypeId: $mainTypeId) { ${commonTypes} }
+}
+`;
+
+const editIssue = `
+mutation EditRcfaIssue($_id: String, $issue: String) {
+  editRcfaIssue(_id: $_id, issue: $issue) { ${commonTypes} }
+}
+`;
+
+const removeIssue = `
+  mutation DeleteRcfaIssue($_id: String) {
+    deleteRcfaIssue(_id: $_id) { ${commonTypes} }
   }
 `;
 
-const editQuestion = `
-  mutation EditRcfaQuestions($id: String, $question: String) {
-    editRcfaQuestions(_id: $id, question: $question)
+const resolveRCFA = `
+mutation ResolveRCFA($mainType: String, $mainTypeId: String, $destinationType: String, $destinationStageId: String) {
+  resolveRCFA(mainType: $mainType, mainTypeId: $mainTypeId, destinationType: $destinationType, destinationStageId: $destinationStageId) {
+    _id
+    mainType
+    mainTypeId
+    relType
+    relTypeId
+    status
+    createdAt
+    userId
+    closedAt
   }
-`;
-
-const deleteQuestion = `
-  mutation DeleteRcfaQuestions($id: String) {
-    deleteRcfaQuestions(_id: $id)
-  }
-`;
-
-const rcfaCreateRelatedTask = `
-  mutation RcfaCreateRelatedTask($type: String, $sourceType: String, $itemId: String, $name: String, $stageId: String) {
-    rcfaCreateRelatedTask(type: $type, sourceType: $sourceType, itemId: $itemId, name: $name, stageId: $stageId)
-  }
+}
 `;
 
 export default {
-  addQuestion,
-  editQuestion,
-  deleteQuestion,
-  rcfaCreateRelatedTask
+  addIssue,
+  editIssue,
+  removeIssue,
+  resolveRCFA
 };

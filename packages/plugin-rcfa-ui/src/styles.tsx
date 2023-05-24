@@ -6,9 +6,31 @@ export const StyledContent = styled.div`
   padding: 1rem 1rem 0.5rem 1rem;
 `;
 
-export const StyledQuestionItem = styled.div`
-  padding-bottom 2rem;
+export const StyledListItem = styled.div`
+  padding: 10px;
 `;
+export const Divider = styled.div`
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: ${colors.colorCoreLightGray};
+  margin: 20px 0;
+
+  > span {
+    margin: 0 20px;
+  }
+
+  &:before,
+  &:after {
+    content: '';
+    flex: 1;
+    height: 0;
+    align-self: center;
+    border-bottom: 1px solid ${colors.borderPrimary};
+  }
+`;
+
 export const SidebarHeader = styled.h5`
   margin-bottom: ${dimensions.coreSpacing}px;
   color: ${colors.colorPrimary};
@@ -27,6 +49,9 @@ export const ListItem = styledTS<{
   border-radius: 4px;
   box-shadow: none;
   left: auto;
+  align-items:center;
+  padding:20px 10px
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -35,6 +60,7 @@ export const ListItem = styledTS<{
     box-shadow: 0 2px 8px ${colors.shadowPrimary};
     border-color: ${colors.colorSecondary};
     border-top: none;
+    cursor: pointer;
   }
   ${props =>
     props.column &&

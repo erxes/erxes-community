@@ -5,10 +5,11 @@ import Section from '../components/Section';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { mutations, queries } from '../graphql';
-import { Spinner } from '@erxes/ui/src';
+import { Alert, Spinner } from '@erxes/ui/src';
 
 type Props = {
   mainTypeId: string;
+  mainType: string;
   queryParams: any;
   history: any;
   type?: string;
@@ -18,7 +19,7 @@ type FinalProps = {
   rcfaDetail: any;
   addRcfaQuestions: any;
   editRcfaQuestions: any;
-  deleteRcfaQuestions: any;
+  deleteRcfaIssue: any;
 } & Props;
 
 class SectionContainer extends React.Component<FinalProps> {
@@ -31,46 +32,49 @@ class SectionContainer extends React.Component<FinalProps> {
       rcfaDetail,
       addRcfaQuestions,
       editRcfaQuestions,
-      deleteRcfaQuestions
+      deleteRcfaIssue,
+      mainType,
+      mainTypeId
     } = this.props;
-    let issues = [];
 
     if (rcfaDetail.loading) {
       return <Spinner />;
     }
-    if (rcfaDetail.rcfaDetail) {
-      issues = rcfaDetail.rcfaDetail.questions;
-    } else {
-      issues = rcfaDetail.rcfaDetail;
-    }
 
-    const createQuestion = (question: string, parentId: string | null) => {
+    const addIssue = data => {
       const payload = {
-        question,
-        parentId,
-        mainType: 'ticket',
-        mainTypeId: this.props.mainTypeId
+        ...data,
+        mainType: mainType,
+        mainTypeId: mainTypeId
       };
       addRcfaQuestions({ variables: payload });
     };
 
-    const editQuestion = (id: string, question: string) => {
-      editRcfaQuestions({ variables: { id, question } });
+    const editIssue = (_id: string, issue: string) => {
+      editRcfaQuestions({ variables: { _id, issue } }).catch(err =>
+        Alert.error(err.message)
+      );
     };
 
-    const deleteQuestion = (id: string) => {
-      deleteRcfaQuestions({ variables: { id } });
+    const removeIssue = (_id: string) => {
+      deleteRcfaIssue({ variables: { _id } }).catch(err =>
+        Alert.error(err.message)
+      );
     };
 
-    return (
-      <Section
-        issues={issues}
-        createQuestion={createQuestion}
-        editQuestion={editQuestion}
-        deleteQuestion={deleteQuestion}
-        ticketId={this.props.mainTypeId}
-      />
-    );
+    const { issues, ...detail } = rcfaDetail?.rcfaDetail || {};
+
+    const updateProps = {
+      issues: issues || [],
+      detail,
+      addIssue,
+      editIssue,
+      removeIssue,
+      mainType,
+      mainTypeId
+    };
+
+    return <Section {...updateProps} />;
   }
 }
 
@@ -95,16 +99,16 @@ export default withProps<Props>(
         }
       })
     }),
-    graphql<Props>(gql(mutations.addQuestion), {
+    graphql<Props>(gql(mutations.addIssue), {
       name: 'addRcfaQuestions',
       options: props => ({ refetchQueries: refetchQueries(props) })
     }),
-    graphql<Props>(gql(mutations.editQuestion), {
+    graphql<Props>(gql(mutations.editIssue), {
       name: 'editRcfaQuestions',
       options: props => ({ refetchQueries: refetchQueries(props) })
     }),
-    graphql<Props>(gql(mutations.deleteQuestion), {
-      name: 'deleteRcfaQuestions',
+    graphql<Props>(gql(mutations.removeIssue), {
+      name: 'deleteRcfaIssue',
       options: props => ({ refetchQueries: refetchQueries(props) })
     })
   )(SectionContainer)

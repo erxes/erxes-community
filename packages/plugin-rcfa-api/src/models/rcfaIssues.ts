@@ -23,7 +23,15 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
         mainTypeId
       });
 
-      if (rcfa) {
+      if (!rcfa) {
+        const rcfaDoc = {
+          mainType,
+          mainTypeId,
+          userId: user._id
+        };
+        const newDoc = await models.RCFA.create(rcfaDoc);
+        issueDoc.rcfaId = newDoc._id;
+      } else {
         if (rcfa?.status !== 'inProgress') {
           throw new Error('RCFA is already in resolved');
         }
@@ -40,37 +48,45 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
           throw new Error('You cannot add issue this rcfa');
         }
 
-        if (rcfa && !parentId) {
-          throw new Error('You cannot add issue this rcfa');
-        }
+        const parent = await models.Issues.findOne({
+          rcfaId: rcfa._id
+        }).sort({ createdAt: -1 });
+
+        issueDoc.parentId = parent?._id;
 
         issueDoc.rcfaId = rcfa._id;
-      }
-      if (!parentId) {
-        const rcfaDoc = {
-          mainType,
-          mainTypeId,
-          userId: user._id
-        };
-        const newDoc = await models.RCFA.create(rcfaDoc);
-        issueDoc.rcfaId = newDoc._id;
       }
 
       return await models.Issues.create({ ...issueDoc });
     }
 
     public static async editIssue(_id, doc) {
+      await this.checkStatus(_id);
+
       return await models.Issues.updateOne({ _id }, { $set: { ...doc } });
     }
 
     public static async removeIssue(_id) {
-      const rcfa = await models.Issues.findOne({ _id });
+      await this.checkStatus(_id);
+      const issue = await models.Issues.findOne({ _id });
 
-      if (!rcfa?.parentId) {
-        await models.RCFA.deleteOne({ _id: rcfa?.rcfaId });
+      if (!issue?.parentId) {
+        await models.RCFA.deleteOne({ _id: issue?.rcfaId });
       }
 
-      return rcfa?.remove();
+      return issue?.remove();
+    }
+
+    public static async checkStatus(_id) {
+      const issue = await models.Issues.findOne({ _id });
+
+      const rcfa = await models.RCFA.findOne({ _id: issue?.rcfaId });
+
+      if (rcfa?.status !== 'inProgress') {
+        throw new Error(
+          'You cannot remove a issue that is already in resolved'
+        );
+      }
     }
   }
 

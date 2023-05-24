@@ -1,6 +1,23 @@
 const rcfa = `
   query rcfaDetail($_id: String, $mainType: String, $mainTypeId: String) {
-    rcfaDetail(_id: $_id, mainType: $mainType, mainTypeId: $mainTypeId)
+    rcfaDetail(_id: $_id, mainType: $mainType, mainTypeId: $mainTypeId){
+    _id
+    mainType
+    mainTypeId
+    relType
+    relTypeId
+    status
+    createdAt
+    userId
+    closedAt
+    issues {
+      _id
+      rcfaId
+      issue
+      createdAt
+      parentId
+    }
+    }
   }
 `;
 

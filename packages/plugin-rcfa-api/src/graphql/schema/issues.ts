@@ -4,7 +4,7 @@ export const types = `
     _id:String,
     rcfaId:String,
     issue:String,
-    parent:String,
+    parentId:String,
     createdAt:Date,
   }
 

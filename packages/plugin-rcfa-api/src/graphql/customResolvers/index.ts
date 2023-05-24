@@ -1,5 +1,5 @@
-import RCFA from './rcfa';
+import RCFAType from './rcfa';
 
 export default {
-  RCFA
+  RCFAType
 };

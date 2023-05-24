@@ -15,147 +15,123 @@ import {
 import { IRCFA } from '../../../../plugin-rcfa-api/src/models/definitions/rcfa';
 import {
   StyledContent,
-  StyledQuestionItem,
+  Divider,
   ListItem,
-  ItemBtn
+  ItemBtn,
+  StyledListItem
 } from '../../styles';
-import CreateTaskModal from './CreateTaskModal';
+import ResolverModal from './ResolverModal';
+import _loadsh from 'lodash';
+import { LinkButton, ModalFooter } from '@erxes/ui/src/styles/main';
 
-interface IRCFAQuestions extends IRCFA {
+interface IRCFAIssues extends IRCFA {
   editing?: boolean;
   issue: string;
 }
 
 type Props = {
-  issues: IRCFAQuestions[];
-  createQuestion: (question: string, parentId: string | null) => void;
-  editQuestion: (_id: string, question: string) => void;
-  deleteQuestion: (_id: string) => void;
-  ticketId: string;
+  issues: IRCFAIssues[];
+  detail: IRCFAIssues;
+  addIssue: (data) => void;
+  editIssue: (_id: string, question: string) => void;
+  removeIssue: (_id: string) => void;
+  mainTypeId: string;
+  mainType: string;
 };
 
 type State = {
   issues: any[];
-  showQuestion: boolean;
-  newQuestion: string;
 };
 
 class RCFASection extends React.Component<Props, State> {
-  // state: { questions: IRCFAQuestions[]; showQuestion: true; newQuestion: '' };
-
   constructor(props) {
     super(props);
 
-    console.log({ issues: props.issues });
-
     this.state = {
-      // questions: props.questions || [],
-      issues: props.issues || [],
-      showQuestion: true,
-      newQuestion: ''
+      issues: props.issues || []
     };
   }
 
-  // componentWillReceiveProps(prevProps) {
-  //   const questions: any = [];
-  //   for (const question of prevProps.questions) {
-  //     questions.push({ editing: false, ...question });
-  //   }
-  //   this.setState({ questions: questions });
-  // }
-
   componentDidMount() {
-    if (!this.state?.issues?.length) {
+    if (
+      _loadsh.isEmpty(this.props.detail || {}) &&
+      !this.state?.issues?.length
+    ) {
       this.setState({
-        issues: [{ value: '', _id: Math.random(), editing: true }]
+        issues: [{ issue: '', _id: Math.random(), editing: true }]
       });
     }
   }
 
-  // addQuestion = () => {
-  //   const { issues } = this.state;
+  componentDidUpdate(prevProps) {
+    if (
+      JSON.stringify(prevProps.issues) !== JSON.stringify(this.props.issues)
+    ) {
+      this.setState({ issues: this.props.issues });
+    }
+  }
 
-  //   if (issues.length >= 5) {
-  //     return;
-  //   } else {
-  //     this.setState({ showQuestion: true });
-  //   }
-  // };
+  handleSave({ _id, value }: { _id?: string; value: string }) {
+    const { detail, editIssue, addIssue } = this.props;
 
-  // writeQuestion = (index: number) => event => {
-  //   const {issues} = this.state;
-  //   issues[index].issue = event.target.value;
-  //   this.setState({ issues });
-  // };
+    if (!_loadsh.isEmpty(detail) && typeof _id === 'string') {
+      return editIssue(_id, value);
+    }
 
-  // editQuestion = (_id: string | undefined, index: number) => () => {
-  //   const { issues } = this.state
-  //   issues[index].editing = !issues[index].editing;
-  //   this.setState({ issues });
-  // };
+    addIssue({ issue: value });
+  }
 
-  saveEditedQuestion = (index: number) => () => {
-    let question = this.state.issues[index];
-    this.props.editQuestion(question._id as string, question.issue);
-  };
+  renderResolveForm(callback) {
+    const { mainType, mainTypeId } = this.props;
 
-  // onChangeQuestion = (index: number) => (event: any) => {
-  //   let questList = this.state.questions;
-  //   questList[index].issue = event.target.value;
-  //   this.setState({ questions: questList });
-  // };
+    const trigger = <Button btnStyle="success">{__('Done')}</Button>;
 
-  // cancelEdit = (index: number) => () => {
-  //   const { questions } = this.state;
+    const resolverContent = ({ closeModal }) => {
+      return (
+        <ResolverModal
+          mainType={mainType}
+          mainTypeId={mainTypeId}
+          closeModal={closeModal}
+          callback={callback}
+        />
+      );
+    };
 
-  //   let questList = this.state.questions;
-  //   questList[index].issue = questions[index].issue;
-  //   questList[index].editing = false;
-  //   this.setState({ questions: questList });
-  // };
-
-  // deleteModalTrigger = (_id: string) => () => {
-  //   confirm().then(() => {
-  //     this.props.deleteQuestion(_id);
-  //   });
-  //   this.setState({ newQuestion: '' });
-  // };
-
-  createQuestion = (_id, value) => {
-    // const parentId = this
-
-    this.props.createQuestion(value, null);
-    // if (this.state.newQuestion) {
-    //   let parentId: string | null = null;
-
-    //   const questions = this.state.questions;
-
-    //   if (this.state.questions.length > 0) {
-    //     parentId = questions[questions.length - 1]._id as string;
-    //   }
-
-    //   this.props.createQuestion(this.state.newQuestion, parentId);
-    //   this.setState({ showQuestion: false });
-    // }
-  };
+    return (
+      <ModalTrigger
+        title="Create related card"
+        content={resolverContent}
+        style={{ overflow: 'auto' }}
+        trigger={trigger}
+      />
+    );
+  }
 
   renderForm() {
+    const { removeIssue, detail } = this.props;
     const { issues } = this.state;
+
+    let icon = 'plus-circle';
+
+    if (!_loadsh.isEmpty(detail)) {
+      icon = 'edit-alt';
+      if (detail.status !== 'inProgress') {
+        icon = 'search';
+      }
+    }
 
     const trigger = (
       <Button btnStyle="simple">
-        <Icon icon="plus-circle" />
+        <Icon icon={icon} />
       </Button>
     );
 
     const content = ({ closeModal }) => {
-      const { issues } = this.state;
-
       const onChangeIssue = (e, _id) => {
         const { value } = e.currentTarget as HTMLInputElement;
 
         const updateIssues = issues.map(issue =>
-          issue._id === _id ? { ...issue, value } : issue
+          issue._id === _id ? { ...issue, issue: value } : issue
         );
 
         this.setState({ issues: updateIssues });
@@ -165,157 +141,89 @@ class RCFASection extends React.Component<Props, State> {
         if (e.key === 'Enter') {
           const { value } = e.currentTarget as HTMLInputElement;
 
+          this.handleSave({ _id, value });
+
           const updatedIssues = issues.map(issue =>
             issue._id === _id ? { ...issue, editing: !issue.editing } : issue
           );
 
           this.setState({ issues: updatedIssues });
-          this.createQuestion(_id, value);
-          // this.props.onSearch(target.value || '');
         }
+      };
+
+      const toggleEdit = _id => {
+        const updatedIssues = issues.map(issue =>
+          issue._id === _id ? { ...issue, editing: !issue.editing } : issue
+        );
+        this.setState({ issues: updatedIssues });
+      };
+
+      const handleAddIssue = () => {
+        this.setState({
+          issues: [...issues, { issue: '', _id: Math.random(), editing: true }]
+        });
+      };
+
+      const handleRemoveIssue = _id => {
+        confirm().then(() => {
+          removeIssue(_id);
+        });
+
+        const updatedIssues = issues.filter(issue => issue._id !== _id);
+
+        this.setState({ issues: updatedIssues });
       };
 
       return (
         <div>
           {issues.map((issue, index) => (
-            <StyledQuestionItem key={index}>
+            <StyledListItem key={issue._id}>
               <FormGroup>
                 <ControlLabel>{`Issue ${index + 1}`}</ControlLabel>
                 {issue.editing ? (
                   <FormControl
                     type="text"
-                    value={issue?.value}
+                    value={issue?.issue}
                     onChange={e => onChangeIssue(e, issue._id)}
                     onKeyPress={e => handleSaveIssue(e, issue._id)}
                   />
                 ) : (
                   <ListItem>
-                    <ControlLabel>{issue.value}</ControlLabel>
+                    <ControlLabel>{issue.issue}</ControlLabel>
                     <BarItems>
                       <ItemBtn color={colors.colorCoreGray}>
-                        <Icon icon="edit" />
+                        <Icon
+                          icon="edit"
+                          onClick={toggleEdit.bind(this, issue._id)}
+                        />
                       </ItemBtn>
-                      <ItemBtn color={colors.colorCoreRed}>
+                      <ItemBtn
+                        color={colors.colorCoreRed}
+                        onClick={handleRemoveIssue.bind(this, issue._id)}
+                      >
                         <Icon icon="times-circle" />
                       </ItemBtn>
                     </BarItems>
                   </ListItem>
                 )}
               </FormGroup>
-              {/* {question.editing ? (
-                <FormGroup>
-                  <ControlLabel>{`Issue ${index +1}`}</ControlLabel>
-                  <FormControl
-                    type="text"
-                    value={question.issue}
-                    onChange={this.onChangeQuestion(index)}
-                    onKeyPress={e => console.log(e)}
-                  />
-                </FormGroup>
-              ) : (
-                <p
-                  style={{ marginTop: '0.4375rem', marginBottom: '0.9375rem' }}
-                >
-                  {question.issue}
-                </p>
+              {issues?.length !== index + 1 && (
+                <Divider>
+                  <span>{'Why ?'}</span>
+                </Divider>
               )}
-              <div>
-                {question.editing ? (
-                  <div>
-                    <Button
-                      btnStyle="simple"
-                      size="small"
-                      onClick={this.cancelEdit(index)}
-                    >
-                      <Icon icon="times-circle" /> Cancel
-                    </Button>
-                    <Button
-                      size="small"
-                      onClick={this.saveEditedQuestion(index)}
-                    >
-                      <Icon icon="times-circle" /> Save
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      btnStyle="simple"
-                      size="small"
-                      onClick={this.editQuestion(question._id, index)}
-                    >
-                      <Icon icon="edit-alt" /> Edit
-                    </Button>
-                    <Button
-                      btnStyle="danger"
-                      size="small"
-                      onClick={this.deleteModalTrigger(question._id as string)}
-                    >
-                      <Icon icon="times-circle" /> Delete
-                    </Button>
-                  </div>
-                )}
-              </div> */}
-            </StyledQuestionItem>
+            </StyledListItem>
           ))}
-
-          {/* {this.state.showQuestion || questions.length === 0 ? (
-            <div style={{ marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <p style={{ marginBottom: 0 }}>
-                  {__('Question')} {questions.length + 1}:
-                </p>
-                {questions.length !== 0 ? (
-                  <Icon
-                    icon="times"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => {
-                      this.setState({ showQuestion: false });
-                    }}
-                  />
-                ) : (
-                  ''
-                )}
-              </div>
-
-              <FormControl
-                type="text"
-                onChange={(event: any) => {
-                  this.setState({ newQuestion: event.target.value });
-                }}
-              />
-              <Button
-                btnStyle="simple"
-                size="small"
-                style={{ marginTop: '0.5rem' }}
-                onClick={this.createQuestion}
-              >
-                <Icon icon="edit-alt" /> Save
-              </Button>
-            </div>
-          ) : (
-            ''
-          )} */}
-
-          {/* <div style={{ textAlign: 'right' }}>
-            {!this.state.showQuestion || questions.length >= 5 ? (
-              <Button
-                btnStyle="simple"
-                onClick={this.addQuestion}
-                disabled={questions.length >= 5}
-              >
-                <Icon icon="plus-circle" /> Add question
-              </Button>
-            ) : (
-              ''
-            )}
-
-            {this.createTask()}
-            {questions.length === 0 ? (
-              <Button onClick={closeModal}>Done1</Button>
-            ) : (
-              ''
-            )}
-          </div> */}
+          {detail?.status === 'inProgress' && (
+            <LinkButton onClick={handleAddIssue}>{__('Add Issue')}</LinkButton>
+          )}
+          <ModalFooter>
+            <Button onClick={closeModal} btnStyle="simple">
+              {__('Cancel')}
+            </Button>
+            {detail?.status === 'inProgress' &&
+              this.renderResolveForm(closeModal)}
+          </ModalFooter>
         </div>
       );
     };
@@ -324,49 +232,21 @@ class RCFASection extends React.Component<Props, State> {
   }
 
   render() {
-    const { issues } = this.state;
+    const { detail } = this.props;
+    const { issues } = this.props;
 
     const extraButtons = <BarItems>{this.renderForm()}</BarItems>;
 
     return (
       <Box title="RCFA" name="name" extraButtons={extraButtons} isOpen>
         <StyledContent>
-          {issues.length > 0 ? (
-            <p>{issues[0]?.value}</p>
+          {!_loadsh.isEmpty(detail || {}) && issues.length > 0 ? (
+            <p>{issues[issues?.length - 1]?.issue}</p>
           ) : (
             <p>No questions there.</p>
           )}
         </StyledContent>
       </Box>
-    );
-  }
-
-  triggerNew() {
-    if (this.state.issues.length > 0) {
-      return <Button>Done2</Button>;
-    } else {
-      return <></>;
-    }
-  }
-
-  createTask() {
-    const taskContent = ({ closeModal }) => {
-      return (
-        <CreateTaskModal
-          ticketId={this.props.ticketId}
-          rcfaCreateRelatedTask={() => {}}
-          closeModal={closeModal}
-        />
-      );
-    };
-
-    return (
-      <ModalTrigger
-        title="Create related card"
-        content={taskContent}
-        style={{ overflow: 'auto' }}
-        trigger={this.triggerNew()}
-      />
     );
   }
 }

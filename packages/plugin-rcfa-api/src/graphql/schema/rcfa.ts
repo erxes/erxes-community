@@ -1,5 +1,5 @@
 export const types = `
-  type rcfaType {
+  type RCFAType {
     _id: String
     mainType: String
     mainTypeId: String
@@ -14,14 +14,14 @@ export const types = `
   }
 
   type rcfaListQueryResponse {
-    list: [rcfaType]
+    list: [RCFAType]
     totalCount: Int
   }
 `;
 
 export const queries = `
   rcfaList(perPage:Int, page:Int, searchValue:String, mainType:String): rcfaListQueryResponse
-  rcfaDetail(_id:String, mainType:String, mainTypeId:String): JSON
+  rcfaDetail(_id:String, mainType:String, mainTypeId:String): RCFAType
 `;
 
 const commonMutationParams = `
@@ -32,5 +32,5 @@ const commonMutationParams = `
 `;
 
 export const mutations = `
-  resolveRCFA(${commonMutationParams}):rcfaType
+  resolveRCFA(${commonMutationParams}):RCFAType
 `;
