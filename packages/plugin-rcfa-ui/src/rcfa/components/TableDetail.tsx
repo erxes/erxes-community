@@ -4,20 +4,23 @@ import * as compose from 'lodash.flowright';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { queries } from '../graphql';
+import { IssueItem } from '../../styles';
+import Label from '@erxes/ui/src/components/Label';
+import Button from '@erxes/ui/src/components/Button';
 
 type Props = {
   item: any;
   rcfaDetail?: any;
 };
 
-interface IQuestion {
+interface IIssue {
   _id: string;
-  question: string;
-  parentId: string;
-  rcfaId: string;
-  createdAt: string;
-  createdUser: string;
-  __v: number;
+  issue: string;
+  parentId: string | null;
+  rcfaId?: string;
+  createdAt?: string;
+  createdUser?: string;
+  __v?: number;
 }
 
 class TableDetail extends React.Component<Props> {
@@ -25,30 +28,51 @@ class TableDetail extends React.Component<Props> {
     super(props);
   }
 
+  seeTask = () => {};
+
   render() {
     const { rcfaDetail } = this.props;
-    let rcfa = null;
-    let questions = <></>;
+
+    let issues = [];
 
     if (!rcfaDetail.loading) {
-      rcfa = rcfaDetail.rcfaDetail;
-
-      questions = rcfaDetail.rcfaDetail.questions.map(
-        (question: IQuestion, index: number) => (
-          <div key={index}>
-            <h5>
-              {index === 0 ? 'Problem: ' : ''}
-              {index === rcfaDetail.rcfaDetail.questions.length - 1
-                ? 'Root cause: '
-                : ''}
-              {question.question}
-            </h5>
-          </div>
-        )
-      );
+      issues = rcfaDetail.rcfaDetail.issues;
     }
 
-    return <div>{questions}</div>;
+    let issueList = issues.map((issue: IIssue, index: number) => (
+      <IssueItem key={issue._id}>
+        <h2
+          style={{
+            margin: '0 1rem 0 0',
+            color: index == issues.length - 1 ? '#673FBD' : ''
+          }}
+        >
+          {index + 1}
+        </h2>
+        <div>
+          <p style={{ marginBottom: '0' }}>{issue.issue}</p>
+          {index == issues.length - 1 ? (
+            <>
+              <p>
+                <Label lblStyle="danger">Root cause</Label>
+              </p>
+              <Button
+                size="small"
+                onClick={() => {
+                  this.seeTask;
+                }}
+              >
+                See task
+              </Button>
+            </>
+          ) : (
+            ''
+          )}
+        </div>
+      </IssueItem>
+    ));
+
+    return <div>{issueList}</div>;
   }
 }
 

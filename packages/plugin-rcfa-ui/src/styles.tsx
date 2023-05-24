@@ -80,3 +80,11 @@ export const ItemBtn = styledTS<{
     cursor: pointer;
   }
 `;
+
+export const IssueItem = styled.div`
+  background-color: #0000000f;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+`;

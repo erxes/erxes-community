@@ -32,7 +32,7 @@ query RcfaList($mainType: String, $searchValue: String, $page: Int, $perPage: In
       relTypeId
       status
       createdAt
-      createdUser
+      userId
       closedAt
     }
     totalCount
