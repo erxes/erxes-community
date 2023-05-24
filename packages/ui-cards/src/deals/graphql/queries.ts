@@ -6,7 +6,7 @@ import {
 } from '../../conformity/graphql/queries';
 
 const commonParams = `
-  $_ids:[String]
+  $_ids: [String]
   $companyIds: [String],
   $customerIds: [String],
   $assignedUserIds: [String],
