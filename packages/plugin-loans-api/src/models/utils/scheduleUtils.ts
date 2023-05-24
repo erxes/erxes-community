@@ -338,7 +338,7 @@ export const fixSchedules = async (
     contractId: contractId,
     payDate: {
       $lte: new Date(today.getTime() + 1000 * 3600 * 24),
-      $gt: periodLock?.date
+      ...(periodLock?.date ? { $gt: periodLock?.date } : {})
     },
     status: SCHEDULE_STATUS.PENDING,
     balance: { $gt: 0 },

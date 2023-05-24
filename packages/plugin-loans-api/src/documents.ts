@@ -103,19 +103,21 @@ export default {
           <tbody>
           ${firstSchedules
             .map(
-              (row, index) => `<tr>
-            <td>${index + 1}</td>
-            <td>${row.payDate.getFullYear()}-${row.payDate.getMonth() +
+              (row, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${row.payDate.getFullYear()}-${row.payDate.getMonth() +
                 1}-${row.payDate.getDate()}</td>
-            <td>${toMoney(row.balance)}</td>
-            <td>${toMoney(row.payment)}</td>
-            <td>${toMoney(
-              (row.interestEve || 0) + (row.interestNonce || 0)
-            )}</td>
-            <td>${toMoney(row.insurance)}</td>
-            <td>${toMoney(row.debt)}</td>
-            <td>${toMoney(row.total)}</td>
-          </tr>`
+                <td>${toMoney(row.balance)}</td>
+                <td>${toMoney(row.payment)}</td>
+                <td>${toMoney(
+                  (row.interestEve || 0) + (row.interestNonce || 0)
+                )}</td>
+                <td>${toMoney(row.insurance)}</td>
+                <td>${toMoney(row.debt)}</td>
+                <td>${toMoney(row.total)}</td>
+              </tr>
+            `
             )
             .join('')}
           </tbody>
