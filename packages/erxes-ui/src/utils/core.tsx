@@ -532,6 +532,20 @@ export function formatValue(value) {
   return value || '-';
 }
 
+export function numberFormatter(value, fixed) {
+  if (
+    fixed &&
+    `${value}`.includes('.') &&
+    `${value}`.split('.')?.[1]?.length > fixed
+  )
+    value = Number(value).toFixed(fixed);
+  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+export function numberParser(value) {
+  return value!.replace(/(,*)/g, '');
+}
+
 export function isEmptyContent(content: string) {
   // check if a string contains whitespace or empty
   return !/\S/.test(content);

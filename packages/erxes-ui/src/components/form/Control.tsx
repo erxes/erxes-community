@@ -12,6 +12,7 @@ import { Column } from '@erxes/ui/src/styles/main';
 import ProgressBar from '../ProgressBar';
 import React from 'react';
 import Textarea from './Textarea';
+import { numberFormatter, numberParser } from '../../utils/core';
 
 type Props = {
   children?: React.ReactNode;
@@ -47,6 +48,8 @@ type Props = {
   maxLength?: number;
   color?: string;
   align?: string;
+  fixed?: number;
+  useNumberFormat?: boolean;
 };
 
 const renderElement = (Element, attributes, type, child) => {
@@ -202,6 +205,41 @@ class FormControl extends React.Component<Props> {
       return (
         <Column>
           <Textarea {...props} hasError={errorMessage} />
+          {errorMessage}
+        </Column>
+      );
+    }
+
+    if (props.type === 'number' && props.useNumberFormat) {
+      function onChangeNumber(e) {
+        if (e.target.value === '') {
+          attributes.onChange(e);
+          return;
+        }
+        if (/^[0-9.,]+$/.test(e.target.value)) {
+          e.target.value = numberParser(e.target.value);
+          if (!e.target.value?.includes('.')) {
+            e.target.value = Number(e.target.value);
+          }
+          if (e.target.value?.includes('.')) {
+            var numberValue = e.target.value.split('.');
+            numberValue[0] = Number(numberValue[0]);
+            if (props.fixed && numberValue[1].length > props.fixed)
+              numberValue[1] = numberValue[1].substring(0, props.fixed);
+            e.target.value = `${numberValue[0]}.${numberValue[1]}`;
+          }
+          attributes.onChange(e);
+        }
+      }
+
+      return (
+        <Column>
+          <Input
+            {...attributes}
+            type={undefined}
+            value={numberFormatter(attributes.value, props.fixed)}
+            onChange={onChangeNumber}
+          />
           {errorMessage}
         </Column>
       );
