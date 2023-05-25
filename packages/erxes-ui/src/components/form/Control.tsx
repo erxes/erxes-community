@@ -212,22 +212,9 @@ class FormControl extends React.Component<Props> {
 
     if (props.type === 'number' && props.useNumberFormat) {
       function onChangeNumber(e) {
-        if (e.target.value === '') {
-          attributes.onChange(e);
-          return;
-        }
-        if (/^[0-9.,]+$/.test(e.target.value)) {
-          e.target.value = numberParser(e.target.value);
-          if (!e.target.value?.includes('.')) {
-            e.target.value = Number(e.target.value);
-          }
-          if (e.target.value?.includes('.')) {
-            var numberValue = e.target.value.split('.');
-            numberValue[0] = Number(numberValue[0]);
-            if (props.fixed && numberValue[1].length > props.fixed)
-              numberValue[1] = numberValue[1].substring(0, props.fixed);
-            e.target.value = `${numberValue[0]}.${numberValue[1]}`;
-          }
+        if (e.target.value === '') attributes.onChange(e);
+        else if (/^[0-9.,]+$/.test(e.target.value)) {
+          e.target.value = numberParser(e.target.value, props.fixed);
           attributes.onChange(e);
         }
       }

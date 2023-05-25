@@ -542,8 +542,17 @@ export function numberFormatter(value, fixed) {
   return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-export function numberParser(value) {
-  return value!.replace(/(,*)/g, '');
+export function numberParser(value, fixed) {
+  value = value!.replace(/(,*)/g, '');
+
+  if (value?.includes('.')) {
+    var numberValues = value.split('.');
+    numberValues[0] = Number(numberValues[0]);
+    if (fixed && numberValues[1].length > fixed)
+      numberValues[1] = numberValues[1].substring(0, fixed);
+    value = `${numberValues[0]}.${numberValues[1]}`;
+  } else value = Number(value);
+  return value;
 }
 
 export function isEmptyContent(content: string) {
