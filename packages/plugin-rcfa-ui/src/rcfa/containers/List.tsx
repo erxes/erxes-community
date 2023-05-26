@@ -18,18 +18,15 @@ type Props = {
 type FinalProps = {} & Props;
 
 class ListContainer extends React.Component<FinalProps> {
-  state: {};
+  static displayName = 'rcfa';
 
-  constructor(props) {
+  constructor(props: FinalProps) {
     super(props);
-    this.state = {};
   }
 
   render() {
     const { queryParams, history, rcfaList } = this.props;
 
-    console.log(queryParams);
-    refetchQueries(queryParams);
     let rcfa: any = [];
     let totalCount: number = 0;
 
@@ -50,12 +47,14 @@ class ListContainer extends React.Component<FinalProps> {
   }
 }
 
-const refetchQueries = props => [
-  {
-    query: gql(queries.rcfa),
-    variables: props
-  }
-];
+const rcfaRefetchQueries = queryParams => {
+  return [
+    {
+      query: gql(queries.rcfaList),
+      variables: queryParams
+    }
+  ];
+};
 
 export default withProps<Props>(
   compose(
@@ -66,9 +65,11 @@ export default withProps<Props>(
           mainType: props.mainType,
           searchValue: props.searchValue,
           page: props.page,
-          perPage: props.perPage
+          perPage: props.perPage,
+          createdAtFrom: props.queryParams?.createdAtFrom,
+          createdAtTo: props.queryParams?.createdAtTo
         },
-        refetchQueries: refetchQueries(props)
+        refetchQueries: rcfaRefetchQueries(props)
       })
     })
   )(ListContainer)
