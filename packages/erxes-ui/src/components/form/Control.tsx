@@ -48,8 +48,8 @@ type Props = {
   maxLength?: number;
   color?: string;
   align?: string;
-  fixed?: number;
   useNumberFormat?: boolean;
+  fixed?: number; // useNumberFormat is true then used
 };
 
 const renderElement = (Element, attributes, type, child) => {
@@ -211,13 +211,14 @@ class FormControl extends React.Component<Props> {
     }
 
     if (props.type === 'number' && props.useNumberFormat) {
-      function onChangeNumber(e) {
-        if (e.target.value === '') attributes.onChange(e);
-        else if (/^[0-9.,]+$/.test(e.target.value)) {
+      const onChangeNumber = e => {
+        if (e.target.value === '') {
+          attributes.onChange(e);
+        } else if (/^[0-9.,]+$/.test(e.target.value)) {
           e.target.value = numberParser(e.target.value, props.fixed);
           attributes.onChange(e);
         }
-      }
+      };
 
       return (
         <Column>

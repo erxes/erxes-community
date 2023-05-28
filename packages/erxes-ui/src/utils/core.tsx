@@ -539,6 +539,7 @@ export function numberFormatter(value, fixed) {
     `${value}`.split('.')?.[1]?.length > fixed
   )
     value = Number(value).toFixed(fixed);
+
   return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
@@ -548,10 +549,16 @@ export function numberParser(value, fixed) {
   if (value?.includes('.')) {
     var numberValues = value.split('.');
     numberValues[0] = Number(numberValues[0]);
-    if (fixed && numberValues[1].length > fixed)
+
+    if (fixed && numberValues[1].length > fixed) {
       numberValues[1] = numberValues[1].substring(0, fixed);
+    }
+
     value = `${numberValues[0]}.${numberValues[1]}`;
-  } else value = Number(value);
+  } else {
+    value = Number(value);
+  }
+
   return value;
 }
 
