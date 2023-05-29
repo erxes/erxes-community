@@ -4,7 +4,7 @@ import React from 'react';
 import List from '../components/List';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { mutations, queries } from '../graphql';
+import { queries } from '../graphql';
 
 type Props = {
   queryParams: any;
@@ -18,15 +18,15 @@ type Props = {
 type FinalProps = {} & Props;
 
 class ListContainer extends React.Component<FinalProps> {
-  state: {};
+  static displayName = 'rcfa';
 
-  constructor(props) {
+  constructor(props: FinalProps) {
     super(props);
-    this.state = {};
   }
 
   render() {
     const { queryParams, history, rcfaList } = this.props;
+
     let rcfa: any = [];
     let totalCount: number = 0;
 
@@ -47,6 +47,15 @@ class ListContainer extends React.Component<FinalProps> {
   }
 }
 
+const rcfaRefetchQueries = queryParams => {
+  return [
+    {
+      query: gql(queries.rcfaList),
+      variables: queryParams
+    }
+  ];
+};
+
 export default withProps<Props>(
   compose(
     graphql<Props>(gql(queries.rcfaList), {
@@ -56,8 +65,11 @@ export default withProps<Props>(
           mainType: props.mainType,
           searchValue: props.searchValue,
           page: props.page,
-          perPage: props.perPage
-        }
+          perPage: props.perPage,
+          createdAtFrom: props.queryParams?.createdAtFrom,
+          createdAtTo: props.queryParams?.createdAtTo
+        },
+        refetchQueries: rcfaRefetchQueries(props)
       })
     })
   )(ListContainer)
