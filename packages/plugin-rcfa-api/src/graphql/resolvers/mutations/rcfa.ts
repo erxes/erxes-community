@@ -3,9 +3,15 @@ import { sendCardsMessage } from '../../../messageBroker';
 
 const rcfaMutations = {
   async resolveRCFA(_root, args, { models, subdomain }: IContext) {
-    const { mainType, mainTypeId, destinationType, destinationStageId } = args;
+    const {
+      mainType,
+      mainTypeId,
+      destinationType,
+      destinationStageId,
+      issueId
+    } = args;
 
-    if (!destinationType || !destinationStageId) {
+    if (!destinationType || !destinationStageId || !issueId) {
       throw new Error('Cannot resolve rcfa');
     }
 
@@ -15,9 +21,11 @@ const rcfaMutations = {
       throw new Error('Something went wrong');
     }
 
-    const issue = await models.Issues.findOne({ rcfaId: rcfa._id }).sort({
-      createdAt: -1
-    });
+    const issue = await models.Issues.findOne({ _id: issueId });
+
+    if (!issue) {
+      throw new Error('Issue not found');
+    }
 
     const payload = {
       type: destinationType,
@@ -27,21 +35,25 @@ const rcfaMutations = {
       stageId: destinationStageId
     };
 
-    const relItem = await sendCardsMessage({
+    await sendCardsMessage({
       subdomain: subdomain,
       action: 'createRelatedItem',
       data: payload,
       isRPC: true
     });
 
+    await models.Issues.updateOne({ _id: issue?._id }, { isRooACause: true });
+    await models.Issues.updateMany(
+      { order: { $regex: new RegExp(issue?.order || '', 'i') } },
+      { $set: { status: 'closed', closedAt: new Date() } }
+    );
+
     return await models.RCFA.updateOne(
       { _id: rcfa._id },
       {
         $set: {
           status: 'resolved',
-          closedAt: new Date(),
-          relType: destinationType,
-          relTypeId: relItem._id
+          closedAt: new Date()
         }
       }
     );

@@ -16,6 +16,10 @@ const rcfa = `
       issue
       createdAt
       parentId
+      status
+      relType
+      relTypeId
+      description
     }
     }
   }

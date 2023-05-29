@@ -7,6 +7,8 @@ export interface IRCFAIssues {
   issue: string;
   parentId?: string;
   createdAt: string;
+  code: string;
+  order: string;
   __v?: number;
 }
 
@@ -17,7 +19,20 @@ export interface IRCFAIssuesDocument extends IRCFAIssues, Document {
 export const rcfaIssuessSchema = new Schema({
   _id: field({ pkey: true }),
   rcfaId: field({ type: String, optional: true }),
+  code: field({ type: String, label: 'code' }),
+  order: field({ type: String, label: 'order' }),
   issue: field({ type: String, label: 'Issue' }),
   parentId: field({ type: String, optional: true }),
-  createdAt: field({ type: Date, default: Date.now })
+  isRooACause: field({ type: Boolean }),
+  status: field({
+    type: String,
+    enum: ['inProgress', 'closed'],
+    default: 'inProgress',
+    label: 'Status'
+  }),
+  createdAt: field({ type: Date, default: Date.now }),
+  closedAt: field({ type: Date, default: Date.now }),
+  relType: field({ type: String, optional: true }),
+  relTypeId: field({ type: String, optional: true }),
+  description: field({ type: String, optional: true })
 });

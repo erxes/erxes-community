@@ -20,6 +20,8 @@ type FinalProps = {
   addRcfaQuestions: any;
   editRcfaQuestions: any;
   deleteRcfaIssue: any;
+  closeRcfaIssue: any;
+  createActionInRoot: any;
 } & Props;
 
 class SectionContainer extends React.Component<FinalProps> {
@@ -32,7 +34,9 @@ class SectionContainer extends React.Component<FinalProps> {
       rcfaDetail,
       addRcfaQuestions,
       editRcfaQuestions,
+      closeRcfaIssue,
       deleteRcfaIssue,
+      createActionInRoot,
       mainType,
       mainTypeId
     } = this.props;
@@ -47,11 +51,17 @@ class SectionContainer extends React.Component<FinalProps> {
         mainType: mainType,
         mainTypeId: mainTypeId
       };
-      addRcfaQuestions({ variables: payload });
+      addRcfaQuestions({ variables: payload })
+        .then(() => {
+          rcfaDetail.refetch();
+        })
+        .catch(err => {
+          Alert.error(err.message);
+        });
     };
 
-    const editIssue = (_id: string, issue: string) => {
-      editRcfaQuestions({ variables: { _id, issue } }).catch(err =>
+    const editIssue = (_id: string, doc: any) => {
+      editRcfaQuestions({ variables: { _id, doc: { ...doc } } }).catch(err =>
         Alert.error(err.message)
       );
     };
@@ -62,6 +72,22 @@ class SectionContainer extends React.Component<FinalProps> {
       );
     };
 
+    const closeIssue = _id => {
+      closeRcfaIssue({ variables: { _id } }).catch(err => {
+        Alert.error(err.message);
+      });
+    };
+
+    const createRootAction = variables => {
+      createActionInRoot({ variables })
+        .then(() => {
+          Alert.success('Successfully created root action');
+        })
+        .catch(err => {
+          Alert.error(err.message);
+        });
+    };
+
     const { issues, ...detail } = rcfaDetail?.rcfaDetail || {};
 
     const updateProps = {
@@ -70,6 +96,9 @@ class SectionContainer extends React.Component<FinalProps> {
       addIssue,
       editIssue,
       removeIssue,
+      closeIssue,
+      createRootAction,
+      createActionInRoot,
       mainType,
       mainTypeId
     };
@@ -109,6 +138,14 @@ export default withProps<Props>(
     }),
     graphql<Props>(gql(mutations.removeIssue), {
       name: 'deleteRcfaIssue',
+      options: props => ({ refetchQueries: refetchQueries(props) })
+    }),
+    graphql<Props>(gql(mutations.closeIssue), {
+      name: 'closeRcfaIssue',
+      options: props => ({ refetchQueries: refetchQueries(props) })
+    }),
+    graphql<Props>(gql(mutations.createActionInRoot), {
+      name: 'createActionInRoot',
       options: props => ({ refetchQueries: refetchQueries(props) })
     })
   )(SectionContainer)

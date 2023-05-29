@@ -12,6 +12,7 @@ import { __ } from '@erxes/ui/src';
 type Props = {
   mainType: string;
   mainTypeId: string;
+  issueId: string;
   closeModal: () => void;
   callback: () => void;
 };
@@ -43,7 +44,8 @@ class rcfaCreateTaskModal extends React.Component<FinalProps, State> {
       mainTypeId,
       closeModal,
       callback,
-      resolveRCFA
+      resolveRCFA,
+      issueId
     } = this.props;
     const { stageId } = this.state;
 
@@ -56,7 +58,8 @@ class rcfaCreateTaskModal extends React.Component<FinalProps, State> {
         mainType,
         destinationType: 'task',
         itemId: mainTypeId,
-        destinationStageId: stageId
+        destinationStageId: stageId,
+        issueId
       };
 
       await resolveRCFA({ variables: payload });

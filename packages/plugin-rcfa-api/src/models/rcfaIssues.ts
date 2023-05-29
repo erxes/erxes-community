@@ -2,20 +2,26 @@ import { Model } from 'mongoose';
 import { IRCFAIssuesDocument, rcfaIssuessSchema } from './definitions/issues';
 import { IModels } from '../connectionResolver';
 import { IUserDocument } from '@erxes/api-utils/src/types';
+import { sendCardsMessage } from '../messageBroker';
 
 export interface IRCFAQuestionModel extends Model<IRCFAIssuesDocument> {
   addIssue(doc: any, user: any): Promise<IRCFAIssuesDocument>;
   editIssue(_id: string, doc: any): Promise<IRCFAIssuesDocument>;
   removeIssue(_id: string): Promise<IRCFAIssuesDocument>;
+  closeRootIssue(_id: string): Promise<IRCFAIssuesDocument>;
+  createActionRcfaRoot(params): Promise<IRCFAIssuesDocument>;
 }
 
 export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
   class Issues {
     public static async addIssue(doc: any, user: IUserDocument) {
       const { mainType, mainTypeId, parentId } = doc;
+      const parent = await models.Issues.findOne({ _id: parentId });
 
       const issueDoc = {
-        ...doc
+        ...doc,
+        code: doc.issue,
+        order: `${parent ? parent.order : ''}${doc.issue}/`
       };
 
       const rcfa = await models.RCFA.findOne({
@@ -36,23 +42,31 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
           throw new Error('RCFA is already in resolved');
         }
 
-        const countIssues = await models.Issues.countDocuments({
-          rcfaId: rcfa._id
-        });
-
-        if (countIssues === 5) {
-          throw new Error('You cannot add issue this rcfa');
+        const [{ status, countHierarchies }] = await models.Issues.aggregate([
+          { $match: { _id: issueDoc?.parentId } },
+          {
+            $graphLookup: {
+              from: 'rcfa_issues',
+              startWith: '$parentId',
+              connectFromField: 'parentId',
+              connectToField: '_id',
+              as: 'hierarchies'
+            }
+          },
+          {
+            $project: { status: 1, countHierarchies: { $size: '$hierarchies' } }
+          }
+        ]);
+        if (countHierarchies === 4) {
+          throw new Error('You cannot add issue this level of rcfa');
         }
 
+        if (status !== 'inProgress') {
+          throw new Error('You cannot add issue this level of rcfa');
+        }
         if (rcfa.userId !== user._id) {
           throw new Error('You cannot add issue this rcfa');
         }
-
-        const parent = await models.Issues.findOne({
-          rcfaId: rcfa._id
-        }).sort({ createdAt: -1 });
-
-        issueDoc.parentId = parent?._id;
 
         issueDoc.rcfaId = rcfa._id;
       }
@@ -75,6 +89,49 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
       }
 
       return issue?.remove();
+    }
+
+    public static async closeRootIssue(_id) {
+      const issueRoot = await models.Issues.findOne({ _id });
+
+      if (!issueRoot) {
+        throw new Error('Issue root not found');
+      }
+
+      return await models.Issues.updateMany(
+        { order: { $regex: new RegExp(issueRoot.order, 'i') } },
+        { $set: { status: 'closed', closedAt: new Date() } }
+      );
+    }
+
+    public static async createActionRcfaRoot(params) {
+      const { issueId, name } = params;
+      if (!issueId || !name) {
+        throw new Error('You should specify a issueID or name');
+      }
+
+      const issue = await models.Issues.findOne({ _id: issueId });
+      if (!issue) {
+        throw new Error('Issue Not Found');
+      }
+
+      const rcfa = await models.RCFA.findOne({ _id: issue?.rcfaId });
+
+      const childItem = await sendCardsMessage({
+        subdomain,
+        action: 'createChildItem',
+        data: {
+          type: rcfa?.mainType,
+          itemId: rcfa?.mainTypeId,
+          name
+        },
+        isRPC: true
+      });
+
+      return await models.Issues.updateOne(
+        { _id: issue?._id },
+        { relTypeId: childItem._id, relType: rcfa?.mainType }
+      );
     }
 
     public static async checkStatus(_id) {

@@ -7,14 +7,14 @@ const commonTypes = `
 `;
 
 const addIssue = `
-mutation AddRcfaIssue($issue: String, $mainType: String, $mainTypeId: String) {
-  addRcfaIssue(issue: $issue, mainType: $mainType, mainTypeId: $mainTypeId) { ${commonTypes} }
+mutation AddRcfaIssue($issue: String,$parentId:String ,$mainType: String, $mainTypeId: String) {
+  addRcfaIssue(issue: $issue,parentId:$parentId ,mainType: $mainType, mainTypeId: $mainTypeId) { ${commonTypes} }
 }
 `;
 
 const editIssue = `
-mutation EditRcfaIssue($_id: String, $issue: String) {
-  editRcfaIssue(_id: $_id, issue: $issue) { ${commonTypes} }
+mutation EditRcfaIssue($_id: String, $doc: JSON) {
+  editRcfaIssue(_id: $_id, doc: $doc) { ${commonTypes} }
 }
 `;
 
@@ -25,8 +25,8 @@ const removeIssue = `
 `;
 
 const resolveRCFA = `
-mutation ResolveRCFA($mainType: String, $mainTypeId: String, $destinationType: String, $destinationStageId: String) {
-  resolveRCFA(mainType: $mainType, mainTypeId: $mainTypeId, destinationType: $destinationType, destinationStageId: $destinationStageId) {
+mutation ResolveRCFA($mainType: String, $mainTypeId: String, $destinationType: String, $destinationStageId: String,$issueId:String) {
+  resolveRCFA(mainType: $mainType, mainTypeId: $mainTypeId, destinationType: $destinationType, destinationStageId: $destinationStageId,issueId:$issueId) {
     _id
     mainType
     mainTypeId
@@ -40,9 +40,23 @@ mutation ResolveRCFA($mainType: String, $mainTypeId: String, $destinationType: S
 }
 `;
 
+const closeIssue = `
+mutation CloseRcfaRoot($_id: String) {
+  closeRcfaRoot(_id: $_id)
+}
+`;
+
+const createActionInRoot = `
+mutation CreateActionRcfaRoot($issueId: String, $name: String) {
+  createActionRcfaRoot(issueId: $issueId, name: $name)
+}
+`;
+
 export default {
   addIssue,
   editIssue,
   removeIssue,
-  resolveRCFA
+  resolveRCFA,
+  closeIssue,
+  createActionInRoot
 };

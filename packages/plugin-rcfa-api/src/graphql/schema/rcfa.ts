@@ -28,7 +28,8 @@ const commonMutationParams = `
   mainType:String,
   mainTypeId:String,
   destinationType:String,
-  destinationStageId:String
+  destinationStageId:String,
+  issueId:String,
 `;
 
 export const mutations = `

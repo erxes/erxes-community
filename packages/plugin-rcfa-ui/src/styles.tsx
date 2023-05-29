@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import styledTS from 'styled-components-ts';
 
 export const StyledContent = styled.div`
-  padding: 1rem 1rem 0.5rem 1rem;
+  padding: 0 1rem;
 `;
 
 export const StyledListItem = styled.div`
@@ -74,6 +74,51 @@ export const ItemBtn = styledTS<{
   color?: string;
 }>(styled.div)`
   color: ${({ color }) => (color ? color : '')};
+  text-align: end;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+export const TriggerTabs = styled.div`
+  box-shadow: 0 2px 8px ${colors.shadowPrimary};
+  margin-bottom:10px;
+  .hxZkUW {
+    border: 1px solid ${colors.borderPrimary};
+    border-radius: 5px;
+    padding: 2px;
+
+    > span {
+      flex: 1;
+      flex-shrink: 0;
+      text-align: center;
+      font-weight: 500;
+      padding: ${dimensions.unitSpacing - 4}px ${dimensions.coreSpacing}px
+      border-radius: ${dimensions.unitSpacing - 5}px;
+      border-right: 1px solid ${colors.colorCoreGray}
+
+      &.active {
+        background: ${colors.colorSecondary};
+        color: ${colors.colorWhite};
+
+        &:before {
+          display: none;
+        }
+      }
+    }
+  }
+`;
+
+export const TabCaption = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const TabAction = styled.div`
+  padding-left: ${dimensions.unitSpacing}px;
+  color: ${colors.colorCoreGray};
   text-align: end;
 
   &:hover {
