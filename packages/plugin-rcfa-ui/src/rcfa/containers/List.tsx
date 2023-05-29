@@ -67,7 +67,10 @@ export default withProps<Props>(
           page: props.page,
           perPage: props.perPage,
           createdAtFrom: props.queryParams?.createdAtFrom,
-          createdAtTo: props.queryParams?.createdAtTo
+          createdAtTo: props.queryParams?.createdAtTo,
+          closedAtFrom: props.queryParams?.closedAtFrom,
+          closedAtTo: props.queryParams?.closedAtTo,
+          status: props.queryParams?.status
         },
         refetchQueries: rcfaRefetchQueries(props)
       })

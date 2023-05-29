@@ -26,8 +26,8 @@ const rcfa = `
 `;
 
 const rcfaList = `
-query RcfaList($mainType: String, $searchValue: String, $page: Int, $perPage: Int, $createdAtFrom: String, $createdAtTo: String) {
-  rcfaList(mainType: $mainType, searchValue: $searchValue, page: $page, perPage: $perPage, createdAtFrom: $createdAtFrom, createdAtTo: $createdAtTo) {
+query RcfaList($mainType: String, $searchValue: String, $page: Int, $perPage: Int, $createdAtFrom: String, $createdAtTo: String, $closedAtFrom: String, $closedAtTo: String, $status: String) {
+  rcfaList(mainType: $mainType, searchValue: $searchValue, page: $page, perPage: $perPage, createdAtFrom: $createdAtFrom, createdAtTo: $createdAtTo, closedAtFrom: $closedAtFrom, closedAtTo: $closedAtTo, status: $status) {
     list {
       _id
       mainType

@@ -2,7 +2,33 @@ import { paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 
 const generateFilters = async params => {
-  const filter: object = {};
+  const filter: any = {};
+  let createdAt = {};
+  let closedAt = {};
+
+  if (params.createdAtFrom) {
+    createdAt = { ...createdAt, $gt: params.createdAtFrom };
+    filter.createdAt = createdAt;
+  }
+
+  if (params.createdAtTo) {
+    createdAt = { ...createdAt, $lt: params.createdAtTo };
+    filter.createdAt = createdAt;
+  }
+
+  if (params.closedAtFrom) {
+    closedAt = { ...closedAt, $gt: params.closedAtFrom };
+    filter.closedAt = closedAt;
+  }
+
+  if (params.closedAtTo) {
+    closedAt = { ...closedAt, $lt: params.closedAtTo };
+    filter.closedAt = closedAt;
+  }
+
+  if (params.status) {
+    filter.status = params.status;
+  }
 
   return filter;
 };

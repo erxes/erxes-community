@@ -136,6 +136,7 @@ export const IssueItem = styled.div`
 export const CustomRangeContainer = styled.div`
   margin-top: 10px;
   margin-bottom: 10px;
+  margin-left: 10px;
   display: flex;
   align-items: flex-end;
   > div {
