@@ -85,6 +85,7 @@ export const types = () => `
     nextPayment:Float
     payedAmountSum:Float
     loanBalanceAmount:Float
+    expiredDays:Float
   }
 
 
