@@ -18,7 +18,7 @@ function displayValue(contract, name) {
     return <FlexItem>{formatValue(contract.primaryName)}</FlexItem>;
   }
 
-  return formatValue(value);
+  return formatValue(value ? value.toLocaleString() : value);
 }
 
 function ContractRow({ contract, history, isChecked, toggleBulk }: Props) {
