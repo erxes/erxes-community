@@ -2,9 +2,9 @@ import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import List from '../components/List';
-import gql from 'graphql-tag';
-import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { queries } from '../graphql';
+import { graphql } from '@apollo/client/react/hoc';
 
 type Props = {
   queryParams: any;

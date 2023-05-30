@@ -1,12 +1,12 @@
 import React from 'react';
 import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
-import gql from 'graphql-tag';
 import { queries } from '../graphql';
 import { IssueItem } from '../../styles';
 import Label from '@erxes/ui/src/components/Label';
 import Button from '@erxes/ui/src/components/Button';
 import { graphql } from '@apollo/client/react/hoc';
+import { gql } from '@apollo/client';
 
 type Props = {
   item: any;
