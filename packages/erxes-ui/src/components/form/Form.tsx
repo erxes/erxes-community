@@ -119,7 +119,7 @@ class Form extends React.Component<Props, State> {
       value &&
       props.type === 'number' &&
       !validator.isFloat(value) &&
-      !/^[0-9.,]+$/.test(value)
+      !/^[0-9.,-]+$/.test(value)
     ) {
       return (
         <Error>
