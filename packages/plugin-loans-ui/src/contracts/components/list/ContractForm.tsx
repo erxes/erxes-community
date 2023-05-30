@@ -655,7 +655,7 @@ class ContractForm extends React.Component<Props, State | any> {
 
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
-            Close
+            {__('Close')}
           </Button>
 
           {renderButton({
