@@ -141,7 +141,7 @@ export const CustomRangeContainer = styled.div`
   align-items: flex-end;
   > div {
     flex: 1;
-    margin-right: 8px;
+    margin-right: 10px;
     input[type='text'] {
       border: none;
       width: 100%;

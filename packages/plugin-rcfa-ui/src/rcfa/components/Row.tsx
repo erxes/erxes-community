@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { ModalTrigger } from '@erxes/ui/src';
+import { Label, ModalTrigger } from '@erxes/ui/src';
 import TableDetail from './TableDetail';
 
 type Props = {
@@ -14,14 +14,14 @@ class Row extends React.Component<Props> {
 
   render() {
     const { item } = this.props;
-
+    console.log('###', item);
     const trigger = (
       <tr>
         <td>{item.mainType || '-'}</td>
-        <td>{item?.sourceType || '-'}</td>
-        <td>{item?.source?.name || '-'}</td>
-        <td>{item?.type || '-'}</td>
-        {/* <td>{item?.name || '-'}</td> */}
+        <td>{item?.relType || '-'}</td>
+        <td>
+          <Label lblStyle="default">{item.status}</Label>
+        </td>
         <td>{moment(item?.createdAt).format('ll HH:mm') || '-'}</td>
         <td>
           {item.closedAt
