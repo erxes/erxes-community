@@ -184,7 +184,7 @@ class TransactionsList extends React.Component<IProps> {
               icon="cancel-1"
               onClick={onClick}
             >
-              Delete
+              {__('Delete')}
             </Button>
           )}
         </BarItems>

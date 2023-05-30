@@ -169,7 +169,7 @@ class ContractTypesList extends React.Component<IProps, State> {
             icon="cancel-1"
             onClick={onClick}
           >
-            Delete
+            {__('Delete')}
           </Button>
         </BarItems>
       );
