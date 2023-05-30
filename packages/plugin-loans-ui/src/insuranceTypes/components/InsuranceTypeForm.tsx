@@ -77,7 +77,7 @@ class InsuranceTypeForm extends React.Component<Props, State> {
   renderFormGroup = (label, props) => {
     return (
       <FormGroup>
-        <ControlLabel>{__(label)}</ControlLabel>
+        <ControlLabel required={props.required}>{__(label)}</ControlLabel>
         <FormControl {...props} />
       </FormGroup>
     );
@@ -114,7 +114,7 @@ class InsuranceTypeForm extends React.Component<Props, State> {
 
               {isEnabled('contacts') && (
                 <FormGroup>
-                  <ControlLabel>{__('Company')}</ControlLabel>
+                  <ControlLabel required>{__('Company')}</ControlLabel>
                   <SelectCompanies
                     label="Choose an company"
                     name="companyId"

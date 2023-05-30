@@ -67,7 +67,7 @@ class ContractTypeForm extends React.Component<Props, State> {
   renderFormGroup = (label, props) => {
     return (
       <FormGroup>
-        <ControlLabel>{__(label)}</ControlLabel>
+        <ControlLabel required={props.required}>{__(label)}</ControlLabel>
         <FormControl {...props} />
       </FormGroup>
     );
