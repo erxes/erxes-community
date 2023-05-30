@@ -102,11 +102,13 @@ class InsuranceTypeForm extends React.Component<Props, State> {
               {this.renderFormGroup('Code', {
                 ...formProps,
                 name: 'code',
+                required: true,
                 defaultValue: insuranceType.code || ''
               })}
               {this.renderFormGroup('Name', {
                 ...formProps,
                 name: 'name',
+                required: true,
                 defaultValue: insuranceType.name || ''
               })}
 
@@ -117,6 +119,7 @@ class InsuranceTypeForm extends React.Component<Props, State> {
                     label="Choose an company"
                     name="companyId"
                     initialValue={companyId}
+                    required
                     onSelect={onSelectCompany}
                     multi={false}
                   />
