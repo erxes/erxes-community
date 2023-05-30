@@ -181,6 +181,7 @@ const stageCommon = `
   pipelineId
   code
   age
+  defaultTick
 `;
 
 const stages = `
@@ -322,9 +323,13 @@ const conversionStages = `
     ) {
       ${stageCommon}
       compareNextStage
+      compareNextStagePurchase
       initialDealsTotalCount
       stayedDealsTotalCount
       inProcessDealsTotalCount
+      initialPurchasesTotalCount
+      stayedPurchasesTotalCount
+      inProcessPurchasesTotalCount
     }
   }
 `;
@@ -347,6 +352,7 @@ const boardItemQueryParamsDef = `
   $skip: Int,
   $limit: Int,
   $tagIds: [String],
+  $searchValue: String,
 `;
 
 const boardItemQueryParams = `
@@ -356,6 +362,7 @@ const boardItemQueryParams = `
   skip: $skip,
   limit: $limit,
   tagIds: $tagIds,
+  search: $searchValue,
 `;
 
 const tasks = `
@@ -377,6 +384,14 @@ const tickets = `
 const deals = `
   query deals(${boardItemQueryParamsDef}) {
     deals(${boardItemQueryParams}) {
+      ${cardFields}
+    }
+  }
+`;
+
+const purchases = `
+  query purchases(${boardItemQueryParamsDef}) {
+    purchases(${boardItemQueryParams}) {
       ${cardFields}
     }
   }
@@ -434,5 +449,6 @@ export default {
   tasks,
   boardContentTypeDetail,
   boardLogs,
-  documents
+  documents,
+  purchases
 };

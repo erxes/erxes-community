@@ -7,7 +7,7 @@ import ControlLabel from '@erxes/ui/src/components/form/Label';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import PerformDetail from './PerformDetail';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
@@ -18,7 +18,7 @@ import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectC
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectJobRefer from '../../job/containers/refer/SelectJobRefer';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
-import { __ } from '@erxes/ui/src/utils';
+import { __ } from 'coreui/utils';
 import { AddTrigger, TableOver } from '../../styles';
 import {
   DateContainer,

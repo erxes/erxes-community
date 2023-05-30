@@ -1,5 +1,27 @@
 import React from 'react';
 
+const getRows = stocks => {
+  let res = '';
+  let ind = 0;
+  for (const stock of stocks) {
+    ind += 1;
+    res = res.concat(`
+    <tr class="inventory-info">
+      <td colspan="4">
+        ${ind}. ${stock.code} - ${stock.name}
+      </td>
+    </tr>
+    <tr>
+      <td>${stock.unitPrice}</td>
+      <td colspan="1">${stock.qty}</td>
+      <td>${stock.vat}</td>
+      <td>${stock.totalAmount}</td>
+    </tr>
+    `);
+  }
+  return res;
+};
+
 export default (response, counter?) => {
   return `
     <div class="receipt" id="taxtype-${response.taxType}">
@@ -20,12 +42,14 @@ export default (response, counter?) => {
           ? `
             <div>
               <p>ТТД: ${response.registerNo}</p>
-              ${response.billId && `<p>ДДТД: ${response.billId}</p>`}
+              ${(response.billId && `<p>ДДТД: ${response.billId}</p>`) || ''}
               <p>Огноо: ${response.date}</p>
               ${(response.number && `<p>№: ${response.number}</p>`) || ''}
             </div>
 
-            ${`<div>
+            ${
+              response.customerNo || response.customerName
+                ? `<div>
                 <br />
                 <p><strong>Худалдан авагч:</strong></p>
                 ${
@@ -39,7 +63,9 @@ export default (response, counter?) => {
                     : ''
                 }
                 <br />
-              </div>`}
+              </div>`
+                : ''
+            }
 
             <table class="tb" cellpadding="0" cellspacing="0">
               <thead>
@@ -50,21 +76,9 @@ export default (response, counter?) => {
                   <th>Нийт үнэ</th>
                 </tr>
               </thead>
-              ${(response.stocks || []).map(
-                (stock, index) => `
-                  <tr class="inventory-info">
-                    <td colspan="4">
-                      ${index + 1}. ${stock.code} - ${stock.name}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>${stock.unitPrice}</td>
-                    <td colspan="1">${stock.qty}</td>
-                    <td>${stock.vat || 0}</td>
-                    <td>${stock.totalAmount}</td>
-                  </tr>
-                `
-              )}
+              <tbody>
+              ${getRows(response.stocks || [])}
+              </tbody>
             </table>
 
             <div class="total">

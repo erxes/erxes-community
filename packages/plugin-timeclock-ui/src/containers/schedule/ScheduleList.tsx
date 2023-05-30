@@ -1,6 +1,6 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/client/react/hoc';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import ScheduleList from '../../components/schedule/ScheduleList';
@@ -278,7 +278,7 @@ export default withProps<Props>(
         name: 'sendScheduleReqMutation',
         options: ({ userId, requestedShifts }) => ({
           variables: {
-            userId: `${userId}`,
+            userId,
             shifts: requestedShifts
           },
           refetchQueries: ['schedulesMain']
@@ -289,7 +289,7 @@ export default withProps<Props>(
       name: 'submitScheduleMutation',
       options: ({ userIds, requestedShifts }) => ({
         variables: {
-          userIds: `${userIds}`,
+          userIds,
           shifts: `${requestedShifts}`
         },
         refetchQueries: ['schedulesMain']

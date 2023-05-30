@@ -1,6 +1,6 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/client/react/hoc';
 import { Alert, withProps, confirm } from '@erxes/ui/src/utils';
 import List from '../../components/timeclock/TimeclockList';
 import {
@@ -15,9 +15,13 @@ import { mutations } from '../../graphql';
 import dayjs from 'dayjs';
 import { generateParams } from '../../utils';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { IDepartment, IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
   currentUser: IUser;
+  departments: IDepartment[];
+  branches: IBranch[];
+
   queryParams: any;
   history: any;
   isCurrentUserAdmin: boolean;

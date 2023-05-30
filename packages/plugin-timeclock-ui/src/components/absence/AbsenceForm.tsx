@@ -33,6 +33,8 @@ import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
   currentUser: IUser;
+  departments: IDepartment[];
+  branches: IBranch[];
 
   absenceTypes: IAbsenceType[];
   history: any;
@@ -52,9 +54,6 @@ type Props = {
     totalHoursOfAbsence: string
   ) => void;
   contentProps: any;
-
-  departments: IDepartment[];
-  branches: IBranch[];
 };
 
 type TimeRange = {
@@ -106,6 +105,9 @@ export default (props: Props) => {
       totalUserOptions.push(...branch.userIds);
     }
 
+    if (currentUser) {
+      totalUserOptions.push(currentUser._id);
+    }
     return totalUserOptions;
   };
 
