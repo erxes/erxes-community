@@ -9,7 +9,6 @@ const productFields = `
   vendorId
   description
   unitPrice
-  sku
   barcodes
   barcodeDescription
   ${
@@ -42,9 +41,6 @@ const productFields = `
     size
     type
   }
-  supply
-  productCount
-  minimiumCount
   uomId
   uom {
     _id

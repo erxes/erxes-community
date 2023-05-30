@@ -9,7 +9,7 @@ import {
   IFormProps
 } from '@erxes/ui/src/types';
 import { IConfigsMap, IProduct, IProductCategory, IUom } from '../types';
-import { PRODUCT_SUPPLY, TAX_TYPES, TYPES } from '../constants';
+import { TAX_TYPES, TYPES } from '../constants';
 import { BarcodeContainer, BarcodeItem } from '../styles';
 import {
   extractAttachment,
@@ -40,12 +40,9 @@ type Props = {
 };
 
 type State = {
-  disabled: boolean;
   barcodes: string[];
   barcodeInput: string;
   barcodeDescription: string;
-  productCount: number;
-  minimiumCount: number;
   attachment?: IAttachment;
   attachmentMore?: IAttachment[];
   vendorId: string;
@@ -66,9 +63,6 @@ class Form extends React.Component<Props, State> {
       attachmentMore,
       barcodes,
       barcodeDescription,
-      supply,
-      productCount,
-      minimiumCount,
       vendorId,
       description,
       uomId,
@@ -80,12 +74,9 @@ class Form extends React.Component<Props, State> {
     const defaultUom = props.configsMap.defaultUOM || '';
 
     this.state = {
-      disabled: supply === 'limited' ? false : true,
       barcodes: barcodes ? barcodes : [],
       barcodeInput: '',
       barcodeDescription: barcodeDescription ? barcodeDescription : '',
-      productCount: productCount ? productCount : 0,
-      minimiumCount: minimiumCount ? minimiumCount : 0,
       attachment: attachment ? attachment : undefined,
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
@@ -114,10 +105,8 @@ class Form extends React.Component<Props, State> {
     const {
       attachment,
       attachmentMore,
-      productCount,
       barcodes,
       barcodeDescription,
-      minimiumCount,
       vendorId,
       description,
       uomId,
@@ -136,8 +125,6 @@ class Form extends React.Component<Props, State> {
       attachmentMore,
       barcodes,
       barcodeDescription,
-      productCount,
-      minimiumCount,
       vendorId,
       description,
       uomId,
@@ -322,18 +309,6 @@ class Form extends React.Component<Props, State> {
     this.setState({ barcodes: [...splicedBarcodes] });
   };
 
-  onSupplyChange = e => {
-    const { productCount, minimiumCount } = this.state;
-    const islimited = e.target.value === 'limited';
-    const isUnique = e.target.value === 'unique';
-
-    this.setState({
-      disabled: islimited ? false : true,
-      productCount: islimited ? productCount : isUnique ? 1 : 0,
-      minimiumCount: islimited ? minimiumCount : 0
-    });
-  };
-
   onTaxChange = e => {
     this.setState({
       [e.target.name]: e.target.value
@@ -368,9 +343,6 @@ class Form extends React.Component<Props, State> {
       vendorId,
       description,
       barcodeDescription,
-      productCount,
-      disabled,
-      minimiumCount,
       taxType,
       taxCode
     } = this.state;
@@ -528,48 +500,6 @@ class Form extends React.Component<Props, State> {
           </FormColumn>
           <FormColumn>
             <FormGroup>
-              <ControlLabel>Product supply</ControlLabel>
-              <FormControl
-                {...formProps}
-                name="supply"
-                componentClass="select"
-                onChange={this.onSupplyChange}
-                defaultValue={object.supply}
-                options={PRODUCT_SUPPLY}
-              />
-            </FormGroup>
-
-            <FormWrapper>
-              <FormColumn>
-                <FormGroup>
-                  <ControlLabel>Product count</ControlLabel>
-                  <FormControl
-                    {...formProps}
-                    name="productCount"
-                    value={productCount}
-                    disabled={disabled}
-                    onChange={this.onComboEvent.bind(this, 'productCount')}
-                    type="number"
-                  />
-                </FormGroup>
-              </FormColumn>
-              <FormColumn>
-                <FormGroup>
-                  <ControlLabel>Minimium count</ControlLabel>
-
-                  <FormControl
-                    {...formProps}
-                    name="minimiumCount"
-                    value={minimiumCount}
-                    disabled={disabled}
-                    onChange={this.onComboEvent.bind(this, 'minimiumCount')}
-                    type="number"
-                  />
-                </FormGroup>
-              </FormColumn>
-            </FormWrapper>
-
-            <FormGroup>
               <ControlLabel>Featured image</ControlLabel>
               <Uploader
                 defaultFileList={attachments}
@@ -648,18 +578,6 @@ class Form extends React.Component<Props, State> {
                 ]}
               />
             </FormGroup>
-
-            {!isUom && (
-              <FormGroup>
-                <ControlLabel>SKU</ControlLabel>
-                <FormControl
-                  {...formProps}
-                  name="sku"
-                  defaultValue={object.sku}
-                />
-              </FormGroup>
-            )}
-
             {isUom && (
               <>
                 <FormGroup>

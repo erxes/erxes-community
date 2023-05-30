@@ -47,7 +47,6 @@ export const types = (tagsAvailable, contactsAvailable) => `
     code: String
     type: String
     description: String
-    sku: String
     barcodes: [String]
     barcodeDescription: String
     unitPrice: Float
@@ -60,9 +59,6 @@ export const types = (tagsAvailable, contactsAvailable) => `
     attachment: Attachment
     attachmentMore: [Attachment]
     vendorId: String
-    supply: String
-    productCount: Int
-    minimiumCount: Int
     uomId: String
     subUoms: JSON
 
@@ -80,7 +76,6 @@ const productParams = `
   categoryId: String,
   type: String,
   description: String,
-  sku: String,
   barcodes: [String],
   barcodeDescription: String,
   unitPrice: Float,
@@ -88,9 +83,6 @@ const productParams = `
   customFieldsData: JSON,
   attachment: AttachmentInput,
   attachmentMore: [AttachmentInput],
-  supply: String,
-  productCount: Int,
-  minimiumCount: Int,
   vendorId: String,
   uomId: String,
   subUoms: JSON,

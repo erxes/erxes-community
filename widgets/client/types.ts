@@ -215,8 +215,5 @@ export interface IProduct {
 
   attachment?: any;
   attachmentMore?: any[];
-  supply: string;
-  productCount: number;
-  minimiumCount: number;
   category: IProductCategory;
 }

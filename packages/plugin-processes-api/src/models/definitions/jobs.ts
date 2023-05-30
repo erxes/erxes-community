@@ -11,7 +11,6 @@ export interface IProduct {
   categoryCode?: string;
   type?: string;
   description?: string;
-  sku?: string;
   unitPrice?: number;
   code: string;
   barcodes: string[];
@@ -20,9 +19,6 @@ export interface IProduct {
   attachment?: any;
   attachmentMore?: any[];
   status?: string;
-  supply?: string;
-  productCount?: number;
-  minimiumCount?: number;
   vendorId?: string;
   vendorCode?: string;
 
