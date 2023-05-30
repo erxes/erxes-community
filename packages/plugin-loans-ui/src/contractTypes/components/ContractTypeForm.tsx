@@ -96,23 +96,27 @@ class ContractTypeForm extends React.Component<Props, State> {
               {this.renderFormGroup('Code', {
                 ...formProps,
                 name: 'code',
+                required: true,
                 defaultValue: contractType.code || ''
               })}
               {this.renderFormGroup('Name', {
                 ...formProps,
                 name: 'name',
+                required: true,
                 defaultValue: contractType.name || ''
               })}
               {this.renderFormGroup('Start Number', {
                 ...formProps,
                 name: 'number',
+                required: true,
                 defaultValue: contractType.number || ''
               })}
               {this.renderFormGroup('After vacancy count', {
                 ...formProps,
                 name: 'vacancy',
+                required: true,
                 type: 'number',
-                defaultValue: contractType.vacancy || 0,
+                defaultValue: contractType.vacancy || 1,
                 max: 20
               })}
               {this.renderFormGroup('Undue Percent', {
