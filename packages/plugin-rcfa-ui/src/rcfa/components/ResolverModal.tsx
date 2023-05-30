@@ -3,7 +3,7 @@ import BoardSelect from '@erxes/ui-cards/src/boards/containers/BoardSelect';
 
 import Button from '@erxes/ui/src/components/Button';
 import { withProps } from '@erxes/ui/src/utils/core';
-import { graphql } from 'react-apollo';
+import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { mutations } from '../graphql';
 import * as compose from 'lodash.flowright';
 import gql from 'graphql-tag';

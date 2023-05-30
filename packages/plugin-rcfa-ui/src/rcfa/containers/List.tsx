@@ -3,7 +3,7 @@ import * as compose from 'lodash.flowright';
 import React from 'react';
 import List from '../components/List';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { queries } from '../graphql';
 
 type Props = {

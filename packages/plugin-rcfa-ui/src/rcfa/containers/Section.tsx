@@ -2,8 +2,8 @@ import { withProps } from '@erxes/ui/src/utils/core';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import Section from '../components/Section';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
+import { graphql, withApollo, ChildProps } from '@apollo/client/react/hoc';
 import { mutations, queries } from '../graphql';
 import { Alert, Spinner } from '@erxes/ui/src';
 
