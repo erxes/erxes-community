@@ -1,4 +1,8 @@
-import { isEnabled, renderFullName } from '@erxes/ui/src/utils/core';
+import {
+  isEnabled,
+  loadDynamicComponent,
+  renderFullName
+} from '@erxes/ui/src/utils/core';
 
 import Box from '@erxes/ui/src/components/Box';
 import CompanySection from '@erxes/ui-contacts/src/companies/components/CompanySection';
@@ -73,6 +77,25 @@ export default class RightSidebar extends React.Component<Props> {
     );
   }
 
+  renderAddress = () => {
+    if (!isEnabled('osm')) {
+      return null;
+    }
+    console.log('renderAddress');
+    const { customer } = this.props;
+    const { primaryAddress } = customer;
+
+    const mapProps = {
+      id: `customerAddress-${customer._id}`,
+      width: '100%',
+      height: '300px',
+      zoom: 15,
+      center: primaryAddress && primaryAddress.location
+    };
+
+    return loadDynamicComponent('osMap', mapProps);
+  };
+
   render() {
     const { customer } = this.props;
 
@@ -80,6 +103,7 @@ export default class RightSidebar extends React.Component<Props> {
 
     return (
       <Sidebar>
+        {this.renderAddress()}
         <CompanySection mainType="customer" mainTypeId={customer._id} />
         {isEnabled('cards') && (
           <>

@@ -100,6 +100,7 @@ const deals = `
       limit: $limit,
       ${commonParamDefs}
     ) {
+      order
       products
       amount
       ${commonListFields}

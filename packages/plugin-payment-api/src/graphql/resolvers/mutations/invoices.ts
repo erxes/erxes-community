@@ -26,7 +26,7 @@ const mutations = {
       ? `${getEnv({ name: 'DOMAIN', subdomain })}/gateway`
       : 'http://localhost:4000';
 
-    const cookies = requestInfo.cookies;
+    const cookies = requestInfo.cookies || {};
 
     const paymentCookies = Object.keys(cookies).filter(key =>
       key.includes('paymentData')

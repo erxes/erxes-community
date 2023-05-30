@@ -1171,6 +1171,7 @@ export const getItemList = async (
     serverTiming.endTime('getItemsFields');
   }
 
+  let order = 0;
   for (const item of list) {
     if (
       item.customFieldsData &&
@@ -1196,6 +1197,7 @@ export const getItemList = async (
 
     updatedList.push({
       ...item,
+      order: order++,
       isWatched: (item.watchedUserIds || []).includes(user._id),
       hasNotified: notification ? false : true,
       customers: getCocsByItemId(item._id, customerIdsByItemId, customers),

@@ -120,6 +120,7 @@ export const commonListTypes = `
   companies: JSON
   customers: JSON
   assignedUsers: JSON
+  order: JSON
   stage: JSON
   labels: JSON
   isComplete: Boolean
