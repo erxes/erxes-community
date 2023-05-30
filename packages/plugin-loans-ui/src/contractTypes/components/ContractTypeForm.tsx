@@ -1,5 +1,4 @@
 import {
-  __,
   Button,
   ControlLabel,
   Form,
@@ -14,6 +13,7 @@ import { IProductCategory } from '@erxes/ui-products/src/types';
 import Select from 'react-select-plus';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React from 'react';
+import { __ } from 'coreui/utils';
 
 import { IContractType, IContractTypeDoc } from '../types';
 
@@ -67,7 +67,7 @@ class ContractTypeForm extends React.Component<Props, State> {
   renderFormGroup = (label, props) => {
     return (
       <FormGroup>
-        <ControlLabel>{label}</ControlLabel>
+        <ControlLabel>{__(label)}</ControlLabel>
         <FormControl {...props} />
       </FormGroup>
     );
@@ -118,7 +118,8 @@ class ContractTypeForm extends React.Component<Props, State> {
               {this.renderFormGroup('Undue Percent', {
                 ...formProps,
                 name: 'unduePercent',
-                defaultValue: contractType.unduePercent || ''
+                defaultValue: contractType.unduePercent || '',
+                type: 'number'
               })}
               <FormGroup>
                 <ControlLabel>{__('Lease Type')}:</ControlLabel>
@@ -140,7 +141,7 @@ class ContractTypeForm extends React.Component<Props, State> {
               </FormGroup>
 
               <FormGroup>
-                <ControlLabel>Allow Product Categories</ControlLabel>
+                <ControlLabel>{__('Allow Product Categories')}</ControlLabel>
                 <Select
                   className="flex-item"
                   placeholder={__('Select product categories')}
