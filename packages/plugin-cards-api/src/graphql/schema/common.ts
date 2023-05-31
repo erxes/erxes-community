@@ -142,4 +142,5 @@ export const commonListTypes = `
   branches:[Branch]
   departmentIds: [String]
   departments:[Department]
+  order: Int
 `;
