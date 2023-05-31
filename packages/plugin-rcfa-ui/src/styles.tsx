@@ -177,3 +177,39 @@ export const AutomationFormContainer = styled(Contents)`
     margin: 0;
   }
 `;
+
+export const BackButton = styled.div`
+  width: 35px;
+  height: 35px;
+  border-radius: 35px;
+  line-height: 35px;
+  background: rgba(0, 0, 0, 0.12);
+  text-align: center;
+  margin-right: ${dimensions.unitSpacing}px;
+  color: ${colors.textPrimary};
+  transition: all ease 0.3s;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.18);
+  }
+`;
+
+export const RCFAEndPoint = styled.div`
+  position: absolute;
+  width: 300px;
+  height: auto;
+  display: inline;
+  background-color: red;
+  padding: 0.5rem;
+  cursor: pointer;
+  background: rgb(245, 245, 245);
+  border: 1px solid rgb(238, 238, 238);
+  border-radius: 8px;
+  margin-left: 20px;
+
+  p {
+    text-align: center;
+    margin-bottom: 0;
+  }
+`;

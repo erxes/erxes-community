@@ -2,7 +2,8 @@ import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import React from 'react';
 import { Route } from 'react-router-dom';
 import queryString from 'query-string';
-import rcfaDetail from './rcfa/containers/rcfaDetail';
+import rcfaDetail from './rcfa/containers/detail/rcfaDetail';
+
 const RCFAList = asyncComponent(() =>
   import(/* webpackChunkName: "List - RCFA" */ './rcfa/containers/List')
 );
