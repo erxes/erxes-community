@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
-import { Label, ModalTrigger } from '@erxes/ui/src';
-import TableDetail from './TableDetail';
+import { Button, Label } from '@erxes/ui/src';
+import { Link } from 'react-router-dom';
 
 type Props = {
   item: any;
@@ -14,8 +14,8 @@ class Row extends React.Component<Props> {
 
   render() {
     const { item } = this.props;
-    console.log('###', item);
-    const trigger = (
+
+    const tableRow = (
       <tr>
         <td>{item.mainType || '-'}</td>
         <td>{item?.relType || '-'}</td>
@@ -28,16 +28,15 @@ class Row extends React.Component<Props> {
             ? moment(item.closedAt).format('ll HH:mm') || '-'
             : '-'}
         </td>
+        <td>
+          <Link to={`/rcfa/detail/${item._id}`}>
+            <Button size="small">View</Button>
+          </Link>
+        </td>
       </tr>
     );
 
-    const content = () => {
-      return <TableDetail item={item} />;
-    };
-
-    return (
-      <ModalTrigger title="Detail RCFA" content={content} trigger={trigger} />
-    );
+    return tableRow;
   }
 }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import BoardSelect from '@erxes/ui-cards/src/boards/containers/BoardSelect';
-
 import Button from '@erxes/ui/src/components/Button';
 import { withProps } from '@erxes/ui/src/utils/core';
 import { gql } from '@apollo/client';

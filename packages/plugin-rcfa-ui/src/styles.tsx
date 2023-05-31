@@ -1,6 +1,7 @@
 import { colors, dimensions } from '@erxes/ui/src';
 import styled, { css } from 'styled-components';
 import styledTS from 'styled-components-ts';
+import { Contents } from '@erxes/ui/src/layout/styles';
 
 export const StyledContent = styled.div`
   padding: 0 1rem;
@@ -161,5 +162,18 @@ export const CustomRangeContainer = styled.div`
 export const EndDateContainer = styled.div`
   .rdtPicker {
     left: -98px !important;
+  }
+`;
+
+export const HeightedWrapper = styled.div`
+  flex: 1;
+  position: relative;
+`;
+
+export const AutomationFormContainer = styled(Contents)`
+  margin: 0;
+
+  > section {
+    margin: 0;
   }
 `;

@@ -31,7 +31,7 @@ class rcfaTable extends React.Component<Props, State> {
   }
 
   renderContent() {
-    const { list, history, queryParams } = this.props;
+    const { list } = this.props;
 
     return (
       <div>
@@ -43,6 +43,7 @@ class rcfaTable extends React.Component<Props, State> {
               <th>{__('Status')}</th>
               <th>{__('Created at')}</th>
               <th>{__('Closed at')}</th>
+              <th>{__('Detail')}</th>
             </tr>
           </thead>
           <tbody>
