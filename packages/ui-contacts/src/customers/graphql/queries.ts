@@ -152,6 +152,14 @@ const customerCounts = `
   }
 `;
 
+const addressFields = `
+  lat
+  lng
+  osmId
+  short
+  isPrimary
+`;
+
 const customerDetail = `
   query customerDetail($_id: String!) {
     customerDetail(_id: $_id) {
@@ -172,6 +180,14 @@ const customerDetail = `
         _id
         primaryName
         website
+      }
+
+      addresses {
+        ${addressFields}
+      }
+
+      primaryAddress {
+        ${addressFields}
       }
     }
   }

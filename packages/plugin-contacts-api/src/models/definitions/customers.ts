@@ -35,7 +35,7 @@ export interface IAddress {
 
   isPrimary?: boolean;
 
-  address?: {
+  detail?: {
     building: string;
     city: string;
     cityDistrict: string;
@@ -145,7 +145,7 @@ export const addressSchema = new Schema(
     lng: field({ type: Number, label: 'Longitude', optional: true }),
     isPrimary: field({ type: Boolean, label: 'Is primary', optional: true }),
 
-    address: field({
+    detail: field({
       building: field({ type: String, label: 'Building', optional: true }),
       city: field({ type: String, label: 'City', optional: true }),
       cityDistrict: field({

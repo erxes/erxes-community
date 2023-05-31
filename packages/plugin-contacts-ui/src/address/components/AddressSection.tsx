@@ -13,6 +13,9 @@ import {
   SidebarList
 } from '@erxes/ui/src/layout/styles';
 import { AddressDetail } from '../styles';
+import { Alert } from '@erxes/ui/src/utils';
+import FormControl from '@erxes/ui/src/components/form/Control';
+import Tip from '@erxes/ui/src/components/Tip';
 
 export type Props = {
   _id: string;
@@ -55,7 +58,7 @@ export default function Component(props: Props) {
       .then(data => {
         const { address } = data;
         const updatedAddress = addresses[index];
-        updatedAddress.address = {
+        updatedAddress.detail = {
           ...address,
           countryCode: address.country_code,
           cityDistrict: address.city_district,
@@ -73,11 +76,12 @@ export default function Component(props: Props) {
   };
 
   const onChangePrimary = (index: number) => {
-    addresses.forEach((address, i) => {
-      address.isPrimary = i === index;
-    });
+    const updatedAddresses = addresses.map((address, i) => ({
+      ...address,
+      isPrimary: i === index
+    }));
 
-    setAddresses([...addresses]);
+    setAddresses(updatedAddresses);
   };
 
   const renderBody = () => {
@@ -117,7 +121,7 @@ export default function Component(props: Props) {
           <AddressDetail
             key={index}
             onClick={() => {
-              onChangePrimary(index);
+              // onChangePrimary(index);
             }}
           >
             <SidebarList className="no-link">
@@ -131,15 +135,25 @@ export default function Component(props: Props) {
               </li>
 
               <li>
-                <FieldStyle overflow="unset">{__('Status')}</FieldStyle>
+                <FieldStyle overflow="unset">{__('Default')}</FieldStyle>
                 <SidebarCounter>
-                  {address.isPrimary ? (
-                    <Label lblStyle="success">Default</Label>
-                  ) : (
-                    <Label lblStyle="simple">Not default</Label>
-                  )}
+                  <FormControl
+                    componentClass="checkbox"
+                    checked={address.isPrimary}
+                    onChange={() => {
+                      onChangePrimary(index);
+                    }}
+                  />
                 </SidebarCounter>
               </li>
+              <Tip text={'Remove Schedule'} placement="top">
+                <Button
+                  size="small"
+                  icon="times-circle"
+                  // btnStyle="link"
+                  // onClick={() => removeSchedule(scheduleOfMember._id, 'schedule')}
+                />
+              </Tip>
             </SidebarList>
           </AddressDetail>
         ))}
@@ -153,7 +167,7 @@ export default function Component(props: Props) {
       lat: userLocation.lat,
       lng: userLocation.lng,
       isPrimary: addresses.length === 0,
-      address: {
+      detail: {
         countryCode: '',
         country: '',
         postcode: '',
@@ -167,12 +181,24 @@ export default function Component(props: Props) {
         other: ''
       },
       short: '',
-      osmId: Math.random().toString()
+      osmId: `temporary-${Math.random()}`
     };
 
     setAddresses([...addresses, newAddress]);
 
     setIsEditing(true);
+  };
+
+  const onSave = () => {
+    const incomplete = addresses.filter(address =>
+      String(address.osmId).startsWith('temporary')
+    );
+    if (incomplete.length > 0) {
+      return Alert.warning('Please complete all addresses');
+    }
+
+    props.save(addresses);
+    setIsEditing(false);
   };
 
   const extraButtons = (
@@ -200,14 +226,7 @@ export default function Component(props: Props) {
         >
           Discard
         </Button>
-        <Button
-          btnStyle="success"
-          icon="check-circle"
-          onClick={() => {
-            props.save(addresses);
-            setIsEditing(false);
-          }}
-        >
+        <Button btnStyle="success" icon="check-circle" onClick={onSave}>
           Save
         </Button>
       </Sidebar.Footer>

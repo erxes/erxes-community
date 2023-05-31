@@ -23,7 +23,7 @@ export interface IAddress {
   lng: number;
   isPrimary?: boolean;
 
-  address?: {
+  detail?: {
     building: string;
     city: string;
     cityDistrict: string;

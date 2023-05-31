@@ -34,10 +34,13 @@ function Container(props: Props) {
   //     fetchPolicy: 'network-only'
   //   });
 
-  const [deleteMutation] = useMutation(customerAddressMutation);
+  const [editMutation] = useMutation(customerAddressMutation);
 
-  const editAddresses = (addresses: IAddress[]) => {
-    console.log('editAddresses', addresses);
+  const editAddresses = (newAddresses: IAddress[]) => {
+    // console.log('editAddresses', addresses);
+    editMutation({
+      variables: { id: _id, addresses: newAddresses }
+    });
   };
 
   return <AddressSection {...props} save={editAddresses} />;

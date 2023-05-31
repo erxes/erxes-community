@@ -19,13 +19,14 @@ export const types = (tagsEnabled, inboxEnabled) => `
     road: String
     suburb: String
     street: String
-    other: String
+    other: String 
   }
 
   type Address {
     lat: Float
     lng: Float
 
+    isPrimary: Boolean
     detail: AddressDetail
     short: String
     osmId: String
