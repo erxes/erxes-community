@@ -7,7 +7,8 @@ import {
   ShowReplies,
   ShowReplyButtonWrapper,
   SpaceBetweenRow,
-  ToolBar
+  ToolBar,
+  NewEmailHeader
 } from './styles';
 import { FlexRow, Subject } from './styles';
 import { IEmail, IMail, IMessage } from '@erxes/ui-inbox/src/inbox/types';
@@ -65,6 +66,10 @@ type Props = {
   }) => void;
   verifiedEmails: string[];
   history: any;
+  shrink?: boolean;
+  isWidget?: boolean;
+  changeShrink?: () => void;
+  hideWidget?: () => void;
 };
 
 type State = {
@@ -96,11 +101,22 @@ class MailForm extends React.Component<Props, State> {
 
     const { isForward, replyAll, mailData = {} as IMail } = props;
 
-    const cc = replyAll ? formatObj(mailData.cc || []) : '';
-    const bcc = replyAll ? formatObj(mailData.bcc || []) : '';
+    const mailWidget = JSON.parse(localStorage.getItem('emailWidgetData'));
+
+    const cc = replyAll
+      ? formatObj(mailData.cc || [])
+      : mailWidget
+      ? mailWidget.cc
+      : '';
+    const bcc = replyAll
+      ? formatObj(mailData.bcc || [])
+      : mailWidget
+      ? mailWidget.bcc
+      : '';
 
     const [from] = mailData.from || ([{}] as IEmail[]);
-    const sender = this.getEmailSender(from.email || props.fromEmail);
+    const sender =
+      this.getEmailSender(from.email || props.fromEmail) || mailWidget?.to;
 
     const to = isForward ? '' : sender;
     const mailKey = `mail_${to || this.props.currentUser._id}`;
@@ -108,7 +124,11 @@ class MailForm extends React.Component<Props, State> {
       (localStorage.getItem(`reply_${mailKey}`) || '').length > 0;
 
     const attachments =
-      isForward && mailData.attachments ? mailData.attachments : [];
+      isForward && mailData.attachments
+        ? mailData.attachments
+        : mailWidget
+        ? mailWidget.attachments
+        : [];
 
     this.state = {
       cc,
@@ -125,10 +145,14 @@ class MailForm extends React.Component<Props, State> {
       showPrevEmails,
 
       fromEmail: sender,
-      from: '',
-      subject: mailData.subject || '',
+      from: mailWidget ? mailWidget.from : '',
+      subject: mailData.subject || mailWidget ? mailWidget.subject : '',
       emailSignature: '',
-      content: this.getContent(mailData, ''),
+      content: mailWidget
+        ? mailWidget.content
+        : mailData
+        ? this.getContent(mailData, '')
+        : '',
 
       status: 'draft',
       kind: '',
@@ -166,6 +190,22 @@ class MailForm extends React.Component<Props, State> {
   componentWillUnmount() {
     localStorage.removeItem(this.state.name);
     localStorage.removeItem(this.state.showReply);
+  }
+
+  prepareData() {
+    const { from, to, cc, bcc, subject, content, attachments } = this.state;
+
+    const variables = {
+      from,
+      to,
+      cc,
+      bcc,
+      subject,
+      content,
+      attachments
+    };
+
+    localStorage.setItem('emailWidgetData', JSON.stringify(variables));
   }
 
   getContent(mailData: IMail, emailSignature: string) {
@@ -257,6 +297,8 @@ class MailForm extends React.Component<Props, State> {
       content: '',
       attachments: []
     });
+
+    this.prepareData();
   };
 
   onShowReplies = () => {
@@ -357,6 +399,7 @@ class MailForm extends React.Component<Props, State> {
 
   onEditorChange = e => {
     this.setState({ content: e.editor.getData() });
+    this.prepareData();
   };
 
   onClick = <T extends keyof State>(name: T) => {
@@ -372,6 +415,8 @@ class MailForm extends React.Component<Props, State> {
       State,
       keyof State
     >);
+
+    this.prepareData();
   };
 
   onRemoveAttach = (attachment: any) => {
@@ -446,6 +491,8 @@ class MailForm extends React.Component<Props, State> {
       this.setState({ from });
     };
 
+    this.prepareData();
+
     return (
       <MailChooser
         onChange={onChangeMail}
@@ -459,7 +506,7 @@ class MailForm extends React.Component<Props, State> {
   renderFrom() {
     return (
       <FlexRow>
-        <label>From:</label>
+        <label className="from">From:</label>
         {this.renderFromValue()}
       </FlexRow>
     );
@@ -476,6 +523,7 @@ class MailForm extends React.Component<Props, State> {
           name="to"
           required={true}
         />
+        {this.renderRightSide()}
       </FlexRow>
     );
   }
@@ -614,6 +662,10 @@ class MailForm extends React.Component<Props, State> {
             <Uploader
               defaultFileList={this.state.attachments || []}
               onChange={onChangeAttachment}
+              text=" "
+              icon="attach"
+              tip="Attach files"
+              tipPlacement="top"
             />
             {this.renderIcon({
               text: 'Delete',
@@ -717,21 +769,46 @@ class MailForm extends React.Component<Props, State> {
   renderMeta = () => {
     return (
       <Meta>
-        <SpaceBetweenRow>
-          {this.renderLeftSide()}
-          {this.renderRightSide()}
-        </SpaceBetweenRow>
+        <SpaceBetweenRow>{this.renderLeftSide()}</SpaceBetweenRow>
       </Meta>
     );
   };
 
+  renderData = () => {
+    if (!this.props.shrink) {
+      return (
+        <>
+          {this.renderMeta()}
+          {this.renderSubject()}
+          {this.renderBody()}
+          {this.renderButtons()}
+        </>
+      );
+    }
+
+    return null;
+  };
+
   render() {
+    const { shrink, changeShrink, isWidget, hideWidget } = this.props;
+
+    const onClose = () => {
+      this.clearContent();
+      hideWidget();
+    };
+
     return (
       <ControlWrapper>
-        {this.renderMeta()}
-        {this.renderSubject()}
-        {this.renderBody()}
-        {this.renderButtons()}
+        {isWidget && (
+          <NewEmailHeader onClick={changeShrink}>
+            {__('New Email')}
+            <div>
+              <Icon icon={shrink ? 'plus' : 'minus'} />
+              <Icon icon="cancel" onClick={() => onClose()} />
+            </div>
+          </NewEmailHeader>
+        )}
+        {this.renderData()}
       </ControlWrapper>
     );
   }

@@ -40,6 +40,10 @@ type Props = {
   closeReply?: () => void;
   callback?: () => void;
   queryParams?: any;
+  shrink?: boolean;
+  isWidget?: boolean;
+  changeShrink?: () => void;
+  hideWidget?: () => void;
 } & IRouterProps;
 
 type FinalProps = {
@@ -50,14 +54,19 @@ type FinalProps = {
 
 class MailFormContainer extends React.Component<
   FinalProps,
-  { loadedEmails: boolean; verifiedEmails: string[] }
+  {
+    loadedEmails: boolean;
+    verifiedEmails: string[];
+    verifiedEngageEmails: string[];
+  }
 > {
   constructor(props: FinalProps) {
     super(props);
 
     this.state = {
       loadedEmails: false,
-      verifiedEmails: []
+      verifiedEmails: [],
+      verifiedEngageEmails: []
     };
   }
 
@@ -77,56 +86,53 @@ class MailFormContainer extends React.Component<
       messageId
     } = this.props;
 
-    const { loadedEmails, verifiedEmails } = this.state;
+    const { loadedEmails, verifiedEmails, verifiedEngageEmails } = this.state;
 
     if (!loadedEmails) {
-      if (source === 'engage') {
-        client
-          .query({
-            query: gql(engageQueries.verifiedEmails)
-          })
-          .then(({ data }) => {
-            this.setState({
-              loadedEmails: true,
-              verifiedEmails: data.engageVerifiedEmails || []
-            });
-          })
-          .catch(() => {
-            this.setState({ loadedEmails: true, verifiedEmails: [] });
+      client
+        .query({
+          query: gql(engageQueries.verifiedEmails)
+        })
+        .then(({ data }) => {
+          this.setState({
+            loadedEmails: true,
+            verifiedEngageEmails: data.engageVerifiedEmails || []
           });
-      } else {
-        client
-          .query({
-            query: gql(queries.imapIntegrations),
-            variables: {
-              kind: 'imap'
-            }
-          })
-          .then(({ data }) => {
-            const emails: string[] = [];
+        })
+        .catch(() => {
+          this.setState({ loadedEmails: true, verifiedEngageEmails: [] });
+        });
+      client
+        .query({
+          query: gql(queries.imapIntegrations),
+          variables: {
+            kind: 'imap'
+          }
+        })
+        .then(({ data }) => {
+          const emails: string[] = [];
 
-            for (const integration of data.imapGetIntegrations || []) {
-              if (integration.user && !emails.includes(integration.user)) {
-                emails.push(integration.user);
-              }
-
-              if (
-                integration.mainUser &&
-                !emails.includes(integration.mainUser)
-              ) {
-                emails.push(integration.mainUser);
-              }
+          for (const integration of data.imapGetIntegrations || []) {
+            if (integration.user && !emails.includes(integration.user)) {
+              emails.push(integration.user);
             }
 
-            this.setState({
-              loadedEmails: true,
-              verifiedEmails: emails
-            });
-          })
-          .catch(() => {
-            this.setState({ loadedEmails: true, verifiedEmails: [] });
+            if (
+              integration.mainUser &&
+              !emails.includes(integration.mainUser)
+            ) {
+              emails.push(integration.mainUser);
+            }
+          }
+
+          this.setState({
+            loadedEmails: true,
+            verifiedEmails: emails
           });
-      }
+        })
+        .catch(() => {
+          this.setState({ loadedEmails: true, verifiedEmails: [] });
+        });
     }
 
     const { emailTemplatesTotalCount } = emailTemplatesTotalCountQuery;
@@ -222,7 +228,7 @@ class MailFormContainer extends React.Component<
     }) => {
       let sendEmailMutation = mutations.imapSendMail;
 
-      if (source === 'engage') {
+      if (!variables.replyToMessageId) {
         sendEmailMutation = engageMutations.sendMail;
       }
 
@@ -237,6 +243,12 @@ class MailFormContainer extends React.Component<
         callback
       });
     };
+
+    verifiedEngageEmails.map(email => {
+      if (!verifiedEmails.includes(email)) {
+        verifiedEmails.push(email);
+      }
+    });
 
     const updatedProps = {
       ...this.props,
