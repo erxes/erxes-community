@@ -7,6 +7,8 @@ module.exports = {
     './osmap': './src/containers/Map.tsx'
   },
 
+
+
   osMap: './osmap',
 
   routes: {

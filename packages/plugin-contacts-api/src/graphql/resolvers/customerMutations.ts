@@ -1,6 +1,7 @@
 import * as _ from 'underscore';
 
 import {
+  IAddress,
   ICustomer,
   ICustomerDocument
 } from '../../models/definitions/customers';
@@ -276,6 +277,14 @@ const customerMutations = {
       { _id: { $in: _ids } },
       { $set: { state: value } }
     );
+  },
+
+  customersEditAddresses(
+    _root,
+    { _id, addresses }: { _id: string; addresses: IAddress[] },
+    { models: { Customers } }: IContext
+  ) {
+    return Customers.updateAddresses(_id, addresses);
   }
 };
 

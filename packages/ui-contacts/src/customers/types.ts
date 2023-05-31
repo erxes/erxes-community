@@ -19,25 +19,25 @@ export interface ICustomerLinks {
 }
 
 export interface IAddress {
-  id: string; // lng_lat || random
-  location: {
-    type: string;
-    coordinates: number[];
-  };
-  address: {
-    countryCode: string;
-    country: string;
-    postCode: string;
-    city: string;
-    city_district: string;
-    suburb: string;
-    road: string;
-    street: string;
+  lat: number;
+  lng: number;
+  isPrimary?: boolean;
+
+  address?: {
     building: string;
-    number: string;
+    city: string;
+    cityDistrict: string;
+    country: string;
+    countryCode: string;
+    houseNumber: string;
+    postcode: string;
+    road: string;
+    suburb: string;
+    street: string;
     other: string;
   };
   short: string;
+  osmId: string;
 }
 
 export interface ICustomerDoc {

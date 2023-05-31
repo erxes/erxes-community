@@ -2,14 +2,15 @@ import 'leaflet/dist/leaflet.css';
 import '../fullscreen/Leaflet.fullscreen';
 import '../fullscreen/leaflet.fullscreen.css';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import Leaflet from 'leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 
 import { Alert } from '@erxes/ui/src/utils';
 
-import { Coordinate } from '../types';
 import { __ } from '@erxes/ui/src/utils/core';
+import { Coordinate } from '../types';
+import { Spinner } from '@erxes/ui/src/components';
 
 type Props = {
   id: string;
@@ -18,10 +19,13 @@ type Props = {
   zoom?: number;
   markers?: any[];
   center?: Coordinate;
+  autoCenter?: boolean;
+  editable?: boolean;
+  loading?: boolean;
 
-  onAddMarker?: (marker: any) => void;
   onChangeCenter?: (position: any) => void;
   onChangeZoom?: (zoomLevel: number) => void;
+  onChangeMarker?: (index: number, marker: any) => void;
 };
 
 const FullscreenControl = () => {
@@ -100,58 +104,129 @@ const RelocateControl = props => {
 const Map = (props: Props) => {
   const { id, zoom, width = '100%', height = '100%' } = props;
   const [markers, setMarkers] = React.useState<any[]>(props.markers || []);
-  const [center, setCenter] = useState(props.center || { lat: 0, lng: 0 });
+  const [center, setCenter] = useState(props.center);
+  const mapRef: any = useRef(null);
+
+  console.log('Map', props.markers);
 
   useEffect(() => {
     if (props.center) {
       setCenter(props.center);
     }
-  }, [center]);
+
+    if (props.markers) {
+      setMarkers(props.markers);
+    }
+
+    if (props.autoCenter) {
+      autoCenter();
+    }
+  }, [props.center, props.markers, markers]);
 
   const eventHandlers = {
     dragend: e => {
       const { lat, lng } = e.target.getLatLng();
 
+      console.log('dragend', e.target.options);
+
       if (props.onChangeCenter) {
         props.onChangeCenter({ lat, lng });
       }
+
+      if (mapRef && mapRef.current) {
+        mapRef.current.setView([lat, lng], props.zoom || 10);
+      }
+
+      if (props.onChangeMarker) {
+        const index = Number(e.target.options.alt);
+        const marker = markers[index];
+        marker.position = { lat, lng };
+
+        props.onChangeMarker(index, marker);
+        // console.log('onChangeMarker', index, marker);
+      }
+
+      // const index = markers.findIndex((marker) => marker.id === e.target.options.id);
     }
   };
 
-  const markerHtmlStyles = `
-width: 30px;
-height: 30px;
-border-radius: 50% 50% 50% 0;
-background: #ff0000;
-position: absolute;
-transform: rotate(-45deg);
-left: 50%;
-top: 50%;
-margin: -20px 0 0 -20px;`;
+  const autoCenter = () => {
+    let lat = 0;
+    let lng = 0;
 
-  const icon = Leaflet.divIcon({
-    className: 'my-custom-pin',
-    iconAnchor: [0, 24],
-    popupAnchor: [0, -36],
-    html: `<div style="${markerHtmlStyles}" />`
-  });
+    if (!markers.length && !props.center) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const { latitude, longitude } = position.coords;
+            lat = latitude;
+            lng = longitude;
+            if (mapRef && mapRef.current) {
+              mapRef.current.setView([lat, lng], props.zoom || 10);
+            }
+          },
+          _error => {
+            lat = 0;
+            lng = 0;
+          }
+        );
+      } else {
+        lat = 0;
+        lng = 0;
+      }
+
+      console.log('center default', { lat, lng });
+      return;
+    }
+
+    if (markers.length === 1) {
+      lat = markers[0].position.lat;
+      lng = markers[0].position.lng;
+      if (mapRef && mapRef.current) {
+        mapRef.current.setView([lat, lng], props.zoom || 10);
+      }
+      return;
+    }
+
+    if (markers.length === 0) {
+      return;
+    }
+
+    for (const marker of markers) {
+      lat += marker.position.lat;
+      lng += marker.position.lng;
+    }
+
+    lat /= markers.length;
+    lng /= markers.length;
+
+    setCenter({ lat, lng });
+    console.log('centerrrrr', markers);
+    console.log('center', { lat, lng });
+
+    if (mapRef && mapRef.current) {
+      mapRef.current.setView([lat, lng], props.zoom || 10);
+    }
+  };
 
   return (
     <MapContainer
       id={id}
-      center={center || [47.919481, 106.904299]}
+      ref={mapRef}
+      center={center || [0, 0]}
       zoom={zoom || 10}
       zoomControl={true}
       style={{ height, width, zIndex: 0 }}
     >
       {markers.map((marker, index) => (
         <Marker
-          icon={icon}
           key={index}
           position={marker.position}
-          draggable={marker.draggable}
+          draggable={props.editable || false}
           eventHandlers={eventHandlers}
-          title={marker.id}
+          riseOnHover={true}
+          riseOffset={250}
+          alt={index.toString()}
         >
           <Popup>{marker.name}</Popup>
         </Marker>
@@ -162,6 +237,7 @@ margin: -20px 0 0 -20px;`;
       />
       <FullscreenControl />
       <RelocateControl setCenter={setCenter} {...props} />
+      {props.loading && <Spinner />}
     </MapContainer>
   );
 };

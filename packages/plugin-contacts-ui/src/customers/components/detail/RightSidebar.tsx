@@ -19,6 +19,7 @@ import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from 'coreui/utils';
 import colors from '@erxes/ui/src/styles/colors';
 import { pluginsOfCustomerSidebar } from 'coreui/pluginUtils';
+import AddressSection from '../../../address/containers/AddressSection';
 
 type Props = {
   customer: ICustomer;
@@ -81,19 +82,17 @@ export default class RightSidebar extends React.Component<Props> {
     if (!isEnabled('osm')) {
       return null;
     }
-    console.log('renderAddress');
+
     const { customer } = this.props;
-    const { primaryAddress } = customer;
+    const { addresses = [] } = customer;
 
-    const mapProps = {
-      id: `customerAddress-${customer._id}`,
-      width: '100%',
-      height: '300px',
-      zoom: 15,
-      center: primaryAddress && primaryAddress.location
-    };
-
-    return loadDynamicComponent('osMap', mapProps);
+    return (
+      <AddressSection
+        _id={customer._id}
+        addresses={addresses}
+        type="customer"
+      />
+    );
   };
 
   render() {
