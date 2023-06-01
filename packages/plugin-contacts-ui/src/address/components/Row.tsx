@@ -6,10 +6,13 @@ import { renderFullName } from '@erxes/ui/src/utils/core';
 import React from 'react';
 
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
+import FormControl from '@erxes/ui/src/components/form/Control';
 
 type Props = {
-  address: IAddress;
-  onChangeCheck: (selectedId: string, isChecked: boolean) => void;
+  address: IAddress & { isEditing?: boolean };
+  index: number;
+  onSelect: (address: IAddress) => void;
+  onChangeCheck: (index: number, isChecked: boolean) => void;
 };
 
 class Row extends React.Component<Props> {
@@ -17,24 +20,17 @@ class Row extends React.Component<Props> {
     const { address, onChangeCheck } = this.props;
 
     const onChange = e => {
-      onChangeCheck(address.osmId, e.target.checked);
+      onChangeCheck(this.props.index, e.target.checked);
     };
 
     const checked = address.isPrimary;
 
     return (
-      <div>
-        <Toggle
-          id="toggle"
-          onChange={onChange}
-          defaultChecked={checked}
-          checked={checked}
-          icons={{
-            checked: <span>Yes</span>,
-            unchecked: <span>No</span>
-          }}
-        />
-      </div>
+      <FormControl
+        componentClass="checkbox"
+        checked={checked}
+        onChange={onChange}
+      />
     );
   }
 
@@ -42,14 +38,17 @@ class Row extends React.Component<Props> {
     const { address } = this.props;
 
     return (
-      <tr>
+      <tr
+        onClick={() => {
+          this.props.onSelect(address);
+        }}
+      >
         <td>
-          <TextInfo ignoreTrans={true}>{address.short}</TextInfo>
-        </td>
-        <td>
-          <TextInfo ignoreTrans={true}>
-            {address.isPrimary ? 'Primary' : ''}
-          </TextInfo>
+          {address.isEditing ? (
+            <TextInfo textStyle="primary">{address.short}</TextInfo>
+          ) : (
+            <TextInfo textStyle="simple">{address.short}</TextInfo>
+          )}
         </td>
         <td>
           <ActionButtons>{this.renderAction()}</ActionButtons>

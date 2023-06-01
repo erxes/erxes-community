@@ -25,7 +25,7 @@ type Props = {
 
   onChangeCenter?: (position: any) => void;
   onChangeZoom?: (zoomLevel: number) => void;
-  onChangeMarker?: (index: number, marker: any) => void;
+  onChangeMarker?: (marker: any, index?: number) => void;
 };
 
 const FullscreenControl = () => {
@@ -142,7 +142,7 @@ const Map = (props: Props) => {
         const marker = markers[index];
         marker.position = { lat, lng };
 
-        props.onChangeMarker(index, marker);
+        props.onChangeMarker(marker, index);
         // console.log('onChangeMarker', index, marker);
       }
 

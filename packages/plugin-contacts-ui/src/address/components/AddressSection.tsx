@@ -5,17 +5,10 @@ import React from 'react';
 
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
 import Button from '@erxes/ui/src/components/Button';
-import Label from '@erxes/ui/src/components/Label';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
-import {
-  FieldStyle,
-  SidebarCounter,
-  SidebarList
-} from '@erxes/ui/src/layout/styles';
-import { AddressDetail } from '../styles';
 import { Alert } from '@erxes/ui/src/utils';
-import FormControl from '@erxes/ui/src/components/form/Control';
-import Tip from '@erxes/ui/src/components/Tip';
+import EditForm from './EditForm';
 
 export type Props = {
   _id: string;
@@ -117,7 +110,7 @@ export default function Component(props: Props) {
 
     return (
       <>
-        {addresses.map((address, index) => (
+        {/* {addresses.map((address, index) => (
           <AddressDetail
             key={index}
             onClick={() => {
@@ -156,7 +149,7 @@ export default function Component(props: Props) {
               </Tip>
             </SidebarList>
           </AddressDetail>
-        ))}
+        ))} */}
         {loadDynamicComponent('osMap', mapProps)}
       </>
     );
@@ -201,8 +194,28 @@ export default function Component(props: Props) {
     setIsEditing(false);
   };
 
+  const manageContent = formProps => (
+    <EditForm
+      addresses={addresses}
+      onSave={props.save}
+      closeModal={formProps.closeModal}
+    />
+  );
+
   const extraButtons = (
     <>
+      {addresses.length && (
+        <ModalTrigger
+          title="Manage"
+          size="xl"
+          trigger={
+            <button>
+              <Icon icon="edit-3" />
+            </button>
+          }
+          content={manageContent}
+        />
+      )}
       <button onClick={onAddMarker}>
         <Icon icon="plus-circle" />
       </button>

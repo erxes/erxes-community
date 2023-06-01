@@ -1,67 +1,54 @@
 import Table from '@erxes/ui/src/components/table';
 import { __ } from '@erxes/ui/src/utils/core';
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 
 import Row from './Row';
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
 
 type Props = {
   addresses: IAddress[];
+  currentAddress: IAddress | undefined;
   onChange: (addresses: IAddress[]) => void;
+  onSelect: (address: IAddress) => void;
 };
 
-type State = {
-  addresses: IAddress[];
-};
+const List = (props: Props) => {
+  const [addresses, setAddresses] = useState(props.addresses || []);
 
-class List extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
+  const onChangeStatus = (index: number, isChecked: boolean) => {
+    const updatedAddresses = addresses.map((address, i) => ({
+      ...address,
+      isPrimary: i === index
+    }));
+    setAddresses(updatedAddresses);
+  };
 
-    this.state = {
-      addresses: props.addresses || []
-    };
-  }
-
-  renderRow() {
-    const addresses = this.state.addresses;
-
-    const onChangeStatus = (selectedId: string, isChecked: boolean) => {
-      const changed = addresses.map(p => {
-        if (p.osmId === selectedId) {
-          return { ...p, status: p.isPrimary = isChecked };
-        }
-
-        return { ...p, isPrimary: false };
-      });
-
-      this.props.onChange(changed);
-      this.setState({ addresses: changed });
-    };
-
-    return addresses.map(address => (
+  const renderRow = () => {
+    return addresses.map((address, index) => (
       <Row
         key={address.osmId || Math.random().toString()}
-        address={address}
+        address={{
+          ...address,
+          isEditing: address.osmId === props.currentAddress?.osmId
+        }}
+        index={index}
         onChangeCheck={onChangeStatus}
+        onSelect={props.onSelect}
       />
     ));
-  }
+  };
 
-  render() {
-    return (
-      <Table whiteSpace="nowrap" hover={true}>
-        <thead>
-          <tr>
-            <th>{__('Address')}</th>
-            <th>{__('Primary')}</th>
-            <th>{__('Action')}</th>
-          </tr>
-        </thead>
-        <tbody>{this.renderRow()}</tbody>
-      </Table>
-    );
-  }
-}
+  return (
+    <Table whiteSpace="nowrap" hover={true}>
+      <thead>
+        <tr>
+          <th>{__('Addresses')}</th>
+          <th>{__('Default')}</th>
+        </tr>
+      </thead>
+      <tbody>{renderRow()}</tbody>
+    </Table>
+  );
+};
 
 export default List;
