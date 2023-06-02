@@ -273,6 +273,16 @@ const WidgetWrapper = styledTS<{ show: boolean }>(styled.div)`
   ${props => !props.show && 'display:none;'}
 `;
 
+const UploaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > div {
+    margin: 0;
+  }
+`;
+
 export {
   Attachments,
   FlexRow,
@@ -292,5 +302,6 @@ export {
   PopoverLinkWrapper,
   Meta,
   NewEmailHeader,
-  WidgetWrapper
+  WidgetWrapper,
+  UploaderWrapper
 };
