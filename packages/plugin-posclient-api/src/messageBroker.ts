@@ -51,9 +51,16 @@ const webbuilderReplacer = async args => {
 
     if (pagename === 'product-detail') {
       const product = await models.Products.findOne({ _id: query.productId });
+      const config = await models.Configs.findOne({}).lean();
+      const unitPrice = (product.prices || {})[config.token] || 0;
 
       if (product) {
         result = result.replace('{{ product.name }}', product.name);
+        result = result.replace(
+          '{{ product.description }}',
+          product.description
+        );
+        result = result.replace('{{ product.unitPrice }}', unitPrice);
         result = result.replace(
           '{{ product.image }}',
           product.attachment ? product.attachment.url : ''
