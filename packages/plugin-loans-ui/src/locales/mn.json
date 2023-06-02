@@ -129,5 +129,6 @@
   "Expired repayment": "Хугацаа хэтэрсэн",
   "Close contract today": "Өнөөдөр хаагдах",
   "Close contract this week": "Энэ долоо хоногт хаагдах",
-  "Close contract this month": "Энэ сард хаагдах"
+  "Close contract this month": "Энэ сард хаагдах",
+  "Undue calc type": "Нэмэгдүүлсэн хүү бодох арга"
 }

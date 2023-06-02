@@ -81,6 +81,7 @@ class ContractForm extends React.Component<Props, State | any> {
       feeAmount: contract.feeAmount || 0,
       tenor: contract.tenor || 0,
       unduePercent: contract.unduePercent || 0,
+      undueCalcType: contract.undueCalcType || 'fromInterest',
       interestRate: contract.interestRate || 0,
       interestMonth: (contract.interestRate || 0) / 12,
       repayment: contract.repayment || 'fixed',
@@ -132,6 +133,7 @@ class ContractForm extends React.Component<Props, State | any> {
       unduePercent: Number(this.state.unduePercent),
       interestRate: Number(this.state.interestRate),
       repayment: this.state.repayment,
+      undueCalcType: this.state.undueCalcType || 'fromInterest',
       startDate: this.state.startDate,
       scheduleDay: this.state.scheduleDay,
       debt: Number(this.state.debt),
@@ -486,6 +488,30 @@ class ContractForm extends React.Component<Props, State | any> {
                 onChange: this.onChangeUnduePercent,
                 onClick: this.onFieldClick
               })}
+              <FormGroup>
+                <ControlLabel required={true}>
+                  {__('Undue calc type')}
+                </ControlLabel>
+                <FormControl
+                  {...formProps}
+                  name="undueCalcType"
+                  componentClass="select"
+                  value={this.state.undueCalcType}
+                  required={true}
+                  onChange={this.onChangeField}
+                >
+                  {[
+                    'fromInterest',
+                    'fromAmount',
+                    'fromTotalPayment',
+                    'fromEndAmount'
+                  ].map((typeName, index) => (
+                    <option key={`undeType${index}`} value={typeName}>
+                      {typeName}
+                    </option>
+                  ))}
+                </FormControl>
+              </FormGroup>
 
               <FormGroup>
                 <ControlLabel required={true}>{__('Repayment')}</ControlLabel>
