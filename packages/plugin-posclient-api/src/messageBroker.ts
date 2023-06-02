@@ -16,7 +16,7 @@ import { sendRPCMessage } from '@erxes/api-utils/src/messageBroker';
 let client;
 
 const webbuilderReplacer = async args => {
-  const { models, subdomain, action = '', html, pagename } = args;
+  const { models, subdomain, action = '', html, sitename, pagename } = args;
 
   const query = args.query || {};
 
@@ -24,7 +24,7 @@ const webbuilderReplacer = async args => {
 
   if (action === 'productCategories') {
     result = `
-      <ul id="plugin-posclient-product-categories">
+      <ul class="plugin-posclient-product-categories">
       </ul>
     `;
   }
@@ -278,6 +278,7 @@ const webbuilderReplacer = async args => {
 
           window.addEventListener("message", (event) => {
             const { fromPayment, message, invoiceId } = event.data;
+            
             if (fromPayment) {
               if (message === "paymentSuccessfull") {
                 $('#payment').attr('src', '');
@@ -327,14 +328,17 @@ const webbuilderReplacer = async args => {
           });
         }
 
-        if ($('#plugin-posclient-product-categories').length > 0) {
+        if ($('.plugin-posclient-product-categories').length > 0) {
           fetchGraph({
             query: 'query { poscProductCategories { _id, name } }',
             variables: {},
             callback: ({ poscProductCategories }) => {
+              const lis = [];
               for (const category of poscProductCategories) {
-                $('#plugin-posclient-product-categories').append('<li><a href="/pl:webbuilder/ecommerce/plw/posclient/product-category-detail?categoryId=' + category._id + '">' + category.name + '</a></li>');
+                lis.push('<li><a href="/pl:webbuilder/${sitename}/plw/posclient/product-category-detail?categoryId=' + category._id + '">' + category.name + '</a></li>');
               }
+
+              $('.plugin-posclient-product-categories').append(lis.join(''));
             }
           })
         }

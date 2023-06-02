@@ -185,6 +185,7 @@ export default {
         defaultValue: '',
         data: {
           html,
+          sitename: site.name,
           pagename,
           query: req.query,
           params: req.params
