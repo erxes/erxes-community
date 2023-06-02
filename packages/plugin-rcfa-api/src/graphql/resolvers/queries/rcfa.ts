@@ -1,7 +1,7 @@
 import { paginate } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 
-const generateFilters = async params => {
+const generateFilters = async (params: any) => {
   const filter: any = {};
   let createdAt = {};
   let closedAt = {};
@@ -34,11 +34,7 @@ const generateFilters = async params => {
 };
 
 const RCFAQueries = {
-  async rcfaList(
-    _root,
-    params: { searchValue?: string; perPage: number; page: number },
-    { models }: IContext
-  ) {
+  async rcfaList(_root, params: any, { models }: IContext) {
     const filter = await generateFilters(params);
 
     const list = paginate(

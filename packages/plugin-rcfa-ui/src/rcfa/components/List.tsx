@@ -2,7 +2,6 @@ import React from 'react';
 import { HeaderDescription, Table, __ } from '@erxes/ui/src/';
 import { DefaultWrapper } from '../../common/utils';
 import SideBar from './Sidebar';
-
 import Row from './Row';
 
 type Props = {
@@ -17,7 +16,7 @@ type State = {
 };
 
 class rcfaTable extends React.Component<Props, State> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {};
   }

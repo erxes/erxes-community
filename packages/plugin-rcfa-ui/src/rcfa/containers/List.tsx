@@ -64,8 +64,8 @@ export default withProps<Props>(
         variables: {
           mainType: props.mainType,
           searchValue: props.searchValue,
-          page: props.page,
-          perPage: props.perPage,
+          page: parseInt(props.queryParams?.page, 10),
+          perPage: parseInt(props.queryParams?.perPage, 10),
           createdAtFrom: props.queryParams?.createdAtFrom,
           createdAtTo: props.queryParams?.createdAtTo,
           closedAtFrom: props.queryParams?.closedAtFrom,
