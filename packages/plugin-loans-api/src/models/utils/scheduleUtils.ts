@@ -37,6 +37,11 @@ export const scheduleHelper = async (
 
   const dateRange = contract.scheduleDays.sort((a, b) => a - b);
   var mainDate = new Date(startDate);
+
+  var skipInterestCalcDate = addMonths(
+    new Date(startDate),
+    contract.skipInterestCalcMonth || 0
+  );
   var endDate = addMonths(new Date(startDate), contract.tenor);
 
   var dateRanges: Date[] = [];
@@ -86,7 +91,8 @@ export const scheduleHelper = async (
         currentDate,
         payment,
         perHolidays,
-        paymentDates[i]
+        paymentDates[i],
+        skipInterestCalcDate
       );
       currentDate = perMonth.date;
       balance = perMonth.loanBalance;
@@ -114,7 +120,8 @@ export const scheduleHelper = async (
       weekends: contract.weekends,
       useHoliday: contract.useHoliday,
       perHolidays,
-      paymentDates
+      paymentDates,
+      skipInterestCalcDate
     });
 
     for (let i = 0; i < paymentDates.length - salvageTenor; i++) {
@@ -124,7 +131,8 @@ export const scheduleHelper = async (
         currentDate,
         total,
         perHolidays,
-        paymentDates[i]
+        paymentDates[i],
+        skipInterestCalcDate
       );
       currentDate = perMonth.date;
       balance = perMonth.loanBalance;
@@ -150,6 +158,9 @@ export const scheduleHelper = async (
   lastEntry.balance = salvageAmount || 0;
   lastEntry.payment = lastEntry.payment + tempBalance;
   bulkEntries[bulkEntries.length - 1] = lastEntry;
+
+  console.log('bulkEntries', JSON.stringify(bulkEntries, null, 2));
+
   return bulkEntries;
 };
 
