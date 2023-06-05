@@ -564,6 +564,7 @@ export function numberParser(value, fixed) {
   } else {
     value = Number(value);
   }
+
   return value;
 }
 
