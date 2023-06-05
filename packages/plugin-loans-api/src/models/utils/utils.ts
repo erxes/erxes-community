@@ -236,11 +236,6 @@ export const calcPerMonthFixed = (
   nextDay = checkNextDay(nextDay, doc.weekends, doc.useHoliday, perHolidays);
 
   if (getDiffDay(nextDate, skipInterestCalcDate) > 0) {
-    console.log(
-      'nextDate, skipInterestCalcDate',
-      nextDate,
-      skipInterestCalcDate
-    );
     const loanPayment = total;
     const loanBalance = balance - loanPayment;
 

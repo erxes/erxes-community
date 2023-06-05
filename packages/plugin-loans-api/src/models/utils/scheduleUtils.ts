@@ -159,8 +159,6 @@ export const scheduleHelper = async (
   lastEntry.payment = lastEntry.payment + tempBalance;
   bulkEntries[bulkEntries.length - 1] = lastEntry;
 
-  console.log('bulkEntries', JSON.stringify(bulkEntries, null, 2));
-
   return bulkEntries;
 };
 
