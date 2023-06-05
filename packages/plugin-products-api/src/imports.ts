@@ -132,7 +132,7 @@ export default {
             }
             break;
 
-          case 'subUoms.uomId':
+          case 'subUoms.uom':
             {
               subUomNames = value.split(',');
             }
@@ -144,12 +144,12 @@ export default {
             }
             break;
 
-          case 'uomId':
+          case 'uom':
             {
               const uom = await models.Uoms.findOne({
                 $or: [{ name: value }, { code: value }]
               }).lean();
-              doc.uomId = uom ? uom._id : '';
+              doc.uom = uom ? uom._id : '';
             }
             break;
 
@@ -189,7 +189,7 @@ export default {
 
         subUoms.push({
           id: Math.random(),
-          uomId: uom._id,
+          uom: uom._id,
           ratio: Number(ratios[ind] || 1)
         });
         ind += 1;

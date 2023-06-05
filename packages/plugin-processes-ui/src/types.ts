@@ -4,7 +4,7 @@ import { QueryResponse } from '@erxes/ui/src/types';
 export interface IProductsDataPerform {
   _id: string;
   productId: string;
-  uomId: string;
+  uom: string;
   quantity: number;
   totalCost: number;
   series?: string[];
@@ -17,7 +17,7 @@ export interface IProductsData {
   _id: string;
   productId: string;
   quantity: number;
-  uomId: string;
+  uom: string;
 
   proportion?: number;
   product?: any;
@@ -75,7 +75,7 @@ export type UomEditMutationResponse = {
 };
 
 export type UomRemoveMutationResponse = {
-  uomsRemove: (mutation: { variables: { uomIds: string[] } }) => Promise<any>;
+  uomsRemove: (mutation: { variables: { uoms: string[] } }) => Promise<any>;
 };
 
 // SETTINGS

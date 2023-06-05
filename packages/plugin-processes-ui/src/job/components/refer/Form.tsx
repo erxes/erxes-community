@@ -131,7 +131,7 @@ class Form extends React.Component<Props, State> {
         if (formType !== 'uom') {
           product[formType] = Number(value);
         } else {
-          product.uomId = value;
+          product.uom = value;
         }
       }
 
@@ -174,14 +174,14 @@ class Form extends React.Component<Props, State> {
         p => !currentProductIds.includes(p._id)
       ) || []) {
         const productId = product ? product._id : '';
-        const uomId = product.uomId ? product.uomId : defaultUom;
-        const uom = (uoms || []).find(e => e._id === uomId);
+        const uom = product.uom ? product.uom : defaultUom;
+        const uom = (uoms || []).find(e => e._id === uom);
 
         const inputData = {
           _id: Math.random().toString(),
           productId,
           quantity: 1,
-          uomId,
+          uom,
           product,
           uom
         };
@@ -265,13 +265,13 @@ class Form extends React.Component<Props, State> {
                 product.product && product.product.subUoms
                   ? product.product.subUoms || []
                   : [];
-              const defaultUomId =
-                product.product && product.product.uomId
-                  ? product.product.uomId
+              const defaultUom =
+                product.product && product.product.uom
+                  ? product.product.uom
                   : (configsMap || {}).defaultUOM;
 
-              const productUoms = subUoms.map(e => e.uomId);
-              const mergedUoms = [...productUoms, defaultUomId];
+              const productUoms = subUoms.map(e => e.uom);
+              const mergedUoms = [...productUoms, defaultUom];
 
               const filtered: any[] =
                 mergedUoms.map(e => {
@@ -305,7 +305,7 @@ class Form extends React.Component<Props, State> {
                   <td>
                     <FormControl
                       componentClass="select"
-                      value={product.uomId}
+                      value={product.uom}
                       onChange={this.onChange.bind(
                         this,
                         product._id,

@@ -37,7 +37,7 @@ export const types = `
     tagIds: [String]
     vendorId: String
     attachmentMore: [Attachment]
-    uomId: String
+    uom: String
     subUoms: JSON
     category: PosProductCategory
     remainder: Int

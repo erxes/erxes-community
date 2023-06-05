@@ -51,14 +51,14 @@ export const consumeInventory = async (subdomain, doc, old_code, action) => {
     if (uoms.length) {
       const uom = uoms.find(uom => uom.code === doc.measure_unit_code);
       if (uom) {
-        document.uomId = uom._id;
+        document.uom = uom._id;
       }
 
       const subUom = uoms.find(uom => uom.code === doc.sub_measure_unit_code);
       if (subUom) {
         document.subUoms = [
           {
-            uomId: subUom._id,
+            uom: subUom._id,
             ratio: doc.ratio_measure_unit || 1
           }
         ];

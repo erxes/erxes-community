@@ -58,7 +58,7 @@ class ProductFormContainer extends React.Component<FinalProps> {
             _id: e._id,
             productId: e.productId,
             quantity: e.quantity,
-            uomId: e.uomId,
+            uom: e.uom,
             branchId: e.branchId,
             departmentId: e.departmentId
           } as IProductsData)
@@ -70,7 +70,7 @@ class ProductFormContainer extends React.Component<FinalProps> {
             _id: e._id,
             productId: e.productId,
             quantity: e.quantity,
-            uomId: e.uomId,
+            uom: e.uom,
             branchId: e.branchId,
             departmentId: e.departmentId,
             proportion: e.proportion

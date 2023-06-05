@@ -37,7 +37,7 @@ export interface IProduct {
   category: IProductCategory;
   vendor?: ICompany;
 
-  uomId?: string;
+  uom?: string;
   uom?: any;
   subUoms?: any[];
   taxType?: string;
@@ -114,7 +114,7 @@ export type UomsCountQueryResponse = {
 } & QueryResponse;
 
 export type UomRemoveMutationResponse = {
-  uomsRemove: (mutation: { variables: { uomIds: string[] } }) => Promise<any>;
+  uomsRemove: (mutation: { variables: { uoms: string[] } }) => Promise<any>;
 };
 
 // SETTINGS

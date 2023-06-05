@@ -340,7 +340,7 @@ class Form extends React.Component<Props, State> {
         productsData.push({
           _id: Math.random(),
           quantity: 1,
-          uomId: product.uomId,
+          uom: product.uom,
           productId: product._id,
           product: product,
           uom: product.uom

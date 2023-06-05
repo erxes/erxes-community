@@ -123,7 +123,7 @@ export type UomEditMutationResponse = {
 };
 
 export type UomRemoveMutationResponse = {
-  uomsRemove: (mutation: { variables: { uomIds: string[] } }) => Promise<any>;
+  uomsRemove: (mutation: { variables: { uoms: string[] } }) => Promise<any>;
 };
 
 // SETTINGS

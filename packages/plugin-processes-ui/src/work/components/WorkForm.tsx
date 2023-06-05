@@ -282,7 +282,7 @@ class Form extends React.Component<Props, State> {
             const productsData: IProductsData = {
               _id: Math.random().toString(),
               productId,
-              uomId: product.uomId,
+              uom: product.uom,
               quantity: 1,
               product,
               uom: product.uom

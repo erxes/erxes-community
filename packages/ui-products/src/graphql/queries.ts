@@ -41,12 +41,7 @@ const productFields = `
     size
     type
   }
-  uomId
-  uom {
-    _id
-    code
-    name
-  }
+  uom
   subUoms
   taxType
   taxCode

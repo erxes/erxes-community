@@ -60,7 +60,7 @@ export const safeRemainderItemFields = `
     code
     name
   }
-  uomId
+  uom
 `;
 
 const safeRemainderDetail = `

@@ -8,7 +8,7 @@ export const getProductsData = productsData => {
 
   for (const perProductsData of productsData) {
     for (const productData of perProductsData) {
-      const key = `${productData.productId}_${productData.uomId}`;
+      const key = `${productData.productId}_${productData.uom}`;
       if (!Object.keys(quantityByKey).includes(key)) {
         quantityByKey[key] = 0;
       }
@@ -18,10 +18,10 @@ export const getProductsData = productsData => {
   }
 
   for (const key of Object.keys(quantityByKey)) {
-    const [productId, uomId] = key.split('_');
+    const [productId, uom] = key.split('_');
     result.push({
       productId,
-      uomId,
+      uom,
       quantity: quantityByKey[key]
     });
   }
@@ -57,13 +57,13 @@ export const getProductAndUoms = async (
     }
   }
 
-  const uomIds = productsData.map(n => n.uomId);
+  const uoms = productsData.map(n => n.uom);
 
-  if (uomIds.length) {
+  if (uoms.length) {
     const uoms = await sendProductsMessage({
       subdomain,
       action: 'uoms.find',
-      data: { _id: { $in: uomIds } },
+      data: { _id: { $in: uoms } },
       isRPC: true,
       defaultValue: []
     });

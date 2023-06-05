@@ -134,19 +134,19 @@ class PerformDetail extends React.Component<Props, State> {
       ? `${product.code} - ${product.name}`
       : 'not name';
 
-    const beUomIds = [product.uomId, ...product.subUoms.map(su => su.uomId)];
+    const beUoms = [product.uom, ...product.subUoms.map(su => su.uom)];
 
     return (
       <tr>
         <td>{__(productName)}</td>
         <td>
           <FormControl
-            defaultValue={productData.uomId}
+            defaultValue={productData.uom}
             componentClass="select"
-            name="uomId"
+            name="uom"
             options={[
               ...allUoms
-                .filter(au => (beUomIds || []).includes(au._id))
+                .filter(au => (beUoms || []).includes(au._id))
                 .map(u => ({
                   value: u._id,
                   label: `${u.code} - ${u.name}`

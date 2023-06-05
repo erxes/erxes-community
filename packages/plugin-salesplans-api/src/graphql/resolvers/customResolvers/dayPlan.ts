@@ -47,14 +47,14 @@ export default {
   },
 
   async uom(plan: IDayPlanDocument, _, { subdomain }: IContext) {
-    if (!plan.uomId) {
+    if (!plan.uom) {
       return;
     }
 
     return await sendProductsMessage({
       subdomain,
       action: 'uoms.findOne',
-      data: { _id: plan.uomId },
+      data: { _id: plan.uom },
       isRPC: true
     });
   }

@@ -14,7 +14,7 @@ export interface IYearPlan {
   departmentId?: string;
   branchId?: string;
   productId?: string;
-  uomId?: string;
+  uom?: string;
   values?: IPlanValues;
   confirmedData?: any;
   createdAt?: Date;
@@ -82,7 +82,7 @@ export interface IDayPlan {
   departmentId?: string;
   branchId?: string;
   productId?: string;
-  uomId?: string;
+  uom?: string;
   planCount?: number;
   values?: IPlanValue[];
   confirmedData?: any;

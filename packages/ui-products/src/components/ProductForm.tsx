@@ -47,7 +47,7 @@ type State = {
   attachmentMore?: IAttachment[];
   vendorId: string;
   description: string;
-  uomId: string;
+  uom: string;
   subUoms: any[];
   taxType: string;
   taxCode: string;
@@ -65,7 +65,7 @@ class Form extends React.Component<Props, State> {
       barcodeDescription,
       vendorId,
       description,
-      uomId,
+      uom,
       subUoms,
       taxType,
       taxCode
@@ -81,7 +81,7 @@ class Form extends React.Component<Props, State> {
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
       description: description ? description : '',
-      uomId: uomId ? uomId : defaultUom,
+      uom: uom ? uom : defaultUom,
       subUoms: subUoms ? subUoms : [],
       taxType,
       taxCode
@@ -97,7 +97,7 @@ class Form extends React.Component<Props, State> {
     minimiumCount: number;
     vendorId: string;
     description: string;
-    uomId: string;
+    uom: string;
     subUoms: [];
   }) => {
     const { product } = this.props;
@@ -109,7 +109,7 @@ class Form extends React.Component<Props, State> {
       barcodeDescription,
       vendorId,
       description,
-      uomId,
+      uom,
       subUoms
     } = this.state;
 
@@ -127,7 +127,7 @@ class Form extends React.Component<Props, State> {
       barcodeDescription,
       vendorId,
       description,
-      uomId,
+      uom,
       subUoms
     };
   };
@@ -156,7 +156,7 @@ class Form extends React.Component<Props, State> {
       };
 
       const onChangeUom = option => {
-        updateUoms('uomId', option.value);
+        updateUoms('uom', option.value);
       };
 
       const onChangeRatio = e => {
@@ -174,7 +174,7 @@ class Form extends React.Component<Props, State> {
             <FormGroup>
               <ControlLabel>Sub UOM</ControlLabel>
               <Select
-                value={subUom.uomId}
+                value={subUom.uom}
                 onChange={onChangeUom}
                 options={(uoms || []).map(e => ({
                   value: e._id,
@@ -231,7 +231,7 @@ class Form extends React.Component<Props, State> {
       case 'vendorId':
         value = e;
         break;
-      case 'uomId':
+      case 'uom':
         value = e ? e.value : '';
         break;
       default:
@@ -261,7 +261,7 @@ class Form extends React.Component<Props, State> {
   onClickAddSub = () => {
     const subUoms = this.state.subUoms;
 
-    subUoms.push({ uomId: '', ratio: 0, _id: Math.random().toString() });
+    subUoms.push({ uom: '', ratio: 0, _id: Math.random().toString() });
     this.setState({ subUoms });
   };
 
@@ -584,8 +584,8 @@ class Form extends React.Component<Props, State> {
                   <ControlLabel>UOM</ControlLabel>
                   <Row>
                     <Select
-                      value={this.state.uomId}
-                      onChange={this.onComboEvent.bind(this, 'uomId')}
+                      value={this.state.uom}
+                      onChange={this.onComboEvent.bind(this, 'uom')}
                       options={(uoms || []).map(e => ({
                         value: e._id,
                         label: e.name

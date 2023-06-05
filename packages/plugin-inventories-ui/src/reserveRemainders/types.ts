@@ -6,7 +6,7 @@ export interface IReserveRem {
   departmentId?: string;
   branchId?: string;
   productId?: string;
-  uomId?: string;
+  uom?: string;
   remainder: number;
   createdAt?: Date;
   createdBy?: string;

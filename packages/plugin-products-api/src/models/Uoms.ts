@@ -66,7 +66,7 @@ export const loadUomClass = (models: IModels, subdomain: string) => {
      */
     public static async removeUoms(_ids: string[]) {
       const uoms = await models.Uoms.find({
-        uomId: { $in: _ids }
+        uom: { $in: _ids }
       }).lean();
       const uomIds = uoms.map(p => p._id);
 

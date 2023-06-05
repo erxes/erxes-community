@@ -42,25 +42,25 @@ export const productToErkhet = async (subdomain, params, action) => {
   let subMeasureUnit;
   let ratioMeasureUnit;
 
-  if (product.uomId) {
+  if (product.uom) {
     const firstSubUom = product.subUoms.length && product.subUoms[0];
 
     const uoms: any[] = await sendProductsMessage({
       subdomain,
       action: 'uoms.find',
-      data: { _id: { $in: [product.uomId, firstSubUom && firstSubUom.uomId] } },
+      data: { _id: { $in: [product.uom, firstSubUom && firstSubUom.uom] } },
       isRPC: true,
       defaultValue: []
     });
 
     if (uoms.length) {
-      const uom = uoms.find(uom => uom._id === product.uomId);
+      const uom = uoms.find(uom => uom._id === product.uom);
       if (uom) {
         measureUnit = uom.code || measureUnit;
       }
 
       const subUom = uoms.find(
-        uom => uom._id === (firstSubUom ? firstSubUom.uomId : '')
+        uom => uom._id === (firstSubUom ? firstSubUom.uom : '')
       );
       if (subUom) {
         subMeasureUnit = subUom.code;

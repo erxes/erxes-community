@@ -11,7 +11,7 @@ const productParamsDef = `
   $attachment: AttachmentInput,
   $attachmentMore: [AttachmentInput],
   $vendorId: String,
-  $uomId: String,
+  $uom: String,
   $subUoms: JSON,
   $taxType: String,
   $taxCode: String
@@ -40,7 +40,7 @@ const productParams = `
   attachment: $attachment,
   attachmentMore: $attachmentMore,
   vendorId: $vendorId,
-  uomId: $uomId,
+  uom: $uom,
   subUoms: $subUoms,
   taxType: $taxType,
   taxCode: $taxCode
@@ -125,8 +125,8 @@ const uomsEdit = `
 `;
 
 const uomsRemove = `
-  mutation uomsRemove($uomIds: [String!]) {
-    uomsRemove(uomIds: $uomIds)
+  mutation uomsRemove($uoms: [String!]) {
+    uomsRemove(uoms: $uoms)
   }
 `;
 

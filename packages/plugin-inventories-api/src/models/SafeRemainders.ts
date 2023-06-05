@@ -93,7 +93,7 @@ export const loadSafeRemainderClass = (models: IModels) => {
       });
 
       // Create remainder items for every product
-      const defaultUomId = '';
+      const defaultUom = '';
       const productIds = products.map((item: any) => item._id);
       const liveRemainders = await models.Remainders.find({
         departmentId,
@@ -118,7 +118,7 @@ export const loadSafeRemainderClass = (models: IModels) => {
           productId: product._id,
           preCount: live.count || 0,
           count: live.count || 0,
-          uomId: product.uomId || defaultUomId,
+          uom: product.uom || defaultUom,
           modifiedAt: new Date(),
           modifiedBy: userId
         });

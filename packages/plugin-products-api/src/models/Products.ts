@@ -46,8 +46,8 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
     }
 
     static async checkUOM(doc) {
-      if (doc.uomId) {
-        return doc.uomId;
+      if (doc.uom) {
+        return doc.uom;
       }
 
       const configs = await models.ProductsConfigs.find({
@@ -121,7 +121,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
         isRPC: true
       });
 
-      doc.uomId = await this.checkUOM(doc);
+      doc.uom = await this.checkUOM(doc);
 
       return models.Products.create(doc);
     }
@@ -151,7 +151,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
           isRPC: true
         });
       }
-      doc.uomId = await this.checkUOM(doc);
+      doc.uom = await this.checkUOM(doc);
       await models.Products.updateOne({ _id }, { $set: doc });
 
       return await models.Products.findOne({ _id }).lean();
@@ -272,7 +272,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
         mergedIds: productIds,
         name,
         type,
-        uomId: await this.checkUOM(productFields),
+        uom: await this.checkUOM(productFields),
         description,
         categoryId,
         vendorId

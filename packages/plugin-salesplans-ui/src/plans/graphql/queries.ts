@@ -27,7 +27,7 @@ const commonPlanFields = `
   departmentId
   branchId
   productId
-  uomId
+  uom
   createdAt
   createdBy
   modifiedAt
@@ -50,7 +50,7 @@ const commonPlanFields = `
     code
     name
     categoryId
-    uomId
+    uom
     subUoms
   }
   uom {

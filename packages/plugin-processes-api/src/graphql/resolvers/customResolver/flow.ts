@@ -57,7 +57,7 @@ export default {
 
     for (const need of latestNeedProducts || []) {
       need.product = productById[need.productId] || {};
-      need.uom = uomById[need.uomId] || {};
+      need.uom = uomById[need.uom] || {};
     }
 
     return latestNeedProducts;
@@ -77,7 +77,7 @@ export default {
 
     for (const result of latestResultProducts) {
       result.product = productById[result.productId] || {};
-      result.uom = uomById[result.uomId] || {};
+      result.uom = uomById[result.uom] || {};
     }
 
     return latestResultProducts;

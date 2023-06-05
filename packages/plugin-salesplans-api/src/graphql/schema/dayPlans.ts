@@ -13,7 +13,7 @@ export const types = () => `
     departmentId: String,
     branchId: String,
     productId: String,
-    uomId: String,
+    uom: String,
     values: [PlanTimeValues],
     createdAt: Date,
     createdBy: String,
@@ -68,7 +68,7 @@ export const planCreateParams = `
 export const mutations = `
   dayPlansAdd(${planCreateParams}): [DayPlan]
   dayPlansRemove(_ids: [String]): JSON
-  dayPlanEdit(_id: String!, uomId: String, values: JSON): DayPlan
+  dayPlanEdit(_id: String!, uom: String, values: JSON): DayPlan
   dayPlansConfirm(
     date: Date,
     branchId: String,

@@ -33,7 +33,7 @@ export const remainderProductFields = `
     name
   }
   remainder
-  uomId
+  uom
   uom {
     _id
     code

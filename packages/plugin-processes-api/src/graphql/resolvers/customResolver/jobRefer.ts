@@ -17,7 +17,7 @@ export default {
 
     for (let need of needProducts) {
       need.product = productById[need.productId] || {};
-      need.uom = uomById[need.uomId] || {};
+      need.uom = uomById[need.uom] || {};
     }
 
     return needProducts;
@@ -37,7 +37,7 @@ export default {
 
     for (const result of resultProducts) {
       result.product = productById[result.productId] || {};
-      result.uom = uomById[result.uomId] || {};
+      result.uom = uomById[result.uom] || {};
     }
 
     return resultProducts;

@@ -54,7 +54,7 @@ export default {
     return await sendProductsMessage({
       subdomain,
       action: 'uoms.findOne',
-      data: { _id: reserveRem.uomId },
+      data: { _id: reserveRem.uom },
       isRPC: true
     });
   }

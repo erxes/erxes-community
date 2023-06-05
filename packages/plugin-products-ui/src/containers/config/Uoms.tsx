@@ -34,7 +34,7 @@ const ListContainer = (props: FinalProps) => {
   const remove = uom => {
     confirm(`This action will remove the uom. Are you sure?`)
       .then(() => {
-        uomsRemove({ variables: { uomIds: [uom._id] } })
+        uomsRemove({ variables: { uoms: [uom._id] } })
           .then(() => {
             Alert.success('You successfully deleted a uom');
             uomsQuery.refetch();
