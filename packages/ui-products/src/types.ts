@@ -38,7 +38,6 @@ export interface IProduct {
   vendor?: ICompany;
 
   uom?: string;
-  uom?: any;
   subUoms?: any[];
   taxType?: string;
   taxCode?: string;

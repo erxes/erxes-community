@@ -73,7 +73,6 @@ export const getProductsDataOnOwork = async (
       productId: data.productId,
       uom: data.uom,
       quantity: data.quantity,
-      uom: uomById[data.uom],
       reserveRem: reserveRemByProductId[data.productId] || 0,
       liveRem: liveRemByProductId[data.productId] || 0,
       mainUom: uomById[product.uom],

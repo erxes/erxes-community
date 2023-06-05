@@ -42,7 +42,6 @@ export interface IProductsData {
   series?: string[];
 
   product?: IProduct;
-  uom?: IUom;
 }
 
 export interface IProductsDataDocument extends IProductsData {}

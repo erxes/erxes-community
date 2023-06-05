@@ -33,10 +33,9 @@ export const getProductAndUoms = async (
   productsData: IProductsData[]
 ) => {
   const productById = {};
-  const uomById = {};
 
   if (!productsData || !productsData.length) {
-    return { productById, uomById };
+    return { productById };
   }
 
   const productIds = productsData
@@ -57,21 +56,5 @@ export const getProductAndUoms = async (
     }
   }
 
-  const uoms = productsData.map(n => n.uom);
-
-  if (uoms.length) {
-    const uoms = await sendProductsMessage({
-      subdomain,
-      action: 'uoms.find',
-      data: { _id: { $in: uoms } },
-      isRPC: true,
-      defaultValue: []
-    });
-
-    for (const uom of uoms) {
-      uomById[uom._id] = uom;
-    }
-  }
-
-  return { productById, uomById };
+  return { productById };
 };

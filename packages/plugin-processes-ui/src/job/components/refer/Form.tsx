@@ -163,27 +163,22 @@ class Form extends React.Component<Props, State> {
 
   renderProductModal = (type: 'needProducts' | 'resultProducts') => {
     const productOnChange = (products: IProduct[]) => {
-      const { uoms, configsMap } = this.props;
-
       const currentProducts = this.state[type];
       const currentProductIds = currentProducts.map(p => p.productId);
       const chosenProductIds = products.map(p => p._id);
-      const defaultUom = (configsMap || {}).defaultUOM || '';
 
       for (const product of products.filter(
         p => !currentProductIds.includes(p._id)
       ) || []) {
         const productId = product ? product._id : '';
-        const uom = product.uom ? product.uom : defaultUom;
-        const uom = (uoms || []).find(e => e._id === uom);
+        const uom = product.uom || '';
 
         const inputData = {
           _id: Math.random().toString(),
           productId,
           quantity: 1,
           uom,
-          product,
-          uom
+          product
         };
 
         currentProducts.push(inputData);
