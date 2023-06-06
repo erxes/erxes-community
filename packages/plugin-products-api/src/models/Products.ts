@@ -46,24 +46,25 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
     }
 
     static async checkUOM(doc) {
-      if (doc.uom) {
-        return doc.uom;
+      if (!doc.uom) {
+        throw new Error('uom is required');
       }
 
-      const configs = await models.ProductsConfigs.find({
-        code: { $in: ['isRequireUOM', 'defaultUOM'] }
-      }).lean();
+      const uoms = (doc.subUoms || []).map(u => u.uom);
+      uoms.unshift(doc.uom);
+      const oldUoms = await models.Uoms.find({ code: { $in: uoms } }).lean();
+      const oldUomCodes = (oldUoms || []).map(u => u.code);
+      const creatUoms: any[] = [];
 
-      const isRequireUOM = (configs.find(c => c.code === 'isRequireUOM') || {})
-        .value;
-      const defaultUOM = (configs.find(c => c.code === 'defaultUOM') || {})
-        .value;
-
-      if (isRequireUOM && defaultUOM) {
-        return defaultUOM;
+      for (const uom of uoms) {
+        if (!oldUomCodes.includes(uom)) {
+          creatUoms.push({ code: uom, name: uom });
+        }
       }
 
-      return '';
+      await models.Uoms.insertMany(creatUoms);
+
+      return doc.uom;
     }
 
     static async checkCodeDuplication(code: string) {

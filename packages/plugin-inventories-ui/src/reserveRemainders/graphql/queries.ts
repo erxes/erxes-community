@@ -54,11 +54,6 @@ export const reserveRemFields = `
     uom
     subUoms
   }
-  uom {
-    _id
-    code
-    name
-  }
   createdUser {
     ${userFields}
   }

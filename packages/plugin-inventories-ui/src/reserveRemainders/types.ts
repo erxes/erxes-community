@@ -16,7 +16,6 @@ export interface IReserveRem {
   branch?: IBranch;
   department?: IDepartment;
   product?: IProduct;
-  uom?: IUom;
 }
 
 export interface IReserveRemParams {

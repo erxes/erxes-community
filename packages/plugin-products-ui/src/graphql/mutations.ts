@@ -48,8 +48,8 @@ const uomsEdit = `
 `;
 
 const uomsRemove = `
-  mutation uomsRemove($uoms: [String!]) {
-    uomsRemove(uoms: $uoms)
+  mutation uomsRemove($uomIds: [String!]) {
+    uomsRemove(uomIds: $uomIds)
   }
 `;
 

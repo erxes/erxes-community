@@ -8,6 +8,30 @@ export default {
     return models.Performs.findOne({ _id });
   },
 
+  async needProducts(perform: IPerformDocument, {}, { subdomain }: IContext) {
+    const needProducts = perform.needProducts || [];
+
+    const { productById } = await getProductAndUoms(subdomain, needProducts);
+
+    for (let need of needProducts) {
+      need.product = productById[need.productId] || {};
+      need.uom = (productById[need.productId] || {}).uom;
+    }
+
+    return needProducts;
+  },
+  async resultProducts(perform: IPerformDocument, {}, { subdomain }: IContext) {
+    const resultProducts = perform.resultProducts || [];
+
+    const { productById } = await getProductAndUoms(subdomain, resultProducts);
+
+    for (const result of resultProducts) {
+      result.product = productById[result.productId] || {};
+      result.uom = (productById[result.productId] || {}).uom;
+    }
+
+    return resultProducts;
+  },
   async inProducts(perform: IPerformDocument, {}, { subdomain }: IContext) {
     const inProducts = perform.inProducts || [];
 

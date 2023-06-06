@@ -20,5 +20,5 @@ export const queries = `
 export const mutations = `
   uomsAdd(${params}): Uom
   uomsEdit(_id: String!, ${params}): Uom
-  uomsRemove(uoms: [String!]): String
+  uomsRemove(uomIds: [String!]): String
 `;

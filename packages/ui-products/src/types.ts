@@ -103,18 +103,9 @@ export type EditMutationResponse = {
 };
 
 // UOM
-
 export type UomsQueryResponse = {
   uoms: IUom[];
 } & QueryResponse;
-
-export type UomsCountQueryResponse = {
-  uomsTotalCount: number;
-} & QueryResponse;
-
-export type UomRemoveMutationResponse = {
-  uomsRemove: (mutation: { variables: { uoms: string[] } }) => Promise<any>;
-};
 
 // SETTINGS
 

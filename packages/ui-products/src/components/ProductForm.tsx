@@ -8,7 +8,7 @@ import {
   IButtonMutateProps,
   IFormProps
 } from '@erxes/ui/src/types';
-import { IConfigsMap, IProduct, IProductCategory, IUom } from '../types';
+import { IProduct, IProductCategory, IUom } from '../types';
 import { TAX_TYPES, TYPES } from '../constants';
 import { BarcodeContainer, BarcodeItem } from '../styles';
 import {
@@ -26,15 +26,15 @@ import FormGroup from '@erxes/ui/src/components/form/Group';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import React from 'react';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
-import Select from 'react-select-plus';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
 import Uploader from '@erxes/ui/src/components/Uploader';
+import AutoCompletionSelect from '@erxes/ui/src/components/AutoCompletionSelect';
+import { queries } from '../graphql';
 
 type Props = {
   product?: IProduct;
   productCategories: IProductCategory[];
   uoms?: IUom[];
-  configsMap?: IConfigsMap;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
 };
@@ -71,8 +71,6 @@ class Form extends React.Component<Props, State> {
       taxCode
     } = product;
 
-    const defaultUom = props.configsMap.defaultUOM || '';
-
     this.state = {
       barcodes: barcodes ? barcodes : [],
       barcodeInput: '',
@@ -81,7 +79,7 @@ class Form extends React.Component<Props, State> {
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
       description: description ? description : '',
-      uom: uom ? uom : defaultUom,
+      uom: uom,
       subUoms: subUoms ? subUoms : [],
       taxType,
       taxCode
@@ -155,8 +153,8 @@ class Form extends React.Component<Props, State> {
         });
       };
 
-      const onChangeUom = option => {
-        updateUoms('uom', option.value);
+      const onChangeUom = ({ selectedOption }) => {
+        updateUoms('uom', selectedOption);
       };
 
       const onChangeRatio = e => {
@@ -173,13 +171,14 @@ class Form extends React.Component<Props, State> {
           <FormColumn>
             <FormGroup>
               <ControlLabel>Sub UOM</ControlLabel>
-              <Select
-                value={subUom.uom}
+              <AutoCompletionSelect
+                defaultValue={subUom.uom}
+                defaultOptions={(uoms || []).map(e => e.code)}
+                autoCompletionType="uoms"
+                placeholder="Enter an uom"
+                queryName="uoms"
+                query={queries.uoms}
                 onChange={onChangeUom}
-                options={(uoms || []).map(e => ({
-                  value: e._id,
-                  label: e.name
-                }))}
               />
             </FormGroup>
           </FormColumn>
@@ -231,14 +230,15 @@ class Form extends React.Component<Props, State> {
       case 'vendorId':
         value = e;
         break;
-      case 'uom':
-        value = e ? e.value : '';
-        break;
       default:
         value = e.target.value;
     }
 
     this.setState({ [variable]: value } as any);
+  };
+
+  onChangeUom = ({ selectedOption }) => {
+    this.setState({ uom: selectedOption });
   };
 
   updateBarcodes = (barcode?: string) => {
@@ -321,7 +321,6 @@ class Form extends React.Component<Props, State> {
       closeModal,
       product,
       productCategories,
-      configsMap,
       uoms
     } = this.props;
     const { values, isSubmitted } = formProps;
@@ -346,8 +345,6 @@ class Form extends React.Component<Props, State> {
       taxType,
       taxCode
     } = this.state;
-
-    const isUom = (configsMap || {}).isRequireUOM || false;
 
     return (
       <>
@@ -578,34 +575,31 @@ class Form extends React.Component<Props, State> {
                 ]}
               />
             </FormGroup>
-            {isUom && (
-              <>
-                <FormGroup>
-                  <ControlLabel>UOM</ControlLabel>
-                  <Row>
-                    <Select
-                      value={this.state.uom}
-                      onChange={this.onComboEvent.bind(this, 'uom')}
-                      options={(uoms || []).map(e => ({
-                        value: e._id,
-                        label: e.name
-                      }))}
-                    />
-                    <Button
-                      btnStyle="primary"
-                      uppercase={false}
-                      icon="plus-circle"
-                      onClick={this.onClickAddSub}
-                    >
-                      {' '}
-                      Add sub
-                    </Button>
-                  </Row>
-                </FormGroup>
+            <FormGroup>
+              <ControlLabel>UOM</ControlLabel>
+              <Row>
+                <AutoCompletionSelect
+                  defaultValue={this.state.uom}
+                  defaultOptions={(uoms || []).map(e => e.code)}
+                  autoCompletionType="uoms"
+                  placeholder="Enter an uom"
+                  queryName="uoms"
+                  query={queries.uoms}
+                  onChange={this.onChangeUom}
+                />
+                <Button
+                  btnStyle="primary"
+                  uppercase={false}
+                  icon="plus-circle"
+                  onClick={this.onClickAddSub}
+                >
+                  {' '}
+                  Add sub
+                </Button>
+              </Row>
+            </FormGroup>
 
-                {this.renderSubUoms()}
-              </>
-            )}
+            {this.renderSubUoms()}
           </FormColumn>
         </FormWrapper>
 

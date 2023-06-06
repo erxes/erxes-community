@@ -7,11 +7,7 @@ import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import List from '../../components/config/Uoms';
 import { mutations, queries } from '../../graphql';
-import {
-  UomsQueryResponse,
-  UomsCountQueryResponse,
-  UomRemoveMutationResponse
-} from '../../types';
+import { UomsQueryResponse, UomsCountQueryResponse } from '../../types';
 import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
@@ -34,7 +30,7 @@ const ListContainer = (props: FinalProps) => {
   const remove = uom => {
     confirm(`This action will remove the uom. Are you sure?`)
       .then(() => {
-        uomsRemove({ variables: { uoms: [uom._id] } })
+        uomsRemove({ variables: { uomIds: [uom._id] } })
           .then(() => {
             Alert.success('You successfully deleted a uom');
             uomsQuery.refetch();

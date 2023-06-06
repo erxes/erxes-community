@@ -1,7 +1,6 @@
 import FormControl from '@erxes/ui/src/components/form/Control';
 import React from 'react';
 import { __ } from 'coreui/utils';
-import { IUom } from '@erxes/ui-products/src/types';
 import ActionButtons from '@erxes/ui/src/components/ActionButtons';
 import Button from '@erxes/ui/src/components/Button';
 import Icon from '@erxes/ui/src/components/Icon';
@@ -10,7 +9,6 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import SelectSeries from './../containers/SelectSeries';
 
 type Props = {
-  allUoms: IUom[];
   stateName: 'inProducts' | 'outProducts';
   productData: any;
   productsData: any[];
@@ -128,13 +126,21 @@ class PerformDetail extends React.Component<Props, State> {
   }
 
   render() {
-    const { productData, hasCost, allUoms } = this.props;
+    const { productData, hasCost } = this.props;
     const { product } = productData;
     const productName = product
       ? `${product.code} - ${product.name}`
       : 'not name';
 
-    const beUoms = [product.uom, ...product.subUoms.map(su => su.uom)];
+    const uoms = Array.from(
+      new Set([
+        productData.uom,
+        product.uom,
+        ...product.subUoms.map(su => su.uom)
+      ])
+    )
+      .filter(u => u)
+      .map(u => ({ value: u, label: u }));
 
     return (
       <tr>
@@ -144,14 +150,7 @@ class PerformDetail extends React.Component<Props, State> {
             defaultValue={productData.uom}
             componentClass="select"
             name="uom"
-            options={[
-              ...allUoms
-                .filter(au => (beUoms || []).includes(au._id))
-                .map(u => ({
-                  value: u._id,
-                  label: `${u.code} - ${u.name}`
-                }))
-            ]}
+            options={uoms}
             required={true}
             onChange={this.onChange}
           />

@@ -55,11 +55,6 @@ export const safeRemainderItemFields = `
     name
   }
   productId
-  uom {
-    _id
-    code
-    name
-  }
   uom
 `;
 

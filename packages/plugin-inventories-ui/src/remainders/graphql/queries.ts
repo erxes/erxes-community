@@ -34,11 +34,6 @@ export const remainderProductFields = `
   }
   remainder
   uom
-  uom {
-    _id
-    code
-    name
-  }
 `;
 
 const remainderProducts = `
