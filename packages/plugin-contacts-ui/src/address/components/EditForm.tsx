@@ -56,7 +56,7 @@ const AddressesEdit = (props: Props) => {
           suburb: address.suburb,
           other: address.other
         };
-        updatedAddress.short = data.display_name;
+        updatedAddress.osmAddress = data.display_name;
         updatedAddress.osmId = data.osm_id;
         updatedAddress.lat = lat;
         updatedAddress.lng = lng;
@@ -120,7 +120,7 @@ const AddressesEdit = (props: Props) => {
           <ControlLabel>{__('Address line 1')}</ControlLabel>
           <FormControl
             name="addressLine1"
-            value={currentAddress?.short || ''}
+            value={currentAddress?.osmAddress || ''}
             disabled={true}
           />
         </Formgroup>

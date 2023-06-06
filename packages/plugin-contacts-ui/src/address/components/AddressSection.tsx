@@ -60,7 +60,7 @@ export default function Component(props: Props) {
           suburb: address.suburb,
           other: address.other
         };
-        updatedAddress.short = data.display_name;
+        updatedAddress.osmAddress = data.display_name;
         updatedAddress.osmId = data.osm_id;
 
         addresses[index] = updatedAddress;
@@ -91,7 +91,7 @@ export default function Component(props: Props) {
     const markers = addresses.map(address => {
       return {
         position: { lat: address.lat, lng: address.lng },
-        name: address.short
+        name: address.osmAddress
       };
     });
 
@@ -173,7 +173,8 @@ export default function Component(props: Props) {
         houseNumber: '',
         other: ''
       },
-      short: '',
+      osmAddress: '',
+      address: '',
       osmId: `temporary-${Math.random()}`
     };
 

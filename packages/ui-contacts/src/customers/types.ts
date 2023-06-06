@@ -36,7 +36,8 @@ export interface IAddress {
     street: string;
     other: string;
   };
-  short: string;
+  osmAddress: string;
+  address: string;
   osmId: string;
 }
 
