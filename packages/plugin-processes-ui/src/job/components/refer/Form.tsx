@@ -23,14 +23,12 @@ import {
 import { ProductButton } from '@erxes/ui-cards/src/deals/styles';
 import { Row } from '@erxes/ui-inbox/src/settings/integrations/styles';
 import { TableOver } from '../../../styles';
-import { IConfigsMap, IProduct, IUom } from '@erxes/ui-products/src/types';
+import { IProduct } from '@erxes/ui-products/src/types';
 import { IProductsData } from '../../../types';
 
 type Props = {
   jobRefer?: IJobRefer;
   jobCategories: IJobCategory[];
-  uoms?: IUom[];
-  configsMap?: IConfigsMap;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
 };
@@ -229,7 +227,6 @@ class Form extends React.Component<Props, State> {
         ? this.state.needProducts
         : this.state.resultProducts;
 
-    const { uoms, configsMap } = this.props;
     const { jobType } = this.state;
 
     products.sort();
@@ -256,23 +253,13 @@ class Form extends React.Component<Props, State> {
           </thead>
           <tbody>
             {products.map(product => {
-              const subUoms =
-                product.product && product.product.subUoms
-                  ? product.product.subUoms || []
-                  : [];
-              const defaultUom =
-                product.product && product.product.uom
-                  ? product.product.uom
-                  : (configsMap || {}).defaultUOM;
-
-              const productUoms = subUoms.map(e => e.uom);
-              const mergedUoms = [...productUoms, defaultUom];
-
-              const filtered: any[] =
-                mergedUoms.map(e => {
-                  const uomOne = (uoms || []).find(u => u._id === e);
-                  return uomOne;
-                }) || [];
+              const uoms = Array.from(
+                new Set([
+                  product.uom,
+                  product.product.uom,
+                  ...product.product.subUoms.map(su => su.uom)
+                ])
+              ).filter(u => u);
 
               return (
                 <tr>
@@ -308,10 +295,9 @@ class Form extends React.Component<Props, State> {
                         'uom'
                       )}
                     >
-                      <option value="" />
-                      {(filtered || []).map(u => (
-                        <option key={u._id} value={u._id}>
-                          {u.name}
+                      {uoms.map(u => (
+                        <option key={u} value={u}>
+                          {u}
                         </option>
                       ))}
                     </FormControl>
