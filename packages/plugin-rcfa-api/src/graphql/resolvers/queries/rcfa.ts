@@ -38,7 +38,7 @@ const RCFAQueries = {
     const filter = await generateFilters(params);
 
     const list = paginate(
-      models.RCFA.find(filter).sort({ createdAt: 1 }),
+      models.RCFA.find(filter).sort({ createdAt: -1 }),
       params
     );
 

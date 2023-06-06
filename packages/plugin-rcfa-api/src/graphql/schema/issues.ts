@@ -9,7 +9,8 @@ export const types = `
     status:String,
     relType:String,
     relTypeId:String,
-    description:String
+    description:String,
+    isRootCause:Boolean
   }
 
 `;

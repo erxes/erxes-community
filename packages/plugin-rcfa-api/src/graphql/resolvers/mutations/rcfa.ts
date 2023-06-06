@@ -35,14 +35,14 @@ const rcfaMutations = {
       stageId: destinationStageId
     };
 
-    await sendCardsMessage({
+    const newItem = await sendCardsMessage({
       subdomain: subdomain,
       action: 'createRelatedItem',
       data: payload,
       isRPC: true
     });
 
-    await models.Issues.updateOne({ _id: issue?._id }, { isRooACause: true });
+    await models.Issues.updateOne({ _id: issue?._id }, { isRootCause: true });
     await models.Issues.updateMany(
       { order: { $regex: new RegExp(issue?.order || '', 'i') } },
       { $set: { status: 'closed', closedAt: new Date() } }
@@ -53,7 +53,9 @@ const rcfaMutations = {
       {
         $set: {
           status: 'resolved',
-          closedAt: new Date()
+          closedAt: new Date(),
+          relTypeId: newItem._id,
+          relType: destinationType
         }
       }
     );

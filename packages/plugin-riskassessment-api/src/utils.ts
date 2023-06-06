@@ -7,7 +7,7 @@ import {
 } from './messageBroker';
 
 export const validRiskIndicators = async params => {
-  if (serviceDiscovery.isEnabled('tags') && !params.tagIds) {
+  if ((await serviceDiscovery.isEnabled('tags')) && !params.tagIds) {
     throw new Error('Please select some tags');
   }
   if (await models?.RiskIndicators.findOne({ name: params.name })) {

@@ -1,4 +1,4 @@
-const rcfa = `
+const rcfaDetail = `
   query rcfaDetail($_id: String, $mainType: String, $mainTypeId: String) {
     rcfaDetail(_id: $_id, mainType: $mainType, mainTypeId: $mainTypeId){
     _id
@@ -20,6 +20,7 @@ const rcfa = `
       relType
       relTypeId
       description
+      isRootCause
     }
     }
   }
@@ -45,6 +46,6 @@ query RcfaList($mainType: String, $searchValue: String, $page: Int, $perPage: In
 `;
 
 export default {
-  rcfa,
+  rcfaDetail,
   rcfaList
 };

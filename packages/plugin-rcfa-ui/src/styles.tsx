@@ -2,6 +2,46 @@ import { colors, dimensions } from '@erxes/ui/src';
 import styled, { css } from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { Contents } from '@erxes/ui/src/layout/styles';
+import { rgba } from '@erxes/ui/src/styles/ecolor';
+
+import { Columns } from '@erxes/ui/src/styles/chooser';
+import { Column } from '@erxes/ui/src/styles/main';
+
+export const RoundButton = styled.button`
+  width:30px;
+  height:30px;
+  border-radius:50px;
+  border:0;
+  cursor:pointer;
+  color:${colors.colorWhite}
+  background-color:${colors.colorLightGray}
+  &:hover{
+    background-color:${colors.colorCoreGray}
+  }
+`;
+
+export const TreeCard = styledTS<{
+  color?: string;
+}>(styled.div)`
+  padding:10px 20px;
+  background-color:${({ color }) => (color ? color : colors.colorLightGray)}
+  color:${colors.colorWhite}
+  border-radius:15px;
+  font-size:15px;
+  margin-top:5rem;
+  text-align:center;
+  width:250px
+    .content{
+    background-color:white;
+    border-radius:15px;
+    > h5{
+      color:${colors.colorBlack}
+    }
+    > p{
+      color:${colors.colorLightGray}
+    }
+  }
+`;
 
 export const StyledContent = styled.div`
   padding: 0 1rem;
@@ -212,4 +252,85 @@ export const RCFAEndPoint = styled.div`
     text-align: center;
     margin-bottom: 0;
   }
+`;
+export const Container = styled.div`
+  padding: ${dimensions.coreSpacing}px;
+  height: 100%;
+  overflow: auto;
+  background-image: radial-gradient(
+    ${colors.bgActive} 20%,
+    ${colors.colorWhite} 20%
+  );
+  background-size: ${dimensions.unitSpacing}px ${dimensions.unitSpacing}px;
+  #canvas {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    height: 100%;
+    }
+  }
+
+  .jtk-connector {
+    z-index: 4;
+  }
+
+  .jtk-endpoint {
+    z-index: 5;
+  }
+
+  .jtk-overlay {
+    z-index: 6;
+  }
+`;
+
+export const ZoomActions = styled.div`
+  position: absolute;
+  font-size: 11px;
+  z-index: ${dimensions.unitSpacing};
+
+  > .icon-wrapper {
+    display: table;
+    border: 1px solid ${colors.borderDarker};
+    border-radius: ${dimensions.unitSpacing - 6}px;
+    margin-bottom: ${dimensions.unitSpacing - 5}px;
+  }
+`;
+export const ZoomIcon = styledTS<{ disabled: boolean }>(styled.div)`
+  width: ${dimensions.coreSpacing}px;
+  height: ${dimensions.coreSpacing}px;
+  line-height: ${dimensions.coreSpacing}px;
+  text-align: center;
+  background: ${props =>
+    props.disabled ? colors.bgActive : colors.colorWhite};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  margin: 0;
+  transition: all ease .3s;
+
+  > i {
+    font-weight: 500;
+    font-size: 11px;
+
+    &:before {
+      font-weight: 700;
+    }
+  }
+
+  &:first-child {
+    border-bottom: 1px solid ${colors.borderDarker};
+    padding-bottom: 3px;
+  }
+
+  &:hover {
+    background: ${colors.bgLight};
+    opacity: .8;
+  }
+`;
+
+export const CustomColumns = styled(Columns)`
+  flex-wrap: nowrap;
+`;
+
+export const CustomColumn = styled(Column)`
+  margin: 15px;
+  text-align: -webkit-center;
 `;

@@ -45,7 +45,7 @@ class SectionContainer extends React.Component<FinalProps> {
       return <Spinner />;
     }
 
-    const addIssue = data => {
+    const addIssue = (data, callback) => {
       const payload = {
         ...data,
         mainType: mainType,
@@ -109,7 +109,7 @@ class SectionContainer extends React.Component<FinalProps> {
 
 const refetchQueries = ({ mainTypeId }) => [
   {
-    query: gql(queries.rcfa),
+    query: gql(queries.rcfaDetail),
     variables: {
       mainType: 'ticket',
       mainTypeId: mainTypeId
@@ -119,7 +119,7 @@ const refetchQueries = ({ mainTypeId }) => [
 
 export default withProps<Props>(
   compose(
-    graphql<Props>(gql(queries.rcfa), {
+    graphql<Props>(gql(queries.rcfaDetail), {
       name: 'rcfaDetail',
       options: (props: any) => ({
         variables: {

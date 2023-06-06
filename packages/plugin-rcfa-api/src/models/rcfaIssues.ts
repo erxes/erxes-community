@@ -15,14 +15,7 @@ export interface IRCFAQuestionModel extends Model<IRCFAIssuesDocument> {
 export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
   class Issues {
     public static async addIssue(doc: any, user: IUserDocument) {
-      const { mainType, mainTypeId, parentId } = doc;
-      const parent = await models.Issues.findOne({ _id: parentId });
-
-      const issueDoc = {
-        ...doc,
-        code: doc.issue,
-        order: `${parent ? parent.order : ''}${doc.issue}/`
-      };
+      const { mainType, mainTypeId } = doc;
 
       const rcfa = await models.RCFA.findOne({
         mainType,
@@ -36,14 +29,18 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
           userId: user._id
         };
         const newDoc = await models.RCFA.create(rcfaDoc);
-        issueDoc.rcfaId = newDoc._id;
+        doc.rcfaId = newDoc._id;
       } else {
         if (rcfa?.status !== 'inProgress') {
           throw new Error('RCFA is already in resolved');
         }
+        console.log({ status: 'dss' });
 
-        const [{ status, countHierarchies }] = await models.Issues.aggregate([
-          { $match: { _id: issueDoc?.parentId } },
+        const [{ status, countHierarchies }]: {
+          status?: string;
+          countHierarchies?;
+        }[] = await models.Issues.aggregate([
+          { $match: { _id: doc?.parentId } },
           {
             $graphLookup: {
               from: 'rcfa_issues',
@@ -57,10 +54,10 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
             $project: { status: 1, countHierarchies: { $size: '$hierarchies' } }
           }
         ]);
+        console.log({ status, countHierarchies });
         if (countHierarchies === 4) {
           throw new Error('You cannot add issue this level of rcfa');
         }
-
         if (status !== 'inProgress') {
           throw new Error('You cannot add issue this level of rcfa');
         }
@@ -68,10 +65,10 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
           throw new Error('You cannot add issue this rcfa');
         }
 
-        issueDoc.rcfaId = rcfa._id;
+        doc.rcfaId = rcfa._id;
       }
 
-      return await models.Issues.create({ ...issueDoc });
+      return await models.Issues.create({ ...doc });
     }
 
     public static async editIssue(_id, doc) {

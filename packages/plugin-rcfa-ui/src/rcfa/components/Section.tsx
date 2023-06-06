@@ -37,7 +37,7 @@ interface IRCFAIssues extends IRCFA {
 type Props = {
   issues: IRCFAIssues[];
   detail: IRCFAIssues;
-  addIssue: (data) => void;
+  addIssue: (data, callback: () => void) => void;
   editIssue: (_id: string, doc: any) => void;
   removeIssue: (_id: string) => void;
   closeIssue: (_id: string) => void;
@@ -80,22 +80,25 @@ class RCFASection extends React.Component<Props, State> {
     }
   }
 
-  handleSave({
-    _id,
-    value,
-    parentId
-  }: {
-    _id?: string;
-    value: string;
-    parentId?: string;
-  }) {
+  handleSave(
+    {
+      _id,
+      value,
+      parentId
+    }: {
+      _id?: string;
+      value: string;
+      parentId?: string;
+    },
+    callback: () => void
+  ) {
     const { detail, editIssue, addIssue } = this.props;
 
     if (!_loadsh.isEmpty(detail) && typeof _id === 'string') {
       return editIssue(_id, { issue: value });
     }
 
-    addIssue({ issue: value, parentId });
+    addIssue({ issue: value, parentId }, callback);
   }
 
   renderResolveForm({ issueId, callback }) {
@@ -218,14 +221,13 @@ class RCFASection extends React.Component<Props, State> {
     const handleSaveIssue = (e, _id, parentId) => {
       if (e.key === 'Enter') {
         const { value } = e.currentTarget as HTMLInputElement;
-
-        this.handleSave({ _id, value, ...(parentId && { parentId }) });
-
         const updatedIssues = issues.map(issue =>
           issue._id === _id ? { ...issue, isEditing: !issue.isEditing } : issue
         );
 
-        this.setState({ issues: updatedIssues });
+        this.handleSave({ _id, value, ...(parentId && { parentId }) }, () =>
+          this.setState({ issues: updatedIssues })
+        );
       }
     };
 

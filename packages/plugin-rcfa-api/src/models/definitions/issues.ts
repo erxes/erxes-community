@@ -9,6 +9,7 @@ export interface IRCFAIssues {
   createdAt: string;
   code: string;
   order: string;
+  isRootCause?: boolean;
   __v?: number;
 }
 
@@ -23,7 +24,7 @@ export const rcfaIssuessSchema = new Schema({
   order: field({ type: String, label: 'order' }),
   issue: field({ type: String, label: 'Issue' }),
   parentId: field({ type: String, optional: true }),
-  isRooACause: field({ type: Boolean }),
+  isRootCause: field({ type: Boolean }),
   status: field({
     type: String,
     enum: ['inProgress', 'closed'],
