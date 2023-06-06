@@ -10,15 +10,18 @@ import {
   customFixDate,
   findAllTeamMembersWithEmpId,
   generateCommonUserIds,
-  generateFilter
+  generateFilter,
+  returnSupervisedUsers
 } from '../../utils';
 import { IReport } from '../../models/definitions/timeclock';
+import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 import { fixDate, paginate } from '@erxes/api-utils/src';
+import { sendCoreMessage } from '../../messageBroker';
 
 const timeclockQueries = {
-  async absences(_root, queryParams, { models, subdomain }: IContext) {
+  async absences(_root, queryParams, { models, subdomain, user }: IContext) {
     return models.Absences.find(
-      await generateFilter(queryParams, subdomain, 'absence')
+      await generateFilter(queryParams, subdomain, 'absence', user)
     );
   },
 
@@ -30,11 +33,40 @@ const timeclockQueries = {
     return models.Absences.find({ status: 'Holiday' });
   },
 
+  // show supervisod branches, departments, users of those only
+  timeclockBranches(_root, {}, { subdomain, user }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: `branches.find`,
+      data: {
+        query: {
+          supervisorId: user._id
+        }
+      },
+      isRPC: true,
+      defaultValue: []
+    });
+  },
+
+  timeclockDepartments(_root, {}, { subdomain, user }: IContext) {
+    return sendCoreMessage({
+      subdomain,
+      action: `departments.find`,
+      data: {
+        supervisorId: user._id
+      },
+      isRPC: true,
+      defaultValue: []
+    });
+  },
+
   timeclocksPerUser(
     _root,
-    { userId, startDate, endDate },
-    { models }: IContext
+    { userId, startDate, endDate, shiftActive },
+    { models, user }: IContext
   ) {
+    const getUserId = userId || user._id;
+
     const timeField = {
       $or: [
         {
@@ -52,14 +84,25 @@ const timeclockQueries = {
       ]
     };
 
-    return models.Timeclocks.find({ $and: [{ userId }, timeField] });
+    const selector: any = [{ userId: getUserId }, timeField];
+
+    if (shiftActive) {
+      selector.push({ shiftActive });
+    }
+
+    return models.Timeclocks.find({ $and: selector });
   },
 
-  async timeclocksMain(_root, queryParams, { subdomain, models }: IContext) {
+  async timeclocksMain(
+    _root,
+    queryParams,
+    { subdomain, models, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'timeclock'
+      'timeclock',
+      user
     );
 
     // if there's no common user, return empty list
@@ -69,15 +112,14 @@ const timeclockQueries = {
 
     const totalCount = models.Timeclocks.count(selector);
 
-    const list = paginate(
-      models.Timeclocks.find(selector).sort({
+    const list = paginate(models.Timeclocks.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    })
+      .sort({
         shiftStart: -1
-      }),
-      {
-        perPage: queryParams.perPage,
-        page: queryParams.page
-      }
-    );
+      })
+      .limit(queryParams.perPage || 20);
 
     return { list, totalCount };
   },
@@ -96,11 +138,16 @@ const timeclockQueries = {
     return getActiveTimeclock.pop();
   },
 
-  async timelogsMain(_root, queryParams, { subdomain, models }: IContext) {
+  async timelogsMain(
+    _root,
+    queryParams,
+    { subdomain, models, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'timelog'
+      'timelog',
+      user
     );
     const totalCount = models.TimeLogs.count(selector);
 
@@ -109,10 +156,12 @@ const timeclockQueries = {
       return { list: [], totalCount: 0 };
     }
 
-    const list = paginate(
-      models.TimeLogs.find(selector).sort({ userId: 1, timelog: -1 }),
-      { perPage: queryParams.perPage, page: queryParams.page }
-    );
+    const list = paginate(models.TimeLogs.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    })
+      .sort({ userId: 1, timelog: -1 })
+      .limit(queryParams.perPage || 20);
 
     return { list, totalCount };
   },
@@ -130,11 +179,16 @@ const timeclockQueries = {
     }).sort({ timelog: 1 });
   },
 
-  async schedulesMain(_root, queryParams, { models, subdomain }: IContext) {
+  async schedulesMain(
+    _root,
+    queryParams,
+    { models, subdomain, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'schedule'
+      'schedule',
+      user
     );
     const totalCount = models.Schedules.count(selector);
 
@@ -153,11 +207,8 @@ const timeclockQueries = {
 
   schedulesPerUser(_root, queryParams, { models, user }: IContext) {
     const getUserId = queryParams.userId || user._id;
-    return models.Schedules.find({ userId: getUserId });
+    return models.Schedules.find({ userId: getUserId, status: 'Approved' });
   },
-  // scheduleShiftsOfUser(_root, queryParams, { models }: IContext) {
-
-  // },
 
   scheduleConfigs(_root, {}, { models }: IContext) {
     return models.ScheduleConfigs.find();
@@ -174,11 +225,16 @@ const timeclockQueries = {
     return { list, totalCount };
   },
 
-  async requestsMain(_root, queryParams, { models, subdomain }: IContext) {
+  async requestsMain(
+    _root,
+    queryParams,
+    { models, subdomain, user }: IContext
+  ) {
     const [selector, commonUserFound] = await generateFilter(
       queryParams,
       subdomain,
-      'absence'
+      'absence',
+      user
     );
     const totalCount = models.Absences.count(selector);
 
@@ -187,13 +243,10 @@ const timeclockQueries = {
       return { list: [], totalCount: 0 };
     }
 
-    const list = paginate(
-      models.Absences.find(selector).sort({ startTime: -1 }),
-      {
-        perPage: queryParams.perPage,
-        page: queryParams.page
-      }
-    );
+    const list = paginate(models.Absences.find(selector), {
+      perPage: queryParams.perPage,
+      page: queryParams.page
+    }).sort({ startTime: -1 });
 
     return { list, totalCount };
   },
@@ -221,11 +274,17 @@ const timeclockQueries = {
 
   async timeclockReportByUser(
     _root,
-    { selectedUser },
+    { selectedUser, selectedMonth, selectedYear, selectedDate },
     { subdomain, user }: IContext
   ) {
     const userId = selectedUser || user._id;
-    return timeclockReportByUser(userId, subdomain);
+    return timeclockReportByUser(
+      subdomain,
+      userId,
+      selectedMonth,
+      selectedYear,
+      selectedDate
+    );
   },
 
   async timeclockReports(
@@ -238,9 +297,10 @@ const timeclockQueries = {
       endDate,
       page,
       perPage,
-      reportType
+      reportType,
+      isCurrentUserAdmin
     },
-    { subdomain }: IContext
+    { subdomain, user }: IContext
   ) {
     let filterGiven = false;
     if (userIds || branchIds || departmentIds) {
@@ -255,20 +315,20 @@ const timeclockQueries = {
 
     const returnReport: IReport[] = [];
 
-    const teamMembersWithIds = await findAllTeamMembersWithEmpId(subdomain);
-    const teamMemberIds: string[] = [];
+    const totalSupervisedUserIds = await returnSupervisedUsers(
+      user._id,
+      subdomain
+    );
 
-    for (const teamMember of teamMembersWithIds) {
-      if (!teamMember.employeeId) {
-        continue;
-      }
+    const totalUserIds = (await findAllTeamMembersWithEmpId(subdomain)).map(
+      returnedUser => returnedUser._id
+    );
 
-      teamMemberIds.push(teamMember._id);
-    }
-    const totalTeamMemberIds =
-      teamMemberIdsFromFilter.length || filterGiven
-        ? teamMemberIdsFromFilter
-        : teamMemberIds;
+    const totalTeamMemberIds = filterGiven
+      ? teamMemberIdsFromFilter
+      : isCurrentUserAdmin
+      ? totalUserIds
+      : totalSupervisedUserIds;
 
     switch (reportType) {
       case 'Урьдчилсан' || 'Preliminary':
@@ -325,6 +385,7 @@ const timeclockQueries = {
   }
 };
 
-// moduleRequireLogin(timeclockQueries);
+moduleRequireLogin(timeclockQueries);
+// checkPermission(timeclockQueries, 'timeclocksMain', 'showTimeclocks');
 
 export default timeclockQueries;

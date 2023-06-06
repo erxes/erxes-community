@@ -2,7 +2,7 @@ import { Document, Schema } from 'mongoose';
 import { field } from './utils';
 
 export interface ITimeClock {
-  userId?: string;
+  userId: string;
   shiftStart: Date;
   shiftEnd?: Date;
   shiftActive?: boolean;
@@ -72,6 +72,7 @@ export interface ISchedule {
   scheduleChecked?: boolean;
   submittedByAdmin?: boolean;
   totalBreakInMins?: number;
+  createdByRequest?: boolean;
   shiftIds?: string[];
 }
 
@@ -181,15 +182,13 @@ export const timeclockSchema = new Schema({
 
 export const absenceTypeSchema = new Schema({
   _id: field({ pkey: true }),
-  name: field({ type: String, label: 'Absence type' }),
-
+  name: field({ type: String, label: 'Absence type', index: true }),
   requestType: field({ type: String, label: 'Type of a request' }),
   requestTimeType: field({ type: String, label: 'Either by day or by hours' }),
   requestHoursPerDay: field({
     type: Number,
     label: 'Hours per day if requestTimeType is by day'
   }),
-
   explRequired: field({
     type: Boolean,
     label: 'whether absence type requires explanation'
@@ -278,8 +277,13 @@ export const scheduleSchema = new Schema({
   }),
   totalBreakInMins: field({
     type: Number,
-    label: 'Total break time in mins',
-    default: false
+    label: 'Total break time in mins'
+  }),
+  createdByRequest: field({
+    type: Boolean,
+    label: 'Whether schedule was created by shift request',
+    default: false,
+    optional: true
   })
 });
 
@@ -337,7 +341,8 @@ export const scheduleConfigSchema = new Schema({
   _id: field({ pkey: true }),
   scheduleName: field({
     type: String,
-    label: 'Name of the schedule'
+    label: 'Name of the schedule',
+    index: true
   }),
   lunchBreakInMins: field({
     type: Number,
@@ -357,7 +362,11 @@ export const scheduleConfigSchema = new Schema({
 export const deviceConfigSchema = new Schema({
   _id: field({ pkey: true }),
   deviceName: field({ type: String, label: 'Name of the device' }),
-  serialNo: field({ type: String, label: 'Serial number of the device' }),
+  serialNo: field({
+    type: String,
+    label: 'Serial number of the device',
+    index: true
+  }),
   extractRequired: field({
     type: Boolean,
     label: 'whether extract from the device'
@@ -366,7 +375,7 @@ export const deviceConfigSchema = new Schema({
 
 export const reportCheckSchema = new Schema({
   _id: field({ pkey: true }),
-  userId: field({ type: String, label: 'User of the report' }),
+  userId: field({ type: String, label: 'User of the report', index: true }),
   startDate: field({ type: String, label: 'Start date of report' }),
   endDate: field({
     type: String,
@@ -401,6 +410,8 @@ export interface IScheduleReport {
   totalMinsLate?: string;
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
+  shiftDuration?: number;
+  checked?: boolean;
 }
 
 export interface IUserReport {
@@ -413,20 +424,24 @@ export interface IUserReport {
   scheduleReport: IScheduleReport[];
 
   totalMinsWorked?: number;
-  totalMinsWorkedToday?: number;
-  totalMinsWorkedThisMonth?: number;
-  totalDaysWorkedThisMonth?: number;
 
   totalMinsScheduled?: number;
-  totalMinsScheduledToday?: number;
-  totalMinsScheduledThisMonth?: number;
-  totalDaysScheduledThisMonth?: number;
 
   totalMinsLate?: number;
-  totalMinsLateToday?: number;
-  totalMinsLateThisMonth?: number;
   totalAbsenceMins?: number;
-  totalMinsAbsenceThisMonth?: number;
+
+  totalHoursWorkedSelectedDay?: number;
+  totalHoursScheduledSelectedDay?: number;
+  totalHoursAbsentSelectedDay?: number;
+  totalMinsLateSelectedDay?: number;
+
+  totalHoursWorkedSelectedMonth?: number;
+  totalHoursScheduledSelectedMonth: number;
+  totalHoursAbsentSelectedMonth?: number;
+  totalMinsLateSelectedMonth?: number;
+
+  totalDaysScheduledSelectedMonth?: number;
+  totalDaysWorkedSelectedMonth?: number;
 }
 
 export interface IUserExportReport {
@@ -444,8 +459,8 @@ export interface IUserExportReport {
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
 
-  totalHoursBreak?: string;
-  totalHoursBreak2?: string;
+  totalHoursBreakScheduled?: string;
+  totalHoursBreakTaken?: string;
 
   totalMinsLate?: string;
 

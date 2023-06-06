@@ -7,6 +7,8 @@ import { generateModels } from './connectionResolver';
 import cronjobs from './cronjobs/timelock';
 import { routeErrorHandling } from '@erxes/api-utils/src/requests';
 import { buildFile } from './reportExport';
+import * as permissions from './permissions';
+import { removeDuplicates } from './removeDuplicateTimeclocks';
 
 export let mainDb;
 export let debug;
@@ -15,6 +17,7 @@ export let serviceDiscovery;
 
 export default {
   name: 'timeclock',
+  permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
 
@@ -41,6 +44,13 @@ export default {
   onServerInit: async options => {
     mainDb = options.db;
     const app = options.app;
+    app.get(
+      '/remove-duplicates',
+      routeErrorHandling(async (req: any, res) => {
+        const remove = await removeDuplicates();
+        return res.send(remove);
+      })
+    );
 
     app.get(
       '/report-export',

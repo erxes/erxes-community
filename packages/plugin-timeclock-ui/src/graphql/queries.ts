@@ -36,6 +36,7 @@ const listParamsDef = `
   $departmentIds: [String]
   $reportType: String
   $scheduleStatus: String
+  $isCurrentUserAdmin: Boolean
 `;
 
 const listParamsValue = `
@@ -48,6 +49,7 @@ const listParamsValue = `
   departmentIds: $departmentIds
   reportType: $reportType
   scheduleStatus: $scheduleStatus
+  isCurrentUserAdmin: $isCurrentUserAdmin
 `;
 
 const timelogsMain = `
@@ -223,14 +225,14 @@ const timeclockReports = `
 
               totalRegularHoursWorked
               totalHoursWorked
-              totalMinsWorkedThisMonth
               totalDaysWorked
 
               totalHoursOvertime
               totalHoursOvernight
-              totalHoursBreak
             
-              totalMinsScheduledThisMonth
+              totalHoursBreakScheduled
+              totalHoursBreakTaken
+            
               totalDaysScheduled
               totalHoursScheduled
           
@@ -330,6 +332,24 @@ const timeLogsPerUser = `
   }
 `;
 
+const timeclockBranches = `
+query timeclockBranches($searchValue: String){
+  timeclockBranches(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
+const timeclockDepartments = `
+query timeclockDepartments($searchValue: String){
+  timeclockDepartments(searchValue: $searchValue){
+    _id
+    title
+    userIds
+  }
+}`;
+
 export default {
   timeclockReports,
   branches,
@@ -349,5 +369,8 @@ export default {
   holidays,
 
   scheduleConfigs,
-  deviceConfigs
+  deviceConfigs,
+
+  timeclockBranches,
+  timeclockDepartments
 };

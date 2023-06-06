@@ -7,7 +7,7 @@ import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import moment from 'moment';
 import React from 'react';
-import { __ } from '@erxes/ui/src/utils';
+import { __ } from 'coreui/utils';
 import {
   DateContainer,
   FormColumn,
@@ -28,7 +28,7 @@ import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 import SelectJobRefer from '../../job/containers/refer/SelectJobRefer';
 import client from '@erxes/ui/src/apolloClient';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import jobQueries from '../../job/graphql/queries';
 import Alert from '@erxes/ui/src/utils/Alert';
 import productQueries from '@erxes/ui-products/src/graphql/queries';
