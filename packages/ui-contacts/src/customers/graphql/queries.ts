@@ -158,6 +158,19 @@ const addressFields = `
   osmId
   short
   isPrimary
+  detail {
+    building
+    city
+    cityDistrict
+    country
+    countryCode
+    houseNumber
+    postcode
+    road
+    suburb
+    street
+    other 
+  }
 `;
 
 const customerDetail = `

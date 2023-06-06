@@ -206,7 +206,7 @@ export default function Component(props: Props) {
     <>
       {addresses.length && (
         <ModalTrigger
-          title="Manage"
+          title="Address"
           size="xl"
           trigger={
             <button>

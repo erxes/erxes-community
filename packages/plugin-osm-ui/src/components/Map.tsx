@@ -107,8 +107,6 @@ const Map = (props: Props) => {
   const [center, setCenter] = useState(props.center);
   const mapRef: any = useRef(null);
 
-  console.log('Map', props.markers);
-
   useEffect(() => {
     if (props.center) {
       setCenter(props.center);
@@ -126,8 +124,6 @@ const Map = (props: Props) => {
   const eventHandlers = {
     dragend: e => {
       const { lat, lng } = e.target.getLatLng();
-
-      console.log('dragend', e.target.options);
 
       if (props.onChangeCenter) {
         props.onChangeCenter({ lat, lng });
@@ -175,7 +171,7 @@ const Map = (props: Props) => {
         lng = 0;
       }
 
-      console.log('center default', { lat, lng });
+      // console.log('center default', { lat, lng });
       return;
     }
 
@@ -201,8 +197,6 @@ const Map = (props: Props) => {
     lng /= markers.length;
 
     setCenter({ lat, lng });
-    console.log('centerrrrr', markers);
-    console.log('center', { lat, lng });
 
     if (mapRef && mapRef.current) {
       mapRef.current.setView([lat, lng], props.zoom || 10);

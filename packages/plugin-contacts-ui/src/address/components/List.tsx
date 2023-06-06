@@ -1,15 +1,14 @@
-import Table from '@erxes/ui/src/components/table';
 import { __ } from '@erxes/ui/src/utils/core';
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 
-import Row from './Row';
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
-import { FieldStyle, SidebarList } from '@erxes/ui/src/layout/styles';
 import { SidebarListItem } from '@erxes/ui-settings/src/styles';
 import ActionButtons from '@erxes/ui/src/components/ActionButtons';
-import Tip from '@erxes/ui/src/components/Tip';
 import Button from '@erxes/ui/src/components/Button';
+import Tip from '@erxes/ui/src/components/Tip';
 import LeftSidebar from '@erxes/ui/src/layout/components/Sidebar';
+import { FieldStyle, SidebarList } from '@erxes/ui/src/layout/styles';
+import { TopHeader } from '@erxes/ui/src/styles/main';
 
 type Props = {
   addresses: IAddress[];
@@ -20,6 +19,11 @@ type Props = {
 
 const List = (props: Props) => {
   const [addresses, setAddresses] = useState(props.addresses || []);
+  console.log('list addresses', addresses);
+
+  React.useEffect(() => {
+    setAddresses(props.addresses);
+  }, [props.addresses]);
 
   const onChangeStatus = (index: number, isChecked: boolean) => {
     const updatedAddresses = addresses.map((address, i) => ({
@@ -34,16 +38,19 @@ const List = (props: Props) => {
   };
 
   const renderRow = () => {
+    console.log('renderRow');
     return (addresses || []).map((address, index) => (
       <SidebarListItem
-        key={address.osmId}
+        onClick={() => props.onSelect(address)}
+        key={index}
         isActive={address.osmId === props.currentAddress?.osmId}
       >
-        <FieldStyle>
-          {address.short}
-          <p>{address.short}</p>
-        </FieldStyle>
-
+        <a>
+          <FieldStyle>
+            {address.short}
+            <p>{address.short}</p>
+          </FieldStyle>
+        </a>
         <ActionButtons>
           <Tip text={__('Delete')} placement="bottom">
             <Button btnStyle="link" onClick={onRemove} icon="cancel-1" />
@@ -54,7 +61,7 @@ const List = (props: Props) => {
 
     // return addresses.map((address, index) => (
     //   <Row
-    //     key={address.osmId || Math.random().toString()}
+    //     keaay={address.osmId || Math.random().toString()}
     //     address={{
     //       ...address,
     //       isEditing: address.osmId === props.currentAddress?.osmId
@@ -66,8 +73,24 @@ const List = (props: Props) => {
     // ));
   };
 
+  const renderSidebarHeader = () => {
+    console.log('renderSidebarHeader');
+    return (
+      <TopHeader>
+        <Button
+          btnStyle="success"
+          block={true}
+          uppercase={false}
+          icon="plus-circle"
+        >
+          Add New Address
+        </Button>
+      </TopHeader>
+    );
+  };
+
   return (
-    <LeftSidebar wide={true} hasBorder={true}>
+    <LeftSidebar wide={true} hasBorder={true} header={renderSidebarHeader()}>
       <SidebarList noTextColor={true} noBackground={true} id={'test'}>
         {renderRow()}
       </SidebarList>
