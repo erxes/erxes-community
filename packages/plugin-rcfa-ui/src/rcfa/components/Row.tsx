@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { Button, Label } from '@erxes/ui/src';
+import { Icon, Label } from '@erxes/ui/src';
 import { Link } from 'react-router-dom';
 
 type Props = {
@@ -29,8 +29,11 @@ class Row extends React.Component<Props> {
             : '-'}
         </td>
         <td>
-          <Link to={`/rcfa/detail/${item._id}`}>
-            <Button size="small">View</Button>
+          <Link
+            to={`/rcfa/detail/${item._id}`}
+            style={{ color: 'rgb(68, 68, 68)' }}
+          >
+            <Icon icon="next-3" /> Detail
           </Link>
         </td>
       </tr>

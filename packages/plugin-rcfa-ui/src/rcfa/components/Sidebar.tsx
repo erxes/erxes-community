@@ -22,43 +22,44 @@ type Props = {
   queryParams: any;
 };
 
-type State = {
-  movedAtFrom?: string;
-  movedAtTo?: string;
-  modifiedAtFrom?: string;
-  modifiedAtTo?: string;
-  createdAtFrom?: string;
-  createdAtTo?: string;
-  userId?: string;
-};
-
-class SideBar extends React.Component<Props, State> {
+class SideBar extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
-
-    this.state = {
-      ...props.queryParams
-    };
   }
 
   render() {
     const { queryParams } = this.props;
 
-    const handleDate = (field, value) => {
+    if (queryParams.createdAtFrom === 'Invalid date') {
+      router.removeParams(this.props.history, 'createdAtFrom', 'createdAtTo');
+    }
+
+    if (queryParams.createdAtTo === 'Invalid date') {
+      router.removeParams(this.props.history, 'createdAtFrom', 'createdAtTo');
+    }
+
+    if (queryParams.closedAtFrom === 'Invalid date') {
+      router.removeParams(this.props.history, 'closedAtFrom', 'closedAtTo');
+    }
+
+    if (queryParams.closedAtTo === 'Invalid date') {
+      router.removeParams(this.props.history, 'closedAtFrom', 'closedAtTo');
+    }
+
+    const handleDate = (field: string, value: {}) => {
       value = moment(value).format('YYYY/MM/DD');
-      this.setState({ [field]: value });
       router.setParams(this.props.history, { [field]: value });
       router.setParams(this.props.history, { page: 1 });
     };
 
     const clearCreatedAt = () => {
-      router.removeParams(this.props.history, 'createdAtFrom');
-      router.removeParams(this.props.history, 'createdAtTo');
+      router.removeParams(this.props.history, 'createdAtFrom', 'createdAtTo');
+      router.setParams(this.props.history, { page: 1 });
     };
 
     const clearClosedAt = () => {
-      router.removeParams(this.props.history, 'closedAtFrom');
-      router.removeParams(this.props.history, 'closedAtTo');
+      router.removeParams(this.props.history, 'closedAtFrom', 'closedAtTo');
+      router.setParams(this.props.history, { page: 1 });
     };
 
     const statusOptions = [
@@ -96,8 +97,9 @@ class SideBar extends React.Component<Props, State> {
               <DateControl
                 name="createdAtFrom"
                 placeholder="Choose start date"
-                value={queryParams?.createdAtFrom}
+                value={queryParams.createdAtFrom}
                 onChange={e => handleDate('createdAtFrom', e)}
+                dateFormat="YYYY/MM/DD"
               />
             </DateContainer>
             <EndDateContainer>
@@ -105,8 +107,9 @@ class SideBar extends React.Component<Props, State> {
                 <DateControl
                   name="createdAtTo"
                   placeholder="Choose end date"
-                  value={queryParams?.createdAtTo}
+                  value={queryParams.createdAtTo}
                   onChange={e => handleDate('createdAtTo', e)}
+                  dateFormat="YYYY/MM/DD"
                 />
               </DateContainer>
             </EndDateContainer>

@@ -238,7 +238,7 @@ export const BackButton = styled.div`
 export const RCFAEndPoint = styled.div`
   position: absolute;
   width: 300px;
-  height: auto;
+  height: 100px;
   display: inline;
   background-color: red;
   padding: 0.5rem;

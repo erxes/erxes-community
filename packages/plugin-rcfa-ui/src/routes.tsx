@@ -8,6 +8,12 @@ const RCFAList = asyncComponent(() =>
   import(/* webpackChunkName: "List - RCFA" */ './rcfa/containers/List')
 );
 
+const RCFADetail = asyncComponent(() =>
+  import(
+    /* webpackChunkName: "List - Detail" */ './rcfa/containers/detail/rcfaDetail'
+  )
+);
+
 const rcfa = ({ history, location }) => {
   return (
     <RCFAList
@@ -21,7 +27,7 @@ const routes = () => {
   return (
     <React.Fragment>
       <Route path="/rcfa" exact component={rcfa} />
-      <Route path="/rcfa/detail/:id" exact component={rcfaDetail} />
+      <Route path="/rcfa/detail/:id" exact component={RCFADetail} />
     </React.Fragment>
   );
 };
