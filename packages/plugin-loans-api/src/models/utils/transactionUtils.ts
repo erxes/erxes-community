@@ -169,7 +169,7 @@ export const getCalcedAmounts = async (
     contract.skipInterestCalcMonth || 0
   );
 
-  const isSkipInterestCalc = getDiffDay(trDate, skipInterestCalcDate) > 0;
+  const isSkipInterestCalc = getDiffDay(trDate, skipInterestCalcDate) >= 0;
 
   if (trDate < startDate) {
     return result;

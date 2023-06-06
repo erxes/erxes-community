@@ -39,9 +39,10 @@ export const scheduleHelper = async (
   var mainDate = new Date(startDate);
 
   var skipInterestCalcDate = addMonths(
-    new Date(startDate),
+    new Date(currentDate),
     contract.skipInterestCalcMonth || 0
   );
+
   var endDate = addMonths(new Date(startDate), contract.tenor);
 
   var dateRanges: Date[] = [];
@@ -577,7 +578,7 @@ export const generatePendingSchedules = async (
   );
 
   const isSkipInterestCalc =
-    getDiffDay(updatedSchedule.payDate, skipInterestCalcDate) > 0;
+    getDiffDay(updatedSchedule.payDate, skipInterestCalcDate) >= 0;
 
   let updatePrevScheduleReactions: any = []; //this updatePrevScheduleReactions variable for transaction reaction
   let updatePrevSchedulesBulk: any = [];
@@ -814,7 +815,7 @@ export const generatePendingSchedules = async (
   ) {
     if (
       isSkipInterestCalc &&
-      getDiffDay(schedule.payDate, skipInterestCalcDate) > 0
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
     ) {
       interestEve = 0;
       interestNonce = 0;
@@ -875,7 +876,7 @@ export const generatePendingSchedules = async (
   if (index === pendingSchedules.length - 1) {
     if (
       isSkipInterestCalc &&
-      getDiffDay(schedule.payDate, skipInterestCalcDate) > 0
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
     ) {
       interestEve = 0;
       interestNonce = 0;
@@ -921,7 +922,7 @@ export const generatePendingSchedules = async (
   } else {
     if (
       isSkipInterestCalc &&
-      getDiffDay(schedule.payDate, skipInterestCalcDate) > 0
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
     ) {
       interestEve = 0;
       interestNonce = 0;
@@ -977,7 +978,7 @@ export const generatePendingSchedules = async (
   if (schedule) {
     if (
       isSkipInterestCalc &&
-      getDiffDay(schedule.payDate, skipInterestCalcDate) > 0
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
     ) {
       interestEve = 0;
       interestNonce = 0;

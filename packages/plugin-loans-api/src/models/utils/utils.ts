@@ -63,7 +63,7 @@ export const getFullDate = (date: Date) => {
 export const addMonths = (date, months) => {
   date.setMonth(date.getMonth() + months);
 
-  return date;
+  return new Date(date);
 };
 
 export const getNextMonthDay = (date: Date, days: number[]) => {
@@ -141,7 +141,7 @@ export const calcPerMonthEqual = (
   let nextDay = nextDate;
   nextDay = checkNextDay(nextDay, doc.weekends, doc.useHoliday, perHolidays);
 
-  if (getDiffDay(nextDate, skipInterestCalcDate) > 0) {
+  if (getDiffDay(nextDate, skipInterestCalcDate) >= 0) {
     const loanBalance = balance - payment;
     const totalPayment = payment;
 
@@ -212,7 +212,7 @@ export const getEqualPay = async ({
     let nextDay = paymentDates[i];
     nextDay = checkNextDay(nextDay, weekends, useHoliday, perHolidays);
     const dayOfMonth = getDiffDay(currentDate, nextDay);
-    const isSkipCalc = getDiffDay(nextDay, skipInterestCalcDate) > 0;
+    const isSkipCalc = getDiffDay(nextDay, skipInterestCalcDate) >= 0;
     const newRatio = isSkipCalc
       ? 1
       : ratio / (1 + (dayOfMonth * (interestRate / 100)) / 365);
@@ -235,7 +235,7 @@ export const calcPerMonthFixed = (
   let nextDay = nextDate;
   nextDay = checkNextDay(nextDay, doc.weekends, doc.useHoliday, perHolidays);
 
-  if (getDiffDay(nextDate, skipInterestCalcDate) > 0) {
+  if (getDiffDay(nextDate, skipInterestCalcDate) >= 0) {
     const loanPayment = total;
     const loanBalance = balance - loanPayment;
 
