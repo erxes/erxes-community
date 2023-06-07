@@ -20,7 +20,7 @@ export class ViberAPI {
   async registerWebhook(): Promise<any> {
     const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
-      : 'https://bf48-202-21-104-34.ngrok-free.app';
+      : 'https://c0bf-202-21-104-34.jp.ngrok.io';
 
     const url: string = `${domain}/pl:viber/webhook/${this.integrationId}`;
 
