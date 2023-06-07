@@ -227,6 +227,8 @@ const integrationMutations = {
     { data, ...doc }: IExternalIntegrationParams & { data: object },
     { user, models, subdomain }: IContext
   ) {
+    console.log('test', data);
+
     const modifiedDoc: any = { ...doc };
 
     if (modifiedDoc.kind === 'webhook') {

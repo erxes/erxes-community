@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
 const types = `
-  input createInput {
+  input CreateInput {
     _id: String
     createdUserId: String
     createdDate: Date
@@ -23,7 +23,7 @@ const queries = `
 `;
 
 const mutations = `
-  viberCreate(create: createInput): JSON
+  viberCreate(create: CreateInput): JSON
 `;
 
 const typeDefs = gql`

@@ -1,5 +1,4 @@
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-
 import Button from '@erxes/ui/src/components/Button';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import Form from '@erxes/ui/src/components/form/Form';
@@ -9,7 +8,6 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import React from 'react';
 import SelectBrand from '@erxes/ui-inbox/src/settings/integrations/containers/SelectBrand';
 import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
-import Accounts from '../containers/Accounts';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -18,29 +16,16 @@ type Props = {
   channelIds: string[];
 };
 
-type State = {
-  accountId: string;
-};
-
-class IntegrationForm extends React.Component<Props, State> {
+class IntegrationForm extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
-
-    this.state = {
-      accountId: ''
-    };
   }
-
-  onSelectAccount = (accountId: string) => {
-    this.setState({ accountId });
-  };
 
   generateDoc = (values: { name: string; brandId: string; token: string }) => {
     return {
       name: values.name,
       brandId: values.brandId,
       kind: 'viber',
-      accountId: this.state.accountId,
       data: {
         token: values.token
       }
@@ -75,7 +60,7 @@ class IntegrationForm extends React.Component<Props, State> {
 
     return (
       <>
-        <p>Please enter your Viber bot name</p>
+        <p>Please enter your Viber app info</p>
 
         {this.renderField({ label: 'Name', fieldName: 'name', formProps })}
 
@@ -91,11 +76,6 @@ class IntegrationForm extends React.Component<Props, State> {
           defaultValue={channelIds}
           isRequired={true}
           onChange={onChannelChange}
-        />
-
-        <Accounts
-          onSelectAccount={this.onSelectAccount}
-          accountId={this.state.accountId}
         />
 
         <ModalFooter>
