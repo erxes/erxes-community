@@ -48,8 +48,8 @@ type Props = {
   maxLength?: number;
   color?: string;
   align?: string;
-  fixed?: number;
   useNumberFormat?: boolean;
+  fixed?: number; // useNumberFormat is true then used
 };
 
 const renderElement = (Element, attributes, type, child) => {
