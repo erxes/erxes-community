@@ -16,7 +16,6 @@ export const types = () => `
     department: Department,
     branch: Branch,
     product: Product,
-    uom: Uom,
     createdUser: User,
     modifiedUser: User
   }

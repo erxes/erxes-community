@@ -95,7 +95,7 @@ export const loadRemainderClass = (models: IModels) => {
         pUom = subUom.uom;
       }
 
-      return { count, uom: uom };
+      return { count, uom };
     }
 
     public static async getRemainderProducts(

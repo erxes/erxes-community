@@ -79,7 +79,7 @@ class Form extends React.Component<Props, State> {
       attachmentMore: attachmentMore ? attachmentMore : undefined,
       vendorId: vendorId ? vendorId : '',
       description: description ? description : '',
-      uom: uom,
+      uom,
       subUoms: subUoms ? subUoms : [],
       taxType,
       taxCode

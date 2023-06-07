@@ -189,7 +189,7 @@ export default {
 
         subUoms.push({
           id: Math.random(),
-          uom: uom._id,
+          uom,
           ratio: Number(ratios[ind] || 1)
         });
         ind += 1;
