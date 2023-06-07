@@ -19,6 +19,7 @@ export interface IIntegration {
   chatfuelConfigs?: { [key: string]: string };
   telegramBotToken?: string;
   viberBotToken?: string;
+  instagramToken?: string;
   lineChannelId?: string;
   lineChannelSecret?: string;
   twilioSid?: string;
@@ -69,6 +70,7 @@ export const integrationSchema = new Schema({
   }),
   telegramBotToken: String,
   viberBotToken: String,
+  instagramToken: String,
   lineChannelId: String,
   lineChannelSecret: String,
   twilioSid: String,
