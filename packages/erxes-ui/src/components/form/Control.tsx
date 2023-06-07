@@ -49,7 +49,7 @@ type Props = {
   color?: string;
   align?: string;
   useNumberFormat?: boolean;
-  fixed?: number; // useNumberFormat is true then used
+  fixed?: number; // useNumberFormat is true then tused
 };
 
 const renderElement = (Element, attributes, type, child) => {
