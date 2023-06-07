@@ -34,33 +34,37 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
         if (rcfa?.status !== 'inProgress') {
           throw new Error('RCFA is already in resolved');
         }
-        console.log({ status: 'dss' });
 
-        const [{ status, countHierarchies }]: {
-          status?: string;
-          countHierarchies?;
-        }[] = await models.Issues.aggregate([
-          { $match: { _id: doc?.parentId } },
-          {
-            $graphLookup: {
-              from: 'rcfa_issues',
-              startWith: '$parentId',
-              connectFromField: 'parentId',
-              connectToField: '_id',
-              as: 'hierarchies'
+        if (doc?.parentId) {
+          const [issue]: {
+            status?: string;
+            countHierarchies?;
+          }[] = await models.Issues.aggregate([
+            { $match: { _id: doc?.parentId } },
+            {
+              $graphLookup: {
+                from: 'rcfa_issues',
+                startWith: '$parentId',
+                connectFromField: 'parentId',
+                connectToField: '_id',
+                as: 'hierarchies'
+              }
+            },
+            {
+              $project: {
+                status: 1,
+                countHierarchies: { $size: '$hierarchies' }
+              }
             }
-          },
-          {
-            $project: { status: 1, countHierarchies: { $size: '$hierarchies' } }
+          ]);
+          if (issue?.countHierarchies === 4) {
+            throw new Error('You cannot add issue this level of rcfa');
           }
-        ]);
-        console.log({ status, countHierarchies });
-        if (countHierarchies === 4) {
-          throw new Error('You cannot add issue this level of rcfa');
+          if (issue?.status !== 'inProgress') {
+            throw new Error('You cannot add issue this level of rcfa');
+          }
         }
-        if (status !== 'inProgress') {
-          throw new Error('You cannot add issue this level of rcfa');
-        }
+
         if (rcfa.userId !== user._id) {
           throw new Error('You cannot add issue this rcfa');
         }
@@ -95,8 +99,33 @@ export const loadRCFAIssuesClass = (models: IModels, subdomain: string) => {
         throw new Error('Issue root not found');
       }
 
+      const [{ hierarchIds }] = await models.Issues.aggregate([
+        { $match: { _id } },
+        {
+          $graphLookup: {
+            from: 'rcfa_issues',
+            startWith: '$_id',
+            connectFromField: '_id',
+            connectToField: 'parentId',
+            as: 'hierarchies'
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            hierarchIds: {
+              $map: {
+                input: '$hierarchies',
+                as: 'hierarchies',
+                in: '$$hierarchies._id'
+              }
+            }
+          }
+        }
+      ]);
+
       return await models.Issues.updateMany(
-        { order: { $regex: new RegExp(issueRoot.order, 'i') } },
+        { _id: { $in: [...hierarchIds, _id] } },
         { $set: { status: 'closed', closedAt: new Date() } }
       );
     }

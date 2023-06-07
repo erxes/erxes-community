@@ -65,8 +65,6 @@ class PortableTask extends React.Component<FinalProps, State> {
       return null;
     }
 
-    console.log({ detail });
-
     const onItemClick = (item: IItem) => {
       this.setState({ openItemId: item._id });
     };

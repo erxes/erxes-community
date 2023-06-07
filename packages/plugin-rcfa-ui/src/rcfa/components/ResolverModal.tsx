@@ -7,6 +7,7 @@ import { mutations } from '../graphql';
 import * as compose from 'lodash.flowright';
 import { __ } from '@erxes/ui/src';
 import { graphql } from '@apollo/client/react/hoc';
+import { refetchQueries } from '../containers/Section';
 
 type Props = {
   mainType: string;
@@ -91,7 +92,10 @@ class rcfaCreateTaskModal extends React.Component<FinalProps, State> {
 export default withProps<Props>(
   compose(
     graphql<Props>(gql(mutations.resolveRCFA), {
-      name: 'resolveRCFA'
+      name: 'resolveRCFA',
+      options: ({ mainTypeId }) => ({
+        refetchQueries: refetchQueries({ mainTypeId })
+      })
     })
   )(rcfaCreateTaskModal)
 );

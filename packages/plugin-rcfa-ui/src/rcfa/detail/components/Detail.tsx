@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  PageHeader,
-  BarItems,
-  Icon,
-  colors,
-  __,
-  TextDivider
-} from '@erxes/ui/src';
+import { PageHeader, BarItems, Icon, colors, __ } from '@erxes/ui/src';
 import {
   RoundButton,
   Container,
@@ -16,7 +9,6 @@ import {
   CustomColumn,
   CustomColumns
 } from '../../../styles';
-import { Columns } from '@erxes/ui/src/styles/chooser';
 import { Column } from '@erxes/ui/src/styles/main';
 import PortableCard from '../../../common/PortableCard';
 import { jsPlumb } from 'jsplumb';
@@ -90,8 +82,6 @@ class Detail extends React.Component<Props, State> {
       target: issue._id
     }));
 
-    console.log(connections);
-
     connections.forEach(connection => {
       instance.connect({
         id: Math.random(),
@@ -129,7 +119,6 @@ class Detail extends React.Component<Props, State> {
       const oString =
         transformOrigin[0] * 100 + '% ' + transformOrigin[1] * 100 + '%';
 
-      // tslint:disable-next-line:prefer-for-of
       for (let i = 0; i < p.length; i++) {
         el.style[p[i] + 'Transform'] = s;
         el.style[p[i] + 'TransformOrigin'] = oString;

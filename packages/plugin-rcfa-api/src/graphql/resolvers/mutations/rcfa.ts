@@ -43,10 +43,7 @@ const rcfaMutations = {
     });
 
     await models.Issues.updateOne({ _id: issue?._id }, { isRootCause: true });
-    await models.Issues.updateMany(
-      { order: { $regex: new RegExp(issue?.order || '', 'i') } },
-      { $set: { status: 'closed', closedAt: new Date() } }
-    );
+    await models.Issues.closeRootIssue(issue?._id);
 
     return await models.RCFA.updateOne(
       { _id: rcfa._id },

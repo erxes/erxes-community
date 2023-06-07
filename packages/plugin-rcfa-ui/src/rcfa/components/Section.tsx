@@ -124,7 +124,6 @@ class RCFASection extends React.Component<Props, State> {
       <ModalTrigger
         title="Create related card"
         content={resolverContent}
-        style={{ overflow: 'auto' }}
         trigger={trigger}
       />
     );
@@ -242,11 +241,6 @@ class RCFASection extends React.Component<Props, State> {
     const handleRemoveIssue = _id => {
       confirm().then(() => {
         this.props.removeIssue(_id);
-        // const updatedIssues = this.state.issues.filter(
-        //   issue => issue._id !== _id
-        // );
-
-        // this.setState({ issues: updatedIssues });
       });
     };
 

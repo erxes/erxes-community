@@ -106,7 +106,6 @@ export const noEndPoint = {
   ]
 };
 
-// the definition of target endpoints (will appear when the user drags a connection)
 export const targetEndpoint = {
   endpoint: 'Dot',
   paintStyle: { fill: rgba(colors.colorCoreYellow, 1), radius: 10 },

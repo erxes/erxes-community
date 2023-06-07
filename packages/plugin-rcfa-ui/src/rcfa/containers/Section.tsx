@@ -107,7 +107,7 @@ class SectionContainer extends React.Component<FinalProps> {
   }
 }
 
-const refetchQueries = ({ mainTypeId }) => [
+export const refetchQueries = ({ mainTypeId }) => [
   {
     query: gql(queries.rcfaDetail),
     variables: {

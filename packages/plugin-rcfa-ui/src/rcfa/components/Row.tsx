@@ -29,11 +29,8 @@ class Row extends React.Component<Props> {
             : '-'}
         </td>
         <td>
-          <Link
-            to={`/rcfa/detail/${item._id}`}
-            style={{ color: 'rgb(68, 68, 68)' }}
-          >
-            <Icon icon="next-3" /> Detail
+          <Link to={`/rcfa/detail/${item._id}`}>
+            <Icon icon="file-search-alt" />
           </Link>
         </td>
       </tr>

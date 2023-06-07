@@ -10,13 +10,16 @@ import { EmptyState, Spinner } from '@erxes/ui/src';
 import DetailComponent from '../components/Detail';
 
 type Props = {
-  rcfaDetailQueryResponse?: any;
-  id: string;
+  _id: string;
   history: any;
   queryParams: any;
 };
 
-class RcfaDetail extends React.Component<Props> {
+type FinalProps = {
+  rcfaDetailQueryResponse: any;
+} & Props;
+
+class RcfaDetail extends React.Component<FinalProps> {
   constructor(props: any) {
     super(props);
   }
@@ -40,8 +43,6 @@ class RcfaDetail extends React.Component<Props> {
       detail: rcfaDetail
     };
 
-    console.log({ updatedProps });
-
     return <DetailComponent {...updatedProps} />;
   }
 }
@@ -50,9 +51,10 @@ export default withProps<Props>(
   compose(
     graphql<Props>(gql(queries.rcfaDetail), {
       name: 'rcfaDetailQueryResponse',
-      options: (props: any) => ({
+      skip: ({ _id }) => !_id,
+      options: ({ _id }) => ({
         variables: {
-          _id: props.match.params.id
+          _id
         }
       })
     })
