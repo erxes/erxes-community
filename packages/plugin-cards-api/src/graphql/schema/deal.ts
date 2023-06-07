@@ -10,6 +10,7 @@ import {
 export const types = ({ contacts, tags }) => `
   type DealListItem @key(fields: "_id") {
     products: JSON
+    unUsedAmount: JSON
     amount: JSON
     customFieldsData: JSON
     ${commonListTypes}
@@ -17,6 +18,7 @@ export const types = ({ contacts, tags }) => `
 
   type Deal @key(fields: "_id") {
     _id: String!
+    unUsedAmount: JSON
     amount: JSON
 
     ${
@@ -89,6 +91,9 @@ const commonQueryParams = `
   number: String
   branchIds: [String]
   departmentIds: [String]
+  boardIds: [String]
+  stageCodes: [String]
+  dateRangeFilters:JSON
 `;
 
 const listQueryParams = `

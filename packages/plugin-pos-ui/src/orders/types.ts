@@ -38,12 +38,15 @@ export type IOrder = {
   };
   origin?: string;
   syncedErkhet: boolean;
+  convertDealId: string;
 };
 
 export type IOrderDet = {
   syncErkhetInfo: string;
   putResponses: any[];
   deliveryInfo: any;
+  deal: any;
+  dealLink?: string;
 } & IOrder;
 
 export type OrdersQueryResponse = {
@@ -112,6 +115,7 @@ export interface ICoverSummary {
   _id?: string;
   kind: string;
   kindOfVal: number;
+  value: number;
   amount: number;
 }
 
@@ -156,12 +160,14 @@ export type CoverDetailQueryResponse = {
 };
 
 export type PosCoverEditNoteMutationResponse = {
-  posCoverEditNote: (mutation: {
+  coversEdit: (mutation: {
     variables: {
       _id: string;
-      cashAmount: number;
-      mobileAmount: number;
-      paidAmounts: any[];
+      note: string;
     };
   }) => Promise<any>;
+};
+
+export type RemoveCoverMutationResponse = {
+  removeCover: (mutation: { variables: { _id: string } }) => Promise<any>;
 };

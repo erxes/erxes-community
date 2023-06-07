@@ -161,17 +161,18 @@ export const initBroker = async cl => {
   );
 
   consumeRPCQueue(
-    `posclient:cover.remove${channelToken}`,
+    `posclient:covers.remove${channelToken}`,
     async ({ subdomain, data }) => {
       const models = await generateModels(subdomain);
 
       const { cover } = data;
+      await models.Covers.updateOne(
+        { _id: cover._id },
+        { $set: { status: 'reconf' } }
+      );
       return {
         status: 'success',
-        data: await models.Covers.updateOne(
-          { _id: cover._id },
-          { $set: { status: 'reconf' } }
-        )
+        data: await models.Covers.findOne({ _id: cover._id })
       };
     }
   );
@@ -254,6 +255,18 @@ export const sendContactsMessage = async (
   args: ISendMessageArgs
 ): Promise<any> => {
   return sendMessageWrapper('contacts', args);
+};
+
+export const sendCardsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('cards', args);
+};
+
+export const sendInboxMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessageWrapper('inbox', args);
 };
 
 export const sendLoyaltiesMessage = async (

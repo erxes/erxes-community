@@ -5,6 +5,7 @@ include ./kinds/monpay.pug
 include ./kinds/storepay.pug
 include ./kinds/paypal.pug
 include ./kinds/wechatpay.pug
+include ./kinds/qpayQuickqr.pug
 
 block layout-content
     .my-layout
@@ -90,8 +91,7 @@ block layout-content
                             if(`#{invoiceData.redirectUri}` && window.confirm('Payment is completed. Do you want to continue?')) {
                                 window.location.href = `#{invoiceData.redirectUri}`;
                             } else if (window.confirm('Payment is completed. Do you want to close this window?')) {
-                                //- window.close();
-                                
+                                window.close();                                
                             }
                         }
                     });

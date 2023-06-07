@@ -9,6 +9,7 @@ import {
 
 export const types = ({ contacts, tags }) => `
   type TaskListItem {
+    customPropertiesData:JSON,
     ${commonListTypes}
   }
 
@@ -59,6 +60,9 @@ const listQueryParams = `
     number: String
     branchIds: [String]
     departmentIds: [String]
+    boardIds: [String]
+    stageCodes: [String]
+    dateRangeFilters:JSON
     ${conformityQueryFields}
 `;
 

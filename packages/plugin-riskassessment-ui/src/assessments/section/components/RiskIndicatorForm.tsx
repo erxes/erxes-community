@@ -4,7 +4,8 @@ import {
   ControlLabel,
   FormControl,
   FormGroup,
-  __
+  __,
+  colors
 } from '@erxes/ui/src';
 import {
   FormColumn,
@@ -29,10 +30,13 @@ type Props = {
   branchId: string;
   departmentId: string;
   operationId: string;
+  checkTestScore: (variables: any) => void;
 };
 
 type State = {
-  submissions: { [key: string]: { value: string; description: string } };
+  submissions: {
+    [key: string]: { value: string; description: string; isFlagged?: boolean };
+  };
 };
 
 class IndicatorForm extends React.Component<Props, State> {
@@ -87,6 +91,65 @@ class IndicatorForm extends React.Component<Props, State> {
     );
   }
 
+  renderField(field: IField) {
+    const { submissions } = this.state;
+    const handleChange = field => {
+      let value = field.value;
+
+      if (typeof field.value === 'object') {
+        value = JSON.stringify(field.value);
+      }
+
+      this.setState(prev => ({
+        submissions: {
+          ...prev.submissions,
+          [field._id]: { ...prev.submissions[field._id], value }
+        }
+      }));
+    };
+    const handleFlag = () => {
+      submissions[field._id] = {
+        ...submissions[field._id],
+        isFlagged: !submissions[field._id]?.isFlagged
+      };
+      this.setState({ submissions });
+    };
+
+    const updateProps: any = {
+      isEditing: false,
+      key: field.key,
+      field,
+      onValueChange: handleChange,
+      isPreview: true
+    };
+
+    if (field.type === 'file' && submissions[field._id]?.value) {
+      updateProps.defaultValue = JSON.parse(submissions[field._id].value);
+    } else {
+      updateProps.defaultValue = submissions[field._id]?.value;
+    }
+
+    return (
+      <FormWrapper key={field._id}>
+        <FormColumn>
+          <GenerateField {...updateProps} />
+        </FormColumn>
+        <Button
+          btnStyle="link"
+          icon="flag"
+          iconColor={
+            submissions[field._id]?.isFlagged ? colors.colorCoreRed : ''
+          }
+          onClick={handleFlag}
+        />
+        {this.renderDescriptionField(
+          submissions[field._id]?.description || '',
+          field._id
+        )}
+      </FormWrapper>
+    );
+  }
+
   render() {
     const {
       fields,
@@ -96,19 +159,9 @@ class IndicatorForm extends React.Component<Props, State> {
       indicatorId,
       branchId,
       departmentId,
-      operationId
+      operationId,
+      checkTestScore
     } = this.props;
-
-    const { submissions } = this.state;
-
-    const handleChange = field => {
-      this.setState(prev => ({
-        submissions: {
-          ...prev.submissions,
-          [field._id]: { ...prev.submissions[field._id], value: field.value }
-        }
-      }));
-    };
 
     const setHistory = submissions => {
       this.setState({ submissions });
@@ -122,6 +175,11 @@ class IndicatorForm extends React.Component<Props, State> {
       });
     };
 
+    const handleTestScore = () => {
+      const { submissions } = this.state;
+      checkTestScore({ indicatorId, formSubmissions: submissions });
+    };
+
     return (
       <>
         <IndicatorAssessmentHistory
@@ -132,28 +190,14 @@ class IndicatorForm extends React.Component<Props, State> {
           setHistory={setHistory}
         />
         <Padding horizontal>
-          {(fields || []).map(field => (
-            <FormWrapper key={field._id}>
-              <FormColumn>
-                <GenerateField
-                  isEditing={false}
-                  key={field._id}
-                  field={field}
-                  defaultValue={submissions[field._id]?.value}
-                  onValueChange={handleChange}
-                  isPreview={true}
-                />
-              </FormColumn>
-              {this.renderDescriptionField(
-                submissions[field._id]?.description || '',
-                field._id
-              )}
-            </FormWrapper>
-          ))}
+          {(fields || []).map(field => this.renderField(field))}
         </Padding>
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal}>
             {__('Cancel')}
+          </Button>
+          <Button btnStyle="warning" onClick={handleTestScore}>
+            {__('Check Test Score')}
           </Button>
           {_loadash.isEmpty(submittedFields) && !onlyPreview && (
             <Button btnStyle="success" onClick={submitForm}>

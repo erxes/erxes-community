@@ -1,8 +1,8 @@
-import { checkPermission } from '@erxes/api-utils/src';
-
-import { IContext } from '../../../connectionResolver';
 import { sendCardsMessage, sendContactsMessage } from '../../../messageBroker';
+
 import { IClientPortal } from '../../../models/definitions/clientPortal';
+import { IContext } from '../../../connectionResolver';
+import { checkPermission } from '@erxes/api-utils/src';
 
 export interface IVerificationParams {
   userId: string;
@@ -29,7 +29,10 @@ const clientPortalMutations = {
       stageId,
       parentId,
       closeDate,
-      startDate
+      startDate,
+      customFieldsData,
+      attachments,
+      labelIds
     },
     { subdomain, cpUser, models }: IContext
   ) {
@@ -69,7 +72,10 @@ const clientPortalMutations = {
         stageChangedDate: null,
         parentId,
         closeDate,
-        startDate
+        startDate,
+        customFieldsData,
+        attachments,
+        labelIds
       },
       isRPC: true
     });

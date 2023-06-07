@@ -5,8 +5,13 @@ import { sendRequest } from '@erxes/api-utils/src/requests';
 
 import { IUserDocument } from './../../api-utils/src/types';
 import { graphqlPubsub } from './configs';
-import { generateModels, IModels } from './connectionResolver';
-import { sendCoreMessage, sendCommonMessage } from './messageBroker';
+import { generateModels, IContext, IModels } from './connectionResolver';
+import {
+  sendCoreMessage,
+  sendCommonMessage,
+  sendContactsMessage,
+  sendCardsMessage
+} from './messageBroker';
 
 import * as admin from 'firebase-admin';
 export const getConfig = async (
@@ -124,8 +129,8 @@ export const generateRandomPassword = (len: number = 10) => {
     min: number,
     max: number
   ) => {
-    let n,
-      chars = '';
+    let n;
+    let chars = '';
 
     if (max === undefined) {
       n = min;
@@ -149,11 +154,11 @@ export const generateRandomPassword = (len: number = 10) => {
 
   const shuffle = (string: string) => {
     const array = string.split('');
-    let tmp,
-      current,
-      top = array.length;
+    let tmp;
+    let current;
+    let top = array.length;
 
-    if (top)
+    if (top) {
       while (--top) {
         current = Math.floor(Math.random() * (top + 1));
         tmp = array[current];
@@ -161,7 +166,8 @@ export const generateRandomPassword = (len: number = 10) => {
         array[top] = tmp;
       }
 
-    return array.join('');
+      return array.join('');
+    }
   };
 
   let password = '';
@@ -230,7 +236,7 @@ export const sendNotification = async (
     eventData
   } = doc;
 
-  let link = doc.link;
+  const link = doc.link;
 
   // remove duplicated ids
   const receiverIds = [...Array.from(new Set(receivers))];
@@ -404,4 +410,104 @@ export const sendAfterMutation = async (
       });
     }
   }
+};
+
+export const getCards = async (
+  type: 'ticket' | 'deal' | 'task' | 'purchase',
+  context: IContext,
+  args: any
+) => {
+  const { subdomain, models, cpUser } = context;
+  if (!cpUser) {
+    throw new Error('Login required');
+  }
+
+  const cp = await models.ClientPortals.getConfig(cpUser.clientPortalId);
+
+  const pipelineId = cp[type + 'PipelineId'];
+
+  if (!pipelineId || pipelineId.length === 0) {
+    return [];
+  }
+
+  const customer = await sendContactsMessage({
+    subdomain,
+    action: 'customers.findOne',
+    data: {
+      _id: cpUser.erxesCustomerId
+    },
+    isRPC: true
+  });
+
+  if (!customer) {
+    return [];
+  }
+
+  const conformities = await sendCoreMessage({
+    subdomain,
+    action: 'conformities.getConformities',
+    data: {
+      mainType: 'customer',
+      mainTypeIds: [customer._id],
+      relTypes: [type]
+    },
+    isRPC: true,
+    defaultValue: []
+  });
+
+  if (conformities.length === 0) {
+    return [];
+  }
+
+  const cardIds: string[] = [];
+
+  for (const c of conformities) {
+    if (c.relType === type && c.mainType === 'customer') {
+      cardIds.push(c.relTypeId);
+    }
+
+    if (c.mainType === type && c.relType === 'customer') {
+      cardIds.push(c.mainTypeId);
+    }
+  }
+
+  const stages = await sendCardsMessage({
+    subdomain,
+    action: 'stages.find',
+    data: {
+      pipelineId
+    },
+    isRPC: true,
+    defaultValue: []
+  });
+
+  if (stages.length === 0) {
+    return [];
+  }
+
+  const stageIds = stages.map(stage => stage._id);
+
+  let oneStageId = '';
+  if (args.stageId) {
+    if (stageIds.includes(args.stageId)) {
+      oneStageId = args.stageId;
+    } else {
+      oneStageId = 'noneId';
+    }
+  }
+
+  return sendCardsMessage({
+    subdomain,
+    action: `${type}s.find`,
+    data: {
+      _id: { $in: cardIds },
+      stageId: oneStageId ? oneStageId : { $in: stageIds },
+      ...(args?.priority && { priority: args?.priority || [] }),
+      ...(args?.labelIds && { labelIds: args?.labelIds || [] }),
+      ...(args?.closeDateType && { closeDateType: args?.closeDateType }),
+      ...(args?.userIds && { assignedUserIds: args?.userIds || [] })
+    },
+    isRPC: true,
+    defaultValue: []
+  });
 };

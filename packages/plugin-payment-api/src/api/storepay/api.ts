@@ -16,9 +16,12 @@ export const storepayCallbackHandler = async (
     throw new Error('id is required');
   }
 
-  const invoice = await models.Invoices.getInvoice({
-    'apiResponse.value': id
-  });
+  const invoice = await models.Invoices.getInvoice(
+    {
+      'apiResponse.value': id
+    },
+    true
+  );
 
   const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
 
@@ -62,8 +65,9 @@ export class StorePayAPI extends BaseAPI {
   private app_username: string;
   private app_password: string;
   private store_id: string;
+  private domain?: string;
 
-  constructor(config: IStorePayParams) {
+  constructor(config: IStorePayParams, domain?: string) {
     super(config);
 
     const {
@@ -86,6 +90,7 @@ export class StorePayAPI extends BaseAPI {
     this.app_password = appPassword;
     this.store_id = storeId;
     this.apiUrl = PAYMENTS.storepay.apiUrl;
+    this.domain = domain;
   }
 
   async getHeaders() {
@@ -148,17 +153,13 @@ export class StorePayAPI extends BaseAPI {
    * TODO: update return type
    */
   async createInvoice(invoice: IInvoiceDocument) {
-    const MAIN_API_DOMAIN = process.env.DOMAIN
-      ? `${process.env.DOMAIN}/gateway`
-      : 'http://localhost:4000';
-
     try {
       const data = {
         amount: invoice.amount,
         mobileNumber: invoice.phone,
         description: invoice.description || 'transaction',
         storeId: this.store_id,
-        callbackUrl: `${MAIN_API_DOMAIN}/pl:payment/callback/${PAYMENTS.storepay.kind}`
+        callbackUrl: `${this.domain}/pl:payment/callback/${PAYMENTS.storepay.kind}`
       };
 
       const possibleAmount = await this.checkLoanAmount(invoice.phone);

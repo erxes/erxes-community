@@ -32,6 +32,32 @@ const inventoryMutations = {
       isRPC: true
     });
 
+    const productCategories = await sendProductsMessage({
+      subdomain,
+      action: 'categories.find',
+      data: { query: {} },
+      isRPC: true,
+      defaultValue: []
+    });
+
+    const categoryOfId = {};
+    for (const cat of productCategories) {
+      categoryOfId[cat._id] = cat;
+    }
+
+    const uoms = await sendProductsMessage({
+      subdomain,
+      action: 'uoms.find',
+      data: {},
+      isRPC: true,
+      defaultValue: []
+    });
+
+    const uomById = {};
+    for (const uom of uoms) {
+      uomById[uom._id] = uom;
+    }
+
     const productCodes = products.map(p => p.code) || [];
     const response = await sendRequest({
       url: process.env.ERKHET_URL + '/get-api/',
@@ -69,13 +95,18 @@ const inventoryMutations = {
     for (const resProd of result) {
       if (productCodes.includes(resProd.code)) {
         const product = productByCode[resProd.code];
+        const uom = uomById[product.uomId];
 
         if (
           (resProd.name === product.name ||
             resProd.nickname === product.name) &&
           resProd.unit_price === product.unitPrice &&
           resProd.barcodes === (product.barcodes || []).join(',') &&
-          (resProd.vat_type || '') === (product.taxType || '')
+          (resProd.vat_type || '') === (product.taxType || '') &&
+          uom &&
+          resProd.measure_unit_code === uom.code &&
+          resProd.category_code ===
+            (categoryOfId[product.categoryId] || {}).code
         ) {
           matchedCount = matchedCount + 1;
         } else {
