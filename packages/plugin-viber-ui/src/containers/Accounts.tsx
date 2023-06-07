@@ -1,13 +1,13 @@
-import * as compose from 'lodash.flowright';
 import { Alert, getEnv, withProps } from '@erxes/ui/src/utils';
+import * as compose from 'lodash.flowright';
 
-import Accounts from '../components/Accounts';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import Info from '@erxes/ui/src/components/Info';
-import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
-import { queries, mutations } from '../graphql';
+import React from 'react';
+import Accounts from '../components/Accounts';
+import { mutations, queries } from '../graphql';
 
 type Props = {
   onSelectAccount: (accountId: string) => void;
