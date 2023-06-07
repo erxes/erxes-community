@@ -1,8 +1,8 @@
-import React from 'react';
-import gql from 'graphql-tag';
-import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import MailConversation from '@erxes/ui-inbox/src/inbox/components/conversationDetail/workarea/mail/MailConversation';
+import * as compose from 'lodash.flowright';
+import React from 'react';
 import { queries } from '../graphql';
 
 class Detail extends React.Component<any> {
