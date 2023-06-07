@@ -4743,11 +4743,6 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-10.17.60.tgz"
   integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
-"@types/node@^10.9.4":
-  version "10.12.10"
-  resolved "https://registry.npmjs.org/@types/node/-/node-10.12.10.tgz"
-  integrity sha512-8xZEYckCbUVgK8Eg7lf5Iy4COKJ5uXlnIOnePN0WUwSQggy9tolM+tDJf7wMOnT/JT/W9xDYIaYggt3mRV2O5w==
-
 "@types/node@^12.12.30":
   version "12.20.48"
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.48.tgz"
@@ -4757,6 +4752,11 @@
   version "16.18.3"
   resolved "https://registry.npmjs.org/@types/node/-/node-16.18.3.tgz"
   integrity sha512-jh6m0QUhIRcZpNv7Z/rpN+ZWXOicUUQbSoWks7Htkbb9IjFQj4kzcX/xFCkjstCj5flMsN8FiSvt+q+Tcs4Llg==
+
+"@types/node@^17.0.7", "@types/node@^17.0.8":
+  version "17.0.45"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.45.tgz#2c0fafd78705e7a18b7906b5201a522719dc5190"
+  integrity sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==
 
 "@types/node@^8.10.59":
   version "8.10.66"
@@ -7096,7 +7096,7 @@ body-parser@1.17.2:
     raw-body "~2.2.0"
     type-is "~1.6.15"
 
-body-parser@1.19.1, body-parser@^1.15.2, body-parser@^1.18.3, body-parser@^1.19.0:
+body-parser@1.19.1, body-parser@^1.18.3, body-parser@^1.19.0:
   version "1.19.1"
   resolved "https://registry.npmjs.org/body-parser/-/body-parser-1.19.1.tgz"
   integrity sha512-8ljfQi5eBk8EJfECMrgqNGWPEY5jWP+1IzkzkGdFFEwFQZZyaZ21UqdaHktgiMlH0xLHqIFtE/u2OYE5dOtViA==
@@ -9506,7 +9506,7 @@ dd-trace@^0.30.5:
     url-parse "^1.4.3"
     whatwg-fetch "^3.0.0"
 
-debug@2, debug@2.6.9, debug@^2.1.1, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@~2.6.9:
+debug@2, debug@2.6.9, debug@^2.1.1, debug@^2.2.0, debug@^2.3.3, debug@^2.6.8, debug@^2.6.9, debug@~2.6.9:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -11113,7 +11113,7 @@ express-session@^1.15.5:
     safe-buffer "5.2.1"
     uid-safe "~2.1.5"
 
-express@^4.0.0, express@^4.14.0, express@^4.17.1, express@^4.17.2:
+express@^4.0.0, express@^4.17.1, express@^4.17.2:
   version "4.17.2"
   resolved "https://registry.npmjs.org/express/-/express-4.17.2.tgz"
   integrity sha512-oxlxJxcQlYwqPWKVJJtvQiwHgosH/LrLSPA+H4UxpyvSS6jC5aH+5MoHFM+KABgTOt0APue4w66Ha8jCUo9QGg==
@@ -13280,7 +13280,7 @@ iconv-lite@0.4.15:
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.15.tgz"
   integrity sha512-RGR+c9Lm+tLsvU57FTJJtdbv2hQw42Yl2n26tVIBaYmZzLN+EGfroUugN/z9nJf9kOXd49hBmpoGr4FEm+A4pw==
 
-iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.24, iconv-lite@^0.4.4, iconv-lite@^0.4.5, iconv-lite@~0.4.11, iconv-lite@~0.4.13:
+iconv-lite@0.4.24, iconv-lite@^0.4.17, iconv-lite@^0.4.24, iconv-lite@^0.4.5, iconv-lite@~0.4.11, iconv-lite@~0.4.13:
   version "0.4.24"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
   integrity sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==
@@ -15138,13 +15138,6 @@ json-bigint@^0.3.0:
   version "0.3.1"
   resolved "https://registry.npmjs.org/json-bigint/-/json-bigint-0.3.1.tgz"
   integrity sha512-DGWnSzmusIreWlEupsUelHrhwmPPE+FiQvg+drKfk2p+bdEYa5mp4PJ8JsCWqae0M2jQNb0HPvnwvf1qOTThzQ==
-  dependencies:
-    bignumber.js "^9.0.0"
-
-json-bigint@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/json-bigint/-/json-bigint-1.0.0.tgz"
-  integrity sha512-SiPv/8VpZuWbvLSMtTDU8hEfrZWg/mH/nV/b4o0CYbSxu1UIQPLdwKOCIyLQX+VIPO5vrLX3i8qtqFyhdPSUSQ==
   dependencies:
     bignumber.js "^9.0.0"
 
@@ -17360,14 +17353,6 @@ nearley@^2.20.1:
     moo "^0.5.0"
     railroad-diagrams "^1.0.0"
     randexp "0.4.6"
-
-needle@^1.1.0:
-  version "1.6.0"
-  resolved "https://registry.npmjs.org/needle/-/needle-1.6.0.tgz"
-  integrity sha512-ogVK1D/Cgemw2vM1KJN6B83DwcKbDepdkMNtVJcXIe+xoaCOdC+aJHzhEov7xjsY9S7rBIuHP59W1fLsbGqDhA==
-  dependencies:
-    debug "^2.1.2"
-    iconv-lite "^0.4.4"
 
 negotiator@0.6.2:
   version "0.6.2"
