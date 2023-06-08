@@ -73,35 +73,73 @@ export default {
     );
   },
 
-  async pluginData(invoice: IInvoice, {}, { subdomain }: IContext) {
-    const [pluginName, collectionName] = invoice.contentType.split(':');
+  idOfProvider(invoice: IInvoice) {
+    const apiResponse: any = invoice.apiResponse || {};
 
-    if (!(await serviceDiscovery.isEnabled(pluginName))) {
-      return null;
+    switch (invoice.paymentKind) {
+      case 'qpay':
+        return apiResponse.invoice_id;
+      case 'socialpay':
+        return 'socialpay';
+      case 'qpayQuickqr':
+        return apiResponse.id;
+      case 'storepay':
+        return 'storepay';
+      case 'monpay':
+        return 'monpay';
+      default:
+        return 'not supported';
     }
+  },
 
-    const data: any = {};
+  errorDescription(invoice: IInvoice) {
+    const apiResponse: any = invoice.apiResponse || {};
 
-    const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
-
-    if (!meta) {
-      return await sendCommonMessage(pluginName, {
-        subdomain,
-        action: `${collectionName}.findOne`,
-        data: { _id: invoice.contentTypeId },
-        isRPC: true,
-        defaultValue: null
-      });
+    switch (invoice.paymentKind) {
+      case 'qpay':
+        return apiResponse.error && apiResponse.error;
+      case 'socialpay':
+        return apiResponse.error && apiResponse.error;
+      case 'qpayQuickqr':
+        return apiResponse.error && apiResponse.error;
+      case 'storepay':
+        return apiResponse.error && apiResponse.error;
+      case 'monpay':
+        return apiResponse.error && apiResponse.error;
+      default:
+        return;
     }
-
-    data[meta.queryKey] = invoice.contentTypeId;
-
-    return sendCommonMessage(pluginName, {
-      subdomain,
-      action: meta.action,
-      data,
-      isRPC: true,
-      defaultValue: null
-    });
   }
+
+  // async pluginData(invoice: IInvoice, {}, { subdomain }: IContext) {
+  //   const [pluginName, collectionName] = invoice.contentType.split(':');
+
+  //   if (!(await serviceDiscovery.isEnabled(pluginName))) {
+  //     return null;
+  //   }
+
+  //   const data: any = {};
+
+  //   const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
+
+  //   if (!meta) {
+  //     return await sendCommonMessage(pluginName, {
+  //       subdomain,
+  //       action: `${collectionName}.findOne`,
+  //       data: { _id: invoice.contentTypeId },
+  //       isRPC: true,
+  //       defaultValue: null
+  //     });
+  //   }
+
+  //   data[meta.queryKey] = invoice.contentTypeId;
+
+  //   return sendCommonMessage(pluginName, {
+  //     subdomain,
+  //     action: meta.action,
+  //     data,
+  //     isRPC: true,
+  //     defaultValue: null
+  //   });
+  // }
 };

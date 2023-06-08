@@ -17,6 +17,7 @@ export interface IInvoiceModel extends Model<IInvoiceDocument> {
   updateInvoice(_id: string, doc: any): Promise<IInvoiceDocument>;
   cancelInvoice(_id: string): Promise<string>;
   checkInvoice(_id: string): Promise<string>;
+  removeInvoices(_ids: string[]): Promise<any>;
 }
 
 export const loadInvoiceClass = (models: IModels) => {
@@ -199,6 +200,19 @@ export const loadInvoiceClass = (models: IModels) => {
       }
 
       return status;
+    }
+
+    public static async removeInvoices(_ids: string[]) {
+      const invoiceIds = await models.Invoices.find({
+        _id: { $in: _ids },
+        status: { $ne: 'paid' }
+      }).distinct('_id');
+
+      await models.Invoices.deleteMany({ _id: { $in: invoiceIds } });
+
+      redisUtils.removeInvoices(_ids);
+
+      return 'removed';
     }
   }
   invoiceSchema.loadClass(Invoices);

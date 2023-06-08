@@ -27,7 +27,7 @@ export default function Component(props: Props) {
     </a>
   );
 
-  const renderBody = (invoices: IInvoice[]) => {
+  const renderBody = () => {
     if (!invoices || !invoices.length) {
       return <EmptyState icon="user-6" text="No data" />;
     }
@@ -84,7 +84,7 @@ export default function Component(props: Props) {
       isOpen={true}
       name="invoiceList"
     >
-      {renderBody(invoices)}
+      {renderBody()}
     </Box>
   );
 }

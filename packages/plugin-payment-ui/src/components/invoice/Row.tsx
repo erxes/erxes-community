@@ -19,6 +19,7 @@ type Props = {
   invoice: IInvoice;
   history: any;
   isChecked: boolean;
+  onClick: (invoiceId: string) => void;
   toggleBulk: (invoice: IInvoice, isChecked?: boolean) => void;
   check: (invoiceId: string) => void;
 };
@@ -50,10 +51,13 @@ class Row extends React.Component<Props> {
 
     const onClick = e => {
       e.stopPropagation();
+      this.props.onClick(invoice._id);
     };
 
     const onTrClick = () => {
-      history.push(`/processes/flows/details/${invoice._id}`);
+      console.log('onTrClick');
+      // history.push(`/processes/flows/details/${invoice._id}`);
+      this.props.onClick(invoice._id);
     };
 
     const renderPluginItemName = data => {
