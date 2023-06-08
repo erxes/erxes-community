@@ -98,6 +98,8 @@ export interface IContract {
   repaymentDate?: Date;
   undueCalcType?: string;
 
+  skipInterestCalcMonth?: number;
+
   dealId?: string;
 }
 
@@ -337,6 +339,11 @@ export const contractSchema = schemaHooksWrapper(
       type: String,
       optional: true,
       label: 'Undue Calc Type'
+    }),
+    skipInterestCalcMonth: field({
+      type: Number,
+      optional: true,
+      label: 'Skip Interest Calc Month'
     }),
     dealId: field({
       type: String,

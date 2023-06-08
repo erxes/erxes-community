@@ -40,6 +40,7 @@ export const types = () => `
     unduePercent: Float
     undueCalcType: String
     interestRate: Float
+    skipInterestCalcMonth: Float
     repayment: String
     startDate: Date
     scheduleDays: [Float]
@@ -89,6 +90,7 @@ export const types = () => `
     payedAmountSum:Float
     loanBalanceAmount:Float
     expiredDays:Float
+    loanTransactionHistory:JSON
   }
 
 
@@ -190,6 +192,7 @@ const commonFields = `
   useDebt: Boolean
   relContractId: String
   dealId: String
+  skipInterestCalcMonth: Float
 `;
 
 export const mutations = `

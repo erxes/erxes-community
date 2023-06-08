@@ -43,6 +43,7 @@ type State = {
   tenor: number;
   interestRate: number;
   interestMonth: number;
+  skipInterestCalcMonth: number;
   repayment: string;
   startDate: Date;
   scheduleDays: number[];
@@ -99,6 +100,7 @@ class ContractForm extends React.Component<Props, State> {
       salvageAmount: contract.salvageAmount || 0,
       salvagePercent: contract.salvagePercent || 0,
       salvageTenor: contract.salvageTenor || 0,
+      skipInterestCalcMonth: contract.skipInterestCalcMonth || 0,
       useDebt: contract.useDebt,
       useMargin: contract.useMargin,
 
@@ -140,6 +142,7 @@ class ContractForm extends React.Component<Props, State> {
       tenor: Number(this.state.tenor),
       unduePercent: Number(this.state.unduePercent),
       interestRate: Number(this.state.interestRate),
+      skipInterestCalcMonth: Number(this.state.skipInterestCalcMonth),
       repayment: this.state.repayment,
       undueCalcType: this.state.undueCalcType || 'fromInterest',
       startDate: this.state.startDate,
@@ -511,7 +514,14 @@ class ContractForm extends React.Component<Props, State> {
                 onChange: this.onChangeInterest,
                 onClick: this.onFieldClick
               })}
-
+              {this.renderFormGroup('Skip Interest Calc /Month/', {
+                ...formProps,
+                type: 'number',
+                name: 'skipInterestCalcMonth',
+                value: this.state.skipInterestCalcMonth,
+                onChange: this.onChangeField,
+                onClick: this.onFieldClick
+              })}
               {this.renderFormGroup('Undue Percent', {
                 ...formProps,
                 type: 'number',
@@ -539,7 +549,6 @@ class ContractForm extends React.Component<Props, State> {
                   ))}
                 </FormControl>
               </FormGroup>
-
               <FormGroup>
                 <ControlLabel required>{__('Schedule Days')}</ControlLabel>
                 <Select
