@@ -11,6 +11,7 @@ export const contractTypeFields = `
   unduePercent
   undueCalcType
   useMargin
+  useSkipInterest
   useDebt
   productCategoryIds
   config

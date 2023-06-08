@@ -10,6 +10,7 @@ export const types = () => `
     unduePercent: Float
     undueCalcType: String
     useMargin: Boolean
+    useSkipInterest: Boolean
     useDebt: Boolean
     leaseType: String
     createdAt: Date
@@ -50,6 +51,7 @@ const commonFields = `
   unduePercent: Float 
   undueCalcType: String
   useMargin: Boolean
+  useSkipInterest: Boolean
   useDebt: Boolean
   leaseType: String
   createdAt: Date

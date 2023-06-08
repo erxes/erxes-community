@@ -61,6 +61,7 @@ export interface IContractTypeDoc {
   undueCalcType: string;
   useMargin: boolean;
   useDebt: boolean;
+  useSkipInterest: boolean;
 }
 
 export interface IContractType extends IContractTypeDoc {

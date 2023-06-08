@@ -48,6 +48,7 @@ export interface IContractType {
   unduePercent: number;
   undueCalcType: string;
   useMargin: boolean;
+  useSkipInterest: boolean;
   useDebt: boolean;
   leaseType: string;
   createdAt: Date;
@@ -96,6 +97,7 @@ export const contractTypeSchema = schemaHooksWrapper(
       label: 'Use margin',
       optional: true
     }),
+    useSkipInterest: field({ type: Boolean, label: 'use skip interest' }),
     leaseType: field({
       type: String,
       enum: LEASE_TYPES.ALL,

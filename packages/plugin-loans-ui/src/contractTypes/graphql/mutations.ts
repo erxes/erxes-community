@@ -11,6 +11,7 @@ const commonFields = `
   $undueCalcType:String
   $useMargin: Boolean
   $useDebt: Boolean
+  $useSkipInterest:Boolean
   $leaseType: String
   $createdAt: Date,
   $productCategoryIds: [String],
@@ -28,6 +29,7 @@ const commonVariables = `
   undueCalcType: $undueCalcType
   useMargin: $useMargin
   useDebt: $useDebt
+  useSkipInterest: $useSkipInterest
   leaseType: $leaseType
   createdAt: $createdAt,
   productCategoryIds: $productCategoryIds,

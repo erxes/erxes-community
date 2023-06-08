@@ -65,7 +65,7 @@ type State = {
   riskExpertId: string;
   useDebt: boolean;
   useMargin: boolean;
-
+  useSkipInterest: boolean;
   leaseType: string;
   weekends: number[];
   useHoliday: boolean;
@@ -103,7 +103,7 @@ class ContractForm extends React.Component<Props, State> {
       skipInterestCalcMonth: contract.skipInterestCalcMonth || 0,
       useDebt: contract.useDebt,
       useMargin: contract.useMargin,
-
+      useSkipInterest: contract.useSkipInterest,
       relationExpertId: contract.relationExpertId || '',
       leasingExpertId: contract.leasingExpertId || '',
       riskExpertId: contract.riskExpertId || '',
@@ -157,7 +157,7 @@ class ContractForm extends React.Component<Props, State> {
       salvageTenor: 0,
       useDebt: this.state.useDebt,
       useMargin: this.state.useMargin,
-
+      useSkipInterest: this.state.useSkipInterest,
       relationExpertId: this.state.relationExpertId,
       leasingExpertId: this.state.leasingExpertId,
       riskExpertId: this.state.riskExpertId,
@@ -310,6 +310,7 @@ class ContractForm extends React.Component<Props, State> {
       contractTypeId: value,
       leaseType: (contractTypeObj && contractTypeObj.leaseType) || 'finance',
       useMargin: contractTypeObj.useMargin,
+      useSkipInterest: contractTypeObj.useSkipInterest,
       useDebt: contractTypeObj.useDebt
     };
 
@@ -449,16 +450,17 @@ class ContractForm extends React.Component<Props, State> {
                 </FormGroup>
               )}
 
-              {this.renderFormGroup('Margin Amount', {
-                ...formProps,
-                type: 'number',
-                name: 'marginAmount',
-                useNumberFormat: true,
-                fixed: 2,
-                value: this.state.marginAmount || 0,
-                onChange: this.onChangeWithSalvage,
-                onClick: this.onFieldClick
-              })}
+              {this.state.useMargin &&
+                this.renderFormGroup('Margin Amount', {
+                  ...formProps,
+                  type: 'number',
+                  name: 'marginAmount',
+                  useNumberFormat: true,
+                  fixed: 2,
+                  value: this.state.marginAmount || 0,
+                  onChange: this.onChangeWithSalvage,
+                  onClick: this.onFieldClick
+                })}
 
               {this.renderFormGroup('Lease Amount', {
                 ...formProps,
@@ -514,14 +516,15 @@ class ContractForm extends React.Component<Props, State> {
                 onChange: this.onChangeInterest,
                 onClick: this.onFieldClick
               })}
-              {this.renderFormGroup('Skip Interest Calc /Month/', {
-                ...formProps,
-                type: 'number',
-                name: 'skipInterestCalcMonth',
-                value: this.state.skipInterestCalcMonth,
-                onChange: this.onChangeField,
-                onClick: this.onFieldClick
-              })}
+              {this.state.useSkipInterest &&
+                this.renderFormGroup('Skip Interest Calc /Month/', {
+                  ...formProps,
+                  type: 'number',
+                  name: 'skipInterestCalcMonth',
+                  value: this.state.skipInterestCalcMonth,
+                  onChange: this.onChangeField,
+                  onClick: this.onFieldClick
+                })}
               {this.renderFormGroup('Undue Percent', {
                 ...formProps,
                 type: 'number',

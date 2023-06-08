@@ -111,6 +111,10 @@ class DetailInfo extends React.Component<Props> {
                 'Is use margin',
                 __(contractType.useMargin ? 'Yes' : 'No')
               )}
+              {this.renderRow(
+                'Is use skip interest',
+                __(contractType.useSkipInterest ? 'Yes' : 'No')
+              )}
 
               {this.renderRow('Leasing Type', contractType.leaseType)}
               <li>

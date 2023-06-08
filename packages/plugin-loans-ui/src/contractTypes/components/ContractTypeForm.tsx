@@ -30,6 +30,7 @@ type State = {
   undueCalcType: string;
   useMargin: boolean;
   useDebt: boolean;
+  useSkipInterest: boolean;
 };
 
 class ContractTypeForm extends React.Component<Props, State> {
@@ -43,7 +44,8 @@ class ContractTypeForm extends React.Component<Props, State> {
       productCategoryIds: contractType.productCategoryIds,
       leaseType: contractType.leaseType || 'finance',
       useMargin: contractType.useMargin,
-      useDebt: contractType.useDebt
+      useDebt: contractType.useDebt,
+      useSkipInterest: contractType.useSkipInterest
     };
   }
 
@@ -67,6 +69,7 @@ class ContractTypeForm extends React.Component<Props, State> {
       undueCalcType: finalValues.undueCalcType,
       useMargin: this.state.useMargin,
       useDebt: this.state.useDebt,
+      useSkipInterest: this.state.useSkipInterest,
       leaseType: this.state.leaseType,
       productCategoryIds: this.state.productCategoryIds,
       description: finalValues.description
@@ -237,6 +240,15 @@ class ContractTypeForm extends React.Component<Props, State> {
                 componentClass: 'checkbox',
                 name: 'useMargin',
                 checked: this.state.useMargin,
+                onChange: this.onChangeField
+              })}
+              {this.renderFormGroup('Is use skip interest', {
+                ...formProps,
+                className: 'flex-item',
+                type: 'checkbox',
+                componentClass: 'checkbox',
+                name: 'useSkipInterest',
+                checked: this.state.useSkipInterest,
                 onChange: this.onChangeField
               })}
             </FormColumn>
