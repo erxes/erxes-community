@@ -1,7 +1,6 @@
 import * as QRCode from 'qrcode';
 
 import { IModels } from '../../connectionResolver';
-
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { BaseAPI } from '../base';
 import { PAYMENTS, PAYMENT_STATUS } from '../constants';
