@@ -1,8 +1,6 @@
-import { serviceDiscovery } from './../../configs';
 import { IContext } from '../../connectionResolver';
-import { IInvoice } from '../../models/definitions/invoices';
 import { sendCommonMessage, sendContactsMessage } from '../../messageBroker';
-import { PLUGIN_RESOLVERS_META } from '../../api/constants';
+import { IInvoice } from '../../models/definitions/invoices';
 
 export default {
   __resolveReference({ _id }, { models }: IContext) {
@@ -86,36 +84,4 @@ export default {
         return;
     }
   }
-
-  // async pluginData(invoice: IInvoice, {}, { subdomain }: IContext) {
-  //   const [pluginName, collectionName] = invoice.contentType.split(':');
-
-  //   if (!(await serviceDiscovery.isEnabled(pluginName))) {
-  //     return null;
-  //   }
-
-  //   const data: any = {};
-
-  //   const meta = PLUGIN_RESOLVERS_META[invoice.contentType];
-
-  //   if (!meta) {
-  //     return await sendCommonMessage(pluginName, {
-  //       subdomain,
-  //       action: `${collectionName}.findOne`,
-  //       data: { _id: invoice.contentTypeId },
-  //       isRPC: true,
-  //       defaultValue: null
-  //     });
-  //   }
-
-  //   data[meta.queryKey] = invoice.contentTypeId;
-
-  //   return sendCommonMessage(pluginName, {
-  //     subdomain,
-  //     action: meta.action,
-  //     data,
-  //     isRPC: true,
-  //     defaultValue: null
-  //   });
-  // }
 };
