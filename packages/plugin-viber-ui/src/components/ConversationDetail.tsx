@@ -1,9 +1,9 @@
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import MailConversation from '@erxes/ui-inbox/src/inbox/components/conversationDetail/workarea/mail/MailConversation';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { queries } from '../graphql';
+import ViberMessage from './conversation/ViberMessage';
 
 class Detail extends React.Component<any> {
   render() {
@@ -13,13 +13,17 @@ class Detail extends React.Component<any> {
       return null;
     }
 
+    console.log(messagesQuery);
+
     const messages = messagesQuery.viberConversationDetail || [];
 
     return (
-      <MailConversation
-        conversation={currentConversation}
-        conversationMessages={messages}
-      />
+      <div>
+        <ViberMessage
+          conversation={currentConversation}
+          conversationMessages={messages}
+        />
+      </div>
     );
   }
 }

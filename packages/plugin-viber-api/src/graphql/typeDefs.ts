@@ -16,10 +16,16 @@ const types = `
     sendDate: Date
     messageText: String
   }
+
+  type ViberMessageDetail {
+    _id: String
+    mailData: JSON
+  }
 `;
 
 const queries = `
   viberReadSentMessage: [SentMessage]
+  viberConversationDetail(conversationId: String): ViberMessageDetail
 `;
 
 const mutations = `

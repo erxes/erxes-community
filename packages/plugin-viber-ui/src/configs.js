@@ -22,6 +22,7 @@ module.exports = {
       kind: "viber",
       logo: "/images/integrations/viber.png",
       createModal: "viber",
+      components: ['inboxConversationDetail'],
     },
   ],
 };

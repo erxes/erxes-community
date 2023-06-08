@@ -41,7 +41,7 @@ export const initBroker = async cl => {
         await Integrations.deleteOne({ _id: viberIntegration._id });
         return {
           status: 'failed',
-          data: e.message
+          data: e
         };
       }
 
