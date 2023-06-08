@@ -3,7 +3,6 @@ import EmptyState from '@erxes/ui/src/components/EmptyState';
 import Icon from '@erxes/ui/src/components/Icon';
 import Label from '@erxes/ui/src/components/Label';
 import Table from '@erxes/ui/src/components/table';
-import { SectionBodyItem } from '@erxes/ui/src/layout/styles';
 import { __ } from '@erxes/ui/src/utils/core';
 import React from 'react';
 

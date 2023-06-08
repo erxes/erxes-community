@@ -192,9 +192,9 @@ export const loadInvoiceClass = (models: IModels) => {
 
       const api = new ErxesPayment(payment);
 
-      const status = await api.checkInvoice(invoice);
+      const status = await api.manualCheck(invoice);
 
-      if (status !== invoice.status) {
+      if (status === 'paid') {
         invoice.status = status;
         await invoice.save();
       }

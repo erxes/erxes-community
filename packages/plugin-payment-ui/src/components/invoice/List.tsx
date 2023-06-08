@@ -5,10 +5,9 @@ import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Table from '@erxes/ui/src/components/table';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { BarItems } from '@erxes/ui/src/layout/styles';
-import { Count } from '@erxes/ui/src/styles/main';
 import { IRouterProps } from '@erxes/ui/src/types';
 import { __, Alert, confirm, router } from '@erxes/ui/src/utils';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import InvoiceDetail from '../../containers/invoice/Detail';
 
@@ -158,14 +157,6 @@ const List = (props: IProps) => {
         </Modal.Header>
         <Modal.Body>
           <InvoiceDetail id={currentInvoiceId || ''} />
-          <Button
-            btnStyle="primary"
-            size="small"
-            icon="cancel-1"
-            onClick={() => setShowModal(false)}
-          >
-            Cancel
-          </Button>
         </Modal.Body>
       </Modal>
     </>

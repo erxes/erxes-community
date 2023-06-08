@@ -1,19 +1,14 @@
-import {
-  ActionButtons,
-  Button,
-  Icon,
-  ModalTrigger,
-  Tip
-} from '@erxes/ui/src/components';
+import { ActionButtons, Button, Icon, Tip } from '@erxes/ui/src/components';
 import { FormControl } from '@erxes/ui/src/components/form';
 import Label from '@erxes/ui/src/components/Label';
 import { DateWrapper } from '@erxes/ui/src/styles/main';
 import dayjs from 'dayjs';
 import React from 'react';
 
+import { renderFullName } from '@erxes/ui/src/utils';
+import { __, renderUserFullName } from '@erxes/ui/src/utils/core';
 import { IInvoice } from '../../types';
 import { PAYMENTCONFIGS } from '../constants';
-import { __ } from '@erxes/ui/src/utils/core';
 
 type Props = {
   invoice: IInvoice;
@@ -54,9 +49,12 @@ class Row extends React.Component<Props> {
       this.props.onClick(invoice._id);
     };
 
-    const onTrClick = () => {
-      console.log('onTrClick');
-      // history.push(`/processes/flows/details/${invoice._id}`);
+    const onTrClick = e => {
+      if (e.target.className.includes('icon-invoice')) {
+        return;
+      }
+
+      e.stopPropagation();
       this.props.onClick(invoice._id);
     };
 
@@ -105,13 +103,20 @@ class Row extends React.Component<Props> {
         labelStyle = 'danger';
     }
 
-    const renderName = () => {
-      if (customer.name || customer.phone || customer.email) {
-        return `${customer.name || ''} ${customer.phone ||
-          ''} ${customer.email || ''}`;
+    const renderCustomerName = () => {
+      if (!customer) {
+        return '-';
       }
 
-      return '-';
+      if (customerType === 'user') {
+        return renderUserFullName(customer);
+      }
+
+      if (customerType === 'company') {
+        return customer.primaryName || customer.website || '-';
+      }
+
+      return renderFullName(customer);
     };
 
     const meta: any = PAYMENTCONFIGS.find(p => p.kind === payment.kind);
@@ -129,13 +134,10 @@ class Row extends React.Component<Props> {
         <td>{payment ? payment.name : 'NA'}</td>
         <td>{kind}</td>
         <td>{amount.toFixed(2)}</td>
-
-        {/* <td>{`${contentType.split(':')[0]} - ${pluginData &&
-          renderPluginItemName(pluginData)}`}</td> */}
         <td>
           <Label lblStyle={labelStyle}>{status}</Label>
         </td>
-        <td>{customer ? renderName() : '-'}</td>
+        <td>{renderCustomerName()}</td>
         <td>{customerType}</td>
         <td>{description}</td>
         <td>

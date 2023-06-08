@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { router } from '@erxes/ui/src';
+import { __, router } from '@erxes/ui/src';
 import Bulk from '@erxes/ui/src/components/Bulk';
 import React from 'react';
 import List from '../../components/invoice/List';
@@ -8,6 +8,7 @@ import {
   InvoicesQueryResponse,
   InvoicesTotalCountQueryResponse
 } from '../../types';
+import Alert from '@erxes/ui/src/utils/Alert';
 
 type Props = {
   queryParams: any;
@@ -72,7 +73,17 @@ const InvoiceListContainer = (props: Props) => {
       variables: {
         _id: invoiceId
       }
-    });
+    })
+      .then(({ data }) => {
+        if (data.invoicesCheck === 'paid') {
+          return Alert.success(__('Invoice is paid'));
+        }
+
+        Alert.warning(data.invoicesCheck);
+      })
+      .catch(e => {
+        Alert.error(e.message);
+      });
   };
 
   const removeInvoices = (_ids: string[]) => {

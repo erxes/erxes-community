@@ -12,7 +12,7 @@ export default {
   async customer(invoice: IInvoice, {}, { subdomain }: IContext) {
     switch (invoice.customerType) {
       case 'company':
-        const company = await sendContactsMessage({
+        return await sendContactsMessage({
           subdomain,
           action: 'companies.findOne',
           data: { _id: invoice.customerId },
@@ -20,35 +20,16 @@ export default {
           defaultValue: null
         });
 
-        if (!company) {
-          return null;
-        }
-
-        return {
-          name: company.primaryName,
-          email: company.primaryEmail,
-          phone: company.primaryPhone
-        };
       case 'customer':
-        const customer = await sendContactsMessage({
+        return await sendContactsMessage({
           subdomain,
           action: 'customers.findOne',
           data: { _id: invoice.customerId },
           isRPC: true,
           defaultValue: null
         });
-
-        if (!customer) {
-          return null;
-        }
-
-        return {
-          name: `${customer.firstName} ${customer.lastName}`,
-          email: customer.primaryEmail,
-          phone: customer.primaryPhone
-        };
       case 'user':
-        const user = await sendCommonMessage('core', {
+        return await sendCommonMessage('core', {
           subdomain,
           action: 'users.findOne',
           data: { _id: invoice.customerId },
@@ -56,11 +37,6 @@ export default {
           defaultValue: null
         });
 
-        if (!user) {
-          return null;
-        }
-
-        return { name: user.username, email: user.email, phone: '' };
       default:
         return null;
     }
@@ -80,13 +56,13 @@ export default {
       case 'qpay':
         return apiResponse.invoice_id;
       case 'socialpay':
-        return 'socialpay';
+        return invoice.identifier;
       case 'qpayQuickqr':
         return apiResponse.id;
       case 'storepay':
-        return 'storepay';
+        return apiResponse.value;
       case 'monpay':
-        return 'monpay';
+        return apiResponse.uuid;
       default:
         return 'not supported';
     }
