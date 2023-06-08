@@ -133,7 +133,7 @@ class Row extends React.Component<Props> {
         </td>
         <td>{payment ? payment.name : 'NA'}</td>
         <td>{kind}</td>
-        <td>{amount.toFixed(2)}</td>
+        <td>{amount.toLocaleString()}</td>
         <td>
           <Label lblStyle={labelStyle}>{status}</Label>
         </td>
