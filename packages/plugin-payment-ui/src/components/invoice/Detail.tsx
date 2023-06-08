@@ -173,7 +173,7 @@ const Detail = ({ invoice }: Props) => {
             <li>
               <FieldStyle overflow="unset">Amount:</FieldStyle>
               <SidebarCounter nowrap={true}>
-                {invoice.amount.toFixed(2)}
+                {invoice.amount.toLocaleString()}
               </SidebarCounter>
             </li>
             <li
