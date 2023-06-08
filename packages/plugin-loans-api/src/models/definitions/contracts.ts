@@ -85,6 +85,8 @@ export interface IContract {
 
   weekends: number[];
   useHoliday: boolean;
+  useMargin: boolean;
+  useDebt: boolean;
 
   closeDate?: Date;
   closeType?: string;
@@ -298,7 +300,8 @@ export const contractSchema = schemaHooksWrapper(
     }),
     weekends: field({ type: [Number], label: 'weekend' }),
     useHoliday: field({ type: Boolean, label: 'use holiday' }),
-
+    useMargin: field({ type: Boolean, label: 'use margin' }),
+    useDebt: field({ type: Boolean, label: 'use debt' }),
     closeDate: field({
       type: Date,
       optional: true,

@@ -8,6 +8,9 @@ const commonFields = `
   $number: String,
   $vacancy: Float,
   $unduePercent: Float,
+  $undueCalcType:String
+  $useMargin: Boolean
+  $useDebt: Boolean
   $leaseType: String
   $createdAt: Date,
   $productCategoryIds: [String],
@@ -22,6 +25,9 @@ const commonVariables = `
   number: $number,
   vacancy: $vacancy,
   unduePercent: $unduePercent
+  undueCalcType: $undueCalcType
+  useMargin: $useMargin
+  useDebt: $useDebt
   leaseType: $leaseType
   createdAt: $createdAt,
   productCategoryIds: $productCategoryIds,
