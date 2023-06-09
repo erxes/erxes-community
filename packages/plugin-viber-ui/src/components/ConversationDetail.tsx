@@ -16,12 +16,10 @@ class Detail extends React.Component<any> {
     const messages = messagesQuery.viberConversationDetail || [];
 
     return (
-      <div>
-        <ViberMessage
-          conversation={currentConversation}
-          conversationMessages={messages}
-        />
-      </div>
+      <ViberMessage
+        conversation={currentConversation}
+        conversationMessages={messages}
+      />
     );
   }
 }
