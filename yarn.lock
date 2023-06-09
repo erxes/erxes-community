@@ -8535,6 +8535,9 @@ console.table@^0.10.0:
     easy-table "1.1.0"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 constantinople@^3.0.1, constantinople@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/constantinople/-/constantinople-3.1.2.tgz#d45ed724f57d3d10500017a7d3a889c1381ae647"
@@ -8544,12 +8547,19 @@ constantinople@^3.0.1, constantinople@^3.1.2:
     "@types/babylon" "^6.16.2"
     babel-types "^6.26.0"
     babylon "^6.18.0"
+<<<<<<< HEAD
 =======
+=======
+
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
   integrity sha512-xFxOwqIzR/e1k1gLiWEophSCMqXcwVHIH7akf7b/vxcUeGunlj3hvZaaqxwHsTgn+IndtkQJgSztIDWeumWJDQ==
+<<<<<<< HEAD
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 
 content-disposition@0.5.4:
   version "0.5.4"
@@ -10032,11 +10042,14 @@ diff@^5.0.0:
   integrity sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 dijkstrajs@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/dijkstrajs/-/dijkstrajs-1.0.2.tgz#2e48c0d3b825462afe75ab4ad5e829c8ece36257"
   integrity sha512-QV6PMaHTCNmKSeP6QoXhVTw9snc9VD8MulTT0Bd99Pacp4SS1cjcrYPgBPmibqKVtMJJfqC6XvOXgPMEEPH/fg==
 =======
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 diffie-hellman@^5.0.0:
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/diffie-hellman/-/diffie-hellman-5.0.3.tgz#40e8ee98f55a2149607146921c63e1ae5f3d2875"
@@ -10045,7 +10058,15 @@ diffie-hellman@^5.0.0:
     bn.js "^4.1.0"
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
+<<<<<<< HEAD
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+
+dijkstrajs@^1.0.1:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/dijkstrajs/-/dijkstrajs-1.0.3.tgz#4c8dbdea1f0f6478bff94d9c49c784d623e4fc23"
+  integrity sha512-qiSlmBq9+BCdCA/L46dw8Uy93mloxsPSbwnm5yrKn2vMPiy8KyAskTF6zuV/j5BMsmOGZDPs7KjU+mjb670kfA==
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 
 dir-glob@^3.0.1:
   version "3.0.1"
@@ -17821,15 +17842,22 @@ object-inspect@^1.11.0, object-inspect@^1.9.0:
   integrity sha512-Ho2z80bVIvJloH+YzRmpZVQe87+qASmBUKZDWgx9cu+KDrX2ZDH/3tMy+gXbZETVGs2M8YdxObOh7XAtim9Y0g==
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 object-inspect@^1.12.0, object-inspect@^1.12.2:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.12.2.tgz#c0641f26394532f28ab8d796ab954e43c009a8ea"
-  integrity sha512-z+cPxW0QGUp0mcqcsgQyLVRDoXFQbXOwBaqyF7VIgI4TWNQsDHrBpUQslRmIfAoYWdYzs6UlKJtB2XJpTaNSpQ==
+  version "1.12.3"
+  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.12.3.tgz#ba62dffd67ee256c8c086dfae69e016cd1f198b9"
+  integrity sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==
 
+<<<<<<< HEAD
 object-is@^1.1.4:
 =======
 object-is@^1.0.1, object-is@^1.1.4:
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+object-is@^1.0.1, object-is@^1.1.4:
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/object-is/-/object-is-1.1.5.tgz#b9deeaa5fc7f1846a0faecdceec138e5778f53ac"
   integrity sha512-3cyDsyHgtmi7I7DfSSI2LDp6SK2lwvtbg0p0R1e0RvTqF5ceGx+K2dfSjm1bKDMVCFEDAQvy+o8c6a7VujOddw==
@@ -18947,6 +18975,21 @@ pstree.remy@^1.1.8:
   integrity sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+public-encrypt@^4.0.0:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/public-encrypt/-/public-encrypt-4.0.3.tgz#4fcc9d77a07e48ba7527e7cbe0de33d0701331e0"
+  integrity sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==
+  dependencies:
+    bn.js "^4.1.0"
+    browserify-rsa "^4.0.0"
+    create-hash "^1.1.0"
+    parse-asn1 "^5.0.0"
+    randombytes "^2.0.1"
+    safe-buffer "^5.1.2"
+
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 pug-attrs@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pug-attrs/-/pug-attrs-2.0.4.tgz#b2f44c439e4eb4ad5d4ef25cac20d18ad28cc336"
@@ -19051,6 +19094,7 @@ pug@^2.0.4:
     pug-parser "^5.0.1"
     pug-runtime "^2.0.5"
     pug-strip-comments "^1.0.4"
+<<<<<<< HEAD
 =======
 public-encrypt@^4.0.0:
   version "4.0.3"
@@ -19064,6 +19108,8 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 
 pump@^3.0.0:
   version "3.0.0"
@@ -19155,6 +19201,15 @@ qs@~6.5.2:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
+
+query-string@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.0.0.tgz#fbdf7004b4d2aff792f9871981b7a2794f555947"
+  integrity sha512-Y2rS8lFpKsdZHmjNMZ8BxbuE4ZJtXX0xAy+KCTNE21XgWdKCLkgwtuIIz5N3KSJAQrC9UaZ+lmTUKBzyLVYzHQ==
+  dependencies:
+    decode-uri-component "^0.2.0"
+    object-assign "^4.1.0"
+    strict-uri-encode "^1.0.0"
 
 query-string@^5.0.0:
   version "5.1.1"

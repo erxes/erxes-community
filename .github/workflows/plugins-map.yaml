@@ -5,6 +5,7 @@ on:
     branches:
       - dev
 <<<<<<< HEAD
+<<<<<<< HEAD
     paths:
       - "scripts/pluginsMap.js"
       - ".github/workflows/plugins-map.yaml"
@@ -15,6 +16,8 @@ on:
       - "scripts/pluginsMap.js"
       - ".github/workflows/plugins-map.yaml"
 =======
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
       - staging
     paths:
       - 'scripts/pluginsMap.js'
@@ -26,7 +29,10 @@ on:
     paths:
       - 'scripts/pluginsMap.js'
       - '.github/workflows/plugins-map.yaml'
+<<<<<<< HEAD
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 
 jobs:
   ui:
@@ -42,10 +48,14 @@ jobs:
 
       - name: Configure AWS credentials
 <<<<<<< HEAD
+<<<<<<< HEAD
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )
 =======
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -53,6 +63,7 @@ jobs:
           aws-region: us-west-2
 
       - name: Deploy
+<<<<<<< HEAD
 <<<<<<< HEAD
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )
         run: |
@@ -63,3 +74,8 @@ jobs:
         run: |
           aws s3 cp scripts/pluginsMap.js s3://erxes-${GITHUB_REF#refs/heads/}-plugins
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
+        run: |
+          aws s3 cp scripts/pluginsMap.js s3://erxes-${GITHUB_REF#refs/heads/}-plugins
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f

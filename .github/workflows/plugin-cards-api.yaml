@@ -57,10 +57,14 @@ jobs:
 
       - name: Build docker image
 <<<<<<< HEAD
+<<<<<<< HEAD
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' )
 =======
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
         run: |
           cd dist/plugin-cards-api/.erxes
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin

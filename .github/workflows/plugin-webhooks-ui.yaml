@@ -7,6 +7,9 @@ on:
       - staging
     paths:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
       - "packages/erxes-ui/**"
       - "packages/ui-plugin-template/**"
       - "packages/ui-cards/**"
@@ -24,6 +27,7 @@ on:
       - "packages/ui-webhooks/**"
       - "packages/plugin-webhooks-ui/**"
       - ".github/workflows/plugin-webhooks-ui.yaml"
+<<<<<<< HEAD
 =======
       - 'packages/erxes-ui/**'
       - 'packages/ui-plugin-template/**'
@@ -42,11 +46,17 @@ on:
       - 'packages/plugin-webhooks-ui/**'
       - '.github/workflows/plugin-webhooks-ui.yaml'
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
   pull_request:
     branches:
       - dev
+      - staging
     paths:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
       - "packages/erxes-ui/**"
       - "packages/ui-plugin-template/**"
       - "packages/ui-cards/**"
@@ -64,6 +74,7 @@ on:
       - "packages/ui-webhooks/**"
       - "packages/plugin-webhooks-ui/**"
       - ".github/workflows/plugin-webhooks-ui.yaml"
+<<<<<<< HEAD
 =======
       - 'packages/erxes-ui/**'
       - 'packages/ui-plugin-template/**'
@@ -82,6 +93,8 @@ on:
       - 'packages/plugin-webhooks-ui/**'
       - '.github/workflows/plugin-webhooks-ui.yaml'
 >>>>>>> 3846448c426cb709c354a9d501581cfd7a056c2e
+=======
+>>>>>>> 60aafd191796a43599931329c246a6a242dcac2f
 
 jobs:
   ui:
