@@ -19,13 +19,17 @@ const types = `
 
   type ViberMessageDetail {
     _id: String
+    userId: String
+    customerId: String
+    content: String
+    createdAt: Date
     mailData: JSON
   }
 `;
 
 const queries = `
   viberReadSentMessage: [SentMessage]
-  viberConversationDetail(conversationId: String): ViberMessageDetail
+  viberConversationDetail(conversationId: String!): [ViberMessageDetail]
 `;
 
 const mutations = `

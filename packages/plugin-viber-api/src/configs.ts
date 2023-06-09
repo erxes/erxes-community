@@ -3,6 +3,7 @@ import resolvers from './graphql/resolvers';
 import { initBroker } from './messageBroker';
 import init from './controller';
 import webhookListen from './viber/webhookListen';
+import { getSubdomain } from '@erxes/api-utils/src/core';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -29,7 +30,13 @@ export default {
 
   postHandlers: [{ path: '/webhook/:integrationId', method: webhookListen }],
 
-  apolloServerContext: async context => {
+  apolloServerContext: async (context, req) => {
+    const subdomain = getSubdomain(req);
+    // const models = await generateModels(subdomain);
+
+    context.subdomain = subdomain;
+    // context.models = models;
+
     return context;
   },
 

@@ -1,9 +1,13 @@
 const detail = `
-  query viber($conversationId: String!) {
-      viberConversationDetail(conversationId: $conversationId) {
-          _id
-          mailData
-      }
+  query ViberConversationDetail($conversationId: String!) {
+    viberConversationDetail(conversationId: $conversationId) {
+      _id
+      content
+      customerId
+      userId
+      mailData
+      createdAt
+    }
   }
 `;
 

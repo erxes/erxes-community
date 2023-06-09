@@ -18,7 +18,7 @@ class ViberMessage extends React.Component<Props, {}> {
 
     const messages = conversationMessages || [];
 
-    return messages.map((message, index) => {
+    return messages.map(message => {
       return (
         <SimpleMessage
           key={message._id}

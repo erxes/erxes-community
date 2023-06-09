@@ -13,8 +13,6 @@ class Detail extends React.Component<any> {
       return null;
     }
 
-    console.log(messagesQuery);
-
     const messages = messagesQuery.viberConversationDetail || [];
 
     return (
