@@ -6,7 +6,6 @@ module.exports = {
     "./routes": "./src/routes.tsx",
     "./inboxIntegrationForm": "./src/components/IntegrationForm.tsx",
     "./inboxConversationDetail": "./src/components/ConversationDetail.tsx",
-    // './inboxConversationDetailRespondBoxMask': './src/components/conversation/RespondBox.tsx',
   },
   routes: {
     url: "http://localhost:3024/remoteEntry.js",
@@ -15,7 +14,6 @@ module.exports = {
   },
   inboxIntegrationForm: "./inboxIntegrationForm",
   inboxConversationDetail: "./inboxConversationDetail",
-  // inboxDirectMessage: {
   //   messagesQuery: {
   //     query: `
   //         query facebookConversationMessages(
@@ -99,8 +97,7 @@ module.exports = {
       kind: "viber",
       logo: "/images/integrations/viber.png",
       createModal: "viber",
-      components: ['inboxConversationDetail'],
+      components: ["inboxConversationDetail"],
     },
   ],
-  // inboxConversationDetailRespondBoxMask: './inboxConversationDetail',
 };
