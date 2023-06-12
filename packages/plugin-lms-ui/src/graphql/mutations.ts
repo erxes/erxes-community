@@ -93,10 +93,40 @@ const lmsLessonRemove = `mutation LmsLessonRemove($id: String!) {
   lmsLessonRemove(_id: $id)
 }`;
 
+const lmsCourseAdd = `mutation LmsCourseAdd($doc: LmsCourseDoc!) {
+  lmsCourseAdd(doc: $doc) {
+    _id
+    name
+    title
+    createdBy
+    createdDate
+    modifiedBy
+    modifiedDate
+    categoryId
+  }
+}`;
+
+const lmsCourseEdit = `
+mutation LmsCourseEdit($id: String!, $doc: LmsCourseDoc!) {
+  lmsCourseEdit(_id: $id, doc: $doc) {
+    _id
+    name
+    title
+    createdBy
+    createdDate
+    modifiedBy
+    modifiedDate
+    categoryId
+  }
+}`;
+
 export default {
   lmsChapterAdd,
   lmsChapterEdit,
   lmsLessonAdd,
   lmsLessonEdit,
-  lmsLessonRemove
+  lmsLessonRemove,
+
+  lmsCourseAdd,
+  lmsCourseEdit
 };

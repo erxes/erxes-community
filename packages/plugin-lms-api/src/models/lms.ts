@@ -283,7 +283,7 @@ export const loadCategoryClass = (models: IModels) => {
 
 export const loadCourseClass = (models: IModels) => {
   class Course {
-    public static async getCategory(_id: string) {
+    public static async getCourse(_id: string) {
       const course = await models.LmsCourses.findOne({ _id });
 
       if (!course) {
@@ -312,7 +312,7 @@ export const loadCourseClass = (models: IModels) => {
     }
 
     /**
-     * Update LmsCategory document
+     * Update course document
      */
     public static async updateDoc(
       _id: string,
@@ -335,7 +335,6 @@ export const loadCourseClass = (models: IModels) => {
       );
 
       const course = await models.LmsCourses.getCourse(_id);
-
       return course;
     }
 

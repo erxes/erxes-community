@@ -187,7 +187,7 @@ const lmsMutations = {
    * Update category document
    */
 
-  async lmsLCourseEdit(
+  async lmsCourseEdit(
     _root,
     { _id, doc }: { _id: string; doc: ICourseCreate },
     { user, models, subdomain }: IContext
