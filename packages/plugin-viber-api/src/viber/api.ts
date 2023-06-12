@@ -20,7 +20,7 @@ export class ViberAPI {
   async registerWebhook(): Promise<any> {
     const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
-      : 'https://b66f-202-21-104-34.jp.ngrok.io';
+      : 'https://faa1-202-21-104-34.jp.ngrok.io';
 
     const url: string = `${domain}/pl:viber/webhook/${this.integrationId}`;
 
@@ -46,12 +46,13 @@ export class ViberAPI {
 
     try {
       const response = await sendRequest(payload);
-
-      if (response.status !== 0) {
+      if (response.status === 0) {
+        return response;
+      } else if (response.status === 2) {
+        throw new Error('Invalid Auth Token');
+      } else {
         throw new Error(response.status_message);
       }
-
-      return response;
     } catch (e) {
       throw e.message;
     }
