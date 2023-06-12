@@ -34,7 +34,6 @@ export interface IPaidAmount {
 
 export interface IPosOrder {
   createdAt: Date;
-  dueDate: Date;
   status: string;
   paidDate?: Date;
   dueDate?: Date;

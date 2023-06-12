@@ -1,34 +1,54 @@
 federation_version: =2.3.1
 subgraphs:
-  products:
-    routing_url: http://localhost:3302/graphql
+  payment:
+    routing_url: http://localhost:3307/graphql
     schema:
-      subgraph_url: http://localhost:3302/graphql
-  pos:
-    routing_url: http://localhost:3303/graphql
-    schema:
-      subgraph_url: http://localhost:3303/graphql
-  forms:
+      subgraph_url: http://localhost:3307/graphql
+  contacts:
     routing_url: http://localhost:3306/graphql
     schema:
       subgraph_url: http://localhost:3306/graphql
-  knowledgebase:
-    routing_url: http://localhost:3305/graphql
+  inventories:
+    routing_url: http://localhost:3308/graphql
     schema:
-      subgraph_url: http://localhost:3305/graphql
+      subgraph_url: http://localhost:3308/graphql
   posclient:
     routing_url: http://localhost:3304/graphql
     schema:
       subgraph_url: http://localhost:3304/graphql
-  contacts:
-    routing_url: http://localhost:3307/graphql
-    schema:
-      subgraph_url: http://localhost:3307/graphql
-  core:
-    routing_url: http://localhost:3300/graphql
-    schema:
-      subgraph_url: http://localhost:3300/graphql
   clientportal:
     routing_url: http://localhost:3301/graphql
     schema:
       subgraph_url: http://localhost:3301/graphql
+  pos:
+    routing_url: http://localhost:3303/graphql
+    schema:
+      subgraph_url: http://localhost:3303/graphql
+  core:
+    routing_url: http://localhost:3300/graphql
+    schema:
+      subgraph_url: http://localhost:3300/graphql
+  ecommerce:
+    routing_url: http://localhost:3312/graphql
+    schema:
+      subgraph_url: http://localhost:3312/graphql
+  inbox:
+    routing_url: http://localhost:3310/graphql
+    schema:
+      subgraph_url: http://localhost:3310/graphql
+  forms:
+    routing_url: http://localhost:3311/graphql
+    schema:
+      subgraph_url: http://localhost:3311/graphql
+  cards:
+    routing_url: http://localhost:3309/graphql
+    schema:
+      subgraph_url: http://localhost:3309/graphql
+  products:
+    routing_url: http://localhost:3302/graphql
+    schema:
+      subgraph_url: http://localhost:3302/graphql
+  knowledgebase:
+    routing_url: http://localhost:3305/graphql
+    schema:
+      subgraph_url: http://localhost:3305/graphql
