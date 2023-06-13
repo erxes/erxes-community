@@ -2,15 +2,7 @@ import React, { useState } from 'react';
 import { ITimelog } from '../../types';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Button from '@erxes/ui/src/components/Button';
-import {
-  CustomRangeContainer,
-  FlexCenter,
-  FlexColumn,
-  FlexRowLeft,
-  ToggleButton
-} from '../../styles';
-import { ControlLabel } from '@erxes/ui/src/components/form';
-import DateControl from '@erxes/ui/src/components/form/DateControl';
+import { FlexRowLeft, ToggleButton } from '../../styles';
 import Table from '@erxes/ui/src/components/table';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
@@ -19,6 +11,8 @@ import { dateFormat, timeFormat } from '../../constants';
 import dayjs from 'dayjs';
 import Tip from '@erxes/ui/src/components/Tip';
 import Icon from '@erxes/ui/src/components/Icon';
+import ExtractForm from './LogsExtractForm';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
   queryParams: any;
@@ -26,10 +20,22 @@ type Props = {
   timelogs: ITimelog[];
   totalCount?: number;
 
+  departments: IDepartment[];
+  branches: IBranch[];
+
   isCurrentUserAdmin: boolean;
 
-  extractTimeLogsFromMsSQL: (startDate: Date, endDate: Date) => void;
-  createTimeclockFromLog: (userId: string, timelog: Date) => void;
+  extractTimeLogsFromMsSQL: (
+    startDate: Date,
+    endDate: Date,
+    params: any
+  ) => void;
+
+  createTimeclockFromLog: (
+    userId: string,
+    timelog: Date,
+    inDevice?: string
+  ) => void;
 
   showSideBar: (sideBar: boolean) => void;
   getActionBar: (actionBar: any) => void;
@@ -40,7 +46,6 @@ function ReportList(props: Props) {
   const {
     totalCount,
     timelogs,
-    extractTimeLogsFromMsSQL,
     getPagination,
     showSideBar,
     getActionBar,
@@ -59,20 +64,6 @@ function ReportList(props: Props) {
     new Date(localStorage.getItem('endDate') || Date.now())
   );
 
-  const extractTimeLogs = (startDateRange, endDateRange) => {
-    extractTimeLogsFromMsSQL(startDateRange, endDateRange);
-  };
-
-  const onStartDateChange = dateVal => {
-    setStartDate(dateVal);
-    localStorage.setItem('startDate', startDate.toISOString());
-  };
-
-  const onEndDateChange = dateVal => {
-    setEndDate(dateVal);
-    localStorage.setItem('endDate', endDate.toISOString());
-  };
-
   const onToggleSidebar = () => {
     const toggleIsOpen = !isSideBarOpen;
     setIsOpen(toggleIsOpen);
@@ -85,34 +76,7 @@ function ReportList(props: Props) {
     <></>
   );
 
-  const extractContent = () => (
-    <FlexColumn marginNum={10}>
-      <ControlLabel>Select Date Range</ControlLabel>
-      <CustomRangeContainer>
-        <DateControl
-          required={false}
-          value={startDate}
-          name="startDate"
-          placeholder={'Starting date'}
-          dateFormat={'YYYY-MM-DD'}
-          onChange={onStartDateChange}
-        />
-        <DateControl
-          required={false}
-          value={endDate}
-          name="endDate"
-          placeholder={'Ending date'}
-          dateFormat={'YYYY-MM-DD'}
-          onChange={onEndDateChange}
-        />
-      </CustomRangeContainer>
-      <FlexCenter>
-        <Button onClick={() => extractTimeLogs(startDate, endDate)}>
-          Extract all data
-        </Button>
-      </FlexCenter>
-    </FlexColumn>
-  );
+  const extractContent = () => <ExtractForm {...props} />;
 
   const actionBarLeft = (
     <FlexRowLeft>
@@ -176,7 +140,11 @@ function ReportList(props: Props) {
                   <Button
                     btnStyle="link"
                     onClick={() =>
-                      createTimeclockFromLog(timelog.user._id, timelog.timelog)
+                      createTimeclockFromLog(
+                        timelog.user._id,
+                        timelog.timelog,
+                        timelog.deviceName
+                      )
                     }
                     icon="clock-eight"
                   />
