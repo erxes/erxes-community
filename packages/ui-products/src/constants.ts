@@ -17,7 +17,7 @@ export const PRODUCT_INFO = {
   category: 'Category',
   code: 'Code',
   description: 'Description',
-  sku: 'Sku',
+  uom: 'UOM',
   unitPrice: 'UnitPrice',
   vendor: 'Vendor',
 
@@ -27,7 +27,7 @@ export const PRODUCT_INFO = {
     { field: 'category', label: 'Category' },
     { field: 'code', label: 'Code' },
     { field: 'description', label: 'Description' },
-    { field: 'sku', label: 'Sku' },
+    { field: 'uom', label: 'UOM' },
     { field: 'unitPrice', label: 'UnitPrice' },
     { field: 'vendor', label: 'Vendor' }
   ]

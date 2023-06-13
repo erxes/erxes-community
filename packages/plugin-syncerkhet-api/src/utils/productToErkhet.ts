@@ -38,7 +38,7 @@ export const productToErkhet = async (subdomain, params, action) => {
     isRPC: true
   });
 
-  let measureUnit = product.sku || 'ш';
+  let measureUnit = product.uom || 'ш';
   let subMeasureUnit;
   let ratioMeasureUnit;
 

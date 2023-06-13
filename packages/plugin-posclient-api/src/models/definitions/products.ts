@@ -38,7 +38,6 @@ export interface IPrice {
 export interface IProduct extends IProductCommonFields {
   categoryId?: string;
   type?: string;
-  sku?: string;
   barcodes?: string[];
   barcodeDescription?: string;
   prices: IPrice;
@@ -110,12 +109,6 @@ export const productSchema = schemaWrapper(
       optional: true,
       label: 'Tags',
       index: true
-    }),
-    sku: field({
-      type: String,
-      optional: true,
-      label: 'Stock keeping unit',
-      default: 'ш'
     }),
     uom: field({
       type: String,

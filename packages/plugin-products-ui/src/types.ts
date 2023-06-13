@@ -67,7 +67,7 @@ export type MutationVariables = {
   type: string;
   name?: string;
   description?: string;
-  sku?: string;
+  uom?: string;
   createdAt?: Date;
 };
 

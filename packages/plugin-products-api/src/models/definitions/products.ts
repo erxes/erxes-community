@@ -38,7 +38,6 @@ export interface IProduct {
   categoryCode?: string;
   type?: string;
   description?: string;
-  sku?: string;
   barcodes?: string[];
   barcodeDescription?: string;
   unitPrice?: number;
