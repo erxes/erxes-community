@@ -16,12 +16,13 @@ module.exports = {
   inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxIntegrationForm: './inboxIntegrationForm',
   inboxConversationDetail: './inboxConversationDetail',
-  inboxIntegration: {
+  inboxIntegration: [{
     name: '{Name}',
     description:
       'Please write integration description on plugin config file',
     isAvailable: true,
     kind: '{name}',
-    logo: '/images/integrations/{name}.png'
-  }
+    logo: '/images/integrations/{name}.png',
+    components: ["inboxConversationDetail"],
+  }]
 };
