@@ -7,11 +7,7 @@ import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import List from '../../components/config/Uoms';
 import { mutations, queries } from '../../graphql';
-import {
-  UomsQueryResponse,
-  UomsCountQueryResponse,
-  UomRemoveMutationResponse
-} from '../../types';
+import { UomsQueryResponse, UomsCountQueryResponse } from '../../types';
 import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {

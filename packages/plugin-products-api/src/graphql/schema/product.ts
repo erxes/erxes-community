@@ -59,10 +59,9 @@ export const types = (tagsAvailable, contactsAvailable) => `
     attachment: Attachment
     attachmentMore: [Attachment]
     vendorId: String
-    uomId: String
+    uom: String
     subUoms: JSON
 
-    uom: Uom
     category: ProductCategory
     ${contactsAvailable ? 'vendor: Company' : ''}
     taxType: String
@@ -84,7 +83,7 @@ const productParams = `
   attachment: AttachmentInput,
   attachmentMore: [AttachmentInput],
   vendorId: String,
-  uomId: String,
+  uom: String,
   subUoms: JSON,
   taxType: String,
   taxCode: String,

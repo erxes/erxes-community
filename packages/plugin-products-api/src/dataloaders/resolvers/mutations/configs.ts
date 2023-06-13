@@ -28,9 +28,9 @@ const configMutations = {
     if (isRequireUOM && defaultUOM) {
       await models.Products.updateMany(
         {
-          $or: [{ uomId: { $exists: false } }, { uomId: '' }]
+          $or: [{ uom: { $exists: false } }, { uom: '' }]
         },
-        { $set: { uomId: defaultUOM } }
+        { $set: { uom: defaultUOM } }
       );
     }
     return ['success'];

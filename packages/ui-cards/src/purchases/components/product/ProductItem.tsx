@@ -28,7 +28,6 @@ import Tip from '@erxes/ui/src/components/Tip';
 
 type Props = {
   advancedView?: boolean;
-  uom: string[];
   currencies: string[];
   productsData?: IProductData[];
   productData: IProductData;
@@ -74,10 +73,10 @@ class ProductItem extends React.Component<Props, State> {
 
   componentDidMount = () => {
     // default select item
-    const { uom, currencies, productData } = this.props;
+    const { currencies, productData } = this.props;
 
-    if (uom.length > 0 && !productData.uom) {
-      this.onChangeField('uom', uom[0], productData._id);
+    if (!productData.uom && productData.product?.uom) {
+      this.onChangeField('uom', productData.product.uom, productData._id);
     }
 
     if (currencies.length > 0 && !productData.currency) {
@@ -401,7 +400,6 @@ class ProductItem extends React.Component<Props, State> {
     const {
       advancedView,
       productData,
-      uom,
       currencies,
       duplicateProductItem,
       removeProductItem
@@ -418,6 +416,16 @@ class ProductItem extends React.Component<Props, State> {
     if (!productData.product) {
       return null;
     }
+
+    const uoms = Array.from(
+      new Set([
+        productData.uom,
+        productData.product.uom,
+        ...(productData.product.subUoms || []).map(su => su.uom)
+      ])
+    )
+      .filter(u => u)
+      .map(u => ({ value: u, label: u }));
 
     return (
       <tr key={productData._id}>
@@ -509,7 +517,7 @@ class ProductItem extends React.Component<Props, State> {
             value={productData.uom}
             onChange={this.uomOnChange}
             optionRenderer={selectOption}
-            options={selectConfigOptions(uom, MEASUREMENTS)}
+            options={uoms}
           />
         </td>
         <td>

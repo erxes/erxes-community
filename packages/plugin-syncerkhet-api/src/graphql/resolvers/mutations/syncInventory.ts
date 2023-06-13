@@ -95,7 +95,7 @@ const inventoryMutations = {
     for (const resProd of result) {
       if (productCodes.includes(resProd.code)) {
         const product = productByCode[resProd.code];
-        const uom = uomById[product.uomId];
+        const uom = uomById[product.uom];
 
         if (
           (resProd.name === product.name ||
