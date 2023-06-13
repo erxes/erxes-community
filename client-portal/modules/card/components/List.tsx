@@ -37,11 +37,12 @@ export default function List({
   const [viewType, setViewType] = useState("list");
   const [showForm, setShowForm] = useState(false);
   const [activeStageId, setStageId] = useState(
-    stageId ? stageId : stages.stages[0]._id
+    stageId ? stageId : stages && stages.length !== 0 ? stages[0]._id : ""
   );
 
   useEffect(() => {
-    setStageId(stageId);
+    // tslint:disable-next-line:no-unused-expression
+    stageId && setStageId(stageId);
   }, [stageId]);
 
   if (itemId) {
@@ -61,21 +62,28 @@ export default function List({
       return null;
     }
 
-    return (items || []).map((item, index) => (
-      <GroupList key={index}>
-        <Card.Header>
-          {groupType === "user" ? renderUserFullName(item.details) : item.name}
-        </Card.Header>
-        <Group groupType={groupType} type={type} id={item._id} />
-      </GroupList>
-    ));
+    return (items || []).map((item, index) => {
+      const id =
+        groupType === "priority" || groupType === "duedate"
+          ? item.name
+          : item._id;
+
+      return (
+        <GroupList key={index}>
+          <Card.Header>
+            {groupType === "user" ? renderUserFullName(item) : item.name}
+          </Card.Header>
+          <Group groupType={groupType} type={type} id={id} />
+        </GroupList>
+      );
+    });
   };
 
   const renderContent = () => {
     if (viewType === "board") {
       return (
         <BoardView
-          stages={stages.stages}
+          stages={stages}
           stageId={activeStageId}
           currentUser={currentUser}
           config={config}
@@ -88,7 +96,7 @@ export default function List({
 
     switch (mode) {
       case "stage":
-        return renderGroup(stages?.stages, "stage");
+        return renderGroup(stages, "stage");
       case "label":
         return renderGroup(pipeLinelabels?.pipelineLabels, "label");
       case "duedate":
@@ -117,6 +125,7 @@ export default function List({
         setMode={setMode}
         setViewType={setViewType}
         setShowForm={setShowForm}
+        hideHeader={!stages || stages.length === 0}
       />
 
       {renderContent()}

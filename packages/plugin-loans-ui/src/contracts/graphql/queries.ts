@@ -16,6 +16,7 @@ const contractFields = `
   feeAmount
   tenor
   unduePercent
+  undueCalcType
   interestRate
   repayment
   startDate
@@ -34,7 +35,11 @@ const contractFields = `
   riskExpertId
   weekends
   useHoliday
+  useMargin
+  useSkipInterest
+  useDebt
   relContractId
+  skipInterestCalcMonth
   dealId
 `;
 

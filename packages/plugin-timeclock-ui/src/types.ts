@@ -12,6 +12,10 @@ export interface ITimeclock {
   employeeId?: number;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
   branchName?: string;
 }
 export interface ITimelog {
@@ -282,11 +286,11 @@ export type ScheduleMutationVariables = {
 
 export type TimeLogMutationResponse = {
   extractTimeLogsFromMsSQLMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 
   createTimeClockFromLogMutation: (params: {
-    variables: { userId: string; timelog: Date };
+    variables: { userId: string; timelog: Date; inDevice?: string };
   }) => Promise<any>;
 };
 
@@ -301,7 +305,7 @@ export type TimeClockMutationResponse = {
     variables: MutationVariables;
   }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 };
 

@@ -1,9 +1,10 @@
-import { IModels } from '../../connectionResolver';
 import { PAYMENTS, PAYMENT_STATUS } from '../constants';
-import { IInvoiceDocument } from '../../models/definitions/invoices';
-import redis from '../../redis';
+
 import { BaseAPI } from '../base';
+import { IInvoiceDocument } from '../../models/definitions/invoices';
+import { IModels } from '../../connectionResolver';
 import { IQpayInvoice } from '../types';
+import redis from '../../redis';
 
 export const qpayCallbackHandler = async (models: IModels, data: any) => {
   const { identifier } = data;
@@ -144,8 +145,25 @@ export class QpayAPI extends BaseAPI {
   }
 
   async checkInvoice(invoice: IInvoiceDocument) {
-    return PAYMENT_STATUS.PAID;
+    // return PAYMENT_STATUS.PAID;
+    try {
+      const res = await this.request({
+        method: 'GET',
+        path: `${PAYMENTS.qpay.actions.invoice}/${invoice.apiResponse.invoice_id}`,
+        headers: await this.getHeaders()
+      });
 
+      if (res.invoice_status === 'CLOSED') {
+        return PAYMENT_STATUS.PAID;
+      }
+
+      return PAYMENT_STATUS.PENDING;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async manualCheck(invoice: IInvoiceDocument) {
     try {
       const res = await this.request({
         method: 'GET',
