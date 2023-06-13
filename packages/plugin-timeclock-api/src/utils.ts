@@ -16,7 +16,8 @@ const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
 import {
   findBranchUsers,
-  findDepartmentUsers
+  findDepartmentUsers,
+  returnUnionOfUserIds
 } from './graphql/resolvers/utils';
 import { IUserDocument } from '@erxes/api-utils/src/types';
 
@@ -51,8 +52,8 @@ const createMsSqlConnection = () => {
   return sequelize;
 };
 
-const findAllTeamMembersWithEmpId = async (subdomain: string) => {
-  const users = await sendCoreMessage({
+const findAllTeamMembersWithEmpId = (subdomain: string) => {
+  return sendCoreMessage({
     subdomain,
     action: 'users.find',
     data: {
@@ -61,8 +62,18 @@ const findAllTeamMembersWithEmpId = async (subdomain: string) => {
     isRPC: true,
     defaultValue: []
   });
+};
 
-  return users;
+const findTeamMembers = (subdomain: string, userIds: string[]) => {
+  return sendCoreMessage({
+    subdomain,
+    action: 'users.find',
+    data: {
+      query: { employeeId: { $exists: true }, _id: { $in: userIds } }
+    },
+    isRPC: true,
+    defaultValue: []
+  });
 };
 
 const returnNewTimeLogsFromEmpData = async (
@@ -85,7 +96,7 @@ const returnNewTimeLogsFromEmpData = async (
     const checkTimeLogAlreadyExists = existingTimeLogs.find(
       existingTimeLog =>
         existingTimeLog.userId === newTimeLog.userId &&
-        existingTimeLog.timelog === newTimeLog.timelog
+        existingTimeLog.timelog?.getTime() === newTimeLog.timelog.getTime()
     );
 
     if (!checkTimeLogAlreadyExists) {
@@ -110,6 +121,20 @@ const createTimelogs = async (
     }
   });
 
+  const existingTimeLogsDict: { [key: string]: ITimeLogDocument[] } = {};
+
+  for (const timelog of existingTimeLogs) {
+    if (timelog.userId in existingTimeLogsDict) {
+      existingTimeLogsDict[timelog.userId] = [
+        ...existingTimeLogsDict[timelog.userId],
+        timelog
+      ];
+      continue;
+    }
+
+    existingTimeLogsDict[timelog.userId] = [timelog];
+  }
+
   const totalTimeLogs: ITimeLog[] = [];
 
   let currentEmpId;
@@ -128,13 +153,14 @@ const createTimelogs = async (
     const currEmpNumber = parseInt(currEmpId, 10);
 
     if (currEmpNumber) {
+      const teamMemberId = teamMembersObj[currEmpNumber];
       currentEmpId = currEmpId;
       const currEmpData = queryData.filter(row => row.ID === currEmpId);
       totalTimeLogs.push(
         ...(await returnNewTimeLogsFromEmpData(
           currEmpData,
           teamMembersObj,
-          existingTimeLogs
+          existingTimeLogsDict[teamMemberId]
         ))
       );
     }
@@ -145,17 +171,37 @@ const createTimelogs = async (
 
 const connectAndQueryTimeLogsFromMsSql = async (
   subdomain: string,
-  startDate: string,
-  endDate: string
+  params: any
 ) => {
   const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
   const sequelize = createMsSqlConnection();
   const models = await generateModels(subdomain);
 
+  const {
+    startDate,
+    endDate,
+    extractAll,
+    branchIds,
+    departmentIds,
+    userIds
+  } = params;
+
   let returnData;
+  let teamMembers;
 
   try {
-    const teamMembers = await findAllTeamMembersWithEmpId(subdomain);
+    if (extractAll) {
+      teamMembers = await findAllTeamMembersWithEmpId(subdomain);
+    } else {
+      const getUserIds = await returnUnionOfUserIds(
+        branchIds,
+        departmentIds,
+        userIds,
+        subdomain
+      );
+      teamMembers = await findTeamMembers(subdomain, getUserIds);
+    }
+
     const teamMembersObject = {};
     const teamEmployeeIds: string[] = [];
 
@@ -182,6 +228,7 @@ const connectAndQueryTimeLogsFromMsSql = async (
     );
   } catch (err) {
     console.error(err);
+    return err;
   }
 
   return returnData;
@@ -189,14 +236,35 @@ const connectAndQueryTimeLogsFromMsSql = async (
 
 const connectAndQueryFromMsSql = async (
   subdomain: string,
-  startDate: string,
-  endDate: string
+  params: any
 ): Promise<ITimeClockDocument[]> => {
-  const sequelize = createMsSqlConnection();
+  const {
+    startDate,
+    endDate,
+    extractAll,
+    branchIds,
+    departmentIds,
+    userIds
+  } = params;
+
   const MYSQL_TABLE = getEnv({ name: 'MYSQL_TABLE' });
+  const sequelize = createMsSqlConnection();
+
+  let teamMembers;
+
+  if (extractAll) {
+    teamMembers = await findAllTeamMembersWithEmpId(subdomain);
+  } else {
+    const getUserIds = await returnUnionOfUserIds(
+      branchIds,
+      departmentIds,
+      userIds,
+      subdomain
+    );
+    teamMembers = await findTeamMembers(subdomain, getUserIds);
+  }
 
   // find team members with employee Id
-  const teamMembers = await findAllTeamMembersWithEmpId(subdomain);
   const models: IModels = await generateModels(subdomain);
 
   let returnData: ITimeClockDocument[];
@@ -337,7 +405,9 @@ const importDataAndCreateTimeclock = async (
         ...existingTimeclocksDict[timeclock.userId],
         timeclock
       ];
+      continue;
     }
+
     existingTimeclocksDict[timeclock.userId] = [timeclock];
   }
 
@@ -396,7 +466,6 @@ const createUserTimeclock = async (
           shiftStartIdx,
           shiftEndReverseIdx,
           teamMembersObj[empId],
-          existingTimeclocks,
           devicesDictionary
         );
 
@@ -420,7 +489,6 @@ const createUserTimeclock = async (
       getShiftStartIdx,
       getShiftEndReverseIdx,
       teamMembersObj[empId],
-      existingTimeclocks,
       devicesDictionary
     );
 
@@ -429,7 +497,16 @@ const createUserTimeclock = async (
     }
   }
 
-  return returnUserData;
+  if (!existingTimeclocks) {
+    return returnUserData;
+  }
+
+  const checkExistingTimeclocksAndFilter = filterExistingTimeclocks(
+    returnUserData,
+    existingTimeclocks
+  );
+
+  return checkExistingTimeclocksAndFilter;
 };
 
 const createNewTimeClock = (
@@ -437,7 +514,6 @@ const createNewTimeClock = (
   getShiftStartIdx: number,
   getShiftEndReverseIdx: number,
   userId: string,
-  existingTimeclocks: ITimeClockDocument[],
   devicesDictionary: any
 ) => {
   if (getShiftStartIdx !== -1) {
@@ -446,13 +522,23 @@ const createNewTimeClock = (
     ).toDate();
 
     const getShiftEndIdx = empData.length - 1 - getShiftEndReverseIdx;
-    let getDeviceName;
+
+    const inDeviceSerialNo = empData[getShiftStartIdx].deviceSerialNo;
+    const inDevice =
+      devicesDictionary[inDeviceSerialNo] ||
+      empData[getShiftStartIdx].deviceName;
+
+    const inDeviceType = 'faceTerminal';
 
     // if both shift start and end exist, shift is ended
     if (getShiftEndReverseIdx !== -1) {
-      const deviceSerialNo = empData[getShiftEndIdx].deviceSerialNo;
-      getDeviceName =
-        devicesDictionary[deviceSerialNo] || empData[getShiftEndIdx].deviceName;
+      const outDeviceSerialNo = empData[getShiftEndIdx].deviceSerialNo;
+
+      const outDevice =
+        devicesDictionary[outDeviceSerialNo] ||
+        empData[getShiftEndIdx].deviceName;
+
+      const outDeviceType = 'faceTerminal';
       const getShiftEnd = dayjs(empData[getShiftEndIdx].authDateTime).toDate();
 
       const newTimeclock = {
@@ -460,32 +546,26 @@ const createNewTimeClock = (
         shiftEnd: getShiftEnd,
         shiftActive: false,
         userId,
-        deviceName: getDeviceName,
-        deviceType: 'faceTerminal'
+
+        inDevice,
+        outDevice,
+        inDeviceType,
+        outDeviceType
       };
 
-      if (!checkTimeClockAlreadyExists(newTimeclock, existingTimeclocks)) {
-        return newTimeclock;
-      }
-      return;
+      return newTimeclock;
     }
-
-    const deviceSerial = empData[getShiftStartIdx].deviceSerialNo;
-    getDeviceName =
-      devicesDictionary[deviceSerial] || empData[getShiftStartIdx].deviceName;
 
     // else shift is still active
     const newTime = {
       shiftStart: getShiftStart,
       shiftActive: true,
       userId,
-      deviceName: getDeviceName,
-      deviceType: 'faceTerminal'
+      inDevice,
+      inDeviceType
     };
 
-    if (!checkTimeClockAlreadyExists(newTime, existingTimeclocks)) {
-      return newTime;
-    }
+    return newTime;
   }
 };
 
@@ -623,6 +703,38 @@ const checkTimeClockAlreadyExists = (
   return alreadyExists;
 };
 
+const filterExistingTimeclocks = (
+  userData: ITimeClock[],
+  existingTimeclocks: ITimeClock[]
+) => {
+  const existingTimeclocksDict: any = {};
+
+  for (const existingTimeclock of existingTimeclocks) {
+    existingTimeclocksDict[
+      existingTimeclock.shiftStart.getTime()
+    ] = existingTimeclock;
+
+    if (existingTimeclock.shiftEnd) {
+      existingTimeclocksDict[
+        existingTimeclock.shiftEnd.getTime()
+      ] = existingTimeclock;
+    }
+  }
+
+  const returnNewTimeclocks: ITimeClock[] = userData.filter(timeclock => {
+    if (
+      timeclock.shiftStart.getTime() in existingTimeclocksDict ||
+      (timeclock.shiftEnd &&
+        timeclock.shiftEnd.getTime() in existingTimeclocksDict)
+    ) {
+      return;
+    }
+    return timeclock;
+  });
+
+  return returnNewTimeclocks;
+};
+
 const findAndUpdateUnfinishedShifts = async (
   models: IModels,
   teamMemberIds: string[],
@@ -678,17 +790,19 @@ const findAndUpdateUnfinishedShifts = async (
           newEmpData[getShiftEndIdx].authDateTime
         ).toDate();
 
-        const getDeviceName =
+        const outDevice =
           devicesDictionary[newEmpData[getShiftEndIdx].deviceSerialNo] ||
           newEmpData[getShiftEndIdx].deviceName;
+
+        const outDeviceType = 'faceTerminal';
 
         const updateTimeClock = {
           shiftStart: unfinishedTimeclock.shiftStart,
           shiftEnd: getShiftEnd,
           userId: teamMemberId,
           shiftActive: false,
-          deviceName: getDeviceName,
-          deviceType: unfinishedTimeclock.deviceType + ' x faceTerminal'
+          outDevice,
+          outDeviceType
         };
 
         const updateTimeclockOperation = {
@@ -733,7 +847,8 @@ const createScheduleObjOfMembers = async (
 
   const totalSchedules = await models.Schedules.find({
     userId: { $in: teamMemberIds },
-    status: { $regex: /Approved/, $options: 'gi' }
+    status: { $regex: /Approved/, $options: 'gi' },
+    $or: [{ createdByRequest: { $exists: false } }, { createdByRequest: false }]
   });
 
   const totalScheduleIds = totalSchedules.map(schedule => schedule._id);
