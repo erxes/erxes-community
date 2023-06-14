@@ -118,10 +118,9 @@ class Form extends React.Component<Props, State> {
     for (const product of products) {
       const { uom } = product;
       const productName = product.product ? product.product.name : 'not name';
-      const uomCode = uom ? uom.code : 'not uom';
 
       result.push(
-        this.renderView(productName, product.quantity * workInfo.count, uomCode)
+        this.renderView(productName, product.quantity * workInfo.count, uom)
       );
     }
 
@@ -284,8 +283,7 @@ class Form extends React.Component<Props, State> {
               productId,
               uom: product.uom,
               quantity: 1,
-              product,
-              uom: product.uom
+              product
             };
             let needProducts: IProductsData[] = [];
             let resultProducts: IProductsData[] = [];
