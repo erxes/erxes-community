@@ -59,7 +59,7 @@ export type UomEditMutationResponse = {
 };
 
 export type UomRemoveMutationResponse = {
-  uomsRemove: (mutation: { variables: { uoms: string[] } }) => Promise<any>;
+  uomsRemove: (mutation: { variables: { uomIds: string[] } }) => Promise<any>;
 };
 
 export type MutationVariables = {
