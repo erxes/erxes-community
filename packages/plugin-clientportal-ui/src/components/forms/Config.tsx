@@ -14,6 +14,7 @@ import { CONFIGURATIONS } from '../../constants';
 import { ToggleWrap } from '../../styles';
 import { ClientPortalConfig } from '../../types';
 import PasswordConfig from './PasswordConfig';
+import { Formgroup } from '@erxes/ui/src/components/form/styles';
 
 type Props = {
   handleFormChange: (name: string, value: any) => void;
@@ -41,6 +42,9 @@ function General({
   name,
   manualVerificationConfig,
   passwordVerificationConfig,
+  tokenPassMethod = 'cookie',
+  tokenExpiration = '1',
+  refreshTokenExpiration = '7',
   handleFormChange
 }: Props) {
   const [otpEnabled, setOtpEnabled] = useState<boolean>(
@@ -507,6 +511,62 @@ function General({
 
   return (
     <>
+      <CollapseContent title="User Authentication" compact={true} open={false}>
+        <div style={{ display: 'flex' }}>
+          <Formgroup>
+            <ControlLabel>Token pass method</ControlLabel>
+            <p>set token in cookie or use header authorization</p>
+            <FormControl
+              componentClass="select"
+              placeholder="select"
+              value={tokenPassMethod}
+              onChange={
+                (e: any) =>
+                  handleFormChange('tokenPassMethod', e.currentTarget.value)
+                // console.log(e.currentTarget.value)
+              }
+            >
+              <option value="header">Header</option>
+              <option value="cookie">Cookie</option>
+            </FormControl>
+          </Formgroup>
+
+          <Formgroup>
+            <ControlLabel>Token expiration duration</ControlLabel>
+            <p>token expiration duration in days</p>
+            <FormControl
+              componentClass="input"
+              placeholder="token expiration duration"
+              type="number"
+              min={1}
+              max={5}
+              value={tokenExpiration}
+              onChange={(e: any) =>
+                handleFormChange('tokenExpiration', e.currentTarget.value)
+              }
+            />
+          </Formgroup>
+
+          <Formgroup>
+            <ControlLabel>Refresh Token expiration duration</ControlLabel>
+            <p>refresh token expiration duration in days</p>
+            <FormControl
+              componentClass="input"
+              placeholder="refresh token expiration duration"
+              type="number"
+              min={7}
+              max={30}
+              value={refreshTokenExpiration}
+              onChange={(e: any) =>
+                handleFormChange(
+                  'refreshTokenExpiration',
+                  e.currentTarget.value
+                )
+              }
+            />
+          </Formgroup>
+        </div>
+      </CollapseContent>
       {renderOtp()}
       {renderMailConfig()}
       <PasswordConfig

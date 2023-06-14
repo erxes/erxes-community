@@ -87,6 +87,11 @@ ${
     registrationContent : String
   }
 
+  enum TokenPassMethod {
+    cookie
+    header
+  }
+
   type ClientPortal {
     _id: String!
     name: String!
@@ -141,6 +146,10 @@ ${
     taskToggle: Boolean,
     dealToggle: Boolean,
     purchaseToggle: Boolean,
+
+    tokenExpiration: Int
+    refreshTokenExpiration: Int
+    tokenPassMethod: TokenPassMethod
   }
 
   type Styles {

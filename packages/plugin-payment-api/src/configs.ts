@@ -20,6 +20,7 @@ export let serviceDiscovery;
 
 export default {
   name: 'payment',
+
   permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
