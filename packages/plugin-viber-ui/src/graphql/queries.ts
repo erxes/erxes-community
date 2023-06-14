@@ -1,14 +1,63 @@
-const detail = `
-  query ViberConversationDetail($conversationId: String!) {
-    viberConversationDetail(conversationId: $conversationId) {
+const messages = `
+query viberConversationMessages(
+  $conversationId: String!
+  $skip: Int
+  $limit: Int
+  $getFirst: Boolean
+) {
+  viberConversationMessages(
+    conversationId: $conversationId,
+    skip: $skip,
+    limit: $limit,
+    getFirst: $getFirst
+  ) {
+    _id
+    content
+    conversationId
+    customerId
+    userId
+    createdAt
+    isCustomerRead
+    internal
+
+    attachments {
+      url
+      name
+      type
+      size
+    }
+
+    user {
       _id
-      content
-      customerId
-      userId
-      mailData
-      createdAt
+      username
+      details {
+        avatar
+        fullName
+        position
+      }
+    }
+
+    customer {
+      _id
+      avatar
+      firstName
+      middleName
+      lastName
+      primaryEmail
+      primaryPhone
+      state
+
+      companies {
+        _id
+        primaryName
+        website
+      }
+
+      customFieldsData
+      tagIds
     }
   }
+}
 `;
 
 const accounts = `
@@ -18,6 +67,6 @@ const accounts = `
 `;
 
 export default {
-  detail,
+  messages,
   accounts
 };

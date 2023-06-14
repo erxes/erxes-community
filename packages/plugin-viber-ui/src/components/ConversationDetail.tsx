@@ -13,7 +13,7 @@ class Detail extends React.Component<any> {
       return null;
     }
 
-    const messages = messagesQuery.viberConversationDetail || [];
+    const messages = messagesQuery.viberConversationMessages || [];
 
     return (
       <ViberMessage
@@ -25,7 +25,7 @@ class Detail extends React.Component<any> {
 }
 
 const WithQuery = compose(
-  graphql<any>(gql(queries.detail), {
+  graphql<any>(gql(queries.messages), {
     name: 'messagesQuery',
     options: ({ currentId }) => {
       return {

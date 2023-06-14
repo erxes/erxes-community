@@ -19,6 +19,8 @@ class ViberMessage extends React.Component<Props, {}> {
 
     const messages = conversationMessages || [];
 
+    console.log('messages', messages);
+
     const Chat = messages.map((message, key) => (
       <ViberChatPanel key={key}>
         <SimpleMessage

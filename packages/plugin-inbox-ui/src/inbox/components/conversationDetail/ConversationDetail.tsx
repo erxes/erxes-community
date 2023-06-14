@@ -77,15 +77,9 @@ export default class ConversationDetail extends React.Component<Props> {
       let content;
 
       if (
-        ![
-          'messenger',
-          'lead',
-          'booking',
-          'webhook',
-          'callpro',
-          'viber',
-          'instagram'
-        ].includes(currentConversation.integration.kind)
+        !['messenger', 'lead', 'booking', 'webhook', 'callpro'].includes(
+          currentConversation.integration.kind
+        )
       ) {
         const integrations = getPluginConfig({
           pluginName: kind,

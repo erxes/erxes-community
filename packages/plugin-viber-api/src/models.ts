@@ -142,6 +142,7 @@ export interface IConversationMessages extends Document {
   createdAt: Date;
   content: string;
   messageType: string;
+  attachments?: any;
 }
 
 export const conversationMessageSchema: Schema<IConversationMessages> = new Schema<
@@ -152,7 +153,8 @@ export const conversationMessageSchema: Schema<IConversationMessages> = new Sche
   customerId: String,
   createdAt: Date,
   content: String,
-  messageType: String
+  messageType: String,
+  attachments: Schema.Types.Mixed
 });
 
 export const ConversationMessages: Model<IConversationMessages, {}> = model<

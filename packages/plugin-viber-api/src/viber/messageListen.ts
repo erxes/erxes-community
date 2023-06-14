@@ -19,6 +19,7 @@ interface IWebhookMessage {
   message: {
     text: string;
     type: string;
+    media?: string;
   };
 }
 
@@ -86,15 +87,21 @@ const messageListen = async (
   }
 
   try {
+    const messageObj: any = {
+      conversationId: conversation._id,
+      createdAt: message.timestamp,
+      userId: null,
+      customerId: customer.contactsId,
+      content: message.message.text,
+      messageType: message.message.type
+    };
+
+    if (message.message.type === 'sticker') {
+      messageObj.attachments = [{ type: 'image', url: message.message.media }];
+    }
+
     const conversationMessage: IConversationMessages = await ConversationMessages.create(
-      {
-        conversationId: conversation._id,
-        createdAt: message.timestamp,
-        userId: null,
-        customerId: customer.contactsId,
-        content: message.message.text,
-        messageType: message.message.type
-      }
+      messageObj
     );
 
     await sendInboxMessage({
