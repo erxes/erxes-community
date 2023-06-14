@@ -4,7 +4,12 @@ import {
   sendMessage as sendCommonMessage
 } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
-import { Customers, Integrations } from './models';
+import {
+  Customers,
+  Integrations,
+  Conversations,
+  ConversationMessages
+} from './models';
 import { ViberAPI } from './viber/api';
 
 dotenv.config();
@@ -57,8 +62,27 @@ export const initBroker = async cl => {
       const { data } = args;
       const { integrationId } = data;
 
-      await Customers.remove({ inboxIntegrationId: integrationId });
-      await Integrations.remove({ inboxId: integrationId });
+      await Customers.deleteMany({ inboxIntegrationId: integrationId });
+      await Integrations.deleteMany({ inboxId: integrationId });
+
+      const conversationIds: string[] = [];
+
+      const conversationIdsKeys = await Conversations.find(
+        { integrationId: integrationId },
+        '_id'
+      );
+
+      conversationIdsKeys.map(key => {
+        conversationIds.push(key._id);
+      });
+
+      if (conversationIds.length > 0) {
+        await ConversationMessages.deleteMany({
+          conversationId: { $in: conversationIds }
+        });
+      }
+
+      await Conversations.deleteMany({ integrationId: integrationId });
 
       return {
         status: 'success'

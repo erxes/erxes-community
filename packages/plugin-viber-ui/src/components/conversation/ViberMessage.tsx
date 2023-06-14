@@ -2,7 +2,6 @@ import React from 'react';
 import SimpleMessage from '@erxes/ui-inbox/src/inbox/components/conversationDetail/workarea/conversation/messages/SimpleMessage';
 import { IConversation, IMessage } from '@erxes/ui-inbox/src/inbox/types';
 import { ViberChatPanel } from '../../styles';
-import WriteMessage from './WriteMessage';
 
 type Props = {
   conversation: IConversation;
@@ -19,27 +18,15 @@ class ViberMessage extends React.Component<Props, {}> {
 
     const messages = conversationMessages || [];
 
-    console.log('messages', messages);
-
-    const Chat = messages.map((message, key) => (
-      <ViberChatPanel key={key}>
-        <SimpleMessage
-          key={message._id}
-          message={message}
-          isStaff={!message.customerId}
-        />
-      </ViberChatPanel>
+    const Chat = messages.map(message => (
+      <SimpleMessage
+        key={message._id}
+        message={message}
+        isStaff={!message.customerId}
+      />
     ));
 
-    return (
-      <>
-        {/* <ActionBar currentConversation={conversation} /> */}
-
-        <ViberChatPanel>{Chat}</ViberChatPanel>
-
-        <WriteMessage />
-      </>
-    );
+    return <ViberChatPanel>{Chat}</ViberChatPanel>;
   }
 }
 

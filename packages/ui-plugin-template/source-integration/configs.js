@@ -22,7 +22,6 @@ module.exports = {
       'Please write integration description on plugin config file',
     isAvailable: true,
     kind: '{name}',
-    logo: '/images/integrations/{name}.png',
-    components: ["inboxConversationDetail"],
+    logo: '/images/integrations/{name}.png'
   }]
 };
