@@ -17,7 +17,6 @@ function RegisterContainer(props: Props) {
 
   const renderButton = ({ values, isSubmitted }: IButtonMutateProps) => {
     const callbackResponse = () => (window.location.href = "/");
-
     return (
       <ButtonMutate
         mutation={mutations.createUser}

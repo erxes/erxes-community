@@ -11,7 +11,7 @@ import Select from 'react-select-plus';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
 
 import { CONFIGURATIONS } from '../../constants';
-import { ToggleWrap } from '../../styles';
+import { BlockRow, ToggleWrap } from '../../styles';
 import { ClientPortalConfig } from '../../types';
 import PasswordConfig from './PasswordConfig';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
@@ -512,10 +512,13 @@ function General({
   return (
     <>
       <CollapseContent title="User Authentication" compact={true} open={false}>
-        <div style={{ display: 'flex' }}>
+        <BlockRow>
           <Formgroup>
             <ControlLabel>Token pass method</ControlLabel>
-            <p>set token in cookie or use header authorization</p>
+            <p>
+              It is recommended to use cookies, if hosting the client portal on
+              a different domain use bearer token
+            </p>
             <FormControl
               componentClass="select"
               placeholder="select"
@@ -526,14 +529,17 @@ function General({
                 // console.log(e.currentTarget.value)
               }
             >
-              <option value="header">Header</option>
               <option value="cookie">Cookie</option>
+              <option value="header">Bearer token</option>
             </FormControl>
           </Formgroup>
 
           <Formgroup>
             <ControlLabel>Token expiration duration</ControlLabel>
-            <p>token expiration duration in days</p>
+            <p>
+              In order to be a more secure, it is recommended to set a short
+              expiration duration.
+            </p>
             <FormControl
               componentClass="input"
               placeholder="token expiration duration"
@@ -542,14 +548,19 @@ function General({
               max={5}
               value={tokenExpiration}
               onChange={(e: any) =>
-                handleFormChange('tokenExpiration', e.currentTarget.value)
+                handleFormChange(
+                  'tokenExpiration',
+                  Number(e.currentTarget.value)
+                )
               }
             />
           </Formgroup>
 
           <Formgroup>
             <ControlLabel>Refresh Token expiration duration</ControlLabel>
-            <p>refresh token expiration duration in days</p>
+            <p>
+              Refresh token expiration duration can be set to a longer duration.
+            </p>
             <FormControl
               componentClass="input"
               placeholder="refresh token expiration duration"
@@ -560,12 +571,12 @@ function General({
               onChange={(e: any) =>
                 handleFormChange(
                   'refreshTokenExpiration',
-                  e.currentTarget.value
+                  Number(e.currentTarget.value)
                 )
               }
             />
           </Formgroup>
-        </div>
+        </BlockRow>
       </CollapseContent>
       {renderOtp()}
       {renderMailConfig()}

@@ -279,6 +279,9 @@ export const mutations = cardAvailable => `
     mailConfig: MailConfigInput
     manualVerificationConfig: JSON
     passwordVerificationConfig: JSON
+    tokenPassMethod: TokenPassMethod
+    tokenExpiration: Int
+    refreshTokenExpiration: Int
   ): ClientPortal
 
   clientPortalRemove (_id: String!): JSON

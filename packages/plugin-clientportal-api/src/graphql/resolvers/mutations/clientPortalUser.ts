@@ -885,10 +885,18 @@ const clientPortalUserMutations = {
 
   clientPortalRefreshToken: async (
     _root,
-    { refreshToken }: { refreshToken: string },
-    { models, cpUser, res }: IContext
+    _args,
+    { models, requestInfo }: IContext
   ) => {
-    jwt.verify(
+    const authHeader = requestInfo.headers.authorization;
+
+    if (!authHeader) {
+      throw new Error('Invalid refresh token');
+    }
+
+    const refreshToken = authHeader.replace('Bearer ', '');
+
+    return await jwt.verify(
       refreshToken,
       process.env.JWT_TOKEN_SECRET || '',
       async (err, decoded) => {
@@ -896,13 +904,8 @@ const clientPortalUserMutations = {
           throw new Error('Invalid refresh token');
         }
 
-        const { _id } = decoded as any;
-
-        if (cpUser && cpUser._id !== _id) {
-          throw new Error('Invalid refresh token');
-        }
-
-        const user = await models.ClientPortalUsers.findOne({ _id });
+        const { userId } = decoded as any;
+        const user = await models.ClientPortalUsers.findOne({ _id: userId });
 
         if (!user) {
           throw new Error('User not found');
@@ -912,7 +915,22 @@ const clientPortalUserMutations = {
           user.clientPortalId
         );
 
-        return tokenHandler(user, clientPortal, res);
+        const {
+          tokenExpiration = 1,
+          refreshTokenExpiration = 7
+        } = clientPortal || {
+          tokenExpiration: 1,
+          refreshTokenExpiration: 7
+        };
+
+        return jwt.sign(
+          { userId: user._id, type: user.type } as any,
+          process.env.JWT_TOKEN_SECRET || '',
+          {
+            // expiresIn: `${tokenExpiration}d`
+            expiresIn: '1m'
+          }
+        );
       }
     );
   }

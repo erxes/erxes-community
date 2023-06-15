@@ -55,7 +55,7 @@ function Header({
   headerBottomComponent,
   notificationsCount,
 }: Props) {
-  const [showlogin, setLogin] = useState(false);
+  const [showlogin, setLogin] = useState(true );
   const [showregister, setRegister] = useState(false);
   const [showResetPassword, setResetPassword] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
