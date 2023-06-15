@@ -1,14 +1,14 @@
-import { Config, IUser } from "../../types";
-import { LeftContent, LeftSidebar } from "../../styles/profile";
-import React, { useState } from "react";
+import { Config, IUser } from '../../types';
+import { LeftContent, LeftSidebar } from '../../styles/profile';
+import React, { useState } from 'react';
 
-import Dropdown from "react-bootstrap/Dropdown";
-import Icon from "../../common/Icon";
-import Link from "next/link";
-import NameCard from "../../common/nameCard/NameCard";
-import { getConfigColor } from "../../common/utils";
-import { renderUserFullName } from "../../utils";
-import { useRouter } from "next/router";
+import Dropdown from 'react-bootstrap/Dropdown';
+import Icon from '../../common/Icon';
+import Link from 'next/link';
+import NameCard from '../../common/nameCard/NameCard';
+import { getConfigColor } from '../../common/utils';
+import { renderUserFullName } from '../../utils';
+import { useRouter } from 'next/router';
 
 type Props = {
   config: Config;
@@ -30,7 +30,7 @@ function SettingsLayout({
       <Dropdown.Item
         href={url}
         className={`d-flex align-items-center flex-fill ${
-          router.pathname === url ? "selected" : ""
+          router.pathname === url ? 'selected' : ''
         }`}
       >
         <Icon icon={icon} size={16} /> &nbsp; {name}
@@ -41,7 +41,7 @@ function SettingsLayout({
   return (
     <div className="row">
       <div className="col-md-4">
-        <LeftSidebar baseColor={getConfigColor(config, "baseColor")}>
+        <LeftSidebar baseColor={getConfigColor(config, 'baseColor')}>
           <div className="header-info d-flex flex-column align-items-center text-center ">
             <NameCard user={currentUser} avatarSize={80} hideUserName={true} />
             <h6>{renderUserFullName(currentUser)}</h6>
@@ -49,9 +49,14 @@ function SettingsLayout({
           </div>
           <Dropdown.Divider />
           <div className="list">
-            {renderMenu("dashboard", "/profile", "My profle")}
-            {renderMenu("settings", "/settings", "Settings")}
-            <Dropdown.Item onClick={() => logout()}>
+            {renderMenu('dashboard', '/profile', 'My profle')}
+            {renderMenu('settings', '/settings', 'Settings')}
+            <Dropdown.Item
+              onClick={() => {
+                window.sessionStorage.clear();
+                logout();
+              }}
+            >
               <Icon icon="sign-out-alt" size={18} /> &nbsp; Logout
             </Dropdown.Item>
           </div>

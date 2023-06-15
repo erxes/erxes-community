@@ -12,8 +12,9 @@ export default async function cpUserMiddleware(
 ) {
   const subdomain = getSubdomain(req);
   const models = await generateModels(subdomain);
+  const { body } = req;
 
-  const operationName = req.body.operationName.split('__')[0];
+  const operationName = body.operationName && body.operationName.split('__')[0];
 
   if (
     [
