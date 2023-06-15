@@ -1,5 +1,8 @@
 import { IIntegrationDocument } from '../../models/definitions/integrations';
-import { sendCommonMessage } from '../../messageBroker';
+import {
+  sendCommonMessage,
+  sendIntegrationsMessage
+} from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 
@@ -31,7 +34,10 @@ export default {
   },
 
   async tags(integration: IIntegrationDocument) {
-    return (integration.tagIds || []).map(_id => ({ __typename: 'Tag', _id }));
+    return (integration.tagIds || []).map(_id => ({
+      __typename: 'Tag',
+      _id
+    }));
   },
 
   websiteMessengerApps(
@@ -103,5 +109,23 @@ export default {
     }
 
     return { status: 'healthy' };
+  },
+
+  async data(
+    integration: IIntegrationDocument,
+    _args,
+    { subdomain }: IContext
+  ) {
+    const inboxId: string = integration._id;
+
+    const response = await sendCommonMessage({
+      serviceName: integration.kind,
+      subdomain,
+      action: 'detailIntegration',
+      data: { inboxId: inboxId },
+      isRPC: true
+    });
+
+    return response;
   }
 };

@@ -9,6 +9,11 @@ import React from 'react';
 import SelectBrand from '../../containers/SelectBrand';
 import SelectChannels from '../../containers/SelectChannels';
 import { __ } from '@erxes/ui/src/utils';
+import { withProps } from '@erxes/ui/src/utils';
+import * as compose from 'lodash.flowright';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
+import query from '../../graphql/queries';
 
 type CommonTypes = {
   name: string;
@@ -122,7 +127,6 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
       switch (this.props.integrationKind) {
         case 'webhook': {
           data = webhookData;
-
           break;
         }
       }
@@ -183,4 +187,13 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
   }
 }
 
-export default CommonFieldForm;
+export default withProps<Props>(
+  compose(
+    graphql<Props>(gql(query.integrationDetail), {
+      name: 'integrationDetail',
+      options: ({ integrationId }) => ({
+        variables: { _id: integrationId }
+      })
+    })
+  )(CommonFieldForm)
+);
