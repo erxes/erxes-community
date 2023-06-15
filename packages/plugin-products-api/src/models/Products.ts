@@ -45,28 +45,6 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
       return product;
     }
 
-    static async checkUOM(doc) {
-      if (!doc.uom) {
-        throw new Error('uom is required');
-      }
-
-      const uoms = (doc.subUoms || []).map(u => u.uom);
-      uoms.unshift(doc.uom);
-      const oldUoms = await models.Uoms.find({ code: { $in: uoms } }).lean();
-      const oldUomCodes = (oldUoms || []).map(u => u.code);
-      const creatUoms: any[] = [];
-
-      for (const uom of uoms) {
-        if (!oldUomCodes.includes(uom)) {
-          creatUoms.push({ code: uom, name: uom });
-        }
-      }
-
-      await models.Uoms.insertMany(creatUoms);
-
-      return doc.uom;
-    }
-
     static async checkCodeDuplication(code: string) {
       const product = await models.Products.findOne({
         code,
@@ -122,7 +100,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
         isRPC: true
       });
 
-      doc.uom = await this.checkUOM(doc);
+      doc.uom = await models.Uoms.checkUOM(doc);
 
       return models.Products.create(doc);
     }
@@ -152,7 +130,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
           isRPC: true
         });
       }
-      doc.uom = await this.checkUOM(doc);
+      doc.uom = await models.Uoms.checkUOM(doc);
       await models.Products.updateOne({ _id }, { $set: doc });
 
       return await models.Products.findOne({ _id }).lean();
@@ -273,7 +251,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
         mergedIds: productIds,
         name,
         type,
-        uom: await this.checkUOM(productFields),
+        uom: await models.Uoms.checkUOM({ ...productFields }),
         description,
         categoryId,
         vendorId

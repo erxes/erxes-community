@@ -146,10 +146,11 @@ export default {
 
           case 'uom':
             {
-              const uom = await models.Uoms.findOne({
-                $or: [{ name: value }, { code: value }]
-              }).lean();
-              doc.uom = uom ? uom._id : '';
+              const defaultUom = await models.ProductsConfigs.getConfig(
+                'defaultUOM',
+                ''
+              );
+              doc.uom = value || defaultUom;
             }
             break;
 

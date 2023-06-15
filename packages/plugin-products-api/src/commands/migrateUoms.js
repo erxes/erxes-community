@@ -103,6 +103,9 @@ const command = async () => {
       console.log(`updated uoms ${bulkUpdateOps.length}...`);
       await Uoms.bulkWrite(bulkUpdateOps);
     }
+    if (defaultUom) {
+      await Configs.updateOne({ code: 'defaultUOM' }, { $set: { value: defaultUom } })
+    }
   } catch (e) {
     console.log(`Error occurred: ${e.message}`);
   }

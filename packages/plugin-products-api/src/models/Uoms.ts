@@ -8,6 +8,7 @@ export interface IUomModel extends Model<IUomDocument> {
   createUom(doc: IUom): Promise<IUomDocument>;
   updateUom(_id: string, doc: IUom): Promise<IUomDocument>;
   removeUoms(_ids: string[]): Promise<{ n: number; ok: number }>;
+  checkUOM(doc: { uom?: string; subUoms?: any[] });
 }
 
 export const loadUomClass = (models: IModels, subdomain: string) => {
@@ -59,6 +60,28 @@ export const loadUomClass = (models: IModels, subdomain: string) => {
       await models.Uoms.updateOne({ _id }, { $set: doc });
 
       return models.Uoms.findOne({ _id });
+    }
+
+    static async checkUOM(doc) {
+      if (!doc.uom) {
+        throw new Error('uom is required');
+      }
+
+      const uoms = (doc.subUoms || []).map(u => u.uom);
+      uoms.unshift(doc.uom);
+      const oldUoms = await models.Uoms.find({ code: { $in: uoms } }).lean();
+      const oldUomCodes = (oldUoms || []).map(u => u.code);
+      const creatUoms: any[] = [];
+
+      for (const uom of uoms) {
+        if (!oldUomCodes.includes(uom)) {
+          creatUoms.push({ code: uom, name: uom });
+        }
+      }
+
+      await models.Uoms.insertMany(creatUoms);
+
+      return doc.uom;
     }
 
     /**
