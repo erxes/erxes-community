@@ -21,6 +21,7 @@ import {
 import { loadInvoiceClass, IInvoiceModel } from './models/invoices';
 import { loadScheduleClass, IScheduleModel } from './models/schedules';
 import { loadTransactionClass, ITransactionModel } from './models/transactions';
+import { IGeneral, IGeneralDocument } from './models/definitions/general';
 
 export interface IModels {
   PeriodLocks: IPeriodLockModel;
@@ -31,6 +32,7 @@ export interface IModels {
   Schedules: IScheduleModel;
   FirstSchedules: IScheduleModel;
   Transactions: ITransactionModel;
+  General: IGeneral;
 }
 
 export interface IContext extends IMainContext {

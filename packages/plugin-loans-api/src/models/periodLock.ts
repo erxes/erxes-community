@@ -37,6 +37,7 @@ export const loadPeriodLockClass = (models: IModels) => {
         throw new Error(
           `Can't lock period at this time because already locked`
         );
+
       return models.PeriodLocks.create(doc);
     }
 
