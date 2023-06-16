@@ -36,6 +36,20 @@ export const findBranches = async (subdomain: string, branchIds: string[]) => {
   return branches;
 };
 
+export const findDepartments = async (
+  subdomain: string,
+  departmentIds: string[]
+) => {
+  const branches = await sendCoreMessage({
+    subdomain,
+    action: 'departments.find',
+    data: { _id: { $in: departmentIds } },
+    isRPC: true
+  });
+
+  return branches;
+};
+
 export const findUser = async (subdomain: string, userId: string) => {
   const user = await sendCoreMessage({
     subdomain,
@@ -1052,6 +1066,10 @@ export const timeclockReportPivot = async (
 
             deviceType: currUserTimeclock.deviceType,
             deviceName: currUserTimeclock.deviceName,
+            inDevice: currUserTimeclock.inDevice,
+            inDeviceType: currUserTimeclock.inDeviceType,
+            outDevice: currUserTimeclock.outDevice,
+            outDeviceType: currUserTimeclock.outDeviceType,
 
             scheduledStart: scheduleShiftStart,
             scheduledEnd: scheduleShiftEnd,

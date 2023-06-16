@@ -9,6 +9,10 @@ export interface ITimeClock {
   branchName?: string;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
 }
 
 export interface ITimeClockDocument extends ITimeClock, Document {
@@ -16,8 +20,8 @@ export interface ITimeClockDocument extends ITimeClock, Document {
 }
 
 export interface ITimeLog {
-  userId?: string;
-  timelog?: Date;
+  userId: string;
+  timelog: Date;
   deviceSerialNo?: string;
 }
 
@@ -177,6 +181,26 @@ export const timeclockSchema = new Schema({
   deviceType: field({
     type: String,
     label: 'Which device used for clock in/out'
+  }),
+  inDevice: field({
+    type: String,
+    label: 'check in device name',
+    optional: true
+  }),
+  outDevice: field({
+    type: String,
+    label: 'check out device name',
+    optional: true
+  }),
+  inDeviceType: field({
+    type: String,
+    label: 'check in device type',
+    optional: true
+  }),
+  outDeviceType: field({
+    type: String,
+    label: 'check out device type',
+    optional: true
   })
 });
 
@@ -448,6 +472,8 @@ export interface IUserExportReport {
   firstName?: string;
   lastName?: string;
   branchName?: string;
+  employeeId?: string;
+
   position?: string;
   totalDaysWorked?: number;
   totalHoursWorked?: string;
@@ -462,9 +488,23 @@ export interface IUserExportReport {
   totalHoursBreakScheduled?: string;
   totalHoursBreakTaken?: string;
 
-  totalMinsLate?: string;
-
   absenceInfo?: IUserAbsenceInfo;
+
+  totalMinsLate?: number | string;
+  totalAbsenceMins?: number;
+
+  totalHoursWorkedSelectedDay?: number;
+  totalHoursScheduledSelectedDay?: number;
+  totalHoursAbsentSelectedDay?: number;
+  totalMinsLateSelectedDay?: number;
+
+  totalHoursWorkedSelectedMonth?: number;
+  totalHoursScheduledSelectedMonth?: number;
+  totalHoursAbsentSelectedMonth?: number;
+  totalMinsLateSelectedMonth?: number;
+
+  totalDaysScheduledSelectedMonth?: number;
+  totalDaysWorkedSelectedMonth?: number;
 
   scheduleReport?: IScheduleReport[];
 }

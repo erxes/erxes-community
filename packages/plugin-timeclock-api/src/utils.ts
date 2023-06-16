@@ -15,7 +15,9 @@ import { Sequelize, QueryTypes } from 'sequelize';
 const dateFormat = 'YYYY-MM-DD';
 const timeFormat = 'HH:mm';
 import {
+  findBranches,
   findBranchUsers,
+  findDepartments,
   findDepartmentUsers,
   returnUnionOfUserIds
 } from './graphql/resolvers/utils';
@@ -76,6 +78,17 @@ const findTeamMembers = (subdomain: string, userIds: string[]) => {
   });
 };
 
+const findTeamMember = (subdomain: string, userId: string[]) => {
+  return sendCoreMessage({
+    subdomain,
+    action: 'users.findOne',
+    data: {
+      _id: userId
+    },
+    isRPC: true
+  });
+};
+
 const returnNewTimeLogsFromEmpData = async (
   empData: any[],
   teamMembersObj: any,
@@ -96,7 +109,7 @@ const returnNewTimeLogsFromEmpData = async (
     const checkTimeLogAlreadyExists = existingTimeLogs.find(
       existingTimeLog =>
         existingTimeLog.userId === newTimeLog.userId &&
-        existingTimeLog.timelog === newTimeLog.timelog
+        existingTimeLog.timelog?.getTime() === newTimeLog.timelog.getTime()
     );
 
     if (!checkTimeLogAlreadyExists) {
@@ -121,6 +134,20 @@ const createTimelogs = async (
     }
   });
 
+  const existingTimeLogsDict: { [key: string]: ITimeLogDocument[] } = {};
+
+  for (const timelog of existingTimeLogs) {
+    if (timelog.userId in existingTimeLogsDict) {
+      existingTimeLogsDict[timelog.userId] = [
+        ...existingTimeLogsDict[timelog.userId],
+        timelog
+      ];
+      continue;
+    }
+
+    existingTimeLogsDict[timelog.userId] = [timelog];
+  }
+
   const totalTimeLogs: ITimeLog[] = [];
 
   let currentEmpId;
@@ -139,13 +166,14 @@ const createTimelogs = async (
     const currEmpNumber = parseInt(currEmpId, 10);
 
     if (currEmpNumber) {
+      const teamMemberId = teamMembersObj[currEmpNumber];
       currentEmpId = currEmpId;
       const currEmpData = queryData.filter(row => row.ID === currEmpId);
       totalTimeLogs.push(
         ...(await returnNewTimeLogsFromEmpData(
           currEmpData,
           teamMembersObj,
-          existingTimeLogs
+          existingTimeLogsDict[teamMemberId]
         ))
       );
     }
@@ -451,7 +479,6 @@ const createUserTimeclock = async (
           shiftStartIdx,
           shiftEndReverseIdx,
           teamMembersObj[empId],
-          existingTimeclocks,
           devicesDictionary
         );
 
@@ -475,7 +502,6 @@ const createUserTimeclock = async (
       getShiftStartIdx,
       getShiftEndReverseIdx,
       teamMembersObj[empId],
-      existingTimeclocks,
       devicesDictionary
     );
 
@@ -501,7 +527,6 @@ const createNewTimeClock = (
   getShiftStartIdx: number,
   getShiftEndReverseIdx: number,
   userId: string,
-  existingTimeclocks: ITimeClockDocument[],
   devicesDictionary: any
 ) => {
   if (getShiftStartIdx !== -1) {
@@ -510,13 +535,23 @@ const createNewTimeClock = (
     ).toDate();
 
     const getShiftEndIdx = empData.length - 1 - getShiftEndReverseIdx;
-    let getDeviceName;
+
+    const inDeviceSerialNo = empData[getShiftStartIdx].deviceSerialNo;
+    const inDevice =
+      devicesDictionary[inDeviceSerialNo] ||
+      empData[getShiftStartIdx].deviceName;
+
+    const inDeviceType = 'faceTerminal';
 
     // if both shift start and end exist, shift is ended
     if (getShiftEndReverseIdx !== -1) {
-      const deviceSerialNo = empData[getShiftEndIdx].deviceSerialNo;
-      getDeviceName =
-        devicesDictionary[deviceSerialNo] || empData[getShiftEndIdx].deviceName;
+      const outDeviceSerialNo = empData[getShiftEndIdx].deviceSerialNo;
+
+      const outDevice =
+        devicesDictionary[outDeviceSerialNo] ||
+        empData[getShiftEndIdx].deviceName;
+
+      const outDeviceType = 'faceTerminal';
       const getShiftEnd = dayjs(empData[getShiftEndIdx].authDateTime).toDate();
 
       const newTimeclock = {
@@ -524,33 +559,25 @@ const createNewTimeClock = (
         shiftEnd: getShiftEnd,
         shiftActive: false,
         userId,
-        deviceName: getDeviceName,
-        deviceType: 'faceTerminal'
-      };
 
-      // if (!checkTimeClockAlreadyExists(newTimeclock, existingTimeclocks)) {
-      //   return newTimeclock;
-      // }
+        inDevice,
+        outDevice,
+        inDeviceType,
+        outDeviceType
+      };
 
       return newTimeclock;
     }
-
-    const deviceSerial = empData[getShiftStartIdx].deviceSerialNo;
-    getDeviceName =
-      devicesDictionary[deviceSerial] || empData[getShiftStartIdx].deviceName;
 
     // else shift is still active
     const newTime = {
       shiftStart: getShiftStart,
       shiftActive: true,
       userId,
-      deviceName: getDeviceName,
-      deviceType: 'faceTerminal'
+      inDevice,
+      inDeviceType
     };
 
-    // if (!checkTimeClockAlreadyExists(newTime, existingTimeclocks)) {
-    //   return newTime;
-    // }
     return newTime;
   }
 };
@@ -776,17 +803,19 @@ const findAndUpdateUnfinishedShifts = async (
           newEmpData[getShiftEndIdx].authDateTime
         ).toDate();
 
-        const getDeviceName =
+        const outDevice =
           devicesDictionary[newEmpData[getShiftEndIdx].deviceSerialNo] ||
           newEmpData[getShiftEndIdx].deviceName;
+
+        const outDeviceType = 'faceTerminal';
 
         const updateTimeClock = {
           shiftStart: unfinishedTimeclock.shiftStart,
           shiftEnd: getShiftEnd,
           userId: teamMemberId,
           shiftActive: false,
-          deviceName: getDeviceName,
-          deviceType: unfinishedTimeclock.deviceType + ' x faceTerminal'
+          outDevice,
+          outDeviceType
         };
 
         const updateTimeclockOperation = {
@@ -1031,16 +1060,37 @@ const createTeamMembersObject = async (subdomain: any, userIds: string[]) => {
   return teamMembersObject;
 };
 
+const returnDepartmentsBranchesDict = async (
+  subdomain: any,
+  branchIds: string[],
+  departmentIds: string[]
+): Promise<{ [_id: string]: string }> => {
+  const dictionary: { [_id: string]: string } = {};
+
+  const branches = await findBranches(subdomain, branchIds);
+  const departments = await findDepartments(subdomain, departmentIds);
+
+  for (const branch of branches) {
+    dictionary[branch._id] = branch.title;
+  }
+
+  for (const department of departments) {
+    dictionary[department._id] = department.title;
+  }
+
+  return dictionary;
+};
+
 const returnSupervisedUsers = async (
-  currentUserId: string,
+  currentUser: IUserDocument,
   subdomain: string
-) => {
+): Promise<IUserDocument[]> => {
   const supervisedDepartmenIds = (
     await sendCoreMessage({
       subdomain,
       action: `departments.find`,
       data: {
-        supervisorId: currentUserId
+        supervisorId: currentUser._id
       },
       isRPC: true,
       defaultValue: []
@@ -1052,20 +1102,24 @@ const returnSupervisedUsers = async (
       subdomain,
       action: `branches.find`,
       data: {
-        supervisorId: currentUserId
+        query: {
+          supervisorId: currentUser._id
+        }
       },
       isRPC: true,
       defaultValue: []
     })
   ).map(branch => branch._id);
 
-  const findTotalSupervisedUsers: string[] = [];
+  const findTotalSupervisedUsers: IUserDocument[] = [];
 
   findTotalSupervisedUsers.push(
-    ...(await findDepartmentUsers(subdomain, supervisedDepartmenIds)).map(
-      departmentUser => departmentUser._id
-    ),
-    currentUserId
+    ...(await findDepartmentUsers(subdomain, supervisedDepartmenIds))
+  );
+
+  findTotalSupervisedUsers.push(
+    ...(await findBranchUsers(subdomain, supervisedBranchIds)),
+    currentUser
   );
 
   return findTotalSupervisedUsers;
@@ -1099,12 +1153,12 @@ const generateFilter = async (
   let scheduleFilter = {};
 
   const totalSupervisedUsers = !isCurrentUserAdmin
-    ? await returnSupervisedUsers(user._id, subdomain)
+    ? await returnSupervisedUsers(user, subdomain)
     : [];
 
   if (!isCurrentUserAdmin) {
     scheduleFilter = {
-      userId: { $in: totalSupervisedUsers }
+      userId: { $in: totalSupervisedUsers.map(usr => usr._id) }
     };
   }
 
@@ -1165,7 +1219,9 @@ const generateFilter = async (
   if (!userIdsGiven && type !== 'schedule') {
     returnFilter = {};
     if (!isCurrentUserAdmin) {
-      returnFilter = { userId: { $in: totalSupervisedUsers } };
+      returnFilter = {
+        userId: { $in: totalSupervisedUsers.map(usr => usr._id) }
+      };
     }
     returnFilter = {
       ...returnFilter,
@@ -1337,5 +1393,8 @@ export {
   findAllTeamMembersWithEmpId,
   createTeamMembersObject,
   customFixDate,
-  returnSupervisedUsers
+  returnSupervisedUsers,
+  findTeamMembers,
+  findTeamMember,
+  returnDepartmentsBranchesDict
 };

@@ -305,15 +305,15 @@ function List(props: Props) {
     />
   );
 
-  const compareUserName = (a, b) => {
-    if (a.employeeUserName < b.employeeUserName) {
-      return -1;
-    }
-    if (a.employeeUserName > b.employeeUserName) {
-      return 1;
-    }
-    return 0;
-  };
+  // const compareUserName = (a, b) => {
+  //   if (a.employeeUserName < b.employeeUserName) {
+  //     return -1;
+  //   }
+  //   if (a.employeeUserName > b.employeeUserName) {
+  //     return 1;
+  //   }
+  //   return 0;
+  // };
 
   const content = (
     <Table>
@@ -323,9 +323,10 @@ function List(props: Props) {
           <th>{__('Shift date')}</th>
           <th>{__('Check In')}</th>
           <th>{__('In Device')}</th>
+          <th>{__('Location')}</th>
           <th>{__('Check Out')}</th>
-          <th>{__('Out Device')}</th>
           <th>{__('Overnight')}</th>
+          <th>{__('Out Device')}</th>
           <th>{__('Location')}</th>
           <th>
             <TextAlignCenter>{__('Action')}</TextAlignCenter>
@@ -333,7 +334,7 @@ function List(props: Props) {
         </tr>
       </thead>
       <tbody>
-        {timeclocks.sort(compareUserName).map(timeclock => {
+        {timeclocks.map(timeclock => {
           return (
             <Row
               key={timeclock._id}
