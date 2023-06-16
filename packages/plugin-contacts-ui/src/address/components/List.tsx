@@ -15,6 +15,9 @@ type Props = {
   currentAddress: IAddress | undefined;
   onChange: (addresses: IAddress[]) => void;
   onSelect: (address: IAddress) => void;
+  onAddNew: () => void;
+  onSave: () => void;
+  close: () => void;
 };
 
 const List = (props: Props) => {
@@ -48,7 +51,7 @@ const List = (props: Props) => {
         <a>
           <FieldStyle>
             {address.osmAddress}
-            <p>{address.osmAddress}</p>
+            <p>{address.address}</p>
           </FieldStyle>
         </a>
         <ActionButtons>
@@ -82,6 +85,9 @@ const List = (props: Props) => {
           block={true}
           uppercase={false}
           icon="plus-circle"
+          onClick={() => {
+            props.onAddNew();
+          }}
         >
           Add New Address
         </Button>
@@ -89,8 +95,47 @@ const List = (props: Props) => {
     );
   };
 
+  const renderSidebarFooter = () => {
+    console.log('renderSidebarFooter');
+
+    return (
+      <TopHeader>
+        <div style={{ display: 'flex' }}>
+          <Button
+            btnStyle="danger"
+            block={true}
+            uppercase={false}
+            icon="cancel-1"
+            onClick={() => {
+              props.close();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            btnStyle="success"
+            block={true}
+            uppercase={false}
+            icon="plus-circle"
+            onClick={() => {
+              props.onSave();
+              props.close();
+            }}
+          >
+            Save
+          </Button>
+        </div>
+      </TopHeader>
+    );
+  };
+
   return (
-    <LeftSidebar wide={true} hasBorder={true} header={renderSidebarHeader()}>
+    <LeftSidebar
+      wide={true}
+      hasBorder={true}
+      header={renderSidebarHeader()}
+      footer={renderSidebarFooter()}
+    >
       <SidebarList noTextColor={true} noBackground={true} id={'test'}>
         {renderRow()}
       </SidebarList>

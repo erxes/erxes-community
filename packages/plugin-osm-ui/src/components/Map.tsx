@@ -107,6 +107,8 @@ const Map = (props: Props) => {
   const [center, setCenter] = useState(props.center);
   const mapRef: any = useRef(null);
 
+  console.log('Map', markers.length);
+
   useEffect(() => {
     if (props.center) {
       setCenter(props.center);

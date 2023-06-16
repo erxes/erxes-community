@@ -197,6 +197,7 @@ export default function Component(props: Props) {
 
   const manageContent = formProps => (
     <EditForm
+      userLocation={userLocation}
       addresses={addresses}
       onSave={props.save}
       closeModal={formProps.closeModal}
@@ -205,21 +206,20 @@ export default function Component(props: Props) {
 
   const extraButtons = (
     <>
-      {addresses.length && (
-        <ModalTrigger
-          title="Address"
-          size="xl"
-          trigger={
-            <button>
-              <Icon icon="edit-3" />
-            </button>
-          }
-          content={manageContent}
-        />
-      )}
-      <button onClick={onAddMarker}>
+      <ModalTrigger
+        title="Address"
+        size="xl"
+        trigger={
+          <button>
+            <Icon icon="edit-3" />
+          </button>
+        }
+        content={manageContent}
+      />
+
+      {/* <button onClick={onAddMarker}>
         <Icon icon="plus-circle" />
-      </button>
+      </button> */}
     </>
   );
 

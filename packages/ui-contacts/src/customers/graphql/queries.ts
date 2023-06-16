@@ -156,7 +156,8 @@ const addressFields = `
   lat
   lng
   osmId
-  short
+  osmAddress
+  address
   isPrimary
   detail {
     building
