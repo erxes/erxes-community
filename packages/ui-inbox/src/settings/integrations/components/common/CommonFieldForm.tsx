@@ -9,17 +9,14 @@ import React from 'react';
 import SelectBrand from '../../containers/SelectBrand';
 import SelectChannels from '../../containers/SelectChannels';
 import { __ } from '@erxes/ui/src/utils';
-import { withProps } from '@erxes/ui/src/utils';
-import * as compose from 'lodash.flowright';
-import { gql } from '@apollo/client';
-import { graphql } from '@apollo/client/react/hoc';
-import query from '../../graphql/queries';
+import { loadDynamicComponent } from '@erxes/ui/src/utils/core';
 
 type CommonTypes = {
   name: string;
   brandId: string;
   channelIds: string[];
   webhookData: any;
+  saveButtonClicked: boolean;
 };
 
 type Props = {
@@ -44,7 +41,8 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
       name: props.name || '',
       brandId: props.brandId || '',
       channelIds: props.channelIds || [],
-      webhookData: props.webhookData || {}
+      webhookData: props.webhookData || {},
+      saveButtonClicked: false
     };
   }
 
@@ -59,7 +57,6 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
 
     const onChangeWebhookData = e => {
       webhookData[e.target.name] = e.target.value;
-
       this.setState({
         webhookData: { ...webhookData }
       });
@@ -122,6 +119,7 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
     const saveIntegration = e => {
       e.preventDefault();
 
+      this.setState({ saveButtonClicked: true });
       let data;
 
       switch (this.props.integrationKind) {
@@ -157,12 +155,16 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
             'Which specific Brand does this integration belong to?'
           )}
         />
-
         <SelectChannels
           defaultValue={channelIds}
           isRequired={true}
           onChange={onChannelChange}
         />
+
+        {loadDynamicComponent('integrationEditForm', {
+          integrationId,
+          saveButtonClicked: this.state.saveButtonClicked
+        })}
 
         <ModalFooter>
           <Button
@@ -187,13 +189,4 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
   }
 }
 
-export default withProps<Props>(
-  compose(
-    graphql<Props>(gql(query.integrationDetail), {
-      name: 'integrationDetail',
-      options: ({ integrationId }) => ({
-        variables: { _id: integrationId }
-      })
-    })
-  )(CommonFieldForm)
-);
+export default CommonFieldForm;

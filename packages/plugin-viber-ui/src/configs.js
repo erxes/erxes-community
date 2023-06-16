@@ -6,6 +6,7 @@ module.exports = {
     "./routes": "./src/routes.tsx",
     "./inboxIntegrationForm": "./src/components/IntegrationForm.tsx",
     "./inboxConversationDetail": "./src/components/ConversationDetail.tsx",
+    './integrationEditForm': './src/components/IntegrationEditForm.tsx',
   },
   routes: {
     url: "http://localhost:3024/remoteEntry.js",
@@ -90,7 +91,8 @@ module.exports = {
   },
 },
   inboxIntegrationForm: "./inboxIntegrationForm",
-  inboxConversationDetail: "./inboxConversationDetail",
+  invoiceDetailRightSection: './invoiceDetailRightSection',
+  integrationEditForm: "./integrationEditForm",
   inboxIntegrations: [
     {
       name: "Viber",

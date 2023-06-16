@@ -1,5 +1,9 @@
 import { IContext } from '../../connectionResolver';
-import { Conversations, ConversationMessages } from '../../models';
+import {
+  Conversations,
+  ConversationMessages,
+  Integrations
+} from '../../models';
 
 const queries = {
   async viberConversationDetail(_root, { conversationId }, context: IContext) {
@@ -68,6 +72,15 @@ const queries = {
     }
 
     return 0;
+  },
+
+  async viberIntegrationDetail(
+    _root,
+    { integrationId }: { integrationId: string },
+    context: IContext
+  ) {
+    const integration = await Integrations.findOne({ inboxId: integrationId });
+    return integration;
   }
 };
 

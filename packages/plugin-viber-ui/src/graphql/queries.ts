@@ -66,7 +66,17 @@ const accounts = `
   }
 `;
 
+const viberIntegrationDetail = `
+  query viberIntegrationDetail($integrationId: String!) {
+    viberIntegrationDetail(integrationId: $integrationId) {
+      _id
+      token
+    }
+  }
+`;
+
 export default {
   messages,
-  accounts
+  accounts,
+  viberIntegrationDetail
 };

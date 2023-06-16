@@ -4,6 +4,13 @@ const removeAccount = `
   }
 `;
 
+const viberIntegrationUpdate = `
+  mutation viberIntegrationUpdate($update: UpdateInput) {
+    viberIntegrationUpdate(update: $update)
+  }
+`;
+
 export default {
-  removeAccount
+  removeAccount,
+  viberIntegrationUpdate
 };

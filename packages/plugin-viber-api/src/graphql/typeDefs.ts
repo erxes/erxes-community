@@ -53,6 +53,18 @@ const types = `
     customer: Customer
     user: User
   }
+
+  type ViberIntegrationDetailResponse {
+    _id: String
+    inboxId: String
+    token: String
+  }
+
+  input UpdateInput {
+    _id: String
+    inboxId: String
+    token: String
+  }
 `;
 
 const queries = `
@@ -60,10 +72,12 @@ const queries = `
   viberConversationDetail(conversationId: String!): [ViberMessageDetail]
   viberConversationMessages(conversationId: String! getFirst: Boolean, skip: Int, limit: Int): [ViberMessageResponse]
   viberConversationMessagesCount(conversationId: String!): Int
+  viberIntegrationDetail(integrationId: String!): ViberIntegrationDetailResponse
 `;
 
 const mutations = `
   viberCreate(create: CreateInput): JSON
+  viberIntegrationUpdate(update: UpdateInput): JSON
 `;
 
 const typeDefs = gql`
