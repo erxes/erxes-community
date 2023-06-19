@@ -19,8 +19,10 @@ const AddressesEdit = (props: Props) => {
   const { closeModal, userLocation } = props;
   const [addresses, setAddresses] = useState(props.addresses || []);
 
+  const primary = props.addresses.find(address => address.isPrimary);
+
   const [currentAddress, setCurrentAddress] = useState<IAddress | undefined>(
-    props.addresses.find(address => address.isPrimary)
+    primary ? primary : addresses[0] && addresses[0]
   );
 
   const onChangeAddresses = (updatedAddresses: IAddress[]) => {
@@ -46,12 +48,10 @@ const AddressesEdit = (props: Props) => {
       isPrimary: false
     };
 
+    console.log('newAddress', newAddress);
+
     setAddresses([...addresses, newAddress]);
     setCurrentAddress(newAddress);
-
-    if (userLocation) {
-      reverseGeocode(userLocation);
-    }
   };
 
   const reverseGeocode = ({ lat, lng }) => {
@@ -105,8 +105,8 @@ const AddressesEdit = (props: Props) => {
   };
 
   React.useEffect(() => {
-    console.log('useEffect', currentAddress);
-  }, [addresses, onAddNew]);
+    console.log('useEffect', addresses);
+  }, [addresses]);
 
   const addressDetail = () => {
     const getCenter = () => {
@@ -117,6 +117,7 @@ const AddressesEdit = (props: Props) => {
     };
 
     const onChangeMarker = (marker: any) => {
+      console.log('onChangeMarker', marker);
       if (!currentAddress) {
         return;
       }
@@ -133,13 +134,14 @@ const AddressesEdit = (props: Props) => {
     const markers: any = [];
 
     if (currentAddress) {
-      markers.push({
-        position: { lat: currentAddress.lat, lng: currentAddress.lng }
-      });
+      markers[0] = {
+        position: { lat: currentAddress.lat, lng: currentAddress.lng },
+        selected: false
+      };
     }
 
     const mapProps = {
-      id: `contactAddress`,
+      id: `contactAddressDetail`,
       width: '100%',
       height: '300px',
       zoom: 15,
@@ -147,6 +149,7 @@ const AddressesEdit = (props: Props) => {
       markers,
       editable: true,
       autoCenter: true,
+      loading: !props.userLocation,
       onChangeMarker
     };
 
@@ -185,6 +188,33 @@ const AddressesEdit = (props: Props) => {
                         return {
                           ...a,
                           address: e.target.value
+                        };
+                      }
+                      return a;
+                    })
+                  );
+                }}
+              />
+            </Formgroup>
+
+            <Formgroup>
+              <ControlLabel>{__('Default')}</ControlLabel>
+              <FormControl
+                name="isPrimary"
+                componentClass="checkbox"
+                checked={currentAddress?.isPrimary}
+                onChange={(e: any) => {
+                  setCurrentAddress({
+                    ...currentAddress,
+                    isPrimary: e.target.checked
+                  });
+
+                  setAddresses(
+                    addresses.map(a => {
+                      if (a.osmId === currentAddress.osmId) {
+                        return {
+                          ...a,
+                          isPrimary: e.target.checked
                         };
                       }
                       return a;

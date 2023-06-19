@@ -2,15 +2,15 @@ import 'leaflet/dist/leaflet.css';
 import '../fullscreen/Leaflet.fullscreen';
 import '../fullscreen/leaflet.fullscreen.css';
 
+import { Spinner } from '@erxes/ui/src/components';
+
 import Leaflet from 'leaflet';
 import React, { useEffect, useRef, useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 
-import { Alert } from '@erxes/ui/src/utils';
-
-import { __ } from '@erxes/ui/src/utils/core';
 import { Coordinate } from '../types';
-import { Spinner } from '@erxes/ui/src/components';
+import FullscreenControl from './FullscreenControl';
+import RelocateControl from './RelocateControl';
 
 type Props = {
   id: string;
@@ -28,100 +28,33 @@ type Props = {
   onChangeMarker?: (marker: any, index?: number) => void;
 };
 
-const FullscreenControl = () => {
-  const map = useMap();
-
-  useEffect(() => {
-    map.addControl(new (Leaflet.Control as any).Fullscreen());
-  }, [map]);
-
-  return null;
-};
-
-const RelocateControl = props => {
-  const map = useMap();
-  const controlRef: any = useRef(null);
-
-  const handleClick = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          props.setCenter({ lat: latitude, lng: longitude });
-          map.setView([latitude, longitude], props.zoom || 10);
-        },
-        error => {
-          Alert.error(__('Error getting user location: ' + error.message));
-        }
-      );
-    } else {
-      Alert.error(__('Your browser does not support geolocation'));
-    }
-  };
-
-  useEffect(() => {
-    // Create the control element
-    const control: any = new Leaflet.Control({ position: 'topright' });
-
-    // Set up the control when it is added to the map
-
-    const html = '<div"><i class="icon-crosshair"></i></div>';
-    control.onAdd = () => {
-      const div = Leaflet.DomUtil.create('div', 'leaflet-control-command');
-      div.title = 'Relocate';
-      div.innerHTML = html;
-
-      Leaflet.DomEvent.disableClickPropagation(div);
-      Leaflet.DomEvent.on(div, 'click', handleClick);
-      Leaflet.DomEvent.on(div, 'mouseover', () => {
-        div.style.backgroundColor = '#f4f4f4';
-      });
-      Leaflet.DomEvent.on(div, 'mouseout', () => {
-        div.style.backgroundColor = '#fff';
-      });
-
-      controlRef.current = div;
-      return div;
-    };
-
-    // Remove the control when it is removed from the map
-    control.onRemove = () => {
-      Leaflet.DomEvent.off(controlRef.current, 'click', handleClick);
-    };
-
-    // Add the control to the map
-    control.addTo(map);
-
-    return () => {
-      // Remove the control when the component is unmounted
-      control.removeFrom(map);
-    };
-  }, [map]);
-
-  return null; // The control does not render any JSX directly
-};
-
 const Map = (props: Props) => {
+  console.log('Map', props);
   const { id, zoom, width = '100%', height = '100%' } = props;
   const [markers, setMarkers] = React.useState<any[]>(props.markers || []);
   const [center, setCenter] = useState(props.center);
+  const [isReady, setIsReady] = useState(false);
   const mapRef: any = useRef(null);
-
-  console.log('Map', markers.length);
+  const markerRefs: any = useRef([]);
 
   useEffect(() => {
     if (props.center) {
       setCenter(props.center);
     }
 
-    if (props.markers) {
+    if (props.markers && isReady) {
       setMarkers(props.markers);
+      loadMarkers();
     }
 
     if (props.autoCenter) {
       autoCenter();
     }
-  }, [props.center, props.markers, markers]);
+
+    // if (isReady) {
+    //   loadMarkers();
+    // }
+  }, [isReady, props.center, props.markers]);
 
   const eventHandlers = {
     dragend: e => {
@@ -136,11 +69,18 @@ const Map = (props: Props) => {
       }
 
       if (props.onChangeMarker) {
-        const index = Number(e.target.options.alt);
-        const marker = markers[index];
+        const currentMarkerIndex = markerRefs.current.findIndex(
+          m => m._leaflet_id === e.target._leaflet_id
+        );
+
+        if (currentMarkerIndex === -1) {
+          return;
+        }
+
+        const marker = markers[currentMarkerIndex];
         marker.position = { lat, lng };
 
-        props.onChangeMarker(marker, index);
+        props.onChangeMarker(marker, currentMarkerIndex);
         // console.log('onChangeMarker', index, marker);
       }
 
@@ -205,6 +145,64 @@ const Map = (props: Props) => {
     }
   };
 
+  const loadMarkers = () => {
+    console.log('loadMarkers');
+    if (mapRef && mapRef.current) {
+      mapRef.current.eachLayer(layer => {
+        if (layer instanceof Leaflet.Marker) {
+          layer.remove();
+        }
+      });
+    }
+
+    markerRefs.current = [];
+    console.log('prev markers cleared', markers);
+    for (const marker of markers) {
+      console.log('marker', marker);
+      const iconAttrs: any = {
+        shadowUrl:
+          'https://erxesmn.s3.amazonaws.com/openstreetmap/leaflet-markers/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      };
+
+      const defaultIcon = new Leaflet.Icon({
+        iconUrl:
+          'https://erxesmn.s3.amazonaws.com/openstreetmap/leaflet-markers/marker-icon.png',
+        ...iconAttrs
+      });
+
+      const myMarker = new Leaflet.Marker(marker.position, {
+        draggable: props.editable,
+        icon: defaultIcon
+      });
+
+      if (marker.selected) {
+        const selectedIcon = new Leaflet.Icon({
+          iconUrl:
+            'https://erxesmn.s3.amazonaws.com/openstreetmap/leaflet-markers/marker-icon-red.png',
+          ...iconAttrs
+        });
+
+        myMarker.setIcon(selectedIcon);
+      }
+
+      myMarker.bindPopup(marker.name);
+
+      myMarker.on('dragend', eventHandlers.dragend);
+
+      myMarker.addTo(mapRef.current);
+      markerRefs.current.push(myMarker);
+      console.log('****** ', markerRefs.current);
+    }
+  };
+
+  // if (!isReady) {
+  //   return <Spinner />;
+  // }
+
   return (
     <MapContainer
       id={id}
@@ -213,27 +211,17 @@ const Map = (props: Props) => {
       zoom={zoom || 10}
       zoomControl={true}
       style={{ height, width, zIndex: 0 }}
+      whenReady={() => {
+        setIsReady(true);
+      }}
     >
-      {markers.map((marker, index) => (
-        <Marker
-          key={index}
-          position={marker.position}
-          draggable={props.editable || false}
-          eventHandlers={eventHandlers}
-          riseOnHover={true}
-          riseOffset={250}
-          alt={index.toString()}
-        >
-          <Popup>{marker.name}</Popup>
-        </Marker>
-      ))}
+      {!isReady && <Spinner />}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FullscreenControl />
       <RelocateControl setCenter={setCenter} {...props} />
-      {props.loading && <Spinner />}
     </MapContainer>
   );
 };

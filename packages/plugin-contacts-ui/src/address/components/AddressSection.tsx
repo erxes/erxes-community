@@ -41,7 +41,7 @@ export default function Component(props: Props) {
     } else {
       setUserLocation({ lat: 0, lng: 0 });
     }
-  }, []);
+  }, [setAddresses]);
 
   const reverseGeocode = ({ lat, lng, index }) => {
     // nominatim reverse geocoding
@@ -91,7 +91,8 @@ export default function Component(props: Props) {
     const markers = addresses.map(address => {
       return {
         position: { lat: address.lat, lng: address.lng },
-        name: address.osmAddress
+        name: address.osmAddress,
+        selected: address.isPrimary
       };
     });
 
@@ -108,51 +109,7 @@ export default function Component(props: Props) {
       loading: !userLocation
     };
 
-    return (
-      <>
-        {/* {addresses.map((address, index) => (
-          <AddressDetail
-            key={index}
-            onClick={() => {
-              // onChangePrimary(index);
-            }}
-          >
-            <SidebarList className="no-link">
-              <li>
-                <FieldStyle overflow="unset">
-                  {__('Address line')} {index + 1}
-                </FieldStyle>
-                <SidebarCounter nowrap={true}>
-                  {address.short || __('No address')}
-                </SidebarCounter>
-              </li>
-
-              <li>
-                <FieldStyle overflow="unset">{__('Default')}</FieldStyle>
-                <SidebarCounter>
-                  <FormControl
-                    componentClass="checkbox"
-                    checked={address.isPrimary}
-                    onChange={() => {
-                      onChangePrimary(index);
-                    }}
-                  />
-                </SidebarCounter>
-              </li>
-              <Tip text={'Remove Schedule'} placement="top">
-                <Button
-                  size="small"
-                  icon="times-circle"
-                  // btnStyle="link"
-                  // onClick={() => removeSchedule(scheduleOfMember._id, 'schedule')}
-                />
-              </Tip>
-            </SidebarList>
-          </AddressDetail>
-        ))} */}
-        {loadDynamicComponent('osMap', mapProps)}
-      </>
-    );
+    return <>{loadDynamicComponent('osMap', mapProps)}</>;
   };
 
   const onAddMarker = () => {
@@ -190,8 +147,9 @@ export default function Component(props: Props) {
     if (incomplete.length > 0) {
       return Alert.warning('Please complete all addresses');
     }
-
+    setAddresses(addresses);
     props.save(addresses);
+
     setIsEditing(false);
   };
 
@@ -216,10 +174,6 @@ export default function Component(props: Props) {
         }
         content={manageContent}
       />
-
-      {/* <button onClick={onAddMarker}>
-        <Icon icon="plus-circle" />
-      </button> */}
     </>
   );
 
