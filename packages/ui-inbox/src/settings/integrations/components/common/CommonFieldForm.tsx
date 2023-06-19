@@ -16,7 +16,7 @@ type CommonTypes = {
   brandId: string;
   channelIds: string[];
   webhookData: any;
-  saveButtonClicked: boolean;
+  isSubmitted: boolean;
 };
 
 type Props = {
@@ -28,7 +28,8 @@ type Props = {
   webhookData: any;
   onSubmit: (
     id: string,
-    { name, brandId, channelIds, data }: IntegrationMutationVariables
+    { name, brandId, channelIds, data }: IntegrationMutationVariables,
+    callback: () => void
   ) => void;
   closeModal: () => void;
 };
@@ -42,7 +43,7 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
       brandId: props.brandId || '',
       channelIds: props.channelIds || [],
       webhookData: props.webhookData || {},
-      saveButtonClicked: false
+      isSubmitted: false
     };
   }
 
@@ -119,8 +120,9 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
     const saveIntegration = e => {
       e.preventDefault();
 
-      this.setState({ saveButtonClicked: true });
-      let data;
+      this.setState({ isSubmitted: true });
+
+      let data: any;
 
       switch (this.props.integrationKind) {
         case 'webhook': {
@@ -129,8 +131,10 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
         }
       }
 
-      onSubmit(integrationId, { name, brandId, channelIds, data });
-      closeModal();
+      onSubmit(integrationId, { name, brandId, channelIds, data }, () => {
+        this.setState({ isSubmitted: false });
+        closeModal();
+      });
     };
 
     return (
@@ -163,7 +167,7 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
 
         {loadDynamicComponent('integrationEditForm', {
           integrationId,
-          saveButtonClicked: this.state.saveButtonClicked
+          isSubmitted: this.state.isSubmitted
         })}
 
         <ModalFooter>
