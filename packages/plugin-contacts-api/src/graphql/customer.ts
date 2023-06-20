@@ -28,8 +28,8 @@ export const types = (tagsEnabled, inboxEnabled) => `
 
     isPrimary: Boolean
     detail: AddressDetail
-    osmAddress: String
-    address: String
+    addressLine1: String
+    addressLine2: String
     osmId: String
   }
 

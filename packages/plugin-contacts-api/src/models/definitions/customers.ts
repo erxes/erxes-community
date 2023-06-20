@@ -48,8 +48,8 @@ export interface IAddress {
     street: string;
     other: string;
   };
-  osmAddress: string;
-  address: string;
+  addressLine1: string;
+  addressLine2: string;
   osmId: string;
 }
 
@@ -171,12 +171,16 @@ export const addressSchema = new Schema(
       street: field({ type: String, label: 'Street', optional: true }),
       other: field({ type: String, label: 'Other', optional: true })
     }),
-    osmAddress: field({
+    addressLine1: field({
       type: String,
-      label: 'Open street map address',
+      label: 'Address line 1',
       optional: true
     }),
-    address: field({ type: String, label: 'Address', optional: true }),
+    addressLine2: field({
+      type: String,
+      label: 'Address line 2',
+      optional: true
+    }),
     osmId: field({ type: String, label: 'Osm id', optional: true }),
     locationPoint: {
       type: {

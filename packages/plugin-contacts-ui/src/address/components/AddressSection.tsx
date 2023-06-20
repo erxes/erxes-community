@@ -9,6 +9,9 @@ import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import { Alert } from '@erxes/ui/src/utils';
 import EditForm from './EditForm';
+import { Label } from '@erxes/ui/src/components/form/styles';
+import EmptyState from '@erxes/ui/src/components/EmptyState';
+import { ButtonRelated } from '@erxes/ui/src/styles/main';
 
 export type Props = {
   _id: string;
@@ -23,31 +26,44 @@ export default function Component(props: Props) {
     props.addresses || []
   );
 
-  const [userLocation, setUserLocation] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation({ lat: latitude, lng: longitude });
-        },
-        error => {
-          setUserLocation({ lat: 0, lng: 0 });
-        }
-      );
-    } else {
-      setUserLocation({ lat: 0, lng: 0 });
-    }
-  }, [setAddresses]);
+  const onFormSave = (updatedAddresses: IAddress[]) => {
+    setAddresses(updatedAddresses);
+    props.save(updatedAddresses);
+  };
 
   const renderBody = () => {
-    const center = addresses[0] && addresses[0];
+    if (addresses.length === 0) {
+      const addTrigger = (
+        <ButtonRelated>
+          <span>{__('Add address')}</span>
+        </ButtonRelated>
+      );
+
+      const quickButton = (
+        <ModalTrigger
+          title="Add new address"
+          trigger={addTrigger}
+          size="xl"
+          content={manageContent}
+        />
+      );
+
+      return (
+        <>
+          <EmptyState
+            text={__('No address')}
+            size={'small'}
+            icon={'building'}
+          />
+          {quickButton}
+        </>
+      );
+    }
 
     const markers = addresses.map(address => {
       return {
         position: { lat: address.lat, lng: address.lng },
-        name: address.osmAddress + '\r\n' + address.address,
+        name: `${address.addressLine1} \r\n ${address.addressLine2}`,
         selected: address.isPrimary
       };
     });
@@ -57,7 +73,6 @@ export default function Component(props: Props) {
       width: '100%',
       height: '300px',
       zoom: 15,
-      center,
       markers,
       fitBounds: true,
       editable: false
@@ -68,9 +83,8 @@ export default function Component(props: Props) {
 
   const manageContent = formProps => (
     <EditForm
-      userLocation={userLocation}
       addresses={addresses}
-      onSave={props.save}
+      onSave={onFormSave}
       closeModal={formProps.closeModal}
     />
   );
@@ -93,7 +107,7 @@ export default function Component(props: Props) {
   return (
     <Box
       title={__('Address')}
-      extraButtons={userLocation && extraButtons}
+      extraButtons={extraButtons}
       isOpen={true}
       name="address"
     >

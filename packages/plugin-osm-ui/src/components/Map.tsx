@@ -39,6 +39,10 @@ const Map = (props: Props) => {
   useEffect(() => {
     if (props.center) {
       setCenter(props.center);
+
+      if (mapRef && mapRef.current) {
+        mapRef.current.setView(props.center, props.zoom || 10);
+      }
     }
 
     if (props.markers) {

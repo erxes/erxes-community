@@ -8,15 +8,15 @@ import List from './List';
 import { AddressDetailWrapper } from '../styles';
 
 type Props = {
-  userLocation?: any;
   addresses: IAddress[];
   closeModal: () => void;
   onSave: (addresses: IAddress[]) => void;
 };
 
 const AddressesEdit = (props: Props) => {
-  const { closeModal, userLocation } = props;
+  const { closeModal } = props;
   const [addresses, setAddresses] = useState(props.addresses || []);
+  const [center, setCenter] = useState({ lat: 0, lng: 0 });
 
   const primary = useMemo(() => addresses.find(address => address.isPrimary), [
     addresses
@@ -47,10 +47,10 @@ const AddressesEdit = (props: Props) => {
 
   const onAddNew = () => {
     const newAddress: any = {
-      osmAddress: 'move pin to set address',
+      addressLine1: 'move pin to set address',
       osmId: 'temp',
-      lat: userLocation?.lat || 0,
-      lng: userLocation?.lng || 0,
+      lat: center.lat,
+      lng: center.lng,
       detail: {} as any,
       isPrimary: false
     };
@@ -80,7 +80,7 @@ const AddressesEdit = (props: Props) => {
           suburb: address.suburb,
           other: address.other
         };
-        updatedAddress.osmAddress = data.display_name;
+        updatedAddress.addressLine1 = data.display_name;
         updatedAddress.osmId = data.osm_id;
         updatedAddress.lat = lat;
         updatedAddress.lng = lng;
@@ -99,18 +99,11 @@ const AddressesEdit = (props: Props) => {
       });
   };
 
-  React.useEffect(() => {
-    console.log('useEffect', currentAddress);
-  }, []);
-
   const addressDetail = () => {
     const getCenter = () => {
-      console.log(currentAddress?.osmId, 'currentAddress');
-      console.log(userLocation, 'userLocation');
       if (currentAddress) {
         return { lat: currentAddress.lat, lng: currentAddress.lng };
       }
-      return { lat: userLocation.lat, lng: userLocation.lng };
     };
 
     const onChangeMarker = (marker: any) => {
@@ -127,6 +120,11 @@ const AddressesEdit = (props: Props) => {
       reverseGeocode({ ...marker.position });
     };
 
+    const onChangeCenter = (position: any) => {
+      console.log('onChangeCenter', position);
+      setCenter({ lat: position.lat, lng: position.lng });
+    };
+
     const markers: any = [];
 
     if (currentAddress) {
@@ -136,8 +134,6 @@ const AddressesEdit = (props: Props) => {
       };
     }
 
-    console.log('center ', getCenter());
-
     const mapProps = {
       id: `contactAddressDetail`,
       width: '100%',
@@ -146,7 +142,8 @@ const AddressesEdit = (props: Props) => {
       center: getCenter(),
       markers,
       editable: true,
-      onChangeMarker
+      onChangeMarker,
+      onChangeCenter
     };
 
     return (
@@ -159,8 +156,8 @@ const AddressesEdit = (props: Props) => {
               <ControlLabel>{__('Address')}</ControlLabel>
               <p>{__('Address from Map')}</p>
               <FormControl
-                name="osmAddress"
-                value={currentAddress?.osmAddress || ''}
+                name="addressLine1"
+                value={currentAddress?.addressLine1 || ''}
                 disabled={true}
               />
             </Formgroup>
@@ -170,12 +167,12 @@ const AddressesEdit = (props: Props) => {
               <p>{__('house number, door number etc.')}</p>
               <FormControl
                 name="address"
-                value={currentAddress?.address || ''}
+                value={currentAddress?.addressLine2 || ''}
                 placeholder="Country, City, Street, House Number, Zip Code etc."
                 onChange={(e: any) => {
                   setCurrentAddress({
                     ...currentAddress,
-                    address: e.target.value
+                    addressLine2: e.target.value
                   });
 
                   setAddresses(
