@@ -51,6 +51,9 @@ const webbuilderReplacer = async args => {
 
     if (pagename === 'product-detail') {
       const product = await models.Products.findOne({ _id: query.productId });
+      const category =
+        (await models.ProductCategories.findOne({ _id: product.categoryId })) ||
+        {};
       const config = await models.Configs.findOne({}).lean();
       const unitPrice = (product.prices || {})[config.token] || 0;
 
@@ -68,6 +71,7 @@ const webbuilderReplacer = async args => {
             ? 'http://localhost:4000/read-file?key=' + product.attachment.url
             : ''
         );
+        result = result.replace(/{{ product.categoryName }}/g, category.name);
       }
     }
   }
