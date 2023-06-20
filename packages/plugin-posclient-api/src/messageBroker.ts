@@ -162,6 +162,8 @@ const webbuilderReplacer = async args => {
 
             ttotalAmount += totalAmount;
 
+            console.log('============', ttotalAmount)
+
             newRow = newRow.replace('{{ item.totalAmount }}', totalAmount);
 
             newRow = newRow.replace('{{ item.productImgUrl }}', 'http://localhost:4000/read-file?key=' + item.productImgUrl || '');
@@ -170,6 +172,8 @@ const webbuilderReplacer = async args => {
           }
 
           let html = $('#checkout-order-item-list-container').html();
+
+          console.log('+++++++++++++++', ttotalAmount)
 
           html = html.replace('{{ ttotalAmount }}', ttotalAmount);
 
