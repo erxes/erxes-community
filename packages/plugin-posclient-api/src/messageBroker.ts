@@ -193,7 +193,7 @@ const webbuilderReplacer = async args => {
           }\`;
 
           fetchGraph({
-            query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice } }',
+            query: 'query($categoryId: String) { poscProducts(categoryId: $categoryId) { _id, name, attachment { url }, unitPrice, description } }',
             variables: {
               categoryId,
             },
@@ -205,6 +205,7 @@ const webbuilderReplacer = async args => {
                 temp = temp.replace('{{ product._id }}', product._id);
                 temp = temp.replace('{{ product.image }}', 'http://localhost:4000/read-file?key=' + (product.attachment ? product.attachment.url : ''));
                 temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
+                temp = temp.replace('{{ product.description }}', product.description);
                 rows+= temp;
               }
 
