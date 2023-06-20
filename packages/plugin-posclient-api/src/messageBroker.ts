@@ -218,7 +218,7 @@ const webbuilderReplacer = async args => {
                 temp = temp.replace('{{ product._id }}', product._id);
                 temp = temp.replace('{{ product.image }}', 'http://localhost:4000/read-file?key=' + (product.attachment ? product.attachment.url : ''));
                 temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
-                temp = temp.replace('{{ product.description }}', product.description);
+                temp = temp.replace('{{ product.desc }}', product.description);
                 rows+= temp;
               }
 
