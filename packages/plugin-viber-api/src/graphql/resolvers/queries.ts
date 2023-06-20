@@ -16,7 +16,7 @@ const queries = {
       { erxesApiId: conversationId },
       '_id'
     );
-    // : DocumentQuery<IConversationMessages[], IConversationMessages, {}>
+
     if (conversation) {
       const messages = ConversationMessages.find({
         conversationId: conversation._id
