@@ -18,9 +18,12 @@ export class ViberAPI {
   }
 
   async registerWebhook(): Promise<any> {
+    // used for local testing
+    const localDomain: string = 'https://7d38-202-21-104-34.jp.ngrok.io';
+
     const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
-      : 'https://556a-202-21-104-34.jp.ngrok.io';
+      : localDomain;
 
     const url: string = `${domain}/pl:viber/webhook/${this.integrationId}`;
 
@@ -59,13 +62,10 @@ export class ViberAPI {
   }
 
   async sendMessage(message): Promise<any> {
-    console.log('sendMessage');
     const conversation: IConversation | null = await Conversations.findOne(
       { erxesApiId: message.conversationId },
       { senderId: 1 }
     );
-
-    console.log('conversation', conversation);
 
     if (!conversation) {
       throw new Error('conversation not found');
