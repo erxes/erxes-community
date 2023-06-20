@@ -106,9 +106,11 @@ const timeclockMutations = {
       timeclock = await models.Timeclocks.createTimeClock({
         shiftStart: new Date(),
         shiftActive: true,
-        userId: userId ? `${userId}` : user._id,
+        userId: getUserId,
         branchName: getBranchName,
-        deviceType: `${deviceType}`
+        deviceType,
+        inDevice: getBranchName,
+        inDeviceType: deviceType
       });
     } else {
       throw new Error('User not in the coordinate');
@@ -143,6 +145,8 @@ const timeclockMutations = {
     const userInfo = await findUser(subdomain, getUserId);
     const branches = await findBranches(subdomain, userInfo.branchIds);
 
+    let outDevice;
+
     for (const branch of branches) {
       // convert into radians
       const branchLong = (branch.coordinate.longitude * Math.PI) / 180;
@@ -166,6 +170,7 @@ const timeclockMutations = {
       // if user's coordinate is within the radius
       if (dist * 1000 <= branch.radius) {
         insideCoordinate = true;
+        outDevice = branch.title;
       }
     }
 
@@ -180,6 +185,8 @@ const timeclockMutations = {
         shiftEnd: new Date(),
         shiftActive: false,
         deviceType: getShiftStartDeviceType + ' x ' + deviceType,
+        outDeviceType: deviceType,
+        outDevice,
         userId: getUserId,
         ...doc
       });
@@ -289,7 +296,8 @@ const timeclockMutations = {
             const schedule = await models.Schedules.createSchedule({
               userId: shiftRequest.userId,
               solved: true,
-              status: 'Approved'
+              status: 'Approved',
+              createdByRequest: true
             });
 
             const scheduleShiftsWriteOps: any[] = [];
@@ -360,11 +368,13 @@ const timeclockMutations = {
             return;
           }
 
+          //  shift request - by time
           if (shiftRequest.userId) {
             const newSchedule = await models.Schedules.createSchedule({
               userId: shiftRequest.userId,
               solved: true,
-              status: 'Approved'
+              status: 'Approved',
+              createdByRequest: true
             });
 
             await models.Shifts.createShift({
@@ -728,32 +738,26 @@ const timeclockMutations = {
     });
   },
 
-  createTimeClockFromLog(_root, { userId, timelog }, { models }: IContext) {
+  createTimeClockFromLog(
+    _root,
+    { userId, timelog, inDevice },
+    { models }: IContext
+  ) {
     return models.Timeclocks.createTimeClock({
       shiftStart: timelog,
       userId,
+      inDeviceType: 'log',
+      inDevice,
       shiftActive: true
     });
   },
 
-  async extractAllDataFromMsSQL(
-    _root,
-    { startDate, endDate },
-    { subdomain }: IContext
-  ) {
-    return await connectAndQueryFromMsSql(subdomain, startDate, endDate);
+  async extractAllDataFromMsSQL(_root, params, { subdomain }: IContext) {
+    return connectAndQueryFromMsSql(subdomain, params);
   },
 
-  async extractTimeLogsFromMsSQL(
-    _root,
-    { startDate, endDate },
-    { subdomain }: IContext
-  ) {
-    return await connectAndQueryTimeLogsFromMsSql(
-      subdomain,
-      startDate,
-      endDate
-    );
+  async extractTimeLogsFromMsSQL(_root, params, { subdomain }: IContext) {
+    return connectAndQueryTimeLogsFromMsSql(subdomain, params);
   }
 };
 
