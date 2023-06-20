@@ -137,6 +137,8 @@ const webbuilderReplacer = async args => {
           customerId = Math.random().toString();
 
           setLocalStorageItem('customerId', customerId)
+
+          return customerId;
         };
 
         const getOrderId = () => getLocalStorageItem('posclientOrderId');
