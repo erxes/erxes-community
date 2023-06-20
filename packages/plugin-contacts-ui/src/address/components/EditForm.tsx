@@ -3,40 +3,47 @@ import { ControlLabel, Form, FormControl } from '@erxes/ui/src/components/form';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
 import { IFormProps } from '@erxes/ui/src/types';
 import { __, loadDynamicComponent } from '@erxes/ui/src/utils/core';
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import List from './List';
+import { AddressDetailWrapper } from '../styles';
 
 type Props = {
   userLocation?: any;
   addresses: IAddress[];
   closeModal: () => void;
   onSave: (addresses: IAddress[]) => void;
-  //   renderButton: (props: IButtonMutateProps) => JSX.Element;
-  modal?: boolean;
 };
 
 const AddressesEdit = (props: Props) => {
   const { closeModal, userLocation } = props;
   const [addresses, setAddresses] = useState(props.addresses || []);
 
-  const primary = props.addresses.find(address => address.isPrimary);
+  const primary = useMemo(() => addresses.find(address => address.isPrimary), [
+    addresses
+  ]);
 
   const [currentAddress, setCurrentAddress] = useState<IAddress | undefined>(
     primary ? primary : addresses[0] && addresses[0]
   );
 
   const onChangeAddresses = (updatedAddresses: IAddress[]) => {
-    console.log('onChangeAddresses', updatedAddresses);
+    if (updatedAddresses.length === 0) {
+      setCurrentAddress(undefined);
+    } else {
+      setCurrentAddress(updatedAddresses[0]);
+    }
+
+    setAddresses(updatedAddresses);
   };
 
-  const onSelectRow = (address: IAddress) => {
+  const onSelectRow = useCallback((address: IAddress) => {
     setCurrentAddress(address);
-  };
+  }, []);
 
-  const submit = () => {
-    console.log('submit');
+  const submit = useCallback(() => {
     props.onSave(addresses);
-  };
+    closeModal();
+  }, [addresses]);
 
   const onAddNew = () => {
     const newAddress: any = {
@@ -48,15 +55,11 @@ const AddressesEdit = (props: Props) => {
       isPrimary: false
     };
 
-    console.log('newAddress', newAddress);
-
     setAddresses([...addresses, newAddress]);
     setCurrentAddress(newAddress);
   };
 
   const reverseGeocode = ({ lat, lng }) => {
-    console.log('reverseGeocode', lat, lng);
-    console.log('currentAddress', currentAddress);
     if (!currentAddress) {
       return;
     }
@@ -66,7 +69,6 @@ const AddressesEdit = (props: Props) => {
       .then(response => response.json())
       .then(data => {
         const { address } = data;
-        // console.log('currentAddress', currentAddress);
         const previousOsmId = currentAddress.osmId;
         const updatedAddress = { ...currentAddress };
         const detail = {
@@ -88,28 +90,23 @@ const AddressesEdit = (props: Props) => {
 
         setAddresses(
           addresses.map(a => {
-            console.log('a.osmId', a.osmId);
-            // console.log('previousOsmId', previousOsmId);
             if (a.osmId === previousOsmId) {
-              // console.log('updatedAddress', updatedAddress);
-              console.log('new address');
               return updatedAddress;
             }
-            console.log('old address');
             return a;
           })
         );
-
-        // console.log('addressessssssssssss', addresses);
       });
   };
 
   React.useEffect(() => {
-    console.log('useEffect', addresses);
-  }, [addresses]);
+    console.log('useEffect', currentAddress);
+  }, []);
 
   const addressDetail = () => {
     const getCenter = () => {
+      console.log(currentAddress?.osmId, 'currentAddress');
+      console.log(userLocation, 'userLocation');
       if (currentAddress) {
         return { lat: currentAddress.lat, lng: currentAddress.lng };
       }
@@ -117,7 +114,6 @@ const AddressesEdit = (props: Props) => {
     };
 
     const onChangeMarker = (marker: any) => {
-      console.log('onChangeMarker', marker);
       if (!currentAddress) {
         return;
       }
@@ -140,6 +136,8 @@ const AddressesEdit = (props: Props) => {
       };
     }
 
+    console.log('center ', getCenter());
+
     const mapProps = {
       id: `contactAddressDetail`,
       width: '100%',
@@ -148,8 +146,6 @@ const AddressesEdit = (props: Props) => {
       center: getCenter(),
       markers,
       editable: true,
-      autoCenter: true,
-      loading: !props.userLocation,
       onChangeMarker
     };
 
@@ -230,9 +226,8 @@ const AddressesEdit = (props: Props) => {
   };
 
   const renderContent = (formProps: IFormProps) => {
-    console.log('renderContent', addresses);
     return (
-      <div style={{ display: 'flex' }}>
+      <AddressDetailWrapper>
         <div style={{ width: '40%' }}>
           <List
             onAddNew={onAddNew}
@@ -245,7 +240,7 @@ const AddressesEdit = (props: Props) => {
           />
         </div>
         <div style={{ width: '60%' }}>{addressDetail()}</div>
-      </div>
+      </AddressDetailWrapper>
     );
   };
 

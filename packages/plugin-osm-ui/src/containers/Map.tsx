@@ -17,7 +17,6 @@ type Props = {
 };
 
 const Container = (props: Props) => {
-  console.log('MapContainer', props);
   return <Map {...props} />;
 };
 

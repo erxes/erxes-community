@@ -19,7 +19,7 @@ type Props = {
   zoom?: number;
   markers?: any[];
   center?: Coordinate;
-  autoCenter?: boolean;
+  fitBounds?: boolean;
   editable?: boolean;
   loading?: boolean;
 
@@ -29,7 +29,6 @@ type Props = {
 };
 
 const Map = (props: Props) => {
-  console.log('Map', props);
   const { id, zoom, width = '100%', height = '100%' } = props;
   const [markers, setMarkers] = React.useState<any[]>(props.markers || []);
   const [center, setCenter] = useState(props.center);
@@ -42,19 +41,18 @@ const Map = (props: Props) => {
       setCenter(props.center);
     }
 
-    if (props.markers && isReady) {
+    if (props.markers) {
       setMarkers(props.markers);
+    }
+
+    if (isReady) {
       loadMarkers();
     }
 
-    if (props.autoCenter) {
-      autoCenter();
+    if (props.fitBounds) {
+      fitBounds();
     }
-
-    // if (isReady) {
-    //   loadMarkers();
-    // }
-  }, [isReady, props.center, props.markers]);
+  }, [isReady, props.center, props.markers, markers]);
 
   const eventHandlers = {
     dragend: e => {
@@ -81,14 +79,11 @@ const Map = (props: Props) => {
         marker.position = { lat, lng };
 
         props.onChangeMarker(marker, currentMarkerIndex);
-        // console.log('onChangeMarker', index, marker);
       }
-
-      // const index = markers.findIndex((marker) => marker.id === e.target.options.id);
     }
   };
 
-  const autoCenter = () => {
+  const fitBounds = () => {
     let lat = 0;
     let lng = 0;
 
@@ -112,8 +107,6 @@ const Map = (props: Props) => {
         lat = 0;
         lng = 0;
       }
-
-      // console.log('center default', { lat, lng });
       return;
     }
 
@@ -130,23 +123,15 @@ const Map = (props: Props) => {
       return;
     }
 
-    for (const marker of markers) {
-      lat += marker.position.lat;
-      lng += marker.position.lng;
-    }
-
-    lat /= markers.length;
-    lng /= markers.length;
-
-    setCenter({ lat, lng });
-
     if (mapRef && mapRef.current) {
-      mapRef.current.setView([lat, lng], props.zoom || 10);
+      const bounds = Leaflet.latLngBounds(
+        markerRefs.current.map(m => m.getLatLng())
+      );
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
   };
 
   const loadMarkers = () => {
-    console.log('loadMarkers');
     if (mapRef && mapRef.current) {
       mapRef.current.eachLayer(layer => {
         if (layer instanceof Leaflet.Marker) {
@@ -156,9 +141,8 @@ const Map = (props: Props) => {
     }
 
     markerRefs.current = [];
-    console.log('prev markers cleared', markers);
+
     for (const marker of markers) {
-      console.log('marker', marker);
       const iconAttrs: any = {
         shadowUrl:
           'https://erxesmn.s3.amazonaws.com/openstreetmap/leaflet-markers/marker-shadow.png',
@@ -176,7 +160,8 @@ const Map = (props: Props) => {
 
       const myMarker = new Leaflet.Marker(marker.position, {
         draggable: props.editable,
-        icon: defaultIcon
+        icon: defaultIcon,
+        opacity: 0.8
       });
 
       if (marker.selected) {
@@ -185,7 +170,7 @@ const Map = (props: Props) => {
             'https://erxesmn.s3.amazonaws.com/openstreetmap/leaflet-markers/marker-icon-red.png',
           ...iconAttrs
         });
-
+        myMarker.setOpacity(1);
         myMarker.setIcon(selectedIcon);
       }
 
@@ -195,13 +180,8 @@ const Map = (props: Props) => {
 
       myMarker.addTo(mapRef.current);
       markerRefs.current.push(myMarker);
-      console.log('****** ', markerRefs.current);
     }
   };
-
-  // if (!isReady) {
-  //   return <Spinner />;
-  // }
 
   return (
     <MapContainer

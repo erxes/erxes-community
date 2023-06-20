@@ -12,4 +12,11 @@ const AddressDetail = styled.div`
   }
 `;
 
-export { AddressDetail };
+const AddressDetailWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  border-radius: 4px;
+  border: 1px solid ${colors.borderPrimary};
+`;
+
+export { AddressDetail, AddressDetailWrapper };

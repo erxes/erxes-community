@@ -1,14 +1,13 @@
-import { __ } from '@erxes/ui/src/utils/core';
 import React, { useState } from 'react';
 
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
-import { SidebarListItem } from '@erxes/ui-settings/src/styles';
-import ActionButtons from '@erxes/ui/src/components/ActionButtons';
+import { ActionButtons, SidebarListItem } from '@erxes/ui-settings/src/styles';
+// import ActionButtons from '@erxes/ui/src/components/ActionButtons';
 import Button from '@erxes/ui/src/components/Button';
-import Tip from '@erxes/ui/src/components/Tip';
 import LeftSidebar from '@erxes/ui/src/layout/components/Sidebar';
 import { FieldStyle, SidebarList } from '@erxes/ui/src/layout/styles';
 import { TopHeader } from '@erxes/ui/src/styles/main';
+import { Alert, confirm } from '@erxes/ui/src/utils';
 
 type Props = {
   addresses: IAddress[];
@@ -22,7 +21,6 @@ type Props = {
 
 const List = (props: Props) => {
   const [addresses, setAddresses] = useState(props.addresses || []);
-  console.log('list addresses', addresses);
 
   React.useEffect(() => {
     setAddresses(props.addresses);
@@ -36,12 +34,17 @@ const List = (props: Props) => {
     setAddresses(updatedAddresses);
   };
 
-  const onRemove = () => {
-    console.log('remove');
+  const onRemove = (index: number) => {
+    confirm().then(() => {
+      const updatedAddresses = addresses.filter((_address, i) => i !== index);
+      setAddresses(updatedAddresses);
+      props.onChange(updatedAddresses);
+
+      Alert.success('Address removed successfully');
+    });
   };
 
   const renderRow = () => {
-    console.log('renderRow');
     return (addresses || []).map((address, index) => (
       <SidebarListItem
         onClick={() => props.onSelect(address)}
@@ -55,29 +58,17 @@ const List = (props: Props) => {
           </FieldStyle>
         </a>
         <ActionButtons>
-          <Tip text={__('Delete')} placement="bottom">
-            <Button btnStyle="link" onClick={onRemove} icon="cancel-1" />
-          </Tip>
+          <Button
+            btnStyle="link"
+            onClick={() => onRemove(index)}
+            icon="cancel-1"
+          />
         </ActionButtons>
       </SidebarListItem>
     ));
-
-    // return addresses.map((address, index) => (
-    //   <Row
-    //     keaay={address.osmId || Math.random().toString()}
-    //     address={{
-    //       ...address,
-    //       isEditing: address.osmId === props.currentAddress?.osmId
-    //     }}
-    //     index={index}
-    //     onChangeCheck={onChangeStatus}
-    //     onSelect={props.onSelect}
-    //   />
-    // ));
   };
 
   const renderSidebarHeader = () => {
-    console.log('renderSidebarHeader');
     return (
       <TopHeader>
         <Button
@@ -96,8 +87,6 @@ const List = (props: Props) => {
   };
 
   const renderSidebarFooter = () => {
-    console.log('renderSidebarFooter');
-
     return (
       <TopHeader>
         <div style={{ display: 'flex' }}>
@@ -136,20 +125,10 @@ const List = (props: Props) => {
       header={renderSidebarHeader()}
       footer={renderSidebarFooter()}
     >
-      <SidebarList noTextColor={true} noBackground={true} id={'test'}>
+      <SidebarList noTextColor={true} noBackground={true} id={'address'}>
         {renderRow()}
       </SidebarList>
     </LeftSidebar>
-
-    // <Table whiteSpace="nowrap" hover={true}>
-    //   <thead>
-    //     <tr>
-    //       <th>{__('Addresses')}</th>
-    //       <th>{__('Default')}</th>
-    //     </tr>
-    //   </thead>
-    //   <tbody>{renderRow()}</tbody>
-    // </Table>
   );
 };
 

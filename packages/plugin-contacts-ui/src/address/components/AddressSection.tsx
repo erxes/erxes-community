@@ -23,8 +23,6 @@ export default function Component(props: Props) {
     props.addresses || []
   );
 
-  const [isEditing, setIsEditing] = React.useState(false);
-
   const [userLocation, setUserLocation] = React.useState<any>(null);
 
   React.useEffect(() => {
@@ -43,55 +41,13 @@ export default function Component(props: Props) {
     }
   }, [setAddresses]);
 
-  const reverseGeocode = ({ lat, lng, index }) => {
-    // nominatim reverse geocoding
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        const { address } = data;
-        const updatedAddress = addresses[index];
-        updatedAddress.detail = {
-          ...address,
-          countryCode: address.country_code,
-          cityDistrict: address.city_district,
-          houseNumber: address.house_number,
-          road: address.road,
-          suburb: address.suburb,
-          other: address.other
-        };
-        updatedAddress.osmAddress = data.display_name;
-        updatedAddress.osmId = data.osm_id;
-
-        addresses[index] = updatedAddress;
-        setAddresses([...addresses]);
-      });
-  };
-
-  const onChangePrimary = (index: number) => {
-    const updatedAddresses = addresses.map((address, i) => ({
-      ...address,
-      isPrimary: i === index
-    }));
-
-    setAddresses(updatedAddresses);
-  };
-
   const renderBody = () => {
     const center = addresses[0] && addresses[0];
-
-    const onChangeMarker = (index: number, marker: any) => {
-      addresses[index].lat = marker.position.lat;
-      addresses[index].lng = marker.position.lng;
-      setAddresses([...addresses]);
-
-      reverseGeocode({ ...marker.position, index });
-    };
 
     const markers = addresses.map(address => {
       return {
         position: { lat: address.lat, lng: address.lng },
-        name: address.osmAddress,
+        name: address.osmAddress + '\r\n' + address.address,
         selected: address.isPrimary
       };
     });
@@ -103,54 +59,11 @@ export default function Component(props: Props) {
       zoom: 15,
       center,
       markers,
-      autoCenter: true,
-      editable: isEditing,
-      onChangeMarker,
-      loading: !userLocation
+      fitBounds: true,
+      editable: false
     };
 
     return <>{loadDynamicComponent('osMap', mapProps)}</>;
-  };
-
-  const onAddMarker = () => {
-    const newAddress: IAddress = {
-      lat: userLocation.lat,
-      lng: userLocation.lng,
-      isPrimary: addresses.length === 0,
-      detail: {
-        countryCode: '',
-        country: '',
-        postcode: '',
-        city: '',
-        cityDistrict: '',
-        suburb: '',
-        road: '',
-        street: '',
-        building: '',
-        houseNumber: '',
-        other: ''
-      },
-      osmAddress: '',
-      address: '',
-      osmId: `temporary-${Math.random()}`
-    };
-
-    setAddresses([...addresses, newAddress]);
-
-    setIsEditing(true);
-  };
-
-  const onSave = () => {
-    const incomplete = addresses.filter(address =>
-      String(address.osmId).startsWith('temporary')
-    );
-    if (incomplete.length > 0) {
-      return Alert.warning('Please complete all addresses');
-    }
-    setAddresses(addresses);
-    props.save(addresses);
-
-    setIsEditing(false);
   };
 
   const manageContent = formProps => (
@@ -177,30 +90,6 @@ export default function Component(props: Props) {
     </>
   );
 
-  const renderFooter = () => {
-    if (!isEditing) {
-      return null;
-    }
-
-    return (
-      <Sidebar.Footer>
-        <Button
-          btnStyle="simple"
-          onClick={() => {
-            setIsEditing(false);
-            setAddresses(props.addresses);
-          }}
-          icon="times-circle"
-        >
-          Discard
-        </Button>
-        <Button btnStyle="success" icon="check-circle" onClick={onSave}>
-          Save
-        </Button>
-      </Sidebar.Footer>
-    );
-  };
-
   return (
     <Box
       title={__('Address')}
@@ -209,7 +98,6 @@ export default function Component(props: Props) {
       name="address"
     >
       {renderBody()}
-      {renderFooter()}
     </Box>
   );
 }
