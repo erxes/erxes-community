@@ -55,14 +55,15 @@ const webbuilderReplacer = async args => {
       const unitPrice = (product.prices || {})[config.token] || 0;
 
       if (product) {
-        result = result.replace('{{ product.name }}', product.name);
+        result = result.replace(/{{ product._id }}/g, product._id);
+        result = result.replace(/{{ product.name }}/g, product.name);
         result = result.replace(
-          '{{ product.description }}',
+          /{{ product.description }}/g,
           product.description
         );
-        result = result.replace('{{ product.unitPrice }}', unitPrice);
+        result = result.replace(/{{ product.unitPrice }}/g, unitPrice);
         result = result.replace(
-          '{{ product.image }}',
+          /{{ product.image }}/g,
           product.attachment
             ? 'http://localhost:4000/read-file?key=' + product.attachment.url
             : ''
