@@ -71,6 +71,12 @@ const webbuilderReplacer = async args => {
             ? 'http://localhost:4000/read-file?key=' + product.attachment.url
             : ''
         );
+        result = result.replace(
+          /{{ product.attachmentMore }}/g,
+          (product.attachmentMore || []).map(attachment => {
+            return `<img src="http://localhost:4000/read-file?key=${attachment.url}" />`;
+          })
+        );
         result = result.replace(/{{ product.categoryName }}/g, category.name);
       }
     }
