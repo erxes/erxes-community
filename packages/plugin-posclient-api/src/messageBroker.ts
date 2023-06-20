@@ -60,7 +60,10 @@ const webbuilderReplacer = async args => {
       if (product) {
         result = result.replace(/{{ product._id }}/g, product._id);
         result = result.replace(/{{ product.name }}/g, product.name);
-        result = result.replace(/{{ product.desc }}/g, product.description);
+        result = result.replace(
+          /{{ product.description }}/g,
+          product.description
+        );
         result = result.replace(/{{ product.unitPrice }}/g, unitPrice);
         result = result.replace(
           /{{ product.image }}/g,
@@ -211,11 +214,11 @@ const webbuilderReplacer = async args => {
               var rows = '';
 
               for (const product of poscProducts) {
-                var temp = productItemTemplate.replace('{{ product.name }}', product.name);
-                temp = temp.replace('{{ product._id }}', product._id);
-                temp = temp.replace('{{ product.image }}', 'http://localhost:4000/read-file?key=' + (product.attachment ? product.attachment.url : ''));
-                temp = temp.replace('{{ product.unitPrice }}', product.unitPrice);
-                temp = temp.replace('{{ product.desc }}', product.description);
+                var temp = productItemTemplate.replace('{{ productItem.name }}', product.name);
+                temp = temp.replace('{{ productItem._id }}', product._id);
+                temp = temp.replace('{{ productItem.image }}', 'http://localhost:4000/read-file?key=' + (product.attachment ? product.attachment.url : ''));
+                temp = temp.replace('{{ productItem.unitPrice }}', product.unitPrice);
+                temp = temp.replace('{{ productItem.description }}', product.description);
                 rows+= temp;
               }
 
