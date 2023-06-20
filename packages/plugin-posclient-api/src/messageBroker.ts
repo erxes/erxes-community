@@ -159,12 +159,11 @@ const webbuilderReplacer = async args => {
             newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
 
             const totalAmount = item.count * item.unitPrice;
-
             ttotalAmount += totalAmount;
 
             newRow = newRow.replace('{{ item.totalAmount }}', totalAmount);
-
             newRow = newRow.replace('{{ item.productImgUrl }}', 'http://localhost:4000/read-file?key=' + item.productImgUrl || '');
+            newRow = newRow.replace('{{ sitename }}', ${sitename});
 
             $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
           }

@@ -118,8 +118,6 @@ const pageReplacer = async (args: {
 
   let html = pathReplacer(subdomain, page.html, site);
 
-  html = html.replace(/{{ sitename }}/g, site.name);
-
   const pages = await models.Pages.find({
     siteId: site._id,
     name: { $ne: page.name }
