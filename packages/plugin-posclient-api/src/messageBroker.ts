@@ -60,10 +60,7 @@ const webbuilderReplacer = async args => {
       if (product) {
         result = result.replace(/{{ product._id }}/g, product._id);
         result = result.replace(/{{ product.name }}/g, product.name);
-        result = result.replace(
-          /{{ product.description }}/g,
-          product.description
-        );
+        result = result.replace(/{{ product.desc }}/g, product.description);
         result = result.replace(/{{ product.unitPrice }}/g, unitPrice);
         result = result.replace(
           /{{ product.image }}/g,
