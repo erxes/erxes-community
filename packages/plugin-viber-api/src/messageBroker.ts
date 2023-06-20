@@ -8,7 +8,8 @@ import {
   Customers,
   Integrations,
   Conversations,
-  ConversationMessages
+  ConversationMessages,
+  IConversation
 } from './models';
 import { ViberAPI } from './viber/api';
 
@@ -46,7 +47,7 @@ export const initBroker = async cl => {
         await Integrations.deleteOne({ _id: viberIntegration._id });
         return {
           status: 'failed',
-          data: e
+          errorMessage: e
         };
       }
 
@@ -84,12 +85,12 @@ export const initBroker = async cl => {
 
       const conversationIds: string[] = [];
 
-      const conversationIdsKeys = await Conversations.find(
+      const conversationIdsKeys: IConversation[] = await Conversations.find(
         { integrationId: integrationId },
         '_id'
       );
 
-      conversationIdsKeys.map(key => {
+      conversationIdsKeys.map((key: IConversation): void => {
         conversationIds.push(key._id);
       });
 

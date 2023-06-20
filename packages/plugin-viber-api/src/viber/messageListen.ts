@@ -23,21 +23,27 @@ interface IWebhookMessage {
   };
 }
 
+interface ICustomer {
+  inboxIntegrationId: string;
+  contactsId: string | null;
+  viberId: string;
+  name: string;
+  country: string;
+}
+
 const messageListen = async (
   message: IWebhookMessage,
   integrationId: string,
   subdomain: string
 ): Promise<void> => {
-  const customer = await Customers.getOrCreate(
-    {
-      inboxIntegrationId: integrationId,
-      contactsId: null,
-      viberId: message.sender.id,
-      name: message.sender.name,
-      country: message.sender.country
-    },
-    subdomain
-  );
+  const createData: ICustomer = {
+    inboxIntegrationId: integrationId,
+    contactsId: null,
+    viberId: message.sender.id,
+    name: message.sender.name,
+    country: message.sender.country
+  };
+  const customer = await Customers.getOrCreate(createData, subdomain);
 
   let conversation: IConversation | null = await Conversations.findOne({
     senderId: message.sender.id,

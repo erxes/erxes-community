@@ -1,4 +1,4 @@
-const messages = `
+const messages: string = `
 query viberConversationMessages(
   $conversationId: String!
   $skip: Int
@@ -60,13 +60,13 @@ query viberConversationMessages(
 }
 `;
 
-const accounts = `
+const accounts: string = `
   query viberAccounts {
     viberAccounts 
   }
 `;
 
-const viberIntegrationDetail = `
+const viberIntegrationDetail: string = `
   query viberIntegrationDetail($integrationId: String!) {
     viberIntegrationDetail(integrationId: $integrationId) {
       _id

@@ -1,11 +1,10 @@
+import React from 'react';
 import { Alert, getEnv, withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
-
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
 import Info from '@erxes/ui/src/components/Info';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import React from 'react';
 import Accounts from '../components/Accounts';
 import { mutations, queries } from '../graphql';
 

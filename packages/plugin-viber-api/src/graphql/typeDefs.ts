@@ -1,7 +1,8 @@
 import { gql } from 'apollo-server-express';
 import { attachmentType } from '@erxes/api-utils/src/commonTypeDefs';
+import { DocumentNode } from 'graphql';
 
-const types = `
+const types: string = `
   ${attachmentType}
 
   input CreateInput {
@@ -67,7 +68,7 @@ const types = `
   }
 `;
 
-const queries = `
+const queries: string = `
   viberReadSentMessage: [SentMessage]
   viberConversationDetail(conversationId: String!): [ViberMessageDetail]
   viberConversationMessages(conversationId: String! getFirst: Boolean, skip: Int, limit: Int): [ViberMessageResponse]
@@ -75,12 +76,12 @@ const queries = `
   viberIntegrationDetail(integrationId: String!): ViberIntegrationDetailResponse
 `;
 
-const mutations = `
+const mutations: string = `
   viberCreate(create: CreateInput): JSON
   viberIntegrationUpdate(update: UpdateInput): JSON
 `;
 
-const typeDefs = gql`
+const typeDefs: DocumentNode = gql`
   scalar JSON
   scalar Date
 

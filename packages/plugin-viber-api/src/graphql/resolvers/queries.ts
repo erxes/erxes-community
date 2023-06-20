@@ -2,16 +2,21 @@ import { IContext } from '../../connectionResolver';
 import {
   Conversations,
   ConversationMessages,
-  Integrations
+  Integrations,
+  IConversationMessages
 } from '../../models';
 
 const queries = {
-  async viberConversationDetail(_root, { conversationId }, context: IContext) {
+  async viberConversationDetail(
+    _root,
+    { conversationId },
+    context: IContext
+  ): Promise<IConversationMessages[]> {
     let conversation: any = await Conversations.findOne(
       { erxesApiId: conversationId },
       '_id'
     );
-
+    // : DocumentQuery<IConversationMessages[], IConversationMessages, {}>
     if (conversation) {
       const messages = ConversationMessages.find({
         conversationId: conversation._id
@@ -22,8 +27,12 @@ const queries = {
     return [];
   },
 
-  async viberConversationMessages(_root, args: any, context: IContext) {
-    const query = { conversationId: '' };
+  async viberConversationMessages(
+    _root,
+    args: any,
+    context: IContext
+  ): Promise<any[]> {
+    const query: { conversationId: string } = { conversationId: '' };
     const { conversationId, limit, skip, getFirst } = args;
 
     let messages: any[] = [];
@@ -38,7 +47,9 @@ const queries = {
     }
 
     if (limit) {
-      const sort = getFirst ? { createdAt: 1 } : { createdAt: -1 };
+      const sort: { createdAt: number } = getFirst
+        ? { createdAt: 1 }
+        : { createdAt: -1 };
 
       messages = await ConversationMessages.find(query)
         .sort(sort)
@@ -78,7 +89,7 @@ const queries = {
     _root,
     { integrationId }: { integrationId: string },
     context: IContext
-  ) {
+  ): Promise<any> {
     const integration = await Integrations.findOne({ inboxId: integrationId });
     return integration;
   }

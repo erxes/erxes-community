@@ -30,13 +30,9 @@ export default {
 
   postHandlers: [{ path: '/webhook/:integrationId', method: webhookListen }],
 
-  apolloServerContext: async (context, req) => {
-    const subdomain = getSubdomain(req);
-    // const models = await generateModels(subdomain);
-
+  apolloServerContext: async (context, req): Promise<any> => {
+    const subdomain: string = getSubdomain(req);
     context.subdomain = subdomain;
-    // context.models = models;
-
     return context;
   },
 

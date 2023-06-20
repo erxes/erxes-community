@@ -3,7 +3,7 @@ import { sendInboxMessage } from './messageBroker';
 
 interface ICustomer {
   inboxIntegrationId: string;
-  contactsId: string;
+  contactsId: string | null;
   viberId: string;
   name: string;
   country: string;

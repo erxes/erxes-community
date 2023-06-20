@@ -6,16 +6,16 @@ module.exports = {
     "./routes": "./src/routes.tsx",
     "./inboxIntegrationForm": "./src/components/IntegrationForm.tsx",
     "./inboxConversationDetail": "./src/components/ConversationDetail.tsx",
-    './integrationEditForm': './src/components/IntegrationEditForm.tsx',
+    "./integrationEditForm": "./src/components/IntegrationEditForm.tsx",
   },
   routes: {
     url: "http://localhost:3024/remoteEntry.js",
     scope: "viber",
     module: "./routes",
   },
-  inboxDirectMessage:{
-  messagesQuery: {
-    query: `
+  inboxDirectMessage: {
+    messagesQuery: {
+      query: `
         query viberConversationMessages(
           $conversationId: String!
           $skip: Int
@@ -76,22 +76,22 @@ module.exports = {
           }
         }
       `,
-    name: 'viberConversationMessages',
-    integrationKind: 'viber',
-  },
+      name: "viberConversationMessages",
+      integrationKind: "viber",
+    },
 
-  countQuery: {
-    query: `
+    countQuery: {
+      query: `
         query viberConversationMessagesCount($conversationId: String!) {
           viberConversationMessagesCount(conversationId: $conversationId)
         }
       `,
-    name: 'viberConversationMessagesCount',
-    integrationKind: 'viber',
+      name: "viberConversationMessagesCount",
+      integrationKind: "viber",
+    },
   },
-},
   inboxIntegrationForm: "./inboxIntegrationForm",
-  invoiceDetailRightSection: './invoiceDetailRightSection',
+  invoiceDetailRightSection: "./invoiceDetailRightSection",
   integrationEditForm: "./integrationEditForm",
   inboxIntegrations: [
     {
@@ -100,7 +100,7 @@ module.exports = {
       isAvailable: true,
       kind: "viber",
       logo: "/images/integrations/viber.png",
-      createModal: "viber"
+      createModal: "viber",
     },
   ],
 };

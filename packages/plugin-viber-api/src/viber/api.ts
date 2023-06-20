@@ -108,7 +108,7 @@ export class ViberAPI {
     return richText.replace(/<[^>]+>/g, '');
   }
 
-  async getName(integrationId: string) {
+  async getName(integrationId: string): Promise<any> {
     const inboxIntegration = await sendInboxMessage({
       subdomain: this.subdomain,
       action: 'integrations.findOne',
@@ -128,7 +128,7 @@ export class ViberAPI {
     conversation: IConversation,
     plainText: string,
     message: any
-  ) {
+  ): Promise<void> {
     await ConversationMessages.create({
       conversationId: conversation._id,
       createdAt: new Date(),
