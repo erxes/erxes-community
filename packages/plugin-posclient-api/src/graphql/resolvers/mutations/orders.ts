@@ -10,12 +10,12 @@ import { IConfig } from '../../../models/definitions/configs';
 import {
   BILL_TYPES,
   ORDER_ITEM_STATUSES,
-  ORDER_STATUSES
+  ORDER_STATUSES,
+  ORDER_TYPES
 } from '../../../models/definitions/constants';
 import { IPaidAmount } from '../../../models/definitions/orders';
 import { PutData } from '../../../models/PutData';
 import { IContext, IOrderInput } from '../../types';
-import { checkLoyalties } from '../../utils/loyalties';
 import {
   checkOrderAmount,
   checkOrderStatus,
@@ -30,7 +30,6 @@ import {
   validateOrder,
   validateOrderPayment
 } from '../../utils/orderUtils';
-import { checkPricing } from '../../utils/pricing';
 
 interface IPaymentBase {
   billType: string;
@@ -105,9 +104,7 @@ const orderMutations = {
     };
 
     try {
-      let preparedDoc = await prepareOrderDoc(doc, config, models);
-      preparedDoc = await checkLoyalties(subdomain, preparedDoc);
-      preparedDoc = await checkPricing(subdomain, preparedDoc, config);
+      let preparedDoc = await prepareOrderDoc(subdomain, doc, config, models);
 
       const order = await models.Orders.createOrder({
         ...doc,
@@ -169,9 +166,7 @@ const orderMutations = {
 
     await cleanOrderItems(doc._id, doc.items, models);
 
-    let preparedDoc = await prepareOrderDoc(doc, config, models);
-    preparedDoc = await checkLoyalties(subdomain, preparedDoc);
-    preparedDoc = await checkPricing(subdomain, preparedDoc, config);
+    let preparedDoc = await prepareOrderDoc(subdomain, doc, config, models);
 
     preparedDoc.items = await reverseItemStatus(models, preparedDoc.items);
 
@@ -529,6 +524,12 @@ const orderMutations = {
   ) {
     let order = await models.Orders.getOrder(_id);
 
+    if (!ORDER_TYPES.SALES.includes(order.type || '')) {
+      throw new Error(
+        'Зөвхөн борлуулах төрөлтэй захиалгын төлбөрийг төлөх боломжтой'
+      );
+    }
+
     checkOrderStatus(order);
 
     const items = await models.OrderItems.find({
@@ -806,6 +807,73 @@ const orderMutations = {
       },
       isRPC: true
     });
+  },
+
+  async ordersFinish(
+    _root,
+    { _id }: ISettlePaymentParams,
+    { config, models, subdomain }: IContext
+  ) {
+    let order = await models.Orders.getOrder(_id);
+
+    if (!ORDER_TYPES.OUT.includes(order.type || '')) {
+      throw new Error(
+        'Зөвхөн зарлагадах төрөлтэй захиалгыг л шууд хаах боломжтой'
+      );
+    }
+
+    checkOrderStatus(order);
+
+    const items = await models.OrderItems.find({
+      orderId: order._id
+    }).lean();
+
+    await validateOrderPayment(order, { billType: BILL_TYPES.INNER });
+    const now = new Date();
+
+    try {
+      await models.Orders.updateOne(
+        { _id },
+        {
+          $set: {
+            paidDate: now,
+            modifiedAt: now
+          }
+        }
+      );
+
+      order = await models.Orders.getOrder(_id);
+
+      graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          ...order,
+          _id,
+          status: order.status,
+          customerId: order.customerId
+        }
+      });
+
+      try {
+        sendPosMessage({
+          subdomain,
+          action: 'createOrUpdateOrders',
+          data: {
+            posToken: config.token,
+            action: 'makePayment',
+            order,
+            items
+          }
+        });
+      } catch (e) {
+        debugError(`Error occurred while sending data to erxes: ${e.message}`);
+      }
+
+      return;
+    } catch (e) {
+      debugError(e);
+
+      return e;
+    }
   }
 };
 
