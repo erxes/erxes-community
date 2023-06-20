@@ -127,7 +127,18 @@ const webbuilderReplacer = async args => {
           localStorage.setItem("erxes", JSON.stringify(erxesStorage));
         }
 
-        const getCustomerId = () => getLocalStorageItem('customerId') || Math.random().toString();
+        const getCustomerId = () => {
+          let customerId = getLocalStorageItem('customerId');
+
+          if (customerId) {
+            return customerId;
+          }
+
+          customerId = Math.random().toString();
+
+          setLocalStorageItem('customerId', customerId)
+        };
+
         const getOrderId = () => getLocalStorageItem('posclientOrderId');
         const setOrderId = (id) => setLocalStorageItem('posclientOrderId', id);
 
