@@ -63,7 +63,9 @@ const webbuilderReplacer = async args => {
         result = result.replace('{{ product.unitPrice }}', unitPrice);
         result = result.replace(
           '{{ product.image }}',
-          product.attachment ? product.attachment.url : ''
+          product.attachment
+            ? 'http://localhost:4000/read-file?key=' + product.attachment.url
+            : ''
         );
       }
     }
