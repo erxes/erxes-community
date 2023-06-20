@@ -169,7 +169,7 @@ const webbuilderReplacer = async args => {
             $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
           }
 
-          let html = $('#checkout-order-item-list-container');
+          let html = $('#checkout-order-item-list-container').html();
 
           html = html.replace('{{ totalAmount }}', ttotalAmount);
 
