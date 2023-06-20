@@ -163,7 +163,6 @@ const webbuilderReplacer = async args => {
 
             newRow = newRow.replace('{{ item.totalAmount }}', totalAmount);
             newRow = newRow.replace('{{ item.productImgUrl }}', 'http://localhost:4000/read-file?key=' + item.productImgUrl || '');
-            newRow = newRow.replace('{{ sitename }}', ${sitename});
 
             $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
           }
@@ -242,6 +241,8 @@ const webbuilderReplacer = async args => {
                 temp = temp.replace('{{ productItem.image }}', 'http://localhost:4000/read-file?key=' + (product.attachment ? product.attachment.url : ''));
                 temp = temp.replace('{{ productItem.unitPrice }}', product.unitPrice);
                 temp = temp.replace('{{ productItem.description }}', product.description);
+                temp = temp.replace(/{{ sitename }}/g, ${sitename});
+
                 rows+= temp;
               }
 
