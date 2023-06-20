@@ -149,17 +149,31 @@ const webbuilderReplacer = async args => {
         renderOrderItems = () => {
           const firstRow = $('#checkout-order-item-list tbody tr:first').html();
 
+          let ttotalAmount = 0;
+
           for (const item of items) {
             let newRow = firstRow;
 
             newRow = newRow.replace('{{ item.productName }}', item.productName);
             newRow = newRow.replace('{{ item.count }}', item.count);
             newRow = newRow.replace('{{ item.unitPrice }}', item.unitPrice);
-            newRow = newRow.replace('{{ item.totalAmount }}', item.count * item.unitPrice);
+
+            const totalAmount = item.count * item.unitPrice;
+
+            ttotalAmount += totalAmount;
+
+            newRow = newRow.replace('{{ item.totalAmount }}', totalAmount);
+
             newRow = newRow.replace('{{ item.productImgUrl }}', 'http://localhost:4000/read-file?key=' + item.productImgUrl || '');
 
             $('#checkout-order-item-list tbody').append('<tr data-product-id="' + item.productId + '">' + newRow + '</tr');
           }
+
+          let html = $('#checkout-order-item-list-container');
+
+          html = html.replace('{{ totalAmount }}', ttotalAmount);
+
+          $('#checkout-order-item-list-container').html(html);
         }
 
         const refreshCounter = () => {
