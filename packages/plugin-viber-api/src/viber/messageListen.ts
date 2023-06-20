@@ -102,7 +102,7 @@ const messageListen = async (
       messageType: message.message.type
     };
 
-    if (message.message.type === 'sticker') {
+    if (['sticker', 'picture'].includes(message.message.type)) {
       messageObj.attachments = [{ type: 'image', url: message.message.media }];
     }
 
