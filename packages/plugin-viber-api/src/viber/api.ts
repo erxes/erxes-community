@@ -4,6 +4,23 @@ import { sendInboxMessage } from '../messageBroker';
 import { IRequestParams } from '@erxes/api-utils/src/requests';
 import { ConversationMessages } from '../models';
 
+interface IAttachment {
+  url: string;
+  name: string;
+  type: string;
+  size: number;
+  duration: number;
+}
+
+interface IMessage {
+  integrationId: string;
+  conversationId: string;
+  content: string;
+  internal: boolean;
+  attachments: IAttachment[];
+  userId: string;
+}
+
 export class ViberAPI {
   private headers: any;
   private subdomain: string;
@@ -19,7 +36,7 @@ export class ViberAPI {
 
   async registerWebhook(): Promise<any> {
     // used for local testing
-    const localDomain: string = 'https://7d38-202-21-104-34.jp.ngrok.io';
+    const localDomain: string = 'https://a2de-202-21-104-34.jp.ngrok.io';
 
     const domain: string = getEnv({ name: 'DOMAIN', subdomain: this.subdomain })
       ? getEnv({ name: 'DOMAIN', subdomain: this.subdomain }) + '/gateway'
@@ -61,7 +78,7 @@ export class ViberAPI {
     }
   }
 
-  async sendMessage(message): Promise<any> {
+  async sendMessage(message: IMessage): Promise<any> {
     const conversation: IConversation | null = await Conversations.findOne(
       { erxesApiId: message.conversationId },
       { senderId: 1 }
@@ -73,30 +90,77 @@ export class ViberAPI {
 
     const name = await this.getName(message.integrationId);
     const plainText: string = this.convertRichTextToPlainText(message.content);
-
-    const requestPayload: IRequestParams = {
+    const commonReqestParams = {
       method: 'POST',
       headers: this.headers,
-      url: 'https://chatapi.viber.com/pa/send_message',
+      url: 'https://chatapi.viber.com/pa/send_message'
+    };
+    const commonBodyParams = {
+      receiver: conversation.senderId,
+      min_api_version: 1,
+      sender: {
+        name,
+        avatar: null
+      },
+      tracking_data: 'tracking data'
+    };
+
+    const messagePayload: IRequestParams = {
+      ...commonReqestParams,
       body: {
-        receiver: conversation.senderId,
-        min_api_version: 1,
-        sender: {
-          name,
-          avatar: null
-        },
-        tracking_data: 'tracking data',
+        ...commonBodyParams,
         type: 'text',
-        text: plainText
+        text: plainText.slice(0, 512)
       }
     };
 
-    const response = await sendRequest(requestPayload);
+    let response: any = {};
 
-    if (response.status !== 0) {
-      if (!conversation) {
-        throw new Error('message not sent');
+    if (plainText.length > 0) {
+      response = await sendRequest(messagePayload);
+      if (response.status !== 0) {
+        if (!conversation) {
+          throw new Error('message not sent');
+        }
       }
+    }
+
+    const sentAttachments: IAttachment[] = [];
+
+    if (message.attachments.length > 0) {
+      for (const attachment of message.attachments) {
+        let attachmentResponse: any = {};
+        if (['image/jpeg', 'image/png'].includes(attachment.type)) {
+          const attachmentPayload: IRequestParams = {
+            ...commonReqestParams,
+            body: {
+              ...commonBodyParams,
+              type: 'picture',
+              text: null,
+              media: `https://office.erxes.io/gateway/read-file?key=${attachment.url}`,
+              thumbnail: `https://office.erxes.io/gateway/read-file?key==${attachment.url}`
+            }
+          };
+          attachmentResponse = await sendRequest(attachmentPayload);
+        } else {
+          const attachmentPayload: IRequestParams = {
+            ...commonReqestParams,
+            body: {
+              ...commonBodyParams,
+              type: 'document',
+              size: attachment.size,
+              media: `https://office.erxes.io/gateway/read-file?key=${attachment.url}`,
+              file_name: attachment.url
+            }
+          };
+          attachmentResponse = await sendRequest(attachmentPayload);
+        }
+
+        if (attachmentResponse.status === 0) {
+          sentAttachments.push(attachment);
+        }
+      }
+      message.attachments = sentAttachments;
     }
 
     this.savetoDatabase(conversation, plainText, message);
@@ -135,7 +199,8 @@ export class ViberAPI {
       userId: message.userId,
       customerId: null,
       content: plainText,
-      messageType: 'text'
+      messageType: 'text',
+      attachments: message.attachments
     });
   }
 }
