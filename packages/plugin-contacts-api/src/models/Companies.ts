@@ -14,7 +14,6 @@ import {
   sendFormsMessage,
   sendInternalNotesMessage
 } from '../messageBroker';
-import { IAddress } from './definitions/customers';
 
 export interface ICompanyModel extends Model<ICompanyDocument> {
   getCompanyName(company: ICompany): string;
@@ -49,10 +48,6 @@ export interface ICompanyModel extends Model<ICompanyDocument> {
     fieldValues: string[][],
     user: any
   ): Promise<string[]>;
-  updateAddresses(
-    _id: string,
-    addresses: IAddress[]
-  ): Promise<ICompanyDocument | null>;
 }
 
 export const loadCompanyClass = (models: IModels, subdomain) => {
@@ -423,26 +418,6 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
       });
 
       return company;
-    }
-
-    public static async updateAddresses(_id: string, addresses: IAddress[]) {
-      const doc = addresses.map((address: IAddress) => {
-        const modifiedDoc: any = { ...address };
-        modifiedDoc.locationPoint = {
-          type: 'Point',
-          coordinates: [address.lng, address.lat]
-        };
-        return modifiedDoc;
-      });
-
-      await models.Companies.updateOne(
-        { _id },
-        {
-          $set: { addresses: doc }
-        }
-      );
-
-      return models.Companies.findOne({ _id });
     }
   }
 

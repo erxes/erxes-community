@@ -54,11 +54,5 @@ export default {
     { subdomain }: IContext
   ) {
     return customFieldsDataByFieldCode(company, subdomain, sendCommonMessage);
-  },
-
-  primaryAddress(company: ICompanyDocument) {
-    const addresses = company.addresses || [];
-    const primary = addresses.find(address => address.isPrimary);
-    return primary || (addresses.length && addresses[0]);
   }
 };

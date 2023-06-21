@@ -1,8 +1,4 @@
-import {
-  isEnabled,
-  loadDynamicComponent,
-  renderFullName
-} from '@erxes/ui/src/utils/core';
+import { isEnabled, renderFullName } from '@erxes/ui/src/utils/core';
 
 import Box from '@erxes/ui/src/components/Box';
 import CompanySection from '@erxes/ui-contacts/src/companies/components/CompanySection';
@@ -20,7 +16,6 @@ import Tip from '@erxes/ui/src/components/Tip';
 import { __ } from 'coreui/utils';
 import colors from '@erxes/ui/src/styles/colors';
 import { pluginsOfCustomerSidebar } from 'coreui/pluginUtils';
-import AddressSection from '../../../address/containers/AddressSection';
 
 type Props = {
   customer: ICustomer;
@@ -79,23 +74,6 @@ export default class RightSidebar extends React.Component<Props> {
     );
   }
 
-  renderAddress = () => {
-    if (!isEnabled('osm')) {
-      return null;
-    }
-
-    const { customer } = this.props;
-    const { addresses = [] } = customer;
-
-    return (
-      <AddressSection
-        _id={customer._id}
-        addresses={addresses}
-        type="customer"
-      />
-    );
-  };
-
   render() {
     const { customer } = this.props;
 
@@ -103,7 +81,6 @@ export default class RightSidebar extends React.Component<Props> {
 
     return (
       <Sidebar>
-        {this.renderAddress()}
         <CompanySection mainType="customer" mainTypeId={customer._id} />
         {isEnabled('cards') && (
           <>
