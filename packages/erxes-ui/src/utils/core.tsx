@@ -532,19 +532,23 @@ export function formatValue(value) {
   return value || '-';
 }
 
-export function numberFormatter(value = '', fixed) {
-  if (
-    fixed &&
-    `${value}`.includes('.') &&
-    `${value}`.split('.')?.[1]?.length > fixed
-  )
-    value = Number(value).toFixed(fixed);
+export function numberFormatter(value, fixed = 0) {
+  if (typeof value !== 'number') {
+    value = parseFloat(value);
+  }
 
-  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  if (fixed && value && value.toString().includes('.')) {
+    value = Number(value).toFixed(fixed);
+  }
+
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export function numberParser(value, fixed) {
-  if (value === '-') return '-';
+  if (value === '-') {
+    return '-';
+  }
+
   if (RegExp('-', 'g').test(value)) {
     value = value.replace(RegExp('-', 'g'), '');
     value = `-${value}`;
@@ -553,7 +557,7 @@ export function numberParser(value, fixed) {
   value = value!.replace(/(,*)/g, '');
 
   if (value?.includes('.')) {
-    var numberValues = value.split('.');
+    const numberValues = value.split('.');
     numberValues[0] = Number(numberValues[0]);
 
     if (fixed && numberValues[1].length > fixed) {
@@ -792,22 +796,4 @@ export const shortStrToDate = (
   if (resultType === 'd') return new Date(intgr);
 
   return intgr;
-};
-
-export const getCurrentPosition = () => {
-  return new Promise((resolve, reject) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const { latitude, longitude } = position.coords;
-          resolve({ latitude, longitude });
-        },
-        error => {
-          reject(error);
-        }
-      );
-    } else {
-      reject('Geolocation is not supported by this browser.');
-    }
-  });
 };

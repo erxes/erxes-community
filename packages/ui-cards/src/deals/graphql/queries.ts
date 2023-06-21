@@ -117,7 +117,6 @@ const deals = `
       limit: $limit,
       ${commonParamDefs}
     ) {
-      order
       products
       unUsedAmount
       amount

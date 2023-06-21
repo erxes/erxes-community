@@ -24,21 +24,21 @@ const invoiceMutations = {
 
     const invoice = await models.Invoices.createInvoice(doc);
 
-    // const logData = {
-    //   type: 'invoice',
-    //   newData: doc,
-    //   object: invoice,
-    //   extraParams: { models }
-    // };
+    const logData = {
+      type: 'invoice',
+      newData: doc,
+      object: invoice,
+      extraParams: { models }
+    };
 
-    // const descriptions = gatherDescriptions(logData);
+    const descriptions = gatherDescriptions(logData);
 
-    // await putCreateLog(
-    //   subdomain,
-    //   messageBroker(),
-    //   { ...descriptions, ...logData },
-    //   user
-    // );
+    await putCreateLog(
+      subdomain,
+      messageBroker(),
+      { ...descriptions, ...logData },
+      user
+    );
 
     return invoice;
   },

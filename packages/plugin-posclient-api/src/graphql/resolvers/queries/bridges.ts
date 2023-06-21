@@ -48,6 +48,7 @@ const bridgesQueries = {
           phone: 1,
           tagIds: 1,
           code: 1,
+          primaryAddress: 1,
           addresses: 1
         }
       },
