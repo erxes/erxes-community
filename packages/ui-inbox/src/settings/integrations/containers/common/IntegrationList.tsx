@@ -109,7 +109,7 @@ const IntegrationListContainer = (props: FinalProps) => {
     { name, brandId, channelIds, data }: IntegrationMutationVariables,
     callback: () => void
   ) => {
-    if (!name && !brandId) {
+    if (!name || !brandId) {
       Alert.error('Name and brand must be chosen');
 
       return;

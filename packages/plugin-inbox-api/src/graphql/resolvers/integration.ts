@@ -11,6 +11,9 @@ export default {
     return models.Integrations.findOne({ _id });
   },
   brand(integration: IIntegrationDocument) {
+    if (!integration.brandId) {
+      return null;
+    }
     return (
       integration.brandId && {
         __typename: 'Brand',
