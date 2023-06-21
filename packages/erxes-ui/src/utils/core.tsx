@@ -532,23 +532,19 @@ export function formatValue(value) {
   return value || '-';
 }
 
-export function numberFormatter(value, fixed = 0) {
-  if (typeof value !== 'number') {
-    value = parseFloat(value);
-  }
-
-  if (fixed && value && value.toString().includes('.')) {
+export function numberFormatter(value = '', fixed) {
+  if (
+    fixed &&
+    `${value}`.includes('.') &&
+    `${value}`.split('.')?.[1]?.length > fixed
+  )
     value = Number(value).toFixed(fixed);
-  }
 
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export function numberParser(value, fixed) {
-  if (value === '-') {
-    return '-';
-  }
-
+  if (value === '-') return '-';
   if (RegExp('-', 'g').test(value)) {
     value = value.replace(RegExp('-', 'g'), '');
     value = `-${value}`;
@@ -557,7 +553,7 @@ export function numberParser(value, fixed) {
   value = value!.replace(/(,*)/g, '');
 
   if (value?.includes('.')) {
-    const numberValues = value.split('.');
+    var numberValues = value.split('.');
     numberValues[0] = Number(numberValues[0]);
 
     if (fixed && numberValues[1].length > fixed) {
