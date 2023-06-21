@@ -89,7 +89,7 @@ export class ViberAPI {
     }
 
     const name = await this.getName(message.integrationId);
-    const plainText: string = this.convertRichTextToPlainText(message.content);
+    const plainText: string = message.content.replace(/<[^>]+>/g, '');
     const commonReqestParams = {
       method: 'POST',
       headers: this.headers,
@@ -158,6 +158,8 @@ export class ViberAPI {
 
         if (attachmentResponse.status === 0) {
           sentAttachments.push(attachment);
+        } else {
+          throw new Error(attachmentResponse.status_message);
         }
       }
       message.attachments = sentAttachments;
@@ -166,10 +168,6 @@ export class ViberAPI {
     this.savetoDatabase(conversation, plainText, message);
 
     return response;
-  }
-
-  convertRichTextToPlainText(richText) {
-    return richText.replace(/<[^>]+>/g, '');
   }
 
   async getName(integrationId: string): Promise<any> {
