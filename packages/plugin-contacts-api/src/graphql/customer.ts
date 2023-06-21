@@ -8,29 +8,28 @@ export const types = (tagsEnabled, inboxEnabled) => `
     status: String!
   }
 
-  type AddressDetail {
-    building: String
-    city: String
-    cityDistrict: String
-    country: String
-    countryCode: String
-    houseNumber: String
-    postcode: String
-    road: String
-    suburb: String
-    street: String
-    other: String 
-  }
-
   type Address {
     lat: Float
     lng: Float
 
     isPrimary: Boolean
-    detail: AddressDetail
-    addressLine1: String
-    addressLine2: String
+   
+    fullAddress: String
+    description: String
+    
+    country: String
+    countryCode: String
+    city: String
+    district: String
+    quarter: String
+    road: String
+    state: String
+    postcode: String
+    houseNumber: String
+
     osmId: String
+    osmType: String
+    boundingbox: [String]
   }
 
 

@@ -32,25 +32,24 @@ export interface IVisitorContactDocument extends IVisitorContact, Document {}
 export interface IAddress {
   lat: number;
   lng: number;
-
   isPrimary?: boolean;
 
-  detail?: {
-    building: string;
-    city: string;
-    cityDistrict: string;
-    country: string;
-    countryCode: string;
-    houseNumber: string;
-    postcode: string;
-    road: string;
-    suburb: string;
-    street: string;
-    other: string;
-  };
-  addressLine1: string;
-  addressLine2: string;
-  osmId: string;
+  fullAddress?: string;
+  description?: string;
+
+  country?: string;
+  countryCode?: string;
+  city?: string;
+  district?: string;
+  quarter?: string;
+  road?: string;
+  state?: string;
+  postcode?: string;
+  houseNumber?: string;
+
+  osmId?: string;
+  osmType?: string;
+  boundingbox?: string[];
 }
 
 export interface ICustomer {
@@ -146,42 +145,42 @@ export const addressSchema = new Schema(
     lng: field({ type: Number, label: 'Longitude', optional: true }),
     isPrimary: field({ type: Boolean, label: 'Is primary', optional: true }),
 
-    detail: field({
-      building: field({ type: String, label: 'Building', optional: true }),
-      city: field({ type: String, label: 'City', optional: true }),
-      cityDistrict: field({
-        type: String,
-        label: 'City district',
-        optional: true
-      }),
-      country: field({ type: String, label: 'Country', optional: true }),
-      countryCode: field({
-        type: String,
-        label: 'Country code',
-        optional: true
-      }),
-      houseNumber: field({
-        type: String,
-        label: 'House number',
-        optional: true
-      }),
-      postcode: field({ type: String, label: 'Postcode', optional: true }),
-      road: field({ type: String, label: 'Road', optional: true }),
-      suburb: field({ type: String, label: 'Suburb', optional: true }),
-      street: field({ type: String, label: 'Street', optional: true }),
-      other: field({ type: String, label: 'Other', optional: true })
-    }),
-    addressLine1: field({
+    fullAddress: field({
       type: String,
-      label: 'Address line 1',
+      label: 'Full address',
       optional: true
     }),
-    addressLine2: field({
+    description: field({
       type: String,
-      label: 'Address line 2',
+      label: 'Description',
       optional: true
     }),
+    country: field({ type: String, label: 'Country', optional: true }),
+    countryCode: field({
+      type: String,
+      label: 'Country code',
+      optional: true
+    }),
+    city: field({ type: String, label: 'City', optional: true }),
+    district: field({ type: String, label: 'District', optional: true }),
+    quarter: field({ type: String, label: 'Quarter', optional: true }),
+    road: field({ type: String, label: 'Road', optional: true }),
+    state: field({ type: String, label: 'State', optional: true }),
+    postcode: field({ type: String, label: 'Postcode', optional: true }),
+    houseNumber: field({
+      type: String,
+      label: 'House number',
+      optional: true
+    }),
+
     osmId: field({ type: String, label: 'Osm id', optional: true }),
+    osmType: field({ type: String, label: 'Osm type', optional: true }),
+    boundingbox: field({
+      type: [String],
+      label: 'Bounding box',
+      optional: true
+    }),
+
     locationPoint: {
       type: {
         type: String,

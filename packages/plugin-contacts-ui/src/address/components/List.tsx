@@ -53,8 +53,8 @@ const List = (props: Props) => {
       >
         <a>
           <FieldStyle>
-            {address.addressLine1}
-            <p>{address.addressLine2}</p>
+            {address.fullAddress}
+            <p>{address.description}</p>
           </FieldStyle>
         </a>
         <ActionButtons>

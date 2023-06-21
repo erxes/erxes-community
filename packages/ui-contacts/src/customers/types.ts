@@ -23,22 +23,22 @@ export interface IAddress {
   lng: number;
   isPrimary?: boolean;
 
-  detail?: {
-    building: string;
-    city: string;
-    cityDistrict: string;
-    country: string;
-    countryCode: string;
-    houseNumber: string;
-    postcode: string;
-    road: string;
-    suburb: string;
-    street: string;
-    other: string;
-  };
-  addressLine1: string;
-  addressLine2: string;
-  osmId: string;
+  fullAddress?: string;
+  description?: string;
+
+  country?: string;
+  countryCode?: string;
+  city?: string;
+  district?: string;
+  quarter?: string;
+  road?: string;
+  state?: string;
+  postcode?: string;
+  houseNumber?: string;
+
+  osmId?: string;
+  osmType?: string;
+  boundingbox?: string[];
 }
 
 export interface ICustomerDoc {

@@ -1,43 +1,58 @@
 import { gql } from 'apollo-server-express';
 
 const types = `
-  type Osm {
-    _id: String!
-    name: String
-    createdAt:Date
-    expiryDate:Date
-    checked:Boolean
-    typeId: String
-  
-    currentType: OsmType
+  type OSMAddress {
+    fullAddress: String
+
+    country: String
+    countryCode: String
+    city: String
+    district: String
+    quarter: String
+    road: String
+    state: String
+    postcode: String
+    houseNumber: String
+
+    lat: Float
+    lng: Float
+
+    osmId: String
+    osmType: String
+    boundingbox: [String]
   }
 
-  type OsmType {
-    _id: String!
-    name: String
+  input Location {
+    lat: Float
+    lng: Float
   }
+
+  enum RouteProfile {
+    car
+    bike
+    foot
+  }
+`;
+
+const routeParams = `
+  start: Location!
+  end: Location!
+
+  profile: RouteProfile
+
+  alternatives: Int
+  steps: Boolean
+  annotations: Boolean
+  geometries: String
+  overview: String
+
 `;
 
 const queries = `
-  osms(typeId: String): [Osm]
-  osmTypes: [OsmType]
-  osmsTotalCount: Int
-`;
+  osmReverseGeoLocation(location: Location!, language: String): OSMAddress
+  osmSearchAddress(query: String!, language: String): [OSMAddress]
 
-const params = `
-  name: String,
-  expiryDate: Date,
-  checked: Boolean,
-  typeId:String
-`;
-
-const mutations = `
-  osmsAdd(${params}): Osm
-  osmsRemove(_id: String!): JSON
-  osmsEdit(_id:String!, ${params}): Osm
-  osmTypesAdd(name:String):OsmType
-  osmTypesRemove(_id: String!):JSON
-  osmTypesEdit(_id: String!, name:String): OsmType
+  osmFindRoutes(${routeParams}): JSON
 `;
 
 const typeDefs = async _serviceDiscovery => {
@@ -49,10 +64,6 @@ const typeDefs = async _serviceDiscovery => {
     
     extend type Query {
       ${queries}
-    }
-    
-    extend type Mutation {
-      ${mutations}
     }
   `;
 };

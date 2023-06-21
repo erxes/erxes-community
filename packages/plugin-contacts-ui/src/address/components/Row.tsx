@@ -45,9 +45,9 @@ class Row extends React.Component<Props> {
       >
         <td>
           {address.isEditing ? (
-            <TextInfo textStyle="primary">{address.addressLine1}</TextInfo>
+            <TextInfo textStyle="primary">{address.fullAddress}</TextInfo>
           ) : (
-            <TextInfo textStyle="simple">{address.addressLine1}</TextInfo>
+            <TextInfo textStyle="simple">{address.fullAddress}</TextInfo>
           )}
         </td>
         <td>

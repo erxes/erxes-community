@@ -8,7 +8,7 @@ import Button from '@erxes/ui/src/components/Button';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
 import { Alert } from '@erxes/ui/src/utils';
-import EditForm from './EditForm';
+import EditForm from '../containers/EditForm';
 import { Label } from '@erxes/ui/src/components/form/styles';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
 import { ButtonRelated } from '@erxes/ui/src/styles/main';
@@ -63,7 +63,7 @@ export default function Component(props: Props) {
     const markers = addresses.map(address => {
       return {
         position: { lat: address.lat, lng: address.lng },
-        name: `${address.addressLine1} \r\n ${address.addressLine2}`,
+        name: `${address.fullAddress} \r\n ${address.description}`,
         selected: address.isPrimary
       };
     });

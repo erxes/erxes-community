@@ -3,12 +3,22 @@ import { ControlLabel, Form, FormControl } from '@erxes/ui/src/components/form';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
 import { IFormProps } from '@erxes/ui/src/types';
 import { __, loadDynamicComponent } from '@erxes/ui/src/utils/core';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import List from './List';
 import { AddressDetailWrapper } from '../styles';
+import Select from 'react-select-plus';
 
 type Props = {
   addresses: IAddress[];
+
+  searchResult: IAddress[];
+  searchLoading: boolean;
+
+  searchAddress: (query: string) => void;
+  reverseGeoJson: (
+    location: { lat: number; lng: number },
+    callback: any
+  ) => void;
   closeModal: () => void;
   onSave: (addresses: IAddress[]) => void;
 };
@@ -18,6 +28,27 @@ const AddressesEdit = (props: Props) => {
   const [addresses, setAddresses] = useState(props.addresses || []);
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
 
+  const [searchValue, setSearchValue] = useState<string>('');
+
+  useEffect(() => {
+    let timeoutId: any = null;
+
+    if (searchValue && searchValue.length > 2) {
+      timeoutId = setTimeout(() => {
+        props.searchAddress(searchValue);
+      }, 1500);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+
+    // if (props.searchResult) {
+    //   console.log('props.searchResult', props.searchResult);
+    //   setSearchResult(props.searchResult);
+    // }
+  }, [searchValue]);
+
   const primary = useMemo(() => addresses.find(address => address.isPrimary), [
     addresses
   ]);
@@ -25,6 +56,10 @@ const AddressesEdit = (props: Props) => {
   const [currentAddress, setCurrentAddress] = useState<IAddress | undefined>(
     primary ? primary : addresses[0] && addresses[0]
   );
+
+  const onSelectAddress = useCallback((value: any) => {
+    console.log('onSelectAddress', value);
+  }, []);
 
   const onChangeAddresses = (updatedAddresses: IAddress[]) => {
     if (updatedAddresses.length === 0) {
@@ -47,11 +82,10 @@ const AddressesEdit = (props: Props) => {
 
   const onAddNew = () => {
     const newAddress: any = {
-      addressLine1: 'move pin to set address',
+      fullAddress: 'move pin to set address',
       osmId: 'temp',
       lat: center.lat,
       lng: center.lng,
-      detail: {} as any,
       isPrimary: false
     };
 
@@ -64,42 +98,58 @@ const AddressesEdit = (props: Props) => {
       return;
     }
 
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        const { address } = data;
-        const previousOsmId = currentAddress.osmId;
-        const updatedAddress = { ...currentAddress };
-        const detail = {
-          ...address,
-          countryCode: address.country_code,
-          cityDistrict: address.city_district,
-          houseNumber: address.house_number,
-          road: address.road,
-          suburb: address.suburb,
-          other: address.other
-        };
-        updatedAddress.addressLine1 = data.display_name;
-        updatedAddress.osmId = data.osm_id;
-        updatedAddress.lat = lat;
-        updatedAddress.lng = lng;
-        updatedAddress.detail = detail;
+    props.reverseGeoJson({ lat, lng }, fetchedAddress => {
+      const previousOsmId = currentAddress.osmId;
+      const updatedAddress = { ...currentAddress };
 
-        setCurrentAddress(updatedAddress);
+      for (const key in fetchedAddress) {
+        if (fetchedAddress.hasOwnProperty(key)) {
+          const value = fetchedAddress[key];
+          if (value) {
+            updatedAddress[key] = value;
+          }
+        }
+      }
 
-        setAddresses(
-          addresses.map(a => {
-            if (a.osmId === previousOsmId) {
-              return updatedAddress;
-            }
-            return a;
-          })
-        );
-      });
+      setCurrentAddress(updatedAddress);
+
+      setAddresses(
+        addresses.map(a => {
+          if (a.osmId === previousOsmId) {
+            return updatedAddress;
+          }
+          return a;
+        })
+      );
+    });
+  };
+
+  const renderSearch = () => {
+    const options = props.searchResult.map(a => ({
+      value: a.osmId,
+      label: a.fullAddress
+    }));
+
+    console.log('options', options);
+
+    return (
+      <Formgroup>
+        <Select
+          placeholder={__('search address')}
+          value={''}
+          defaultValue={''}
+          onChange={onSelectAddress}
+          isLoading={props.searchLoading}
+          onInputChange={setSearchValue}
+          options={options}
+          multi={false}
+        />
+      </Formgroup>
+    );
   };
 
   const addressDetail = () => {
+    console.log('props.searchResult', props.searchResult);
     const getCenter = () => {
       if (currentAddress) {
         return { lat: currentAddress.lat, lng: currentAddress.lng };
@@ -121,7 +171,6 @@ const AddressesEdit = (props: Props) => {
     };
 
     const onChangeCenter = (position: any) => {
-      console.log('onChangeCenter', position);
       setCenter({ lat: position.lat, lng: position.lng });
     };
 
@@ -148,31 +197,31 @@ const AddressesEdit = (props: Props) => {
 
     return (
       <>
+        {renderSearch()}
+
         {loadDynamicComponent('osMap', mapProps)}
 
         {currentAddress && (
           <>
             <Formgroup>
               <ControlLabel>{__('Address')}</ControlLabel>
-              <p>{__('Address from Map')}</p>
               <FormControl
-                name="addressLine1"
-                value={currentAddress?.addressLine1 || ''}
+                name="fullAddress"
+                value={currentAddress?.fullAddress || ''}
                 disabled={true}
               />
             </Formgroup>
 
             <Formgroup>
               <ControlLabel>{__('Address detail')}</ControlLabel>
-              <p>{__('house number, door number etc.')}</p>
               <FormControl
                 name="address"
-                value={currentAddress?.addressLine2 || ''}
-                placeholder="Country, City, Street, House Number, Zip Code etc."
+                value={currentAddress?.description || ''}
+                placeholder=""
                 onChange={(e: any) => {
                   setCurrentAddress({
                     ...currentAddress,
-                    addressLine2: e.target.value
+                    description: e.target.value
                   });
 
                   setAddresses(
@@ -180,7 +229,7 @@ const AddressesEdit = (props: Props) => {
                       if (a.osmId === currentAddress.osmId) {
                         return {
                           ...a,
-                          address: e.target.value
+                          description: e.target.value
                         };
                       }
                       return a;

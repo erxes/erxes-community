@@ -1,6 +1,5 @@
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
-import { Osms } from './models';
 
 let client;
 
@@ -10,8 +9,6 @@ export const initBroker = async cl => {
   const { consumeQueue, consumeRPCQueue } = client;
 
   consumeQueue('osm:send', async ({ data }) => {
-    Osms.send(data);
-
     return {
       status: 'success'
     };
@@ -20,7 +17,7 @@ export const initBroker = async cl => {
   consumeRPCQueue('osm:find', async ({ data }) => {
     return {
       status: 'success',
-      data: await Osms.find({})
+      data: []
     };
   });
 };

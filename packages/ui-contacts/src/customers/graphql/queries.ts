@@ -153,25 +153,27 @@ const customerCounts = `
 `;
 
 const addressFields = `
-  lat
-  lng
-  osmId
-  addressLine1
-  addressLine2
-  isPrimary
-  detail {
-    building
-    city
-    cityDistrict
-    country
-    countryCode
-    houseNumber
-    postcode
-    road
-    suburb
-    street
-    other 
-  }
+lat
+lng
+
+isPrimary
+
+fullAddress
+description
+
+country
+countryCode
+city
+district
+quarter
+road
+state
+postcode
+houseNumber
+
+osmId
+osmType
+boundingbox
 `;
 
 const customerDetail = `
