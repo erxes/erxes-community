@@ -1,8 +1,9 @@
-import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import React from 'react';
-import AddressSection from '../components/AddressSection';
-// import { mutations, queries } from '../../graphql';
+import { gql, useMutation } from '@apollo/client';
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
+
+import React from 'react';
+
+import AddressSection from '../components/AddressSection';
 
 type Props = {
   _id: string;
@@ -26,48 +27,14 @@ const companyAddressMutation = gql`
   }
 `;
 
-const osmAddressFields = `
-  fullAddress
-  city
-  country
-  countryCode
-
-  district
-  houseNumber
-  lat
-  lng
-  osmId
-  osmType
-  postcode
-  quarter
-  road
-  state
-  boundingbox
-`;
-
-const reverseGeoLocationQry = gql`
-query OsmReverseGeoLocation($location: Location!, $language: String) {
-  osmReverseGeoLocation(location: $location, language: $language) {
-    ${osmAddressFields}
-  }
-}
-`;
-
-const searchAddressQry = gql`
-query OsmSearchAddress($query: String!, $language: String) {
-  osmSearchAddress(query: $query, language: $language) {
-    ${osmAddressFields}
-  }
-}
-`;
-
 function Container(props: Props) {
   const { _id } = props;
 
-  const [editMutation] = useMutation(customerAddressMutation);
+  const [editMutation] = useMutation(
+    props.type === 'customer' ? customerAddressMutation : companyAddressMutation
+  );
 
   const editAddresses = (newAddresses: IAddress[]) => {
-    // console.log('editAddresses', addresses);
     editMutation({
       variables: { id: _id, addresses: newAddresses }
     });

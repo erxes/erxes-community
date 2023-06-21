@@ -1,17 +1,14 @@
 import Box from '@erxes/ui/src/components/Box';
 import Icon from '@erxes/ui/src/components/Icon';
 import { __, loadDynamicComponent } from '@erxes/ui/src/utils/core';
+
 import React from 'react';
 
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
-import Button from '@erxes/ui/src/components/Button';
-import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
-import Sidebar from '@erxes/ui/src/layout/components/Sidebar';
-import { Alert } from '@erxes/ui/src/utils';
-import EditForm from '../containers/EditForm';
-import { Label } from '@erxes/ui/src/components/form/styles';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import { ButtonRelated } from '@erxes/ui/src/styles/main';
+import EditForm from '../containers/EditForm';
 
 export type Props = {
   _id: string;
@@ -24,6 +21,10 @@ export default function Component(props: Props) {
   const { _id, type } = props;
   const [addresses, setAddresses] = React.useState<IAddress[]>(
     props.addresses || []
+  );
+
+  const [defaultAddress] = React.useState<IAddress | null>(
+    addresses.find(address => address.isPrimary) || null
   );
 
   const onFormSave = (updatedAddresses: IAddress[]) => {
@@ -78,7 +79,18 @@ export default function Component(props: Props) {
       editable: false
     };
 
-    return <>{loadDynamicComponent('osMap', mapProps)}</>;
+    return (
+      <>
+        {loadDynamicComponent('osMap', mapProps)}
+        {defaultAddress && (
+          <span>
+            {`Default address`}
+            <br />
+            {`${defaultAddress.fullAddress} - ${defaultAddress.description}`}
+          </span>
+        )}
+      </>
+    );
   };
 
   const manageContent = formProps => (

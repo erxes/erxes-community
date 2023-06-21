@@ -1,8 +1,9 @@
-import { gql, useQuery, useLazyQuery } from '@apollo/client';
-import React from 'react';
-import EditForm from '../components/EditForm';
-// import { mutations, queries } from '../../graphql';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { IAddress } from '@erxes/ui-contacts/src/customers/types';
+
+import React from 'react';
+
+import EditForm from '../components/EditForm';
 
 type Props = {
   addresses: IAddress[];
@@ -46,20 +47,9 @@ query OsmSearchAddress($query: String!, $language: String) {
 `;
 
 function Container(props: Props) {
-  //   const participantsQuery = useQuery(gql(queries.participants), {
-  //     variables: { dealId },
-  //     fetchPolicy: 'network-only'
-  //   });
   const [searchValue, setSearchValue] = React.useState('');
 
-  const [
-    reverseGeoLocationQuery,
-    { data: reverseGeoLocationData }
-  ] = useLazyQuery(reverseGeoLocationQry);
-  //   const [
-  //     searchAddressQuery,
-  //     { data: searchAddressData, loading: searchLoading },
-  //   ] = useQuery(searchAddressQry);
+  const [reverseGeoLocationQuery] = useLazyQuery(reverseGeoLocationQry);
 
   const { data, loading, error } = useQuery(searchAddressQry, {
     fetchPolicy: 'network-only',

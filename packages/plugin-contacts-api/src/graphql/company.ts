@@ -122,4 +122,6 @@ export const mutations = `
   companiesEditByField(selector: JSON, doc: JSON): Company
   companiesRemove(companyIds: [String]): [String]
   companiesMerge(companyIds: [String], companyFields: JSON) : Company
+
+  companiesEditAddresses(_id: String!, addresses: [JSON]): Company
 `;

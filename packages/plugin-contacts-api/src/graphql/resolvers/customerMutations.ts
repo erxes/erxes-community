@@ -290,6 +290,7 @@ const customerMutations = {
 
 checkPermission(customerMutations, 'customersAdd', 'customersAdd');
 checkPermission(customerMutations, 'customersEdit', 'customersEdit');
+checkPermission(customerMutations, 'customersEditAddresses', 'customersEdit');
 checkPermission(customerMutations, 'customersEditByField', 'customersEdit');
 checkPermission(customerMutations, 'customersMerge', 'customersMerge');
 checkPermission(customerMutations, 'customersRemove', 'customersRemove');

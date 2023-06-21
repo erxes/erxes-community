@@ -3,31 +3,31 @@ import { ControlLabel, Form, FormControl } from '@erxes/ui/src/components/form';
 import { Formgroup } from '@erxes/ui/src/components/form/styles';
 import { IFormProps } from '@erxes/ui/src/types';
 import { __, loadDynamicComponent } from '@erxes/ui/src/utils/core';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import List from './List';
-import { AddressDetailWrapper } from '../styles';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Select from 'react-select-plus';
+
+import { AddressDetailWrapper } from '../styles';
+import List from './List';
 
 type Props = {
   addresses: IAddress[];
-
   searchResult: IAddress[];
   searchLoading: boolean;
-
   searchAddress: (query: string) => void;
   reverseGeoJson: (
     location: { lat: number; lng: number },
     callback: any
   ) => void;
-  closeModal: () => void;
+
   onSave: (addresses: IAddress[]) => void;
+  closeModal: () => void;
 };
 
 const AddressesEdit = (props: Props) => {
   const { closeModal } = props;
   const [addresses, setAddresses] = useState(props.addresses || []);
   const [center, setCenter] = useState({ lat: 0, lng: 0 });
-
   const [searchValue, setSearchValue] = useState<string>('');
 
   useEffect(() => {
@@ -42,11 +42,6 @@ const AddressesEdit = (props: Props) => {
         clearTimeout(timeoutId);
       };
     }
-
-    // if (props.searchResult) {
-    //   console.log('props.searchResult', props.searchResult);
-    //   setSearchResult(props.searchResult);
-    // }
   }, [searchValue]);
 
   const primary = useMemo(() => addresses.find(address => address.isPrimary), [
@@ -57,9 +52,27 @@ const AddressesEdit = (props: Props) => {
     primary ? primary : addresses[0] && addresses[0]
   );
 
-  const onSelectAddress = useCallback((value: any) => {
-    console.log('onSelectAddress', value);
-  }, []);
+  const onSelectAddress = useCallback(
+    (e: any) => {
+      const { value } = e;
+      const selectedAddress = props.searchResult.find(a => a.osmId === value);
+
+      if (selectedAddress) {
+        if (!currentAddress) {
+          setAddresses([...addresses, selectedAddress]);
+        } else {
+          const prevIndex = addresses.findIndex(
+            a => a.osmId === currentAddress.osmId
+          );
+          const updatedAddresses = [...addresses];
+          updatedAddresses[prevIndex] = selectedAddress;
+          setAddresses(updatedAddresses);
+        }
+        setCurrentAddress(selectedAddress);
+      }
+    },
+    [props.searchResult]
+  );
 
   const onChangeAddresses = (updatedAddresses: IAddress[]) => {
     if (updatedAddresses.length === 0) {
@@ -74,11 +87,6 @@ const AddressesEdit = (props: Props) => {
   const onSelectRow = useCallback((address: IAddress) => {
     setCurrentAddress(address);
   }, []);
-
-  const submit = useCallback(() => {
-    props.onSave(addresses);
-    closeModal();
-  }, [addresses]);
 
   const onAddNew = () => {
     const newAddress: any = {
@@ -124,20 +132,21 @@ const AddressesEdit = (props: Props) => {
     });
   };
 
+  const submit = useCallback(() => {
+    props.onSave(addresses);
+    closeModal();
+  }, [addresses]);
+
   const renderSearch = () => {
     const options = props.searchResult.map(a => ({
       value: a.osmId,
       label: a.fullAddress
     }));
 
-    console.log('options', options);
-
     return (
       <Formgroup>
         <Select
           placeholder={__('search address')}
-          value={''}
-          defaultValue={''}
           onChange={onSelectAddress}
           isLoading={props.searchLoading}
           onInputChange={setSearchValue}
@@ -148,8 +157,7 @@ const AddressesEdit = (props: Props) => {
     );
   };
 
-  const addressDetail = () => {
-    console.log('props.searchResult', props.searchResult);
+  const renderDetail = () => {
     const getCenter = () => {
       if (currentAddress) {
         return { lat: currentAddress.lat, lng: currentAddress.lng };
@@ -285,7 +293,7 @@ const AddressesEdit = (props: Props) => {
             onSave={submit}
           />
         </div>
-        <div style={{ width: '60%' }}>{addressDetail()}</div>
+        <div style={{ width: '60%' }}>{renderDetail()}</div>
       </AddressDetailWrapper>
     );
   };

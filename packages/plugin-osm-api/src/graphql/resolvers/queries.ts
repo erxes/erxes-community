@@ -112,8 +112,8 @@ const convertToOsmAddress = (
   postcode: obj.address.postcode,
   houseNumber: obj.address.house_number,
 
-  lat: lat || obj.lat,
-  lng: lng || obj.lon,
+  lat: Number(lat || obj.lat),
+  lng: Number(lng || obj.lon),
 
   osmId: obj.osm_id,
   osmType: obj.osm_type,
@@ -172,7 +172,7 @@ const osmQueries = {
         throw new Error('Address not found');
       }
 
-      const addresses: IOsmAddress[] = result.map(convertToOsmAddress);
+      const addresses: IOsmAddress[] = result.map(r => convertToOsmAddress(r));
 
       return addresses;
     } catch (err) {

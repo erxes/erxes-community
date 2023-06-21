@@ -26,6 +26,7 @@ type Props = {
   onChangeCenter?: (position: any) => void;
   onChangeZoom?: (zoomLevel: number) => void;
   onChangeMarker?: (marker: any, index?: number) => void;
+  onClickMarker?: (marker: any, index?: number) => void;
 };
 
 const Map = (props: Props) => {
@@ -83,6 +84,25 @@ const Map = (props: Props) => {
         marker.position = { lat, lng };
 
         props.onChangeMarker(marker, currentMarkerIndex);
+      }
+    },
+
+    click: e => {
+      const { lat, lng } = e.latlng;
+
+      if (props.onClickMarker) {
+        const currentMarkerIndex = markerRefs.current.findIndex(
+          m => m._leaflet_id === e.target._leaflet_id
+        );
+
+        if (currentMarkerIndex === -1) {
+          return;
+        }
+
+        const marker = markers[currentMarkerIndex];
+        marker.position = { lat, lng };
+
+        props.onClickMarker(marker, currentMarkerIndex);
       }
     }
   };
@@ -181,6 +201,7 @@ const Map = (props: Props) => {
       myMarker.bindPopup(marker.name);
 
       myMarker.on('dragend', eventHandlers.dragend);
+      myMarker.on('click', eventHandlers.click);
 
       myMarker.addTo(mapRef.current);
       markerRefs.current.push(myMarker);

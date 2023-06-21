@@ -152,7 +152,7 @@ const customerCounts = `
   }
 `;
 
-const addressFields = `
+export const addressFields = `
 lat
 lng
 
