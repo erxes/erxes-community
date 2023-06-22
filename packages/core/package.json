@@ -37,9 +37,10 @@
     "updateUserNames": "node_modules/.bin/ts-node src/commands/updateUserNames.ts"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.46.0",
+    "apollo-datasource-rest": "^0.5.1",
     "apollo-server-core": "^3.6.1",
     "apollo-server-express": "^3.6.1",
-    "apollo-datasource-rest": "^0.5.1",
     "aws-sdk": "^2.151.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.3",

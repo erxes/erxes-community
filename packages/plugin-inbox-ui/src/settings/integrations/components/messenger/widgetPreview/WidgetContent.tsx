@@ -54,9 +54,9 @@ class WidgetContent extends React.Component<Props, { skillResponse?: string }> {
   renderVideoCall() {
     const { showVideoCallRequest, color, activeStep } = this.props;
 
-    if (!showVideoCallRequest || activeStep !== 'default') {
-      return null;
-    }
+    // if (!showVideoCallRequest || activeStep !== 'default') {
+    //   return null;
+    // }
 
     return (
       <VideoCallRequestWrapper color={color}>

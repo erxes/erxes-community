@@ -20,6 +20,7 @@
     "pm2": "./node_modules/pm2/bin/pm2"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.46.0",
     "chalk": "^4.1.0",
     "cli-progress": "^3.8.2",
     "colors": "^1.4.0",
