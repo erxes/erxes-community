@@ -36,7 +36,7 @@ type Props = {
   isReadyToSaveForm: boolean;
   configs: IConfig[];
   emailTemplates?: any[] /*change type*/;
-  afterFormDbSave: (formId: string) => void;
+  afterFormDbSave: (formId: string, callback?: (integrationId) => void) => void;
   save: (params: {
     name: string;
     brandId: string;
@@ -98,7 +98,7 @@ type State = {
 class Lead extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    //ILeadIntegration
+    // ILeadIntegration
     const integration = props.integration || ({} as any);
 
     const { leadData = {} as ILeadData } = integration;
@@ -410,6 +410,8 @@ class Lead extends React.Component<Props, State> {
                   channelIds={channelIds}
                   visibility={visibility}
                   departmentIds={departmentIds}
+                  integrationId={integration && integration._id}
+                  isReadyToSaveForm={this.props.isReadyToSaveForm}
                   onChange={this.onChange}
                 />
               </Step>
