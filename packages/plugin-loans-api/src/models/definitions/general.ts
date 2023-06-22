@@ -15,6 +15,7 @@ export interface IGeneral {
   payDate: Date;
   generalNumber: string;
   amount?: number;
+  periodLockId: string;
   dtl?: IGeneralRow[];
 }
 
@@ -24,7 +25,7 @@ export interface IGeneralDocument extends IGeneral, Document {
   createdBy?: string;
 }
 
-export const transactionSchema = schemaHooksWrapper(
+export const generalSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     contractId: field({
@@ -40,6 +41,12 @@ export const transactionSchema = schemaHooksWrapper(
       index: true
     }),
     transactionId: field({
+      type: String,
+      optional: true,
+      label: 'Contract',
+      index: true
+    }),
+    periodLockId: field({
       type: String,
       optional: true,
       label: 'Contract',
@@ -76,5 +83,5 @@ export const transactionSchema = schemaHooksWrapper(
       index: true
     })
   }),
-  'erxes_transactionSchema'
+  'erxes_generalSchema'
 );

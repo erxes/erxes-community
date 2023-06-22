@@ -2,9 +2,13 @@ import { IModels } from '../../connectionResolver';
 import { CONTRACT_CLASSIFICATION } from '../definitions/constants';
 import { IContractTypeDocument } from '../definitions/contractTypes';
 import { IContractDocument } from '../definitions/contracts';
-import { ITransaction } from '../definitions/transactions';
+import { ITransactionDocument } from '../definitions/transactions';
 
-async function generateFinance(tr: ITransaction, models: IModels) {
+export async function generateFinance(
+  tr: ITransactionDocument,
+  models: IModels,
+  periodLockId: string
+) {
   const contract = await models.Contracts.findOne({ _id: tr.contractId }).lean<
     IContractDocument
   >();
@@ -14,53 +18,51 @@ async function generateFinance(tr: ITransaction, models: IModels) {
   }).lean<IContractTypeDocument>();
   if (!contract) throw new Error('aldaa :p');
 
-  let financeTransaction = fillTransaction(tr, contract);
+  let financeTransaction = fillTransaction(
+    tr,
+    contract,
+    contractType?.config,
+    periodLockId
+  );
 
   return financeTransaction;
 }
 
 function findAccounts(
-  classification: string
+  classification: string,
+  config: any
 ): {
   paymentAccount: string;
   interestAccount: string;
   undueAccount: string;
+  transAccount: string;
   debtAccount: string;
+  insuranceAccount: string;
 } {
   const accounts = {
-    paymentAccount: '1701',
-    interestAccount: '2701',
-    undueAccount: '3701',
-    debtAccount: '4101'
+    paymentAccount: config.normalAccount,
+    interestAccount: config.interestAccount,
+    undueAccount: config.undueAccount,
+    transAccount: config.transAccount,
+    debtAccount: config.debtAccount,
+    insuranceAccount: config.insuranceAccount
   };
 
   switch (classification) {
     case CONTRACT_CLASSIFICATION.EXPIRED:
-      accounts.paymentAccount = '1701';
-      accounts.interestAccount = '2701';
-      accounts.undueAccount = '3701';
-      accounts.debtAccount = '4101';
+      accounts.paymentAccount = config.expiredAccount;
       break;
 
     case CONTRACT_CLASSIFICATION.DOUBTFUL:
-      accounts.paymentAccount = '1701';
-      accounts.interestAccount = '2701';
-      accounts.undueAccount = '3701';
-      accounts.debtAccount = '4101';
+      accounts.paymentAccount = config.doubtfulAccount;
       break;
 
-    case CONTRACT_CLASSIFICATION.NEGATIVE:
-      accounts.paymentAccount = '1701';
-      accounts.interestAccount = '2701';
-      accounts.undueAccount = '3701';
-      accounts.debtAccount = '4101';
+    case CONTRACT_CLASSIFICATION.ABNORMAL:
+      accounts.paymentAccount = config.negativeAccount;
       break;
 
     case CONTRACT_CLASSIFICATION.BAD:
-      accounts.paymentAccount = '1701';
-      accounts.interestAccount = '2701';
-      accounts.undueAccount = '3701';
-      accounts.debtAccount = '4101';
+      accounts.paymentAccount = config.badAccount;
       break;
 
     default:
@@ -70,63 +72,77 @@ function findAccounts(
   return accounts;
 }
 
-function fillTransaction(tr: ITransaction, contract: IContractDocument) {
-  var result: {
-    trDate: Date;
-    ktAmount: number;
-    dtAmount: number;
+function fillTransaction(
+  tr: ITransactionDocument,
+  contract: IContractDocument,
+  config: any,
+  periodLockId: string
+) {
+  var dtl: {
+    amount: number;
     account: string;
-    currency: string;
+    side: 'debit' | 'credit';
   }[] = [];
-  const account = findAccounts(contract.classification);
+
+  const account = findAccounts(contract.classification, config);
+
   if (tr.payment && tr.payment > 0) {
-    result.push({
-      trDate: tr.payDate,
-      ktAmount: tr.payment,
-      dtAmount: 0,
+    dtl.push({
+      amount: tr.payment,
       account: account.paymentAccount,
-      currency: contract.createdBy
+      side: 'debit'
     });
   }
   const interest = (tr.interestEve || 0) + (tr.interestNonce || 0);
   if (interest > 0) {
-    result.push({
-      trDate: tr.payDate,
-      ktAmount: interest,
-      dtAmount: 0,
-      account: account.interestAccount,
-      currency: contract.createdBy
+    dtl.push({
+      amount: interest,
+      side: 'debit',
+      account: account.interestAccount
     });
   }
 
   if (tr.undue && tr.undue > 0) {
-    result.push({
-      trDate: tr.payDate,
-      ktAmount: tr.undue,
-      dtAmount: 0,
-      account: account.undueAccount,
-      currency: contract.createdBy
+    dtl.push({
+      amount: tr.undue,
+      side: 'debit',
+      account: account.undueAccount
     });
   }
 
   if (tr.debt && tr.debt > 0) {
-    result.push({
-      trDate: tr.payDate,
-      ktAmount: tr.debt,
-      dtAmount: 0,
-      account: account.debtAccount,
-      currency: contract.createdBy
+    dtl.push({
+      amount: tr.debt,
+      side: 'debit',
+      account: account.debtAccount
     });
   }
 
-  const debitAccount = '1001';
-  result.push({
-    trDate: tr.payDate,
-    ktAmount: 0,
-    dtAmount: tr.total,
-    account: debitAccount,
-    currency: contract.createdBy
+  if (tr.insurance && tr.insurance > 0) {
+    dtl.push({
+      amount: tr.insurance,
+      side: 'debit',
+      account: account.insuranceAccount
+    });
+  }
+
+  dtl.push({
+    side: 'credit',
+    amount: tr.total,
+    account: account.transAccount
   });
 
-  return result;
+  return {
+    contractId: tr.contractId,
+    customerId: tr.customerId,
+    periodLockId: periodLockId,
+    transactionId: tr._id,
+    description: tr.description,
+    payDate: tr.payDate,
+    generalNumber: `${contract.number}-${new Date(tr.payDate)
+      .toISOString()
+      .slice(0, 10)}`,
+    amount: tr.total,
+    dtl
+  };
 }
