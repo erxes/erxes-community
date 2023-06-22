@@ -16,6 +16,7 @@ export const sendMessageBroker = async (
     | 'contacts'
     | 'products'
     | 'forms'
+    | 'clientportal'
     | 'syncerkhet'
 ): Promise<any> => {
   return sendMessage({
