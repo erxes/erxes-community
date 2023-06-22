@@ -31,12 +31,13 @@ import { __ } from '@erxes/ui/src/utils/core';
 
 type Props = {
   integration?: ILeadIntegration;
+  integrationId?: string;
   loading?: boolean;
   isActionLoading: boolean;
   isReadyToSaveForm: boolean;
   configs: IConfig[];
   emailTemplates?: any[] /*change type*/;
-  afterFormDbSave: (formId: string, callback?: (integrationId) => void) => void;
+  afterFormDbSave: (formId: string) => void;
   save: (params: {
     name: string;
     brandId: string;
@@ -46,6 +47,7 @@ type Props = {
     visibility?: string;
     departmentIds?: string[];
   }) => void;
+  onChildComponentProcessFinish?: () => void;
 };
 
 type State = {
@@ -322,6 +324,7 @@ class Lead extends React.Component<Props, State> {
       departmentIds,
       visibility
     } = this.state;
+    console.log('&&&&&&&&&&&&&&&&&& ', this.props.integrationId);
 
     const { integration = {} as any, emailTemplates, configs } = this.props;
     const leadData = integration && integration.leadData;
@@ -410,9 +413,12 @@ class Lead extends React.Component<Props, State> {
                   channelIds={channelIds}
                   visibility={visibility}
                   departmentIds={departmentIds}
-                  integrationId={integration && integration._id}
+                  integrationId={this.props.integrationId}
                   isReadyToSaveForm={this.props.isReadyToSaveForm}
                   onChange={this.onChange}
+                  onChildComponentProcessFinish={
+                    this.props.onChildComponentProcessFinish
+                  }
                 />
               </Step>
 

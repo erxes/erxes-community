@@ -30,6 +30,8 @@ type Props = {
 type State = {
   isLoading: boolean;
   isReadyToSaveForm: boolean;
+  integrationId?: string;
+  isReadyToClose?: boolean;
   doc?: {
     brandId: string;
     name: string;
@@ -46,6 +48,15 @@ class CreateLeadContainer extends React.Component<Props, State> {
 
     this.state = { isLoading: false, isReadyToSaveForm: false };
   }
+
+  onChildComponentProcessFinish = () => {
+    this.setState({ isReadyToClose: true });
+
+    this.props.history.push({
+      pathname: '/forms',
+      search: `?popUpRefetchList=true&showInstallCode=${this.state.integrationId}`
+    });
+  };
 
   render() {
     const {
@@ -82,12 +93,15 @@ class CreateLeadContainer extends React.Component<Props, State> {
                 integrationsCreateLeadIntegration: { _id }
               }
             }) => {
+              this.setState({ integrationId: _id });
               Alert.success('You successfully added a form');
 
-              history.push({
-                pathname: '/forms',
-                search: `?popUpRefetchList=true&showInstallCode=${_id}`
-              });
+              if (this.state.isReadyToClose) {
+                history.push({
+                  pathname: '/forms',
+                  search: `?popUpRefetchList=true&showInstallCode=${_id}`
+                });
+              }
             }
           )
 
@@ -108,12 +122,14 @@ class CreateLeadContainer extends React.Component<Props, State> {
       fields: [],
       save,
       afterFormDbSave,
+      onChildComponentProcessFinish: this.onChildComponentProcessFinish,
       isActionLoading: this.state.isLoading,
       isReadyToSaveForm: this.state.isReadyToSaveForm,
       emailTemplates: emailTemplatesQuery
         ? emailTemplatesQuery.emailTemplates || []
         : [],
-      configs: configsQuery.configs || []
+      configs: configsQuery.configs || [],
+      integrationId: this.state.integrationId
     };
 
     return <Lead {...updatedProps} />;

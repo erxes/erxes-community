@@ -14,7 +14,7 @@ import Toggle from '@erxes/ui/src/components/Toggle';
 import { IField } from '@erxes/ui/src/types';
 import { loadDynamicComponent } from '@erxes/ui/src/utils/core';
 import { __ } from 'coreui/utils';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import Select from 'react-select-plus';
 
 type Props = {
@@ -46,22 +46,11 @@ type Props = {
   integrationId?: string;
   isReadyToSaveForm?: boolean;
   onFieldEdit?: () => void;
+
+  onChildComponentProcessFinish?: () => void;
 };
 
 const OptionStep = (props: Props) => {
-  const [integrationId, setIntegrationId] = useState(props.integrationId);
-
-  // React.useEffect(() => {
-  //   if (integrationId) {
-  //     return;
-  //   }
-
-  //   props.afterFormDbSave('', (leadIntegrationId) => {
-  //     setIntegrationId(leadIntegrationId);
-  //     setIsSubmitted(true);
-  //   });
-  // }, [integrationId]);
-
   const onChangeFunction = useCallback((key, val) => {
     props.onChange(key, val);
   }, []);
@@ -142,11 +131,16 @@ const OptionStep = (props: Props) => {
       <>
         {loadDynamicComponent('extendFormOptions', {
           contentType: 'inbox:integrations',
-          contentTypeId: integrationId,
-          isSubmitted: props.isReadyToSaveForm,
+          contentTypeId: props.integrationId,
+          isSubmitted: props.integrationId ? true : false,
           description: __(
             "Choose payment methods you'd like to enable on this form"
-          )
+          ),
+          afterSave: () => {
+            if (props.onChildComponentProcessFinish) {
+              props.onChildComponentProcessFinish();
+            }
+          }
         })}
       </>
     );

@@ -74,10 +74,7 @@ class EditLeadContainer extends React.Component<FinalProps, State> {
     const integration =
       integrationDetailQuery.integrationDetail || ({} as ILeadIntegration);
 
-    const afterFormDbSave = (
-      id: string,
-      callback?: (integrationId) => void
-    ) => {
+    const afterFormDbSave = () => {
       if (this.state.doc) {
         const {
           leadData,
@@ -92,7 +89,7 @@ class EditLeadContainer extends React.Component<FinalProps, State> {
         editIntegrationMutation({
           variables: {
             _id: integration._id,
-            formId: id,
+            formId,
             leadData,
             brandId,
             name,
@@ -103,9 +100,6 @@ class EditLeadContainer extends React.Component<FinalProps, State> {
           }
         })
           .then(() => {
-            if (callback) {
-              callback(integration._id);
-            }
             Alert.success('You successfully updated a form');
 
             history.push({

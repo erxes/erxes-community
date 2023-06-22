@@ -13,6 +13,8 @@ type Props = {
   contentType: string;
   contentTypeId?: string;
   isSubmitted?: boolean;
+
+  afterSave?: () => void;
 };
 
 const SelectPaymentsContainer = (props: Props) => {
@@ -56,6 +58,10 @@ const SelectPaymentsContainer = (props: Props) => {
           _id: currentConfig._id,
           paymentIds
         }
+      }).then(() => {
+        if (props.afterSave) {
+          props.afterSave();
+        }
       });
     }
 
@@ -64,6 +70,10 @@ const SelectPaymentsContainer = (props: Props) => {
         contentType: props.contentType,
         contentTypeId: props.contentTypeId,
         paymentIds
+      }
+    }).then(() => {
+      if (props.afterSave) {
+        props.afterSave();
       }
     });
   };

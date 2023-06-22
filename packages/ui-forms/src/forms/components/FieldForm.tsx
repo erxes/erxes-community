@@ -158,6 +158,8 @@ class FieldForm extends React.Component<Props, State> {
 
     const { field } = this.state;
 
+    console.log('field: ', field);
+
     this.props.onSubmit(field);
   };
 
