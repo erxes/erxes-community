@@ -63,7 +63,10 @@ export const PAYMENTS = {
     kind: 'pocket',
     apiUrl: 'https://service.invescore.mn/merchant',
     actions: {
-      invoice: 'invoice'
+      invoice: 'invoice',
+      checkInvoice: 'invoice/check',
+      webhook: 'pg/config',
+      cancel: 'payment-gateway/transaction/cancel'
     },
     handlerMethod: 'GET'
   },
@@ -105,8 +108,10 @@ export const PAYMENT_STATUS = {
   PENDING: 'pending',
   REFUNDED: 'refunded',
   FAILED: 'failed',
+  CANCELLED: 'cancelled',
+  REJECTED: 'rejected',
 
-  ALL: ['paid', 'pending', 'refunded', 'failed']
+  ALL: ['paid', 'pending', 'refunded', 'failed', 'cancelled', 'rejected']
 };
 
 export const PLUGIN_RESOLVERS_META = {

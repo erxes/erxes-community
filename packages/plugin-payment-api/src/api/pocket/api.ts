@@ -1,26 +1,34 @@
+import * as fetch from 'node-fetch';
+import * as QRCode from 'qrcode';
 import { IModels } from '../../connectionResolver';
-import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import redis from '../../redis';
 import { BaseAPI } from '../base';
+import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 import { IPocketInvoice } from '../types';
-import { sendRequest } from '@erxes/api-utils/src/requests';
 
 export const pocketCallbackHandler = async (models: IModels, data: any) => {
-  const { identifier } = data;
+  const { paymentId, invoiceId } = data;
 
-  if (!identifier) {
-    throw new Error('Invoice id is required');
+  if (!paymentId) {
+    throw new Error('Payment id is required');
   }
 
   const invoice = await models.Invoices.getInvoice(
     {
-      identifier
+      'apiResponse.invoiceId': invoiceId,
+      selectedPaymentId: paymentId
     },
     true
   );
 
-  const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
+  const apiResponse: any = invoice.apiResponse;
+
+  for (const key of Object.keys(data)) {
+    apiResponse[key] = data[key];
+  }
+
+  const payment = await models.Payments.getPayment(paymentId);
 
   if (payment.kind !== 'pocket') {
     throw new Error('Payment config type is mismatched');
@@ -39,6 +47,7 @@ export const pocketCallbackHandler = async (models: IModels, data: any) => {
       {
         $set: {
           status,
+          apiResponse,
           resolvedAt: new Date()
         }
       }
@@ -70,17 +79,13 @@ export class PocketAPI extends BaseAPI {
     this.pocketMerchant = config.pocketMerchant;
     this.pocketClientId = config.pocketClientId;
     this.pocketClientSecret = config.pocketClientSecret;
+
     this.domain = domain;
     this.apiUrl = PAYMENTS.pocket.apiUrl;
   }
 
   async getHeaders() {
-    const { pocketClientId, pocketClientSecret, pocketMerchant } = this;
-    const data = {
-      client_id: pocketClientId,
-      client_secret: pocketClientSecret,
-      grant_type: 'client_credentials'
-    };
+    const { pocketMerchant } = this;
 
     const token = await redis.get(`pocket_token_${pocketMerchant}`);
 
@@ -91,14 +96,25 @@ export class PocketAPI extends BaseAPI {
       };
     }
 
-    try {
-      const requestOptions = {
-        url: 'https://sso.invescore.mn',
-        method: 'POST',
-        body: data
-      };
+    const requestBody = new URLSearchParams({
+      client_id: this.pocketClientId,
+      client_secret: this.pocketClientSecret,
+      grant_type: 'client_credentials'
+    }).toString();
 
-      const res = await sendRequest(requestOptions);
+    try {
+      const authUrl =
+        'https://sso.invescore.mn/auth/realms/invescore/protocol/openid-connect/token';
+
+      const response = await fetch(authUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: requestBody
+      });
+
+      const res = await response.json();
 
       await redis.set(
         `pocket_token_${pocketMerchant}`,
@@ -121,7 +137,7 @@ export class PocketAPI extends BaseAPI {
     try {
       const data: IPocketInvoice = {
         amount: invoice.amount,
-        info: invoice.description || 'тэмдэглэл'
+        info: invoice.description || invoice.contentTypeId
       };
 
       const res = await this.request({
@@ -133,7 +149,8 @@ export class PocketAPI extends BaseAPI {
 
       return {
         ...res,
-        qrData: res.qr
+        invoiceId: res.id,
+        qrData: await QRCode.toDataURL(res.qr)
       };
     } catch (e) {
       return { error: e.message };
@@ -145,12 +162,16 @@ export class PocketAPI extends BaseAPI {
     try {
       const res = await this.request({
         method: 'GET',
-        path: `${PAYMENTS.pocket.actions.invoice}/${invoice.apiResponse.invoice_id}`,
+        path: `${PAYMENTS.pocket.actions.checkInvoice}/${invoice.apiResponse.invoiceId}`,
         headers: await this.getHeaders()
       });
 
-      if (res.invoice_status === 'CLOSED') {
+      if (res.state === 'paid') {
         return PAYMENT_STATUS.PAID;
+      }
+
+      if (PAYMENT_STATUS.ALL.includes(res.state)) {
+        return res.state;
       }
 
       return PAYMENT_STATUS.PENDING;
@@ -163,12 +184,16 @@ export class PocketAPI extends BaseAPI {
     try {
       const res = await this.request({
         method: 'GET',
-        path: `${PAYMENTS.pocket.actions.invoice}/${invoice.apiResponse.invoice_id}`,
+        path: `${PAYMENTS.pocket.actions.checkInvoice}/${invoice.apiResponse.id}`,
         headers: await this.getHeaders()
       });
 
-      if (res.invoice_status === 'CLOSED') {
+      if (res.state === 'paid') {
         return PAYMENT_STATUS.PAID;
+      }
+
+      if (PAYMENT_STATUS.ALL.includes(res.state)) {
+        return res.state;
       }
 
       return PAYMENT_STATUS.PENDING;
@@ -177,12 +202,30 @@ export class PocketAPI extends BaseAPI {
     }
   }
 
-  async cancelInvoice(invoice: IInvoiceDocument) {
+  // todo: cancel invoice
+  // async cancelInvoice(invoice: IInvoiceDocument) {
+  //
+  //   // try {
+  //   //   await this.request({
+  //   //     method: 'PUT',
+  //   //     path: `${PAYMENTS.pocket.actions.cancel}/${invoice.apiResponse.heldId}`,
+  //   //     headers: await this.getHeaders(),
+  //   //   });
+  //   // } catch (e) {
+  //   //   return { error: e.message };
+  //   // }
+  //   return
+  // }
+
+  async resiterWebhook(paymentId: string) {
     try {
       await this.request({
-        method: 'DELETE',
-        path: `${PAYMENTS.pocket.actions.invoice}/${invoice.apiResponse.invoice_id}`,
-        headers: await this.getHeaders()
+        method: 'POST',
+        path: PAYMENTS.pocket.actions.webhook,
+        headers: await this.getHeaders(),
+        data: {
+          fallBackUrl: `https://eb72-103-229-122-53.ngrok-free.app/pl:payment/callback/${PAYMENTS.pocket.kind}?paymentId=${paymentId}`
+        }
       });
     } catch (e) {
       return { error: e.message };

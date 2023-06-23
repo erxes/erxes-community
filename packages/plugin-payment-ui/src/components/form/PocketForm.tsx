@@ -21,10 +21,10 @@ type Props = {
 
 type State = {
   paymentName: string;
-  merchant: string;
+  pocketMerchant: string;
 
-  clientId: string;
-  clientSecret: string;
+  pocketClientId: string;
+  pocketClientSecret: string;
 };
 
 class PocketConfigForm extends React.Component<Props, State> {
@@ -33,22 +33,25 @@ class PocketConfigForm extends React.Component<Props, State> {
 
     const { payment } = this.props;
     const { name = '', config } = payment || ({} as IPaymentDocument);
-    const { merchant = '', clientId = '', clientSecret = '' } =
-      config || ({} as IPocketConfig);
+    const {
+      pocketMerchant = '',
+      pocketClientId = '',
+      pocketClientSecret = ''
+    } = config || ({} as IPocketConfig);
 
     this.state = {
       paymentName: name,
-      merchant,
-      clientId,
-      clientSecret
+      pocketMerchant,
+      pocketClientId,
+      pocketClientSecret
     };
   }
 
   generateDoc = (values: {
     paymentName: string;
-    merchant: string;
-    clientId: string;
-    clientSecret: string;
+    pocketMerchant: string;
+    pocketClientId: string;
+    pocketClientSecret: string;
   }) => {
     const { payment } = this.props;
     const generatedValues = {
@@ -56,9 +59,9 @@ class PocketConfigForm extends React.Component<Props, State> {
       kind: PAYMENT_KINDS.POCKET,
       status: 'active',
       config: {
-        merchant: values.merchant,
-        clientId: values.clientId,
-        clientSecret: values.clientSecret
+        pocketMerchant: values.pocketMerchant,
+        pocketClientId: values.pocketClientId,
+        pocketClientSecret: values.pocketClientSecret
       }
     };
 
@@ -94,22 +97,27 @@ class PocketConfigForm extends React.Component<Props, State> {
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal } = this.props;
     const { isSubmitted } = formProps;
-    const { paymentName, merchant, clientId, clientSecret } = this.state;
+    const {
+      paymentName,
+      pocketMerchant,
+      pocketClientId,
+      pocketClientSecret
+    } = this.state;
 
     const values = {
       paymentName,
-      merchant,
-      clientId,
-      clientSecret
+      pocketMerchant,
+      pocketClientId,
+      pocketClientSecret
     };
 
     return (
       <>
         <SettingsContent title={__('General settings')}>
           {this.renderItem('paymentName', 'Name')}
-          {this.renderItem('merchant', 'Merchant')}
-          {this.renderItem('clientId', 'Client ID')}
-          {this.renderItem('clientSecret', 'Client secret', '', true)}
+          {this.renderItem('pocketMerchant', 'Merchant')}
+          {this.renderItem('pocketClientId', 'Client ID')}
+          {this.renderItem('pocketClientSecret', 'Client secret', '', true)}
 
           {/* <a
             href="https://docs.google.com/forms/d/e/1FAIpQLScxZItJ5egDhNqSOMTj6np6d9yrb5zW9micqvqxHFcyhsRszg/viewform"
