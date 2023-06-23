@@ -12,7 +12,7 @@ import { FlexItem } from '@erxes/ui/src/components/step/style';
 import { LeftItem } from '@erxes/ui/src/components/step/styles';
 import Toggle from '@erxes/ui/src/components/Toggle';
 import { IField } from '@erxes/ui/src/types';
-import { loadDynamicComponent } from '@erxes/ui/src/utils/core';
+import { isEnabled, loadDynamicComponent } from '@erxes/ui/src/utils/core';
 import { __ } from 'coreui/utils';
 import React, { useCallback } from 'react';
 import Select from 'react-select-plus';
@@ -46,7 +46,6 @@ type Props = {
   integrationId?: string;
   isSubmitted?: boolean;
   onFieldEdit?: () => void;
-  onCreateFieldWithPayment?: () => void;
   waitUntilFinish?: (obj: any) => void;
   onChildProcessFinished?: (component: string) => void;
 };
@@ -133,9 +132,21 @@ const OptionStep = (props: Props) => {
         }
       }
     }
+
+    if (!isEnabled('payment')) {
+      setRenderPayments(false);
+
+      if (props.waitUntilFinish) {
+        props.waitUntilFinish({ optionsStep: false });
+      }
+    }
   }, [props.formData.fields]);
 
   const renderPaymentsComponent = () => {
+    if (!isEnabled('payment')) {
+      return null;
+    }
+
     if (!renderPayments) {
       return null;
     }
@@ -223,7 +234,6 @@ const OptionStep = (props: Props) => {
             Turn on to receive a submission from the visitor only once. Once a
             submission is received, the form will not display again.
           </Description>
-          <br />
           <div>
             <Toggle
               id="isRequireOnce"
@@ -240,7 +250,6 @@ const OptionStep = (props: Props) => {
         <FormGroup>
           <ControlLabel>Save as customer</ControlLabel>
           <Description>Forcibly turn lead to customer.</Description>
-          <br />
           <div>
             <Toggle
               id="saveAsCustomer"
