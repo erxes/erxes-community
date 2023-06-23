@@ -60,7 +60,6 @@ const SelectPaymentsContainer = (props: Props) => {
         }
       }).then(() => {
         if (props.afterSave) {
-          console.log('afterSave');
           props.afterSave();
         }
       });
