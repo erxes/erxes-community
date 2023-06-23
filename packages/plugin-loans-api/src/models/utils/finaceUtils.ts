@@ -57,7 +57,7 @@ function findAccounts(
       accounts.paymentAccount = config.doubtfulAccount;
       break;
 
-    case CONTRACT_CLASSIFICATION.ABNORMAL:
+    case CONTRACT_CLASSIFICATION.NEGATIVE:
       accounts.paymentAccount = config.negativeAccount;
       break;
 
