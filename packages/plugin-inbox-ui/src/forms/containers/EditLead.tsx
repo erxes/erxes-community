@@ -139,7 +139,6 @@ class EditLeadContainer extends React.Component<FinalProps, State> {
 
     const waitUntilFinish = (obj: any) => {
       const mustWait = { ...this.state.mustWait, ...obj };
-      console.log('waitUntilFinish', mustWait);
       this.setState({ mustWait });
     };
 
@@ -155,15 +154,12 @@ class EditLeadContainer extends React.Component<FinalProps, State> {
       afterFormDbSave,
       waitUntilFinish,
       onChildProcessFinished: component => {
-        console.log('onChildProcessFinished', component);
         if (this.state.mustWait.hasOwnProperty(component)) {
           const mustWait = { ...this.state.mustWait };
           mustWait[component] = false;
           this.setState({ mustWait });
         }
-
-        console.log('this.state.mustWait', this.state.mustWait);
-        // this.redirect();
+        this.redirect();
       },
       isActionLoading: this.state.isLoading,
       isReadyToSaveForm: this.state.isReadyToSaveForm,
