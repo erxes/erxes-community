@@ -58,6 +58,15 @@ export const PAYMENTS = {
     },
     handlerMethod: 'GET'
   },
+  pocket: {
+    title: 'pocket',
+    kind: 'pocket',
+    apiUrl: 'https://service.invescore.mn/merchant',
+    actions: {
+      invoice: 'invoice'
+    },
+    handlerMethod: 'GET'
+  },
   wechatpay: {
     title: 'WeChat Pay',
     kind: 'wechatpay',
@@ -84,6 +93,7 @@ export const PAYMENTS = {
     'socialpay',
     'monpay',
     'storepay',
+    'pocket',
     'wechatpay',
     'paypal',
     'qpayQuickqr'
