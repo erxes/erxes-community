@@ -123,7 +123,6 @@ const OptionStep = (props: Props) => {
       ) {
         setRenderPayments(true);
         if (props.waitUntilFinish) {
-          console.log('waitUntilFinish true');
           props.waitUntilFinish({ optionsStep: true });
         }
       } else {
