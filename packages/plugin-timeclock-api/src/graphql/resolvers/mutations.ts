@@ -1,7 +1,7 @@
 import { IContext } from '../../connectionResolver';
 import { moduleRequireLogin } from '@erxes/api-utils/src/permissions';
 import { checkPermission } from '@erxes/api-utils/src';
-
+import { redis } from '../../configs';
 import {
   IAbsence,
   ISchedule,
@@ -106,9 +106,11 @@ const timeclockMutations = {
       timeclock = await models.Timeclocks.createTimeClock({
         shiftStart: new Date(),
         shiftActive: true,
-        userId: userId ? `${userId}` : user._id,
+        userId: getUserId,
         branchName: getBranchName,
-        deviceType: `${deviceType}`
+        deviceType,
+        inDevice: getBranchName,
+        inDeviceType: deviceType
       });
     } else {
       throw new Error('User not in the coordinate');
@@ -143,6 +145,8 @@ const timeclockMutations = {
     const userInfo = await findUser(subdomain, getUserId);
     const branches = await findBranches(subdomain, userInfo.branchIds);
 
+    let outDevice;
+
     for (const branch of branches) {
       // convert into radians
       const branchLong = (branch.coordinate.longitude * Math.PI) / 180;
@@ -166,6 +170,7 @@ const timeclockMutations = {
       // if user's coordinate is within the radius
       if (dist * 1000 <= branch.radius) {
         insideCoordinate = true;
+        outDevice = branch.title;
       }
     }
 
@@ -180,6 +185,8 @@ const timeclockMutations = {
         shiftEnd: new Date(),
         shiftActive: false,
         deviceType: getShiftStartDeviceType + ' x ' + deviceType,
+        outDeviceType: deviceType,
+        outDevice,
         userId: getUserId,
         ...doc
       });
@@ -460,7 +467,8 @@ const timeclockMutations = {
         scheduleId: schedule._id,
         shiftStart: shift.shiftStart,
         shiftEnd: shift.shiftEnd,
-        scheduleConfigId: shift.scheduleConfigId
+        scheduleConfigId: shift.scheduleConfigId,
+        lunchBreakInMins: shift.lunchBreakInMins
       });
     });
 
@@ -478,7 +486,9 @@ const timeclockMutations = {
       subdomain
     );
 
-    const filterApprovedSchedules = status ? { status, solved: true } : {};
+    const filterApprovedSchedules = status
+      ? { status, solved: true }
+      : { status: { $ne: 'Rejected' } };
 
     const totalSchedules = await models.Schedules.find({
       userId: { $in: scheduledUserIds },
@@ -731,28 +741,50 @@ const timeclockMutations = {
     });
   },
 
-  createTimeClockFromLog(_root, { userId, timelog }, { models }: IContext) {
+  createTimeClockFromLog(
+    _root,
+    { userId, timelog, inDevice },
+    { models }: IContext
+  ) {
     return models.Timeclocks.createTimeClock({
       shiftStart: timelog,
       userId,
+      inDeviceType: 'log',
+      inDevice,
       shiftActive: true
     });
   },
 
   async extractAllDataFromMsSQL(_root, params, { subdomain }: IContext) {
-    return await connectAndQueryFromMsSql(subdomain, params);
+    try {
+      const checkIfExtractingAlready = await redis.get(
+        'extractAllDataFromMsSQL'
+      );
+
+      if (checkIfExtractingAlready) {
+        return {
+          message:
+            'Someone else is extracting\nPlease wait for few mins and try again'
+        };
+      }
+
+      await redis.set('extractAllDataFromMsSQL', {});
+      const waitForQuery = await connectAndQueryFromMsSql(subdomain, params);
+
+      // wait for 10s to delete queue
+      setTimeout(async () => {
+        await redis.del('extractAllDataFromMsSQL');
+      }, 5000);
+
+      return waitForQuery;
+    } catch (error) {
+      await redis.del('extractAllDataFromMsSQL');
+      return error;
+    }
   },
 
-  async extractTimeLogsFromMsSQL(
-    _root,
-    { startDate, endDate },
-    { subdomain }: IContext
-  ) {
-    return await connectAndQueryTimeLogsFromMsSql(
-      subdomain,
-      startDate,
-      endDate
-    );
+  async extractTimeLogsFromMsSQL(_root, params, { subdomain }: IContext) {
+    return connectAndQueryTimeLogsFromMsSql(subdomain, params);
   }
 };
 
