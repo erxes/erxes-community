@@ -52,7 +52,7 @@ class FieldForm extends React.Component<Props, State> {
 
     const { field } = props;
 
-    const { __typename, ...restOfField } = field as any;
+    // const { __typename, ...restOfField } = field as any;
 
     const selectedOption = field.associatedField && {
       value: field.associatedField._id,
@@ -71,7 +71,7 @@ class FieldForm extends React.Component<Props, State> {
     }
 
     this.state = {
-      field: restOfField,
+      field,
       selectedOption,
       group
     };
@@ -531,7 +531,6 @@ class FieldForm extends React.Component<Props, State> {
           {this.renderExtraButton()}
 
           <Button
-            // onClick={mode === 'update' ? this.onUpdate : this.onSubmit}
             onClick={this.onSubmit}
             btnStyle="success"
             icon={mode === 'update' ? 'check-circle' : 'plus-circle'}
