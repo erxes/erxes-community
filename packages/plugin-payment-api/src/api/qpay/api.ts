@@ -132,8 +132,6 @@ export class QpayAPI extends BaseAPI {
         data
       });
 
-      console.log(data);
-
       return {
         ...res,
         qrData: `data:image/jpg;base64,${res.qr_image}`
@@ -144,7 +142,7 @@ export class QpayAPI extends BaseAPI {
   }
 
   async checkInvoice(invoice: IInvoiceDocument) {
-    return PAYMENT_STATUS.PAID;
+    // return PAYMENT_STATUS.PAID;
     try {
       const res = await this.request({
         method: 'GET',
