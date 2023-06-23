@@ -52,6 +52,8 @@ class FieldForm extends React.Component<Props, State> {
 
     const { field } = props;
 
+    const { __typename, ...restOfField } = field as any;
+
     const selectedOption = field.associatedField && {
       value: field.associatedField._id,
       label: field.associatedField.text
@@ -69,7 +71,7 @@ class FieldForm extends React.Component<Props, State> {
     }
 
     this.state = {
-      field,
+      field: restOfField,
       selectedOption,
       group
     };
@@ -158,8 +160,6 @@ class FieldForm extends React.Component<Props, State> {
 
     const { field } = this.state;
 
-    console.log('field: ', field);
-
     this.props.onSubmit(field);
   };
 
@@ -168,15 +168,9 @@ class FieldForm extends React.Component<Props, State> {
     value: string | boolean | number | string[] | number[] | IFieldLogic[]
   ) {
     const { field } = this.state;
-    try {
-      const fieldUpdeted = { ...field, [attributeName]: value };
+    field[attributeName] = value;
 
-      this.setState({ field: fieldUpdeted });
-    } catch (e) {
-      console.log('attributeName: ', attributeName);
-      console.log('value: ', value);
-      console.log(e);
-    }
+    this.setState({ field });
   }
 
   renderValidation() {
@@ -537,6 +531,7 @@ class FieldForm extends React.Component<Props, State> {
           {this.renderExtraButton()}
 
           <Button
+            // onClick={mode === 'update' ? this.onUpdate : this.onSubmit}
             onClick={this.onSubmit}
             btnStyle="success"
             icon={mode === 'update' ? 'check-circle' : 'plus-circle'}

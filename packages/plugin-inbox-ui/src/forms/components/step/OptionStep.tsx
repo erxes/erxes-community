@@ -44,13 +44,15 @@ type Props = {
   visibility?: string;
   departmentIds?: string[];
   integrationId?: string;
-  isReadyToSaveForm?: boolean;
+  isSubmitted?: boolean;
   onFieldEdit?: () => void;
-
-  onChildComponentProcessFinish?: () => void;
+  onCreateFieldWithPayment?: () => void;
+  waitUntilFinish?: (obj: any) => void;
+  onChildProcessFinished?: (component: string) => void;
 };
 
 const OptionStep = (props: Props) => {
+  const [renderPayments, setRenderPayments] = React.useState(false);
   const onChangeFunction = useCallback((key, val) => {
     props.onChange(key, val);
   }, []);
@@ -91,7 +93,7 @@ const OptionStep = (props: Props) => {
     );
   };
 
-  const { language, brand, isRequireOnce, saveAsCustomer, formData } = props;
+  const { language, brand, isRequireOnce, saveAsCustomer } = props;
 
   const onChange = e => {
     onChangeFunction('brand', (e.currentTarget as HTMLInputElement).value);
@@ -112,15 +114,27 @@ const OptionStep = (props: Props) => {
     onChangeFunction('visibility', visibility);
   };
 
-  let renderPayments = false;
-  const fields = formData.fields || [];
+  React.useEffect(() => {
+    const { fields } = props.formData;
+    if (fields && fields.length > 0) {
+      if (
+        fields.findIndex(f => f.type === 'productCategory' && f.isRequired) !==
+        -1
+      ) {
+        setRenderPayments(true);
+        if (props.waitUntilFinish) {
+          console.log('waitUntilFinish true');
+          props.waitUntilFinish({ optionsStep: true });
+        }
+      } else {
+        setRenderPayments(false);
 
-  if (
-    fields &&
-    fields.findIndex(f => f.type === 'productCategory' && f.isRequired) !== -1
-  ) {
-    renderPayments = true;
-  }
+        if (props.waitUntilFinish) {
+          props.waitUntilFinish({ optionsStep: false });
+        }
+      }
+    }
+  }, [props.formData.fields]);
 
   const renderPaymentsComponent = () => {
     if (!renderPayments) {
@@ -132,13 +146,13 @@ const OptionStep = (props: Props) => {
         {loadDynamicComponent('extendFormOptions', {
           contentType: 'inbox:integrations',
           contentTypeId: props.integrationId,
-          isSubmitted: props.integrationId ? true : false,
+          isSubmitted: props.isSubmitted,
           description: __(
             "Choose payment methods you'd like to enable on this form"
           ),
           afterSave: () => {
-            if (props.onChildComponentProcessFinish) {
-              props.onChildComponentProcessFinish();
+            if (props.onChildProcessFinished) {
+              props.onChildProcessFinished('optionsStep');
             }
           }
         })}

@@ -19,6 +19,8 @@ type Props = {
 };
 
 function SelectPayments(props: Props) {
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+
   const generateOptions = (array: IPaymentDocument[] = []): IOption[] => {
     return array.map(item => {
       const payment = item || ({} as IPaymentDocument);
@@ -41,13 +43,10 @@ function SelectPayments(props: Props) {
       props.setPaymentIds(props.currentConfig.paymentIds);
     }
 
-    if (props.isSubmitted) {
+    if (props.isSubmitted && !isSubmitted) {
+      setIsSubmitted(true);
       props.save();
     }
-
-    return () => {
-      console.log('unmount');
-    };
   }, [props.currentConfig, props.isSubmitted]);
 
   return (

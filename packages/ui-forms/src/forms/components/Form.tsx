@@ -165,7 +165,6 @@ class Form extends React.Component<Props, State> {
   };
 
   onFieldSubmit = (field: IField) => {
-    console.log('onFieldSubmittttttttt', field);
     const { onDocChange } = this.props;
     const { fields, currentMode } = this.state;
 
@@ -183,8 +182,6 @@ class Form extends React.Component<Props, State> {
         onDocChange(this.state);
       }
     });
-
-    console.log('onFieldSubmit', field);
   };
 
   onFieldDelete = (field: IField) => {
@@ -256,7 +253,7 @@ class Form extends React.Component<Props, State> {
         {currentField && (
           <FieldForm
             mode={currentMode || 'create'}
-            field={currentField}
+            field={currentField as any}
             fields={fields}
             numberOfPages={numberOfPages || 1}
             onSubmit={this.onFieldSubmit}

@@ -47,7 +47,8 @@ type Props = {
     visibility?: string;
     departmentIds?: string[];
   }) => void;
-  onChildComponentProcessFinish?: () => void;
+  onChildProcessFinished?: (component: string) => void;
+  waitUntilFinish?: (obj: any) => void;
 };
 
 type State = {
@@ -138,7 +139,7 @@ class Lead extends React.Component<Props, State> {
         title: form.title || 'Form Title',
         description: form.description || 'Form Description',
         buttonText: form.buttonText || 'Send',
-        fields: [],
+        fields: form.fields || [],
         type: form.type || '',
         numberOfPages: form.numberOfPages || 1
       },
@@ -160,6 +161,12 @@ class Lead extends React.Component<Props, State> {
       departmentIds: integration.departmentIds || [],
       visibility: integration.visibility || 'public'
     };
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    if (prevState.formData !== this.state.formData) {
+      this.setState({ formData: this.state.formData });
+    }
   }
 
   handleSubmit = (e: React.FormEvent) => {
@@ -324,7 +331,6 @@ class Lead extends React.Component<Props, State> {
       departmentIds,
       visibility
     } = this.state;
-    console.log('&&&&&&&&&&&&&&&&&& ', this.props.integrationId);
 
     const { integration = {} as any, emailTemplates, configs } = this.props;
     const leadData = integration && integration.leadData;
@@ -407,18 +413,17 @@ class Lead extends React.Component<Props, State> {
                   brand={brand}
                   theme={theme}
                   language={language}
-                  formData={formData}
+                  formData={this.state.formData}
                   isRequireOnce={isRequireOnce}
                   saveAsCustomer={saveAsCustomer}
                   channelIds={channelIds}
                   visibility={visibility}
                   departmentIds={departmentIds}
                   integrationId={this.props.integrationId}
-                  isReadyToSaveForm={this.props.isReadyToSaveForm}
+                  isSubmitted={this.props.isReadyToSaveForm}
                   onChange={this.onChange}
-                  onChildComponentProcessFinish={
-                    this.props.onChildComponentProcessFinish
-                  }
+                  onChildProcessFinished={this.props.onChildProcessFinished}
+                  waitUntilFinish={this.props.waitUntilFinish}
                 />
               </Step>
 
