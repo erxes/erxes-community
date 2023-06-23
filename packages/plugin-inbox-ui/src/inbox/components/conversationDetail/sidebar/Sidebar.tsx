@@ -207,8 +207,6 @@ class Index extends React.Component<IndexProps, IndexState> {
       customerFields
     } = this.props;
 
-    console.log('**************** ', conversation);
-
     const { kind = '' } = customer.integration || {};
 
     if (currentSubTab === 'details') {
