@@ -14,6 +14,7 @@ module.exports = {
     module: './routes'
   },
   extendFormOptions: './SelectPayments',
+  invoiceSection: './invoiceSection',
   menus: [
     {
       text: 'Invoices',
@@ -30,7 +31,7 @@ module.exports = {
       scope: 'payment',
       action: "paymentsAll",
       permissions: ['showPayments']
-    }
+    },
   ],
   dealRightSidebarSection: [
     {
