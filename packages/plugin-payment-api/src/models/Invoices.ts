@@ -43,8 +43,6 @@ export const loadInvoiceClass = (models: IModels) => {
         throw new Error('Payment config id is required');
       }
 
-      console.log('doc', doc);
-
       const payment = await models.Payments.getPayment(doc.selectedPaymentId);
 
       const invoice = await models.Invoices.create({
