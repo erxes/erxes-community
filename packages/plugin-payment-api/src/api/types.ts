@@ -16,6 +16,15 @@ export interface ISocialPayInvoice {
   phone?: string;
 }
 
+export interface IGolomtInvoice {
+  amount: string;
+  callback: string;
+  checksum: string;
+  genToken: string;
+  returnType: string;
+  transactionId: string;
+}
+
 export interface IMonpayInvoice {
   amount: number;
   generateUuid: boolean;

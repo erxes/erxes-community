@@ -8,6 +8,7 @@ import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
 import { WechatPayAPI } from './wechatpay/api';
 import { PocketAPI } from './pocket/api';
+import { GolomtAPI } from './golomt/api';
 
 class ErxesPayment {
   public socialpay: SocialPayAPI;
@@ -18,6 +19,7 @@ class ErxesPayment {
   public wechatpay: WechatPayAPI;
   public qpayQuickqr: QPayQuickQrAPI;
   public pocket: PocketAPI;
+  public golomt: GolomtAPI;
   public domain: string;
 
   private payment: any;
@@ -26,6 +28,7 @@ class ErxesPayment {
     this.payment = payment;
     this.domain = domain || '';
     this.socialpay = new SocialPayAPI(payment.config);
+    this.golomt = new GolomtAPI(payment.config);
     this.storepay = new StorePayAPI(payment.config, domain);
     this.qpay = new QpayAPI(payment.config, domain);
     this.monpay = new MonpayAPI(payment.config, domain);

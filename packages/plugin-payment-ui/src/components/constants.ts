@@ -1,3 +1,4 @@
+import GolomtForm from './form/GolomtForm';
 import MonpayForm from './form/MonpayForm';
 import PaypalForm from './form/PaypalForm';
 import PocketForm from './form/PocketForm';
@@ -46,6 +47,19 @@ export const PAYMENTCONFIGS = [
     category: 'Payment method',
     color: 'blue',
     link: 'https://www.golomtbank.com/retail/digital-bank/socialpay'
+  },
+  {
+    name: 'Golomt E-Commerce',
+    description:
+      'Becoming an E-Commerce merchant for online sales and payment we offer products and services 24/7. Accepts most type of domestic and foreign card and provide opportunity to make and receive payment from anywhere',
+    isAvailable: true,
+    kind: 'golomt',
+    logo: 'images/payments/golomt.png',
+    createModal: GolomtForm,
+    createUrl: '/settings/payments/createGolomt',
+    category: 'Payment method',
+    color: 'blue',
+    link: 'https://www.golomtbank.com/en/cards/8172'
   },
   {
     name: 'MonPay',
@@ -112,6 +126,7 @@ export const PAYMENT_KINDS = {
   QPAY: 'qpay',
   QPAY_QUICK_QR: 'qpayQuickqr',
   SOCIALPAY: 'socialpay',
+  GOLOMT: 'golomt',
   MONPAY: 'monpay',
   STOREPAY: 'storepay',
   POCKET: 'pocket',
@@ -121,6 +136,7 @@ export const PAYMENT_KINDS = {
   ALL: [
     'qpay',
     'socialpay',
+    'golomt',
     'monpay',
     'storepay',
     'pocket',

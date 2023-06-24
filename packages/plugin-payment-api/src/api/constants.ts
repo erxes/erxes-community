@@ -37,6 +37,15 @@ export const PAYMENTS = {
     },
     handlerMethod: 'POST'
   },
+  golomt: {
+    title: 'Golomt E-Commerce',
+    kind: 'golomt',
+    apiUrl: 'https://ecommerce.golomtbank.com',
+    actions: {
+      createInvoice: 'api/invoice'
+    },
+    handlerMethod: 'POST'
+  },
   monpay: {
     title: 'MonPay',
     kind: 'monpay',
@@ -96,6 +105,7 @@ export const PAYMENTS = {
     'socialpay',
     'monpay',
     'storepay',
+    'golomt',
     'pocket',
     'wechatpay',
     'paypal',
