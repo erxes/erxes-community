@@ -5,8 +5,7 @@
     "install-deps": "cd .erxes && yarn install",
     "dev": "cd .erxes && yarn dev",
     "build": "cd .erxes && yarn build",
-    "start": "cd .erxes/dist/plugin-payment-api/.erxes && node src",
-    "buildPayment": "webpack --config webpack.config.js"
+    "start": "cd .erxes/dist/plugin-payment-api/.erxes && node src"
   },
   "dependencies": {
     "i18n": "^0.15.1",
