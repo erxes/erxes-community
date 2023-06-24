@@ -30,7 +30,7 @@ block layout-content
                     img(src=`${prefix}/pl:payment/static/images/payments/${val.kind}.png`)
                     .payment-name  
                       p !{val.title}
-                      span Pay with app                                          
+                      span Pay with app
         .row.flex-reverse 
           .col.m6.s12 
             if invoice
@@ -55,13 +55,6 @@ block layout-content
               invoiceId: `#{invoice._id}`,
               contentType: `#{invoice.contentType}`,
               contentTypeId: `#{invoice.contentTypeId}`,
-            }
-
-            if(window.opener) {
-              window.opener.postMessage(message, '*');
-            }
-            window.parent.postMessage(message, '*');
-
         if invoice && invoice.status !== 'paid' && invoice.apiResponse && !invoice.apiResponse.error
           script.
             setInterval(() => {
