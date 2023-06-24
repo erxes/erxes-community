@@ -32,6 +32,16 @@ export interface IMonpayConfig {
   accountId: string;
 }
 
+export interface IStorepayConfig {
+  merchantUsername: string;
+  merchantPassword: string;
+
+  appUsername: string;
+  appPassword: string;
+
+  storeId: string;
+}
+
 export interface IPocketConfig {
   merchant: string;
   clientId: string;
