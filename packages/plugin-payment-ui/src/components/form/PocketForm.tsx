@@ -119,13 +119,9 @@ class PocketConfigForm extends React.Component<Props, State> {
           {this.renderItem('pocketClientId', 'Client ID')}
           {this.renderItem('pocketClientSecret', 'Client secret', '', true)}
 
-          {/* <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLScxZItJ5egDhNqSOMTj6np6d9yrb5zW9micqvqxHFcyhsRszg/viewform"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {__('Apply for storepay')}
-          </a> */}
+          <a href="https://pocket.mn/" target="_blank" rel="noreferrer">
+            {__('Go to website pocket')}
+          </a>
         </SettingsContent>
 
         <ModalFooter>
