@@ -13,11 +13,6 @@ import { callbackHandler } from './utils';
 import i18n = require('i18n');
 import { PAYMENTS } from './api/constants';
 
-import MyComponent from './components/MyComponent';
-
-// tslint:disable-next-line:no-var-requires
-// const MyComponent = require('./components/MyComponent');
-
 export let mainDb;
 export let debug;
 export let graphqlPubsub;
@@ -108,10 +103,6 @@ export default {
       next();
     });
 
-    app.get('/gateway1', (req, res) => {
-      res.render('index', { component: MyComponent });
-    });
-
-    // app.use(controllers);
+    app.use(controllers);
   }
 };
