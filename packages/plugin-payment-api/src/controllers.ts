@@ -28,6 +28,87 @@ router.post('/checkInvoice', async (req, res) => {
   return res.json({ status });
 });
 
+router.post('/gateway/updateInvoice', async (req, res) => {
+  console.log('updateInvoice', req.body);
+  const { selectedPaymentId, paymentKind, invoiceData } = req.body;
+  const subdomain = getSubdomain(req);
+  const models = await generateModels(subdomain);
+
+  let invoice = await models.Invoices.findOne({ _id: invoiceData._id });
+
+  // if (req.body.phone && invoice) {
+  //   data.phone = req.body.phone;
+  //   invoice.phone = req.body.phone;
+  // }
+
+  // if (
+  //   !data.phone &&
+  //   invoice &&
+  //   invoice.status === 'pending' &&
+  //   selectedPayment.kind === PAYMENTS.storepay.kind
+  // ) {
+  //   res.render('index', {
+  //     title: 'Payment gateway',
+  //     payments: paymentsModified,
+  //     invoiceData: data,
+  //     invoice: {
+  //       ...invoice,
+  //       selectedPaymentId,
+  //       paymentKind: PAYMENTS.storepay.kind,
+  //       apiResponse: {
+  //         error: 'Enter your Storepay registered phone number',
+  //         errorType: 'phoneRequired'
+  //       }
+  //     },
+  //     error: 'Enter your Storepay registered phone number',
+  //     prefix
+  //   });
+
+  //   return;
+  // }
+
+  if (invoice && invoice.status === 'paid') {
+    return res.json({ status: invoice.status });
+  }
+
+  const DOMAIN = getEnv({ name: 'DOMAIN' })
+    ? `${getEnv({ name: 'DOMAIN' })}/gateway`
+    : 'http://localhost:4000';
+  const domain = DOMAIN.replace('<subdomain>', subdomain);
+
+  if (
+    invoice &&
+    invoice.status !== 'paid' &&
+    invoice.selectedPaymentId !== selectedPaymentId
+  ) {
+    await models.Invoices.updateInvoice(invoice._id, {
+      selectedPaymentId,
+      paymentKind,
+      domain
+    });
+
+    invoice = await models.Invoices.findOne({ _id: invoiceData._id });
+  }
+
+  if (!invoice) {
+    invoice = await models.Invoices.createInvoice({
+      ...invoiceData,
+      selectedPaymentId,
+      domain
+    });
+  }
+
+  try {
+    redisUtils.updateInvoiceStatus(invoice._id, 'pending');
+
+    console.log('invoice', invoice);
+
+    return res.json({ invoice: invoice.apiResponse });
+  } catch (e) {
+    return res.json({ error: e.message });
+  }
+});
+
 router.get('/gateway', async (req, res) => {
   const { params } = req.query;
 
@@ -51,9 +132,12 @@ router.get('/gateway', async (req, res) => {
     .lean();
 
   const payments = paymentsFound.map(p => ({
-    ...p,
+    _id: p._id,
+    kind: p.kind,
     title: PAYMENTS[p.kind].title
   }));
+
+  console.log('payments', payments);
 
   const invoice = await models.Invoices.findOne({ _id: data._id }).lean();
 

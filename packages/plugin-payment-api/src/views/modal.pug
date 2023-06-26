@@ -4,15 +4,8 @@ mixin modal(invoice)
         .modal-content
           .modal-header
             button(type='button', class='close', data-dismiss='modal', aria-hidden='true') &times;
-            h4(class='modal-title') #{invoice.paymentKind}
+            h4(class='modal-title', id="paymentKind") #{invoice.paymentKind}
           .modal-body
-            p #{invoice.description}
+            img(src="", alt="qr code", class="qr", id="qr-code")
           .modal-footer
-            button(type='button', class='btn btn-default', data-dismiss='modal') #{__('Close')}
-            button(type='button', class='btn btn-primary') #{__('Save changes')}
-
-//- div#modal.modal-container
-//-           div.modal-content
-//-             h2 Modal Title
-//-             p Modal content goes here.
-//-             button#close-btn Close Modal
+            button(type='button', class='btn btn-primary') #{__('Manual check')}

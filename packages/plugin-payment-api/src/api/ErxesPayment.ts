@@ -77,6 +77,8 @@ class ErxesPayment {
   async cancelInvoice(invoice: IInvoiceDocument) {
     const { payment } = this;
 
+    return 'success';
+
     const api = this[payment.kind];
 
     try {

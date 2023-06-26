@@ -1,4 +1,7 @@
 block variables
+
+include ./modal.pug
+
 doctype html
 html
   head
@@ -21,3 +24,6 @@ html
   body
     div#root
       block layout-content
+
+      block modalContent
+        include modal.pug

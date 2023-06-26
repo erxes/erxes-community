@@ -7,10 +7,9 @@ block layout-content
     .header #{__('Payment')}
     .paymentContainer
       each payment in payments
-        button(type='button', data-toggle='modal', data-target='#myModal', id=`paymentButton_${payment._id}`)
-          div.Payment__logo(class=`payments ${payment.selected === true && 'active'}`)
-            img(src=`${prefix}/pl:payment/static/images/payments/${payment.kind}.png`)
-            .payment-name  
-              p !{payment.title}
+        button(type='button', data-toggle='modal', data-target='#myModal', onclick=`onPaymentClick('${JSON.stringify(payment)}', '${JSON.stringify(invoiceData)}','${prefix}')`).button
+          img(src=`${prefix}/pl:payment/static/images/payments/${payment.kind}.png`)
+          .payment-name  
+            p !{payment.title}
       
   +modal({paymentKind: 'qpay', description:"test"}) 
