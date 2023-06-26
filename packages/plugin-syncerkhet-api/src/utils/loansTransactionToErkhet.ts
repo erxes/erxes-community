@@ -17,7 +17,7 @@ export const getConfig = async (subdomain, code, defaultValue?) => {
 
 export const loansTransactionToErkhet = async (
   subdomain,
-  generals,
+  generals: any[] = [],
   orderId
 ) => {
   let erkhetConfig = await getConfig(subdomain, 'ERKHET', {});

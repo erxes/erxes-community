@@ -75,6 +75,36 @@ export const initBroker = async cl => {
     };
   });
 
+  consumeRPCQueue(
+    'syncerkhet:deleteTransaction',
+    async ({ subdomain, data }) => {
+      const { generals, orderId } = data;
+
+      const postData = await loansTransactionToErkhet(
+        subdomain,
+        generals,
+        orderId
+      );
+      if (!postData) {
+        return {
+          status: 'success',
+          data: {}
+        };
+      }
+
+      return {
+        status: 'success',
+        data: await sendRPCMessage('rpc_queue:erxes-automation-erkhet', {
+          action: 'get-response-delete-journal-orders',
+          isEbarimt: false,
+          payload: JSON.stringify(postData),
+          thirdService: true,
+          isJson: true
+        })
+      };
+    }
+  );
+
   consumeRPCQueue('syncerkhet:returnOrder', async ({ subdomain, data }) => {
     const { pos, order } = data;
 

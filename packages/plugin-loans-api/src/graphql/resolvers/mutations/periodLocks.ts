@@ -6,7 +6,7 @@ import {
   putUpdateLog
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
+import messageBroker, { sendMessageBroker } from '../../../messageBroker';
 import {
   IPeriodLock,
   IPeriodLockDocument
@@ -100,6 +100,16 @@ const periodLockMutations = {
     await models.PeriodLocks.removePeriodLocks(periodLockIds);
 
     for (const periodLock of periodLocks) {
+      await sendMessageBroker(
+        {
+          action: 'deleteTransaction',
+          subdomain,
+          data: { orderId: periodLock._id, config: {} },
+          isRPC: true
+        },
+        'syncerkhet'
+      );
+
       const logData = {
         type: 'periodLock',
         object: periodLock,
