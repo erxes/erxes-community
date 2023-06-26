@@ -1,8 +1,5 @@
 import { IIntegrationDocument } from '../../models/definitions/integrations';
-import {
-  sendCommonMessage,
-  sendIntegrationsMessage
-} from '../../messageBroker';
+import { sendCommonMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 
@@ -125,7 +122,7 @@ export default {
       serviceName: integration.kind,
       subdomain,
       action: 'detailIntegration',
-      data: { inboxId: inboxId },
+      data: { inboxId },
       isRPC: true
     });
   }
