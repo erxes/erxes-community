@@ -8,6 +8,7 @@ import { ModalFooter } from '@erxes/ui/src/styles/main';
 import React from 'react';
 import SelectBrand from '@erxes/ui-inbox/src/settings/integrations/containers/SelectBrand';
 import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
+import { __ } from '@erxes/ui/src/utils/core';
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -77,6 +78,14 @@ class IntegrationForm extends React.Component<Props> {
           isRequired={true}
           onChange={onChannelChange}
         />
+
+        <a
+          href="https://partners.viber.com/login"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {__('Get your viber token')}
+        </a>
 
         <ModalFooter>
           <Button
