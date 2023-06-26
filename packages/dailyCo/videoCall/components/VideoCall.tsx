@@ -1,7 +1,8 @@
 import DailyIframe from '@daily-co/daily-js';
 // import client from 'apolloClient';
-import client from '@apollo/client';
+// import client from '@apollo/client';
 import gql from 'graphql-tag';
+import { graphql } from '@apollo/client/react/hoc';
 import React from 'react';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
@@ -84,8 +85,7 @@ class VideoCall extends React.Component<Props, States> {
       })
       .on('recording-upload-completed', data => {
         if (data.action === 'recording-upload-completed') {
-          client
-            .mutate({
+          graphql({
               mutation: gql(mutations.saveVideoRecordingInfo),
               variables: {
                 conversationId,
