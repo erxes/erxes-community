@@ -141,6 +141,7 @@ class GeneralSettings extends React.Component<Props, State> {
         </CollapseContent>
 
         <CollapseContent title={__('Other')}>
+          {this.renderItem('debtAccount')}
           {this.renderItem('otherReceivable')}
           {this.renderItem('feeIncome')}
         </CollapseContent>
