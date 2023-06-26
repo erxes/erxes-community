@@ -151,6 +151,11 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
 
         {this.renderScript()}
 
+        {loadDynamicComponent('integrationEditForm', {
+          integrationId,
+          isSubmitted: this.state.isSubmitted
+        })}
+
         <SelectBrand
           isRequired={true}
           defaultValue={brandId}
@@ -164,11 +169,6 @@ class CommonFieldForm extends React.PureComponent<Props, CommonTypes> {
           isRequired={true}
           onChange={onChannelChange}
         />
-
-        {loadDynamicComponent('integrationEditForm', {
-          integrationId,
-          isSubmitted: this.state.isSubmitted
-        })}
 
         <ModalFooter>
           <Button

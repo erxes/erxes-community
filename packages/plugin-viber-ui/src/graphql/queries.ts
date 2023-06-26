@@ -60,12 +60,6 @@ query viberConversationMessages(
 }
 `;
 
-const accounts: string = `
-  query viberAccounts {
-    viberAccounts 
-  }
-`;
-
 const viberIntegrationDetail: string = `
   query viberIntegrationDetail($integrationId: String!) {
     viberIntegrationDetail(integrationId: $integrationId) {
@@ -77,6 +71,5 @@ const viberIntegrationDetail: string = `
 
 export default {
   messages,
-  accounts,
   viberIntegrationDetail
 };

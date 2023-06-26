@@ -88,28 +88,6 @@ export const Integrations = model<any, any>(
   loadIntegrationClass()
 );
 
-export const accountSchema: Schema<any> = new Schema({
-  name: String
-});
-
-export const loadAccountClass = () => {
-  class Account {
-    static async removeAccount(_id): Promise<any> {
-      return Accounts.deleteOne({ _id });
-    }
-
-    static async getAccounts(): Promise<any> {
-      return Accounts.find({});
-    }
-  }
-
-  accountSchema.loadClass(Account);
-
-  return accountSchema;
-};
-
-export const Accounts = model<any, any>('viber_accounts', loadAccountClass());
-
 export interface IConversation extends Document {
   erxesApiId?: string;
   timestamp: Date;
