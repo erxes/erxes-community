@@ -1,23 +1,16 @@
 extends layout
 
-//- include ./kinds/socialpay.pug
-//- include ./kinds/qpay.pug
-//- include ./kinds/monpay.pug
-//- include ./kinds/storepay.pug
-//- include ./kinds/paypal.pug
-//- include ./kinds/wechatpay.pug
-//- include ./kinds/qpayQuickqr.pug
-//- include ./kinds/pocket.pug
+include ./modal.pug
 
 block layout-content
   .my-layout
     .header #{__('Payment')}
     .paymentContainer
       each payment in payments
-        button(type='button', class='btn btn-primary', data-toggle='modal', data-target='#myModal') #{payment.title}
-      button#modal-btn Open Modal
-      div#modal.modal-container
-          div.modal-content
-          h2 Modal Title
-          p Modal content goes here.
-          button#close-btn Close Modal
+        button(type='button', data-toggle='modal', data-target='#myModal', id=`paymentButton_${payment._id}`)
+          div.Payment__logo(class=`payments ${payment.selected === true && 'active'}`)
+            img(src=`${prefix}/pl:payment/static/images/payments/${payment.kind}.png`)
+            .payment-name  
+              p !{payment.title}
+      
+  +modal({paymentKind: 'qpay', description:"test"}) 

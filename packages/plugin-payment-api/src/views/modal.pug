@@ -1,0 +1,18 @@
+mixin modal(invoice)
+    .modal.fade(id='myModal', tabindex='-1', role='dialog', aria-labelledby='myModalLabel', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button(type='button', class='close', data-dismiss='modal', aria-hidden='true') &times;
+            h4(class='modal-title') #{invoice.paymentKind}
+          .modal-body
+            p #{invoice.description}
+          .modal-footer
+            button(type='button', class='btn btn-default', data-dismiss='modal') #{__('Close')}
+            button(type='button', class='btn btn-primary') #{__('Save changes')}
+
+//- div#modal.modal-container
+//-           div.modal-content
+//-             h2 Modal Title
+//-             p Modal content goes here.
+//-             button#close-btn Close Modal
