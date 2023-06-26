@@ -137,8 +137,8 @@ export class ViberAPI {
               ...commonBodyParams,
               type: 'picture',
               text: null,
-              media: `https://office.erxes.io/gateway/read-file?key=${attachment.url}`,
-              thumbnail: `https://office.erxes.io/gateway/read-file?key==${attachment.url}`
+              media: this.generateAttachmentUrl(attachment.url),
+              thumbnail: this.generateAttachmentUrl(attachment.url)
             }
           };
           attachmentResponse = await sendRequest(attachmentPayload);
@@ -149,7 +149,7 @@ export class ViberAPI {
               ...commonBodyParams,
               type: 'document',
               size: attachment.size,
-              media: `https://office.erxes.io/gateway/read-file?key=${attachment.url}`,
+              media: this.generateAttachmentUrl(attachment.url),
               file_name: attachment.url
             }
           };
@@ -200,5 +200,20 @@ export class ViberAPI {
       messageType: 'text',
       attachments: message.attachments
     });
+  }
+
+  generateAttachmentUrl(urlOrName: string) {
+    const DOMAIN = getEnv({ name: 'DOMAIN' });
+    const NODE_ENV = getEnv({ name: 'NODE_ENV' });
+
+    if (urlOrName.startsWith('http')) {
+      return urlOrName;
+    }
+
+    if (NODE_ENV === 'development') {
+      return `${DOMAIN}/pl:core/read-file?key=${urlOrName}`;
+    }
+
+    return `${DOMAIN}/gateway/pl:core/read-file?key=${urlOrName}`;
   }
 }

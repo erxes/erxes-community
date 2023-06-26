@@ -121,14 +121,12 @@ export default {
   ) {
     const inboxId: string = integration._id;
 
-    const response = await sendCommonMessage({
+    return await sendCommonMessage({
       serviceName: integration.kind,
       subdomain,
       action: 'detailIntegration',
       data: { inboxId: inboxId },
       isRPC: true
     });
-
-    return response;
   }
 };

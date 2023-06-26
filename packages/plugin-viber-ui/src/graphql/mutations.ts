@@ -1,9 +1,3 @@
-const removeAccount: string = `
-  mutation viberAccountRemove($_id: String!) {
-    viberAccountRemove(_id: $_id)
-  }
-`;
-
 const viberIntegrationUpdate: string = `
   mutation viberIntegrationUpdate($update: UpdateInput) {
     viberIntegrationUpdate(update: $update)
@@ -11,6 +5,5 @@ const viberIntegrationUpdate: string = `
 `;
 
 export default {
-  removeAccount,
   viberIntegrationUpdate
 };
