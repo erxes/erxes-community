@@ -17,6 +17,7 @@ type Props = {
 type FinalProps = {
   accountsQuery: any;
   removeAccount: any;
+  addAccount: any;
 } & Props;
 class AccountContainer extends React.Component<FinalProps, {}> {
   popupWindow(url, title, win, w, h) {
@@ -30,16 +31,19 @@ class AccountContainer extends React.Component<FinalProps, {}> {
     );
   }
 
-  onAdd = () => {
-    const { REACT_APP_API_URL } = getEnv();
+  addAccount = (token: string) => {
+    const { addAccount } = this.props;
 
-    this.popupWindow(
-      `${REACT_APP_API_URL}/pl:telegram/login`,
-      'Integration',
-      window,
-      660,
-      750
-    );
+    addAccount({ variables: { token } })
+      .then(res => {
+        const message = res.data.telegramAccountAdd;
+        Alert.success(message);
+
+        this.props.accountsQuery.refetch();
+      })
+      .catch(e => {
+        Alert.error(e.message);
+      });
   };
 
   removeAccount = (accountId: string) => {
@@ -73,7 +77,7 @@ class AccountContainer extends React.Component<FinalProps, {}> {
       <Accounts
         accountId={accountId}
         onSelectAccount={onSelectAccount}
-        onAdd={this.onAdd}
+        addAccount={this.addAccount}
         removeAccount={this.removeAccount}
         accounts={accounts}
       />
@@ -91,6 +95,12 @@ export default withProps<Props>(
     }),
     graphql<Props>(gql(queries.accounts), {
       name: 'accountsQuery'
+    }),
+    graphql<Props>(gql(mutations.addAccount), {
+      name: 'addAccount',
+      options: {
+        refetchQueries: ['accounts']
+      }
     })
   )(AccountContainer)
 );

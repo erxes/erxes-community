@@ -14,20 +14,34 @@ import {
   StepWrapper
 } from '@erxes/ui/src/components/step/styles';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { __ } from '@erxes/ui/src/utils';
+import { Alert, __ } from '@erxes/ui/src/utils';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
+import client from '@erxes/ui/src/apolloClient';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 import SelectBrand from '@erxes/ui-inbox/src/settings/integrations/containers/SelectBrand';
 import SelectChannels from '@erxes/ui-inbox/src/settings/integrations/containers/SelectChannels';
 import {
+  AccountBox,
+  AccountItem,
+  AccountTitle,
   Content,
   ImageWrapper,
   MessengerPreview,
   TextWrapper
 } from '@erxes/ui-inbox/src/settings/integrations/styles';
 import Accounts from '../containers/Accounts';
+import gql from 'graphql-tag';
+import { queries } from '../graphql';
+import Spinner from '@erxes/ui/src/components/Spinner';
+import EmptyState from '@erxes/ui/src/components/EmptyState';
+
+interface TelegramChat {
+  _id: string;
+  type: string;
+  title: string;
+}
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
@@ -36,6 +50,9 @@ type Props = {
 type State = {
   channelIds: string[];
   accountId: string;
+  selectedTelegramChatId?: string;
+  loadingTelegramChats: boolean;
+  telegramChats: TelegramChat[];
 };
 
 class Telegram extends React.Component<Props, State> {
@@ -44,18 +61,24 @@ class Telegram extends React.Component<Props, State> {
 
     this.state = {
       channelIds: [],
-      accountId: ''
+      accountId: '',
+      selectedTelegramChatId: undefined,
+      loadingTelegramChats: false,
+      telegramChats: []
     };
   }
 
   generateDoc = (values: { name: string; brandId: string }) => {
-    const { channelIds, accountId } = this.state;
+    const { channelIds, accountId, selectedTelegramChatId } = this.state;
 
     return {
       ...values,
       kind: 'telegram',
       channelIds,
-      accountId
+      accountId,
+      data: {
+        telegramChatId: selectedTelegramChatId
+      }
     };
   };
 
@@ -64,7 +87,77 @@ class Telegram extends React.Component<Props, State> {
   };
 
   onSelectAccount = (accountId: string) => {
-    this.setState({ accountId });
+    if (!accountId) {
+      this.setState({ accountId: '' });
+    }
+
+    this.setState({ loadingTelegramChats: true });
+
+    client
+      .query({
+        query: gql(queries.telegramChats)
+      })
+      .then(({ data, loading }) => {
+        if (!loading) {
+          this.setState({
+            accountId,
+            telegramChats: data.telegramChats,
+            loadingTelegramChats: false
+          });
+        }
+      })
+      .catch(error => {
+        Alert.error(error.message);
+        this.setState({ loadingTelegramChats: false });
+      });
+  };
+
+  onSelectChat = (id: string) => {
+    this.setState({ selectedTelegramChatId: id });
+  };
+
+  renderChats = () => {
+    const { telegramChats, loadingTelegramChats } = this.state;
+
+    if (loadingTelegramChats) {
+      return <Spinner objective={true} />;
+    }
+
+    if (telegramChats.length == 0) {
+      return (
+        <EmptyState
+          icon="folder-2"
+          text={__('There are no chats this bot is an admin of')}
+        />
+      );
+    }
+
+    return (
+      <FlexItem>
+        <LeftItem>
+          <AccountBox>
+            <AccountTitle>{__('Telegram Chats')}</AccountTitle>
+            {telegramChats.map(chat => (
+              <AccountItem key={chat._id}>
+                {chat.title}
+                <Button
+                  btnStyle={
+                    this.state.selectedTelegramChatId == chat._id
+                      ? 'primary'
+                      : 'simple'
+                  }
+                  onClick={() => this.onSelectChat(chat._id)}
+                >
+                  {this.state.selectedTelegramChatId == chat._id
+                    ? __('Selected')
+                    : __('Select')}
+                </Button>
+              </AccountItem>
+            ))}
+          </AccountBox>
+        </LeftItem>
+      </FlexItem>
+    );
   };
 
   renderContent = (formProps: IFormProps) => {
@@ -79,9 +172,11 @@ class Telegram extends React.Component<Props, State> {
               <LeftItem>
                 <FormGroup>
                   <Info>
-                    <strong>{__('Add account description question')}</strong>
+                    <strong>{__('Add bot token')}</strong>
                     <br />
-                    {__('Add account description')}
+                    Add a bot token to watch chats that they are an admin of.
+                    See <a>https://telegram.me/BotFather</a> for information on
+                    creating a bot token
                   </Info>
                 </FormGroup>
 
@@ -92,6 +187,10 @@ class Telegram extends React.Component<Props, State> {
                 />
               </LeftItem>
             </FlexItem>
+          </Step>
+
+          <Step img="/images/icons/erxes-04.svg" title="Connect your Chat">
+            {this.renderChats()}
           </Step>
 
           <Step

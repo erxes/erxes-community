@@ -4,7 +4,6 @@ module.exports = {
   port: 3024,
   exposes: {
     './routes': './src/routes.tsx',
-    './inboxIntegrationSettings': './src/components/IntegrationSettings.tsx',
     './inboxConversationDetail': './src/components/ConversationDetail.tsx'
   },
   routes: {
@@ -12,15 +11,14 @@ module.exports = {
     scope: 'telegram',
     module: './routes'
   },
-  inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxConversationDetail: './inboxConversationDetail',
-  inboxIntegration: {
+  inboxIntegrations: [{
     name: 'Telegram',
     description:
-      'Please write integration description on plugin config file',
+      'Connect telegram chats to inbox',
     isAvailable: true,
     kind: 'telegram',
     logo: '/images/integrations/telegram.png',
     createUrl: '/settings/integrations/createTelegram'
-  }
+  }]
 };

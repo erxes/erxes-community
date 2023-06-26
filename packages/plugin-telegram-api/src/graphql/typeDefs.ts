@@ -11,10 +11,12 @@ const types = `
 const queries = `
   telegramConversationDetail(conversationId: String!): [Telegram]
   telegramAccounts: JSON
+  telegramChats: JSON
 `;
 
 const mutations = `
   telegramAccountRemove(_id: String!): String
+  telegramAccountAdd(token: String!): String
 `;
 
 const typeDefs = gql`

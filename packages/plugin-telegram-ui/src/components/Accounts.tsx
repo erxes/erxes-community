@@ -6,18 +6,31 @@ import {
 import { CenterText } from '@erxes/ui-log/src/activityLogs/styles';
 import Button from '@erxes/ui/src/components/Button';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
+import {
+  ControlLabel,
+  Form,
+  FormControl,
+  FormGroup
+} from '@erxes/ui/src/components/form';
 import { __, confirm } from '@erxes/ui/src/utils';
 import React from 'react';
 
 type Props = {
   accounts: any[];
-  onAdd: () => void;
+  addAccount: (token: string) => void;
   removeAccount: (accountId: string) => void;
   onSelectAccount: (accountId: string) => void;
   accountId: string;
 };
 
 class Accounts extends React.Component<Props> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      newBotKey: ''
+    };
+  }
   onRemove(accountId: string) {
     const { removeAccount } = this.props;
 
@@ -28,12 +41,31 @@ class Accounts extends React.Component<Props> {
   }
 
   renderAccountAction() {
-    const { onAdd } = this.props;
+    const handleSubmit = ({ token }) => {
+      this.props.addAccount(token);
+    };
 
     return (
-      <Button btnStyle="primary" icon="plus-circle" onClick={onAdd}>
-        Add Account
-      </Button>
+      <Form
+        onSubmit={handleSubmit}
+        renderContent={formProps => (
+          <>
+            <FormGroup>
+              <ControlLabel required={true}>Bot Token</ControlLabel>
+              <p>{__('Paste the bot token here')}</p>
+              <FormControl
+                {...formProps}
+                name="token"
+                required={true}
+                autoFocus={true}
+              />
+            </FormGroup>
+            <Button btnStyle="primary" icon="plus-circle" type="submit">
+              Add Bot Account
+            </Button>
+          </>
+        )}
+      />
     );
   }
 
@@ -42,7 +74,7 @@ class Accounts extends React.Component<Props> {
 
     if (accounts.length === 0) {
       return (
-        <EmptyState icon="user-6" text={__('There is no linked accounts')} />
+        <EmptyState icon="user-6" text={__('There are no bot accounts')} />
       );
     }
 

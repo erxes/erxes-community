@@ -7,8 +7,8 @@ class Settings extends React.Component<any> {
 
     return (
       <CollapseContent title="Telegram">
-        {renderItem('TELEGRAM_ACCESS_KEY', '', '', '', 'Key')}
-        {renderItem('TELEGRAM_ACCESS_TOKEN', '', '', '', 'Token')}
+        {renderItem('TELEGRAM_API_ID', '', '', '', 'App  api_id')}
+        {renderItem('TELEGRAM_API_HASH', '', '', '', 'App api_hash')}
       </CollapseContent>
     );
   }

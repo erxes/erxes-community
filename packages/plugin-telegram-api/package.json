@@ -6,5 +6,8 @@
     "dev": "cd .erxes && yarn dev",
     "build": "cd .erxes && yarn build",
     "start": "cd .erxes/dist/plugin-telegram-api/.erxes && node src"
+  },
+  "dependencies": {
+    "telegraf": "^4.12.2"
   }
 }

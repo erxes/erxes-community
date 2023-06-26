@@ -1,5 +1,5 @@
 import { IContext } from '@erxes/api-utils/src/types';
-import { Accounts, Messages } from '../../models';
+import { Accounts, Chats, Messages } from '../../models';
 
 const queries = {
   async telegramConversationDetail(
@@ -32,6 +32,10 @@ const queries = {
 
   async telegramAccounts(_root, _args, _context: IContext) {
     return Accounts.getAccounts();
+  },
+
+  async telegramChats(_root, _args, _context: IContext) {
+    return Chats.getAllChats();
   }
 };
 

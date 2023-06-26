@@ -1,9 +1,33 @@
 import { Schema, model } from 'mongoose';
 
+export const chatSchema = new Schema({
+  botAccountId: String,
+  telegramId: { type: String, unique: true },
+  title: String,
+  chatType: String,
+  memberType: String
+});
+
+export const loadChatClass = () => {
+  class Chat {
+    static async getAllChats() {
+      return Chats.find({});
+    }
+
+    static async createOrUpdate(find, chat) {
+      return Chats.update(find, chat, { upsert: true });
+    }
+  }
+
+  chatSchema.loadClass(Chat);
+
+  return chatSchema;
+};
+
 export const customerSchema = new Schema({
   inboxIntegrationId: String,
   contactsId: String,
-  email: { type: String, unique: true },
+  telegramId: { type: String, unique: true },
   firstName: String,
   lastName: String
 });
@@ -16,7 +40,7 @@ export const loadCustomerClass = () => {
   return customerSchema;
 };
 
-const emailSchema = new Schema(
+const telegramAddressSchema = new Schema(
   {
     name: String,
     address: String
@@ -29,13 +53,14 @@ export const messageSchema = new Schema({
   inboxConversationId: String,
   subject: String,
   messageId: { type: String, unique: true },
+  chatId: String,
   inReplyTo: String,
   references: [String],
   body: String,
-  to: [emailSchema],
-  cc: [emailSchema],
-  bcc: [emailSchema],
-  from: [emailSchema],
+  to: telegramAddressSchema,
+  cc: telegramAddressSchema,
+  bcc: telegramAddressSchema,
+  from: telegramAddressSchema,
   createdAt: { type: Date, index: true, default: new Date() }
 });
 
@@ -49,8 +74,9 @@ export const loadMessageClass = () => {
 
 // schema for integration document
 export const integrationSchema = new Schema({
-  inboxId: String,
-  accountId: String
+  inboxIntegrationId: String,
+  accountId: String,
+  telegramChatId: String
 });
 
 export const loadIntegrationClass = () => {
@@ -63,7 +89,8 @@ export const loadIntegrationClass = () => {
 
 // schema for integration account
 export const accountSchema = new Schema({
-  name: String
+  name: String,
+  token: String
 });
 
 export const loadAccountClass = () => {
@@ -81,6 +108,8 @@ export const loadAccountClass = () => {
 
   return accountSchema;
 };
+
+export const Chats = model<any, any>('telegram_chats', loadChatClass());
 
 export const Customers = model<any, any>(
   'telegram_customers',

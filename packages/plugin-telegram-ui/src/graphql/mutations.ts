@@ -4,6 +4,13 @@ const removeAccount = `
   }
 `;
 
+const addAccount = `
+  mutation telegramAccountAdd($token: String!) {
+    telegramAccountAdd(token: $token)
+  }
+`;
+
 export default {
-  removeAccount
+  removeAccount,
+  addAccount
 };

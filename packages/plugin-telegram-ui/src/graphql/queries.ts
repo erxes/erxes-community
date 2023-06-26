@@ -13,7 +13,14 @@ const accounts = `
   }
 `;
 
+const telegramChats = `
+  query telegramChats {
+    telegramChats
+  }
+`;
+
 export default {
   detail,
-  accounts
+  accounts,
+  telegramChats
 };
