@@ -9,12 +9,11 @@ import {
   ErxesSpacialMessage,
   FromCustomer,
   SkillWrapper,
-  VideoCallRequestWrapper
+  VideoCallRequestWrapper,
 } from './styles';
-import {
-  IMessagesItem,
-  ISkillData
-} from '@erxes/ui-inbox/src/settings/integrations/types';
+import { IMessagesItem, ISkillData } from '@erxes/ui-inbox/src/settings/integrations/types';
+
+import { MESSAGE_TYPES } from '../../../../../../../plugin-inbox-api/src/models/definitions/constants';
 
 import Button from '@erxes/ui/src/components/Button';
 import React from 'react';
@@ -36,7 +35,7 @@ class WidgetContent extends React.Component<Props, { skillResponse?: string }> {
     super(props);
 
     this.state = {
-      skillResponse: ''
+      skillResponse: '',
     };
   }
   onSkillClick = skill => {
@@ -58,13 +57,19 @@ class WidgetContent extends React.Component<Props, { skillResponse?: string }> {
     //   return null;
     // }
 
+    const sendCallRequest = () => {
+      // this.props.sendMessage(MESSAGE_TYPES.VIDEO_CALL_REQUEST, '');
+    };
+
     return (
       <VideoCallRequestWrapper color={color}>
         <h5>{__('Audio and video call')}</h5>
         <p>{__('You can contact the operator by voice or video!')}</p>
         <CallButtons color={color}>
           <Button icon="phone-call">{__('Audio call')}</Button>
-          <Button icon="videocamera">{__('Video call')}</Button>
+          <Button icon="videocamera" onClick={sendCallRequest}>
+            {__('Video call')}
+          </Button>
         </CallButtons>
       </VideoCallRequestWrapper>
     );
@@ -73,12 +78,7 @@ class WidgetContent extends React.Component<Props, { skillResponse?: string }> {
   renderSkills() {
     const { activeStep, color, skillData } = this.props;
 
-    if (
-      !skillData ||
-      (Object.keys(skillData) || []).length === 0 ||
-      !skillData.options ||
-      activeStep !== 'intro'
-    ) {
+    if (!skillData || (Object.keys(skillData) || []).length === 0 || !skillData.options || activeStep !== 'intro') {
       return null;
     }
 
@@ -126,9 +126,7 @@ class WidgetContent extends React.Component<Props, { skillResponse?: string }> {
             <ErxesDate>{__('1 hour ago')}</ErxesDate>
           </li>
           <ErxesFromCustomer>
-            <FromCustomer style={{ backgroundColor: color, color: textColor }}>
-              {__('We need your help!')}
-            </FromCustomer>
+            <FromCustomer style={{ backgroundColor: color, color: textColor }}>{__('We need your help!')}</FromCustomer>
             <ErxesDate>{__('6 minutes ago')}</ErxesDate>
           </ErxesFromCustomer>
           {!isOnline && this.renderMessage(message && message.away)}

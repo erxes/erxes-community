@@ -1,17 +1,15 @@
-import * as Random from "meteor-random";
-import * as dotenv from "dotenv";
-import * as request from "request-promise";
-import * as sanitizeHtml from "sanitize-html";
-import { debugBase, debugExternalRequests } from "./debuggers";
-import memoryStorage from "./inmemoryStorage";
-import { sendRPCMessage } from './messageBroker';
-// import { IParticipants, IProviderSettings } from './nylas/types';
-// import { sendDailyRequest } from './videoCall/controller';
-import { IRecording } from "./models";
-import { sendDailyRequest } from "./controller";
-import Configs from "./Configs";
+import * as Random from 'meteor-random';
+import * as dotenv from 'dotenv';
+import * as request from 'request-promise';
+import * as sanitizeHtml from 'sanitize-html';
+import { debugBase, debugExternalRequests } from './debuggers';
+import memoryStorage from '../inmemoryStorage';
+import { sendRPCMessage } from '../messageBroker';
+import { IRecording } from '../models/definitions/callRecords';
+import { sendDailyRequest } from './controller';
+import Configs, { IConfigDocument } from '../models/definitions/configs';
 
-export const field = (options) => {
+export const field = options => {
   const { pkey, type, optional } = options;
 
   if (type === String && !pkey && !optional) {
@@ -26,28 +24,8 @@ export const field = (options) => {
   return options;
 };
 
-// import { IParticipants, IProviderSettings } from './nylas/types';
-
-// export const getConfigs = async (models: any) => {
-//   const configsCache = await get("configs_erxes_integrations");
-
-//   if (configsCache && configsCache !== "{}") {
-//     return JSON.parse(configsCache);
-//   }
-
-//   const configsMap = {};
-//   const configs = await models.Configs.find({});
-
-//   for (const config of configs) {
-//     configsMap[config.code] = config.value;
-//   }
-
-//   set("configs_erxes_integrations", JSON.stringify(configsMap));
-
-//   return configsMap;
-// };
-
 dotenv.config();
+
 interface IRequestParams {
   url?: string;
   path?: string;
@@ -79,26 +57,15 @@ interface IRequestParams {
  * @returns throw Error
  */
 export const checkConcurrentError = (e: any, name: string) => {
-  throw new Error(
-    e.message.includes("duplicate")
-      ? `Concurrent request: nylas ${name} duplication`
-      : e
-  );
+  throw new Error(e.message.includes('duplicate') ? `Concurrent request: nylas ${name} duplication` : e);
 };
 
 /**
  * Send request
  */
-export const sendRequest = ({
-  url,
-  headerType,
-  headerParams,
-  method,
-  body,
-  params,
-}: IRequestParams): Promise<any> => {
+export const sendRequest = ({ url, headerType, headerParams, method, body, params }: IRequestParams): Promise<any> => {
   return new Promise((resolve, reject) => {
-    const DOMAIN = getEnv({ name: "DOMAIN" });
+    const DOMAIN = getEnv({ name: 'DOMAIN' });
 
     const reqBody = JSON.stringify(body || {});
     const reqParams = JSON.stringify(params || {});
@@ -112,20 +79,18 @@ export const sendRequest = ({
       `);
 
     request({
-      uri: encodeURI(url),
+      uri: encodeURI(url as string),
       method,
       headers: {
-        "Content-Type": headerType || "application/json",
+        'Content-Type': headerType || 'application/json',
         ...headerParams,
         origin: DOMAIN,
       },
-      ...(headerType && headerType.includes("form")
-        ? { form: body }
-        : { body }),
+      ...(headerType && headerType.includes('form') ? { form: body } : { body }),
       qs: params,
       json: true,
     })
-      .then((res) => {
+      .then(res => {
         debugExternalRequests(`
         Success from ${url}
         requestBody: ${reqBody}
@@ -135,8 +100,8 @@ export const sendRequest = ({
 
         return resolve(res);
       })
-      .catch((e) => {
-        if (e.code === "ECONNREFUSED") {
+      .catch(e => {
+        if (e.code === 'ECONNREFUSED') {
           debugExternalRequests(`Failed to connect ${url}`);
           throw new Error(`Failed to connect ${url}`);
         } else {
@@ -153,7 +118,7 @@ export const sendRequest = ({
  * @returns {String} striped text
  */
 export const cleanHtml = (body: string) => {
-  const clean = sanitizeHtml(body || "", {
+  const clean = sanitizeHtml(body || '', {
     allowedTags: [],
     allowedAttributes: {},
   }).trim();
@@ -161,16 +126,10 @@ export const cleanHtml = (body: string) => {
   return clean.substring(0, 65);
 };
 
-export const getEnv = ({
-  name,
-  defaultValue,
-}: {
-  name: string;
-  defaultValue?: string;
-}): string => {
+export const getEnv = ({ name, defaultValue }: { name: string; defaultValue?: string }): string => {
   const value = process.env[name];
 
-  if (!value && typeof defaultValue !== "undefined") {
+  if (!value && typeof defaultValue !== 'undefined') {
     return defaultValue;
   }
 
@@ -178,7 +137,7 @@ export const getEnv = ({
     debugBase(`Missing environment variable configuration for ${name}`);
   }
 
-  return value || "";
+  return value || '';
 };
 
 /**
@@ -186,63 +145,64 @@ export const getEnv = ({
  * @param {Functions} fns
  * @returns {Promise} fns value
  */
-export const compose = (...fns) => (arg) =>
-  fns.reduceRight((p, f) => p.then(f), Promise.resolve(arg));
+export const compose = (...fns) => arg => fns.reduceRight((p, f) => p.then(f), Promise.resolve(arg));
 
 /*
  * Generate url depending on given file upload publicly or not
  */
-export const generateAttachmentUrl = (urlOrName: string) => {
-  const MAIN_API_DOMAIN = getEnv({ name: "MAIN_API_DOMAIN" });
+export const generateAttachmentUrl = (urlOrName: string): string => {
+  const MAIN_API_DOMAIN = getEnv({ name: 'MAIN_API_DOMAIN' });
 
-  if (urlOrName.startsWith("http")) {
+  if (urlOrName.startsWith('http')) {
     return urlOrName;
   }
 
   return `${MAIN_API_DOMAIN}/read-file?key=${urlOrName}`;
 };
 
-export const downloadAttachment = (urlOrName) => {
-  return new Promise(async (resolve, reject) => {
-    const url = generateAttachmentUrl(urlOrName);
+export const downloadAttachment = urlOrName => {
+  return new Promise(
+    async (resolve, reject): Promise<void> => {
+      const url = generateAttachmentUrl(urlOrName);
 
-    const options = {
-      url,
-      encoding: null,
-    };
+      const options = {
+        url,
+        encoding: null,
+      };
 
-    try {
-      await request.get(options).then((res) => {
-        const buffer = Buffer.from(res, "utf8");
+      try {
+        await request.get(options).then((res): void => {
+          const buffer = Buffer.from(res, 'utf8');
 
-        resolve(buffer.toString("base64"));
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+          resolve(buffer.toString('base64'));
+        });
+      } catch (e) {
+        reject(e);
+      }
+    },
+  );
 };
 
-export const getConfigs = async () => {
-  const configsCache = await memoryStorage().get("configs_erxes_integrations");
+export const getConfigs = async (): Promise<any> => {
+  const configsCache = await memoryStorage().get('configs_erxes_integrations');
 
-  if (configsCache && configsCache !== "{}") {
+  if (configsCache && configsCache !== '{}') {
     return JSON.parse(configsCache);
   }
 
-  const configsMap = {};
-  const configs = await Configs.find({});
+  const configsMap: object = {};
+  const configs: IConfigDocument[] = await Configs.find({});
 
   for (const config of configs) {
     configsMap[config.code] = config.value;
   }
 
-  memoryStorage().set("configs_erxes_integrations", JSON.stringify(configsMap));
+  memoryStorage().set('configs_erxes_integrations', JSON.stringify(configsMap));
 
   return configsMap;
 };
 
-export const getConfig = async (code, defaultValue?) => {
+export const getConfig = async (code, defaultValue?): Promise<any> => {
   const configs = await getConfigs();
 
   if (!configs[code]) {
@@ -252,8 +212,8 @@ export const getConfig = async (code, defaultValue?) => {
   return configs[code];
 };
 
-export const getCommonGoogleConfigs = async () => {
-  const response = await sendRPCMessage({ action: "get-configs" });
+export const getCommonGoogleConfigs = async (): Promise<any> => {
+  const response = await sendRPCMessage({ action: 'get-configs' });
 
   const configs = response.configs;
 
@@ -265,31 +225,23 @@ export const getCommonGoogleConfigs = async () => {
   };
 };
 
-export const resetConfigsCache = () => {
-  memoryStorage().set("configs_erxes_integrations", "");
+export const resetConfigsCache = (): void => {
+  memoryStorage().set('configs_erxes_integrations', '');
 };
 
-export const generateUid = () => {
+export const generateUid = (): string => {
   return (
-    "_" +
+    '_' +
     Math.random()
       .toString(36)
       .substr(2, 9)
   );
 };
 
-export const isAfter = (
-  expiresTimestamp: number,
-  defaultMillisecond?: number
-) => {
+export const isAfter = (expiresTimestamp: number, defaultMillisecond?: number): boolean => {
   const millisecond = defaultMillisecond || new Date().getTime();
   const expiresMillisecond = new Date(expiresTimestamp * 1000).getTime();
-
-  if (expiresMillisecond > millisecond) {
-    return true;
-  }
-
-  return false;
+  return expiresMillisecond > millisecond;
 };
 
 export const getRecordings = async (recordings: IRecording[]) => {
@@ -297,15 +249,10 @@ export const getRecordings = async (recordings: IRecording[]) => {
 
   for (const record of recordings) {
     if (!record.expires || (record.expires && !isAfter(record.expires))) {
-      const accessLinkResponse = await sendDailyRequest(
-        `/api/v1/recordings/${record.id}/access-link`,
-        "GET"
-      );
-
+      const accessLinkResponse = await sendDailyRequest(`/api/v1/recordings/${record.id}/access-link`, 'GET');
       record.expires = accessLinkResponse.expires;
       record.url = accessLinkResponse.download_link;
     }
-
     newRecordings.push(record);
   }
 

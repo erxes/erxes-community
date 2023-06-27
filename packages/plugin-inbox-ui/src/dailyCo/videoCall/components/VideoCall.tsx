@@ -59,7 +59,7 @@ class VideoCall extends React.Component<Props, States> {
     super(props);
 
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
@@ -68,9 +68,7 @@ class VideoCall extends React.Component<Props, States> {
 
     const owner = { url };
 
-    const parentEl =
-      document.getElementById('call-frame-container') ||
-      document.getElementsByTagName('body')[0];
+    const parentEl = document.getElementById('call-frame-container') || document.getElementsByTagName('body')[0];
 
     this.callFrame = DailyIframe.createFrame(parentEl, {});
 
@@ -80,21 +78,20 @@ class VideoCall extends React.Component<Props, States> {
       })
       .on('recording-started', data => {
         this.setState({
-          recordingId: data.recordingId
+          recordingId: data.recordingId,
         });
       })
       .on('recording-upload-completed', data => {
         if (data.action === 'recording-upload-completed') {
           graphql({
-              mutation: gql(mutations.saveVideoRecordingInfo),
-              variables: {
-                conversationId,
-                recordingId: this.state.recordingId
-              }
-            })
-            .catch(error => {
-              Alert.error(error.message);
-            });
+            mutation: gql(mutations.saveVideoRecordingInfo),
+            variables: {
+              conversationId,
+              recordingId: this.state.recordingId,
+            },
+          }).catch(error => {
+            Alert.error(error.message);
+          });
         }
       });
 
@@ -108,7 +105,7 @@ class VideoCall extends React.Component<Props, States> {
     client
       .mutate({
         mutation: gql(mutations.deleteVideoChatRoom),
-        variables: { name }
+        variables: { name },
       })
       .then(({ data: { conversationDeleteVideoChatRoom } }) => {
         if (conversationDeleteVideoChatRoom) {
@@ -144,10 +141,7 @@ class VideoCall extends React.Component<Props, States> {
       <>
         {this.renderControls()}
         {errorMessage && <Error>{errorMessage}</Error>}
-        <div
-          id="call-frame-container"
-          style={{ width: '100%', height: '100%' }}
-        />
+        <div id="call-frame-container" style={{ width: '100%', height: '100%' }} />
       </>
     );
   }

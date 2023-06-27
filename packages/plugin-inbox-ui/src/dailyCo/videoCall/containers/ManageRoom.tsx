@@ -28,17 +28,12 @@ function ManageRoom(props: Props) {
     window.open(
       `/videoCall?url=${url}&name=${name}&conversationId=${conversationId}`,
       '_blank',
-      `toolbar=no,titlebar=no,directories=no,menubar=no,location=no,scrollbars=yes,status=no,height=${height},width=${width},top=${y},left=${x}`
+      `toolbar=no,titlebar=no,directories=no,menubar=no,location=no,scrollbars=yes,status=no,height=${height},width=${width},top=${y},left=${x}`,
     );
   };
 
   const createVideoRoom = () => {
-    const {
-      conversationId,
-      activeVideo,
-      refetchDetail,
-      refetchMessages
-    } = props;
+    const { conversationId, activeVideo, refetchDetail, refetchMessages } = props;
 
     if (activeVideo && activeVideo.url) {
       openWindow(conversationId, activeVideo.url, activeVideo.name || '');
@@ -48,7 +43,7 @@ function ManageRoom(props: Props) {
       client
         .mutate({
           mutation: gql(mutations.createVideoChatRoom),
-          variables: { _id: conversationId }
+          variables: { _id: conversationId },
         })
         .then(({ data }: any) => {
           setLoading(false);
@@ -70,9 +65,7 @@ function ManageRoom(props: Props) {
 
   return (
     <Tip text={__('Invite to video call')}>
-      <label onClick={createVideoRoom}>
-        {loading ? <SmallLoader /> : <Icon icon="video" />}
-      </label>
+      <label onClick={createVideoRoom}>{loading ? <SmallLoader /> : <Icon icon="video" />}</label>
     </Tip>
   );
 }

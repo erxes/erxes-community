@@ -22,5 +22,5 @@ const saveVideoRecordingInfo = `
 export default {
   deleteVideoChatRoom,
   createVideoChatRoom,
-  saveVideoRecordingInfo
+  saveVideoRecordingInfo,
 };

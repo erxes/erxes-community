@@ -1,11 +1,5 @@
-import { Document, Model, model, Schema } from "mongoose";
-import { field } from "./utils";
-
-export interface IRecording {
-  id: string;
-  url?: string;
-  expires?: number;
-}
+import { Document, Model, model, Schema } from 'mongoose';
+import { field } from './utils';
 
 export interface ICallRecord {
   erxesApiMessageId: string;
@@ -14,38 +8,27 @@ export interface ICallRecord {
   kind: string;
   privacy: string;
   status?: string;
+  recordId?: string;
   token?: string;
-  recordings?: IRecording[];
 }
 
 interface ICallRecordDocument extends ICallRecord, Document {
   _id: string;
 }
 
-const recordingSchema = new Schema(
-  {
-    id: String,
-    url: String,
-    expires: Number,
-  },
-  {
-    _id: false,
-  }
-);
-
 const callRecordSchema = new Schema({
   _id: field({ pkey: true }),
   erxesApiMessageId: String,
   erxesApiConversationId: String,
-  recordings: [recordingSchema],
   roomName: String,
   kind: String,
   privacy: String,
   token: String,
   status: {
     type: String,
-    default: "ongoing",
+    default: 'ongoing',
   },
+  recordId: String,
   createdAt: Date,
 });
 
@@ -68,7 +51,4 @@ const loadCallRecordClass = () => {
 loadCallRecordClass();
 
 // tslint:disable-next-line
-export const CallRecords = model<ICallRecordDocument, ICallRecordModel>(
-  "call_records",
-  callRecordSchema
-);
+export const CallRecords = model<ICallRecordDocument, ICallRecordModel>('call_records', callRecordSchema);
