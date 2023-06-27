@@ -4,12 +4,27 @@ include ./modal.pug
 
 block layout-content
   .my-layout
-    .header #{__('Payment')}
+    .header #{__('Payment methods')}
+      h1(style="font-size: 16px; color: grey;") #{__('Choose your payment method')}
     .paymentContainer
+
+      //- TODO temporary hide invoice description
+      //- if (invoiceData.description)
+      //-   h3 #{__('Description')}
+      //-   .border
+      //-     strong #{invoiceData.description}
       each payment in payments
         button(type='button', data-toggle='modal', data-target='#myModal', onclick=`onPaymentClick('${JSON.stringify(payment)}', '${JSON.stringify(invoiceData)}','${prefix}')`).button
           img(src=`${prefix}/pl:payment/static/images/payments/${payment.kind}.png`)
           .payment-name  
-            p !{payment.title}
-      
-  +modal({paymentKind: 'qpay', description:"test"}) 
+            p !{payment.title}  
+    .block.amount
+      h4 #{__('Payment amount')}
+      h2.amount-total #{invoiceData.amount.toLocaleString(undefined, {maximumFractionDigits: 2})} ₮
+  
+      if invoiceData.warningText 
+        .block.warning
+          i.fa.fa-exclamation-triangle
+          p.warning-text #{invoiceData.warningText}
+
+  +modal() 
