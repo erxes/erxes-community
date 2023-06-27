@@ -14,7 +14,7 @@ module.exports = {
   },
   inboxIntegrationSettings: './inboxIntegrationSettings',
   inboxConversationDetail: './inboxConversationDetail',
-  inboxIntegration: {
+  inboxIntegrations: [{
     name: 'Discord',
     description:
       'Please write integration description on plugin config file',
@@ -22,5 +22,5 @@ module.exports = {
     kind: 'discord',
     logo: '/images/integrations/discord.png',
     createUrl: '/settings/integrations/createDiscord'
-  }
+  }]
 };
