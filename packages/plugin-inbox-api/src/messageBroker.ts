@@ -7,6 +7,9 @@ import { sendToWebhook as sendWebhook } from '@erxes/api-utils/src';
 import { getIntegrationsKinds } from './utils';
 import { sendNotifications } from './graphql/resolvers/conversationMutations';
 import { pConversationClientMessageInserted } from './graphql/resolvers/widgetMutations';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export let client: any;
 
@@ -93,23 +96,18 @@ export const initBroker = cl => {
 
   consumeRPCQueue('inbox:integrations.find', async ({ subdomain, data: { query, options } }) => {
     const models = await generateModels(subdomain);
-
     const integrations = await models.Integrations.findIntegrations(query, options);
-
     return { data: integrations, status: 'success' };
   });
 
   consumeRPCQueue('inbox:integrations.count', async ({ subdomain, data: { selector } }) => {
     const models = await generateModels(subdomain);
-
     const count = await models.Integrations.count(selector);
-
     return { data: count, status: 'success' };
   });
 
   consumeQueue('inbox:changeCustomer', async ({ subdomain, data: { customerId, customerIds } }) => {
     const models = await generateModels(subdomain);
-
     await models.Conversations.changeCustomer(customerId, customerIds);
   });
 
@@ -151,7 +149,6 @@ export const initBroker = cl => {
 
   consumeRPCQueue('inbox:updateConversationMessage', async ({ subdomain, data: { filter, updateDoc } }) => {
     const models = await generateModels(subdomain);
-
     const updated = await models.ConversationMessages.updateOne(filter, {
       $set: updateDoc,
     });
@@ -164,13 +161,11 @@ export const initBroker = cl => {
 
   consumeQueue('inbox:removeCustomersConversations', async ({ subdomain, data: { customerIds } }) => {
     const models = await generateModels(subdomain);
-
     return models.Conversations.removeCustomersConversations(customerIds);
   });
 
   consumeQueue('inbox:removeConversation', async ({ subdomain, data: { _id } }) => {
     const models = await generateModels(subdomain);
-
     await models.ConversationMessages.deleteMany({ conversationId: _id });
     return models.Conversations.deleteOne({ _id });
   });
@@ -237,7 +232,6 @@ export const initBroker = cl => {
 
     if (module.includes('contacts')) {
       const queryField = target[module.includes('company') ? 'companyId' : 'customerId'];
-
       if (queryField) {
         filter = {
           _id: queryField,
