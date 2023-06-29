@@ -40,7 +40,11 @@ export const loadPeriodLockClass = (models: IModels) => {
         );
 
       const periodLocks = await models.PeriodLocks.create(doc);
-      const prevLock = await models.PeriodLocks.findOne().sort({ date: 1 });
+
+      const prevLock = await models.PeriodLocks.findOne({
+        data: { $lt: periodLocks.date }
+      }).sort({ date: 1 });
+
       const transactions = await models.Transactions.find({
         payDate: {
           $lte: periodLocks.date,
