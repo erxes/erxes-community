@@ -50,6 +50,7 @@ export const loadPeriodLockClass = (models: IModels) => {
           $lte: periodLocks.date,
           ...(prevLock?.date ? { $gte: prevLock?.date } : {})
         },
+        total: { $gt: 0 },
         contractId: { $nin: doc.excludeContracts || [] }
       });
 
