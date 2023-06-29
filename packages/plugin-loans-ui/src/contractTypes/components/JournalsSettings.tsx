@@ -72,7 +72,7 @@ class GeneralSettings extends React.Component<Props, State> {
 
     return (
       <FormGroup>
-        <ControlLabel>{key}</ControlLabel>
+        <ControlLabel>{__(JOURNALS_KEY_LABELS[key])}</ControlLabel>
         {description && <p>{__(description)}</p>}
         <FormControl
           {...controlProps}
@@ -88,7 +88,7 @@ class GeneralSettings extends React.Component<Props, State> {
 
     return (
       <FormGroup>
-        <ControlLabel>{JOURNALS_KEY_LABELS[key]}</ControlLabel>
+        <ControlLabel>{__(JOURNALS_KEY_LABELS[key])}</ControlLabel>
         {description && <p>{__(description)}</p>}
         <FormControl
           checked={currentMap[key]}
@@ -120,31 +120,37 @@ class GeneralSettings extends React.Component<Props, State> {
           {this.renderItem('doubtfulAccount')}
           {this.renderItem('negativeAccount')}
           {this.renderItem('badAccount')}
+          {this.renderCheckbox('amountHasEBarimt')}
         </CollapseContent>
 
         <CollapseContent title={__('Interest')}>
           {this.renderItem('interestAccount')}
-          {this.renderCheckbox('extraInterestHasVat')}
-          {this.renderCheckbox('extraInterestHasCitytax')}
-          {this.renderCheckbox('extraInterestIsEbarimt')}
+          {this.renderCheckbox('interestHasEBarimt')}
         </CollapseContent>
 
         <CollapseContent title={__('Insurance')}>
           {this.renderItem('insuranceAccount')}
         </CollapseContent>
 
-        <CollapseContent title={__('Undue')}>
+        <CollapseContent title={__('Loss')}>
           {this.renderItem('undueAccount')}
-          {this.renderCheckbox('undueHasVat')}
-          {this.renderCheckbox('undueHasCitytax')}
-          {this.renderCheckbox('undueIsEbarimt')}
+          {this.renderCheckbox('undueHasEBarimt')}
         </CollapseContent>
 
         <CollapseContent title={__('Other')}>
           {this.renderItem('debtAccount')}
           {this.renderItem('otherReceivable')}
-          {this.renderItem('feeIncome')}
+          {this.renderItem('feeIncomeAccount')}
         </CollapseContent>
+
+        <CollapseContent title={__('EBarimt')}>
+          {this.renderItem('eBarimtAccount')}
+          {this.renderItem('organizationRegister')}
+          {this.renderCheckbox('isAmountUseEBarimt')}
+          {this.renderCheckbox('isInterestUseEBarimt')}
+          {this.renderCheckbox('isUndueUseEBarimt')}
+        </CollapseContent>
+
         <CollapseContent title={__('Classification')}>
           {this.renderItem('normalExpirationDay', 'Normal /Expiration Day/', {
             type: 'number'

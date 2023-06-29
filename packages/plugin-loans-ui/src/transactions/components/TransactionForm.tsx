@@ -161,7 +161,7 @@ class TransactionForm extends React.Component<Props, State> {
           {this.renderRowTr('Payment', 'payment')}
           {this.renderRowTr('Interest Eve', 'interestEve')}
           {this.renderRowTr('Interest Nonce', 'interestNonce')}
-          {this.renderRowTr('Undue', 'undue')}
+          {this.renderRowTr('Loss', 'undue')}
           {this.renderRowTr('Insurance', 'insurance')}
           {this.renderRowTr('Debt', 'debt')}
         </>
