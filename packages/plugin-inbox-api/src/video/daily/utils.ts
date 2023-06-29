@@ -2,10 +2,9 @@ import * as dotenv from 'dotenv';
 import * as request from 'request-promise';
 import * as sanitizeHtml from 'sanitize-html';
 import { debugBase, debugExternalRequests } from '../debuggers';
-import memoryStorage from './inmemoryStorage';
-import { sendRPCMessage } from './messageBroker';
-import Configs from '../models/Configs';
-import { IProviderSettings } from './nylas/types';
+import memoryStorage from '../../inmemoryStorage';
+import { sendRPCMessage } from '../../messageBroker';
+import Configs from '../../models/definitions/configs';
 
 dotenv.config();
 
@@ -16,7 +15,7 @@ interface IRequestParams {
   headerParams?: { [key: string]: string };
   method: string;
   params?: { [key: string]: string };
-  body?: { [key: string]: string | string[] | boolean | { [key: string]: string } | IProviderSettings };
+  body?: { [key: string]: string | string[] | boolean | { [key: string]: string } | any };
 }
 
 /**
@@ -48,7 +47,7 @@ export const sendRequest = ({ url, headerType, headerParams, method, body, param
       `);
 
     request({
-      uri: encodeURI(url),
+      uri: encodeURI(url as string),
       method,
       headers: {
         'Content-Type': headerType || 'application/json',

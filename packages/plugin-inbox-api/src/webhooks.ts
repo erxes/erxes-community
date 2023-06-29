@@ -4,18 +4,18 @@ export default {
     {
       label: 'Customer create conversation',
       action: 'create',
-      type: 'inbox:conversation'
+      type: 'inbox:conversation',
     },
     {
       label: 'Customer messages',
       action: 'create',
-      type: 'inbox:customerMessages'
+      type: 'inbox:customerMessages',
     },
     {
       label: 'Form submission received',
       action: 'create',
-      type: 'inbox:popupSubmitted'
-    }
+      type: 'inbox:popupSubmitted',
+    },
   ],
   getInfo: ({ data: { data, contentType } }) => {
     let url: string;
@@ -25,17 +25,14 @@ export default {
       case 'userMessages':
         url = `/inbox/index?_id=${data.conversationId}`;
         content = 'Admin has replied to a conversation';
-
         break;
       case 'customerMessages':
         url = `/inbox/index?_id=${data.conversationId}`;
         content = 'Customer has send a conversation message';
-
         break;
       case 'conversation':
         url = `/inbox/index?_id=${data._id}`;
         content = 'Customer has started new conversation';
-
         break;
       // if contentType equal to popupSubmitted, default will work
       default:
@@ -45,7 +42,7 @@ export default {
 
     return {
       url,
-      content
+      content,
     };
-  }
+  },
 };

@@ -1,9 +1,9 @@
-// import DailyIframe from '@daily-co/daily-js';
+import React from 'react';
+import DailyIframe from '@daily-co/daily-js';
 import client from '@erxes/ui/src/apolloClient';
 import { gql } from '@apollo/client';
 import { SimpleButton } from '@erxes/ui/src/styles/main';
-import { __, Alert } from 'coreui/utils';
-import React from 'react';
+import { __, Alert } from '@erxes/ui/src/utils';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { mutations } from '../graphql';
@@ -16,10 +16,8 @@ const Control = styled('div')`
 
 const ControlBtn = styledTS<{ disabled?: boolean }>(styled(SimpleButton))`
   float: left;
-  
   width: auto;
   height: auto;
-  
   padding: 0 10px;
   margin: 0 20px;
   font-size: 13px;
@@ -56,7 +54,7 @@ class VideoCall extends React.Component<Props, States> {
     super(props);
 
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
@@ -65,9 +63,7 @@ class VideoCall extends React.Component<Props, States> {
 
     const owner = { url };
 
-    const parentEl =
-      document.getElementById('call-frame-container') ||
-      document.getElementsByTagName('body')[0];
+    const parentEl = document.getElementById('call-frame-container') || document.getElementsByTagName('body')[0];
 
     // this.callFrame = DailyIframe.createFrame(parentEl, {});
 
@@ -106,7 +102,7 @@ class VideoCall extends React.Component<Props, States> {
     client
       .mutate({
         mutation: gql(mutations.deleteVideoChatRoom),
-        variables: { name }
+        variables: { name },
       })
       .then(({ data: { integrationsDeleteVideoChatRoom } }) => {
         if (integrationsDeleteVideoChatRoom) {
@@ -142,10 +138,7 @@ class VideoCall extends React.Component<Props, States> {
       <>
         {this.renderControls()}
         {errorMessage && <Error>{errorMessage}</Error>}
-        <div
-          id="call-frame-container"
-          style={{ width: '100%', height: '100%' }}
-        />
+        <div id="call-frame-container" style={{ width: '100%', height: '100%' }} />
       </>
     );
   }

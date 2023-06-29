@@ -1,4 +1,4 @@
-import { debugError } from '@packages/core/src/debuggers';
+import { debugError } from './debuggers';
 
 export const routeErrorHandling = (fn, callback?: any) => {
   return async (req, res, next): Promise<any> => {

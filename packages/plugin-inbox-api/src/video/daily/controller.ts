@@ -117,7 +117,10 @@ const init = async app => {
     const { DAILY_END_POINT } = await getConfigs();
 
     try {
-      const callRecord = await CallRecords.findOne({ erxesApiConversationId, status: VIDEO_CALL_STATUS.ONGOING });
+      const callRecord = await CallRecords.findOne({
+        erxesApiConversationId,
+        status: VIDEO_CALL_STATUS.ONGOING,
+      });
 
       if (callRecord) {
         const ownerTokenResponse = await sendDailyRequest(`/api/v1/meeting-tokens/`, 'POST', {

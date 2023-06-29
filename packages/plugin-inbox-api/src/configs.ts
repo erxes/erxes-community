@@ -6,12 +6,7 @@ import resolvers from './graphql/resolvers';
 import { generateAllDataLoaders } from './dataLoaders';
 import { initBroker } from './messageBroker';
 import { routeErrorHandling } from '@erxes/api-utils/src/requests';
-import {
-  identifyCustomer,
-  trackCustomEvent,
-  trackViewPageEvent,
-  updateCustomerProperties
-} from './events';
+import { identifyCustomer, trackCustomEvent, trackViewPageEvent, updateCustomerProperties } from './events';
 import { generateModels } from './connectionResolver';
 import logs from './logUtils';
 import tags from './tags';
@@ -27,11 +22,11 @@ import cronjobs from './cronjobs/conversations';
 import dashboards from './dashboards';
 import webhookMiddleware from './middlewares/webhookMiddleware';
 import payment from './payment';
+import videoCallInit from './video/controller';
 
 export let mainDb;
 export let graphqlPubsub;
 export let serviceDiscovery;
-
 export let debug;
 
 export default {
@@ -42,7 +37,7 @@ export default {
 
     return {
       typeDefs: await typeDefs(sd),
-      resolvers
+      resolvers,
     };
   },
   hasSubscriptions: true,
@@ -58,7 +53,7 @@ export default {
     cronjobs,
     permissions,
     dashboards,
-    payment
+    payment,
   },
   apolloServerContext: async (context, req, res) => {
     const subdomain = getSubdomain(req);
@@ -72,7 +67,7 @@ export default {
     context.serverTiming = {
       startTime: res.startTime,
       endTime: res.endTime,
-      setMetric: res.setMetric
+      setMetric: res.setMetric,
     };
 
     return context;
@@ -98,13 +93,13 @@ export default {
                   name,
                   triggerAutomation,
                   customerId,
-                  attributes
+                  attributes,
                 });
 
           return res.json(response);
         },
-        res => res.json({ status: 'success' })
-      )
+        res => res.json({ status: 'success' }),
+      ),
     );
 
     app.post(
@@ -117,8 +112,8 @@ export default {
           const response = await identifyCustomer(subdomain, args);
           return res.json(response);
         },
-        res => res.json({})
-      )
+        res => res.json({}),
+      ),
     );
 
     app.post(
@@ -130,16 +125,19 @@ export default {
           const response = await updateCustomerProperties(subdomain, req.body);
           return res.json(response);
         },
-        res => res.json({})
-      )
+        res => res.json({}),
+      ),
     );
 
     app.get('/script-manager', cors({ origin: '*' }), widgetsMiddleware);
+
     app.post('/webhooks/:id', webhookMiddleware);
+
+    videoCallInit(app);
 
     initBroker(options.messageBrokerClient);
 
     debug = options.debug;
     graphqlPubsub = options.pubsubClient;
-  }
+  },
 };

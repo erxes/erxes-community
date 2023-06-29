@@ -11,16 +11,13 @@ import Configs, { IConfigDocument } from '../models/definitions/configs';
 
 export const field = options => {
   const { pkey, type, optional } = options;
-
   if (type === String && !pkey && !optional) {
     options.validate = /\S+/;
   }
-
   if (pkey) {
     options.type = String;
     options.default = () => Random.id();
   }
-
   return options;
 };
 
@@ -66,7 +63,6 @@ export const checkConcurrentError = (e: any, name: string) => {
 export const sendRequest = ({ url, headerType, headerParams, method, body, params }: IRequestParams): Promise<any> => {
   return new Promise((resolve, reject) => {
     const DOMAIN = getEnv({ name: 'DOMAIN' });
-
     const reqBody = JSON.stringify(body || {});
     const reqParams = JSON.stringify(params || {});
 
@@ -97,7 +93,6 @@ export const sendRequest = ({ url, headerType, headerParams, method, body, param
         requestParams: ${reqParams}
         responseBody: ${JSON.stringify(res)}
       `);
-
         return resolve(res);
       })
       .catch(e => {
@@ -122,21 +117,17 @@ export const cleanHtml = (body: string) => {
     allowedTags: [],
     allowedAttributes: {},
   }).trim();
-
   return clean.substring(0, 65);
 };
 
 export const getEnv = ({ name, defaultValue }: { name: string; defaultValue?: string }): string => {
   const value = process.env[name];
-
   if (!value && typeof defaultValue !== 'undefined') {
     return defaultValue;
   }
-
   if (!value) {
     debugBase(`Missing environment variable configuration for ${name}`);
   }
-
   return value || '';
 };
 
@@ -152,11 +143,9 @@ export const compose = (...fns) => arg => fns.reduceRight((p, f) => p.then(f), P
  */
 export const generateAttachmentUrl = (urlOrName: string): string => {
   const MAIN_API_DOMAIN = getEnv({ name: 'MAIN_API_DOMAIN' });
-
   if (urlOrName.startsWith('http')) {
     return urlOrName;
   }
-
   return `${MAIN_API_DOMAIN}/read-file?key=${urlOrName}`;
 };
 
@@ -164,16 +153,10 @@ export const downloadAttachment = urlOrName => {
   return new Promise(
     async (resolve, reject): Promise<void> => {
       const url = generateAttachmentUrl(urlOrName);
-
-      const options = {
-        url,
-        encoding: null,
-      };
-
+      const options = { url, encoding: null };
       try {
         await request.get(options).then((res): void => {
           const buffer = Buffer.from(res, 'utf8');
-
           resolve(buffer.toString('base64'));
         });
       } catch (e) {
@@ -185,38 +168,29 @@ export const downloadAttachment = urlOrName => {
 
 export const getConfigs = async (): Promise<any> => {
   const configsCache = await memoryStorage().get('configs_erxes_integrations');
-
   if (configsCache && configsCache !== '{}') {
     return JSON.parse(configsCache);
   }
-
   const configsMap: object = {};
   const configs: IConfigDocument[] = await Configs.find({});
-
   for (const config of configs) {
     configsMap[config.code] = config.value;
   }
-
   memoryStorage().set('configs_erxes_integrations', JSON.stringify(configsMap));
-
   return configsMap;
 };
 
 export const getConfig = async (code, defaultValue?): Promise<any> => {
   const configs = await getConfigs();
-
   if (!configs[code]) {
     return defaultValue;
   }
-
   return configs[code];
 };
 
 export const getCommonGoogleConfigs = async (): Promise<any> => {
   const response = await sendRPCMessage({ action: 'get-configs' });
-
   const configs = response.configs;
-
   return {
     GOOGLE_PROJECT_ID: configs.GOOGLE_PROJECT_ID,
     GOOGLE_CLIENT_ID: configs.GOOGLE_CLIENT_ID,
@@ -246,7 +220,6 @@ export const isAfter = (expiresTimestamp: number, defaultMillisecond?: number): 
 
 export const getRecordings = async (recordings: IRecording[]) => {
   const newRecordings: IRecording[] = [];
-
   for (const record of recordings) {
     if (!record.expires || (record.expires && !isAfter(record.expires))) {
       const accessLinkResponse = await sendDailyRequest(`/api/v1/recordings/${record.id}/access-link`, 'GET');
@@ -255,6 +228,5 @@ export const getRecordings = async (recordings: IRecording[]) => {
     }
     newRecordings.push(record);
   }
-
   return newRecordings;
 };
