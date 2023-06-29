@@ -56,7 +56,8 @@ export const loadPeriodLockClass = (models: IModels) => {
 
       const generals = await models.General.createGeneral(
         transactions,
-        periodLocks._id
+        periodLocks._id,
+        subdomain
       );
 
       await sendMessageBroker(
@@ -95,7 +96,11 @@ export const loadPeriodLockClass = (models: IModels) => {
       });
 
       await models.General.deleteMany({ periodLockId: _id });
-      const generals = await models.General.createGeneral(transactions, _id);
+      const generals = await models.General.createGeneral(
+        transactions,
+        _id,
+        subdomain
+      );
 
       await sendMessageBroker(
         {
