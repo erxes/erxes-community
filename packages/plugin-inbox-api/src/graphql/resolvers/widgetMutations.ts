@@ -701,8 +701,6 @@ const widgetMutations = {
           debug.error(e);
         }
 
-        console.log('--- integrationConfigs --- ', integrationConfigs);
-
         const timeDelay = integrationConfigs.find(
           config => config.code === 'VIDEO_CALL_TIME_DELAY_BETWEEN_REQUESTS',
         ) || { value: '0' };

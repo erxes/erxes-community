@@ -23,7 +23,7 @@ export const sendChannelNotifications = async (
   channel: IChannelDocument,
   type: 'invited' | 'removed',
   user: any,
-  receivers?: string[]
+  receivers?: string[],
 ) => {
   let action = `invited you to the`;
 
@@ -45,10 +45,8 @@ export const sendChannelNotifications = async (
       link: `/inbox/index?channelId=${channel._id}`,
 
       // exclude current user
-      receivers:
-        receivers ||
-        (channel.memberIds || []).filter(id => id !== channel.userId)
-    }
+      receivers: receivers || (channel.memberIds || []).filter(id => id !== channel.userId),
+    },
   });
 };
 
@@ -56,11 +54,7 @@ const channelMutations = {
   /**
    * Create a new channel and send notifications to its members bar the creator
    */
-  async channelsAdd(
-    _root,
-    doc: IChannel,
-    { user, models, subdomain }: IContext
-  ) {
+  async channelsAdd(_root, doc: IChannel, { user, models, subdomain }: IContext) {
     const channel = await models.Channels.createChannel(doc, user._id);
 
     await sendChannelNotifications(subdomain, channel, 'invited', user);
@@ -72,12 +66,12 @@ const channelMutations = {
         {
           type: MODULE_NAMES.CHANNEL,
           newData: { ...doc, userId: user._id },
-          object: channel
+          object: channel,
         },
-        user
+        user,
       );
     } catch (e) {
-      console.log(e, 'eee');
+      console.log(e);
     }
 
     return channel;
@@ -86,34 +80,15 @@ const channelMutations = {
   /**
    * Update channel data
    */
-  async channelsEdit(
-    _root,
-    { _id, ...doc }: IChannelsEdit,
-    { user, models, subdomain }: IContext
-  ) {
+  async channelsEdit(_root, { _id, ...doc }: IChannelsEdit, { user, models, subdomain }: IContext) {
     const channel = await models.Channels.getChannel(_id);
 
-    const { addedUserIds, removedUserIds } = checkUserIds(
-      channel.memberIds || [],
-      doc.memberIds || []
-    );
+    const { addedUserIds, removedUserIds } = checkUserIds(channel.memberIds || [], doc.memberIds || []);
 
     const updated = await models.Channels.updateChannel(_id, doc);
 
-    await sendChannelNotifications(
-      subdomain,
-      channel,
-      'invited',
-      user,
-      addedUserIds
-    );
-    await sendChannelNotifications(
-      subdomain,
-      channel,
-      'removed',
-      user,
-      removedUserIds
-    );
+    await sendChannelNotifications(subdomain, channel, 'invited', user, addedUserIds);
+    await sendChannelNotifications(subdomain, channel, 'removed', user, removedUserIds);
 
     await putUpdateLog(
       models,
@@ -122,22 +97,19 @@ const channelMutations = {
         type: MODULE_NAMES.CHANNEL,
         object: channel,
         newData: doc,
-        updatedDocument: updated
+        updatedDocument: updated,
       },
-      user
+      user,
     );
 
-    if (
-      (channel.integrationIds || []).toString() !==
-      (updated.integrationIds || []).toString()
-    ) {
+    if ((channel.integrationIds || []).toString() !== (updated.integrationIds || []).toString()) {
       sendCoreMessage({
         subdomain,
         action: 'registerOnboardHistory',
         data: {
           type: 'connectIntegrationsToChannel',
-          user
-        }
+          user,
+        },
       });
     }
 
@@ -147,26 +119,17 @@ const channelMutations = {
   /**
    * Remove a channel
    */
-  async channelsRemove(
-    _root,
-    { _id }: { _id: string },
-    { user, models, subdomain }: IContext
-  ) {
+  async channelsRemove(_root, { _id }: { _id: string }, { user, models, subdomain }: IContext) {
     const channel = await models.Channels.getChannel(_id);
 
     await models.Channels.removeChannel(_id);
 
     await sendChannelNotifications(subdomain, channel, 'removed', user);
 
-    await putDeleteLog(
-      models,
-      subdomain,
-      { type: MODULE_NAMES.CHANNEL, object: channel },
-      user
-    );
+    await putDeleteLog(models, subdomain, { type: MODULE_NAMES.CHANNEL, object: channel }, user);
 
     return true;
-  }
+  },
 };
 
 checkPermission(channelMutations, 'channelsAdd', 'manageChannels');

@@ -2,7 +2,7 @@ import { debugDaily, debugRequest } from './debuggers';
 import { routeErrorHandling } from './helpers';
 import { getConfig, getRecordings, sendRequest } from './utils';
 import { CallRecords, ICallRecord, IRecording } from '../models/definitions/callRecords';
-import { Express } from 'express';
+import { Express, Request, Response } from 'express';
 
 const VIDEO_CALL_STATUS = {
   ONGOING: 'ongoing',
@@ -22,6 +22,8 @@ export const getConfigs = async () => {
 export const sendDailyRequest = async (url: string, method: string, body = {}) => {
   const { DAILY_API_KEY, DAILY_END_POINT } = await getConfigs();
 
+  console.log('DAILY_API_KEY', DAILY_API_KEY);
+
   return sendRequest({
     url: `${DAILY_END_POINT}${url}`,
     method,
@@ -35,7 +37,7 @@ export const sendDailyRequest = async (url: string, method: string, body = {}) =
 const init = async (app: Express) => {
   app.get(
     '/videoCall/usageStatus',
-    routeErrorHandling(async (_req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       const videoCallType = await getConfig('VIDEO_CALL_TYPE');
 
       switch (videoCallType) {
@@ -52,7 +54,7 @@ const init = async (app: Express) => {
 
   app.delete(
     '/daily/rooms',
-    routeErrorHandling(async (_req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       const response = await sendDailyRequest('/api/v1/rooms', 'GET');
       const rooms = response.data || [];
 
@@ -67,7 +69,7 @@ const init = async (app: Express) => {
 
   app.delete(
     '/daily/rooms/:roomName',
-    routeErrorHandling(async (req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       const { roomName } = req.params;
 
       const callRecord = await CallRecords.findOne({
@@ -87,7 +89,7 @@ const init = async (app: Express) => {
 
   app.get(
     '/daily/room',
-    routeErrorHandling(async (req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
 
       const { DAILY_END_POINT } = await getConfigs();
@@ -115,7 +117,7 @@ const init = async (app: Express) => {
 
   app.get(
     '/daily/get-active-room',
-    routeErrorHandling(async (req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
 
       const { erxesApiConversationId } = req.query;
@@ -149,7 +151,7 @@ const init = async (app: Express) => {
 
   app.post(
     '/daily/saveRecordingInfo',
-    routeErrorHandling(async (req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
       const { erxesApiConversationId, recordingId } = req.body;
       await CallRecords.updateOne(
@@ -165,7 +167,7 @@ const init = async (app: Express) => {
 
   app.post(
     '/daily/room',
-    routeErrorHandling(async (req, res) => {
+    routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
       const { DAILY_END_POINT } = await getConfigs();
       const { erxesApiMessageId, erxesApiConversationId } = req.body;
