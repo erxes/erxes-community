@@ -18,6 +18,7 @@ export const sendMessageBroker = async (
     | 'forms'
     | 'clientportal'
     | 'syncerkhet'
+    | 'ebarimt'
 ): Promise<any> => {
   return sendMessage({
     client,

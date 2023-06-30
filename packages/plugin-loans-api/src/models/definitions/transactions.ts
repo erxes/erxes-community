@@ -50,6 +50,7 @@ export interface ITransaction {
   reactions?: any[];
   futureDebt?: number;
   debtTenor?: number;
+  ebarimt?: any;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -147,6 +148,11 @@ export const transactionSchema = schemaHooksWrapper(
       min: 0,
       optional: true,
       label: 'debt Tenor'
+    }),
+    ebarimt: field({
+      type: Schema.Types.Mixed,
+      optional: true,
+      label: 'ebarimt'
     })
   }),
   'erxes_transactionSchema'

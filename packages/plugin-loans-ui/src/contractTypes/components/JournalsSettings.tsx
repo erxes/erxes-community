@@ -1,9 +1,12 @@
 import {
   Button,
+  Chooser,
   CollapseContent,
   ControlLabel,
   FormControl,
   FormGroup,
+  Icon,
+  ModalTrigger,
   MainStyleTitle as Title,
   Wrapper
 } from '@erxes/ui/src';
@@ -14,6 +17,8 @@ import React from 'react';
 import { JOURNALS_KEY_LABELS } from '../constants';
 import { IContractTypeDetail } from '../types';
 import { __ } from 'coreui/utils';
+import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
+import { CollateralButton } from '../../contracts/styles';
 
 const ContentBox = styled.div`
   padding: ${dimensions.coreSpacing}px;
@@ -83,7 +88,7 @@ class GeneralSettings extends React.Component<Props, State> {
     );
   };
 
-  renderCheckbox = (key: string, description?: string) => {
+  renderCheckbox = (key: string, description?: string, backElement?: any) => {
     const { currentMap } = this.state;
 
     return (
@@ -95,9 +100,64 @@ class GeneralSettings extends React.Component<Props, State> {
           onChange={this.onChangeCheckbox.bind(this, key)}
           componentClass="checkbox"
         />
+        {backElement}
       </FormGroup>
     );
   };
+
+  renderCollateralTrigger(collateral?: any) {
+    let content = (
+      <div>
+        {__('Choose Collateral')} <Icon icon="plus-circle" />
+      </div>
+    );
+
+    // if collateral selected
+    if (collateral) {
+      content = (
+        <div>
+          {collateral.name} <Icon icon="pen-1" />
+        </div>
+      );
+    }
+
+    return <CollateralButton>{content}</CollateralButton>;
+  }
+
+  renderProductModal(collateralData: any, key: string) {
+    const collateralOnChange = (collaterals: any[]) => {
+      const collateral =
+        collaterals && collaterals.length === 1 ? collaterals[0] : null;
+
+      if (collateral) {
+        this.onChangeInput.bind(collateral._id, key);
+      }
+    };
+
+    const content = props => (
+      <ProductChooser
+        {...props}
+        onSelect={collateralOnChange}
+        // onChangeCategory={this.onChangeCategory}
+        // categoryId={this.state.categoryId}
+        data={{
+          name: 'Collateral',
+          products: collateralData.collateral ? [collateralData.collateral] : []
+        }}
+        limit={1}
+        chooserComponent={Chooser}
+      />
+    );
+
+    return (
+      <ModalTrigger
+        title="Choose collateral"
+        trigger={this.renderCollateralTrigger(collateralData.collateral)}
+        size="lg"
+        content={content}
+      />
+    );
+  }
 
   render() {
     const actionButtons = (
@@ -146,9 +206,21 @@ class GeneralSettings extends React.Component<Props, State> {
         <CollapseContent title={__('EBarimt')}>
           {this.renderItem('eBarimtAccount')}
           {this.renderItem('organizationRegister')}
-          {this.renderCheckbox('isAmountUseEBarimt')}
-          {this.renderCheckbox('isInterestUseEBarimt')}
-          {this.renderCheckbox('isUndueUseEBarimt')}
+          {this.renderCheckbox(
+            'isAmountUseEBarimt',
+            undefined,
+            this.renderCollateralModal({}, 'amountEBarimtProduct')
+          )}
+          {this.renderCheckbox(
+            'isInterestUseEBarimt',
+            undefined,
+            this.renderCollateralModal({}, 'amountEBarimtProduct')
+          )}
+          {this.renderCheckbox(
+            'isUndueUseEBarimt',
+            undefined,
+            this.renderCollateralModal({}, 'amountEBarimtProduct')
+          )}
         </CollapseContent>
 
         <CollapseContent title={__('Classification')}>
