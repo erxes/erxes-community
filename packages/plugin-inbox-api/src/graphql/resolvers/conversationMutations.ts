@@ -1,10 +1,7 @@
 import * as strip from 'strip';
 import * as _ from 'underscore';
 
-import {
-  checkPermission,
-  requireLogin
-} from '@erxes/api-utils/src/permissions';
+import { checkPermission, requireLogin } from '@erxes/api-utils/src/permissions';
 import { IUserDocument } from '@erxes/api-utils/src/types';
 
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
@@ -28,6 +25,8 @@ import { CONVERSATION_STATUSES } from '../../models/definitions/constants';
 import { generateModels, IContext, IModels } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 import { IIntegrationDocument } from '../../models/definitions/integrations';
+import { CallRecords, ICallRecord } from '../../models/definitions/callRecords';
+import { sendDailyRequest } from '../../video/controller';
 
 export interface IConversationMessageAdd {
   conversationId: string;
@@ -64,6 +63,25 @@ interface IConversationConvert {
   description?: string;
 }
 
+interface IDailyRoomCreateResponse {
+  id: string;
+  name: string;
+  api_created: boolean;
+  privacy: string;
+  url: string;
+  created_at: string;
+  config: object;
+}
+
+const VIDEO_CALL_STATUS = {
+  ONGOING: 'ongoing',
+  END: 'end',
+  ALL: ['ongoing', 'end']
+};
+
+const DAILY_API_KEY = 'be6327e28a96394e97243df047fc63a50977898ce94a656291a0242c8b03d16a';
+const DAILY_END_POINT = 'https://api.daily.co';
+
 /**
  *  Send conversation to integrations
  */
@@ -86,9 +104,7 @@ const sendConversationToServices = async (
       }
     });
   } catch (e) {
-    throw new Error(
-      `Your message not sent Error: ${e.message}. Go to integrations list and fix it`
-    );
+    throw new Error(`Your message not sent Error: ${e.message}. Go to integrations list and fix it`);
   }
 };
 
@@ -108,10 +124,7 @@ export const conversationNotifReceivers = (
   }
 
   // participated users can get notifications
-  if (
-    conversation.participatedUserIds &&
-    conversation.participatedUserIds.length > 0
-  ) {
+  if (conversation.participatedUserIds && conversation.participatedUserIds.length > 0) {
     userIds = _.union(userIds, conversation.participatedUserIds);
   }
 
@@ -157,11 +170,7 @@ export const publishConversationsChanged = async (
 /**
  * Publish admin's message
  */
-export const publishMessage = async (
-  models: IModels,
-  message: IMessageDocument,
-  customerId?: string
-) => {
+export const publishMessage = async (models: IModels, message: IMessageDocument, customerId?: string) => {
   graphqlPubsub.publish('conversationMessageInserted', {
     conversationMessageInserted: message
   });
@@ -169,9 +178,7 @@ export const publishMessage = async (
   // widget is listening for this subscription to show notification
   // customerId available means trying to notify to client
   if (customerId) {
-    const unreadCount = await models.ConversationMessages.widgetsGetUnreadMessagesCount(
-      message.conversationId
-    );
+    const unreadCount = await models.ConversationMessages.widgetsGetUnreadMessagesCount(message.conversationId);
 
     graphqlPubsub.publish('conversationAdminMessageInserted', {
       conversationAdminMessageInserted: {
@@ -203,9 +210,7 @@ export const sendNotifications = async (
       createdUser: user,
       link: `/inbox/index?_id=${conversation._id}`,
       title: 'Conversation updated',
-      content: messageContent
-        ? messageContent
-        : conversation.content || 'Conversation updated',
+      content: messageContent ? messageContent : conversation.content || 'Conversation updated',
       notifType: type,
       receivers: conversationNotifReceivers(conversation, user._id),
       action: 'updated conversation',
@@ -229,9 +234,7 @@ export const sendNotifications = async (
 
         break;
       case 'conversationStateChange':
-        doc.action = `changed conversation status to ${(
-          conversation.status || ''
-        ).toUpperCase()}`;
+        doc.action = `changed conversation status to ${(conversation.status || '').toUpperCase()}`;
 
         break;
       default:
@@ -253,11 +256,7 @@ export const sendNotifications = async (
           data: {
             title: doc.title,
             body: strip(doc.content),
-            receivers: conversationNotifReceivers(
-              conversation,
-              user._id,
-              false
-            ),
+            receivers: conversationNotifReceivers(conversation, user._id, false),
             customerId: conversation.customerId,
             conversationId: conversation._id,
             data: {
@@ -286,14 +285,8 @@ const conversationMutations = {
   /**
    * Create new message in conversation
    */
-  async conversationMessageAdd(
-    _root,
-    doc: IConversationMessageAdd,
-    { user, models, subdomain }: IContext
-  ) {
-    const conversation = await models.Conversations.getConversation(
-      doc.conversationId
-    );
+  async conversationMessageAdd(_root, doc: IConversationMessageAdd, { user, models, subdomain }: IContext) {
+    const conversation = await models.Conversations.getConversation(doc.conversationId);
     const integration = await models.Integrations.getIntegration({
       _id: conversation.integrationId
     });
@@ -349,12 +342,7 @@ const conversationMutations = {
         userId: user._id
       };
 
-      const response = await sendConversationToServices(
-        subdomain,
-        integration,
-        serviceName,
-        payload
-      );
+      const response = await sendConversationToServices(subdomain, integration, serviceName, payload);
 
       // if the service runs separately & returns data, then don't save message inside inbox
       if (response && response.data) {
@@ -372,10 +360,7 @@ const conversationMutations = {
 
     // do not send internal message to third service integrations
     if (doc.internal) {
-      const messageObj = await models.ConversationMessages.addMessage(
-        doc,
-        user._id
-      );
+      const messageObj = await models.ConversationMessages.addMessage(doc, user._id);
 
       // publish new message to conversation detail
       publishMessage(models, messageObj);
@@ -407,10 +392,7 @@ const conversationMutations = {
    */
   async conversationsAssign(
     _root,
-    {
-      conversationIds,
-      assignedUserId
-    }: { conversationIds: string[]; assignedUserId: string },
+    { conversationIds, assignedUserId }: { conversationIds: string[]; assignedUserId: string },
     { user, models, subdomain }: IContext
   ) {
     const { oldConversationById } = await getConversationById(models, {
@@ -452,18 +434,9 @@ const conversationMutations = {
   /**
    * Unassign employee from conversation
    */
-  async conversationsUnassign(
-    _root,
-    { _ids }: { _ids: string[] },
-    { user, models, subdomain }: IContext
-  ) {
-    const {
-      oldConversations,
-      oldConversationById
-    } = await getConversationById(models, { _id: { $in: _ids } });
-    const updatedConversations = await models.Conversations.unassignUserConversation(
-      _ids
-    );
+  async conversationsUnassign(_root, { _ids }: { _ids: string[] }, { user, models, subdomain }: IContext) {
+    const { oldConversations, oldConversationById } = await getConversationById(models, { _id: { $in: _ids } });
+    const updatedConversations = await models.Conversations.unassignUserConversation(_ids);
 
     await sendNotifications(subdomain, {
       user,
@@ -567,11 +540,7 @@ const conversationMutations = {
   /**
    * Resolve all conversations
    */
-  async conversationResolveAll(
-    _root,
-    params: IListArgs,
-    { user, models, subdomain }: IContext
-  ) {
+  async conversationResolveAll(_root, params: IListArgs, { user, models, subdomain }: IContext) {
     // initiate query builder
     const qb = new QueryBuilder(models, subdomain, params, { _id: user._id });
 
@@ -585,10 +554,7 @@ const conversationMutations = {
       closedAt: new Date()
     };
 
-    const updated = await models.Conversations.resolveAllConversation(
-      query,
-      param
-    );
+    const updated = await models.Conversations.resolveAllConversation(query, param);
 
     const updatedConversations = await models.Conversations.find({
       _id: { $in: Object.keys(oldConversationById) }
@@ -615,20 +581,17 @@ const conversationMutations = {
   /**
    * Conversation mark as read
    */
-  async conversationMarkAsRead(
-    _root,
-    { _id }: { _id: string },
-    { user, models }: IContext
-  ) {
+  async conversationMarkAsRead(_root, { _id }: { _id: string }, { user, models }: IContext) {
     return models.Conversations.markAsReadConversation(_id, user._id);
   },
 
-  async conversationCreateVideoChatRoom(
-    _root,
-    { _id },
-    { user, models, subdomain }: IContext
-  ) {
-    let message;
+  async conversationCreateVideoChatRoom(_root, { _id }, { user, models, subdomain }: IContext) {
+    let message: any;
+    const privacy: string = 'private';
+
+    const roomCreateResponse: IDailyRoomCreateResponse = await sendDailyRequest('/v1/rooms', 'POST', {
+      privacy
+    });
 
     try {
       const doc = {
@@ -639,27 +602,30 @@ const conversationMutations = {
 
       message = await models.ConversationMessages.addMessage(doc, user._id);
 
-      const videoCallData = await sendIntegrationsMessage({
-        subdomain,
-        action: 'createDailyRoom',
-        data: {
-          erxesApiConversationId: _id,
-          erxesApiMessageId: message._id
-        },
-        isRPC: true
-      });
+      const callRecordData: ICallRecord = {
+        erxesApiConversationId: _id,
+        erxesApiMessageId: message._id,
+        roomName: roomCreateResponse.name,
+        kind: 'daily',
+        privacy,
+        token: DAILY_API_KEY
+      };
 
-      const updatedMessage = { ...message._doc, videoCallData };
+      const callRecord = await CallRecords.createCallRecord(callRecordData);
 
-      // publish new message to conversation detail
+      const updatedMessage = { ...message._doc };
       publishMessage(models, updatedMessage);
 
-      return videoCallData;
+      console.log('-----', roomCreateResponse);
+
+      return {
+        url: roomCreateResponse.url,
+        name: callRecord.roomName,
+        status: VIDEO_CALL_STATUS.ONGOING
+      };
     } catch (e) {
       debug.error(e.message);
-
       await models.ConversationMessages.deleteOne({ _id: message._id });
-
       throw new Error(e.message);
     }
   },
@@ -683,17 +649,10 @@ const conversationMutations = {
       conversationMessageInserted: message
     });
 
-    return models.Conversations.updateOne(
-      { _id },
-      { $set: { operatorStatus } }
-    );
+    return models.Conversations.updateOne({ _id }, { $set: { operatorStatus } });
   },
 
-  async conversationConvertToCard(
-    _root,
-    params: IConversationConvert,
-    { user, models, subdomain }: IContext
-  ) {
+  async conversationConvertToCard(_root, params: IConversationConvert, { user, models, subdomain }: IContext) {
     const { _id } = params;
 
     const conversation = await models.Conversations.getConversation(_id);
@@ -726,30 +685,10 @@ requireLogin(conversationMutations, 'conversationMarkAsRead');
 requireLogin(conversationMutations, 'conversationCreateVideoChatRoom');
 requireLogin(conversationMutations, 'conversationConvertToCard');
 
-checkPermission(
-  conversationMutations,
-  'conversationMessageAdd',
-  'conversationMessageAdd'
-);
-checkPermission(
-  conversationMutations,
-  'conversationsAssign',
-  'assignConversation'
-);
-checkPermission(
-  conversationMutations,
-  'conversationsUnassign',
-  'assignConversation'
-);
-checkPermission(
-  conversationMutations,
-  'conversationsChangeStatus',
-  'changeConversationStatus'
-);
-checkPermission(
-  conversationMutations,
-  'conversationResolveAll',
-  'conversationResolveAll'
-);
+checkPermission(conversationMutations, 'conversationMessageAdd', 'conversationMessageAdd');
+checkPermission(conversationMutations, 'conversationsAssign', 'assignConversation');
+checkPermission(conversationMutations, 'conversationsUnassign', 'assignConversation');
+checkPermission(conversationMutations, 'conversationsChangeStatus', 'changeConversationStatus');
+checkPermission(conversationMutations, 'conversationResolveAll', 'conversationResolveAll');
 
 export default conversationMutations;

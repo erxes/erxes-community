@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { SmallLoader } from '@erxes/ui/src/components/ButtonMutate';
 import Icon from '@erxes/ui/src/components/Icon';
 import Tip from '@erxes/ui/src/components/Tip';
-import { __, Alert } from 'coreui/utils';
+import { __, Alert } from '@erxes/ui/src/utils';
 import { IVideoCallData } from '@erxes/ui-inbox/src/inbox/types';
 import React, { useState } from 'react';
 import { mutations } from '../graphql';
@@ -33,12 +33,7 @@ function ManageRoom(props: Props) {
   };
 
   const createVideoRoom = () => {
-    const {
-      conversationId,
-      activeVideo,
-      refetchDetail,
-      refetchMessages
-    } = props;
+    const { conversationId, activeVideo, refetchDetail, refetchMessages } = props;
 
     if (activeVideo && activeVideo.url) {
       openWindow(conversationId, activeVideo.url, activeVideo.name || '');
@@ -70,9 +65,7 @@ function ManageRoom(props: Props) {
 
   return (
     <Tip text={__('Invite to video call')}>
-      <label onClick={createVideoRoom}>
-        {loading ? <SmallLoader /> : <Icon icon="video" />}
-      </label>
+      <label onClick={createVideoRoom}>{loading ? <SmallLoader /> : <Icon icon="video" />}</label>
     </Tip>
   );
 }
