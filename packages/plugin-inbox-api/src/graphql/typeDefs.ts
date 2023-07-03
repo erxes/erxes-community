@@ -1,10 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-import {
-  types as ChannelTypes,
-  queries as ChannelQueries,
-  mutations as ChannelMutations
-} from './channelTypeDefs';
+import { types as ChannelTypes, queries as ChannelQueries, mutations as ChannelMutations } from './channelTypeDefs';
 
 import {
   types as ConversationTypes,
@@ -30,23 +26,19 @@ import {
   mutations as ResponseTemplateMutations
 } from './responseTemplateTypeDefs';
 
-import {
-  types as widgetTypes,
-  queries as widgetQueries,
-  mutations as widgetMutations
-} from './widgetTypeDefs';
+import { types as widgetTypes, queries as widgetQueries, mutations as widgetMutations } from './widgetTypeDefs';
 
-import {
-  types as SkillTypes,
-  queries as SkillQueries,
-  mutations as SkillMutations
-} from './skillTypeDefs';
+import { types as SkillTypes, queries as SkillQueries, mutations as SkillMutations } from './skillTypeDefs';
 
-import {
-  types as ScriptTypes,
-  queries as ScriptQueries,
-  mutations as ScriptMutations
-} from './scriptTypeDefs';
+import { types as ScriptTypes, queries as ScriptQueries, mutations as ScriptMutations } from './scriptTypeDefs';
+
+interface IEnabled {
+  products: any;
+  tags: any;
+  forms: any;
+  knowledgeBase: any;
+  contacts: any;
+}
 
 const typeDefs = async serviceDiscovery => {
   const isProductsEnabled = await serviceDiscovery.isEnabled('products');
@@ -55,7 +47,7 @@ const typeDefs = async serviceDiscovery => {
   const isKbEnabled = await serviceDiscovery.isEnabled('knowledgebase');
   const isContactsEnabled = await serviceDiscovery.isEnabled('contacts');
 
-  const isEnabled = {
+  const isEnabled: IEnabled = {
     products: isProductsEnabled,
     tags: isTagsEnabled,
     forms: isFormsEnabled,
@@ -75,8 +67,7 @@ const typeDefs = async serviceDiscovery => {
     ${widgetTypes(isEnabled)}
     ${SkillTypes}
     ${ScriptTypes(isEnabled)}
-    
-    
+
     extend type Query {
       ${ConversationQueries(isEnabled)}
       ${MessengerAppQueries}

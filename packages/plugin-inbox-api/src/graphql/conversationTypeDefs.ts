@@ -1,9 +1,6 @@
-import {
-  attachmentInput,
-  attachmentType
-} from '@erxes/api-utils/src/commonTypeDefs';
+import { attachmentInput, attachmentType } from '@erxes/api-utils/src/commonTypeDefs';
 
-export const types = ({ tags, forms, contacts }) => `
+export const types = ({ tags, forms, contacts }): string => `
   ${attachmentType}
   ${attachmentInput}
 
@@ -181,7 +178,6 @@ export const types = ({ tags, forms, contacts }) => `
     createdAt: Date,
     isCustomerRead: Boolean,
   }
-
 `;
 
 const mutationFilterParams = `
@@ -216,13 +212,13 @@ const convertParams = `
   description: String
 `;
 
-const filterParams = `
+const filterParams: string = `
   limit: Int,
   ids: [String]
   ${mutationFilterParams}
 `;
 
-export const queries = ({ forms }) => `
+export const queries = ({ forms }): string => `
   conversationMessage(_id: String!): ConversationMessage
   
   conversations(${filterParams}): [Conversation]
@@ -244,7 +240,7 @@ export const queries = ({ forms }) => `
   userConversations(_id: String, perPage: Int): UserConversationListResponse
 `;
 
-export const mutations = `
+export const mutations: string = `
   conversationMessageAdd(
     conversationId: String,
     content: String,
@@ -258,7 +254,6 @@ export const mutations = `
   conversationsUnassign(_ids: [String]!): [Conversation]
   conversationsChangeStatus(_ids: [String]!, status: String!): [Conversation]
   conversationMarkAsRead(_id: String): Conversation
-  conversationCreateVideoChatRoom(_id: String!): VideoCallData
   changeConversationOperator(_id: String! operatorStatus: String!): JSON
   conversationResolveAll(${mutationFilterParams}): Int
   conversationConvertToCard(${convertParams}): String
