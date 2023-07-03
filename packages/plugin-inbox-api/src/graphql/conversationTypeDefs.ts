@@ -258,4 +258,6 @@ export const mutations: string = `
   conversationResolveAll(${mutationFilterParams}): Int
   conversationConvertToCard(${convertParams}): String
   conversationEditCustomFields(_id: String!, customFieldsData: JSON): Conversation
+  conversationCreateVideoChatRoom(_id: String!): VideoCallData
+  conversationDeleteVideoChatRoom(name: String!): JSON
 `;

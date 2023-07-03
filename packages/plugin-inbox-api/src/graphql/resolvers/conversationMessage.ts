@@ -3,6 +3,8 @@ import { IMessageDocument } from '../../models/definitions/conversationMessages'
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
+import { sendDailyRequest } from '../../video/controller';
+import { CallRecords } from '../../models/definitions/callRecords';
 
 export default {
   user(message: IMessageDocument) {
@@ -10,16 +12,10 @@ export default {
   },
 
   customer(message: IMessageDocument) {
-    return (
-      message.customerId && { __typename: 'Customer', _id: message.customerId }
-    );
+    return message.customerId && { __typename: 'Customer', _id: message.customerId };
   },
 
-  async mailData(
-    message: IMessageDocument,
-    _args,
-    { models, subdomain }: IContext
-  ) {
+  async mailData(message: IMessageDocument, _args, { models, subdomain }: IContext) {
     const conversation = await models.Conversations.findOne({
       _id: message.conversationId
     }).lean();
@@ -43,9 +39,7 @@ export default {
       return null;
     }
 
-    const path = kind.includes('nylas')
-      ? `/nylas/get-message`
-      : `/${kind}/get-message`;
+    const path = kind.includes('nylas') ? `/nylas/get-message` : `/${kind}/get-message`;
 
     return sendIntegrationsMessage({
       subdomain,
@@ -60,11 +54,7 @@ export default {
     });
   },
 
-  async videoCallData(
-    message: IMessageDocument,
-    _args,
-    { models, subdomain }: IContext
-  ) {
+  async videoCallData(message: IMessageDocument, _args, { models, subdomain }: IContext) {
     const conversation = await models.Conversations.findOne({
       _id: message.conversationId
     }).lean();
@@ -77,19 +67,16 @@ export default {
       return null;
     }
 
-    try {
-      const response = await sendIntegrationsMessage({
-        subdomain,
-        action: 'getDailyRoom',
-        data: {
-          erxesApiMessageId: message._id
-        },
-        isRPC: true
-      });
+    const videoCall = await CallRecords.findOne({ erxesApiMessageId: message._id }).lean();
 
+    if (!videoCall) {
+      return null;
+    }
+
+    try {
+      const response = await sendDailyRequest(`/v1/rooms/${videoCall.roomName}`, 'GET');
       return response;
     } catch (e) {
-      debug.error(e);
       return null;
     }
   }

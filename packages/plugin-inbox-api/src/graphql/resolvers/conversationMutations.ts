@@ -630,6 +630,14 @@ const conversationMutations = {
     }
   },
 
+  async conversationDeleteVideoChatRoom(_root, { name }, { dataSources }: IContext) {
+    try {
+      return await dataSources.IntegrationsAPI.deleteDailyVideoChatRoom(name);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
   async changeConversationOperator(
     _root,
     { _id, operatorStatus }: { _id: string; operatorStatus: string },
