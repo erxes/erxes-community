@@ -1,8 +1,11 @@
 import { IModels } from '../../connectionResolver';
-import { SCHEDULE_STATUS } from '../definitions/constants';
+import { CONTRACT_STATUS, SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
 import { IScheduleDocument } from '../definitions/schedules';
-import { ITransactionDocument } from '../definitions/transactions';
+import {
+  ITransaction,
+  ITransactionDocument
+} from '../definitions/transactions';
 import { trAfterSchedule, transactionRule } from './transactionUtils';
 import {
   addMonths,
@@ -1018,13 +1021,33 @@ export const generatePendingSchedules = async (
   updatePrevSchedulesBulk.length > 0 &&
     (await models.Schedules.bulkWrite(updatePrevSchedulesBulk));
 
-  tr._id &&
-    (await models.Transactions.updateOne(
+  console.log('updatedSchedule', updatedSchedule);
+
+  if (tr._id) {
+    var transactionReaction: any = {
+      reactions: [...trReaction, ...updatePrevScheduleReactions]
+    };
+
+    if (updatedSchedule.balance === 0 && contract._id) {
+      transactionReaction.contractReaction = {
+        _id: contract._id,
+        status: contract.status
+      };
+
+      await models.Contracts.updateOne(
+        { _id: contract._id },
+        { $set: { status: CONTRACT_STATUS.CLOSED } }
+      );
+    }
+
+    await models.Transactions.updateOne(
       { _id: tr._id },
       {
-        $set: { reactions: [...trReaction, ...updatePrevScheduleReactions] }
+        $set: transactionReaction
       }
-    ));
+    );
+  }
+
   await models.Schedules.bulkWrite(bulkOps);
 };
 /**

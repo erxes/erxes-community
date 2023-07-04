@@ -711,6 +711,11 @@ export const removeTrAfterSchedule = async (
     }
   }
 
+  if (tr.contractReaction) {
+    const { _id, ...otherData } = tr.contractReaction;
+    await models.Contracts.updateOne({ _id: _id }, { $set: otherData });
+  }
+
   if (bulkOps && bulkOps.length) {
     await models.Schedules.bulkWrite(bulkOps);
   }
