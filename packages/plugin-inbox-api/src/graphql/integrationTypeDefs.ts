@@ -296,4 +296,6 @@ export const mutations = `
     leadData: IntegrationLeadData
     bookingData: IntegrationBookingData
   ): Integration
+  
+  integrationsDeleteVideoChatRoom(name: String!): JSON
 `;

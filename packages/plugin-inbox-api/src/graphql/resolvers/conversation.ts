@@ -3,6 +3,8 @@ import { IConversationDocument } from '../../models/definitions/conversations';
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
+import { CallRecords } from '../../models/definitions/callRecords';
+import { sendDailyRequest } from '../../video/controller';
 
 export default {
   /**
@@ -11,9 +13,7 @@ export default {
   idleTime(conversation: IConversationDocument) {
     const now = new Date();
 
-    return (
-      (now.getTime() - (conversation.updatedAt || now).getTime()) / (1000 * 60)
-    );
+    return (now.getTime() - (conversation.updatedAt || now).getTime()) / (1000 * 60);
   },
 
   customer(conversation: IConversationDocument) {
@@ -25,20 +25,14 @@ export default {
     );
   },
 
-  async integration(
-    conversation: IConversationDocument,
-    _args,
-    { models }: IContext
-  ) {
+  async integration(conversation: IConversationDocument, _args, { models }: IContext) {
     return models.Integrations.findOne({
       _id: conversation.integrationId
     });
   },
 
   user(conversation: IConversationDocument) {
-    return (
-      conversation.userId && { __typename: 'User', _id: conversation.userId }
-    );
+    return conversation.userId && { __typename: 'User', _id: conversation.userId };
   },
 
   assignedUser(conversation: IConversationDocument) {
@@ -62,17 +56,11 @@ export default {
   },
 
   async messages(conv: IConversationDocument, _, { dataLoaders }: IContext) {
-    const messages = await dataLoaders.conversationMessagesByConversationId.load(
-      conv._id
-    );
+    const messages = await dataLoaders.conversationMessagesByConversationId.load(conv._id);
     return messages.filter(message => message);
   },
 
-  async callProAudio(
-    conv: IConversationDocument,
-    _args,
-    { user, models, subdomain }: IContext
-  ) {
+  async callProAudio(conv: IConversationDocument, _args, { user, models, subdomain }: IContext) {
     const integration =
       (await models.Integrations.findOne({
         _id: conv.integrationId
@@ -108,33 +96,22 @@ export default {
     return (conv.tagIds || []).map(_id => ({ __typename: 'Tag', _id }));
   },
 
-  async videoCallData(
-    conversation: IConversationDocument,
-    _args,
-    { models, subdomain }: IContext
-  ) {
+  async videoCallData(conversation: IConversationDocument, _args, { models, subdomain }: IContext) {
     const message = await models.ConversationMessages.findOne({
       conversationId: conversation._id,
       contentType: MESSAGE_TYPES.VIDEO_CALL
     }).lean();
+
+    const videoCall = await CallRecords.findOne({ erxesApiMessageId: message._id }).lean();
 
     if (!message) {
       return null;
     }
 
     try {
-      const response = await sendIntegrationsMessage({
-        subdomain,
-        action: 'getDailyActiveRoom',
-        data: {
-          erxesApiConversationId: conversation._id
-        },
-        isRPC: true
-      });
-
+      const response = await sendDailyRequest(`/v1/rooms/${videoCall.roomName}`, 'GET');
       return response;
     } catch (e) {
-      debug.error(e);
       return null;
     }
   }

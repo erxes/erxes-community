@@ -3,12 +3,7 @@ import * as telemetry from 'erxes-telemetry';
 import { getUniqueValue } from '@erxes/api-utils/src/core';
 import { putActivityLog } from '@erxes/api-utils/src/logUtils';
 
-import {
-  IIntegration,
-  IIntegrationDocument,
-  IMessengerData,
-  IUiOptions
-} from '../../models/definitions/integrations';
+import { IIntegration, IIntegrationDocument, IMessengerData, IUiOptions } from '../../models/definitions/integrations';
 
 import { IExternalIntegrationParams } from '../../models/Integrations';
 
@@ -52,10 +47,7 @@ const createIntegration = async (
   type: string
 ) => {
   if (doc.channelIds) {
-    await models.Channels.updateMany(
-      { _id: { $in: doc.channelIds } },
-      { $push: { integrationIds: integration._id } }
-    );
+    await models.Channels.updateMany({ _id: { $in: doc.channelIds } }, { $push: { integrationIds: integration._id } });
   }
 
   await putCreateLog(
@@ -91,10 +83,7 @@ const editIntegration = async (
   updated: IIntegrationDocument,
   models: IModels
 ) => {
-  await models.Channels.updateMany(
-    { integrationIds: integration._id },
-    { $pull: { integrationIds: integration._id } }
-  );
+  await models.Channels.updateMany({ integrationIds: integration._id }, { $pull: { integrationIds: integration._id } });
 
   if (fields.channelIds) {
     await models.Channels.updateMany(
@@ -122,24 +111,10 @@ const integrationMutations = {
   /**
    * Creates a new messenger integration
    */
-  async integrationsCreateMessengerIntegration(
-    _root,
-    doc: IIntegration,
-    { user, models, subdomain }: IContext
-  ) {
-    const integration = await models.Integrations.createMessengerIntegration(
-      doc,
-      user._id
-    );
+  async integrationsCreateMessengerIntegration(_root, doc: IIntegration, { user, models, subdomain }: IContext) {
+    const integration = await models.Integrations.createMessengerIntegration(doc, user._id);
 
-    return createIntegration(
-      models,
-      subdomain,
-      doc,
-      integration,
-      user,
-      'messenger'
-    );
+    return createIntegration(models, subdomain, doc, integration, user, 'messenger');
   },
 
   /**
@@ -151,19 +126,9 @@ const integrationMutations = {
     { user, models, subdomain }: IContext
   ) {
     const integration = await models.Integrations.getIntegration({ _id });
-    const updated = await models.Integrations.updateMessengerIntegration(
-      _id,
-      fields
-    );
+    const updated = await models.Integrations.updateMessengerIntegration(_id, fields);
 
-    return editIntegration(
-      subdomain,
-      fields,
-      integration,
-      user,
-      updated,
-      models
-    );
+    return editIntegration(subdomain, fields, integration, user, updated, models);
   },
 
   /**
@@ -191,15 +156,8 @@ const integrationMutations = {
   /**
    * Create a new messenger integration
    */
-  async integrationsCreateLeadIntegration(
-    _root,
-    doc: IIntegration,
-    { user, models, subdomain }: IContext
-  ) {
-    const integration = await models.Integrations.createLeadIntegration(
-      doc,
-      user._id
-    );
+  async integrationsCreateLeadIntegration(_root, doc: IIntegration, { user, models, subdomain }: IContext) {
+    const integration = await models.Integrations.createLeadIntegration(doc, user._id);
 
     return createIntegration(models, subdomain, doc, integration, user, 'lead');
   },
@@ -232,14 +190,8 @@ const integrationMutations = {
     if (modifiedDoc.kind === 'webhook') {
       modifiedDoc.webhookData = { ...data };
 
-      if (
-        !modifiedDoc.webhookData.token ||
-        modifiedDoc.webhookData.token === ''
-      ) {
-        modifiedDoc.webhookData.token = await getUniqueValue(
-          models.Integrations,
-          'token'
-        );
+      if (!modifiedDoc.webhookData.token || modifiedDoc.webhookData.token === '') {
+        modifiedDoc.webhookData.token = await getUniqueValue(models.Integrations, 'token');
       }
     }
 
@@ -247,10 +199,7 @@ const integrationMutations = {
       throw new Error('Channel must be chosen');
     }
 
-    const integration = await models.Integrations.createExternalIntegration(
-      modifiedDoc,
-      user._id
-    );
+    const integration = await models.Integrations.createExternalIntegration(modifiedDoc, user._id);
 
     if (doc.channelIds) {
       await models.Channels.updateMany(
@@ -320,10 +269,7 @@ const integrationMutations = {
     );
 
     if (channelIds) {
-      await models.Channels.updateMany(
-        { _id: { $in: channelIds } },
-        { $push: { integrationIds: integration._id } }
-      );
+      await models.Channels.updateMany({ _id: { $in: channelIds } }, { $push: { integrationIds: integration._id } });
     }
 
     await putUpdateLog(
@@ -344,11 +290,7 @@ const integrationMutations = {
   /**
    * Deletes an integration
    */
-  async integrationsRemove(
-    _root,
-    { _id }: { _id: string },
-    { user, models, subdomain }: IContext
-  ) {
+  async integrationsRemove(_root, { _id }: { _id: string }, { user, models, subdomain }: IContext) {
     const integration = await models.Integrations.getIntegration({ _id });
 
     try {
@@ -372,12 +314,7 @@ const integrationMutations = {
       }
     }
 
-    await putDeleteLog(
-      models,
-      subdomain,
-      { type: MODULE_NAMES.INTEGRATION, object: integration },
-      user
-    );
+    await putDeleteLog(models, subdomain, { type: MODULE_NAMES.INTEGRATION, object: integration }, user);
 
     return models.Integrations.removeIntegration(_id);
   },
@@ -392,8 +329,7 @@ const integrationMutations = {
   ) {
     try {
       const { erxesApiIds } = await sendCommonMessage({
-        serviceName:
-          kind && (await isServiceRunning(kind)) ? kind : 'integrations',
+        serviceName: kind && (await isServiceRunning(kind)) ? kind : 'integrations',
         subdomain,
         action: 'api_to_integrations',
         data: {
@@ -414,17 +350,10 @@ const integrationMutations = {
     }
   },
 
-  async integrationsRepair(
-    _root,
-    { _id, kind }: { _id: string; kind: string },
-    { subdomain }: IContext
-  ) {
+  async integrationsRepair(_root, { _id, kind }: { _id: string; kind: string }, { subdomain }: IContext) {
     try {
       const response = await sendCommonMessage({
-        serviceName:
-          kind && (await isServiceRunning(kind))
-            ? kind.split('-')[0]
-            : 'integrations',
+        serviceName: kind && (await isServiceRunning(kind)) ? kind.split('-')[0] : 'integrations',
         subdomain,
         action: 'api_to_integrations',
         data: {
@@ -441,17 +370,10 @@ const integrationMutations = {
     }
   },
 
-  async integrationsArchive(
-    _root,
-    { _id, status }: IArchiveParams,
-    { user, models, subdomain }: IContext
-  ) {
+  async integrationsArchive(_root, { _id, status }: IArchiveParams, { user, models, subdomain }: IContext) {
     const integration = await models.Integrations.getIntegration({ _id });
 
-    await models.Integrations.updateOne(
-      { _id },
-      { $set: { isActive: !status } }
-    );
+    await models.Integrations.updateOne({ _id }, { $set: { isActive: !status } });
 
     const updated = await models.Integrations.findOne({ _id });
 
@@ -462,9 +384,7 @@ const integrationMutations = {
         type: MODULE_NAMES.INTEGRATION,
         object: integration,
         newData: { isActive: !status },
-        description: `"${integration.name}" has been ${
-          status === true ? 'archived' : 'unarchived'
-        }.`,
+        description: `"${integration.name}" has been ${status === true ? 'archived' : 'unarchived'}.`,
         updatedDocument: updated
       },
       user
@@ -473,11 +393,7 @@ const integrationMutations = {
     return updated;
   },
 
-  async integrationsSendSms(
-    _root,
-    args: ISmsParams,
-    { user, subdomain }: IContext
-  ) {
+  async integrationsSendSms(_root, args: ISmsParams, { user, subdomain }: IContext) {
     const customer = await sendContactsMessage({
       subdomain,
       action: 'customers.findOne',
@@ -522,11 +438,7 @@ const integrationMutations = {
     }
   },
 
-  async integrationsCopyLeadIntegration(
-    _root,
-    { _id }: { _id },
-    { docModifier, user, models, subdomain }: IContext
-  ) {
+  async integrationsCopyLeadIntegration(_root, { _id }: { _id }, { docModifier, user, models, subdomain }: IContext) {
     const sourceIntegration = await models.Integrations.getIntegration({ _id });
 
     if (!sourceIntegration.formId) {
@@ -577,10 +489,7 @@ const integrationMutations = {
 
     delete doc._id;
 
-    const copiedIntegration = await models.Integrations.createLeadIntegration(
-      doc,
-      user._id
-    );
+    const copiedIntegration = await models.Integrations.createLeadIntegration(doc, user._id);
 
     const fields = sourceFields.map(e => ({
       options: e.options,
@@ -630,24 +539,10 @@ const integrationMutations = {
   /**
    * Create a new booking integration
    */
-  async integrationsCreateBookingIntegration(
-    _root,
-    doc: IIntegration,
-    { user, models, subdomain }: IContext
-  ) {
-    const integration = await models.Integrations.createBookingIntegration(
-      doc,
-      user._id
-    );
+  async integrationsCreateBookingIntegration(_root, doc: IIntegration, { user, models, subdomain }: IContext) {
+    const integration = await models.Integrations.createBookingIntegration(doc, user._id);
 
-    return createIntegration(
-      models,
-      subdomain,
-      doc,
-      integration,
-      user,
-      'booking'
-    );
+    return createIntegration(models, subdomain, doc, integration, user, 'booking');
   },
 
   /**
@@ -660,12 +555,17 @@ const integrationMutations = {
   ) {
     const integration = await models.Integrations.getIntegration({ _id });
 
-    const updated = await models.Integrations.updateBookingIntegration(
-      _id,
-      doc
-    );
+    const updated = await models.Integrations.updateBookingIntegration(_id, doc);
 
     return editIntegration(subdomain, doc, integration, user, updated, models);
+  },
+
+  async integrationsDeleteVideoChatRoom(
+    _root,
+    { _id, ...doc }: IEditIntegration,
+    { user, models, subdomain }: IContext
+  ) {
+    return { status: 'ok' };
   }
 };
 
@@ -679,50 +579,14 @@ checkPermission(
   'integrationsSaveMessengerAppearanceData',
   'integrationsSaveMessengerAppearanceData'
 );
-checkPermission(
-  integrationMutations,
-  'integrationsSaveMessengerConfigs',
-  'integrationsSaveMessengerConfigs'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsCreateLeadIntegration',
-  'integrationsCreateLeadIntegration'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsEditLeadIntegration',
-  'integrationsEditLeadIntegration'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsRemove',
-  'integrationsRemove'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsArchive',
-  'integrationsArchive'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsEditCommonFields',
-  'integrationsEdit'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsCopyLeadIntegration',
-  'integrationsCreateLeadIntegration'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsCreateBookingIntegration',
-  'integrationsCreateBookingIntegration'
-);
-checkPermission(
-  integrationMutations,
-  'integrationsEditBookingIntegration',
-  'integrationsEditBookingIntegration'
-);
+checkPermission(integrationMutations, 'integrationsSaveMessengerConfigs', 'integrationsSaveMessengerConfigs');
+checkPermission(integrationMutations, 'integrationsCreateLeadIntegration', 'integrationsCreateLeadIntegration');
+checkPermission(integrationMutations, 'integrationsEditLeadIntegration', 'integrationsEditLeadIntegration');
+checkPermission(integrationMutations, 'integrationsRemove', 'integrationsRemove');
+checkPermission(integrationMutations, 'integrationsArchive', 'integrationsArchive');
+checkPermission(integrationMutations, 'integrationsEditCommonFields', 'integrationsEdit');
+checkPermission(integrationMutations, 'integrationsCopyLeadIntegration', 'integrationsCreateLeadIntegration');
+checkPermission(integrationMutations, 'integrationsCreateBookingIntegration', 'integrationsCreateBookingIntegration');
+checkPermission(integrationMutations, 'integrationsEditBookingIntegration', 'integrationsEditBookingIntegration');
 
 export default integrationMutations;
