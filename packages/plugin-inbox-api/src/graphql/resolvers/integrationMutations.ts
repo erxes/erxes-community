@@ -558,14 +558,6 @@ const integrationMutations = {
     const updated = await models.Integrations.updateBookingIntegration(_id, doc);
 
     return editIntegration(subdomain, doc, integration, user, updated, models);
-  },
-
-  async integrationsDeleteVideoChatRoom(
-    _root,
-    { _id, ...doc }: IEditIntegration,
-    { user, models, subdomain }: IContext
-  ) {
-    return { status: 'ok' };
   }
 };
 

@@ -3,6 +3,7 @@ import { routeErrorHandling } from './helpers';
 import { getConfig, getRecordings, sendRequest } from './utils';
 import { CallRecords, ICallRecord, IRecording } from '../models/definitions/callRecords';
 import { Express, Request, Response } from 'express';
+import Configs from '../models/definitions/configs';
 
 const VIDEO_CALL_STATUS = {
   ONGOING: 'ongoing',
@@ -10,23 +11,18 @@ const VIDEO_CALL_STATUS = {
   ALL: ['ongoing', 'end']
 };
 
-export const getConfigs = async () => {
-  // const DAILY_API_KEY = await getConfig('DAILY_API_KEY');
-  // const DAILY_END_POINT = await getConfig('DAILY_END_POINT');
-  const DAILY_API_KEY = 'be6327e28a96394e97243df047fc63a50977898ce94a656291a0242c8b03d16a';
-  const DAILY_END_POINT = 'https://api.daily.co';
-  return {
-    DAILY_API_KEY,
-    DAILY_END_POINT
-  };
+const DAILY_END_POINT = 'https://api.daily.co';
+
+const getAuthHeader = async () => {
+  const config = await Configs.getConfig('DAILY_API_KEY');
+  return { authorization: `Bearer ${config.value}` };
 };
 
 export const sendDailyRequest = async (url: string, method: string, body = {}) => {
-  const { DAILY_API_KEY, DAILY_END_POINT } = await getConfigs();
   return sendRequest({
+    headerParams: await getAuthHeader(),
     url: `${DAILY_END_POINT}${url}`,
     method,
-    headerParams: { authorization: `Bearer ${DAILY_API_KEY}` },
     body
   });
 };
@@ -39,8 +35,8 @@ const init = async (app: Express) => {
 
       switch (videoCallType) {
         case 'daily': {
-          const { DAILY_API_KEY, DAILY_END_POINT } = await getConfigs();
-          return res.send(Boolean(DAILY_API_KEY && DAILY_END_POINT));
+          const config = await Configs.getConfig('DAILY_API_KEY');
+          return res.send(Boolean(config.value && DAILY_END_POINT));
         }
         default: {
           return res.send(false);
@@ -89,7 +85,6 @@ const init = async (app: Express) => {
     routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
 
-      const { DAILY_END_POINT } = await getConfigs();
       const { erxesApiMessageId } = req.query;
       const callRecord = await CallRecords.findOne({ erxesApiMessageId });
 
@@ -118,7 +113,6 @@ const init = async (app: Express) => {
       debugRequest(debugDaily, req);
 
       const { erxesApiConversationId } = req.query;
-      const { DAILY_END_POINT } = await getConfigs();
 
       const callRecord = await CallRecords.findOne({
         erxesApiConversationId,
@@ -166,7 +160,6 @@ const init = async (app: Express) => {
     '/daily/room',
     routeErrorHandling(async (req: Request, res: Response) => {
       debugRequest(debugDaily, req);
-      const { DAILY_END_POINT } = await getConfigs();
       const { erxesApiMessageId, erxesApiConversationId } = req.body;
       const privacy = 'private';
       const response = await sendDailyRequest(`/api/v1/rooms`, 'POST', {
