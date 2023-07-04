@@ -112,11 +112,9 @@ export const initBroker = async cl => {
       //     ' ' +
       //     date.toTimeString().split(' ')[0],
       //   orderId: =contentId,
-      //   hasVat: boolean,
-      //   hasCitytax: boolean,
-      //   billType: 1 | 3,
-      //   customerCode: string [7],
-      //   customerName: string,
+      //   billType: '1' | '3',
+      //   customerCode?: string [7],
+      //   customerName?: string,
       //   description: string,
       //   details: [{
       //     productId: string
@@ -130,7 +128,9 @@ export const initBroker = async cl => {
 
       // config = {
       //   districtName: string,
+      //   hasVat: boolean;
       //   vatPercent?: number,
+      //   hasCitytax: boolean
       //   cityTaxPercent?: number
       //   defaultGSCode?: string *
       //   companyRD: string
@@ -187,12 +187,16 @@ export const initBroker = async cl => {
     'ebarimt:putresponses.returnBill',
     async ({ subdomain, data: { contentType, contentId, config } }) => {
       const models = await generateModels(subdomain);
+      const mainConfig = {
+        ...(await getConfig(subdomain, 'EBARIMT', {})),
+        ...config
+      };
 
       return {
         status: 'success',
         data: await models.PutResponses.returnBill(
           { contentType, contentId },
-          config
+          mainConfig
         )
       };
     }
@@ -272,6 +276,17 @@ export const sendPosMessage = async (args: ISendMessageArgs): Promise<any> => {
     client,
     serviceDiscovery,
     serviceName: 'pos',
+    ...args
+  });
+};
+
+export const sendLoansMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'loans',
     ...args
   });
 };

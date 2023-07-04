@@ -22,14 +22,7 @@ export async function createEbarimt(
       productId: ebarimtConfig.amountEBarimtProduct._id,
       amount: transaction.payment,
       count: 1,
-      barcode: '',
-      uom: ebarimtConfig.amountEBarimtProduct.uom,
-      vat: 10,
-      citytax: 0,
-      descount: 0,
-      hasVat: true,
-      productName: ebarimtConfig.amountEBarimtProduct.name,
-      productCode: ebarimtConfig.amountEBarimtProduct.code
+      discount: 0
     });
   }
 
@@ -43,8 +36,7 @@ export async function createEbarimt(
     details.push({
       productId: ebarimtConfig.interestEBarimtProduct._id,
       amount: transaction.interestEve + transaction.interestNonce,
-      count: 1,
-      inventoryCode: ebarimtConfig.interestEBarimtProduct.code
+      count: 1
     });
   }
 
@@ -57,21 +49,18 @@ export async function createEbarimt(
     details.push({
       productId: ebarimtConfig.undueEBarimtProduct._id,
       amount: transaction.undue,
-      count: 1,
-      inventoryCode: ebarimtConfig.undueEBarimtProduct.code
+      count: 1
     });
   }
 
   const orderInfo = {
-    number: new Date().getTime(),
+    number: new Date().getTime(), // transactionii number l baihad bolno
     date:
       new Date().toISOString().split('T')[0] +
       ' ' +
       new Date().toTimeString().split(' ')[0],
     orderId: transaction._id,
-    hasVat: true,
-    hasCitytax: false,
-    billType: '1',
+    billType: '1', // ** baiguullaga bol '3'
     description: 'string',
     details: details,
     nonCashAmount: details.reduce((v, m) => v + m.amount, 0)
@@ -83,7 +72,9 @@ export async function createEbarimt(
     districtName: ebarimtConfig?.districtName,
     companyRD: ebarimtConfig?.organizationRegister,
     vatPercent: 10,
-    cityTaxPercent: 10,
+    cityTaxPercent: 1,
+    hasVat: true,
+    hasCitytax: false,
     defaultGSCode: '3929000'
   };
 

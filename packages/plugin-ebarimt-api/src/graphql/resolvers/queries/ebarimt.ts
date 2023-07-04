@@ -1,6 +1,10 @@
 import { getFullDate, getTomorrow } from './utils';
 import { paginate, regexSearchText } from '@erxes/api-utils/src';
-import { sendCardsMessage, sendPosMessage } from '../../../messageBroker';
+import {
+  sendCardsMessage,
+  sendLoansMessage,
+  sendPosMessage
+} from '../../../messageBroker';
 import { IContext } from '../../../connectionResolver';
 
 const generateFilter = async (subdomain, params, commonQuerySelector) => {
@@ -78,6 +82,34 @@ const generateFilter = async (subdomain, params, commonQuerySelector) => {
         });
 
         filter.contentId = { $in: (deals || []).map(d => d._id) };
+      }
+    }
+
+    if (params.contentType === 'loans:transaction') {
+      if (params.contractNumber) {
+        const loansContracts = await sendLoansMessage({
+          subdomain,
+          action: 'transactions.findAtContracts',
+          data: { number: { $regex: params.contractNumber, $options: 'mui' } },
+          isRPC: true,
+          defaultValue: []
+        });
+
+        filter.contentId = { $in: (loansContracts || []).map(p => p._id) };
+      }
+
+      if (params.transactionNumber) {
+        const loansTransactions = await sendLoansMessage({
+          subdomain,
+          action: 'transactions.find',
+          data: {
+            number: { $regex: params.transactionNumber, $options: 'mui' }
+          },
+          isRPC: true,
+          defaultValue: []
+        });
+
+        filter.contentId = { $in: (loansTransactions || []).map(p => p._id) };
       }
     }
   }

@@ -53,6 +53,8 @@ const queryParams = `
   billIdRule: String
   isLast: String
   orderNumber: String
+  contractNumber: String
+  transactionNumber: String
   dealName: String
   pipelineId: String
   stageId: String
