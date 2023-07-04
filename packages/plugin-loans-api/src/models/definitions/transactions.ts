@@ -50,6 +50,7 @@ export interface ITransaction {
     surplus?: number;
   };
   reactions?: any[];
+  contractReaction?: any;
   futureDebt?: number;
   debtTenor?: number;
   ebarimt?: any;
@@ -139,6 +140,7 @@ export const transactionSchema = schemaHooksWrapper(
     }),
     pendings: field({ type: [Object], label: 'Pending Schedules reaction' }),
     reactions: field({ type: [Object], label: 'Pending Schedules reaction' }),
+    contractReaction: field({ type: Object, label: 'Contract reaction' }),
     futureDebt: field({
       type: Number,
       min: 0,
