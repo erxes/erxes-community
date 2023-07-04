@@ -27,6 +27,7 @@ export async function createEbarimt(
       vat: 10,
       citytax: 0,
       descount: 0,
+      hasVat: true,
       productName: ebarimtConfig.amountEBarimtProduct.name,
       productCode: ebarimtConfig.amountEBarimtProduct.code
     });
@@ -80,12 +81,15 @@ export async function createEbarimt(
 
   const config = {
     districtName: ebarimtConfig?.districtName,
-    companyRD: ebarimtConfig?.organizationRegister
+    companyRD: ebarimtConfig?.organizationRegister,
+    vatPercent: 10,
+    cityTaxPercent: 10,
+    defaultGSCode: '3929000'
   };
 
   const ebarimt = await sendMessageBroker(
     {
-      action: 'putresponses.putData',
+      action: 'putresponses.putDatas',
       data: {
         contentType: 'loans:transaction',
         contentId: transaction._id,
