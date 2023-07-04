@@ -13,7 +13,7 @@ export interface IConfigDocument extends IConfig, Document {
 export const configSchema: Schema = new Schema({
   _id: field({ pkey: true }),
   code: field({ type: String, unique: true }),
-  value: field({ type: Object }),
+  value: field({ type: Object })
 });
 
 export interface IConfigModel extends Model<IConfigDocument> {
@@ -24,7 +24,7 @@ export interface IConfigModel extends Model<IConfigDocument> {
 
 export const loadClass = () => {
   class Config {
-    /*
+    /**
      * Get a Config
      */
     public static async getConfig(code: string) {

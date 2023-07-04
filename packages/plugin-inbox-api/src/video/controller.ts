@@ -1,9 +1,9 @@
 import { debugDaily, debugRequest } from './debuggers';
 import { routeErrorHandling } from './helpers';
-import { getConfig, getRecordings, sendRequest } from './utils';
 import { CallRecords, ICallRecord, IRecording } from '../models/definitions/callRecords';
 import { Express, Request, Response } from 'express';
 import Configs from '../models/definitions/configs';
+import { sendRequest } from '@erxes/api-utils/src/requests';
 
 const VIDEO_CALL_STATUS = {
   ONGOING: 'ongoing',
@@ -13,34 +13,53 @@ const VIDEO_CALL_STATUS = {
 
 const DAILY_END_POINT = 'https://api.daily.co';
 
-const getAuthHeader = async () => {
+export const getAuthToken = async () => {
   const config = await Configs.getConfig('DAILY_API_KEY');
-  return { authorization: `Bearer ${config.value}` };
+  return config.value;
+};
+
+const getAuthHeader = async () => {
+  return { authorization: `Bearer ${await getAuthToken()}` };
 };
 
 export const sendDailyRequest = async (url: string, method: string, body = {}) => {
   return sendRequest({
-    headerParams: await getAuthHeader(),
+    headers: await getAuthHeader(),
     url: `${DAILY_END_POINT}${url}`,
     method,
     body
   });
 };
 
+export const isAfter = (expiresTimestamp: number, defaultMillisecond?: number): boolean => {
+  const millisecond = defaultMillisecond || new Date().getTime();
+  const expiresMillisecond = new Date(expiresTimestamp * 1000).getTime();
+  return expiresMillisecond > millisecond;
+};
+
+export const getRecordings = async (recordings: IRecording[]) => {
+  const newRecordings: IRecording[] = [];
+  for (const record of recordings) {
+    if (!record.expires || (record.expires && !isAfter(record.expires))) {
+      const accessLinkResponse = await sendDailyRequest(`/api/v1/recordings/${record.id}/access-link`, 'GET');
+      record.expires = accessLinkResponse.expires;
+      record.url = accessLinkResponse.download_link;
+    }
+    newRecordings.push(record);
+  }
+  return newRecordings;
+};
+
 const init = async (app: Express) => {
   app.get(
     '/videoCall/usageStatus',
     routeErrorHandling(async (req: Request, res: Response) => {
-      const videoCallType = await getConfig('VIDEO_CALL_TYPE');
+      const videoCallType = await Configs.getConfig('VIDEO_CALL_TYPE');
 
-      switch (videoCallType) {
-        case 'daily': {
-          const config = await Configs.getConfig('DAILY_API_KEY');
-          return res.send(Boolean(config.value && DAILY_END_POINT));
-        }
-        default: {
-          return res.send(false);
-        }
+      if (videoCallType.value === 'daily') {
+        return res.send(Boolean((await getAuthToken()) && DAILY_END_POINT));
+      } else {
+        return res.send(false);
       }
     })
   );
