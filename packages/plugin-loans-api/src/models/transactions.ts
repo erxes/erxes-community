@@ -14,6 +14,7 @@ import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
 import { IContractDocument } from './definitions/contracts';
 import { getPureDate } from '@erxes/api-utils/src';
+import { createEbarimt } from './utils/ebarimtUtils';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
@@ -92,6 +93,12 @@ export const loadTransactionClass = (models: IModels) => {
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
 
       await trAfterSchedule(models, tr);
+
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract.contractTypeId
+      });
+
+      await createEbarimt(models, subdomain, contractType?.config, tr);
 
       return tr;
     }

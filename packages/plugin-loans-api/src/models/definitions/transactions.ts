@@ -22,6 +22,8 @@ export interface IBankTransaction {
   toOwner?: string;
 }
 
+export interface IEBarimt {}
+
 export interface ITransaction {
   contractId?: string;
   customerId?: string;

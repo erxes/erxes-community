@@ -20,6 +20,39 @@ import { __ } from 'coreui/utils';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
 import { CollateralButton } from '../../contracts/styles';
 
+export const DISTRICTS = [
+  { value: 'Архангай', label: 'Архангай' },
+  { value: 'Баян-Өлгий', label: 'Баян-Өлгий' },
+  { value: 'Баянхонгор', label: 'Баянхонгор' },
+  { value: 'Булган', label: 'Булган' },
+  { value: 'Говь-Алтай', label: 'Говь-Алтай' },
+  { value: 'Дорноговь', label: 'Дорноговь' },
+  { value: 'Дорнод', label: 'Дорнод' },
+  { value: 'Дундговь', label: 'Дундговь' },
+  { value: 'Завхан', label: 'Завхан' },
+  { value: 'Өвөрхангай', label: 'Өвөрхангай' },
+  { value: 'Өмнөговь', label: 'Өмнөговь' },
+  { value: 'Сүхбаатар аймаг', label: 'Сүхбаатар аймаг' },
+  { value: 'Сэлэнгэ', label: 'Сэлэнгэ' },
+  { value: 'Төв', label: 'Төв' },
+  { value: 'Увс', label: 'Увс' },
+  { value: 'Ховд', label: 'Ховд' },
+  { value: 'Хөвсгөл', label: 'Хөвсгөл' },
+  { value: 'Хэнтий', label: 'Хэнтий' },
+  { value: 'Дархан-Уул', label: 'Дархан-Уул' },
+  { value: 'Орхон', label: 'Орхон' },
+  { value: 'Говьсүмбэр', label: 'Говьсүмбэр' },
+  { value: 'Хан-Уул', label: 'Хан-Уул' },
+  { value: 'Баянзүрх', label: 'Баянзүрх' },
+  { value: 'Сүхбаатар', label: 'Сүхбаатар' },
+  { value: 'Баянгол', label: 'Баянгол' },
+  { value: 'Багануур', label: 'Багануур' },
+  { value: 'Багахангай', label: 'Багахангай' },
+  { value: 'Налайх', label: 'Налайх' },
+  { value: 'Сонгинохайрхан', label: 'Сонгинохайрхан' },
+  { value: 'Чингэлтэй', label: 'Чингэлтэй' }
+];
+
 const ContentBox = styled.div`
   padding: ${dimensions.coreSpacing}px;
   max-width: 640px;
@@ -93,6 +126,11 @@ class GeneralSettings extends React.Component<Props, State> {
 
     return (
       <FormGroup>
+        {backElement && (
+          <div style={{ display: 'inline-block', marginRight: '5px' }}>
+            {backElement}
+          </div>
+        )}
         <ControlLabel>{__(JOURNALS_KEY_LABELS[key])}</ControlLabel>
         {description && <p>{__(description)}</p>}
         <FormControl
@@ -100,15 +138,14 @@ class GeneralSettings extends React.Component<Props, State> {
           onChange={this.onChangeCheckbox.bind(this, key)}
           componentClass="checkbox"
         />
-        {backElement}
       </FormGroup>
     );
   };
 
-  renderCollateralTrigger(collateral?: any) {
+  renderProductTrigger(collateral?: any) {
     let content = (
       <div>
-        {__('Choose Collateral')} <Icon icon="plus-circle" />
+        {__('Choose E-Barimt Product')} <Icon icon="plus-circle" />
       </div>
     );
 
@@ -124,25 +161,25 @@ class GeneralSettings extends React.Component<Props, State> {
     return <CollateralButton>{content}</CollateralButton>;
   }
 
-  renderProductModal(collateralData: any, key: string) {
-    const collateralOnChange = (collaterals: any[]) => {
-      const collateral =
-        collaterals && collaterals.length === 1 ? collaterals[0] : null;
+  renderProductModal(key: string) {
+    const { currentMap } = this.state;
+    const product = currentMap[key];
 
-      if (collateral) {
-        this.onChangeInput.bind(collateral._id, key);
+    const productOnChange = (products: any[]) => {
+      const product = products && products.length === 1 ? products[0] : null;
+
+      if (product) {
+        this.onChangeConfig(key, product);
       }
     };
 
     const content = props => (
       <ProductChooser
         {...props}
-        onSelect={collateralOnChange}
-        // onChangeCategory={this.onChangeCategory}
-        // categoryId={this.state.categoryId}
+        onSelect={productOnChange}
         data={{
-          name: 'Collateral',
-          products: collateralData.collateral ? [collateralData.collateral] : []
+          name: 'Product',
+          products: product ? [product] : []
         }}
         limit={1}
         chooserComponent={Chooser}
@@ -151,8 +188,8 @@ class GeneralSettings extends React.Component<Props, State> {
 
     return (
       <ModalTrigger
-        title="Choose collateral"
-        trigger={this.renderCollateralTrigger(collateralData.collateral)}
+        title="Choose product"
+        trigger={this.renderProductTrigger(product)}
         size="lg"
         content={content}
       />
@@ -205,21 +242,31 @@ class GeneralSettings extends React.Component<Props, State> {
 
         <CollapseContent title={__('EBarimt')}>
           {this.renderItem('eBarimtAccount')}
+          <FormGroup>
+            <ControlLabel>{__('Provice/District')}</ControlLabel>
+            <FormControl
+              componentClass="select"
+              defaultValue={this.state.currentMap.districtName}
+              options={DISTRICTS}
+              onChange={this.onChangeInput.bind(this, 'districtName')}
+              required={true}
+            />
+          </FormGroup>
           {this.renderItem('organizationRegister')}
           {this.renderCheckbox(
             'isAmountUseEBarimt',
             undefined,
-            this.renderCollateralModal({}, 'amountEBarimtProduct')
+            this.renderProductModal('amountEBarimtProduct')
           )}
           {this.renderCheckbox(
             'isInterestUseEBarimt',
             undefined,
-            this.renderCollateralModal({}, 'amountEBarimtProduct')
+            this.renderProductModal('interestEBarimtProduct')
           )}
           {this.renderCheckbox(
             'isUndueUseEBarimt',
             undefined,
-            this.renderCollateralModal({}, 'amountEBarimtProduct')
+            this.renderProductModal('undueEBarimtProduct')
           )}
         </CollapseContent>
 
