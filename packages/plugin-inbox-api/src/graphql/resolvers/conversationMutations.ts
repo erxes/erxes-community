@@ -26,7 +26,7 @@ import { generateModels, IContext, IModels } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 import { IIntegrationDocument } from '../../models/definitions/integrations';
 import { CallRecords, ICallRecord } from '../../models/definitions/callRecords';
-import { getAuthToken, sendDailyRequest } from '../../video/controller';
+import { getAuthToken, sendDailyRequest } from '../../dailyCo/controller';
 
 export interface IConversationMessageAdd {
   conversationId: string;
@@ -78,9 +78,6 @@ const VIDEO_CALL_STATUS = {
   END: 'end',
   ALL: ['ongoing', 'end']
 };
-
-// const DAILY_API_KEY = 'be6327e28a96394e97243df047fc63a50977898ce94a656291a0242c8b03d16a';
-// const DAILY_END_POINT = 'https://api.daily.co';
 
 /**
  *  Send conversation to integrations

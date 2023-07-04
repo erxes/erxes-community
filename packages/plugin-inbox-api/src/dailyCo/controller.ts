@@ -1,9 +1,9 @@
-import { debugDaily, debugRequest } from './debuggers';
-import { routeErrorHandling } from './helpers';
 import { CallRecords, ICallRecord, IRecording } from '../models/definitions/callRecords';
 import { Express, Request, Response } from 'express';
 import Configs from '../models/definitions/configs';
 import { sendRequest } from '@erxes/api-utils/src/requests';
+import { debugDaily, debugRequest } from './debuggers';
+import { routeErrorHandling } from './helpers';
 
 const VIDEO_CALL_STATUS = {
   ONGOING: 'ongoing',
@@ -20,15 +20,6 @@ export const getAuthToken = async () => {
 
 const getAuthHeader = async () => {
   return { authorization: `Bearer ${await getAuthToken()}` };
-};
-
-export const sendDailyRequest = async (url: string, method: string, body = {}) => {
-  return sendRequest({
-    headers: await getAuthHeader(),
-    url: `${DAILY_END_POINT}${url}`,
-    method,
-    body
-  });
 };
 
 export const isAfter = (expiresTimestamp: number, defaultMillisecond?: number): boolean => {
@@ -48,6 +39,26 @@ export const getRecordings = async (recordings: IRecording[]) => {
     newRecordings.push(record);
   }
   return newRecordings;
+};
+
+export const sendDailyRequest = async (url: string, method: string, body = {}) => {
+  return sendRequest({
+    headers: await getAuthHeader(),
+    url: `${DAILY_END_POINT}${url}`,
+    method,
+    body
+  });
+};
+
+export const getRoom = (roomName: string) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const response = sendDailyRequest(`/v1/rooms/${roomName}`, 'GET');
+      resolve(response);
+    } catch (e) {
+      reject(null);
+    }
+  });
 };
 
 const init = async (app: Express) => {

@@ -22,7 +22,7 @@ import cronjobs from './cronjobs/conversations';
 import dashboards from './dashboards';
 import webhookMiddleware from './middlewares/webhookMiddleware';
 import payment from './payment';
-import videoCallInit from './video/controller';
+import videoCallInit from './dailyCo/controller';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -37,7 +37,7 @@ export default {
 
     return {
       typeDefs: await typeDefs(sd),
-      resolvers,
+      resolvers
     };
   },
   hasSubscriptions: true,
@@ -53,7 +53,7 @@ export default {
     cronjobs,
     permissions,
     dashboards,
-    payment,
+    payment
   },
   apolloServerContext: async (context, req, res) => {
     const subdomain = getSubdomain(req);
@@ -67,7 +67,7 @@ export default {
     context.serverTiming = {
       startTime: res.startTime,
       endTime: res.endTime,
-      setMetric: res.setMetric,
+      setMetric: res.setMetric
     };
 
     return context;
@@ -93,13 +93,13 @@ export default {
                   name,
                   triggerAutomation,
                   customerId,
-                  attributes,
+                  attributes
                 });
 
           return res.json(response);
         },
-        res => res.json({ status: 'success' }),
-      ),
+        res => res.json({ status: 'success' })
+      )
     );
 
     app.post(
@@ -112,8 +112,8 @@ export default {
           const response = await identifyCustomer(subdomain, args);
           return res.json(response);
         },
-        res => res.json({}),
-      ),
+        res => res.json({})
+      )
     );
 
     app.post(
@@ -125,8 +125,8 @@ export default {
           const response = await updateCustomerProperties(subdomain, req.body);
           return res.json(response);
         },
-        res => res.json({}),
-      ),
+        res => res.json({})
+      )
     );
 
     app.get('/script-manager', cors({ origin: '*' }), widgetsMiddleware);
@@ -139,5 +139,5 @@ export default {
 
     debug = options.debug;
     graphqlPubsub = options.pubsubClient;
-  },
+  }
 };

@@ -3,7 +3,7 @@ import { IMessageDocument } from '../../models/definitions/conversationMessages'
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
-import { sendDailyRequest } from '../../video/controller';
+import { getRoom, sendDailyRequest } from '../../dailyCo/controller';
 import { CallRecords } from '../../models/definitions/callRecords';
 
 export default {
@@ -73,11 +73,6 @@ export default {
       return null;
     }
 
-    try {
-      const response = await sendDailyRequest(`/v1/rooms/${videoCall.roomName}`, 'GET');
-      return response;
-    } catch (e) {
-      return null;
-    }
+    return getRoom(videoCall.roomName);
   }
 };
