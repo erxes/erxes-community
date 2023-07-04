@@ -83,6 +83,8 @@ export const scheduleHelper = async (
     return true;
   });
 
+  if (paymentDates.length === 0) paymentDates.push(endDate);
+
   if (contract.repayment === 'equal') {
     const payment = Math.round(
       (balance - (salvageAmount || 0)) / paymentDates.length
