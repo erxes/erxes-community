@@ -88,6 +88,7 @@ export const deleteRoom = async (roomName: string) => {
   return true;
 };
 
+//no usage
 export const deleteAllRoom = async () => {
   try {
     const response = await sendDailyRequest('/api/v1/rooms', 'GET');
