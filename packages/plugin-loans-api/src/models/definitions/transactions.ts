@@ -25,6 +25,7 @@ export interface IBankTransaction {
 export interface IEBarimt {}
 
 export interface ITransaction {
+  number?: string;
   contractId?: string;
   customerId?: string;
   companyId?: string;
@@ -54,6 +55,7 @@ export interface ITransaction {
   futureDebt?: number;
   debtTenor?: number;
   ebarimt?: any;
+  isManual?: boolean;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -65,6 +67,11 @@ export interface ITransactionDocument extends ITransaction, Document {
 export const transactionSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
+    number: field({
+      type: String,
+      label: 'Number',
+      index: true
+    }),
     contractId: field({
       type: String,
       optional: true,
@@ -155,6 +162,11 @@ export const transactionSchema = schemaHooksWrapper(
     }),
     ebarimt: field({
       type: Schema.Types.Mixed,
+      optional: true,
+      label: 'ebarimt'
+    }),
+    isManual: field({
+      type: Boolean,
       optional: true,
       label: 'ebarimt'
     })

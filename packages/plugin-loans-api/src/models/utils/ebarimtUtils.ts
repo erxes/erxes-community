@@ -1,14 +1,14 @@
 import { IModels } from '../../connectionResolver';
 import { sendMessageBroker } from '../../messageBroker';
+import { IContract } from '../definitions/contracts';
 import { ITransactionDocument } from '../definitions/transactions';
-
-interface IEBarimtConfig {}
 
 export async function createEbarimt(
   models: IModels,
   subdomain: string,
   ebarimtConfig: any,
-  transaction: ITransactionDocument
+  transaction: ITransactionDocument,
+  contract: IContract
 ) {
   let details: any[] = [];
 
@@ -53,8 +53,8 @@ export async function createEbarimt(
     });
   }
 
-  const orderInfo = {
-    number: new Date().getTime(), // transactionii number l baihad bolno
+  const orderInfo: any = {
+    number: transaction.number, // transactionii number l baihad bolno
     date:
       new Date().toISOString().split('T')[0] +
       ' ' +
@@ -66,7 +66,19 @@ export async function createEbarimt(
     nonCashAmount: details.reduce((v, m) => v + m.amount, 0)
   };
 
-  console.log(orderInfo);
+  if (contract.customerType === 'company') {
+    const company = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'companies.findOne',
+        data: { _id: contract.customerId },
+        isRPC: true
+      },
+      'contacts'
+    );
+    orderInfo.billType = '3';
+    orderInfo.customerCode = company.code;
+  }
 
   const config = {
     districtName: ebarimtConfig?.districtName,
@@ -75,7 +87,7 @@ export async function createEbarimt(
     cityTaxPercent: 1,
     hasVat: true,
     hasCitytax: false,
-    defaultGSCode: '3929000'
+    defaultGSCode: ebarimtConfig?.defaultGSCode
   };
 
   const ebarimt = await sendMessageBroker(

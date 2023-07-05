@@ -31,7 +31,9 @@ export const JOURNALS_KEY_LABELS = {
   minTenor: 'Min tenor',
   maxTenor: 'Max tenor',
   minAmount: 'Min amount',
-  maxAmount: 'Max amount'
+  maxAmount: 'Max amount',
+  isAutoSendEBarimt: 'Is send e-barimt auto',
+  defaultGSCode: 'DEFAULTGSCODE'
 };
 
 // erkhet.role.cashAccount ==== journalConfig.repaymentTemp

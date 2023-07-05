@@ -79,6 +79,8 @@ export const loadTransactionClass = (models: IModels) => {
         return models.Transactions.create({ ...doc });
       }
 
+      doc.number = `${contract.number}${new Date().getTime().toString()}`;
+
       if (doc.invoiceId) {
         const invoiceData: any = {
           status: INVOICE_STATUS.DONE
@@ -98,7 +100,13 @@ export const loadTransactionClass = (models: IModels) => {
         _id: contract.contractTypeId
       });
 
-      await createEbarimt(models, subdomain, contractType?.config, tr);
+      await createEbarimt(
+        models,
+        subdomain,
+        contractType?.config,
+        tr,
+        contract
+      );
 
       return tr;
     }

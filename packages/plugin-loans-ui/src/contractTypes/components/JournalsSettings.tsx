@@ -242,6 +242,7 @@ class GeneralSettings extends React.Component<Props, State> {
 
         <CollapseContent title={__('EBarimt')}>
           {this.renderItem('eBarimtAccount')}
+          {this.renderCheckbox('isAutoSendEBarimt')}
           <FormGroup>
             <ControlLabel>{__('Provice/District')}</ControlLabel>
             <FormControl
@@ -253,6 +254,8 @@ class GeneralSettings extends React.Component<Props, State> {
             />
           </FormGroup>
           {this.renderItem('organizationRegister')}
+          {this.renderItem('defaultGSCode')}
+
           {this.renderCheckbox(
             'isAmountUseEBarimt',
             undefined,

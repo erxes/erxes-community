@@ -6,7 +6,7 @@ import {
   putUpdateLog
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
+import messageBroker, { sendMessageBroker } from '../../../messageBroker';
 import redis from '../../../redis';
 import {
   ITransaction,
@@ -150,6 +150,18 @@ const transactionMutations = {
       };
 
       const descriptions = gatherDescriptions(logData);
+      if (!!transaction.ebarimt)
+        await sendMessageBroker(
+          {
+            action: 'putresponses.returnBill',
+            data: {
+              contentType: 'loans:transaction',
+              contentId: transaction._id
+            },
+            subdomain
+          },
+          'ebarimt'
+        );
 
       await putDeleteLog(
         subdomain,
