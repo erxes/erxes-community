@@ -54,7 +54,7 @@ class VideoCall extends React.Component<Props, States> {
     super(props);
 
     this.state = {
-      loading: false,
+      loading: false
     };
   }
 
@@ -65,34 +65,34 @@ class VideoCall extends React.Component<Props, States> {
 
     const parentEl = document.getElementById('call-frame-container') || document.getElementsByTagName('body')[0];
 
-    // this.callFrame = DailyIframe.createFrame(parentEl, {});
+    this.callFrame = DailyIframe.createFrame(parentEl, {});
 
-    // this.callFrame
-    //   .on('error', e => {
-    //     this.setState({ errorMessage: e.errorMsg });
-    //   })
-    //   .on('recording-started', data => {
-    //     this.setState({
-    //       recordingId: data.recordingId
-    //     });
-    //   })
-    //   .on('recording-upload-completed', data => {
-    //     if (data.action === 'recording-upload-completed') {
-    //       client
-    //         .mutate({
-    //           mutation: gql(mutations.saveVideoRecordingInfo),
-    //           variables: {
-    //             conversationId,
-    //             recordingId: this.state.recordingId
-    //           }
-    //         })
-    //         .catch(error => {
-    //           Alert.error(error.message);
-    //         });
-    //     }
-    //   });
+    this.callFrame
+      .on('error', e => {
+        this.setState({ errorMessage: e.errorMsg });
+      })
+      .on('recording-started', data => {
+        this.setState({
+          recordingId: data.recordingId
+        });
+      })
+      .on('recording-upload-completed', data => {
+        if (data.action === 'recording-upload-completed') {
+          client
+            .mutate({
+              mutation: gql(mutations.saveVideoRecordingInfo),
+              variables: {
+                conversationId,
+                recordingId: this.state.recordingId
+              }
+            })
+            .catch(error => {
+              Alert.error(error.message);
+            });
+        }
+      });
 
-    // this.callFrame.join(owner);
+    this.callFrame.join(owner);
   }
 
   onDelete = () => {
@@ -102,7 +102,7 @@ class VideoCall extends React.Component<Props, States> {
     client
       .mutate({
         mutation: gql(mutations.deleteVideoChatRoom),
-        variables: { name },
+        variables: { name }
       })
       .then(({ data: { integrationsDeleteVideoChatRoom } }) => {
         if (integrationsDeleteVideoChatRoom) {
@@ -112,6 +112,7 @@ class VideoCall extends React.Component<Props, States> {
       })
       .catch(error => {
         Alert.error(error.message);
+        this.setState({ loading: false });
       });
   };
 
