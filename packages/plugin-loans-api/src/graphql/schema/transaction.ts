@@ -84,7 +84,7 @@ const commonFields = `
   payDate: Date,
   description: String,
   total: Float,
-
+  isManual: Boolean,
   payment: Float,
   interestEve: Float,
   interestNonce: Float,

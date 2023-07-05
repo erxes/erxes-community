@@ -81,6 +81,7 @@ class TransactionForm extends React.Component<Props, State> {
     return {
       _id: finalValues._id,
       ...this.state,
+      isManual: true,
       payDate: finalValues.payDate,
       total: Number(this.state.total)
     };

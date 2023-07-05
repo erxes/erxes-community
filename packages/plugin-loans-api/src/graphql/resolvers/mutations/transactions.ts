@@ -137,10 +137,11 @@ const transactionMutations = {
   ) => {
     // TODO: contracts check
     const transactions = await models.Transactions.find({
-      _id: { $in: transactionIds }
+      _id: { $in: transactionIds },
+      isManual: true
     }).lean();
 
-    await models.Transactions.removeTransactions(transactionIds);
+    await models.Transactions.removeTransactions(transactions.map(a => a._id));
 
     for (const transaction of transactions) {
       const logData = {
@@ -150,7 +151,7 @@ const transactionMutations = {
       };
 
       const descriptions = gatherDescriptions(logData);
-      if (!!transaction.ebarimt)
+      if (!!transaction.ebarimt && transaction.isManual)
         await sendMessageBroker(
           {
             action: 'putresponses.returnBill',

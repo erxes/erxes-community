@@ -7,7 +7,7 @@ const commonFields = `
   $invoiceId: String,
   $description: String,
   $total: Float,
-
+  $isManual: Boolean,
   $payDate: Date,
   $payment: Float,
   $interestEve: Float,
@@ -24,7 +24,7 @@ const commonVariables = `
   invoiceId: $invoiceId,
   description: $description,
   total: $total,
-
+  isManual: $isManual,
   payDate: $payDate,
   payment: $payment,
   interestEve: $interestEve,
