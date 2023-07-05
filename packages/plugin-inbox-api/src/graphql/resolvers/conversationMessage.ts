@@ -3,7 +3,7 @@ import { IMessageDocument } from '../../models/definitions/conversationMessages'
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
-import { getRoom, sendDailyRequest } from '../../dailyCo/controller';
+import { getRoomDetail, sendDailyRequest } from '../../dailyCo/controller';
 import { CallRecords } from '../../models/definitions/callRecords';
 
 export default {
@@ -73,6 +73,6 @@ export default {
       return null;
     }
 
-    return getRoom(videoCall.roomName);
+    return await getRoomDetail(videoCall.roomName);
   }
 };

@@ -26,7 +26,7 @@ import { generateModels, IContext, IModels } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 import { IIntegrationDocument } from '../../models/definitions/integrations';
 import { CallRecords, ICallRecord } from '../../models/definitions/callRecords';
-import { getAuthToken, sendDailyRequest } from '../../dailyCo/controller';
+import { createRoom, getAuthToken } from '../../dailyCo/controller';
 
 export interface IConversationMessageAdd {
   conversationId: string;
@@ -582,13 +582,11 @@ const conversationMutations = {
     return models.Conversations.markAsReadConversation(_id, user._id);
   },
 
-  async conversationCreateVideoChatRoom(_root, { _id }, { user, models, subdomain }: IContext) {
+  async conversationCreateVideoChatRoom(_root, { _id }, { user, models }: IContext) {
     let message: any;
     const privacy: string = 'private';
 
-    const roomCreateResponse: IDailyRoomCreateResponse = await sendDailyRequest('/v1/rooms', 'POST', {
-      privacy
-    });
+    const roomCreateResponse: IDailyRoomCreateResponse = await createRoom();
 
     try {
       const doc = {

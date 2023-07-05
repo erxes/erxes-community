@@ -4,7 +4,7 @@ import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
 import { CallRecords } from '../../models/definitions/callRecords';
-import { getRoom, sendDailyRequest } from '../../dailyCo/controller';
+import { getRoomDetail } from '../../dailyCo/controller';
 
 export default {
   /**
@@ -108,6 +108,6 @@ export default {
       return null;
     }
 
-    return getRoom(videoCall.roomName);
+    return await getRoomDetail(videoCall.roomName);
   }
 };
