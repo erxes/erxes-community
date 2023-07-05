@@ -259,5 +259,6 @@ export const mutations: string = `
   conversationConvertToCard(${convertParams}): String
   conversationEditCustomFields(_id: String!, customFieldsData: JSON): Conversation
   conversationCreateVideoChatRoom(_id: String!): VideoCallData
-  conversationDeleteVideoChatRoom(name: String!): VideoCallData
+  conversationDeleteVideoChatRoom(name: String!): Boolean
+  conversationsSaveVideoRecordingInfo(conversationId: String!, recordingId: String): String
 `;

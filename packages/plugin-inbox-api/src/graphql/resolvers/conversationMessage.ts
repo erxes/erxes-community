@@ -73,6 +73,11 @@ export default {
       return null;
     }
 
-    return await getRoomDetail(videoCall.roomName);
+    const room = await getRoomDetail(videoCall.roomName);
+    if (room) {
+      room.url = `${room.url}?t=${videoCall.token}`;
+    }
+
+    return room;
   }
 };

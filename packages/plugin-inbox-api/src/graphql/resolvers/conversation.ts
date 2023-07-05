@@ -4,7 +4,13 @@ import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { sendIntegrationsMessage } from '../../messageBroker';
 import { IContext } from '../../connectionResolver';
 import { CallRecords } from '../../models/definitions/callRecords';
-import { getRoomDetail } from '../../dailyCo/controller';
+import { getAuthToken, getEndpoint, getRoomDetail, getRoomToken } from '../../dailyCo/controller';
+
+const VIDEO_CALL_STATUS = {
+  ONGOING: 'ongoing',
+  END: 'end',
+  ALL: ['ongoing', 'end']
+};
 
 export default {
   /**
@@ -102,12 +108,29 @@ export default {
       contentType: MESSAGE_TYPES.VIDEO_CALL
     }).lean();
 
-    const videoCall = await CallRecords.findOne({ erxesApiMessageId: message._id }).lean();
-
     if (!message) {
       return null;
     }
 
-    return await getRoomDetail(videoCall.roomName);
+    const callRecord = await CallRecords.findOne({
+      erxesApiConversationId: conversation._id,
+      status: VIDEO_CALL_STATUS.ONGOING
+    });
+
+    const response: {
+      url?: string;
+      name?: string;
+      recordingLinks?: string[];
+    } = {
+      recordingLinks: []
+    };
+
+    if (callRecord) {
+      const ownerToken = await getRoomToken(callRecord.roomName, true);
+      response.url = `${await getEndpoint()}/${callRecord.roomName}?t=${ownerToken}`;
+      response.name = callRecord.roomName;
+    }
+
+    return response;
   }
 };

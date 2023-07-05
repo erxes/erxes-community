@@ -9,15 +9,23 @@ const VIDEO_CALL_STATUS = {
   ALL: ['ongoing', 'end']
 };
 
-const DAILY_END_POINT: string = 'https://api.daily.co';
+export const getEndpoint = async (): Promise<string> => {
+  const config = await Configs.getConfig('DAILY_END_POINT');
+  return config.value;
+};
 
 export const getAuthToken = async (): Promise<string> => {
   const config = await Configs.getConfig('DAILY_API_KEY');
   return config.value;
 };
 
-const getAuthHeader = async () => {
-  return { authorization: `Bearer ${await getAuthToken()}` };
+export const sendDailyRequest = async (url: string, method: string, body = {}) => {
+  return await sendRequest({
+    headers: { authorization: `Bearer ${await getAuthToken()}` },
+    url: `${await getEndpoint()}${url}`,
+    method,
+    body
+  });
 };
 
 export const isAfter = (expiresTimestamp: number, defaultMillisecond?: number): boolean => {
@@ -30,7 +38,7 @@ export const getRecordings = async (recordings: IRecording[]) => {
   const newRecordings: IRecording[] = [];
   for (const record of recordings) {
     if (!record.expires || (record.expires && !isAfter(record.expires))) {
-      const accessLinkResponse = await sendDailyRequest(`/v1/recordings/${record.id}/access-link`, 'GET');
+      const accessLinkResponse = await sendDailyRequest(`/api/v1/recordings/${record.id}/access-link`, 'GET');
       record.expires = accessLinkResponse.expires;
       record.url = accessLinkResponse.download_link;
     }
@@ -39,18 +47,9 @@ export const getRecordings = async (recordings: IRecording[]) => {
   return newRecordings;
 };
 
-export const sendDailyRequest = async (url: string, method: string, body = {}) => {
-  return sendRequest({
-    headers: await getAuthHeader(),
-    url: `${DAILY_END_POINT}${url}`,
-    method,
-    body
-  });
-};
-
 export const getRoomDetail = async (roomName: string) => {
   try {
-    return await sendDailyRequest(`/v1/rooms/${roomName}`, 'GET');
+    return await sendDailyRequest(`/api/v1/rooms/${roomName}`, 'GET');
   } catch (e) {
     return null;
   }
@@ -58,7 +57,7 @@ export const getRoomDetail = async (roomName: string) => {
 
 export const getRoomList = async () => {
   try {
-    const response = await sendDailyRequest('/v1/rooms', 'GET');
+    const response = await sendDailyRequest('/api/v1/rooms', 'GET');
     return response.data;
   } catch (e) {
     throw new Error(e.message);
@@ -67,7 +66,7 @@ export const getRoomList = async () => {
 
 export const createRoom = async () => {
   try {
-    return await sendDailyRequest('/v1/rooms', 'POST', {
+    return await sendDailyRequest('/api/v1/rooms', 'POST', {
       privacy: 'private'
     });
   } catch (e) {
@@ -82,7 +81,7 @@ export const deleteRoom = async (roomName: string) => {
   });
 
   if (callRecord) {
-    sendDailyRequest(`/v1/rooms/${roomName}`, 'DELETE');
+    sendDailyRequest(`/api/v1/rooms/${roomName}`, 'DELETE');
     CallRecords.updateOne({ _id: callRecord._id }, { $set: { status: VIDEO_CALL_STATUS.END } });
   }
 
@@ -96,10 +95,27 @@ export const deleteAllRoom = async () => {
 
     for (const room of rooms) {
       await CallRecords.updateOne({ roomName: room.name }, { $set: { status: VIDEO_CALL_STATUS.END } });
-      await sendDailyRequest(`/api/v1/rooms/${room.name}`, 'DELETE');
+      await sendDailyRequest(`/api/api/v1/rooms/${room.name}`, 'DELETE');
     }
 
     return true;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
+
+export const getRoomToken = async (roomName: string, isOwner = false) => {
+  const properties: any = { room_name: roomName };
+
+  if (isOwner) {
+    properties.enable_recording = 'cloud';
+  }
+
+  try {
+    const response = await sendDailyRequest('/api/v1/meeting-tokens', 'POST', {
+      properties
+    });
+    return response.token;
   } catch (e) {
     throw new Error(e.message);
   }

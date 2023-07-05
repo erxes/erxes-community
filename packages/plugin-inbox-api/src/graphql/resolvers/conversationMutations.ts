@@ -1,9 +1,7 @@
 import * as strip from 'strip';
 import * as _ from 'underscore';
-
 import { checkPermission, requireLogin } from '@erxes/api-utils/src/permissions';
 import { IUserDocument } from '@erxes/api-utils/src/types';
-
 import { MESSAGE_TYPES } from '../../models/definitions/constants';
 import { IMessageDocument } from '../../models/definitions/conversationMessages';
 import { IConversationDocument } from '../../models/definitions/conversations';
@@ -13,7 +11,6 @@ import {
   sendContactsMessage,
   sendCardsMessage,
   sendCoreMessage,
-  sendIntegrationsMessage,
   sendNotificationsMessage,
   sendToWebhook,
   sendCommonMessage,
@@ -26,7 +23,7 @@ import { generateModels, IContext, IModels } from '../../connectionResolver';
 import { isServiceRunning } from '../../utils';
 import { IIntegrationDocument } from '../../models/definitions/integrations';
 import { CallRecords, ICallRecord } from '../../models/definitions/callRecords';
-import { createRoom, getAuthToken } from '../../dailyCo/controller';
+import { createRoom, deleteRoom, getEndpoint, getRoomToken } from '../../dailyCo/controller';
 
 export interface IConversationMessageAdd {
   conversationId: string;
@@ -584,7 +581,6 @@ const conversationMutations = {
 
   async conversationCreateVideoChatRoom(_root, { _id }, { user, models }: IContext) {
     let message: any;
-    const privacy: string = 'private';
 
     const roomCreateResponse: IDailyRoomCreateResponse = await createRoom();
 
@@ -602,17 +598,19 @@ const conversationMutations = {
         erxesApiMessageId: message._id,
         roomName: roomCreateResponse.name,
         kind: 'daily',
-        privacy,
-        token: await getAuthToken()
+        privacy: 'private',
+        token: await getRoomToken(roomCreateResponse.name)
       };
 
       const callRecord = await CallRecords.createCallRecord(callRecordData);
+
+      const ownerToken = await getRoomToken(roomCreateResponse.name, true);
 
       const updatedMessage = { ...message._doc };
       publishMessage(models, updatedMessage);
 
       return {
-        url: roomCreateResponse.url,
+        url: `${await getEndpoint()}/${callRecord.roomName}?t=${ownerToken}`,
         name: callRecord.roomName,
         status: VIDEO_CALL_STATUS.ONGOING
       };
@@ -623,29 +621,20 @@ const conversationMutations = {
     }
   },
 
-  async conversationDeleteVideoChatRoom(_root, { name }, { dataSources }: IContext) {
-    console.log('-----', name);
-    try {
-      return await dataSources.IntegrationsAPI.deleteDailyVideoChatRoom(name);
-    } catch (e) {
-      throw new Error(e.message);
-    }
+  async conversationDeleteVideoChatRoom(_root, { name }) {
+    await CallRecords.updateOne({ roomName: name }, { $set: { status: VIDEO_CALL_STATUS.END } });
+    return await deleteRoom(name);
   },
 
   async conversationsSaveVideoRecordingInfo(
     _root,
-    { conversationId, recordingId }: { conversationId: string; recordingId: string },
-    { dataSources }: IContext
+    { conversationId, recordingId }: { conversationId: string; recordingId: string }
   ) {
-    try {
-      const response = await dataSources.IntegrationsAPI.saveDailyRecordingInfo({
-        erxesApiConversationId: conversationId,
-        recordingId
-      });
-      return response.status;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    await CallRecords.updateOne(
+      { erxesApiConversationId: conversationId, status: VIDEO_CALL_STATUS.ONGOING },
+      { $push: { recordings: { id: recordingId } } }
+    );
+    return { status: 'ok' };
   },
 
   async changeConversationOperator(
