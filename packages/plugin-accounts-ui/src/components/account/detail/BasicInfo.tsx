@@ -98,7 +98,7 @@ class BasicInfo extends React.Component<Props> {
       type,
       categoryId,
       currency,
-      isbalance,
+      isBalance,
       closePercent,
       journal,
       createdAt
@@ -123,7 +123,7 @@ class BasicInfo extends React.Component<Props> {
           {this.renderView('Type', type)}
           {this.renderView('Category', categoryId ? categoryId : '')}
           {this.renderView('Currency', currency)}
-          {this.renderView('Is Balance', isbalance)}
+          {this.renderView('Is Balance', isBalance)}
           {this.renderView('Close Percent', closePercent)}
           {this.renderView('Journal', journal)}
           {this.renderView('Created At', createdAt)}

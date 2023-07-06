@@ -35,10 +35,10 @@ class Form extends React.Component<Props, State> {
     super(props);
 
     const account = props.account || ({} as IAccount);
-    const { currency, isbalance, closePercent } = account;
+    const { currency, isBalance, closePercent } = account;
 
     this.state = {
-      disabled: isbalance === 'true' ? false : true,
+      disabled: isBalance === 'true' ? true : false,
       currency: currency ? currency : 0,
       closePercent: closePercent ? closePercent : 0
     };
@@ -66,9 +66,25 @@ class Form extends React.Component<Props, State> {
 
   onComboEvent = (variable: string, e) => {
     let value = '';
-    value = e.target.value;
+
+    switch (variable) {
+      case 'vendorId':
+        value = e;
+        break;
+      case 'uomId':
+        value = e ? e.value : '';
+        break;
+      default:
+        value = e.target.value;
+    }
+
     this.setState({ [variable]: value } as any);
   };
+  // onComboEvent = (variable: string, e) => {
+  //   let value = '';
+  //   value = e.target.value;
+  //   this.setState({ [variable]: value } as any);
+  // };
 
   renderFormTrigger(trigger: React.ReactNode) {
     const content = props => (
@@ -78,14 +94,17 @@ class Form extends React.Component<Props, State> {
       <ModalTrigger title="Add category" trigger={trigger} content={content} />
     );
   }
+
   onBalanceChange = e => {
     const { closePercent } = this.state;
-    const yes = e.target.value === 'true';
+    const true_check = e.target.value === 'true';
+
     this.setState({
-      disabled: yes ? false : true,
-      closePercent: yes ? closePercent : 0
+      disabled: true_check ? false : true,
+      closePercent: true_check ? closePercent : 0
     });
   };
+
   renderContent = (formProps: IFormProps) => {
     const { renderButton, closeModal, account, accountCategories } = this.props;
     const { values, isSubmitted } = formProps;
@@ -166,27 +185,25 @@ class Form extends React.Component<Props, State> {
                 name="currency"
                 value={currency}
                 onChange={this.onComboEvent.bind(this, 'currency')}
-                // defaultValue={object.currency}
                 required={true}
                 type="number"
               />
             </FormGroup>
 
             <FormGroup>
-              <ControlLabel required={true}>Balance</ControlLabel>
+              <ControlLabel>Balance</ControlLabel>
               <FormControl
                 {...formProps}
-                name="isbalance"
+                name="isBalance"
                 componentClass="select"
                 onChange={this.onBalanceChange}
-                defaultValue={object.isbalance}
+                defaultValue={object.isBalance}
                 options={IS_BALANCE}
-                required={true}
               />
             </FormGroup>
-
             <FormGroup>
               <ControlLabel>Close Percent</ControlLabel>
+
               <FormControl
                 {...formProps}
                 name="closePercent"

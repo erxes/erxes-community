@@ -34,12 +34,11 @@ class AccountFormContainer extends React.Component<FinalProps> {
       callback,
       object
     }: IButtonMutateProps) => {
-      const { currency, closePercent, isbalance } = values;
-      console.log(values, 'asjdioasdjio');
+      const { currency, closePercent, isBalance } = values;
 
       values.currency = Number(currency);
       values.closePercent = Number(closePercent);
-      values.isbalance = isbalance === 'true' ? true : false;
+      values.isBalance = isBalance === 'true' ? true : false;
 
       return (
         <ButtonMutate

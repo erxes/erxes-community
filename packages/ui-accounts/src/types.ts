@@ -19,7 +19,7 @@ export interface IAccount {
   category: IAccountCategory;
   customFieldsData?: any;
   currency?: number;
-  isbalance?: boolean;
+  isBalance?: boolean;
   closePercent?: number;
   journal?: string;
   createdAt: Date;

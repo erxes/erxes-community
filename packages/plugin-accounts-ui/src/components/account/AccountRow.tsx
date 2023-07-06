@@ -41,7 +41,7 @@ class Row extends React.Component<Props> {
       type,
       category,
       currency,
-      isbalance,
+      isBalance,
       closePercent,
       journal,
       createdAt
@@ -63,7 +63,7 @@ class Row extends React.Component<Props> {
         </td>
         <td>{category ? category.name : ''}</td>
         <td>{(currency || 0).toLocaleString()}</td>
-        <td>{isbalance ? 'Yes' : 'No'}</td>
+        <td>{isBalance ? 'Yes' : 'No'}</td>
         <td>{(closePercent || 0).toLocaleString()}</td>
         <td>
           <TextInfo>{journal}</TextInfo>
