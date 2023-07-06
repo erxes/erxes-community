@@ -23,7 +23,6 @@ import dashboards from './dashboards';
 import webhookMiddleware from './middlewares/webhookMiddleware';
 import { NOTIFICATION_MODULES } from './constants';
 import payment from './payment';
-import videoCallInit from './dailyCo/controller';
 
 export let mainDb;
 export let graphqlPubsub;
@@ -35,7 +34,6 @@ export default {
   permissions,
   graphql: async sd => {
     serviceDiscovery = sd;
-
     return {
       typeDefs: await typeDefs(sd),
       resolvers
@@ -134,8 +132,6 @@ export default {
     app.get('/script-manager', cors({ origin: '*' }), widgetsMiddleware);
 
     app.post('/webhooks/:id', webhookMiddleware);
-
-    videoCallInit(app);
 
     initBroker(options.messageBrokerClient);
 

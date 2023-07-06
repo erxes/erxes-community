@@ -621,9 +621,10 @@ const conversationMutations = {
     }
   },
 
-  async conversationDeleteVideoChatRoom(_root, { name }) {
+  async conversationDeleteVideoChatRoom(_, { name }) {
     await CallRecords.updateOne({ roomName: name }, { $set: { status: VIDEO_CALL_STATUS.END } });
-    return await deleteRoom(name);
+    await deleteRoom(name);
+    return true;
   },
 
   async conversationsSaveVideoRecordingInfo(

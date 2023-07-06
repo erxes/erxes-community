@@ -104,14 +104,15 @@ class VideoCall extends React.Component<Props, States> {
         mutation: gql(mutations.deleteVideoChatRoom),
         variables: { name }
       })
-      .then(({ data: { integrationsDeleteVideoChatRoom } }) => {
-        if (integrationsDeleteVideoChatRoom) {
+      .then(({ data }) => {
+        if (data.conversationDeleteVideoChatRoom) {
           window.close();
-          this.setState({ loading: false });
         }
       })
       .catch(error => {
         Alert.error(error.message);
+      })
+      .finally(() => {
         this.setState({ loading: false });
       });
   };
