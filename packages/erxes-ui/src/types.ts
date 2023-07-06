@@ -120,6 +120,7 @@ export interface IField {
   showInCard?: boolean;
   keys?: string[];
   productCategoryId?: string;
+  accountCategoryId?: string;
   optionsValues?: string;
 
   relationType?: string;
