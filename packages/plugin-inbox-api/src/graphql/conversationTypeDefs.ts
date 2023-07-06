@@ -260,5 +260,5 @@ export const mutations: string = `
   conversationEditCustomFields(_id: String!, customFieldsData: JSON): Conversation
   conversationCreateVideoChatRoom(_id: String!): VideoCallData
   conversationDeleteVideoChatRoom(name: String!): Boolean
-  conversationsSaveVideoRecordingInfo(conversationId: String!, recordingId: String): String
+  conversationsSaveVideoRecordingInfo(conversationId: String!, recordingId: String): JSON
 `;
