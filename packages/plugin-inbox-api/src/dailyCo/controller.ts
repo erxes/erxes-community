@@ -75,14 +75,10 @@ export const createRoom = async () => {
 };
 
 export const deleteRoom = async (roomName: string) => {
-  const callRecord = await CallRecords.findOne({
-    roomName,
-    status: VIDEO_CALL_STATUS.ONGOING
-  });
-
-  if (callRecord) {
-    sendDailyRequest(`/api/v1/rooms/${roomName}`, 'DELETE');
-    CallRecords.updateOne({ _id: callRecord._id }, { $set: { status: VIDEO_CALL_STATUS.END } });
+  try {
+    await sendDailyRequest(`/api/v1/rooms/${roomName}`, 'DELETE');
+  } catch (e) {
+    return true;
   }
 
   return true;
