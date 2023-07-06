@@ -3,9 +3,10 @@ import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
 import { afterMutationHandlers } from './afterMutations';
 import { beforeResolverHandlers } from './beforeResolvers';
-import { getConfig } from './utils';
+import { getCompany, getConfig } from './utils';
 import { getPostDataCommon } from './commonUtils';
 import { PutData } from './models/utils';
+import { sendRequest } from '@erxes/api-utils/src/requests';
 
 let client;
 
@@ -255,6 +256,16 @@ export const initBroker = async cl => {
 
       return {
         status: 'success'
+      };
+    }
+  );
+
+  consumeRPCQueue(
+    'ebarimt:putresponses.getCompany',
+    async ({ subdomain, data: { companyRD } }) => {
+      return {
+        status: 'success',
+        data: await getCompany(subdomain, companyRD)
       };
     }
   );

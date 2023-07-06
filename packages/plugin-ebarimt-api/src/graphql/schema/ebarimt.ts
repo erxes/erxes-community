@@ -69,4 +69,5 @@ export const queries = `
   putResponsesCount(${queryParams}): Int
   putResponsesAmount(${queryParams}): Float
   getDealLink(_id: String): String
+  ebarimtGetCompany(companyRD: String!): JSON
 `;

@@ -6,6 +6,7 @@ import {
   sendPosMessage
 } from '../../../messageBroker';
 import { IContext } from '../../../connectionResolver';
+import { getCompany } from '../../../utils';
 
 const generateFilter = async (subdomain, params, commonQuerySelector) => {
   const filter: any = commonQuerySelector;
@@ -262,6 +263,14 @@ const queries = {
       data: { _id: param._id, type: 'deal' },
       isRPC: true
     });
+  },
+
+  ebarimtGetCompany: async (
+    _root,
+    { companyRD }: { companyRD: string },
+    { subdomain }
+  ) => {
+    return getCompany(subdomain, companyRD);
   }
 };
 
