@@ -155,10 +155,17 @@ query GetPaymentInfo($id: String!, $payDate: Date) {
 }
 `;
 
+export const getCompanyName = `
+  query EbarimtGetCompany($companyRd: String!) {
+    ebarimtGetCompany(companyRD: $companyRd)
+  }
+`;
+
 export default {
   transactions,
   transactionsMain,
   transactionCounts,
   transactionDetail,
-  getPaymentInfo
+  getPaymentInfo,
+  getCompanyName
 };

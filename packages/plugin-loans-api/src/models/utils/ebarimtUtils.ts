@@ -104,9 +104,18 @@ export async function createEbarimt(
     },
     'ebarimt'
   );
-
-  await models.Transactions.updateOne(
-    { _id: transaction._id },
-    { $set: { ebarimt: ebarimt } }
-  );
+  if (ebarimt.length > 0)
+    await models.Transactions.updateOne(
+      { _id: transaction._id },
+      {
+        $set: {
+          ebarimt: {
+            success: ebarimt[0]?.success,
+            _id: ebarimt[0]?._id,
+            taxType: ebarimt[0]?.taxType,
+            vat: ebarimt[0]?.vat
+          }
+        }
+      }
+    );
 }

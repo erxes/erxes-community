@@ -99,14 +99,14 @@ export const loadTransactionClass = (models: IModels) => {
       const contractType = await models.ContractTypes.findOne({
         _id: contract.contractTypeId
       });
-
-      await createEbarimt(
-        models,
-        subdomain,
-        contractType?.config,
-        tr,
-        contract
-      );
+      if (contractType?.config?.isAutoSendEBarimt === true)
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract
+        );
 
       return tr;
     }
