@@ -113,4 +113,5 @@ export const mutations = `
   transactionsEdit(_id: String!, ${commonFields}): LoanTransaction
   transactionsChange(_id: String!, ${changeFields}): LoanTransaction
   transactionsRemove(transactionIds: [String]): [String]
+  createEBarimtOnTransaction(id: String!,isGetEBarimt: Boolean,isOrganization: Boolean,organizationRegister: String):LoanTransaction
 `;

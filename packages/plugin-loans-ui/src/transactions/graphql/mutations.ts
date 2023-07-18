@@ -98,9 +98,19 @@ const transactionsRemove = `
   }
 `;
 
+const createEBarimtOnTransaction = `
+mutation createEBarimtOnTransaction($id: String!, $isGetEBarimt:Boolean, $isOrganization:Boolean, $organizationRegister:String) {
+  createEBarimtOnTransaction(id: $id, isGetEBarimt: $isGetEBarimt,isOrganization: $isOrganization,organizationRegister: $organizationRegister) {
+    _id
+    ${transactionOtherFields}
+  }
+}
+`;
+
 export default {
   transactionsAdd,
   transactionsEdit,
   transactionsChange,
-  transactionsRemove
+  transactionsRemove,
+  createEBarimtOnTransaction
 };

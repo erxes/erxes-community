@@ -31,6 +31,13 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
     subdomain: string,
     scheduleDate?: Date
   );
+  createEBarimtOnTransaction(
+    subdomain: string,
+    id: string,
+    isGetEBarimt?: boolean,
+    isOrganization?: boolean,
+    organizationRegister?: string
+  );
 }
 export const loadTransactionClass = (models: IModels) => {
   class Transaction {
@@ -418,6 +425,34 @@ export const loadTransactionClass = (models: IModels) => {
         debt;
 
       return paymentInfo;
+    }
+
+    public static async createEBarimtOnTransaction(
+      subdomain: string,
+      id: string,
+      isGetEBarimt?: boolean,
+      isOrganization?: boolean,
+      organizationRegister?: string
+    ) {
+      const tr = await models.Transactions.findOne({ _id: id });
+      if (!tr) throw new Error('Transaction not found');
+      const contract = await models.Contracts.findOne({ _id: tr?.contractId });
+      if (!contract) throw new Error('Contract not found');
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract?.contractTypeId
+      });
+      if (!contractType) throw new Error('Contract type not found');
+      if (isGetEBarimt)
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
+        );
+
+      return tr;
     }
   }
   transactionSchema.loadClass(Transaction);

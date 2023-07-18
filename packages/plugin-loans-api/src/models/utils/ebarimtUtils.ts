@@ -35,16 +35,18 @@ export async function createEbarimt(
     });
   }
 
+  const interest =
+    (transaction?.interestEve || 0) + (transaction?.interestNonce || 0);
+
   if (
     ebarimtConfig.interestEBarimtProduct &&
     ebarimtConfig.isInterestUseEBarimt &&
-    transaction?.interestEve &&
-    transaction.interestNonce &&
-    transaction.interestEve + transaction.interestNonce > 0
+    interest &&
+    interest > 0
   ) {
     details.push({
       productId: ebarimtConfig.interestEBarimtProduct._id,
-      amount: transaction.interestEve + transaction.interestNonce,
+      amount: interest,
       count: 1,
       discount: 0
     });

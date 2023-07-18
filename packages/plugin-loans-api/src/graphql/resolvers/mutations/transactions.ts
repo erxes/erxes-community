@@ -174,6 +174,31 @@ const transactionMutations = {
     }
 
     return transactionIds;
+  },
+  createEBarimtOnTransaction: async (
+    _root,
+    {
+      id,
+      isGetEBarimt,
+      isOrganization,
+      organizationRegister
+    }: {
+      id: string;
+      isGetEBarimt?: boolean;
+      isOrganization?: boolean;
+      organizationRegister?: string;
+    },
+    { models, subdomain }: IContext
+  ) => {
+    const transaction = await models.Transactions.createEBarimtOnTransaction(
+      subdomain,
+      id,
+      isGetEBarimt,
+      isOrganization,
+      organizationRegister
+    );
+
+    return transaction;
   }
 };
 checkPermission(transactionMutations, 'transactionsAdd', 'manageTransactions');
