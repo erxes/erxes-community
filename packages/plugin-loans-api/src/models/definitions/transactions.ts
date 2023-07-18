@@ -56,6 +56,9 @@ export interface ITransaction {
   debtTenor?: number;
   ebarimt?: any;
   isManual?: boolean;
+  isGetEBarimt?: boolean;
+  isOrganization?: boolean;
+  organizationRegister?: string;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {

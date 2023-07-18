@@ -139,6 +139,9 @@ class TransactionsList extends React.Component<IProps> {
               <th>
                 <SortHandler sortField={'total'} label={__('Total')} />
               </th>
+              <th>
+                <SortHandler sortField={'ebarimt'} label={__('EBarimt')} />
+              </th>
               <th></th>
             </tr>
           </thead>

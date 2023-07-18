@@ -15,6 +15,9 @@ const commonFields = `
   $undue: Float,
   $insurance: Float,
   $debt: Float,
+  $isGetEBarimt: Boolean,
+  $isOrganization: Boolean,
+  $organizationRegister: String,
 `;
 
 const commonVariables = `
@@ -32,6 +35,9 @@ const commonVariables = `
   undue: $undue,
   insurance: $insurance,
   debt: $debt,
+  isGetEBarimt: $isGetEBarimt,
+  isOrganization: $isOrganization,
+  organizationRegister: $organizationRegister,
 `;
 
 const changeFields = `

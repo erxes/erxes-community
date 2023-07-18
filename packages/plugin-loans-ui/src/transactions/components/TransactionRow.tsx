@@ -68,6 +68,7 @@ function TransactionRow({
     const trBaseForm = props => (
       <TransactionForm {...props} transaction={transaction} />
     );
+
     return (
       <ModalTrigger
         title={__('Edit basic info')}
@@ -112,6 +113,7 @@ function TransactionRow({
       <TrNumberCols key={'total'}>
         {displayNumber(transaction, 'total')}
       </TrNumberCols>
+      <td key={'hasEbarimt'}>{!!transaction.ebarimt ? 'yes' : 'no'}</td>
       <td key={'manage'}>
         {renderChangeBtn()}
 

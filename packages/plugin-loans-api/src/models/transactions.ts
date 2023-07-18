@@ -56,7 +56,12 @@ export const loadTransactionClass = (models: IModels) => {
      */
     public static async createTransaction(
       subdomain: string,
-      doc: ITransaction
+      {
+        isGetEBarimt,
+        isOrganization,
+        organizationRegister,
+        ...doc
+      }: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
@@ -99,13 +104,17 @@ export const loadTransactionClass = (models: IModels) => {
       const contractType = await models.ContractTypes.findOne({
         _id: contract.contractTypeId
       });
-      if (contractType?.config?.isAutoSendEBarimt === true)
+      if (
+        contractType?.config?.isAutoSendEBarimt === true ||
+        (isGetEBarimt && doc.isManual)
+      )
         await createEbarimt(
           models,
           subdomain,
           contractType?.config,
           tr,
-          contract
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
         );
 
       return tr;

@@ -67,6 +67,7 @@ export const transactionOtherFields = `
     debt
     total
   }
+  ebarimt
 `;
 
 const listParamsDef = `

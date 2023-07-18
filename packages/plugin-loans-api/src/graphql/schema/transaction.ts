@@ -45,6 +45,7 @@ export const types = `
     customer: Customer,
     company: Company,
     calcedInfo: CalcedInfo
+    ebarimt:JSON
   }
 
   type TransactionsListResponse {
@@ -91,6 +92,9 @@ const commonFields = `
   undue: Float,
   insurance: Float,
   debt: Float,
+  isGetEBarimt: Boolean,
+  isOrganization: Boolean,
+  organizationRegister: String,
 `;
 
 const changeFields = `

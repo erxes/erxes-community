@@ -8,7 +8,16 @@ export async function createEbarimt(
   subdomain: string,
   ebarimtConfig: any,
   transaction: ITransactionDocument,
-  contract: IContract
+  contract: IContract,
+  {
+    isGetEBarimt,
+    isOrganization,
+    organizationRegister
+  }: {
+    isGetEBarimt?: boolean;
+    isOrganization?: boolean;
+    organizationRegister?: string;
+  }
 ) {
   let details: any[] = [];
 
@@ -36,7 +45,8 @@ export async function createEbarimt(
     details.push({
       productId: ebarimtConfig.interestEBarimtProduct._id,
       amount: transaction.interestEve + transaction.interestNonce,
-      count: 1
+      count: 1,
+      discount: 0
     });
   }
 
@@ -49,7 +59,8 @@ export async function createEbarimt(
     details.push({
       productId: ebarimtConfig.undueEBarimtProduct._id,
       amount: transaction.undue,
-      count: 1
+      count: 1,
+      discount: 0
     });
   }
 
@@ -66,7 +77,10 @@ export async function createEbarimt(
     nonCashAmount: details.reduce((v, m) => v + m.amount, 0)
   };
 
-  if (contract.customerType === 'company') {
+  if (isGetEBarimt && isOrganization && organizationRegister) {
+    orderInfo.billType = '3';
+    orderInfo.customerCode = organizationRegister;
+  } else if (contract.customerType === 'company') {
     const company = await sendMessageBroker(
       {
         subdomain,
@@ -78,6 +92,20 @@ export async function createEbarimt(
     );
     orderInfo.billType = '3';
     orderInfo.customerCode = company.code;
+  }
+
+  if (orderInfo.billType === '3') {
+    const companyCheck = await sendMessageBroker(
+      {
+        subdomain,
+        action: 'putresponses.getCompany',
+        data: { companyRD: orderInfo.customerCode },
+        isRPC: true
+      },
+      'ebarimt'
+    );
+
+    if (companyCheck?.info?.found === false) return;
   }
 
   const config = {
