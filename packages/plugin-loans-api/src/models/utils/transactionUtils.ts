@@ -619,7 +619,7 @@ export const trAfterSchedule = async (
     };
   }
 
-  const prePayDate = getFullDate(preSchedule.payDate);
+  const prePayDate = preSchedule.payDate;
 
   // wrong date
   if (trDate < prePayDate) {

@@ -255,22 +255,62 @@ class GeneralSettings extends React.Component<Props, State> {
           </FormGroup>
           {this.renderItem('organizationRegister')}
           {this.renderItem('defaultGSCode')}
-
-          {this.renderCheckbox(
-            'isAmountUseEBarimt',
-            undefined,
-            this.renderProductModal('amountEBarimtProduct')
-          )}
-          {this.renderCheckbox(
-            'isInterestUseEBarimt',
-            undefined,
-            this.renderProductModal('interestEBarimtProduct')
-          )}
-          {this.renderCheckbox(
-            'isUndueUseEBarimt',
-            undefined,
-            this.renderProductModal('undueEBarimtProduct')
-          )}
+          <div
+            style={{
+              backgroundColor: 'rgba(5,5,5,0.05)',
+              padding: 20,
+              paddingBottom: 10,
+              borderRadius: 10
+            }}
+          >
+            {this.renderCheckbox('isAmountUseEBarimt')}
+            {this.state?.currentMap?.isAmountUseEBarimt && (
+              <FormGroup>
+                <ControlLabel>{__('Product')}</ControlLabel>
+                {this.renderProductModal('amountEBarimtProduct')}
+              </FormGroup>
+            )}
+            {this.state?.currentMap?.isAmountUseEBarimt &&
+              this.renderCheckbox('isAmountHasVat')}
+          </div>
+          <div
+            style={{
+              backgroundColor: 'rgba(5,5,5,0.05)',
+              padding: 20,
+              paddingBottom: 10,
+              borderRadius: 10,
+              marginTop: 10
+            }}
+          >
+            {this.renderCheckbox('isInterestUseEBarimt')}
+            {this.state?.currentMap?.isInterestUseEBarimt && (
+              <FormGroup>
+                <ControlLabel>{__('Product')}</ControlLabel>
+                {this.renderProductModal('interestEBarimtProduct')}
+              </FormGroup>
+            )}
+            {this.state?.currentMap?.isInterestUseEBarimt &&
+              this.renderCheckbox('isInterestHasVat')}
+          </div>
+          <div
+            style={{
+              backgroundColor: 'rgba(5,5,5,0.05)',
+              padding: 20,
+              paddingBottom: 10,
+              borderRadius: 10,
+              marginTop: 10
+            }}
+          >
+            {this.renderCheckbox('isUndueUseEBarimt')}
+            {this.state?.currentMap?.isUndueUseEBarimt && (
+              <FormGroup>
+                <ControlLabel>{__('Product')}</ControlLabel>
+                {this.renderProductModal('undueEBarimtProduct')}
+              </FormGroup>
+            )}
+            {this.state?.currentMap?.isUndueUseEBarimt &&
+              this.renderCheckbox('isUndueHasVat')}
+          </div>
         </CollapseContent>
 
         <CollapseContent title={__('Classification')}>

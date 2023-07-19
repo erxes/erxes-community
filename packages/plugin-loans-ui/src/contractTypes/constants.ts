@@ -33,7 +33,10 @@ export const JOURNALS_KEY_LABELS = {
   minAmount: 'Min amount',
   maxAmount: 'Max amount',
   isAutoSendEBarimt: 'Is send e-barimt auto',
-  defaultGSCode: 'DEFAULTGSCODE'
+  defaultGSCode: 'DEFAULTGSCODE',
+  isAmountHasVat: 'isAmountHasVat',
+  isUndueHasVat: 'isUndueHasVat',
+  isInterestHasVat: 'isInterestHasVat'
 };
 
 // erkhet.role.cashAccount ==== journalConfig.repaymentTemp

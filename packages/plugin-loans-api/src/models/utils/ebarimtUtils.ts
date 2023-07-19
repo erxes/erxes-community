@@ -21,50 +21,56 @@ export async function createEbarimt(
 ) {
   let details: any[] = [];
 
+  //check config of ebarimt amount
   if (
-    ebarimtConfig.amountEBarimtProduct &&
-    ebarimtConfig.isAmountUseEBarimt &&
     transaction?.payment &&
-    transaction.payment > 0
+    transaction.payment > 0 &&
+    ebarimtConfig.isAmountUseEBarimt
   ) {
-    details.push({
-      productId: ebarimtConfig.amountEBarimtProduct._id,
-      amount: transaction.payment,
-      count: 1,
-      discount: 0
-    });
+    if (ebarimtConfig.amountEBarimtProduct)
+      details.push({
+        productId: ebarimtConfig.amountEBarimtProduct._id,
+        amount: transaction.payment,
+        count: 1,
+        discount: 0
+      });
+    else throw new Error('Amount EBarimt config not found');
   }
 
   const interest =
     (transaction?.interestEve || 0) + (transaction?.interestNonce || 0);
-
-  if (
-    ebarimtConfig.interestEBarimtProduct &&
-    ebarimtConfig.isInterestUseEBarimt &&
-    interest &&
-    interest > 0
-  ) {
-    details.push({
-      productId: ebarimtConfig.interestEBarimtProduct._id,
-      amount: interest,
-      count: 1,
-      discount: 0
-    });
+  //interest config check
+  if (interest && interest > 0 && ebarimtConfig.isInterestUseEBarimt) {
+    if (ebarimtConfig.interestEBarimtProduct)
+      details.push({
+        productId: ebarimtConfig.interestEBarimtProduct._id,
+        amount: interest,
+        count: 1,
+        discount: 0
+      });
+    else throw new Error('Interest EBarimt config not found');
   }
 
+  //undue config check
   if (
-    ebarimtConfig.undueEBarimtProduct &&
-    ebarimtConfig.isUndueUseEBarimt &&
     transaction?.undue &&
-    transaction.undue > 0
+    transaction.undue > 0 &&
+    ebarimtConfig.isUndueUseEBarimt
   ) {
-    details.push({
-      productId: ebarimtConfig.undueEBarimtProduct._id,
-      amount: transaction.undue,
-      count: 1,
-      discount: 0
-    });
+    if (ebarimtConfig.undueEBarimtProduct)
+      details.push({
+        productId: ebarimtConfig.undueEBarimtProduct._id,
+        amount: transaction.undue,
+        count: 1,
+        discount: 0
+      });
+    else throw new Error('Undue EBarimt config not found');
   }
+
+  const sumAmount = details.reduce((v, r) => v + r.amount, 0);
+
+  if (sumAmount !== transaction.total)
+    throw new Error('Sum value not match transaction total');
 
   const orderInfo: any = {
     number: transaction.number, // transactionii number l baihad bolno
@@ -79,7 +85,7 @@ export async function createEbarimt(
     nonCashAmount: details.reduce((v, m) => v + m.amount, 0)
   };
 
-  if (isGetEBarimt && isOrganization && organizationRegister) {
+  if (transaction.isManual && isOrganization && organizationRegister) {
     orderInfo.billType = '3';
     orderInfo.customerCode = organizationRegister;
   } else if (contract.customerType === 'company') {
