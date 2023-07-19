@@ -257,7 +257,7 @@ class GeneralSettings extends React.Component<Props, State> {
           {this.renderItem('defaultGSCode')}
           <div
             style={{
-              backgroundColor: 'rgba(5,5,5,0.05)',
+              boxShadow: '1px 0px 5px rgba(0,0,0,0.1)',
               padding: 20,
               paddingBottom: 10,
               borderRadius: 10
@@ -275,7 +275,7 @@ class GeneralSettings extends React.Component<Props, State> {
           </div>
           <div
             style={{
-              backgroundColor: 'rgba(5,5,5,0.05)',
+              boxShadow: '1px 0px 5px rgba(0,0,0,0.1)',
               padding: 20,
               paddingBottom: 10,
               borderRadius: 10,
@@ -294,7 +294,7 @@ class GeneralSettings extends React.Component<Props, State> {
           </div>
           <div
             style={{
-              backgroundColor: 'rgba(5,5,5,0.05)',
+              boxShadow: '1px 0px 5px rgba(0,0,0,0.1)',
               padding: 20,
               paddingBottom: 10,
               borderRadius: 10,
