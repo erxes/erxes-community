@@ -385,22 +385,13 @@ export const loadTransactionClass = (models: IModels) => {
       }
     }
 
-    public static async getPaymentInfo(id, payDate, subdomain, scheduleDate) {
+    public static async getPaymentInfo(id, payDate, subdomain) {
       const today = getPureDate(new Date(payDate));
 
       const paymentInfo = await getCalcedAmounts(models, subdomain, {
         contractId: id,
         payDate: today
       });
-
-      if (scheduleDate) {
-        const schedulePayDate = getPureDate(new Date(scheduleDate));
-        const paymentScheduleInfo = await getCalcedAmounts(models, subdomain, {
-          contractId: id,
-          payDate: schedulePayDate
-        });
-        paymentInfo.payment = paymentScheduleInfo.payment;
-      }
 
       const {
         payment = 0,

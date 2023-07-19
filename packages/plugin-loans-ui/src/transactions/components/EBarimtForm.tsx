@@ -220,7 +220,7 @@ class EBarimtForm extends React.Component<Props, State> {
           object ? 'updated' : 'added'
         } a ${name}`}
       >
-        {__('Save')}
+        {__('Get')}
       </ButtonMutate>
     );
   };
