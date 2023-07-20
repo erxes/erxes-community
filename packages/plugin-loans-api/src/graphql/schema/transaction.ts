@@ -45,6 +45,7 @@ export const types = `
     customer: Customer,
     company: Company,
     calcedInfo: CalcedInfo
+    currency:String
   }
 
   type TransactionsListResponse {
@@ -91,6 +92,7 @@ const commonFields = `
   undue: Float,
   insurance: Float,
   debt: Float,
+  currency:String,
 `;
 
 const changeFields = `

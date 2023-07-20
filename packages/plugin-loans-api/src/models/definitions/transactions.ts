@@ -51,6 +51,7 @@ export interface ITransaction {
   contractReaction?: any;
   futureDebt?: number;
   debtTenor?: number;
+  currency: string;
 }
 
 export interface ITransactionDocument extends ITransaction, Document {
@@ -149,6 +150,11 @@ export const transactionSchema = schemaHooksWrapper(
       min: 0,
       optional: true,
       label: 'debt Tenor'
+    }),
+    currency: field({
+      type: String,
+      default: 'MNT',
+      label: 'transaction currency of lease'
     })
   }),
   'erxes_transactionSchema'
