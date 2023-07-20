@@ -243,6 +243,7 @@ class GeneralSettings extends React.Component<Props, State> {
         <CollapseContent title={__('EBarimt')}>
           {this.renderItem('eBarimtAccount')}
           {this.renderCheckbox('isAutoSendEBarimt')}
+          {this.renderCheckbox('isHasVat')}
           <FormGroup>
             <ControlLabel>{__('Provice/District')}</ControlLabel>
             <FormControl
@@ -270,8 +271,6 @@ class GeneralSettings extends React.Component<Props, State> {
                 {this.renderProductModal('amountEBarimtProduct')}
               </FormGroup>
             )}
-            {this.state?.currentMap?.isAmountUseEBarimt &&
-              this.renderCheckbox('isAmountHasVat')}
           </div>
           <div
             style={{
@@ -289,8 +288,6 @@ class GeneralSettings extends React.Component<Props, State> {
                 {this.renderProductModal('interestEBarimtProduct')}
               </FormGroup>
             )}
-            {this.state?.currentMap?.isInterestUseEBarimt &&
-              this.renderCheckbox('isInterestHasVat')}
           </div>
           <div
             style={{
@@ -308,8 +305,6 @@ class GeneralSettings extends React.Component<Props, State> {
                 {this.renderProductModal('undueEBarimtProduct')}
               </FormGroup>
             )}
-            {this.state?.currentMap?.isUndueUseEBarimt &&
-              this.renderCheckbox('isUndueHasVat')}
           </div>
         </CollapseContent>
 

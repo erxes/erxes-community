@@ -121,7 +121,7 @@ export async function createEbarimt(
     companyRD: ebarimtConfig?.organizationRegister,
     vatPercent: 10,
     cityTaxPercent: 1,
-    hasVat: true,
+    hasVat: ebarimtConfig?.isHasVat,
     hasCitytax: false,
     defaultGSCode: ebarimtConfig?.defaultGSCode
   };
