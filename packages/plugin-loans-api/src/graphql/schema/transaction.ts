@@ -46,6 +46,7 @@ export const types = `
     company: Company,
     calcedInfo: CalcedInfo
     currency:String
+    ebarimt:JSON
   }
 
   type TransactionsListResponse {
@@ -85,7 +86,7 @@ const commonFields = `
   payDate: Date,
   description: String,
   total: Float,
-
+  isManual: Boolean,
   payment: Float,
   interestEve: Float,
   interestNonce: Float,
@@ -111,4 +112,5 @@ export const mutations = `
   transactionsEdit(_id: String!, ${commonFields}): LoanTransaction
   transactionsChange(_id: String!, ${changeFields}): LoanTransaction
   transactionsRemove(transactionIds: [String]): [String]
+  createEBarimtOnTransaction(id: String!,isGetEBarimt: Boolean,isOrganization: Boolean,organizationRegister: String):LoanTransaction
 `;

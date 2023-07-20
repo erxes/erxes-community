@@ -167,7 +167,7 @@ class ContractTypeForm extends React.Component<Props, State> {
               </FormGroup>
             </FormColumn>
             <FormColumn>
-              {this.renderFormGroup('Undue Percent', {
+              {this.renderFormGroup('Loss Percent', {
                 ...formProps,
                 name: 'unduePercent',
                 defaultValue: contractType.unduePercent || '',
@@ -213,7 +213,7 @@ class ContractTypeForm extends React.Component<Props, State> {
               </FormGroup>
               <FormGroup>
                 <ControlLabel required={true}>
-                  {__('Undue calc type')}
+                  {__('Loss calc type')}
                 </ControlLabel>
                 <FormControl
                   {...formProps}

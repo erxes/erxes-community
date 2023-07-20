@@ -532,7 +532,7 @@ class ContractForm extends React.Component<Props, State> {
                   onChange: this.onChangeField,
                   onClick: this.onFieldClick
                 })}
-              {this.renderFormGroup('Undue Percent', {
+              {this.renderFormGroup('Loss Percent', {
                 ...formProps,
                 type: 'number',
                 name: 'unduePercent',
