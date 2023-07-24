@@ -19,9 +19,29 @@ requestTimeType: $requestTimeType,
 requestHoursPerDay: $requestHoursPerDay
 `;
 
+const userFields = `
+  _id
+  username
+  email
+  employeeId
+  details {
+    avatar
+    fullName
+    firstName
+    lastName
+    position
+  }
+  departments {
+    title
+  }
+  branches {
+    title
+  }
+`;
+
 const timeclockEdit = `
-  mutation timeclockEdit($_id: String!, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
-    timeclockEdit(_id: $_id, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+  mutation timeclockEdit($_id: String!, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean, $inDeviceType: String,$inDevice: String $outDeviceType: String,$outDevice: String ){
+    timeclockEdit(_id: $_id, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive, inDeviceType: $inDeviceType, inDevice: $inDevice, outDeviceType: $outDeviceType, outDevice: $outDevice){
       _id
     }
   }
@@ -49,8 +69,8 @@ const timeclockStop = `
 `;
 
 const timeclockCreate = `
-    mutation timeclockCreate($userId: String, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean){
-      timeclockCreate(userId: $userId, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive){
+    mutation timeclockCreate($userId: String, $shiftStart: Date, $shiftEnd: Date, $shiftActive: Boolean, $inDeviceType: String, $outDeviceType: String){
+      timeclockCreate(userId: $userId, shiftStart: $shiftStart, shiftEnd: $shiftEnd, shiftActive: $shiftActive, inDeviceType: $inDeviceType, outDeviceType: $outDeviceType){
         _id
       }
     }
@@ -88,16 +108,34 @@ const absenceTypeRemove = `
   }`;
 
 const sendScheduleRequest = `
-  mutation sendScheduleRequest($userId: String, $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+  mutation sendScheduleRequest($userId: String, $shifts: [ShiftInput], $scheduleConfigId: String, $totalBreakInMins: Int){
     sendScheduleRequest(userId: $userId, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
     }
   }`;
 
 const submitSchedule = `
-  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftsRequestInput], $scheduleConfigId: String, $totalBreakInMins: Int){
+  mutation submitSchedule($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftInput], $scheduleConfigId: String, $totalBreakInMins: Int){
     submitSchedule(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, scheduleConfigId: $scheduleConfigId, totalBreakInMins: $totalBreakInMins){
       _id
+    }
+  }`;
+
+const checkDuplicateScheduleShifts = `
+  mutation checkDuplicateScheduleShifts($branchIds: [String], $departmentIds: [String],$userIds: [String], $shifts: [ShiftInput], $status: String){
+    checkDuplicateScheduleShifts(branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds, shifts: $shifts, status: $status ){
+        shifts{
+          _id
+          shiftStart
+          shiftEnd
+          solved
+          status
+          scheduleConfigId
+        }
+        user {
+          ${userFields}
+        }
+        solved
     }
   }`;
 
@@ -172,12 +210,12 @@ const scheduleShiftRemove = `
     scheduleShiftRemove(_id: $_id)
   }`;
 
-const scheduleConfigAdd = `mutation scheduleConfigAdd($scheduleName: String, $lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
+const scheduleConfigAdd = `mutation scheduleConfigAdd($scheduleName: String, $lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftInput]){
   scheduleConfigAdd(scheduleName: $scheduleName, lunchBreakInMins : $lunchBreakInMins, configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
     _id
   }
 }`;
-const scheduleConfigEdit = `mutation scheduleConfigEdit($_id: String, $scheduleName: String,$lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftsRequestInput]){
+const scheduleConfigEdit = `mutation scheduleConfigEdit($_id: String, $scheduleName: String,$lunchBreakInMins: Int, $configShiftStart: String, $configShiftEnd: String, $scheduleConfig: [ShiftInput]){
   scheduleConfigEdit(_id: $_id, scheduleName: $scheduleName, lunchBreakInMins : $lunchBreakInMins, configShiftStart:$configShiftStart, configShiftEnd: $configShiftEnd, scheduleConfig : $scheduleConfig){
     _id
   }
@@ -204,22 +242,18 @@ const deviceConfigRemove = `mutation deviceConfigRemove($_id: String){
 }`;
 
 const extractAllDataFromMsSQL = `
-mutation extractAllDataFromMsSQL($startDate: String, $endDate: String){
-  extractAllDataFromMsSQL(startDate: $startDate, endDate: $endDate){
-    _id
-  }
+mutation extractAllDataFromMsSQL($startDate: String, $endDate: String, $extractAll: Boolean, $branchIds: [String], $departmentIds: [String],$userIds: [String]){
+  extractAllDataFromMsSQL(startDate: $startDate, endDate: $endDate, extractAll: $extractAll, branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds)
 }`;
 
 const extractTimeLogsFromMsSql = `
-mutation extractTimeLogsFromMsSQL($startDate: String, $endDate: String){
-  extractTimeLogsFromMsSQL(startDate: $startDate, endDate: $endDate){
-    _id
-  }
+mutation extractTimeLogsFromMsSQL($startDate: String, $endDate: String, $extractAll: Boolean, $branchIds: [String], $departmentIds: [String],$userIds: [String]){
+  extractTimeLogsFromMsSQL(startDate: $startDate, endDate: $endDate, extractAll: $extractAll, branchIds: $branchIds, departmentIds:$departmentIds, userIds: $userIds)
 }`;
 
 const createTimeClockFromLog = `
-mutation createTimeClockFromLog($userId: String, $timelog: Date){
-  createTimeClockFromLog(userId: $userId, timelog: $timelog){
+mutation createTimeClockFromLog($userId: String, $timelog: Date, $inDevice: String){
+  createTimeClockFromLog(userId: $userId, timelog: $timelog, inDevice: $inDevice){
     _id
   }
 }`;
@@ -239,6 +273,7 @@ export default {
   absenceTypeEdit,
   absenceTypeRemove,
 
+  checkDuplicateScheduleShifts,
   solveAbsenceRequest,
   removeAbsenceRequest,
   solveSchedule,

@@ -3,9 +3,12 @@ import { IPaymentDocument } from '../models/definitions/payments';
 import { MonpayAPI } from './monpay/api';
 import { PaypalAPI } from './paypal/api';
 import { QpayAPI } from './qpay/api';
+import { QPayQuickQrAPI } from './qpayQuickqr/api';
 import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
 import { WechatPayAPI } from './wechatpay/api';
+import { PocketAPI } from './pocket/api';
+import * as QRCode from 'qrcode';
 
 class ErxesPayment {
   public socialpay: SocialPayAPI;
@@ -14,6 +17,8 @@ class ErxesPayment {
   public monpay: MonpayAPI;
   public paypal: PaypalAPI;
   public wechatpay: WechatPayAPI;
+  public qpayQuickqr: QPayQuickQrAPI;
+  public pocket: PocketAPI;
   public domain: string;
 
   private payment: any;
@@ -27,10 +32,15 @@ class ErxesPayment {
     this.monpay = new MonpayAPI(payment.config, domain);
     this.paypal = new PaypalAPI(payment.config);
     this.wechatpay = new WechatPayAPI(payment.config, domain);
+    this.qpayQuickqr = new QPayQuickQrAPI(payment.config, domain);
+    this.pocket = new PocketAPI(payment.config, domain);
   }
 
   async createInvoice(invoice: IInvoiceDocument) {
     const { payment } = this;
+
+    // return { qrData: await QRCode.toDataURL('test') };
+
     const api = this[payment.kind];
 
     try {
@@ -47,6 +57,18 @@ class ErxesPayment {
 
     try {
       return await api.checkInvoice(invoice);
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async manualCheck(invoice: IInvoiceDocument) {
+    const { payment } = this;
+
+    const api = this[payment.kind];
+
+    try {
+      return await api.manualCheck(invoice);
     } catch (e) {
       throw new Error(e.message);
     }

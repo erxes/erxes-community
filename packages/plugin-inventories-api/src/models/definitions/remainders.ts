@@ -5,7 +5,7 @@ export interface IRemainderParams {
   departmentId?: string;
   branchId?: string;
   productId: string;
-  uomId?: string;
+  uom?: string;
 }
 
 export interface IRemainderProductsParams {
@@ -19,8 +19,8 @@ export interface IRemainderProductsParams {
 }
 
 export interface IRemaindersParams {
-  departmentId?: string;
-  branchId?: string;
+  departmentIds?: string[];
+  branchIds?: string[];
   productCategoryId?: string;
   productIds?: string[];
 }
@@ -28,7 +28,7 @@ export interface IRemaindersParams {
 export interface IRemainderCount {
   _id: string;
   count: number;
-  uomId: string;
+  uom: string;
 }
 
 export interface IRemainder {

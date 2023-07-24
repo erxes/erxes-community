@@ -6,6 +6,7 @@ const chats = `
         name
         type
         isSeen
+        isPinned
         lastMessage {
           content
           createdAt
@@ -19,6 +20,7 @@ const chats = `
             }
             lastSeenMessageId
           }
+          attachments
         }
         createdUser {
           _id
@@ -136,9 +138,17 @@ const getChatIdByUserIds = `
   }
 `;
 
+const getUnreadChatCount = `
+  query getUnreadChatCount{
+    getUnreadChatCount
+  }
+
+`;
+
 export default {
   chats,
   chatDetail,
   chatMessages,
-  getChatIdByUserIds
+  getChatIdByUserIds,
+  getUnreadChatCount
 };

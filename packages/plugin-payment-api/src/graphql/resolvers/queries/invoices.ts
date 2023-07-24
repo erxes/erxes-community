@@ -56,7 +56,7 @@ const queries = {
   ) {
     const selector = generateFilterQuery(params);
 
-    return paginate(models.Invoices.find(selector).sort({ createdAt: 1 }), {
+    return paginate(models.Invoices.find(selector).sort({ createdAt: -1 }), {
       ...params
     });
   },
@@ -99,8 +99,8 @@ const queries = {
     return counts;
   },
 
-  async checkInvoice(_root, { _id }: { _id: string }, { models }: IContext) {
-    return models.Invoices.checkInvoice(_id);
+  async invoiceDetail(_root, { _id }: { _id: string }, { models }: IContext) {
+    return models.Invoices.getInvoice({ _id });
   }
 };
 

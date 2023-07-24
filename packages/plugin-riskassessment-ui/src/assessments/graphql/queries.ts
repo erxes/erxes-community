@@ -70,6 +70,7 @@ const commonField = `
     }
     status
     statusColor
+    permittedUserIds
  `;
 
 const riskAssessments = `
@@ -87,8 +88,8 @@ const totalCount = `
 `;
 
 const riskAssessmentDetail = `
-  query RiskAssessmentDetail($id: String) {
-    riskAssessmentDetail(id: $id)
+  query RiskAssessmentDetail($id: String,$showFlagged: Boolean) {
+    riskAssessmentDetail(id: $id,showFlagged: $showFlagged)
   }
 `;
 

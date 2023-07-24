@@ -14,8 +14,15 @@ import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import CheckInOutForm from '../../containers/absence/CheckInOutForm';
 import Tip from '@erxes/ui/src/components/Tip';
 import Icon from '@erxes/ui/src/components/Icon';
+import { IUser } from '@erxes/ui/src/auth/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import { FlexRowLeft, ToggleButton } from '../../styles';
 
 type Props = {
+  currentUser: IUser;
+  departments: IDepartment[];
+  branches: IBranch[];
+
   absences: IAbsence[];
   absenceTypes: IAbsenceType[];
   queryParams: any;
@@ -23,6 +30,8 @@ type Props = {
   startTime?: Date;
   loading?: boolean;
   totalCount: number;
+
+  isCurrentUserAdmin: boolean;
 
   solveAbsence: (absenceId: string, status: string) => void;
   submitRequest: (
@@ -43,7 +52,6 @@ type Props = {
   getPagination: (pagination: any) => void;
   showSideBar: (sideBar: boolean) => void;
 };
-
 function AbsenceList(props: Props) {
   const {
     absences,
@@ -55,9 +63,19 @@ function AbsenceList(props: Props) {
     totalCount
   } = props;
 
+  const [isSideBarOpen, setIsOpen] = useState(
+    localStorage.getItem('isSideBarOpen') === 'true' ? true : false
+  );
+
   const [seeDates, setSeeDates] = useState(
     JSON.parse(localStorage.getItem('seeDates') || 'false')
   );
+
+  const onToggleSidebar = () => {
+    const toggleIsOpen = !isSideBarOpen;
+    setIsOpen(toggleIsOpen);
+    localStorage.setItem('isSideBarOpen', toggleIsOpen.toString());
+  };
 
   const trigger = (
     <Button id="timeClockButton2" btnStyle="success" icon="plus-circle">
@@ -81,8 +99,8 @@ function AbsenceList(props: Props) {
   const checkInModalContent = contentProps => {
     const updatedProps = {
       ...props,
-      checkInOutRequest: true,
-      contentProps
+      contentProps,
+      checkInOutRequest: true
     };
     return <AbsenceForm {...updatedProps} />;
   };
@@ -119,6 +137,18 @@ function AbsenceList(props: Props) {
     );
   };
 
+  const actionBarLeft = (
+    <FlexRowLeft>
+      <ToggleButton
+        id="btn-inbox-channel-visible"
+        isActive={isSideBarOpen}
+        onClick={onToggleSidebar}
+      >
+        <Icon icon="subject" />
+      </ToggleButton>
+    </FlexRowLeft>
+  );
+
   const actionBarRight = (
     <>
       <ModalTrigger
@@ -137,6 +167,7 @@ function AbsenceList(props: Props) {
 
   const actionBar = (
     <Wrapper.ActionBar
+      left={actionBarLeft}
       right={actionBarRight}
       hasFlex={true}
       wideSpacing={true}
@@ -161,15 +192,20 @@ function AbsenceList(props: Props) {
     const absenceTimeType = absence.absenceTimeType;
 
     const calculateAbsenceHours = () => {
-      if (absenceTimeType === 'by hour') {
-        const getTimeInHours = (
-          (endTime.getTime() - startTime.getTime()) /
-          3600000
-        ).toFixed(1);
-        return getTimeInHours;
+      // if check in request or request time type is by day
+      if (
+        absence.reason.match(/Check in request/gi) ||
+        absence.reason.match(/Check out request/gi) ||
+        absenceTimeType === 'by day'
+      ) {
+        return '-';
       }
-      // by day
-      return '-';
+
+      const getTimeInHours = (
+        (endTime.getTime() - startTime.getTime()) /
+        3600000
+      ).toFixed(1);
+      return getTimeInHours;
     };
 
     const renderAbsenceDays = () => {
@@ -183,6 +219,25 @@ function AbsenceList(props: Props) {
     };
 
     const renderAbsenceTimeInfo = () => {
+      if (absence.reason.match(/Check in request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{startingTime}</td>
+            <td>{'-'}</td>
+          </>
+        );
+      }
+      if (absence.reason.match(/Check out request/gi)) {
+        return (
+          <>
+            <td>{startingDate}</td>
+            <td>{'-'}</td>
+            <td>{startingTime}</td>
+          </>
+        );
+      }
+
       if (absenceTimeType === 'by day') {
         return (
           <>
@@ -284,7 +339,7 @@ function AbsenceList(props: Props) {
           <th>{__('Date')}</th>
           <th>{__('From')}</th>
           <th>{__('To')}</th>
-          <th>{__('Total hours: ')}</th>
+          <th>{__('Total hours ')}</th>
           <th onClick={toggleSeeDates} style={{ cursor: 'pointer' }}>
             <div style={{ display: 'flex', flex: 'row', alignItems: 'center' }}>
               <div>{__('See dates')}</div>
@@ -307,7 +362,7 @@ function AbsenceList(props: Props) {
   );
 
   getActionBar(actionBar);
-  showSideBar(true);
+  showSideBar(isSideBarOpen);
   getPagination(<Pagination count={totalCount} />);
 
   return content;

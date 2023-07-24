@@ -25,7 +25,8 @@ export const types = `
         department: Department
         operationId:String,
         operation:Operation,
-        isSplittedUsers:Boolean
+        isSplittedUsers:Boolean,
+        permittedUserIds:[String]
     }
 
     type RiskAssessmentDetail  {
@@ -85,6 +86,7 @@ const commonMutationParams = `
     branchId:String
     departmentId:String
     groupsAssignedUsers:[GroupsAssignedUsers]
+    permittedUserIds:[String]
 `;
 
 export const mutations = `
@@ -113,6 +115,7 @@ const commonParams = `
     sortDirection:Int
     tagIds:[String]
     groupIds:[String]
+    customFieldsValues:[String]
 `;
 
 const commonFormSubmitParams = `
@@ -127,7 +130,7 @@ export const queries = `
 
     riskAssessmentsTotalCount(${commonParams}):Int
 
-    riskAssessmentDetail(id:String):JSON
+    riskAssessmentDetail(id:String,showFlagged:Boolean):JSON
 
     riskAssessmentFormSubmissionDetail(${commonFormSubmitParams}):JSON
     

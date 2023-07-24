@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useSubscription } from 'react-apollo';
-import gql from 'graphql-tag';
+import { useQuery, useSubscription } from '@apollo/client';
+import { gql } from '@apollo/client';
 // erxes
 import Spinner from '@erxes/ui/src/components/Spinner';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
-import { IUser } from '@erxes/ui/src/auth/types';
 // local
 import Component from '../../components/messages/MessageList';
 import { queries, subscriptions } from '../../graphql';
+import { Alert } from '@erxes/ui/src/utils';
+import { sendDesktopNotification } from '@erxes/ui/src/utils/core';
+import strip from 'strip';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   chatId: string;
   setReply: (message: any) => void;
+  currentUser: IUser;
 };
 
 const MessageListContainer = (props: Props) => {
-  const { chatId } = props;
+  const { chatId, currentUser } = props;
 
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
@@ -34,13 +37,24 @@ const MessageListContainer = (props: Props) => {
 
   useSubscription(gql(subscriptions.chatMessageInserted), {
     variables: { chatId },
-    onSubscriptionData: ({ subscriptionData }) => {
-      if (!subscriptionData.data) return;
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      if (!data) {
+        return null;
+      }
+      const { chatMessageInserted } = data;
+      const { content } = chatMessageInserted;
+      const { mentionedUserIds = [] } = content;
 
-      setLatestMessages([
-        subscriptionData.data.chatMessageInserted,
-        ...latestMessages
-      ]);
+      mentionedUserIds.map((mentionedUserId: string) => {
+        if (currentUser._id === mentionedUserId) {
+          sendDesktopNotification({
+            title: 'You have a new message',
+            content: strip(content || '')
+          });
+        }
+      });
+
+      setLatestMessages([data.chatMessageInserted, ...latestMessages]);
     }
   });
 
@@ -84,7 +98,7 @@ const MessageListContainer = (props: Props) => {
   }
 
   if (error) {
-    return <p>{error.message}</p>;
+    Alert.error(error.message);
   }
 
   const chatMessages = (data && data.chatMessages.list) || [];

@@ -6,7 +6,7 @@ import Tip from '@erxes/ui/src/components/Tip';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { FlexRowLeft, ToggleButton } from '../../styles';
 
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import ScheduleForm from './ScheduleForm';
 import { ISchedule, IScheduleConfig, IShift } from '../../types';
 import dayjs from 'dayjs';
@@ -24,12 +24,20 @@ import Icon from '@erxes/ui/src/components/Icon';
 import Select from 'react-select-plus';
 
 type Props = {
-  scheduleOfMembers: ISchedule[];
+  currentUser: IUser;
+  isCurrentUserAdmin: boolean;
+  isCurrentUserSupervisor?: boolean;
+
   queryParams: any;
   history: any;
-  branchesList: IBranch[];
+
+  departments: IDepartment[];
+  branches: IBranch[];
+
+  scheduleOfMembers: ISchedule[];
   scheduleConfigs: IScheduleConfig[];
   totalCount: number;
+
   solveSchedule: (scheduleId: string, status: string) => void;
   solveShift: (shiftId: string, status: string) => void;
   submitRequest: (
@@ -48,6 +56,8 @@ type Props = {
   ) => void;
   removeScheduleShifts: (_id: string, type: string) => void;
 
+  checkDuplicateScheduleShifts: (values: any) => any;
+
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
   getPagination: (pagination: any) => void;
@@ -60,11 +70,11 @@ function ScheduleList(props: Props) {
     totalCount,
     queryParams,
     solveSchedule,
-    solveShift,
     removeScheduleShifts,
     getActionBar,
     showSideBar,
-    getPagination
+    getPagination,
+    isCurrentUserSupervisor
   } = props;
 
   const [selectedScheduleStatus, setScheduleStatus] = useState(
@@ -205,12 +215,14 @@ function ScheduleList(props: Props) {
         content={modalContent}
       />
 
-      <ModalTrigger
-        size="lg"
-        title={__('Schedule config - Admin')}
-        trigger={adminConfigTrigger}
-        content={adminConfigContent}
-      />
+      {isCurrentUserSupervisor && (
+        <ModalTrigger
+          size="lg"
+          title={__('Schedule config - Admin')}
+          trigger={adminConfigTrigger}
+          content={adminConfigContent}
+        />
+      )}
     </>
   );
 
@@ -401,17 +413,23 @@ function ScheduleList(props: Props) {
     ).size;
 
     let totalHoursScheduled = 0;
+    let totalBreakInMins = 0;
 
     scheduleOfMember.shifts.map(shift => {
       totalHoursScheduled +=
         (new Date(shift.shiftEnd).getTime() -
           new Date(shift.shiftStart).getTime()) /
         (1000 * 3600);
+
+      totalBreakInMins += shift.lunchBreakInMins || 0;
     });
 
-    const totalBreakInHours = scheduleOfMember.totalBreakInMins
-      ? (scheduleOfMember.totalBreakInMins / 60).toFixed(1)
-      : 0;
+    const totalBreakInHours = totalBreakInMins / 60;
+
+    if (totalHoursScheduled) {
+      totalHoursScheduled -= totalBreakInHours;
+    }
+
     return (
       <tr style={{ textAlign: 'left' }}>
         <td
@@ -454,8 +472,8 @@ function ScheduleList(props: Props) {
         <td>{name}</td>
         <td>{employeeId}</td>
         <td>{totalDaysScheduled}</td>
-        <td>{totalHoursScheduled}</td>
-        <td>{totalBreakInHours}</td>
+        <td>{totalHoursScheduled.toFixed(1)}</td>
+        <td>{totalBreakInHours.toFixed(1)}</td>
         {!isEnabled('bichil') && <td>{scheduleChecked}</td>}
         {renderScheduleShifts(scheduleOfMember.shifts, user._id)}
       </tr>

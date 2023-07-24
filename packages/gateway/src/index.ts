@@ -1,13 +1,6 @@
-import * as apm from 'elastic-apm-node';
+import * as Sentry from '@sentry/node';
 import * as dotenv from 'dotenv';
 dotenv.config();
-
-if (process.env.ELASTIC_APM_HOST_NAME) {
-  apm.start({
-    serviceName: `${process.env.ELASTIC_APM_HOST_NAME}-gateway`,
-    serverUrl: 'http://172.104.115.19:8200'
-  });
-}
 
 import * as express from 'express';
 import * as http from 'http';
@@ -23,7 +16,10 @@ import {
 import { initBroker } from './messageBroker';
 import * as cors from 'cors';
 import { retryGetProxyTargets, ErxesProxyTarget } from './proxy/targets';
-import createErxesProxyMiddleware from './proxy/create-middleware';
+import {
+  applyProxiesCoreless,
+  applyProxyToCore
+} from './proxy/create-middleware';
 import apolloRouter from './apollo-router';
 import { ChildProcess } from 'child_process';
 import { startSubscriptionServer } from './subscription';
@@ -38,7 +34,8 @@ const {
   ALLOWED_ORIGINS,
   PORT,
   RABBITMQ_HOST,
-  MESSAGE_BROKER_PREFIX
+  MESSAGE_BROKER_PREFIX,
+  SENTRY_DSN
 } = process.env;
 
 let apolloRouterProcess: ChildProcess | undefined = undefined;
@@ -55,6 +52,35 @@ const stopRouter = () => {
   await clearCache();
 
   const app = express();
+
+  // for health check
+  app.get('/health', async (_req, res) => {
+    res.end('ok');
+  });
+
+  if (SENTRY_DSN) {
+    Sentry.init({
+      dsn: SENTRY_DSN,
+      integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // Automatically instrument Node.js libraries and frameworks
+        ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations()
+      ],
+
+      // Set tracesSampleRate to 1.0 to capture 100%
+      // of transactions for performance monitoring.
+      // We recommend adjusting this value in production
+      tracesSampleRate: 1.0,
+      profilesSampleRate: 1.0 // Profiling sample rate is relative to tracesSampleRate
+    });
+  }
+
+  // RequestHandler creates a separate execution context, so that all
+  // transactions/spans/breadcrumbs are isolated across requests
+  app.use(Sentry.Handlers.requestHandler());
+  // TracingHandler creates a trace for every incoming request
+  app.use(Sentry.Handlers.tracingHandler());
 
   app.use(cookieParser());
 
@@ -76,12 +102,10 @@ const stopRouter = () => {
   const targets: ErxesProxyTarget[] = await retryGetProxyTargets();
   await apolloRouter(targets);
 
-  app.use(createErxesProxyMiddleware(targets));
+  applyProxiesCoreless(app, targets);
 
-  // for health check
-  app.get('/health', async (_req, res) => {
-    res.end('ok');
-  });
+  // The error handler must be before any other error middleware and after all controllers
+  app.use(Sentry.Handlers.errorHandler());
 
   const httpServer = http.createServer(app);
 
@@ -103,6 +127,9 @@ const stopRouter = () => {
   );
 
   app.use(express.urlencoded({ limit: '15mb', extended: true }));
+
+  // this has to be applied last, just like 404 route handlers are applied last
+  applyProxyToCore(app, targets);
 
   const port = PORT || 4000;
 

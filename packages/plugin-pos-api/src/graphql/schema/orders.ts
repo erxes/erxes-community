@@ -32,6 +32,7 @@ const posOrderFields = contactsEnabled => `
   }
   syncedErkhet: Boolean,
   origin: String
+  convertDealId: String
 `;
 
 export const types = ({ contactsEnabled, productsEnabled }) => `
@@ -53,6 +54,8 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     syncErkhetInfo: String
     putResponses: JSON
     deliveryInfo: JSON
+    deal: JSON
+    dealLink: String
   }
 
   type PosProduct {
@@ -60,7 +63,7 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     name: String
     code: String
     type: String
-    sku: String
+    uom: String
     unitPrice: Float
     categoryId: String
     createdAt: Date,
@@ -78,13 +81,6 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
   type PosProducts {
     products: [PosProduct],
     totalCount: Float,
-  }
-
-  type CheckOrderResponse {
-    orderId: String
-    isSynced: Boolean
-    syncedDate: Date
-    syncedBillNumber: String
   }
 `;
 
@@ -104,6 +100,7 @@ const queryParams = `
   customerType: String
   posId: String
   posToken: String
+  types: [String]
 `;
 
 export const queries = `

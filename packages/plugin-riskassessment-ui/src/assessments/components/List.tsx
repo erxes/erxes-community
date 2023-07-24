@@ -9,7 +9,6 @@ import {
 } from '@erxes/ui/src';
 import * as _loadash from 'lodash';
 import React from 'react';
-import { subMenu } from '../../common/constants';
 import { DefaultWrapper } from '../../common/utils';
 import Row from './Row';
 import { SideBar } from './SideBar';
@@ -36,7 +35,7 @@ class List extends React.Component<Props, State> {
   }
 
   renderContent = () => {
-    const { list } = this.props;
+    const { list, queryParams, history } = this.props;
     const { selectedAssessmentIds } = this.state;
 
     const handleSelect = (id: string) => {
@@ -101,6 +100,8 @@ class List extends React.Component<Props, State> {
               key={item._id}
               selecteAssessmentIds={selectedAssessmentIds}
               handleSelect={handleSelect}
+              queryParams={queryParams}
+              history={history}
             />
           ))}
         </tbody>
@@ -140,7 +141,6 @@ class List extends React.Component<Props, State> {
       content: this.renderContent(),
       leftActionBar,
       rightActionBar,
-      subMenu,
       sidebar: (
         <SideBar history={this.props.history} queryParams={queryParams} />
       ),

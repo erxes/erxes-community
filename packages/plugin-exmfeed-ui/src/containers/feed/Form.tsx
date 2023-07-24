@@ -9,9 +9,9 @@ import { IButtonMutateProps } from '@erxes/ui/src/types';
 import PublicHolidayForm from '../../components/feed/PublicHolidayForm';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import { isEnabled } from '@erxes/ui/src/utils/core';
-import { useQuery } from 'react-apollo';
+import { useQuery } from '@apollo/client';
 
 type Props = {
   contentType: string;
