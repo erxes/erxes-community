@@ -15,6 +15,7 @@ on:
       - develop
       - apm
       - staging
+      - perf-exm-feed
     paths:
       - "exm/**"
 
