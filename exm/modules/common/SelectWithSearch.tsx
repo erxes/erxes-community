@@ -8,8 +8,8 @@ import React from "react";
 import Select from "react-select-plus";
 import { __ } from "../../utils";
 import colors from "../styles/colors";
-import gql from "graphql-tag";
-import { graphql } from "react-apollo";
+import { gql } from "@apollo/client";
+import { graphql } from "@apollo/client/react/hoc";
 import { readFile } from "./utils";
 import styled from "styled-components";
 
