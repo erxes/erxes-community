@@ -1,5 +1,4 @@
 import {
-  __,
   Alert,
   Button,
   confirm,
@@ -25,6 +24,7 @@ import RightMenu from './RightMenu';
 import { can } from '@erxes/ui/src/utils/core';
 import withConsumer from '../../withConsumer';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { __ } from 'coreui/utils';
 
 interface IProps extends IRouterProps {
   transactions: ITransaction[];
@@ -131,13 +131,16 @@ class TransactionsList extends React.Component<IProps> {
                 />
               </th>
               <th>
-                <SortHandler sortField={'undue'} label={__('Undue')} />
+                <SortHandler sortField={'undue'} label={__('Loss')} />
               </th>
               <th>
                 <SortHandler sortField={'insurance'} label={__('Insurance')} />
               </th>
               <th>
                 <SortHandler sortField={'total'} label={__('Total')} />
+              </th>
+              <th>
+                <SortHandler sortField={'ebarimt'} label={__('EBarimt')} />
               </th>
               <th></th>
             </tr>
@@ -184,7 +187,7 @@ class TransactionsList extends React.Component<IProps> {
               icon="cancel-1"
               onClick={onClick}
             >
-              Delete
+              {__('Delete')}
             </Button>
           )}
         </BarItems>

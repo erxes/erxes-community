@@ -9,7 +9,6 @@ import {
 } from '@erxes/ui/src';
 import * as _loadash from 'lodash';
 import React from 'react';
-import { subMenu } from '../../common/constants';
 import { DefaultWrapper } from '../../common/utils';
 import Row from './Row';
 import { SideBar } from './SideBar';
@@ -142,7 +141,6 @@ class List extends React.Component<Props, State> {
       content: this.renderContent(),
       leftActionBar,
       rightActionBar,
-      subMenu,
       sidebar: (
         <SideBar history={this.props.history} queryParams={queryParams} />
       ),

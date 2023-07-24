@@ -3,7 +3,11 @@ import resolvers from './graphql/resolvers';
 import { generateModels } from './connectionResolver';
 import { initBroker } from './messageBroker';
 import documents from './documents';
+import forms from './forms';
+import imports from './imports';
+import exporter from './exporter';
 import * as permissions from './permissions';
+import payment from './payment';
 import { checkContractScheduleAnd } from './cronjobs/contractCronJobs';
 
 export let debug;
@@ -44,6 +48,10 @@ export default {
     cronjobs: {
       handleDailyJob: checkContractScheduleAnd
     },
-    documents
+    documents,
+    forms,
+    imports,
+    exporter,
+    payment
   }
 };

@@ -19,10 +19,17 @@ const itemFields = `
     email
     username
     details {
+      avatar
       firstName
       lastName
       fullName
     }
+  }
+  attachments {
+    name
+    url
+    type
+    size
   }
   createdUser {
     _id
@@ -39,6 +46,7 @@ const itemFields = `
   stageChangedDate
   stage {
     name
+    itemsTotalCount
   }
   labels {
     name
@@ -55,17 +63,18 @@ const clientPortalGetTicket = `
 `;
 
 const clientPortalGetTask = `
-  query taskDetail($_id: String!) {
-    taskDetail(_id: $_id) {
+  query taskDetail($_id: String!, $clientPortalCard: Boolean) {
+    taskDetail(_id: $_id, clientPortalCard: $clientPortalCard) {
      ${itemFields}
     }
   }
 `;
 
 const clientPortalGetDeal = `
-  query dealDetail($_id: String!) {
-    dealDetail(_id: $_id) {
+  query dealDetail($_id: String!, $clientPortalCard: Boolean) {
+    dealDetail(_id: $_id, clientPortalCard: $clientPortalCard) {
       ${itemFields}
+      productsData
     }
   }
 `;
@@ -98,6 +107,7 @@ const clientPortalDeals = `
   query clientPortalDeals($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String]) {
     clientPortalDeals(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds) {
       ${itemFields}
+      productsData  
     }
   }
 `;
@@ -115,7 +125,15 @@ const clientPortalComments = `
     clientPortalComments(typeId: $typeId, type: $type) {
       _id
       content
-      createdUser 
+      createdUser {
+        _id
+        avatar
+        firstName
+        fullName
+        lastName
+        email
+        username
+      }
       createdAt
       userType
       type
@@ -327,6 +345,31 @@ query pipelineAssignedUsers($_id: String!) {
     __typename
   }
 }`;
+
+const productCategories = `
+  query productCategories($status: String) {
+    productCategories(status: $status) {
+      _id
+      name
+      order
+      code
+      parentId
+      description
+      status
+      meta
+      attachment {
+        name
+        url
+        type
+        size
+      }
+
+      isRoot
+      productCount
+    }
+  }
+`;
+
 export default {
   clientPortalGetTicket,
   clientPortalGetDeal,
@@ -343,5 +386,6 @@ export default {
   products,
   pipelineLabels,
   pipelineAssignedUsers,
-  stages
+  stages,
+  productCategories
 };

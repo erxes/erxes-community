@@ -14,6 +14,7 @@ import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
 import { IContractDocument } from './definitions/contracts';
 import { getPureDate } from '@erxes/api-utils/src';
+import { createEbarimt } from './utils/ebarimtUtils';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
@@ -24,7 +25,19 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
   updateTransaction(memoryStorage: any, _id: string, doc: ITransaction);
   changeTransaction(_id: string, doc: ITransaction);
   removeTransactions(_ids: string[]);
-  getPaymentInfo(id: string, payDate: Date, subdomain: string);
+  getPaymentInfo(
+    id: string,
+    payDate: Date,
+    subdomain: string,
+    scheduleDate?: Date
+  );
+  createEBarimtOnTransaction(
+    subdomain: string,
+    id: string,
+    isGetEBarimt?: boolean,
+    isOrganization?: boolean,
+    organizationRegister?: string
+  );
 }
 export const loadTransactionClass = (models: IModels) => {
   class Transaction {
@@ -50,7 +63,12 @@ export const loadTransactionClass = (models: IModels) => {
      */
     public static async createTransaction(
       subdomain: string,
-      doc: ITransaction
+      {
+        isGetEBarimt,
+        isOrganization,
+        organizationRegister,
+        ...doc
+      }: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
@@ -69,9 +87,15 @@ export const loadTransactionClass = (models: IModels) => {
         _id: doc.contractId
       }).lean<IContractDocument>();
 
+      if (!doc.currency && contract?.currency) {
+        doc.currency = contract?.currency;
+      }
+
       if (!contract || !contract._id) {
         return models.Transactions.create({ ...doc });
       }
+
+      doc.number = `${contract.number}${new Date().getTime().toString()}`;
 
       if (doc.invoiceId) {
         const invoiceData: any = {
@@ -87,6 +111,22 @@ export const loadTransactionClass = (models: IModels) => {
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
 
       await trAfterSchedule(models, tr);
+
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract.contractTypeId
+      });
+      if (
+        contractType?.config?.isAutoSendEBarimt === true ||
+        (isGetEBarimt && doc.isManual)
+      )
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
+        );
 
       return tr;
     }
@@ -363,13 +403,51 @@ export const loadTransactionClass = (models: IModels) => {
         interestEve = 0,
         interestNonce = 0,
         insurance = 0,
-        debt = 0
+        debt = 0,
+        balance = 0
       } = paymentInfo;
 
       paymentInfo.total =
         payment + undue + interestEve + interestNonce + insurance + debt;
 
+      paymentInfo.closeAmount =
+        balance +
+        payment +
+        undue +
+        interestEve +
+        interestNonce +
+        insurance +
+        debt;
+
       return paymentInfo;
+    }
+
+    public static async createEBarimtOnTransaction(
+      subdomain: string,
+      id: string,
+      isGetEBarimt?: boolean,
+      isOrganization?: boolean,
+      organizationRegister?: string
+    ) {
+      const tr = await models.Transactions.findOne({ _id: id });
+      if (!tr) throw new Error('Transaction not found');
+      const contract = await models.Contracts.findOne({ _id: tr?.contractId });
+      if (!contract) throw new Error('Contract not found');
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract?.contractTypeId
+      });
+      if (!contractType) throw new Error('Contract type not found');
+      if (isGetEBarimt)
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
+        );
+
+      return tr;
     }
   }
   transactionSchema.loadClass(Transaction);

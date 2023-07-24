@@ -9,6 +9,8 @@ const typeFields = `
   insurance: Float,
   debt: Float,
   total: Float,
+  balance: Float,
+  closeAmount: Float,
 `;
 export const types = `
   type TransactionPreInfo {
@@ -43,6 +45,8 @@ export const types = `
     customer: Customer,
     company: Company,
     calcedInfo: CalcedInfo
+    currency:String
+    ebarimt:JSON
   }
 
   type TransactionsListResponse {
@@ -71,7 +75,7 @@ export const queries = `
   transactionsMain(${queryParams}): TransactionsListResponse
   transactions(${queryParams}): [LoanTransaction]
   transactionDetail(_id: String!): LoanTransaction
-  getPaymentInfo(id: String!, payDate: Date): TransactionPreInfo
+  getPaymentInfo(id: String!, payDate: Date, scheduleDate:Date): TransactionPreInfo
 `;
 
 const commonFields = `
@@ -82,13 +86,17 @@ const commonFields = `
   payDate: Date,
   description: String,
   total: Float,
-
+  isManual: Boolean,
   payment: Float,
   interestEve: Float,
   interestNonce: Float,
   undue: Float,
   insurance: Float,
   debt: Float,
+  currency:String,
+  isGetEBarimt: Boolean,
+  isOrganization: Boolean,
+  organizationRegister: String,
 `;
 
 const changeFields = `
@@ -107,4 +115,5 @@ export const mutations = `
   transactionsEdit(_id: String!, ${commonFields}): LoanTransaction
   transactionsChange(_id: String!, ${changeFields}): LoanTransaction
   transactionsRemove(transactionIds: [String]): [String]
+  createEBarimtOnTransaction(id: String!,isGetEBarimt: Boolean,isOrganization: Boolean,organizationRegister: String):LoanTransaction
 `;

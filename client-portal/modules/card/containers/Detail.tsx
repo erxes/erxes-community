@@ -1,11 +1,12 @@
-import { Config, IUser } from "../../types";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { mutations, queries } from "../graphql";
+import { Config, IUser } from '../../types';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { mutations, queries } from '../graphql';
 
-import Detail from "../components/Detail";
-import React from "react";
-import { capitalize } from "../../common/utils";
-import { confirm } from "../../utils";
+import Detail from '../components/Detail';
+import React from 'react';
+import Spinner from '../../common/Spinner';
+import { capitalize } from '../../common/utils';
+import { confirm } from '../../utils';
 
 type Props = {
   _id?: string;
@@ -19,8 +20,13 @@ function DetailContainer({ _id, type, ...props }: Props) {
   const { data, loading: cardQueryLoading } = useQuery(
     gql(queries[`clientPortalGet${capitalize(type)}`]),
     {
-      variables: { _id },
+      variables: { _id, clientPortalCard: true },
       skip: !_id,
+      context: {
+        headers: {
+          'erxes-app-token': props.config?.erxesAppToken
+        }
+      }
     }
   );
 
@@ -29,6 +35,11 @@ function DetailContainer({ _id, type, ...props }: Props) {
     {
       variables: { typeId: _id, type },
       skip: !_id,
+      context: {
+        headers: {
+          'erxes-app-token': props.config?.erxesAppToken
+        }
+      }
     }
   );
 
@@ -37,8 +48,13 @@ function DetailContainer({ _id, type, ...props }: Props) {
       {
         query: gql(queries.clientPortalComments),
         variables: { typeId: _id, type },
-      },
-    ],
+        context: {
+          headers: {
+            'erxes-app-token': props.config?.erxesAppToken
+          }
+        }
+      }
+    ]
   });
 
   const [deleteComment] = useMutation(
@@ -48,14 +64,25 @@ function DetailContainer({ _id, type, ...props }: Props) {
         {
           query: gql(queries.clientPortalComments),
           variables: { typeId: _id, type },
-        },
-      ],
+          context: {
+            headers: {
+              'erxes-app-token': props.config?.erxesAppToken
+            }
+          }
+        }
+      ]
     }
   );
 
-  if (cardQueryLoading || commentsQueryLoading) return null;
+  if (cardQueryLoading || commentsQueryLoading) {
+    return <Spinner objective={true} />;
+  }
 
-  const item = data[`clientPortal${capitalize(type)}`];
+  const item =
+    type === 'ticket'
+      ? data[`clientPortal${capitalize(type)}`]
+      : data[`${type}Detail`];
+
   const comments = commentsQuery?.clientPortalComments || [];
 
   const handleSubmit = (values: { content: string }) => {
@@ -64,8 +91,8 @@ function DetailContainer({ _id, type, ...props }: Props) {
         ...values,
         typeId: item._id,
         type,
-        userType: "client",
-      },
+        userType: 'client'
+      }
     });
   };
 
@@ -73,8 +100,8 @@ function DetailContainer({ _id, type, ...props }: Props) {
     confirm().then(() =>
       deleteComment({
         variables: {
-          _id: commentId,
-        },
+          _id: commentId
+        }
       })
     );
   };
@@ -85,7 +112,7 @@ function DetailContainer({ _id, type, ...props }: Props) {
     type,
     comments,
     handleSubmit,
-    handleRemoveComment,
+    handleRemoveComment
   };
 
   return <Detail {...updatedProps} />;

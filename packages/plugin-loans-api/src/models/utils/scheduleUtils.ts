@@ -1,8 +1,11 @@
 import { IModels } from '../../connectionResolver';
-import { SCHEDULE_STATUS } from '../definitions/constants';
+import { CONTRACT_STATUS, SCHEDULE_STATUS } from '../definitions/constants';
 import { IContractDocument } from '../definitions/contracts';
 import { IScheduleDocument } from '../definitions/schedules';
-import { ITransactionDocument } from '../definitions/transactions';
+import {
+  ITransaction,
+  ITransactionDocument
+} from '../definitions/transactions';
 import { trAfterSchedule, transactionRule } from './transactionUtils';
 import {
   addMonths,
@@ -37,6 +40,12 @@ export const scheduleHelper = async (
 
   const dateRange = contract.scheduleDays.sort((a, b) => a - b);
   var mainDate = new Date(startDate);
+
+  var skipInterestCalcDate = addMonths(
+    new Date(currentDate),
+    contract.skipInterestCalcMonth || 0
+  );
+
   var endDate = addMonths(new Date(startDate), contract.tenor);
 
   var dateRanges: Date[] = [];
@@ -74,6 +83,8 @@ export const scheduleHelper = async (
     return true;
   });
 
+  if (paymentDates.length === 0) paymentDates.push(endDate);
+
   if (contract.repayment === 'equal') {
     const payment = Math.round(
       (balance - (salvageAmount || 0)) / paymentDates.length
@@ -86,7 +97,8 @@ export const scheduleHelper = async (
         currentDate,
         payment,
         perHolidays,
-        paymentDates[i]
+        paymentDates[i],
+        skipInterestCalcDate
       );
       currentDate = perMonth.date;
       balance = perMonth.loanBalance;
@@ -114,7 +126,8 @@ export const scheduleHelper = async (
       weekends: contract.weekends,
       useHoliday: contract.useHoliday,
       perHolidays,
-      paymentDates
+      paymentDates,
+      skipInterestCalcDate
     });
 
     for (let i = 0; i < paymentDates.length - salvageTenor; i++) {
@@ -124,7 +137,8 @@ export const scheduleHelper = async (
         currentDate,
         total,
         perHolidays,
-        paymentDates[i]
+        paymentDates[i],
+        skipInterestCalcDate
       );
       currentDate = perMonth.date;
       balance = perMonth.loanBalance;
@@ -150,6 +164,7 @@ export const scheduleHelper = async (
   lastEntry.balance = salvageAmount || 0;
   lastEntry.payment = lastEntry.payment + tempBalance;
   bulkEntries[bulkEntries.length - 1] = lastEntry;
+
   return bulkEntries;
 };
 
@@ -466,6 +481,7 @@ export const generatePendingSchedules = async (
 ) => {
   let changeDoc = {};
 
+  //this preMainSchedule is payment is less but if prev schedule is done and
   const preMainSchedule: any =
     !updatedSchedule.isDefault &&
     (await models.Schedules.findOne({
@@ -506,6 +522,7 @@ export const generatePendingSchedules = async (
     return;
   }
 
+  // if undue payed less than must pay undue then this section will be true
   if (
     !!updatedSchedule.didUndue &&
     !!updatedSchedule.undue &&
@@ -538,6 +555,7 @@ export const generatePendingSchedules = async (
     return;
   }
 
+  //this diff is payment diff payed greater is less
   let diff =
     (updatedSchedule.didPayment || 0) +
     (updatedSchedule.didInterestEve || 0) +
@@ -546,15 +564,96 @@ export const generatePendingSchedules = async (
     (updatedSchedule.interestEve || 0) -
     (updatedSchedule.interestNonce || 0);
 
-  let preSchedule = updatedSchedule;
-  let schedule = pendingSchedules[0];
-  let balance = updatedSchedule.balance;
+  let preSchedule = updatedSchedule; //current schedule
+  let schedule = pendingSchedules[0]; //feature schedule
+
+  if (!schedule) {
+    return;
+  }
+
+  let balance = updatedSchedule.balance; //current balance
+
+  //must pay payment paid greater than or less than payed
   let paymentBalance =
     (updatedSchedule.payment || 0) - (updatedSchedule.didPayment || 0);
-  let interestEve = 0;
-  let interestNonce = 0;
-  let index = 0;
+
+  let interestEve = 0; //this is for calculate interestEve for between schedules
+  let interestNonce = 0; //this is for calculate interestNonce for between schedules
+  let index = 0; //this index for while loop for correction future schedules
   let payment = 0;
+
+  const skipInterestCalcDate = addMonths(
+    new Date(getFullDate(contract.startDate)),
+    contract.skipInterestCalcMonth || 0
+  );
+
+  const isSkipInterestCalc =
+    getDiffDay(updatedSchedule.payDate, skipInterestCalcDate) >= 0;
+
+  let updatePrevScheduleReactions: any = []; //this updatePrevScheduleReactions variable for transaction reaction
+  let updatePrevSchedulesBulk: any = [];
+
+  //undoneSchedules this list is undone default schedules
+  const undoneSchedules = await models.Schedules.find({
+    contractId: contract._id,
+    payDate: { $lt: tr.payDate },
+    scheduleDidStatus: { $ne: SCHEDULE_STATUS.DONE },
+    isDefault: true
+  })
+    .sort({ payDate: 1 })
+    .lean();
+
+  if (undoneSchedules.length > 0) {
+    undoneSchedules.map((schedule: IScheduleDocument) => {
+      let changeDoc = {
+        scheduleDidPayment: schedule.scheduleDidPayment || 0,
+        scheduleDidInterest: schedule.scheduleDidInterest || 0,
+        scheduleDidStatus: SCHEDULE_STATUS.PENDING
+      };
+
+      let sumPayment =
+        (updatedSchedule.didPayment || 0) + (changeDoc.scheduleDidPayment || 0);
+
+      if (updatedSchedule.didPayment && sumPayment >= (schedule.payment || 0)) {
+        changeDoc.scheduleDidPayment = schedule.payment || 0;
+        changeDoc.scheduleDidStatus = SCHEDULE_STATUS.DONE;
+      } else {
+        changeDoc.scheduleDidPayment = sumPayment;
+        changeDoc.scheduleDidStatus = SCHEDULE_STATUS.LESS;
+      }
+
+      let sumInterest =
+        (updatedSchedule.didInterestEve || 0) +
+        (updatedSchedule.didInterestNonce || 0) +
+        (changeDoc.scheduleDidInterest || 0);
+
+      if (
+        (updatedSchedule.didInterestEve || 0) +
+          (updatedSchedule.didInterestNonce || 0) >
+          0 &&
+        sumInterest >=
+          (schedule.didInterestEve || 0) + (schedule.didInterestNonce || 0)
+      ) {
+        changeDoc.scheduleDidInterest =
+          (schedule.interestEve || 0) + (schedule.interestNonce || 0);
+      } else {
+        changeDoc.scheduleDidInterest = sumInterest;
+      }
+
+      updatePrevScheduleReactions.push({
+        scheduleId: updatedSchedule._id,
+        preData: { ...getChanged({ ...schedule }, { ...changeDoc }) }
+      });
+
+      updatePrevSchedulesBulk.push({
+        updateOne: {
+          filter: { _id: schedule._id },
+          update: { $set: { ...changeDoc } }
+        }
+      });
+    });
+  }
+
   if (
     paymentBalance < 0 &&
     (tr.payment || 0) > 0 &&
@@ -585,27 +684,34 @@ export const generatePendingSchedules = async (
         (await models.Transactions.updateOne(
           { _id: tr._id },
           {
-            $set: { reactions: trReaction }
+            $set: { reactions: [...trReaction, ...updatePrevScheduleReactions] }
           }
         ));
     }
 
-    const { diffEve, diffNonce } = getDatesDiffMonth(
-      preSchedule.payDate,
-      schedule.payDate
-    );
-    interestEve = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffEve
-    });
+    if (isSkipInterestCalc) {
+      interestEve = 0;
+      interestNonce = 0;
+    } else {
+      const { diffEve, diffNonce } = getDatesDiffMonth(
+        preSchedule.payDate,
+        schedule.payDate
+      );
+      interestEve = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffEve
+      });
 
-    interestNonce = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffNonce
-    });
+      interestNonce = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffNonce
+      });
+    }
+
     payment = schedule.payment || 0;
+
     if (paymentBalance < 0) {
       payment = payment + paymentBalance;
       if (payment < 0) {
@@ -634,9 +740,13 @@ export const generatePendingSchedules = async (
       (await models.Transactions.updateOne(
         { _id: tr._id },
         {
-          $set: { reactions: trReaction }
+          $set: { reactions: [...trReaction, ...updatePrevScheduleReactions] }
         }
       ));
+
+    //updatePrevSchedulesBulk this update section must be update schedule Payment is done
+    updatePrevSchedulesBulk.length > 0 &&
+      (await models.Schedules.bulkWrite(updatePrevSchedulesBulk));
     return;
   }
 
@@ -664,9 +774,10 @@ export const generatePendingSchedules = async (
       (await models.Transactions.updateOne(
         { _id: tr._id },
         {
-          $set: { reactions: trReaction }
+          $set: { reactions: [...trReaction, ...updatePrevScheduleReactions] }
         }
       ));
+
     return;
   }
 
@@ -693,9 +804,10 @@ export const generatePendingSchedules = async (
       (await models.Transactions.updateOne(
         { _id: tr._id },
         {
-          $set: { reactions: trReaction }
+          $set: { reactions: [...trReaction, ...updatePrevScheduleReactions] }
         }
       ));
+
     return;
   }
 
@@ -711,21 +823,29 @@ export const generatePendingSchedules = async (
     diff > (schedule.payment || 0) &&
     index < pendingSchedules.length - 1
   ) {
-    const { diffEve, diffNonce } = getDatesDiffMonth(
-      preSchedule.payDate,
-      schedule.payDate
-    );
-    interestEve = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffEve
-    });
+    if (
+      isSkipInterestCalc &&
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
+    ) {
+      interestEve = 0;
+      interestNonce = 0;
+    } else {
+      const { diffEve, diffNonce } = getDatesDiffMonth(
+        preSchedule.payDate,
+        schedule.payDate
+      );
+      interestEve = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffEve
+      });
 
-    interestNonce = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffNonce
-    });
+      interestNonce = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffNonce
+      });
+    }
 
     diff = diff - (schedule.payment || 0);
 
@@ -764,20 +884,29 @@ export const generatePendingSchedules = async (
 
   // on lastSchedule
   if (index === pendingSchedules.length - 1) {
-    const { diffEve, diffNonce } = getDatesDiffMonth(
-      preSchedule.payDate,
-      schedule.payDate
-    );
-    interestEve = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffEve
-    });
-    interestNonce = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffNonce
-    });
+    if (
+      isSkipInterestCalc &&
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
+    ) {
+      interestEve = 0;
+      interestNonce = 0;
+    } else {
+      const { diffEve, diffNonce } = getDatesDiffMonth(
+        preSchedule.payDate,
+        schedule.payDate
+      );
+      interestEve = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffEve
+      });
+      interestNonce = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffNonce
+      });
+    }
+
     diff = diff - (schedule.payment || 0);
 
     changeDoc = {
@@ -801,20 +930,28 @@ export const generatePendingSchedules = async (
       }
     });
   } else {
-    const { diffEve, diffNonce } = getDatesDiffMonth(
-      preSchedule.payDate,
-      schedule.payDate
-    );
-    interestEve = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffEve
-    });
-    interestNonce = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffNonce
-    });
+    if (
+      isSkipInterestCalc &&
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
+    ) {
+      interestEve = 0;
+      interestNonce = 0;
+    } else {
+      const { diffEve, diffNonce } = getDatesDiffMonth(
+        preSchedule.payDate,
+        schedule.payDate
+      );
+      interestEve = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffEve
+      });
+      interestNonce = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffNonce
+      });
+    }
     payment = schedule.payment || 0;
     if (paymentBalance < 0) {
       payment = payment + paymentBalance;
@@ -849,17 +986,25 @@ export const generatePendingSchedules = async (
   schedule = pendingSchedules[index];
 
   if (schedule) {
-    const diffs = getDatesDiffMonth(preSchedule.payDate, schedule.payDate);
-    interestEve = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffs.diffEve
-    });
-    interestNonce = calcInterest({
-      balance,
-      interestRate: contract.interestRate,
-      dayOfMonth: diffs.diffNonce
-    });
+    if (
+      isSkipInterestCalc &&
+      getDiffDay(schedule.payDate, skipInterestCalcDate) >= 0
+    ) {
+      interestEve = 0;
+      interestNonce = 0;
+    } else {
+      const diffs = getDatesDiffMonth(preSchedule.payDate, schedule.payDate);
+      interestEve = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffs.diffEve
+      });
+      interestNonce = calcInterest({
+        balance,
+        interestRate: contract.interestRate,
+        dayOfMonth: diffs.diffNonce
+      });
+    }
     changeDoc = { interestEve, interestNonce };
     trReaction.push({
       scheduleId: schedule._id,
@@ -874,13 +1019,37 @@ export const generatePendingSchedules = async (
     });
   }
 
-  tr._id &&
-    (await models.Transactions.updateOne(
+  //updatePrevSchedulesBulk this update section must be update schedule Payment is done
+  updatePrevSchedulesBulk.length > 0 &&
+    (await models.Schedules.bulkWrite(updatePrevSchedulesBulk));
+
+  console.log('updatedSchedule', updatedSchedule);
+
+  if (tr._id) {
+    var transactionReaction: any = {
+      reactions: [...trReaction, ...updatePrevScheduleReactions]
+    };
+
+    if (updatedSchedule.balance === 0 && contract._id) {
+      transactionReaction.contractReaction = {
+        _id: contract._id,
+        status: contract.status
+      };
+
+      await models.Contracts.updateOne(
+        { _id: contract._id },
+        { $set: { status: CONTRACT_STATUS.CLOSED } }
+      );
+    }
+
+    await models.Transactions.updateOne(
       { _id: tr._id },
       {
-        $set: { reactions: trReaction }
+        $set: transactionReaction
       }
-    ));
+    );
+  }
+
   await models.Schedules.bulkWrite(bulkOps);
 };
 /**

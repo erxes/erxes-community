@@ -38,7 +38,9 @@ export const types = () => `
     feeAmount: Float
     tenor: Float
     unduePercent: Float
+    undueCalcType: String
     interestRate: Float
+    skipInterestCalcMonth: Float
     repayment: String
     startDate: Date
     scheduleDays: [Float]
@@ -72,6 +74,9 @@ export const types = () => `
 
     weekends: [Int]
     useHoliday: Boolean
+    useMargin: Boolean
+    useSkipInterest: Boolean
+    useDebt: Boolean
 
     closeDate: Date
     closeType: String
@@ -85,6 +90,9 @@ export const types = () => `
     nextPayment:Float
     payedAmountSum:Float
     loanBalanceAmount:Float
+    expiredDays:Float
+    loanTransactionHistory:JSON
+    currency:String
   }
 
 
@@ -162,6 +170,7 @@ const commonFields = `
   feeAmount: Float
   tenor: Float
   unduePercent: Float
+  undueCalcType: String
   interestRate: Float
   repayment: String
   startDate: Date
@@ -181,8 +190,13 @@ const commonFields = `
   riskExpertId: String
   weekends: [Int]
   useHoliday: Boolean
+  useMargin: Boolean
+  useSkipInterest: Boolean
+  useDebt: Boolean
   relContractId: String
   dealId: String
+  skipInterestCalcMonth: Float
+  currency:String
 `;
 
 export const mutations = `

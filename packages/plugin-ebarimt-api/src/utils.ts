@@ -147,7 +147,7 @@ const arrangeTaxType = async (deal, productsById, billType) => {
       discount: productData.discount,
       productCode: product.code,
       productName: product.name,
-      sku: product.sku || 'ш',
+      uom: product.uom || 'ш',
       productId: productData.productId
     };
 
@@ -416,4 +416,21 @@ export const getPostData = async (subdomain, config, deal) => {
     });
   }
   return result;
+};
+
+export const getCompany = async (subdomain, companyRD) => {
+  const config = await getConfig(subdomain, 'EBARIMT', {});
+  const re = new RegExp('(^[А-ЯЁӨҮ]{2}[0-9]{8}$)|(^\\d{7}$)', 'gui');
+
+  if (!re.test(companyRD)) {
+    return { status: 'notValid' };
+  }
+
+  const info = await sendRequest({
+    url: config.checkCompanyUrl,
+    method: 'GET',
+    params: { regno: companyRD }
+  });
+
+  return { status: 'checked', info };
 };

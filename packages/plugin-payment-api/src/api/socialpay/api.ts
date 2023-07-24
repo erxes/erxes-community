@@ -76,7 +76,7 @@ export class SocialPayAPI extends BaseAPI {
 
   async createInvoice(invoice: IInvoiceDocument) {
     const amount = invoice.amount.toString();
-    let path = PAYMENTS.socialpay.actions.invoiceQr;
+    const path = PAYMENTS.socialpay.actions.invoiceQr;
 
     const data: ISocialPayInvoice = {
       amount,
@@ -88,14 +88,15 @@ export class SocialPayAPI extends BaseAPI {
       terminal: this.inStoreSPTerminal
     };
 
-    if (invoice.phone) {
-      data.phone = invoice.phone;
-      path = PAYMENTS.socialpay.actions.invoicePhone;
-      data.checksum = hmac256(
-        this.inStoreSPKey,
-        this.inStoreSPTerminal + invoice.identifier + amount + invoice.phone
-      );
-    }
+    // TODO: add phone number back
+    // if (invoice.phone) {
+    //   data.phone = invoice.phone;
+    //   path = PAYMENTS.socialpay.actions.invoicePhone;
+    //   data.checksum = hmac256(
+    //     this.inStoreSPKey,
+    //     this.inStoreSPTerminal + invoice.identifier + amount + invoice.phone
+    //   );
+    // }
 
     try {
       const { header, body } = await this.request({
@@ -112,7 +113,7 @@ export class SocialPayAPI extends BaseAPI {
       if (body.response.desc.includes('socialpay-payment')) {
         const qrData = await QRCode.toDataURL(body.response.desc);
 
-        return { qrData };
+        return { qrData, deeplink: body.response.desc };
       } else {
         return { text: 'Invoice has sent to SocialPay app' };
       }
@@ -154,6 +155,41 @@ export class SocialPayAPI extends BaseAPI {
         headers: { 'Content-Type': 'application/json' },
         data
       });
+
+      if (body.response.resp_code !== '00') {
+        throw new Error(body.response.resp_desc);
+      }
+
+      return PAYMENT_STATUS.PAID;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async manualCheck(invoice: IInvoiceDocument) {
+    const amount = invoice.amount.toString();
+
+    const data: ISocialPayInvoice = {
+      amount,
+      checksum: hmac256(
+        this.inStoreSPKey,
+        this.inStoreSPTerminal + invoice.identifier + amount
+      ),
+      invoice: invoice.identifier,
+      terminal: this.inStoreSPTerminal
+    };
+
+    try {
+      const { body } = await this.request({
+        path: PAYMENTS.socialpay.actions.invoiceCheck,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data
+      });
+
+      if (body.error) {
+        return body.error.errorDesc;
+      }
 
       if (body.response.resp_code !== '00') {
         throw new Error(body.response.resp_desc);

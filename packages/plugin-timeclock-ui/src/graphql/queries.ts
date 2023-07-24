@@ -83,6 +83,10 @@ const timeclocksMain = `
             employeeId
             deviceName
             deviceType
+            inDevice
+            inDeviceType  
+            outDevice
+            outDeviceType
         }
         totalCount
     }
@@ -112,6 +116,7 @@ const schedulesMain = `
             solved
             status
             scheduleConfigId
+            lunchBreakInMins
           }
           scheduleConfigId
           solved
@@ -207,7 +212,12 @@ const timeclockReports = `
             
                 deviceName
                 deviceType
-            
+                
+                inDevice
+                inDeviceType
+                outDevice
+                outDeviceType
+
                 scheduledStart
                 scheduledEnd
                 scheduledDuration
@@ -218,6 +228,10 @@ const timeclockReports = `
                 totalHoursOvertime
                 totalHoursOvernight
               }
+
+              branchTitles
+              departmentTitles
+              
               totalMinsLate
               totalAbsenceMins
               totalMinsWorked
@@ -327,6 +341,7 @@ const timeLogsPerUser = `
     timeLogsPerUser(userId: $userId, startDate: $startDate, endDate: $endDate){
       _id
       timelog
+      deviceName
       deviceSerialNo
     }
   }

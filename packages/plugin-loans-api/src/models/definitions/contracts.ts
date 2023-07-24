@@ -85,6 +85,9 @@ export interface IContract {
 
   weekends: number[];
   useHoliday: boolean;
+  useMargin: boolean;
+  useSkipInterest: boolean;
+  useDebt: boolean;
 
   closeDate?: Date;
   closeType?: string;
@@ -94,8 +97,12 @@ export interface IContract {
 
   isExpired?: boolean;
   repaymentDate?: Date;
+  undueCalcType?: string;
+
+  skipInterestCalcMonth?: number;
 
   dealId?: string;
+  currency: string;
 }
 
 export interface IContractDocument extends IContract, Document {
@@ -173,7 +180,7 @@ export const contractSchema = schemaHooksWrapper(
     createdBy: field({ type: String, label: 'Created By' }),
     createdAt: field({
       type: Date,
-      default: new Date(),
+      default: () => new Date(),
       label: 'Created at'
     }),
     marginAmount: field({
@@ -213,7 +220,7 @@ export const contractSchema = schemaHooksWrapper(
       type: String,
       enum: REPAYMENT_TYPE.map(option => option.value),
       required: true,
-      label: 'Type',
+      label: 'Schedule Type',
       selectOptions: REPAYMENT_TYPE
     }),
     startDate: field({ type: Date, label: 'Rate Start Date' }),
@@ -297,7 +304,9 @@ export const contractSchema = schemaHooksWrapper(
     }),
     weekends: field({ type: [Number], label: 'weekend' }),
     useHoliday: field({ type: Boolean, label: 'use holiday' }),
-
+    useMargin: field({ type: Boolean, label: 'use margin' }),
+    useSkipInterest: field({ type: Boolean, label: 'use skip interest' }),
+    useDebt: field({ type: Boolean, label: 'use debt' }),
     closeDate: field({
       type: Date,
       optional: true,
@@ -322,18 +331,32 @@ export const contractSchema = schemaHooksWrapper(
     isExpired: field({
       type: Boolean,
       optional: true,
-      label:
-        'when contract expired of payment date then this field will be true'
+      label: 'Is Expired'
     }),
     repaymentDate: field({
       type: Date,
       optional: true,
-      label: 'contract payment date of schedule'
+      label: 'Repayment'
+    }),
+    undueCalcType: field({
+      type: String,
+      optional: true,
+      label: 'Undue Calc Type'
+    }),
+    skipInterestCalcMonth: field({
+      type: Number,
+      optional: true,
+      label: 'Skip Interest Calc Month'
     }),
     dealId: field({
       type: String,
       optional: true,
       label: 'contract relation of dealId'
+    }),
+    currency: field({
+      type: String,
+      default: 'MNT',
+      label: 'contract currency of lease'
     })
   }),
   'erxes_contractSchema'

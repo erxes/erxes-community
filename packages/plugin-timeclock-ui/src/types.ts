@@ -12,6 +12,10 @@ export interface ITimeclock {
   employeeId?: number;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
   branchName?: string;
 }
 export interface ITimelog {
@@ -60,6 +64,9 @@ export interface IReport {
 export interface IUserReport {
   user: IUser;
   scheduleReport: IScheduleReport[];
+
+  branchTitles?: string[];
+  departmentTitles?: string[];
 
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
@@ -136,6 +143,7 @@ export interface IShift {
   shiftStart: Date;
   shiftEnd: Date;
   scheduleConfigId: string;
+  lunchBreakInMins?: number;
 }
 
 export interface IShiftSchedule {
@@ -286,7 +294,7 @@ export type TimeLogMutationResponse = {
   }) => Promise<any>;
 
   createTimeClockFromLogMutation: (params: {
-    variables: { userId: string; timelog: Date };
+    variables: { userId: string; timelog: Date; inDevice?: string };
   }) => Promise<any>;
 };
 

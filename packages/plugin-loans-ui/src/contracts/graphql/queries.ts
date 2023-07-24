@@ -16,6 +16,7 @@ const contractFields = `
   feeAmount
   tenor
   unduePercent
+  undueCalcType
   interestRate
   repayment
   startDate
@@ -34,8 +35,14 @@ const contractFields = `
   riskExpertId
   weekends
   useHoliday
+  useMargin
+  useSkipInterest
+  useDebt
   relContractId
+  skipInterestCalcMonth
   dealId
+  nextPayment
+  currency
 `;
 
 const listParamsDef = `
@@ -103,6 +110,7 @@ export const contractsMain = `
     contractsMain(${listParamsValue}) {
       list {
         ${contractFields}
+        nextPayment
       }
       totalCount
     }
@@ -153,6 +161,7 @@ export const contractDetailFields = `
     closeType
   }
   hasTransaction
+  nextPayment
 `;
 
 export const contractDetail = `
