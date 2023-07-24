@@ -160,7 +160,13 @@ export default function List({
   return (
     <NewsFeedLayout>
       {renderList()}
-      <LoadMore perPage={limit} all={totalCount} />
+      <LoadMore
+        perPage={limit}
+        all={totalCount}
+        history={undefined}
+        location={undefined}
+        match={undefined}
+      />
     </NewsFeedLayout>
   );
 }

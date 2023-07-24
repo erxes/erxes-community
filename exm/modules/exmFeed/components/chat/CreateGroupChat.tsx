@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+
 // import queryString from 'query-string';
 // erxes
-import Button from '../../../common/Button';
-import FormControl from '../../../common/form/Control';
-import SelectTeamMembers from '../../../common/team/containers/SelectTeamMembers';
+import Button from "../../../common/Button";
+import FormControl from "../../../common/form/Control";
+// import SelectTeamMembers from '../../../common/team/containers/SelectTeamMembers';
 // import * as router from '../../../utils/router';
-import { GroupChatModal } from '../../styles';
+import { GroupChatModal } from "../../styles";
 
 type Props = {
   closeModal: () => void;
@@ -17,19 +18,19 @@ const CreateGroupChat = (props: Props) => {
   // const queryParams = queryString.parse(location.search);
 
   const [userIds, setUserIds] = useState([]);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
 
   const handleSubmit = () => {
     props.startGroupChat(name, userIds);
     // router.removeParams(history, 'userIds');
 
     setUserIds([]);
-    setName('');
+    setName("");
   };
 
-  const handleUserChange = _userIds => {
-    setUserIds(_userIds);
-  };
+  // const handleUserChange = (_userIds) => {
+  //   setUserIds(_userIds);
+  // };
 
   return (
     <GroupChatModal>
@@ -47,12 +48,12 @@ const CreateGroupChat = (props: Props) => {
         onSelect={handleUserChange}
       /> */}
       <br />
-      <Button style={{ float: 'right' }} onClick={handleSubmit}>
+      <Button style={{ float: "right" }} onClick={handleSubmit}>
         Create
       </Button>
       <Button
         btnStyle="simple"
-        style={{ float: 'right', marginRight: '10px' }}
+        style={{ float: "right", marginRight: "10px" }}
         onClick={props.closeModal}
       >
         Cancel

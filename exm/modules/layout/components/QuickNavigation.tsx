@@ -6,7 +6,6 @@ import DropdownToggle from "../../common/DropdownToggle";
 import { IUser } from "../../auth/types";
 import Icon from "../../common/Icon";
 import Link from "next/link";
-import ModalTrigger from "../../common/ModalTrigger";
 import NameCard from "../../common/nameCard/NameCard";
 import React from "react";
 import Search from "../containers/Search";

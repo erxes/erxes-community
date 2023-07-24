@@ -1,6 +1,7 @@
 import { IUser } from "../../auth/types";
 import QuickNavigation from "../components/QuickNavigation";
 import React from "react";
+import withCurrentUser from "../../auth/containers/withCurrentUser";
 
 type Props = {
   currentUser: IUser;
@@ -16,6 +17,6 @@ class QuickNavigationContainer extends React.Component<Props, State> {
   }
 }
 
-const WithUser = QuickNavigationContainer;
+const WithUser = withCurrentUser(QuickNavigationContainer);
 
 export default WithUser;

@@ -1,10 +1,10 @@
-import { ButtonWrap, FormWrap } from "../../styles";
 import { mutations, queries } from "../../graphql";
 
 import BravoForm from "../../components/feed/BravoForm";
 import ButtonMutate from "../../../common/ButtonMutate";
 import EventForm from "../../components/feed/EventForm";
 import Form from "../../components/feed/Form";
+import { FormWrap } from "../../styles";
 import { IButtonMutateProps } from "../../../common/types";
 import PublicHolidayForm from "../../components/feed/PublicHolidayForm";
 import React from "react";

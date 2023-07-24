@@ -1,6 +1,5 @@
-import { Config } from "../types";
-import { urlParser } from "../utils";
 import { getEnv } from "../../utils/configs";
+import { urlParser } from "../utils";
 
 /**
  * Generate random string
@@ -38,7 +37,7 @@ export const getValue = (name) => {
   return "";
 };
 
-export const getConfigColor = (config: Config, key: string) => {
+export const getConfigColor = (config: any, key: string) => {
   if (!config.styles) {
     return null;
   }
