@@ -4,8 +4,6 @@ import Button from "./Button";
 import { IRouterProps } from "../types";
 import React from "react";
 
-// import { withRouter } from "react-router-dom";
-
 interface IProps extends IRouterProps {
   perPage?: number;
   all: number;
