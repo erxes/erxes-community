@@ -5,9 +5,10 @@ on:
     branches:
       - dev
       - staging
+      - perf-exm-feed
     paths:
       - "exm/**"
-      - ".github/workflows/client_portal.yaml"
+      - ".github/workflows/exm_feed.yaml"
   pull_request:
     branches:
       - master
