@@ -8,7 +8,7 @@ on:
       - perf-exm-feed
     paths:
       - "exm/**"
-      - ".github/workflows/exm_feed.yaml"
+      - ".github/workflows/exm.yaml"
   pull_request:
     branches:
       - master
