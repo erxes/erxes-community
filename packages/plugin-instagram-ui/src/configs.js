@@ -18,8 +18,7 @@ module.exports = {
   inboxConversationDetail: './inboxConversationDetail',
   inboxIntegrations: [{
     name: 'instagram',
-    description:
-      'Please write integration description on plugin config file',
+    description: 'Integrate your Instagram messages with Erxes',
     isAvailable: true,
     kind: 'instagram',
     logo: '/images/integrations/instagram.png',
