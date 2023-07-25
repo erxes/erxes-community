@@ -7,6 +7,7 @@ import mpegEncoder from 'audio-recorder-polyfill/mpeg-encoder';
 import React, { useRef, useState } from 'react';
 import { RecordButton, VoiceRecordWrapper } from '../../styles';
 import { __ } from '@erxes/ui/src/utils/core';
+import Tip from '@erxes/ui/src/components/Tip';
 
 type Props = {
   attachments: IAttachment[] | null;
@@ -140,14 +141,20 @@ const VoiceRecorder = (props: Props) => {
         </>
       )}
       {isRecording && <p>{__('recording')}...</p>}
-      <RecordButton
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        isRecording={isRecording}
+      <Tip
+        text={
+          isRecording ? __('release to send') : __('press and hold to record')
+        }
       >
-        <Icon icon="microphone-2" size={18} />
-      </RecordButton>
+        <RecordButton
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          isRecording={isRecording}
+        >
+          <Icon icon="microphone-2" size={18} />
+        </RecordButton>
+      </Tip>
     </VoiceRecordWrapper>
   );
 };
