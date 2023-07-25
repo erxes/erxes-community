@@ -42,7 +42,7 @@
     "lodash.flowright": "^3.5.0",
     "next": "10.0.5",
     "next-routes": "^1.4.2",
-    "query-string": "^8.1.0",
+    "query-string": "^5.0.0",
     "react": "17.0.1",
     "react-bootstrap": "1.0.0-beta.14",
     "react-color": "^2.17.3",
