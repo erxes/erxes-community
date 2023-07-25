@@ -70,6 +70,14 @@ export const PAYMENTS = {
     },
     handlerMethod: 'GET'
   },
+  hipay: {
+    title: 'hipay',
+    kind: 'hipay',
+    apiUrl: 'https://test.hipay.mn',
+    actions: {
+      invoice: 'checkout'
+    }
+  },
   wechatpay: {
     title: 'WeChat Pay',
     kind: 'wechatpay',
@@ -97,6 +105,7 @@ export const PAYMENTS = {
     'monpay',
     'storepay',
     'pocket',
+    'hipay',
     'wechatpay',
     'paypal',
     'qpayQuickqr'

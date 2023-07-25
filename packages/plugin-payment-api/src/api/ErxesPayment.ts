@@ -8,6 +8,7 @@ import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
 import { WechatPayAPI } from './wechatpay/api';
 import { PocketAPI } from './pocket/api';
+import { HipayAPI } from './hipay/api';
 import * as QRCode from 'qrcode';
 
 class ErxesPayment {
@@ -19,6 +20,7 @@ class ErxesPayment {
   public wechatpay: WechatPayAPI;
   public qpayQuickqr: QPayQuickQrAPI;
   public pocket: PocketAPI;
+  public hipay: HipayAPI;
   public domain: string;
 
   private payment: any;
@@ -34,6 +36,7 @@ class ErxesPayment {
     this.wechatpay = new WechatPayAPI(payment.config, domain);
     this.qpayQuickqr = new QPayQuickQrAPI(payment.config, domain);
     this.pocket = new PocketAPI(payment.config, domain);
+    this.hipay = new HipayAPI(payment.config, domain);
   }
 
   async createInvoice(invoice: IInvoiceDocument) {

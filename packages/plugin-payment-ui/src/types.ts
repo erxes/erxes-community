@@ -48,6 +48,11 @@ export interface IPocketConfig {
   clientSecret: string;
 }
 
+export interface IHipayConfig {
+  hipayEntity: string;
+  hipayToken: string;
+}
+
 export interface IPaymentDocument extends IPayment, Document {
   _id: string;
 }
