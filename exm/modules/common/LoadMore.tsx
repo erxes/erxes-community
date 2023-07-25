@@ -18,7 +18,7 @@ function LoadMore({
   paramName = "limit",
   loading,
 }: IProps) {
-  const loaded = parseInt(getParam(history, paramName), 10) || perPage;
+  const loaded = parseInt(getParam(history, paramName) as any, 10) || perPage;
 
   const load = () => {
     setParams(history, { limit: loaded + perPage });
