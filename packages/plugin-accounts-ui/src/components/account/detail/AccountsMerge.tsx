@@ -5,7 +5,7 @@ import { Column, Columns, Title } from '@erxes/ui/src/styles/chooser';
 import { ModalFooter } from '@erxes/ui/src/styles/main';
 import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
-import { ACCOUNT_INFO } from '@erxes/ui-accounts/src/constants';
+import { ACCOUNT_INFO } from '../../../constants';
 import { InfoDetail } from '../../../styles';
 import { Info, InfoTitle } from '@erxes/ui/src/styles/main';
 import { IAccount, IAccountDoc } from '../../../types';

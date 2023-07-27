@@ -2,8 +2,8 @@ import React from 'react';
 
 import SelectWithSearch from '@erxes/ui/src/components/SelectWithSearch';
 import { IOption, IQueryParams } from '@erxes/ui/src/types';
-import { queries } from '../graphql';
-import { IAccount } from '../types';
+import { queries } from '../../graphql';
+import { IAccount } from '../../types';
 
 // get config options for react-select-plus
 export function generateAccountOptions(array: IAccount[] = []): IOption[] {

@@ -3,22 +3,21 @@ import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
-
 import Chooser from '@erxes/ui/src/components/Chooser';
 import { Alert, withProps } from '@erxes/ui/src/utils';
-import AccountCategoryChooser from '../components/AccountCategoryChooser';
+import AccountCategoryChooser from '../../components/ui_accounts/AccountCategoryChooser';
 import {
   mutations as accountMutations,
   queries as accountQueries
-} from '../graphql';
+} from '../../graphql';
 import {
   IAccount,
   IAccountDoc,
   AccountAddMutationResponse,
   AccountsQueryResponse
-} from '../types';
+} from '../../types';
 import AccountForm from './AccountForm';
-import { AccountCategoriesQueryResponse } from '@erxes/ui-accounts/src/types';
+import { AccountCategoriesQueryResponse } from '../../types';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {

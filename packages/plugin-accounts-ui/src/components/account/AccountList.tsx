@@ -12,7 +12,7 @@ import Button from '@erxes/ui/src/components/Button';
 import CategoryList from '../../containers/accountCategory/CategoryList';
 import DataWithLoader from '@erxes/ui/src/components/DataWithLoader';
 import EmptyState from '@erxes/ui/src/components/EmptyState';
-import Form from '@erxes/ui-accounts/src/containers/AccountForm';
+import Form from '../../containers/ui_accounts/AccountForm';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import HeaderDescription from '@erxes/ui/src/components/HeaderDescription';
 import { IRouterProps } from '@erxes/ui/src/types';
@@ -27,7 +27,7 @@ import TaggerPopover from '@erxes/ui-tags/src/components/TaggerPopover';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 import TemporarySegment from '@erxes/ui-segments/src/components/filter/TemporarySegment';
-import AccountsPrintAction from './AccountPrintAction';
+import AccountsPrintAction from './AccountsPrintAction';
 
 interface IProps extends IRouterProps {
   history: any;

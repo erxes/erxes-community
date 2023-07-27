@@ -1,6 +1,11 @@
 import { colors, dimensions } from '@erxes/ui/src/styles';
 import styled from 'styled-components';
 
+export const CategoryContainer = styled.div`
+  flex: 1;
+  flex-shrink: 0;
+`;
+
 const InfoDetail = styled.p`
   margin: 0;
   display: block;

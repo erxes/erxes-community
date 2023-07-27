@@ -4,11 +4,11 @@ import {
   ModalFooter
 } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
-import { IAccount, IAccountCategory } from '../types';
-import { IS_BALANCE, ACCOUNT_TYPE, JOURNAL_TYPES } from '../constants';
+import { IAccount, IAccountCategory } from '../../types';
+import { IS_BALANCE, ACCOUNT_TYPE, JOURNAL_TYPES } from '../../constants';
 import { generateCategoryOptions } from '@erxes/ui/src/utils';
 import Button from '@erxes/ui/src/components/Button';
-import CategoryForm from '../containers/CategoryForm';
+import CategoryForm from '../../containers/ui_accounts/CategoryForm';
 import CommonForm from '@erxes/ui/src/components/form/Form';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import FormControl from '@erxes/ui/src/components/form/Control';

@@ -1,12 +1,64 @@
-import { queries as accountQueries } from '@erxes/ui-accounts/src/graphql';
+const accountFields = `
+  _id
+  name
+  type
+  code
+  journal
+  currency
+  categoryId
+  isBalance,
+  closePercent,
+  createdAt
+  category {
+    _id
+    code
+    status
+    name
+  }
+  accountCount
+`;
 
-const accountCategories = accountQueries.accountCategories;
-
-const accounts = accountQueries.accounts;
-
-const accountCountByTags = `
-  query accountCountByTags {
-    accountCountByTags
+const accounts = `
+  query accounts(
+    $type: String,
+    $categoryId: String,
+    $searchValue: String,
+    $perPage: Int,
+    $page: Int $ids: [String],
+    $excludeIds: Boolean,
+    $pipelineId: String,
+    $boardId: String,
+    $segment: String,
+    $segmentData: String
+  ) {
+    accounts(
+      type: $type,
+      categoryId: $categoryId,
+      searchValue: $searchValue,
+      perPage: $perPage,
+      page: $page ids: $ids,
+      excludeIds: $excludeIds,
+      pipelineId: $pipelineId,
+      boardId: $boardId,
+      segment: $segment,
+      segmentData: $segmentData
+    ) {
+      ${accountFields}
+    }
+  }
+`;
+const accountCategories = `
+  query accountCategories($status: String) {
+    accountCategories(status: $status) {
+      _id
+      name
+      order
+      code
+      parentId
+      status
+      isRoot
+      accountCount
+    }
   }
 `;
 
@@ -36,8 +88,6 @@ const accountsCount = `
   }
 `;
 
-const accountDetail = accountQueries.accountDetail;
-
 const accountCategoryDetail = `
   query accountCategoryDetail($_id: String) {
     accountCategoryDetail(_id: $_id) {
@@ -59,13 +109,19 @@ const documents = `
     }
   }
 `;
-
+const accountDetail = `
+  query accountDetail($_id: String) {
+    accountDetail(_id: $_id) {
+      ${accountFields}
+      customFieldsData
+    }
+  }
+`;
 export default {
   accounts,
   accountDetail,
   accountsCount,
   accountsGroupCounts,
-  accountCountByTags,
   accountCategories,
   accountCategoriesCount,
   accountCategoryDetail,

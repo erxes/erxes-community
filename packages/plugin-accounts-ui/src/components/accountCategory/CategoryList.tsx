@@ -11,12 +11,10 @@ import { SidebarList } from '@erxes/ui/src/layout/styles';
 import { ActionButtons, SidebarListItem } from '@erxes/ui-settings/src/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CategoryForm from '@erxes/ui-accounts/src/containers/CategoryForm';
-import TagFilter from '../../containers/TagFilter';
+import CategoryForm from '../../containers/ui_accounts/CategoryForm';
 import { IAccountCategory } from '../../types';
 import CategoryStatusFilter from '../account/filters/CategoryStatusFilter';
 import SegmentFilter from '../account/filters/SegmentFilter';
-import { pluginsOfProductCategoryActions } from 'coreui/pluginUtils';
 import { isEnabled } from '@erxes/ui/src/utils/core';
 import { Header } from '@erxes/ui-settings/src/styles';
 
@@ -115,7 +113,7 @@ class List extends React.Component<IProps> {
           </Link>
           <ActionButtons>
             {this.renderEditAction(category)}
-            {pluginsOfProductCategoryActions(category)}
+
             {this.renderRemoveAction(category)}
           </ActionButtons>
         </SidebarListItem>
@@ -185,8 +183,6 @@ class List extends React.Component<IProps> {
           <SegmentFilter loadingMainQuery={this.props.loading} />
         )}
         <CategoryStatusFilter />
-
-        {isEnabled('tags') && <TagFilter />}
       </Sidebar>
     );
   }

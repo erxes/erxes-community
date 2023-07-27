@@ -128,8 +128,7 @@ const getRefetchQueries = () => {
     'accounts',
     'accountCategories',
     'accountCategoriesCount',
-    'accountsTotalCount',
-    'accountCountByTags'
+    'accountsTotalCount'
   ];
 };
 
@@ -146,7 +145,6 @@ export default withProps<Props>(
         options: ({ queryParams }) => ({
           variables: {
             categoryId: queryParams.categoryId,
-            tag: queryParams.tag,
             searchValue: queryParams.searchValue,
             type: queryParams.type,
             segment: queryParams.segment,

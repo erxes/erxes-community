@@ -5,8 +5,7 @@ module.exports = {
   exposes: {
     './routes': './src/routes.tsx',
     './extendFormField':
-      './src/containers/accountCategory/SelectAccountCategory.tsx',
-    './extendFormFieldChoice': './src/components/account/FormFieldChoice.tsx'
+      './src/containers/accountCategory/SelectAccountCategory.tsx'
   },
   routes: {
     url: 'http://localhost:3017/remoteEntry.js',
@@ -14,7 +13,6 @@ module.exports = {
     module: './routes'
   },
   extendFormField: './extendFormField',
-  extendFormFieldChoice: './extendFormFieldChoice',
   menus: [
     {
       text: 'Account',

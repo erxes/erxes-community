@@ -1,25 +1,65 @@
-import {
-  IAccount as IAccountC,
-  IAccountCategory as IAccountCategoryC,
-  IAccountDoc as IAccountDocC
-} from '@erxes/ui-accounts/src/types';
 import { QueryResponse } from '@erxes/ui/src/types';
 
-export type IAccountDoc = IAccountDocC & {};
+export interface IAccountDoc {
+  _id?: string;
+  type: string;
+  name?: string;
+  createdAt?: Date;
+  customFieldsData?: any;
+}
 
-export type IAccount = IAccountC & {};
+export interface IAccount {
+  _id: string;
+  name: string;
+  type: string;
+  categoryId: string;
+  code: string;
+  category: IAccountCategory;
+  customFieldsData?: any;
+  currency?: number;
+  isBalance?: boolean;
+  closePercent?: number;
+  journal?: string;
+  createdAt: Date;
+  accountCount: number;
+}
 
-export type IAccountCategory = IAccountCategoryC & {};
+export interface IAccountCategory {
+  _id: string;
+  name: string;
+  order: string;
+  code: string;
+  status: string;
+  parentId?: string;
+  createdAt: Date;
+  isRoot: boolean;
+  accountCount: number;
+}
+
+export type DetailQueryResponse = {
+  accountDetail: IAccount;
+  loading: boolean;
+};
 
 export type Counts = {
   [key: string]: number;
 };
 type AccountCounts = {
   bySegment: Counts;
-  byTag: Counts;
 };
 // query types
 
+export interface IAccountCategory {
+  _id: string;
+  name: string;
+  order: string;
+  code: string;
+  status: string;
+  parentId?: string;
+  createdAt: Date;
+  isRoot: boolean;
+  accountCount: number;
+}
 export type AccountsQueryResponse = {
   accounts: IAccount[];
 } & QueryResponse;
@@ -36,11 +76,11 @@ export type AccountCategoriesCountQueryResponse = {
   accountCategoriesTotalCount: number;
 } & QueryResponse;
 
-// UOM
-
-export type UomsCountQueryResponse = {
-  uomsTotalCount: number;
-} & QueryResponse;
+export type MutationUomVariables = {
+  _id?: string;
+  name: string;
+  code: string;
+};
 
 export type MutationVariables = {
   _id?: string;
@@ -48,12 +88,6 @@ export type MutationVariables = {
   name?: string;
   code?: string;
   createdAt?: Date;
-};
-
-export type MutationUomVariables = {
-  _id?: string;
-  name: string;
-  code: string;
 };
 
 // mutation types
@@ -77,19 +111,19 @@ export type AccountCategoryRemoveMutationResponse = {
     variables: { _id: string };
   }) => Promise<any>;
 };
-
-export type DetailQueryResponse = {
-  accountDetail: IAccount;
-  loading: boolean;
+export type AccountAddMutationResponse = {
+  accountAdd: (params: { variables: IAccountDoc }) => Promise<void>;
 };
+export type AccountCategoriesQueryResponse = {
+  accountCategories: IAccountCategory[];
+} & QueryResponse;
+
+export type AccountsQueryResponses = {
+  accounts: IAccount[];
+} & QueryResponse;
 
 export type CategoryDetailQueryResponse = {
   accountCategoryDetail: IAccountCategory;
-  loading: boolean;
-};
-
-export type CountByTagsQueryResponse = {
-  accountCountByTags: { [key: string]: number };
   loading: boolean;
 };
 

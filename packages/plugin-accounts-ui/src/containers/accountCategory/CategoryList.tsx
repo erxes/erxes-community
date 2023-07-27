@@ -10,7 +10,7 @@ import {
   AccountCategoryRemoveMutationResponse,
   AccountsQueryResponse
 } from '../../types';
-import { AccountCategoriesQueryResponse } from '@erxes/ui-accounts/src/types';
+import { AccountCategoriesQueryResponse } from '../../types';
 type Props = { history: any; queryParams: any };
 
 type FinalProps = {

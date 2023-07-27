@@ -11,7 +11,7 @@ import {
   IFormProps
 } from '@erxes/ui/src/types';
 import { generateCategoryOptions } from '@erxes/ui/src/utils';
-import { IAccountCategory } from '../types';
+import { IAccountCategory } from '../../types';
 import { ICategory } from '@erxes/ui/src/utils/categories';
 
 type Props = {

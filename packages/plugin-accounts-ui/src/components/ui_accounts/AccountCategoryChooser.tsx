@@ -2,8 +2,8 @@ import React from 'react';
 import Select from 'react-select-plus';
 import Icon from '@erxes/ui/src/components/Icon';
 import { __ } from '@erxes/ui/src/utils/core';
-import { CategoryContainer } from '../styles';
-import { IAccountCategory } from '../types';
+import { CategoryContainer } from '../../styles';
+import { IAccountCategory } from '../../types';
 
 type Props = {
   categories: IAccountCategory[];

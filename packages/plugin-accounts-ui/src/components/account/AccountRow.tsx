@@ -4,7 +4,7 @@ import TextInfo from '@erxes/ui/src/components/TextInfo';
 import React from 'react';
 import { IAccount } from '../../types';
 import { __ } from '@erxes/ui/src/utils/core';
-import AccountForm from '@erxes/ui-accounts/src/containers/AccountForm';
+import AccountForm from '../../containers/ui_accounts/AccountForm';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import dayjs from 'dayjs';
 

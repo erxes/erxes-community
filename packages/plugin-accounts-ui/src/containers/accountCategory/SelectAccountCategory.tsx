@@ -1,4 +1,4 @@
-import SelectAccountCategory from '@erxes/ui-accounts/src/containers/SelectAccountCategory';
+import SelectAccountCategory from '../../containers/ui_accounts/SelectAccountCategory';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { IField } from '@erxes/ui/src/types';
 import React from 'react';

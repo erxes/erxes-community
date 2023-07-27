@@ -5,10 +5,10 @@ import { graphql } from '@apollo/client/react/hoc';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
 import { withProps } from '@erxes/ui/src/utils';
-import From from '../components/AccountForm';
-import { mutations, queries } from '../graphql';
-import { IAccount, IConfigsMap } from '../types';
-import { AccountCategoriesQueryResponse } from '@erxes/ui-accounts/src/types';
+import From from '../../components/ui_accounts/AccountForm';
+import { mutations, queries } from '../../graphql';
+import { IAccount, IConfigsMap } from '../../types';
+import { AccountCategoriesQueryResponse } from '../../types';
 
 type Props = {
   account?: IAccount;

@@ -1,13 +1,78 @@
-import { mutations as accountMutations } from '@erxes/ui-accounts/src/graphql';
+const accountParamsDef = `
+  $name: String,
+  $type: String,
+  $categoryId: String,
+  $code: String
+  $customFieldsData: JSON,
+  $currency:Float,
+  $isBalance: Boolean,
+  $closePercent: Float,
+  $journal: String,
+`;
 
-const accountAdd = accountMutations.accountAdd;
+const accountCategoryParamsDef = `
+  $name: String!,
+  $code: String!,
+  $parentId: String,
+  $status: String,
+`;
 
-const accountEdit = accountMutations.accountEdit;
+const accountParams = `
+  name: $name,
+  type: $type,
+  categoryId: $categoryId,
+  code: $code,
+  customFieldsData: $customFieldsData,
+  currency:$currency,
+  isBalance: $isBalance,
+  closePercent: $closePercent,
+  journal: $journal,
+`;
 
-const accountsRemove = accountMutations.accountsRemove;
+const accountCategoryParams = `
+  name: $name,
+  code: $code,
+  parentId: $parentId,
+  status: $status,
+`;
 
-const accountCategoryAdd = accountMutations.accountCategoryAdd;
-const accountCategoryEdit = accountMutations.accountCategoryEdit;
+const accountAdd = `
+  mutation accountsAdd(${accountParamsDef}) {
+    accountsAdd(${accountParams}) {
+      _id
+    }
+  }
+`;
+
+const accountEdit = `
+  mutation accountsEdit($_id: String!, ${accountParamsDef}) {
+    accountsEdit(_id: $_id, ${accountParams}) {
+      _id
+    }
+  }
+`;
+
+const accountCategoryAdd = `
+  mutation accountCategoriesAdd(${accountCategoryParamsDef}) {
+    accountCategoriesAdd(${accountCategoryParams}) {
+      _id
+    }
+  }
+`;
+
+const accountCategoryEdit = `
+  mutation accountCategoriesEdit($_id: String!, ${accountCategoryParamsDef}) {
+    accountCategoriesEdit(_id: $_id, ${accountCategoryParams}) {
+      _id
+    }
+  }
+`;
+
+const accountsRemove = `
+  mutation accountsRemove($accountIds: [String!]) {
+    accountsRemove(accountIds: $accountIds)
+  }
+`;
 
 const accountCategoryRemove = `
   mutation accountCategoriesRemove($_id: String!) {

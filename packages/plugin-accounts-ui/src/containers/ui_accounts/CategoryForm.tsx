@@ -1,9 +1,9 @@
 import React from 'react';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import CategoryForm from '../components/CategoryForm';
-import { mutations } from '../graphql';
-import { IAccountCategory } from '../types';
+import CategoryForm from '../../components/ui_accounts/CategoryForm';
+import { mutations } from '../../graphql';
+import { IAccountCategory } from '../../types';
 
 type Props = {
   categories: IAccountCategory[];
