@@ -207,7 +207,7 @@ class List extends React.Component<IProps, State> {
       content = (
         <EmptyState
           image="/images/actions/8.svg"
-          text="No Brands"
+          text="No Accounts"
           size="small"
         />
       );
