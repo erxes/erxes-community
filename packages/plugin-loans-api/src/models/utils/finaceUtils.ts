@@ -45,7 +45,8 @@ export async function generateFinance(
   const contractType = await models.ContractTypes.findOne({
     _id: contract?.contractTypeId
   }).lean<IContractTypeDocument>();
-  if (!contract) throw new Error('aldaa :p');
+  if (!contract)
+    throw new Error('there is not connected transaction with contract');
 
   let financeTransaction = fillTransaction(
     tr,
