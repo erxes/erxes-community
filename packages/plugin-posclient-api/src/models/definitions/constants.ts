@@ -22,7 +22,13 @@ export const ORDER_TYPES = {
   EAT: 'eat',
   SAVE: 'save',
   DELIVERY: 'delivery',
-  ALL: ['take', 'eat', 'save', 'delivery']
+  SPEND: 'spend',
+  LOSS: 'loss',
+  REJECT: 'reject',
+  BEFORE: 'before',
+  ALL: ['take', 'eat', 'delivery', 'save', 'spend', 'loss', 'reject', 'before'],
+  SALES: ['take', 'eat', 'delivery', 'save', 'before'],
+  OUT: ['spend', 'loss', 'reject']
 };
 
 export const DEFAULT_SEX_CHOICES = [
@@ -125,8 +131,9 @@ export const ORDER_STATUSES = {
   REDOING: 'reDoing',
   DONE: 'done',
   COMPLETE: 'complete',
+  PENDING: 'pinding',
 
-  ALL: ['new', 'doing', 'done', 'complete', 'reDoing'],
+  ALL: ['new', 'doing', 'done', 'complete', 'reDoing', 'pending'],
   FULL: ['paid', 'done', 'complete']
 };
 

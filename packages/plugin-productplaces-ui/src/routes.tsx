@@ -23,6 +23,16 @@ const SplitSetting = () => {
   );
 };
 
+const PrintSettings = asyncComponent(() =>
+  import(/* webpackChunkName: "PrintSettings" */ './components/PrintSettings')
+);
+
+const PrintSetting = () => {
+  return (
+    <Settings component={PrintSettings} configCode="dealsProductsDataPrint" />
+  );
+};
+
 const routes = () => {
   return (
     <React.Fragment>
@@ -33,10 +43,16 @@ const routes = () => {
         component={StageSetting}
       />
       <Route
-        key="/erxes-plugin-product-places/settings/stage"
+        key="/erxes-plugin-product-places/settings/split"
         exact={true}
         path="/erxes-plugin-product-places/settings/split"
         component={SplitSetting}
+      />
+      <Route
+        key="/erxes-plugin-product-places/settings/print"
+        exact={true}
+        path="/erxes-plugin-product-places/settings/print"
+        component={PrintSetting}
       />
     </React.Fragment>
   );

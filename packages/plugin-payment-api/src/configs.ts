@@ -1,6 +1,8 @@
 import { getSubdomain } from '@erxes/api-utils/src/core';
 import * as express from 'express';
 import * as path from 'path';
+import * as cookieParser from 'cookie-parser';
+import * as bodyParser from 'body-parser';
 
 import { generateModels } from './connectionResolver';
 import * as permissions from './permissions';
@@ -64,6 +66,8 @@ export default {
     return context;
   },
 
+  middlewares: [cookieParser(), bodyParser.json()],
+
   onServerInit: async options => {
     mainDb = options.db;
 
@@ -88,7 +92,9 @@ export default {
       locales: ['en', 'mn'],
       queryParameter: 'lang',
       directory: __dirname + '/locales',
-      defaultLocale: 'en'
+      defaultLocale: 'en',
+      autoReload: false,
+      updateFiles: false
     });
 
     app.use(i18n.init);
@@ -100,6 +106,9 @@ export default {
 
       next();
     });
+
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(controllers);
   }

@@ -23,12 +23,12 @@ export const initBroker = async cl => {
       const models = await generateModels(subdomain);
       const product = await models.Products.getProduct({ _id: productId });
 
-      if (!product.uomId) {
+      if (!product.uom) {
         throw new Error('has not uom');
       }
 
       return {
-        data: await models.Uoms.findOne({ _id: product.uomId }).lean(),
+        data: await models.Uoms.findOne({ _id: product.uom }).lean(),
         status: 'success'
       };
     }
@@ -75,7 +75,7 @@ export const initBroker = async cl => {
     async ({ subdomain, data: { _id, ids } }) => {
       const models = await generateModels(subdomain);
       const categoryIds = _id ? [_id] : ids || [];
-      if (!categoryIds) {
+      if (!categoryIds.length) {
         return {
           data: [],
           status: 'success'
@@ -83,7 +83,7 @@ export const initBroker = async cl => {
       }
 
       const categories = await models.ProductCategories.find({
-        _id: { $in: ids }
+        _id: { $in: categoryIds }
       }).lean();
 
       if (!categories.length) {
@@ -96,7 +96,7 @@ export const initBroker = async cl => {
       const orderQry: any[] = [];
       for (const category of categories) {
         orderQry.push({
-          order: { $regex: new RegExp(category.order) }
+          order: { $regex: new RegExp(`^${category.order}`) }
         });
       }
 
@@ -176,7 +176,7 @@ export const initBroker = async cl => {
           _id: categoryId
         }).lean();
         const categories = await models.ProductCategories.find({
-          order: { $regex: new RegExp(category.order) }
+          order: { $regex: new RegExp(`^${category.order}`) }
         }).lean();
 
         query.categoryId = { $in: categories.map(c => c._id) };
@@ -204,7 +204,7 @@ export const initBroker = async cl => {
           _id: categoryId
         }).lean();
         const categories = await models.ProductCategories.find({
-          order: { $regex: new RegExp(category.order) }
+          order: { $regex: new RegExp(`^${category.order}`) }
         }).lean();
 
         filter.categoryId = { $in: categories.map(c => c._id) };

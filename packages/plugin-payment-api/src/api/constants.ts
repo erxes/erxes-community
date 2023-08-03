@@ -9,6 +9,22 @@ export const PAYMENTS = {
     },
     handlerMethod: 'GET'
   },
+
+  qpayQuickqr: {
+    title: 'Qpay',
+    kind: 'qpayQuickqr',
+    apiUrl: 'https://sandbox-quickqr.qpay.mn/v2',
+    actions: {
+      auth: 'auth/token',
+      refresh: 'auth/refresh',
+      createCompany: 'merchant/company',
+      createPerson: 'merchant/person',
+      getMerchant: 'merchant',
+      merchantList: 'merchant/list',
+      checkInvoice: 'payment/check',
+      invoice: 'invoice'
+    }
+  },
   socialpay: {
     title: 'Social Pay',
     kind: 'socialpay',
@@ -42,6 +58,18 @@ export const PAYMENTS = {
     },
     handlerMethod: 'GET'
   },
+  pocket: {
+    title: 'pocket',
+    kind: 'pocket',
+    apiUrl: 'https://service.invescore.mn/merchant',
+    actions: {
+      invoice: 'invoice',
+      checkInvoice: 'invoice/check',
+      webhook: 'pg/config',
+      cancel: 'payment-gateway/transaction/cancel'
+    },
+    handlerMethod: 'GET'
+  },
   wechatpay: {
     title: 'WeChat Pay',
     kind: 'wechatpay',
@@ -63,7 +91,16 @@ export const PAYMENTS = {
     handlerMethod: 'POST'
   },
 
-  ALL: ['qpay', 'socialpay', 'monpay', 'storepay', 'wechatpay', 'paypal']
+  ALL: [
+    'qpay',
+    'socialpay',
+    'monpay',
+    'storepay',
+    'pocket',
+    'wechatpay',
+    'paypal',
+    'qpayQuickqr'
+  ]
 };
 
 export const PAYMENT_STATUS = {
@@ -71,8 +108,10 @@ export const PAYMENT_STATUS = {
   PENDING: 'pending',
   REFUNDED: 'refunded',
   FAILED: 'failed',
+  CANCELLED: 'cancelled',
+  REJECTED: 'rejected',
 
-  ALL: ['paid', 'pending', 'refunded', 'failed']
+  ALL: ['paid', 'pending', 'refunded', 'failed', 'cancelled', 'rejected']
 };
 
 export const PLUGIN_RESOLVERS_META = {

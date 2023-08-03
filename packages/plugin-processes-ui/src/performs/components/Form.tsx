@@ -7,7 +7,7 @@ import ControlLabel from '@erxes/ui/src/components/form/Label';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import PerformDetail from './PerformDetail';
 import ProductChooser from '@erxes/ui-products/src/containers/ProductChooser';
@@ -18,7 +18,7 @@ import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectC
 import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectJobRefer from '../../job/containers/refer/SelectJobRefer';
 import SelectTeamMembers from '@erxes/ui/src/team/containers/SelectTeamMembers';
-import { __ } from '@erxes/ui/src/utils';
+import { __ } from 'coreui/utils';
 import { AddTrigger, TableOver } from '../../styles';
 import {
   DateContainer,
@@ -45,7 +45,6 @@ type Props = {
     props: IButtonMutateProps & { disabled?: boolean }
   ) => JSX.Element;
   closeModal: () => void;
-  allUoms: IUom[];
   perform?: IPerform;
   overallWorkDetail?: IOverallWorkDet;
   max: number;
@@ -234,17 +233,28 @@ class Form extends React.Component<Props, State> {
       overallWorkDet.type === 'outlet' &&
       !(
         overallWorkDet.key.inBranchId &&
-        overallWorkDet.inDepartmentId &&
+        overallWorkDet.key.inDepartmentId &&
         inProducts.length
       )
     ) {
       return false;
     }
-    if (overallWorkDet.type === 'move' && !inProducts.length) {
-      return false;
+    if (overallWorkDet.type === 'move') {
+      if (!inProducts.length) {
+        return false;
+      }
+      if (
+        !(
+          (overallWorkDet.key.inBranchId &&
+            overallWorkDet.key.inDepartmentId) ||
+          (overallWorkDet.key.outBranchId && overallWorkDet.key.outDepartmentId)
+        )
+      ) {
+        return false;
+      }
     }
     if (
-      ['job', 'end', 'move'].includes(overallWorkDet.type) &&
+      ['job', 'end'].includes(overallWorkDet.type) &&
       !(
         overallWorkDet.key.inBranchId &&
         overallWorkDet.key.inDepartmentId &&
@@ -294,8 +304,10 @@ class Form extends React.Component<Props, State> {
 
     for (const product of products) {
       const { uom } = product;
-      const productName = product.product ? product.product.name : 'not name';
-      const uomCode = uom ? uom.code : 'not uom';
+      const productName = product.product
+        ? `${product.product.code} - ${product.product.name}`
+        : 'not nameqqq';
+      const uomCode = uom;
 
       result.push(
         this.renderViewInfo(productName, product.quantity * count, uomCode)
@@ -340,10 +352,9 @@ class Form extends React.Component<Props, State> {
         productsData.push({
           _id: Math.random(),
           quantity: 1,
-          uomId: product.uomId,
+          uom: product.uom,
           productId: product._id,
-          product: product,
-          uom: product.uom
+          product: product
         });
       }
 
@@ -398,8 +409,6 @@ class Form extends React.Component<Props, State> {
     productsData: any[],
     stateName: 'inProducts' | 'outProducts'
   ) => {
-    const { allUoms } = this.props;
-
     return (
       <>
         <TableOver>
@@ -418,7 +427,6 @@ class Form extends React.Component<Props, State> {
               return (
                 <PerformDetail
                   key={pd._id}
-                  allUoms={allUoms}
                   productData={pd}
                   productsData={productsData}
                   stateName={stateName}
@@ -436,8 +444,6 @@ class Form extends React.Component<Props, State> {
   };
 
   renderProductsIncome = (productsData: any[]) => {
-    const { allUoms } = this.props;
-
     return (
       <>
         <TableOver>
@@ -456,7 +462,6 @@ class Form extends React.Component<Props, State> {
               return (
                 <PerformDetail
                   key={pd._id}
-                  allUoms={allUoms}
                   productData={pd}
                   productsData={productsData}
                   stateName={'outProducts'}
@@ -587,7 +592,7 @@ class Form extends React.Component<Props, State> {
       return (
         <FormColumn>
           <FormGroup>
-            <ControlLabel>{__(`In Branch`)}</ControlLabel>
+            <ControlLabel>{__(`Send Branch`)}</ControlLabel>
             <SelectBranches
               label="Choose branch"
               name="inBranchId"
@@ -601,7 +606,7 @@ class Form extends React.Component<Props, State> {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>{__(`In Department`)}</ControlLabel>
+            <ControlLabel>{__(`Send Department`)}</ControlLabel>
             <SelectDepartments
               label="Choose department"
               name="inDepartmentId"
@@ -643,7 +648,7 @@ class Form extends React.Component<Props, State> {
       return (
         <FormColumn>
           <FormGroup>
-            <ControlLabel>{__(`Out Branch`)}</ControlLabel>
+            <ControlLabel>{__(`Receipt Branch`)}</ControlLabel>
             <SelectBranches
               label="Choose branch"
               name="outBranchId"
@@ -657,7 +662,7 @@ class Form extends React.Component<Props, State> {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>{__(`Out Department`)}</ControlLabel>
+            <ControlLabel>{__(`Receipt Department`)}</ControlLabel>
             <SelectDepartments
               label="Choose department"
               name="outDepartmentId"
@@ -680,13 +685,13 @@ class Form extends React.Component<Props, State> {
       <FormColumn>
         <FormGroup>
           <ControlLabel>
-            {__(`Out Branch`)}:{' '}
+            {__(`Receipt Branch`)}:{' '}
             {this.renderLocLabel(overallWorkDetail.outBranch)}
           </ControlLabel>
         </FormGroup>
         <FormGroup>
           <ControlLabel>
-            {__(`Out Department`)}:{' '}
+            {__(`Receipt Department`)}:{' '}
             {this.renderLocLabel(overallWorkDetail.outDepartment)}
           </ControlLabel>
         </FormGroup>

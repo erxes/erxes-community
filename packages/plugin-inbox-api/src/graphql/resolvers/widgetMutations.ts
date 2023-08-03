@@ -99,19 +99,21 @@ export const pConversationClientMessageInserted = async (
     channelMemberIds
   });
 
-  sendCoreMessage({
-    subdomain,
-    action: 'sendMobileNotification',
-    data: {
-      title: integration ? integration.name : 'New message',
-      body: message.content,
-      receivers: channelMemberIds,
+  if (message.content) {
+    sendCoreMessage({
+      subdomain,
+      action: 'sendMobileNotification',
       data: {
-        type: 'conversation',
-        id: conversation._id
+        title: integration ? integration.name : 'New message',
+        body: message.content,
+        receivers: channelMemberIds,
+        data: {
+          type: 'conversation',
+          id: conversation._id
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 export const getMessengerData = async (
@@ -131,6 +133,17 @@ export const getMessengerData = async (
 
     if (messages) {
       messagesByLanguage = messages[languageCode];
+    }
+
+    if (
+      messengerData &&
+      messengerData.hideWhenOffline &&
+      messengerData.availabilityMethod === 'auto'
+    ) {
+      const isOnline = await models.Integrations.isOnline(integration);
+      if (!isOnline) {
+        messengerData.showChat = false;
+      }
     }
   }
 
@@ -624,6 +637,7 @@ const widgetMutations = {
 
       if (!company) {
         companyData.primaryName = companyData.name;
+        companyData.names = [companyData.name];
 
         company = await sendContactsMessage({
           subdomain,
