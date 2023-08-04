@@ -155,13 +155,16 @@ export class MonpayAPI extends BaseAPI {
     }
   }
 
-  async couponCheck(couponCode: string) {
+  async couponScan(couponCode: string) {
     try {
       const loginRes = await this.request({
         method: 'POST',
         headers: this.headers,
         path: PAYMENTS.monpay.actions.branchLogin,
-        data: { username: 'Agent11', password: '1111' }
+        data: {
+          username: process.env.MONPAY_COUPON_USERNAME || 'partnerBayas',
+          password: process.env.MONPAY_COUPON_PASSWORD || 'qwerty'
+        }
       });
 
       if (loginRes.code !== 0) {
@@ -186,6 +189,20 @@ export class MonpayAPI extends BaseAPI {
         }
 
         console.log('SCAN res ', res);
+
+        //   {
+        //     "code": 0,
+        //     "info": "Амжилттай",
+        //     "result": {
+        //         "couponCategory": "MOBI_BDAY_JURUR15000",
+        //         "couponCode": "jurur_4kYE7uOQYFJRc",
+        //         "couponEndDate": 1701360000000,
+        //         "userPhone": "90371041",
+        //         "isUsable": true,
+        //         "description": "COUPON IS AVAILABLE",
+        //         "couponAmount": 15000
+        //     }
+        // }
 
         return { ...res.result };
       } catch (e) {
