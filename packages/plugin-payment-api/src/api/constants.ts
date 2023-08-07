@@ -40,7 +40,7 @@ export const PAYMENTS = {
   monpay: {
     title: 'MonPay',
     kind: 'monpay',
-    apiUrl: 'https://z-wallet.monpay.mn',
+    apiUrl: 'https://wallet.monpay.mn',
     actions: {
       invoiceQr: 'rest/branch/qrpurchase/generate',
       invoiceCheck: 'rest/branch/qrpurchase/check',
