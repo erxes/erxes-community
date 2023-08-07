@@ -22,9 +22,9 @@ block layout-content
     if monpayCouponEnabled
       .monpay-coupon(id='monpay-coupon')
         input(type='text', placeholder='Enter coupon code', id='coupon-input')
-        button(type='button', onclick=`onCouponClick('${JSON.stringify(invoiceData)}','${prefix}')`) #{__('Apply')}
-
-    p(id='coupon-response')
+        br
+        button(type='button', onclick=`onCouponClick('${JSON.stringify(invoiceData)}','${prefix}')`, class='btn btn-primary') #{__('Apply coupon')}
+      p(id='coupon-response')
     
         
     .block.amount

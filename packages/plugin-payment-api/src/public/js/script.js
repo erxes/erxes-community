@@ -190,8 +190,11 @@ async function onPaymentClick(payment, invoiceData, prefix) {
     deeplink.innerHTML = `Open in ${paymentObj.kind}`;
   }
 
+  let amountValue = data.invoice.amount - data.invoice.couponAmount;
+  amountValue = amountValue < 0 ? 0 : amountValue;
+
   amount.innerHTML =
-    invoiceObj.amount.toLocaleString(undefined, {
+  amountValue.toLocaleString(undefined, {
       maximumFractionDigits: 2,
     }) + ' ₮';
 

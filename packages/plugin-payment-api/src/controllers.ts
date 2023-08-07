@@ -378,39 +378,22 @@ router.post('/gateway/monpay/coupon', async (req, res, next) => {
   const token = loginResponse.result.token;
 
   try {
-    // let couponResponse = await sendRequest({
-    //   url: `${PAYMENTS.monpay.apiUrl}/rest/branch/coupon/scan`,
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    //   params: {
-    //     couponCode,
-    //   },
-    // });
-
-    const couponResponse = {
-      code: 0,
-      info: 'Successful',
-      result: {
-        couponCategory: 'GEGEENTEN',
-        couponCode: ' GC001',
-        couponEndDate: 1577774451000,
-        userPhone: '99908855',
-        userEmail: 'bayasaa217@gmail.com',
-        isUsable: true,
-        description: 'COUPON IS AVAILABLE',
-        couponAmount: 50
+    const couponResponse = await sendRequest({
+      url: `${PAYMENTS.monpay.apiUrl}/rest/branch/coupon/scan`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        couponCode
       }
-    };
+    });
 
     if (couponResponse.code !== 0) {
       return res.status(400).json({
         message: 'Invalid coupon code'
       });
-      // throw new Error('Invalid coupon code');
-      // return next(new Error('Invalid coupon code'));
     }
 
     if (!couponResponse.result.isUsable) {
@@ -448,8 +431,6 @@ router.post('/gateway/monpay/coupon', async (req, res, next) => {
       message: 'Invalid coupon code'
     });
   }
-
-  // get coupon details
 });
 
 export default router;

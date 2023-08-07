@@ -8,7 +8,6 @@ import { SocialPayAPI } from './socialpay/api';
 import { StorePayAPI } from './storepay/api';
 import { WechatPayAPI } from './wechatpay/api';
 import { PocketAPI } from './pocket/api';
-import * as QRCode from 'qrcode';
 
 class ErxesPayment {
   public socialpay: SocialPayAPI;
