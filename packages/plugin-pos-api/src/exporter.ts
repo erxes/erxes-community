@@ -43,6 +43,7 @@ const prepareDataCount = async (
 };
 const getCustomFieldsData = async (item, fieldId) => {
   let value;
+
   if (item.customFieldsData && item.customFieldsData.length > 0) {
     for (const customFeild of item.customFieldsData) {
       if (customFeild.field === fieldId) {
@@ -52,12 +53,11 @@ const getCustomFieldsData = async (item, fieldId) => {
           value = value.join(', ');
         }
 
-        return {
-          value
-        };
+        return { value };
       }
     }
   }
+
   return { value };
 };
 
@@ -72,47 +72,61 @@ export const fillValue = async (
   switch (column) {
     case 'createdAt':
       value = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss');
-
+      break;
+    case 'branch':
+      const branches = await sendCoreMessage({
+        subdomain,
+        action: `branches.find`,
+        data: {
+          query: { _id: { $in: item.branchId || [] } }
+        },
+        isRPC: true,
+        defaultValue: []
+      });
+      value = branches.map(branch => branch.title).join(', ');
       break;
     case 'branchId':
       const branchId = await models.PosOrders.findOne({
         branchId: item.branchId
       }).lean();
-      value = branchId ? branchId.branchId : 'branchId not found';
+      value = branchId ? branchId : '';
       break;
     case 'departmentId':
-      const departmentId = await models.PosOrders.findOne({
-        departmentId: item.departmentId
-      }).lean();
-      value = departmentId
-        ? departmentId.departmentId
-        : 'departmentId not found';
+      const departments = await sendCoreMessage({
+        subdomain,
+        action: 'departments.find',
+        data: {
+          _id: { $in: item.departmentId || [] }
+        },
+        isRPC: true,
+        defaultValue: []
+      });
+      value = departments.map(department => department.title).join(', ');
       break;
     case 'customerId':
       const customerId = await models.PosOrders.findOne({
         customerId: item.customerId
       }).lean();
-      value = customerId ? customerId.customerId : 'customerId not found';
+      value = customerId ? customerId : '';
       break;
     case 'registerNumber':
       const registerNumber = await models.PosOrders.findOne({
         registerNumber: item.registerNumber
       }).lean();
-      value = registerNumber
-        ? registerNumber.registerNumber
-        : 'registerNumber not found';
+      value = registerNumber ? registerNumber : '';
+
       break;
     case 'totalAmount':
       const totalAmount = await models.PosOrders.findOne({
         totalAmount: item.totalAmount
       }).lean();
-      value = totalAmount ? totalAmount.totalAmount : 'totalAmount not found';
+      value = totalAmount ? totalAmount : '';
       break;
     case 'number':
       const number = await models.PosOrders.findOne({
         number: item.number
       }).lean();
-      value = number ? number.number : 'number not found';
+      value = number ? number : '';
       break;
     case 'userId':
       const createdUser: IUserDocument | null = await sendCoreMessage({
@@ -131,21 +145,19 @@ export const fillValue = async (
       const convertDealId = await models.PosOrders.findOne({
         convertDealId: item.convertDealId
       }).lean();
-      value = convertDealId
-        ? convertDealId.convertDealId
-        : 'convertDealId not found';
+      value = convertDealId ? convertDealId : '';
       break;
     case 'billId':
       const billId = await models.PosOrders.findOne({
         billId: item.billId
       }).lean();
-      value = billId ? billId.billId : 'billId not found';
+      value = billId ? billId : '';
       break;
     default:
       break;
   }
 
-  return value || '-';
+  return value || '';
 };
 
 const filposOrderValue = async (subdomain, column, item) => {
@@ -158,14 +170,12 @@ const filposOrderValue = async (subdomain, column, item) => {
     let value;
     const result = {};
     switch (column) {
-      case 'items.createdAt':
-        value = moment(itemData.createdAt).format('YYYY-MM-DD HH:mm:ss');
-        break;
       case 'items.discountPercent':
-        value = itemData.discountPercent;
+        value = parseInt(itemData.discountPercent);
         break;
-      case 'count':
-        value = itemData.count;
+      case 'items.count':
+        value = parseInt(itemData.count);
+
         break;
       case 'items.productId':
         product =
@@ -179,19 +189,23 @@ const filposOrderValue = async (subdomain, column, item) => {
           })) || {};
         value = product.name;
       case 'items.unitPrice':
-        value = itemData.unitPrice;
+        value = parseInt(itemData.unitPrice);
+
         break;
       case 'items.orderId':
         value = itemData.orderId;
         break;
       case 'items.bonusCount':
-        value = itemData.bonusCount;
+        value = parseInt(itemData.bonusCount);
         break;
       case 'items.bonusVoucherId':
         value = itemData.bonusVoucherId;
+        value = value ? undefined : 0;
+
         break;
       case 'items.discountAmount':
-        value = itemData.discountAmount;
+        value = parseInt(itemData.discountAmount);
+
         break;
     }
 
@@ -213,7 +227,6 @@ export const IMPORT_EXPORT_TYPES = [
 
 export default {
   importExportTypes: IMPORT_EXPORT_TYPES,
-
   prepareExportData: async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
@@ -243,6 +256,8 @@ export default {
           });
 
           headers.push(`customFieldsData.${field.text}.${fieldId}`);
+        } else if (column.startsWith('items')) {
+          headers.push(column);
         } else {
           headers.push(column);
         }
@@ -306,7 +321,7 @@ export default {
 
             const { value } = await getCustomFieldsData(item, fieldId);
 
-            result[fieldName] = value || '-';
+            result[fieldName] = value || '';
           } else if (column.startsWith('items')) {
             const productItem = await filposOrderValue(subdomain, column, item);
 
@@ -314,7 +329,7 @@ export default {
           } else {
             const value = await fillValue(models, subdomain, column, item);
 
-            result[column] = value || '-';
+            result[column] = value || '';
           }
         }
 
