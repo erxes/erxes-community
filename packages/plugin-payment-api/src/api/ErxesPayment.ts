@@ -48,8 +48,6 @@ class ErxesPayment {
       invoice.amount = amount > 0 ? amount : 0;
     }
 
-    console.log('invoice', invoice);
-
     try {
       return await api.createInvoice(invoice, payment);
     } catch (e) {
