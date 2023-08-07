@@ -6,6 +6,7 @@ import { generateModels } from './connectionResolver';
 import redisUtils from './redisUtils';
 import { PAYMENTS } from './api/constants';
 import { StorePayAPI } from './api/storepay/api';
+import { sendRequest } from '@erxes/api-utils/src';
 
 const router = Router();
 
@@ -188,11 +189,17 @@ router.get('/gateway', async (req, res) => {
     });
   }
 
+  const monpayCouponEnabled: boolean =
+    process.env.MONPAY_COUPON_USERNAME && process.env.MONPAY_COUPON_PASSWORD
+      ? true
+      : false;
+
   res.render('index', {
     title: 'Payment gateway',
     payments,
     invoiceData: data,
-    prefix: subdomain === 'localhost' ? '' : `/gateway`
+    prefix: subdomain === 'localhost' ? '' : `/gateway`,
+    monpayCouponEnabled
   });
 });
 
@@ -330,6 +337,119 @@ router.post('/gateway', async (req, res, next) => {
       prefix
     });
   }
+});
+
+router.post('/gateway/monpay/coupon', async (req, res, next) => {
+  // const body = {
+  // selectedPaymentId: payment._id,
+  // invoiceData: invoice,
+  // paymentKind: payment.kind,
+  // couponCode: document.getElementById('coupon-input').value,
+  // };
+
+  const { selectedPaymentId, invoiceData, paymentKind, couponCode } = req.body;
+
+  const subdomain = getSubdomain(req);
+  const models = await generateModels(subdomain);
+
+  // login to monpay and get token
+  const username = process.env.MONPAY_COUPON_USERNAME;
+  const password = process.env.MONPAY_COUPON_PASSWORD;
+
+  const loginResponse = await sendRequest({
+    url: `${PAYMENTS.monpay.apiUrl}/rest/branch/login`,
+    method: 'POST',
+    body: {
+      username,
+      password
+    },
+
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (loginResponse.code !== 0) {
+    return res.status(400).json({
+      message: 'Invalid credentials'
+    });
+  }
+
+  const token = loginResponse.result.token;
+
+  try {
+    // let couponResponse = await sendRequest({
+    //   url: `${PAYMENTS.monpay.apiUrl}/rest/branch/coupon/scan`,
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    //   params: {
+    //     couponCode,
+    //   },
+    // });
+
+    const couponResponse = {
+      code: 0,
+      info: 'Successful',
+      result: {
+        couponCategory: 'GEGEENTEN',
+        couponCode: ' GC001',
+        couponEndDate: 1577774451000,
+        userPhone: '99908855',
+        userEmail: 'bayasaa217@gmail.com',
+        isUsable: true,
+        description: 'COUPON IS AVAILABLE',
+        couponAmount: 50
+      }
+    };
+
+    if (couponResponse.code !== 0) {
+      return res.status(400).json({
+        message: 'Invalid coupon code'
+      });
+      // throw new Error('Invalid coupon code');
+      // return next(new Error('Invalid coupon code'));
+    }
+
+    if (!couponResponse.result.isUsable) {
+      return res.status(400).json({
+        message: 'Coupon is not usable'
+      });
+    }
+
+    const invoice = await models.Invoices.findOne({
+      _id: invoiceData._id
+    }).lean();
+
+    if (!invoice) {
+      return res.status(400).json({
+        message: 'Invoice not found'
+      });
+    }
+
+    if (invoice.status === 'paid') {
+      return res.status(400).json({
+        message: 'Invoice already paid'
+      });
+    }
+
+    await models.Invoices.updateOne(
+      { _id: invoice._id },
+      { $set: { couponCode: '11111test', couponAmount: 100 } }
+    );
+
+    return res.json({
+      invoice: await models.Invoices.findOne({ _id: invoice._id })
+    });
+  } catch (e) {
+    return res.status(400).json({
+      message: 'Invalid coupon code'
+    });
+  }
+
+  // get coupon details
 });
 
 export default router;

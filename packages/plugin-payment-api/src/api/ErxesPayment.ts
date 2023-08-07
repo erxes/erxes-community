@@ -43,6 +43,14 @@ class ErxesPayment {
 
     const api = this[payment.kind];
 
+    if (invoice.couponAmount) {
+      const amount = invoice.amount - invoice.couponAmount;
+
+      invoice.amount = amount > 0 ? amount : 0;
+    }
+
+    console.log('invoice', invoice);
+
     try {
       return await api.createInvoice(invoice, payment);
     } catch (e) {

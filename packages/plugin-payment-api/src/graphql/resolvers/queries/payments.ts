@@ -95,22 +95,22 @@ const queries = {
     return counts;
   },
 
-  async paymentsCheckMonpayCoupon(
-    _root,
-    args: {
-      paymentId: string;
-      couponCode: string;
-    },
-    { models }: IContext
-  ) {
-    const { paymentId, couponCode } = args;
+  // async paymentsCheckMonpayCoupon(
+  //   _root,
+  //   args: {
+  //     paymentId: string;
+  //     couponCode: string;
+  //   },
+  //   { models }: IContext
+  // ) {
+  //   const { paymentId, couponCode } = args;
 
-    const config = await models.Payments.getPayment(paymentId);
+  //   const config = await models.Payments.getPayment(paymentId);
 
-    const api = new MonpayAPI(config.config);
+  //   const api = new MonpayAPI(config.config);
 
-    return api.couponCheck(couponCode);
-  },
+  //   return api.couponCheck(couponCode);
+  // },
 
   async qpayGetMerchant(_root, args, { models }: IContext) {
     const api = new QPayQuickQrAPI({
