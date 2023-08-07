@@ -340,14 +340,7 @@ router.post('/gateway', async (req, res, next) => {
 });
 
 router.post('/gateway/monpay/coupon', async (req, res, next) => {
-  // const body = {
-  // selectedPaymentId: payment._id,
-  // invoiceData: invoice,
-  // paymentKind: payment.kind,
-  // couponCode: document.getElementById('coupon-input').value,
-  // };
-
-  const { selectedPaymentId, invoiceData, paymentKind, couponCode } = req.body;
+  const { invoiceData, couponCode } = req.body;
 
   const subdomain = getSubdomain(req);
   const models = await generateModels(subdomain);
@@ -420,7 +413,7 @@ router.post('/gateway/monpay/coupon', async (req, res, next) => {
 
     await models.Invoices.updateOne(
       { _id: invoice._id },
-      { $set: { couponCode: '11111test', couponAmount: 100 } }
+      { $set: { couponCode, couponAmount: couponResponse.result.couponAmount } }
     );
 
     return res.json({
