@@ -188,8 +188,6 @@ export class MonpayAPI extends BaseAPI {
           return { error: 'Coupon is not valid' };
         }
 
-        console.log('SCAN res ', res);
-
         //   {
         //     "code": 0,
         //     "info": "Амжилттай",
