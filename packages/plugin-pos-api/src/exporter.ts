@@ -166,6 +166,8 @@ const filposOrderValue = async (subdomain, column, item) => {
   const productDocs: any[] = [];
 
   for (const itemData of items) {
+    console.log(itemData, 'asdioasdjioasdj');
+    console.log(items, 'asdopaksdpoaksopdkopaskdaopsk');
     let product;
     let value;
     const result = {};
