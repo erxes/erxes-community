@@ -5,21 +5,21 @@ import {
   Row,
   SingleEvent,
   TabContent,
-  WidgetChatWrapper,
-} from "../styles";
-import { MainContainer, SideContainer } from "../../layout/styles";
-import React, { useState } from "react";
-import { TabTitle, Tabs } from "../../common/tabs";
+  WidgetChatWrapper
+} from '../styles';
+import { MainContainer, SideContainer } from '../../layout/styles';
+import React, { useState } from 'react';
+import { TabTitle, Tabs } from '../../common/tabs';
 
-import ChatList from "../containers/chat/ChatList";
-import Form from "../containers/feed/Form";
-import { IUser } from "../../auth/types";
-import Icon from "../../common/Icon";
-import List from "../containers/feed/List";
-import ThankForm from "../containers/feed/ThankForm";
-import ThankList from "../containers/feed/ThankList";
-import { Wrapper } from "../../layout";
-import { __ } from "../../../utils";
+import ChatList from '../containers/chat/ChatList';
+import Form from '../containers/feed/Form';
+import { IUser } from '../../auth/types';
+import Icon from '../../common/Icon';
+import List from '../containers/feed/List';
+import ThankForm from '../containers/feed/ThankForm';
+import ThankList from '../containers/feed/ThankList';
+import { Wrapper } from '../../layout';
+import { __ } from '../../../utils';
 import WidgetChatWindow from '../containers/chat/WidgetChatWindow';
 
 type Props = {
@@ -30,19 +30,19 @@ type Props = {
 const LOCALSTORAGE_KEY = 'erxes_active_chats';
 
 export default function Home(props: Props) {
-  const [currentTab, setCurrentTab] = useState("post");
+  const [currentTab, setCurrentTab] = useState('post');
   const { queryParams, currentUser } = props;
   const [activeChatIds, setActiveChatIds] = useState<any[]>(
     JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]')
   );
-  
+
   const onClickTab = (type: string) => {
     setCurrentTab(type);
   };
 
   const handleActive = (_chatId: string) => {
     if (checkActive(_chatId)) {
-      updateActive(activeChatIds.filter(c => c !== _chatId));
+      updateActive(activeChatIds.filter((c) => c !== _chatId));
     } else {
       updateActive([...activeChatIds, _chatId]);
     }
@@ -59,11 +59,19 @@ export default function Home(props: Props) {
   };
 
   const renderTabContent = () => {
-    if (currentTab === "thankyou") {
+    if (currentTab === 'thankyou') {
       return (
         <>
           <ThankForm queryParams={queryParams} />
           <ThankList queryParams={queryParams} />
+        </>
+      );
+    }
+
+    if (currentTab === 'welcome') {
+      return (
+        <>
+          <List queryParams={queryParams} contentType={currentTab} />
         </>
       );
     }
@@ -80,7 +88,7 @@ export default function Home(props: Props) {
     return (
       <>
         <Card>
-          <label>{__("Today`s events")}</label>
+          <label>{__('Today`s events')}</label>
           <SingleEvent>
             <div className="image-wrapper">
               <img src="/static/event.jpg" alt="event-img" />
@@ -92,7 +100,7 @@ export default function Home(props: Props) {
           </SingleEvent>
         </Card>
         <Card>
-          <label>{__("Birthdays")}</label>
+          <label>{__('Birthdays')}</label>
           <SingleEvent>
             <Icon icon="gift" size={30} />
             <div>
@@ -101,68 +109,79 @@ export default function Home(props: Props) {
           </SingleEvent>
         </Card>
         <Card>
-          <ChatList handleActive={_chatId => handleActive(_chatId)} currentUser={props.currentUser} />
+          <ChatList
+            handleActive={(_chatId) => handleActive(_chatId)}
+            currentUser={props.currentUser}
+          />
         </Card>
       </>
     );
   };
 
   const renderContent = () => {
-    return (<>
-      <FeedLayout>
-        <Row>
-          <MainContainer>
-            <OverflowWrapper>
-              <Tabs full={true}>
-                <TabTitle
-                  className={currentTab === "post" ? "active" : ""}
-                  onClick={() => onClickTab("post")}
-                >
-                  Post
-                </TabTitle>
-                <TabTitle
-                  className={currentTab === "event" ? "active" : ""}
-                  onClick={() => onClickTab("event")}
-                >
-                  Event
-                </TabTitle>
-                <TabTitle
-                  className={currentTab === "bravo" ? "active" : ""}
-                  onClick={() => onClickTab("bravo")}
-                >
-                  Bravo
-                </TabTitle>
-                <TabTitle
-                  className={currentTab === "publicHoliday" ? "active" : ""}
-                  onClick={() => onClickTab("publicHoliday")}
-                >
-                  Public holiday
-                </TabTitle>
-              </Tabs>
-              <TabContent>{renderTabContent()}</TabContent>
-            </OverflowWrapper>
-          </MainContainer>
-          <SideContainer>
-            <OverflowWrapper>{renderRightSidebar()}</OverflowWrapper>
-          </SideContainer>
-        </Row>
-      </FeedLayout>
-      <WidgetChatWrapper>
-        {activeChatIds.map(c => (
-          <WidgetChatWindow
-            key={c._id}
-            chatId={c}
-            handleActive={handleActive}
-            currentUser={currentUser}
-          />
-        ))}
-      </WidgetChatWrapper>
-    </>);
+    return (
+      <>
+        <FeedLayout>
+          <Row>
+            <MainContainer>
+              <OverflowWrapper>
+                <Tabs full={true}>
+                  <TabTitle
+                    className={currentTab === 'post' ? 'active' : ''}
+                    onClick={() => onClickTab('post')}
+                  >
+                    Post
+                  </TabTitle>
+                  <TabTitle
+                    className={currentTab === 'event' ? 'active' : ''}
+                    onClick={() => onClickTab('event')}
+                  >
+                    Event
+                  </TabTitle>
+                  <TabTitle
+                    className={currentTab === 'bravo' ? 'active' : ''}
+                    onClick={() => onClickTab('bravo')}
+                  >
+                    Bravo
+                  </TabTitle>
+                  <TabTitle
+                    className={currentTab === 'publicHoliday' ? 'active' : ''}
+                    onClick={() => onClickTab('publicHoliday')}
+                  >
+                    Public holiday
+                  </TabTitle>
+                  <TabTitle
+                    className={currentTab === 'welcome' ? 'active' : ''}
+                    onClick={() => onClickTab('welcome')}
+                  >
+                    Welcome
+                  </TabTitle>
+                </Tabs>
+                <TabContent>{renderTabContent()}</TabContent>
+              </OverflowWrapper>
+            </MainContainer>
+            <SideContainer>
+              <OverflowWrapper>{renderRightSidebar()}</OverflowWrapper>
+            </SideContainer>
+          </Row>
+        </FeedLayout>
+        <WidgetChatWrapper>
+          {activeChatIds.map((c) => (
+            <WidgetChatWindow
+              key={c._id}
+              chatId={c}
+              handleActive={handleActive}
+              currentUser={currentUser}
+            />
+          ))}
+        </WidgetChatWrapper>
+      </>
+    );
   };
 
   return (
     <Wrapper
-      header={<Wrapper.Header title={"Feed"} />}
+      header={<Wrapper.Header title={'Feed'} />}
       content={renderContent()}
       transparent={true}
       initialOverflow={true}

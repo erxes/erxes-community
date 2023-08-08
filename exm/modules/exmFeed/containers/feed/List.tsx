@@ -1,12 +1,13 @@
-import { mutations, queries } from "../../graphql";
-import { useMutation, useQuery } from "@apollo/client";
+import { mutations, queries } from '../../graphql';
+import { useMutation, useQuery } from '@apollo/client';
 
-import Alert from "../../../utils/Alert";
-import List from "../../components/feed/List";
-import React from "react";
-import Spinner from "../../../common/Spinner";
-import { confirm } from "../../../utils";
-import gql from "graphql-tag";
+import Alert from '../../../utils/Alert';
+import List from '../../components/feed/List';
+import WelcomeList from '../../components/feed/WelcomeList';
+import React from 'react';
+import Spinner from '../../../common/Spinner';
+import { confirm } from '../../../utils';
+import gql from 'graphql-tag';
 
 type Props = {
   queryParams: any;
@@ -22,8 +23,8 @@ export default function ListContainer(props: Props) {
   const feedResponse = useQuery(gql(queries.feed), {
     variables: {
       limit,
-      contentTypes: [contentType || "post"],
-    },
+      contentTypes: [contentType || 'post']
+    }
   });
 
   const [deleteMutation] = useMutation(gql(mutations.deleteFeed));
@@ -36,7 +37,7 @@ export default function ListContainer(props: Props) {
   const pinItem = (_id: string) => {
     pinMutation({ variables: { _id } })
       .then(() => {
-        Alert.success("Success!");
+        Alert.success('Success!');
 
         feedResponse.refetch();
       })
@@ -49,7 +50,7 @@ export default function ListContainer(props: Props) {
     confirm().then(() => {
       deleteMutation({ variables: { _id } })
         .then(() => {
-          Alert.success("You successfully deleted.");
+          Alert.success('You successfully deleted.');
 
           feedResponse.refetch();
         })
@@ -60,6 +61,10 @@ export default function ListContainer(props: Props) {
   };
 
   const { list, totalCount } = feedResponse.data?.exmFeed || {};
+
+  if (contentType === 'welcome') {
+    return <WelcomeList list={list} totalCount={totalCount} limit={limit} />;
+  }
 
   return (
     <List

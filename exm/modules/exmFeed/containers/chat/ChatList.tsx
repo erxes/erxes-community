@@ -1,8 +1,8 @@
-import ChatList from "../../components/chat/ChatList";
-import { IUser } from "../../../auth/types";
-import gql from "graphql-tag";
-import { queries } from "../../graphql";
-import { useQuery } from "@apollo/client";
+import ChatList from '../../components/chat/ChatList';
+import { IUser } from '../../../auth/types';
+import gql from 'graphql-tag';
+import { queries } from '../../graphql';
+import { useQuery } from '@apollo/client';
 
 type Props = {
   currentUser: IUser;
@@ -19,7 +19,7 @@ const ChatListContainer = (props: Props) => {
   }
 
   const users = usersQuery
-    ? usersQuery.data.users.filter((u) => u._id !== currentUser._id)
+    ? usersQuery.data?.users.filter((u) => u._id !== currentUser._id)
     : [];
 
   return (
