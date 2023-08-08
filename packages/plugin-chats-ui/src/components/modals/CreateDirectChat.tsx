@@ -19,7 +19,7 @@ const CreateDirectChat = (props: Props) => {
 
   const handleSubmit = () => {
     router.removeParams(history, 'id', 'userIds');
-    router.setParams(history, { userId: userId });
+    router.setParams(history, { userId });
 
     setUserId('');
     props.closeModal();
@@ -27,7 +27,7 @@ const CreateDirectChat = (props: Props) => {
 
   return (
     <>
-      <h3>Direct chat</h3>
+      {/* <h3>Direct chat</h3> */}
       <SelectTeamMembers
         label={'Choose team member'}
         name="assignedUserId"

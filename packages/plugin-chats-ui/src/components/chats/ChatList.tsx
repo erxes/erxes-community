@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 // erxes
 import FormControl from '@erxes/ui/src/components/form/Control';
+import Button from '@erxes/ui/src/components/Button';
+import Icon from '@erxes/ui/src/components/Icon';
 import { IUser } from '@erxes/ui/src/auth/types';
 // local
 import ChatItem from '../../containers/chats/ChatItem';
-import { Title, ChatListSearch, ChatListWrapper } from '../../styles';
+import {
+  Title,
+  ChatListSearch,
+  ChatListWrapper,
+  ChatWidgetHeader,
+  ChatWidgetHeaderIcons
+} from '../../styles';
 import LoadMore from '@erxes/ui/src/components/LoadMore';
+import { Link } from 'react-router-dom';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
+import CreateGroupChat from '../../containers/modals/CreateGroupChat';
 
 type Props = {
   chats: any[];
@@ -146,6 +157,28 @@ const ChatList = (props: Props) => {
 
   return (
     <React.Fragment>
+      {isWidget && (
+        <ChatWidgetHeader>
+          <h3>Chats</h3>
+          <ChatWidgetHeaderIcons>
+            <Link to="/erxes-plugin-chat">
+              <Icon size={18} icon="expand-arrows-alt" />
+            </Link>
+            <ModalTrigger
+              title="Create chat"
+              trigger={
+                // <IconButton>
+                <Icon icon="pencil" size={18} />
+                // </IconButton>
+              }
+              content={prop => <CreateGroupChat {...prop} />}
+              // hideHeader={true}
+              isAnimate={true}
+            />
+            {/* <Button icon="pencil" /> */}
+          </ChatWidgetHeaderIcons>
+        </ChatWidgetHeader>
+      )}
       <ChatListSearch>
         <FormControl
           type="text"

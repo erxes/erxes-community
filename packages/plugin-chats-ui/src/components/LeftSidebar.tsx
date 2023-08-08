@@ -20,26 +20,15 @@ const LeftSidebar = (props: Props) => {
     return (
       <div>
         <ModalTrigger
-          title="Compose"
+          title="Create chat"
           trigger={
             <IconButton>
               <Icon icon="pencil" size={12} />
             </IconButton>
           }
-          content={props => <CreateDirectChat {...props} />}
-          hideHeader
-          isAnimate
-        />
-        <ModalTrigger
-          title="Create a group chat"
-          trigger={
-            <IconButton>
-              <Icon icon="users" size={12} />
-            </IconButton>
-          }
           content={props => <CreateGroupChat {...props} />}
-          hideHeader
-          isAnimate
+          // hideHeader={true}
+          isAnimate={true}
         />
       </div>
     );

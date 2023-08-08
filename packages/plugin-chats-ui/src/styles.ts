@@ -228,6 +228,33 @@ export const WidgetChatWindowHeader = styled.div`
     }
   }
 `;
+export const ChatWidgetHeader = styled.div`
+  padding: 0 ${dimensions.coreSpacing}px;
+  margin-bottom: ${dimensions.coreSpacing}px;
+  display: flex;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+  }
+`;
+export const ChatWidgetHeaderIcons = styled.div`
+  display: flex;
+
+  a {
+    color: #444;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background: #dcdcdc8c;
+      border-radius: 50%;
+    }
+  }
+`;
 /**
  * Widget - END
  */
@@ -276,12 +303,21 @@ export const ChatItemWrapper = styledTS<{
       props.isWidget && `1px solid ${colors.borderPrimary}`};
   }
 
+  .options {
+    display: none;
+  }
+
   &:hover {
     background-color: ${props =>
       props.isWidget ? colors.bgLight : colors.bgGray};
     cursor: pointer;
     transition: 0.2s;
+
+    .options {
+      display: inline;
+    }
   }
+
   z-index: 0
 `;
 

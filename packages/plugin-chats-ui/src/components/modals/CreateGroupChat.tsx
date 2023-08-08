@@ -23,13 +23,19 @@ const CreateGroupChat = (props: Props) => {
   const [name, setName] = useState('');
 
   const handleSubmit = () => {
-    props.startGroupChat(name, userIds);
-    router.removeParams(history, 'userIds');
-    router.removeParams(history, 'limit');
-    props.closeModal();
+    if (userIds.length === 1) {
+      router.removeParams(history, 'id', 'userIds');
+      router.setParams(history, { userId: userIds });
+      setUserIds([]);
+    } else {
+      props.startGroupChat(name, userIds);
+      router.removeParams(history, 'userIds');
+      router.removeParams(history, 'limit');
+      props.closeModal();
 
-    setUserIds([]);
-    setName('');
+      setUserIds([]);
+      setName('');
+    }
   };
 
   const handleUserChange = _userIds => {
@@ -38,19 +44,20 @@ const CreateGroupChat = (props: Props) => {
 
   return (
     <>
-      <h3>Create a group chat</h3>
-      <FormControl
-        placeholder="Name"
-        value={name}
-        onChange={(e: any) => setName(e.target.value)}
-      />
-      <br />
       <SelectTeamMembers
         label={'Choose team member'}
         name="assignedUserIds"
         initialValue={userIds}
         onSelect={handleUserChange}
       />
+      <br />
+      {userIds.length > 1 && (
+        <FormControl
+          placeholder="Name"
+          value={name}
+          onChange={(e: any) => setName(e.target.value)}
+        />
+      )}
       <br />
       <Button style={{ float: 'right' }} onClick={handleSubmit}>
         Create

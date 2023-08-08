@@ -135,7 +135,7 @@ const ChatItem = (props: FinalProps) => {
           </ChatTimestamp>
         </ChatBody>
       </ChatWrapper>
-      <ChatActions innerRef={actionsRef}>
+      <ChatActions innerRef={actionsRef} className="options">
         <OverlayTrigger
           trigger="click"
           rootClose={true}
