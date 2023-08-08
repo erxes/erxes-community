@@ -13,5 +13,6 @@ export const options = [
   { value: 'event', label: 'Event' },
   { value: 'bravo', label: 'Bravo' },
   { value: 'publicHoliday', label: 'Public holiday' },
+  { value: 'welcome', label: 'Welcome' },
   { value: '', label: 'All' }
 ];
