@@ -146,6 +146,7 @@ export default function List({
                 height="390"
                 src={String(link)
                   .replace('watch?v=', 'embed/')
+                  .replace('youtu.be/', 'youtube.com/embed/')
                   .replace('share/', 'embed/')}
                 title="Video"
                 frameBorder="0"
