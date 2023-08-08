@@ -36,7 +36,6 @@ const listParamsDef = `
   $departmentIds: [String]
   $reportType: String
   $scheduleStatus: String
-  $isCurrentUserAdmin: Boolean
 `;
 
 const listParamsValue = `
@@ -49,7 +48,6 @@ const listParamsValue = `
   departmentIds: $departmentIds
   reportType: $reportType
   scheduleStatus: $scheduleStatus
-  isCurrentUserAdmin: $isCurrentUserAdmin
 `;
 
 const timelogsMain = `
@@ -83,10 +81,6 @@ const timeclocksMain = `
             employeeId
             deviceName
             deviceType
-            inDevice
-            inDeviceType  
-            outDevice
-            outDeviceType
         }
         totalCount
     }
@@ -116,7 +110,6 @@ const schedulesMain = `
             solved
             status
             scheduleConfigId
-            lunchBreakInMins
           }
           scheduleConfigId
           solved
@@ -212,12 +205,7 @@ const timeclockReports = `
             
                 deviceName
                 deviceType
-                
-                inDevice
-                inDeviceType
-                outDevice
-                outDeviceType
-
+            
                 scheduledStart
                 scheduledEnd
                 scheduledDuration
@@ -228,10 +216,6 @@ const timeclockReports = `
                 totalHoursOvertime
                 totalHoursOvernight
               }
-
-              branchTitles
-              departmentTitles
-              
               totalMinsLate
               totalAbsenceMins
               totalMinsWorked
@@ -239,19 +223,18 @@ const timeclockReports = `
 
               totalRegularHoursWorked
               totalHoursWorked
+              totalMinsWorkedThisMonth
               totalDaysWorked
 
               totalHoursOvertime
               totalHoursOvernight
+              totalHoursBreak
             
-              totalHoursBreakScheduled
-              totalHoursBreakTaken
-            
+              totalMinsScheduledThisMonth
               totalDaysScheduled
               totalHoursScheduled
           
               absenceInfo {
-                totalHoursShiftRequest
                 totalHoursWorkedAbroad
                 totalHoursPaidAbsence
                 totalHoursUnpaidAbsence
@@ -323,23 +306,28 @@ const scheduleConfigs = `
 
 `;
 
-const timeclockBranches = `
-query timeclockBranches($searchValue: String){
-  timeclockBranches(searchValue: $searchValue){
-    _id
-    title
-    userIds
+const deviceConfigs = `
+query deviceConfigs (${listParamsDef}){
+  deviceConfigs(${listParamsValue}) {
+    list {
+      _id 
+      deviceName
+      serialNo
+      extractRequired
+    }
+    totalCount
   }
 }`;
 
-const timeclockDepartments = `
-query timeclockDepartments($searchValue: String){
-  timeclockDepartments(searchValue: $searchValue){
-    _id
-    title
-    userIds
+const timeLogsPerUser = `
+  query timeLogsPerUser($userId: String, $startDate: String, $endDate: String){
+    timeLogsPerUser(userId: $userId, startDate: $startDate, endDate: $endDate){
+      _id
+      timelog
+      deviceSerialNo
+    }
   }
-}`;
+`;
 
 export default {
   timeclockReports,
@@ -349,6 +337,7 @@ export default {
   timeclocksPerUser,
 
   timelogsMain,
+  timeLogsPerUser,
 
   schedulesMain,
   requestsMain,
@@ -359,7 +348,5 @@ export default {
   holidays,
 
   scheduleConfigs,
-
-  timeclockBranches,
-  timeclockDepartments
+  deviceConfigs
 };

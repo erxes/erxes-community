@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from 'react-apollo';
 import { Alert, withProps, confirm } from '@erxes/ui/src/utils';
 import List from '../../components/timeclock/TimeclockList';
 import {
@@ -12,19 +12,12 @@ import { queries } from '../../graphql';
 import React, { useState } from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { mutations } from '../../graphql';
+import dayjs from 'dayjs';
 import { generateParams } from '../../utils';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { IDepartment, IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
-  currentUser: IUser;
-  departments: IDepartment[];
-  branches: IBranch[];
-
   queryParams: any;
   history: any;
-  isCurrentUserAdmin: boolean;
-
   timeclockUser?: string;
 
   timeclockId?: string;
@@ -40,7 +33,11 @@ type FinalProps = {
   TimeClockMutationResponse;
 
 const ListContainer = (props: FinalProps) => {
-  const { timeclocksMainQuery, timeclockRemove } = props;
+  const {
+    timeclocksMainQuery,
+    extractAllMsSqlDataMutation,
+    timeclockRemove
+  } = props;
 
   const dateFormat = 'YYYY-MM-DD';
   const [loading, setLoading] = useState(false);
@@ -57,6 +54,25 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
+  const extractAllMsSqlData = (start: Date, end: Date) => {
+    setLoading(true);
+    extractAllMsSqlDataMutation({
+      variables: {
+        startDate: dayjs(start).format(dateFormat),
+        endDate: dayjs(end).format(dateFormat)
+      }
+    })
+      .then(() => {
+        setLoading(false);
+        timeclocksMainQuery.refetch();
+        Alert.success('Successfully extracted data');
+      })
+      .catch(e => {
+        setLoading(false);
+        Alert.error(e.message);
+      });
+  };
+
   const { list = [], totalCount = 0 } =
     timeclocksMainQuery.timeclocksMain || {};
 
@@ -65,7 +81,8 @@ const ListContainer = (props: FinalProps) => {
     totalCount,
     timeclocks: list,
     loading: timeclocksMainQuery.loading || loading,
-    removeTimeclock
+    removeTimeclock,
+    extractAllMsSqlData
   };
 
   return <List {...updatedProps} />;
@@ -75,11 +92,17 @@ export default withProps<Props>(
   compose(
     graphql<Props, TimeClockQueryResponse>(gql(queries.timeclocksMain), {
       name: 'timeclocksMainQuery',
-      options: ({ queryParams, isCurrentUserAdmin }) => ({
-        variables: { ...generateParams(queryParams), isCurrentUserAdmin },
+      options: ({ queryParams }) => ({
+        variables: generateParams(queryParams),
         fetchPolicy: 'network-only'
       })
     }),
+    graphql<Props, TimeClockMutationResponse>(
+      gql(mutations.extractAllDataFromMsSQL),
+      {
+        name: 'extractAllMsSqlDataMutation'
+      }
+    ),
     graphql<Props, TimeClockMutationResponse>(gql(mutations.timeclockRemove), {
       name: 'timeclockRemove',
       options: ({ timeclockId }) => ({

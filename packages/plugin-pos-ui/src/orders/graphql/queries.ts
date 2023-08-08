@@ -16,6 +16,7 @@ const listParamsDef = `
   $customerId: String
   $customerType: String
   $posId: String
+  $types: [String]
 `;
 
 const listParamsValue = `
@@ -33,6 +34,7 @@ const listParamsValue = `
   customerId: $customerId
   customerType: $customerType
   posId: $posId
+  types: $types
 `;
 
 export const orderFields = `
@@ -58,6 +60,10 @@ export const orderFields = `
   userId
   items
   posToken
+  branchId
+  departmentId
+  branch
+  department
 
   syncedErkhet
 
@@ -67,6 +73,7 @@ export const orderFields = `
     _id
     email
   }
+  convertDealId
 `;
 
 const posOrders = `
@@ -104,6 +111,8 @@ const posOrderDetail = `
       syncErkhetInfo
       putResponses
       deliveryInfo
+      deal
+      dealLink
     }
   }
 `;
@@ -222,6 +231,22 @@ const coverDetail = `
   }
 `;
 
+const posOrderRecords = `
+  query posOrderRecords(${listParamsDef}) {
+    posOrderRecords(${listParamsValue}) {
+      ${orderFields}
+      customer {
+        _id
+        code
+        primaryPhone
+        firstName
+        primaryEmail
+        lastName
+      }
+    }
+  }
+`;
+
 export default {
   posOrders,
   posOrdersSummary,
@@ -229,5 +254,6 @@ export default {
   posProducts,
   productCategories,
   covers,
-  coverDetail
+  coverDetail,
+  posOrderRecords
 };

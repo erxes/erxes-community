@@ -27,7 +27,6 @@ export const types = `
   type PoscProduct {
     ${commonFieldDefs}
     type: String
-    sku: String
     barcodes: [String]
     barcodeDescription: String
     unitPrice: Float
@@ -38,13 +37,10 @@ export const types = `
     tagIds: [String]
     vendorId: String
     attachmentMore: [Attachment]
-    supply: String
-    productCount: Int
-    minimiumCount: Int
-    uomId: String
+    uom: String
     subUoms: JSON
     category: PosProductCategory
-    remainder: Int
+    remainder: Float
     remainders: [JSON]
   }
 `;

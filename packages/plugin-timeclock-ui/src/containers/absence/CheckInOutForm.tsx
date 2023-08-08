@@ -7,8 +7,8 @@ import {
 } from '../../types';
 import { Alert, withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
-import { graphql } from '@apollo/client/react/hoc';
-import { gql } from '@apollo/client';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import { mutations, queries } from '../../graphql';
 import CheckInOutForm from '../../components/absence/CheckInOutForm';
 import React from 'react';
@@ -77,6 +77,7 @@ const ListContainer = (props: FinalProps) => {
     createTimeclock,
     editTimeclock,
     solveAbsence,
+    timelogsPerUser: listTimeLogsPerUser.timeLogsPerUser || [],
     timeclocksPerUser: listTimeclocksPerUser.timeclocksPerUser || []
   };
 
@@ -93,15 +94,28 @@ export default withProps<Props>(
       })
     }),
 
+    graphql<Props, TimeClockQueryResponse>(gql(queries.timeLogsPerUser), {
+      name: 'listTimeLogsPerUser',
+      options: ({ userId, startDate, endDate }) => ({
+        variables: { userId, startDate, endDate },
+        fetchPolicy: 'network-only'
+      })
+    }),
+
     graphql<Props, TimeClockQueryResponse>(gql(mutations.timeclockEdit), {
       name: 'timeclockEditMutation',
-      options: () => ({
+      options: ({ timeclockId, shiftStart, shiftEnd, shiftActive }) => ({
+        variables: { _id: timeclockId, shiftStart, shiftEnd, shiftActive },
         refetchQueries: ['timeclocksMain']
       })
     }),
 
     graphql<Props, TimeClockQueryResponse>(gql(mutations.timeclockCreate), {
-      name: 'timeclockCreateMutation'
+      name: 'timeclockCreateMutation',
+      options: ({ userId, shiftStart, shiftEnd, shiftActive }) => ({
+        variables: { userId, shiftStart, shiftEnd, shiftActive },
+        refetchQueries: ['timeclocksMain']
+      })
     }),
 
     graphql<Props, AbsenceMutationResponse>(

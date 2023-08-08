@@ -23,6 +23,11 @@ export type IOrder = {
   oldBillId: string;
   type: string;
   userId: string;
+  branchId: string;
+  departmentId: string;
+
+  branch: any;
+  department: any;
 
   items: any;
   posToken: string;
@@ -38,16 +43,27 @@ export type IOrder = {
   };
   origin?: string;
   syncedErkhet: boolean;
+  convertDealId: string;
 };
+
+export type IOrderRecord = {} & IOrder;
 
 export type IOrderDet = {
   syncErkhetInfo: string;
   putResponses: any[];
   deliveryInfo: any;
+  deal: any;
+  dealLink?: string;
 } & IOrder;
 
 export type OrdersQueryResponse = {
   posOrders: IOrder[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type OrderRecordsQueryResponse = {
+  posOrderRecords: IOrderRecord[];
   loading: boolean;
   refetch: () => void;
 };
@@ -85,12 +101,6 @@ export type ProductCategoriesQueryResponse = {
 } & QueryResponse;
 
 // mutation
-export type PosOrderSyncErkhetMutationResponse = {
-  posOrderSyncErkhet: (mutation: {
-    variables: { _id: string };
-  }) => Promise<any>;
-};
-
 export type PosOrderReturnBillMutationResponse = {
   posOrderReturnBill: (mutation: {
     variables: { _id: string };

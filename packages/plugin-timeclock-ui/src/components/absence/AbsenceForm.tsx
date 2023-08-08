@@ -24,20 +24,9 @@ import { PopoverButton } from '@erxes/ui/src/styles/main';
 import Icon from '@erxes/ui/src/components/Icon';
 import { dateFormat } from '../../constants';
 import * as dayjs from 'dayjs';
-import {
-  compareStartAndEndTimeOfSingleDate,
-  prepareCurrentUserOption
-} from '../../utils';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import { compareStartAndEndTimeOfSingleDate } from '../../utils';
 
 type Props = {
-  currentUser: IUser;
-  departments: IDepartment[];
-  branches: IBranch[];
-
-  isCurrentUserAdmin: boolean;
-
   absenceTypes: IAbsenceType[];
   history: any;
   queryParams: any;
@@ -69,19 +58,12 @@ type RequestDates = {
 
 export default (props: Props) => {
   const {
-    currentUser,
-
-    departments,
-    branches,
-
     absenceTypes,
     queryParams,
     submitRequest,
     contentProps,
     checkInOutRequest,
-    submitCheckInOut,
-
-    isCurrentUserAdmin
+    submitCheckInOut
   } = props;
 
   type RequestByTime = {
@@ -98,28 +80,9 @@ export default (props: Props) => {
     byTime: RequestByTime;
   };
 
-  const returnTotalUserOptions = () => {
-    const totalUserOptions: string[] = [];
-
-    for (const dept of departments) {
-      totalUserOptions.push(...dept.userIds);
-    }
-
-    for (const branch of branches) {
-      totalUserOptions.push(...branch.userIds);
-    }
-
-    if (currentUser) {
-      totalUserOptions.push(currentUser._id);
-    }
-    return totalUserOptions;
-  };
-
   const { closeModal } = contentProps;
 
   const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
-
-  const [lastSelectedDate, setlastSelectedDate] = useState(new Date());
 
   const [request, setRequest] = useState<Request>({
     byDay: { requestDates: [] },
@@ -231,13 +194,6 @@ export default (props: Props) => {
     closeModal();
   };
 
-  const filterParams = isCurrentUserAdmin
-    ? {}
-    : {
-        ids: returnTotalUserOptions(),
-        excludeIds: false
-      };
-
   if (checkInOutRequest) {
     return (
       <FlexColumn marginNum={10}>
@@ -252,8 +208,6 @@ export default (props: Props) => {
 
         <SelectTeamMembers
           queryParams={queryParams}
-          filterParams={filterParams}
-          customOption={prepareCurrentUserOption(currentUser)}
           customField="employeeId"
           label={'Team member'}
           onSelect={onUserSelect}
@@ -290,14 +244,6 @@ export default (props: Props) => {
 
   const onDateSelectChange = date => {
     if (date) {
-      // handle click on a different month
-      if (
-        JSON.stringify(date).split('-')[1] !==
-        JSON.stringify(lastSelectedDate).split('-')[1]
-      ) {
-        setlastSelectedDate(new Date(date));
-      }
-
       const dateString = dayjs(date).format(dateFormat);
 
       const oldRequestDates = request.byDay.requestDates;
@@ -341,7 +287,6 @@ export default (props: Props) => {
             open={true}
             input={false}
             renderDay={renderDay}
-            value={lastSelectedDate}
             closeOnSelect={false}
             timeFormat={false}
             onChange={onDateSelectChange}
@@ -357,7 +302,7 @@ export default (props: Props) => {
     );
   };
 
-  const onDateChange = selectedDate => {
+  const onDateChange = (day_key, selectedDate) => {
     const [
       getCorrectStartTime,
       getCorrectEndTime
@@ -449,11 +394,7 @@ export default (props: Props) => {
     <FlexRowEven>
       <FlexColumn marginNum={2}>
         <div>Date:</div>
-        <Datetime
-          value={request.byTime.date}
-          timeFormat={false}
-          onChange={onDateChange}
-        />
+        <Datetime value={request.byTime.date} timeFormat={false} />
       </FlexColumn>
 
       <FlexColumn marginNum={2}>
@@ -539,8 +480,6 @@ export default (props: Props) => {
       </MarginY>
       <SelectTeamMembers
         customField="employeeId"
-        filterParams={filterParams}
-        customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}

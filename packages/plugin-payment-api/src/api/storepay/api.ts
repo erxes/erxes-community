@@ -3,7 +3,7 @@ import { sendRequest } from '@erxes/api-utils/src/requests';
 import { BaseAPI } from '../../api/base';
 import { IModels } from '../../connectionResolver';
 import { PAYMENTS, PAYMENT_STATUS } from '../constants';
-import { IInvoiceDocument } from '../../models/definitions/invoices';
+import { IInvoice, IInvoiceDocument } from '../../models/definitions/invoices';
 import redis from '../../redis';
 
 export const storepayCallbackHandler = async (
@@ -16,9 +16,12 @@ export const storepayCallbackHandler = async (
     throw new Error('id is required');
   }
 
-  const invoice = await models.Invoices.getInvoice({
-    'apiResponse.value': id
-  });
+  const invoice = await models.Invoices.getInvoice(
+    {
+      'apiResponse.value': id
+    },
+    true
+  );
 
   const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
 
@@ -210,6 +213,28 @@ export class StorePayAPI extends BaseAPI {
     }
   }
 
+  async manualCheck(invoice: IInvoiceDocument) {
+    if (invoice.apiResponse.error) {
+      return invoice.apiResponse.error;
+    }
+
+    try {
+      const res = await this.request({
+        headers: await this.getHeaders(),
+        method: 'GET',
+        path: `merchant/loan/check/${invoice.apiResponse.value}`
+      });
+
+      if (!res.value) {
+        return PAYMENT_STATUS.PENDING;
+      }
+
+      return PAYMENT_STATUS.PAID;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
   async checkLoanAmount(mobileNumber: string) {
     try {
       const res = await this.request({
@@ -220,6 +245,11 @@ export class StorePayAPI extends BaseAPI {
           mobileNumber
         }
       });
+
+      const { msgList = [], status } = res;
+      if (status === 'Failed' && msgList.length > 0) {
+        throw new Error(msgList[0].code);
+      }
 
       if (!res.value || res.value === 0) {
         throw new Error('Insufficient loan amount');

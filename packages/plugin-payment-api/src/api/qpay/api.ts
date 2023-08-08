@@ -12,9 +12,12 @@ export const qpayCallbackHandler = async (models: IModels, data: any) => {
     throw new Error('Invoice id is required');
   }
 
-  const invoice = await models.Invoices.getInvoice({
-    identifier
-  });
+  const invoice = await models.Invoices.getInvoice(
+    {
+      identifier
+    },
+    true
+  );
 
   const payment = await models.Payments.getPayment(invoice.selectedPaymentId);
 
@@ -139,6 +142,25 @@ export class QpayAPI extends BaseAPI {
   }
 
   async checkInvoice(invoice: IInvoiceDocument) {
+    // return PAYMENT_STATUS.PAID;
+    try {
+      const res = await this.request({
+        method: 'GET',
+        path: `${PAYMENTS.qpay.actions.invoice}/${invoice.apiResponse.invoice_id}`,
+        headers: await this.getHeaders()
+      });
+
+      if (res.invoice_status === 'CLOSED') {
+        return PAYMENT_STATUS.PAID;
+      }
+
+      return PAYMENT_STATUS.PENDING;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async manualCheck(invoice: IInvoiceDocument) {
     try {
       const res = await this.request({
         method: 'GET',

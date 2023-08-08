@@ -9,37 +9,25 @@ import TimeclockList from '../containers/timeclock/TimeclockList';
 import AbsenceList from '../containers/absence/AbsenceList';
 import ReportList from '../containers/report/ReportList';
 import ScheduleList from '../containers/schedule/ScheduleList';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import LogsList from '../containers/logs/LogsList';
+import { IBranch } from '@erxes/ui/src/team/types';
 import { IScheduleConfig } from '../types';
-import { IUser } from '@erxes/ui/src/auth/types';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
-  currentUser: IUser;
-  branches: IBranch[];
-  departments: IDepartment[];
-
-  isCurrentUserAdmin: boolean;
-  isCurrentUserSupervisor?: boolean;
-
   currentDate?: string;
   queryParams: any;
   history: any;
   route?: string;
   startTime?: Date;
   loading: boolean;
+  branchesList: IBranch[];
   scheduleConfigs: IScheduleConfig[];
   searchFilter: string;
 };
 
 function List(props: Props) {
-  const {
-    queryParams,
-    isCurrentUserAdmin,
-    history,
-    route,
-    searchFilter
-  } = props;
-
+  const { branchesList, queryParams, history, route, searchFilter } = props;
   const [showSideBar, setShowSideBar] = useState(true);
   const [rightActionBar, setRightActionBar] = useState(<div />);
   const [Component, setModalComponent] = useState(<div />);
@@ -49,18 +37,16 @@ function List(props: Props) {
   useEffect(() => {
     switch (route) {
       case 'config':
-        if (isCurrentUserAdmin) {
-          setModalComponent(
-            <ConfigList
-              {...props}
-              getPagination={setPagination}
-              showSideBar={setShowSideBar}
-              getActionBar={setRightActionBar}
-              queryParams={queryParams}
-              history={history}
-            />
-          );
-        }
+        setModalComponent(
+          <ConfigList
+            {...props}
+            getPagination={setPagination}
+            showSideBar={setShowSideBar}
+            getActionBar={setRightActionBar}
+            queryParams={queryParams}
+            history={history}
+          />
+        );
         setLoading(false);
         break;
       case 'report':
@@ -103,6 +89,21 @@ function List(props: Props) {
         );
         setLoading(false);
         break;
+      case 'logs':
+        if (!isEnabled('bichil')) {
+          setModalComponent(
+            <LogsList
+              {...props}
+              showSideBar={setShowSideBar}
+              getPagination={setPagination}
+              getActionBar={setRightActionBar}
+              queryParams={queryParams}
+              history={history}
+            />
+          );
+        }
+        setLoading(false);
+        break;
       default:
         setModalComponent(
           <TimeclockList
@@ -124,7 +125,7 @@ function List(props: Props) {
       header={
         <Wrapper.Header
           title={__('Timeclocks')}
-          submenu={menuTimeClock(searchFilter, isCurrentUserAdmin)}
+          submenu={menuTimeClock(searchFilter)}
         />
       }
       actionBar={rightActionBar}
@@ -139,7 +140,11 @@ function List(props: Props) {
       }
       leftSidebar={
         showSideBar && (
-          <SideBarList {...props} queryParams={queryParams} history={history} />
+          <SideBarList
+            branchesList={branchesList}
+            queryParams={queryParams}
+            history={history}
+          />
         )
       }
       transparent={true}

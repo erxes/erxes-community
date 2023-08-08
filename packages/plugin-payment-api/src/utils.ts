@@ -9,6 +9,10 @@ import { graphqlPubsub } from './configs';
 import { generateModels } from './connectionResolver';
 import { PAYMENTS, PAYMENT_STATUS } from './api/constants';
 import redisUtils from './redisUtils';
+import { quickQrCallbackHandler } from './api/qpayQuickqr/api';
+import messageBroker from './messageBroker';
+import { pocketCallbackHandler } from './api/pocket/api';
+import { isEnabled } from '@erxes/api-utils/src/serviceDiscovery';
 
 export const callbackHandler = async (req, res) => {
   const { route, body, query } = req;
@@ -48,6 +52,12 @@ export const callbackHandler = async (req, res) => {
       case PAYMENTS.paypal.kind:
         invoiceDoc = await paypalCallbackHandler(models, data);
         break;
+      case PAYMENTS.qpayQuickqr.kind:
+        invoiceDoc = await quickQrCallbackHandler(models, data);
+        break;
+      case PAYMENTS.pocket.kind:
+        invoiceDoc = await pocketCallbackHandler(models, data);
+        break;
       default:
         return res.status(400).send('Invalid kind');
     }
@@ -61,6 +71,18 @@ export const callbackHandler = async (req, res) => {
       });
 
       redisUtils.updateInvoiceStatus(invoiceDoc._id, 'paid');
+
+      const [serviceName] = invoiceDoc.contentType.split(':');
+
+      if (await isEnabled(serviceName)) {
+        messageBroker().sendMessage(`${serviceName}:paymentCallback`, {
+          subdomain,
+          data: {
+            ...invoiceDoc,
+            apiResponse: 'success'
+          }
+        });
+      }
     }
   } catch (error) {
     return res.status(400).send(error);

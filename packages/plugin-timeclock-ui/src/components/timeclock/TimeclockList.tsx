@@ -1,24 +1,25 @@
 import Button from '@erxes/ui/src/components/Button';
 import { ITimeclock } from '../../types';
 import Row from './TimeclockRow';
-import { Alert, __ } from '@erxes/ui/src/utils';
+import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import { Title } from '@erxes/ui-settings/src/styles';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Table from '@erxes/ui/src/components/table';
 import TimeForm from '../../containers/timeclock/TimeFormList';
-import { FlexRowLeft, TextAlignCenter, ToggleButton } from '../../styles';
+import {
+  CustomRangeContainer,
+  FlexCenter,
+  FlexColumn,
+  TextAlignCenter
+} from '../../styles';
+import DateControl from '@erxes/ui/src/components/form/DateControl';
+import { ControlLabel } from '@erxes/ui/src/components/form';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
-import Icon from '@erxes/ui/src/components/Icon';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
-  currentUser: IUser;
-  departments: IDepartment[];
-  branches: IBranch[];
-
   queryParams: any;
   history: any;
   startTime?: Date;
@@ -26,9 +27,8 @@ type Props = {
   loading: boolean;
   totalCount: number;
 
-  isCurrentUserAdmin: boolean;
-
   startClockTime?: (userId: string) => void;
+  extractAllMsSqlData: (startDate: Date, endDate: Date) => void;
   removeTimeclock: (_id: string) => void;
 
   getActionBar: (actionBar: any) => void;
@@ -36,64 +36,86 @@ type Props = {
   getPagination: (pagination: any) => void;
 };
 
-function List(props: Props) {
-  const {
-    isCurrentUserAdmin,
-    currentUser,
-    departments,
-    branches,
-    timeclocks,
-    totalCount,
-    startClockTime,
-    removeTimeclock,
-    getActionBar,
-    showSideBar,
-    getPagination
-  } = props;
-
+function List({
+  timeclocks,
+  totalCount,
+  startClockTime,
+  extractAllMsSqlData,
+  removeTimeclock,
+  getActionBar,
+  showSideBar,
+  getPagination
+}: Props) {
   const trigger = (
     <Button btnStyle={'success'} icon="plus-circle">
       Start Shift
     </Button>
   );
 
-  const [isSideBarOpen, setIsOpen] = useState(
-    localStorage.getItem('isSideBarOpen') === 'true' ? true : false
+  const [startDate, setStartDate] = useState(
+    new Date(localStorage.getItem('startDate') || Date.now())
+  );
+  const [endDate, setEndDate] = useState(
+    new Date(localStorage.getItem('endDate') || Date.now())
   );
 
-  const onToggleSidebar = () => {
-    const toggleIsOpen = !isSideBarOpen;
-    setIsOpen(toggleIsOpen);
-    localStorage.setItem('isSideBarOpen', toggleIsOpen.toString());
-  };
+  const extractTrigger = <Button icon="plus-circle">Extract all data</Button>;
 
-  const modalContent = contenProps => (
+  const modalContent = props => (
     <TimeForm
-      {...contenProps}
       {...props}
       startClockTime={startClockTime}
       timeclocks={timeclocks}
     />
   );
 
-  const actionBarLeft = (
-    <FlexRowLeft>
-      <ToggleButton
-        id="btn-inbox-channel-visible"
-        isActive={isSideBarOpen}
-        onClick={onToggleSidebar}
-      >
-        <Icon icon="subject" />
-      </ToggleButton>
+  const onStartDateChange = dateVal => {
+    setStartDate(dateVal);
+    localStorage.setItem('startDate', startDate.toISOString());
+  };
 
-      <Title capitalize={true}>
-        {__(new Date().toDateString().slice(0, -4))}
-      </Title>
-    </FlexRowLeft>
+  const onEndDateChange = dateVal => {
+    setEndDate(dateVal);
+    localStorage.setItem('endDate', endDate.toISOString());
+  };
+  const extractContent = props => (
+    <FlexColumn marginNum={10}>
+      <ControlLabel>Select Date Range</ControlLabel>
+      <CustomRangeContainer>
+        <DateControl
+          required={false}
+          value={startDate}
+          name="startDate"
+          placeholder={'Starting date'}
+          dateFormat={'YYYY-MM-DD'}
+          onChange={onStartDateChange}
+        />
+        <DateControl
+          required={false}
+          value={endDate}
+          name="endDate"
+          placeholder={'Ending date'}
+          dateFormat={'YYYY-MM-DD'}
+          onChange={onEndDateChange}
+        />
+      </CustomRangeContainer>
+      <FlexCenter>
+        <Button onClick={() => extractAllMsSqlData(startDate, endDate)}>
+          Extract all data
+        </Button>
+      </FlexCenter>
+    </FlexColumn>
   );
 
   const actionBarRight = (
     <>
+      {!isEnabled('bichil') && (
+        <ModalTrigger
+          title={__('Extract all data')}
+          trigger={extractTrigger}
+          content={extractContent}
+        />
+      )}
       <ModalTrigger
         title={__('Start shift')}
         trigger={trigger}
@@ -102,14 +124,30 @@ function List(props: Props) {
     </>
   );
 
+  const title = (
+    <Title capitalize={true}>
+      {__(new Date().toDateString().slice(0, -4))}
+    </Title>
+  );
+
   const actionBar = (
     <Wrapper.ActionBar
-      left={actionBarLeft}
+      left={title}
       right={actionBarRight}
       hasFlex={true}
       wideSpacing={true}
     />
   );
+
+  const compareUserName = (a, b) => {
+    if (a.employeeUserName < b.employeeUserName) {
+      return -1;
+    }
+    if (a.employeeUserName > b.employeeUserName) {
+      return 1;
+    }
+    return 0;
+  };
 
   const content = (
     <Table>
@@ -119,10 +157,9 @@ function List(props: Props) {
           <th>{__('Shift date')}</th>
           <th>{__('Check In')}</th>
           <th>{__('In Device')}</th>
-          <th>{__('Location')}</th>
           <th>{__('Check Out')}</th>
-          <th>{__('Overnight')}</th>
           <th>{__('Out Device')}</th>
+          <th>{__('Overnight')}</th>
           <th>{__('Location')}</th>
           <th>
             <TextAlignCenter>{__('Action')}</TextAlignCenter>
@@ -130,10 +167,9 @@ function List(props: Props) {
         </tr>
       </thead>
       <tbody>
-        {timeclocks.map(timeclock => {
+        {timeclocks.sort(compareUserName).map(timeclock => {
           return (
             <Row
-              isCurrentUserAdmin={isCurrentUserAdmin}
               key={timeclock._id}
               timeclock={timeclock}
               removeTimeclock={removeTimeclock}
@@ -145,7 +181,7 @@ function List(props: Props) {
   );
 
   getActionBar(actionBar);
-  showSideBar(isSideBarOpen);
+  showSideBar(true);
   getPagination(<Pagination count={totalCount} />);
 
   return content;

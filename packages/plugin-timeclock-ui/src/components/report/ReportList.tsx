@@ -1,5 +1,5 @@
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { router, __ } from '@erxes/ui/src/utils';
+import { loadDynamicComponent, router, __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import Table from '@erxes/ui/src/components/table';
 import FormGroup from '@erxes/ui/src/components/form/Group';
@@ -8,7 +8,7 @@ import Select from 'react-select-plus';
 import Button from '@erxes/ui/src/components/Button';
 import ReportRow from './ReportRow';
 import { IReport } from '../../types';
-import { FilterItem, FlexRow, FlexRowEven, ToggleButton } from '../../styles';
+import { FilterItem, FlexRow, ToggleButton } from '../../styles';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Icon from '@erxes/ui/src/components/Icon';
 
@@ -36,36 +36,16 @@ function ReportList(props: Props) {
     exportReport,
     showSideBar
   } = props;
+
   const [reportType, setType] = useState(queryParams.reportType);
-
-  const [showDepartment, setShowDepartment] = useState(
-    queryParams.showDepartment ? JSON.parse(queryParams.showDepartment) : false
-  );
-
-  const [showBranch, setShowBranch] = useState(
-    queryParams.showBranch ? JSON.parse(queryParams.showBranch) : false
-  );
-
   const [isSideBarOpen, setIsOpen] = useState(
-    JSON.parse(localStorage.getItem('isSideBarOpen') || 'false')
+    localStorage.getItem('isSideBarOpen') === 'true' ? true : false
   );
 
   const onToggleSidebar = () => {
     const toggleIsOpen = !isSideBarOpen;
     setIsOpen(toggleIsOpen);
     localStorage.setItem('isSideBarOpen', toggleIsOpen.toString());
-  };
-
-  const toggleShowDepartment = () => {
-    const toggle = !showDepartment;
-    setShowDepartment(toggle);
-    router.setParams(history, { showDepartment: toggle });
-  };
-
-  const toggleShowBranch = () => {
-    const toggle = !showBranch;
-    setShowBranch(toggle);
-    router.setParams(history, { showBranch: toggle });
   };
 
   const renderTableHead = () => {
@@ -86,8 +66,6 @@ function ReportList(props: Props) {
         return (
           <>
             <tr>
-              {showDepartment && <th rowSpan={2}>{__('Department')}</th>}
-              {showBranch && <th rowSpan={2}>{__('Branch')}</th>}
               <th rowSpan={2}>{__('Team member Id')}</th>
               <th rowSpan={2}>{__('Last Name')}</th>
               <th rowSpan={2}>{__('First Name')}</th>
@@ -96,7 +74,7 @@ function ReportList(props: Props) {
               <th colSpan={8} style={{ textAlign: 'center' }}>
                 {__('Timeclock info')}
               </th>
-              <th colSpan={5} style={{ textAlign: 'center' }}>
+              <th colSpan={4} style={{ textAlign: 'center' }}>
                 {__('Absence info')}
               </th>
               <th rowSpan={2}>{__('Checked by member')}</th>
@@ -112,7 +90,6 @@ function ReportList(props: Props) {
               <th>{__('Total break')}</th>
               <th>{__('Total')}</th>
               <th>{__('Mins Late')}</th>
-              <th>{__('Shift request')}</th>
               <th>{__('Томилолтоор ажилласан цаг')}</th>
               <th>{__('Чөлөөтэй цаг цалинтай')}</th>
               <th>{__('Чөлөөтэй цаг цалингүй')}</th>
@@ -170,6 +147,16 @@ function ReportList(props: Props) {
   };
 
   const content = () => {
+    // custom report for bichil-globus
+    const bichilTable = loadDynamicComponent('bichilReportTable', {
+      reportType,
+      queryParams
+    });
+
+    if (bichilTable) {
+      return bichilTable;
+    }
+
     return (
       <Table>
         <thead>{renderTableHead()}</thead>
@@ -179,8 +166,6 @@ function ReportList(props: Props) {
               key={Math.random()}
               reportType={reportType}
               report={reportt}
-              showBranch={showBranch}
-              showDepartment={showDepartment}
             />
           ))}
       </Table>
@@ -195,33 +180,13 @@ function ReportList(props: Props) {
 
     return (
       <FlexRow>
-        <FlexRowEven>
-          <ToggleButton
-            id="btn-inbox-channel-visible"
-            isActive={isSideBarOpen}
-            onClick={onToggleSidebar}
-          >
-            <Icon icon="subject" />
-          </ToggleButton>
-          {reportType === 'Сүүлд' && (
-            <>
-              <ToggleButton
-                style={{ width: 'auto' }}
-                isActive={showDepartment}
-                onClick={toggleShowDepartment}
-              >
-                <ControlLabel>{__('Department')}</ControlLabel>
-              </ToggleButton>
-              <ToggleButton
-                style={{ width: 'auto' }}
-                isActive={showBranch}
-                onClick={toggleShowBranch}
-              >
-                <ControlLabel>{__('Branch')}</ControlLabel>
-              </ToggleButton>
-            </>
-          )}
-        </FlexRowEven>
+        <ToggleButton
+          id="btn-inbox-channel-visible"
+          isActive={isSideBarOpen}
+          onClick={onToggleSidebar}
+        >
+          <Icon icon="subject" />
+        </ToggleButton>
         <FilterItem>
           <FormGroup>
             <ControlLabel>Select type</ControlLabel>
@@ -241,6 +206,14 @@ function ReportList(props: Props) {
     );
   };
   const renderExportBtn = () => {
+    const bichilExportReportBtn = loadDynamicComponent(
+      'bichilExportReportBtn',
+      { queryParams }
+    );
+
+    if (bichilExportReportBtn) {
+      return bichilExportReportBtn;
+    }
     return (
       <div>
         <Button onClick={exportReport}>Export</Button>
