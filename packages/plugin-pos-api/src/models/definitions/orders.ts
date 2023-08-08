@@ -163,7 +163,7 @@ export const posOrderSchema = schemaHooksWrapper(
       label: 'Previous bill id if it is changed'
     }),
     type: field({ type: String, label: 'Order type' }),
-    userId: field({ type: String, label: 'Created user id' }),
+    userId: field({ type: String, label: 'Created user' }),
 
     items: field({ type: [posOrderItemSchema], label: 'items' }),
     branchId: field({ type: String, label: 'Branch' }),
