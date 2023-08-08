@@ -107,5 +107,11 @@ export const EXTEND_FIELDS = [
     name: 'paymentType',
     label: 'Payment type',
     type: 'string'
+  },
+  {
+    _id: Math.random(),
+    name: 'pos',
+    label: 'POS',
+    type: 'string'
   }
 ];

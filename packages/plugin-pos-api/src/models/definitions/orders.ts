@@ -168,7 +168,7 @@ export const posOrderSchema = schemaHooksWrapper(
     items: field({ type: [posOrderItemSchema], label: 'items' }),
     branchId: field({ type: String, label: 'Branch' }),
     departmentId: field({ type: String, label: 'Department' }),
-    posToken: field({ type: String, optional: true }),
+    posToken: field({ type: String, optional: true, label: 'Token' }),
 
     syncedErkhet: field({ type: Boolean, default: false }),
     syncErkhetInfo: field({

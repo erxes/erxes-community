@@ -13,24 +13,26 @@ const prepareData = async (
   subdomain: string,
   query: any
 ): Promise<any[]> => {
-  const { segmentData, page = 1, perPage = 1000, otherParams } = query;
+  const { segmentData, page, perPage } = query;
 
   let data: any[] = [];
 
-  const filter: any = { number: { $regex: '20230807_0033' } };
+  const skip = (page - 1) * perPage;
+
+  const filter: any = {};
   let itemIds = [];
 
-  if (segmentData) {
-    if (segmentData.conditions) {
-      itemIds = await fetchSegment(
-        subdomain,
-        '',
-        { page, perPage },
-        segmentData
-      );
+  if (segmentData.conditions) {
+    itemIds = await fetchSegment(subdomain, '', { page, perPage }, segmentData);
 
-      filter._id = { $in: itemIds };
-    }
+    filter._id = { $in: itemIds };
+  }
+
+  if (!(segmentData && Object.keys(segmentData))) {
+    data = await models.PosOrders.find(filter)
+      .skip(skip)
+      .limit(perPage)
+      .lean();
   }
 
   data = await models.PosOrders.find(filter).lean();
@@ -46,16 +48,11 @@ const prepareDataCount = async (
   const { segmentData } = query;
 
   let data = 0;
-  const filter: any = { number: { $regex: '20230807_0033' } };
+  const filter: any = {};
 
-  if (segmentData) {
+  if (segmentData && Object.keys(segmentData).length) {
     if (segmentData.conditions) {
-      const itemIds = await fetchSegment(
-        subdomain,
-        '',
-        { scroll: true, page: 1, perPage: 10000 },
-        segmentData
-      );
+      const itemIds = await fetchSegment(subdomain, '', {}, segmentData);
 
       filter._id = { $in: itemIds };
     }
@@ -218,6 +215,10 @@ export const fillValue = async (
           )
         )
       ].join(', ');
+      break;
+    case 'pos':
+      const pos = await models.Pos.findOne({ token: order.posToken });
+      value = pos ? pos.name : '';
       break;
     default:
       value = order[column] || '';
