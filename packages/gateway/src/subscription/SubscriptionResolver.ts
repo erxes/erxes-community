@@ -253,7 +253,8 @@ export default class SubscriptionResolver {
             });
 
             if (response.data) {
-                return merge(payloadData, Object.values(response.data)[0]);
+                const completeData =  merge(payloadData, Object.values(response.data)[0]);
+                return completeData;
             }
         } catch (error) {
             console.error(error);
