@@ -268,7 +268,6 @@ export default {
               [column]: await fillValue(models, subdomain, column, order)
             };
           }
-          console.log(posOrderItem, 'posOrderItem');
           OrderItemsDocs.push(posOrderItem);
         }
 
