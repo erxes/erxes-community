@@ -1,5 +1,5 @@
 import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { IAttachment, QueryResponse } from '@erxes/ui/src/types';
 
 export interface ITimeclock {
@@ -12,6 +12,10 @@ export interface ITimeclock {
   employeeId?: number;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
   branchName?: string;
 }
 export interface ITimelog {
@@ -61,6 +65,9 @@ export interface IUserReport {
   user: IUser;
   scheduleReport: IScheduleReport[];
 
+  branchTitles?: string[];
+  departmentTitles?: string[];
+
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
   totalMinsWorkedThisMonth?: number;
@@ -76,7 +83,9 @@ export interface IUserReport {
 
   totalHoursOvertime?: number;
   totalHoursOvernight?: number;
-  totalHoursBreak?: number;
+
+  totalHoursBreakScheduled?: number;
+  totalHoursBreakTaken?: number;
 
   totalMinsLate?: number;
   totalMinsLateToday?: number;
@@ -134,6 +143,7 @@ export interface IShift {
   shiftStart: Date;
   shiftEnd: Date;
   scheduleConfigId: string;
+  lunchBreakInMins?: number;
 }
 
 export interface IShiftSchedule {
@@ -218,9 +228,10 @@ export type ScheduleConfigQueryResponse = {
   scheduleConfigs: IScheduleConfig[];
 } & QueryResponse;
 
-export type DeviceConfigsQueryResponse = {
-  deviceConfigs: { list: IDeviceConfig[]; totalCount: number };
-} & QueryResponse;
+export type DepartmentsQueryResponse = {
+  timeclockDepartments: IDepartment[];
+  departments: IDepartment[];
+};
 
 export type ScheduleQueryResponse = {
   schedulesMain: { list: ISchedule[]; totalCount: number };
@@ -228,6 +239,7 @@ export type ScheduleQueryResponse = {
 
 export type BranchesQueryResponse = {
   branches: IBranch[];
+  timeclockBranches: IBranch[];
 } & QueryResponse;
 
 export type ReportsQueryResponse = {
@@ -273,16 +285,6 @@ export type ScheduleMutationVariables = {
   status?: string;
 };
 
-export type TimeLogMutationResponse = {
-  extractTimeLogsFromMsSQLMutation: (params: {
-    variables: { startDate: string; endDate: string };
-  }) => Promise<any>;
-
-  createTimeClockFromLogMutation: (params: {
-    variables: { userId: string; timelog: Date };
-  }) => Promise<any>;
-};
-
 export type TimeClockMutationResponse = {
   startTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
   stopTimeMutation: (params: { variables: MutationVariables }) => Promise<any>;
@@ -294,7 +296,7 @@ export type TimeClockMutationResponse = {
     variables: MutationVariables;
   }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 };
 
@@ -314,7 +316,7 @@ export type AbsenceMutationResponse = {
   submitCheckInOutRequestMutation: (params: {
     variables: {
       checkType: string;
-      userId: string;
+      userId?: string;
       checkTime: Date;
     };
   }) => Promise<any>;

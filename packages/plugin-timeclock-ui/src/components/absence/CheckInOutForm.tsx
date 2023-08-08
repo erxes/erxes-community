@@ -12,7 +12,7 @@ import {
   TextAlignRight,
   CustomRangeContainer
 } from '../../styles';
-import { IAbsence, ITimeclock, ITimelog } from '../../types';
+import { IAbsence, ITimeclock } from '../../types';
 import dayjs from 'dayjs';
 import { dateDayFormat, dateFormat } from '../../constants';
 import Button from '@erxes/ui/src/components/Button';
@@ -21,7 +21,6 @@ import { timeFormat } from '../../constants';
 
 type Props = {
   timeclocksPerUser: ITimeclock[];
-  timelogsPerUser: ITimelog[];
 
   absenceRequest: IAbsence;
   timeType: string;
@@ -36,7 +35,6 @@ type Props = {
 function CheckoutForm(props: Props) {
   const {
     timeclocksPerUser,
-    timelogsPerUser,
     timeType,
     absenceRequest,
     editTimeclock,
@@ -51,10 +49,11 @@ function CheckoutForm(props: Props) {
   const { closeModal } = contentProps;
 
   const [pickTimeclockType, setPickTimeclockType] = useState('');
-  const [shiftStartInput, setShiftStartInput] = useState(null);
+  const [shiftStartInput, setShiftStartInput] = useState('insert');
   const [shiftStart, setShiftStart] = useState(null);
   const [shiftStartInsert, setShiftStartInsert] = useState(requestedTime);
 
+  const [selectedTimeclock, setSelectedTimeclock] = useState(new Date());
   const [selectedTimeclockId, setSelectedTimeclockId] = useState(null);
   const [selectedTimeclockActive, setSelectedTimeclockActive] = useState(false);
 
@@ -98,6 +97,8 @@ function CheckoutForm(props: Props) {
 
     return filterShiftsOfThatDay.map(timeclock => ({
       value: timeclock._id,
+      shiftEnd: timeclock.shiftEnd,
+      shiftStart: timeclock.shiftStart,
       shiftActive: timeclock.shiftActive,
       label: returnDateTimeFormatted(timeclock, 'timeclock')
     }));
@@ -113,16 +114,6 @@ function CheckoutForm(props: Props) {
       }));
   };
 
-  const generateTimelogOptions = () => {
-    // time log options only occur for picking shift start for check out request
-    return timelogsPerUser
-      .filter(log => log.timelog < requestedTime)
-      .map((log: ITimelog) => ({
-        value: log.timelog,
-        label: returnDateTimeFormatted(log, 'timelog')
-      }));
-  };
-
   const generateRadioOptions = () => {
     const options = ['pick', 'insert'];
 
@@ -132,12 +123,9 @@ function CheckoutForm(props: Props) {
   };
 
   const onSelectTimeclock = selectedTime => {
+    setSelectedTimeclock(selectedTime.shiftEnd);
     setSelectedTimeclockId(selectedTime.value);
     setSelectedTimeclockActive(selectedTime.shiftActive);
-  };
-
-  const onShiftStartChange = (selectedTime: any) => {
-    setShiftStart(selectedTime.value);
   };
 
   const onShiftStartInsertChange = timeVal => {
@@ -149,7 +137,17 @@ function CheckoutForm(props: Props) {
       Alert.error('Please pick timeclock from the list');
       return false;
     }
+    //  check in request, when requested shift start is greater than shift end
+    if (
+      pickTimeclockType === 'pick' &&
+      !isCheckOutRequest &&
+      dayjs(requestedTime) >= dayjs(selectedTimeclock)
+    ) {
+      Alert.error(' Please choose shift end later than requested time');
+      return false;
+    }
 
+    // check out requet
     if (pickTimeclockType === 'insert' && isCheckOutRequest) {
       if (
         shiftStartInput === 'insert' &&
@@ -168,15 +166,16 @@ function CheckoutForm(props: Props) {
   };
 
   const onSaveBtn = () => {
-    // check out request
-    if (isCheckOutRequest) {
-      if (checkInput()) {
+    if (checkInput()) {
+      // check out request
+      if (isCheckOutRequest) {
         if (pickTimeclockType === 'pick' && selectedTimeclockId) {
           // edit concurrent timeclock
           editTimeclock({
             _id: selectedTimeclockId,
             shiftEnd: requestedTime,
-            shiftActive: false
+            shiftActive: false,
+            outDeviceType: 'request'
           });
           successfulSubmit();
           return;
@@ -185,27 +184,31 @@ function CheckoutForm(props: Props) {
         createTimeclock({
           shiftStart:
             shiftStartInput === 'pick' ? shiftStart : shiftStartInsert,
-          shiftEnd: requestedTime
+          shiftEnd: requestedTime,
+          inDeviceType: 'insert',
+          outDeviceType: 'request'
         });
         successfulSubmit();
-      }
-    } else {
-      // check in request
-      if (pickTimeclockType === 'pick' && checkInput() && selectedTimeclockId) {
-        editTimeclock({
-          _id: selectedTimeclockId,
+      } else {
+        // check in request
+        if (pickTimeclockType === 'pick' && selectedTimeclockId) {
+          editTimeclock({
+            _id: selectedTimeclockId,
+            shiftStart: requestedTime,
+            shiftActive: selectedTimeclockActive,
+            inDeviceType: 'request'
+          });
+          successfulSubmit();
+          return;
+        }
+        // insert new active timeclock
+        createTimeclock({
           shiftStart: requestedTime,
-          shiftActive: selectedTimeclockActive
+          shiftActive: true,
+          inDeviceType: 'request'
         });
         successfulSubmit();
-        return;
       }
-      // insert new active timeclock
-      createTimeclock({
-        shiftStart: requestedTime,
-        shiftActive: true
-      });
-      successfulSubmit();
     }
   };
 
@@ -263,17 +266,16 @@ function CheckoutForm(props: Props) {
       >
         <FlexRow>
           <ControlLabel>Choose shift start</ControlLabel>
+
           <FlexRowEven>
-            <CustomWidthDiv width={120}>
-              <TextAlignRight>Pick from time logs</TextAlignRight>
-            </CustomWidthDiv>
             <FormControl
               rows={2}
               name="shiftStartInput"
               componentClass="radio"
-              options={['pick', 'insert'].map(el => ({
+              options={['insert'].map(el => ({
                 value: el
               }))}
+              defaultChecked={true}
               inline={true}
               onChange={toggleShiftStartInput}
             />
@@ -281,14 +283,6 @@ function CheckoutForm(props: Props) {
           </FlexRowEven>
         </FlexRow>
 
-        <ToggleDisplay display={shiftStartInput === 'pick'}>
-          <Select
-            placeholder="Pick shift start"
-            onChange={onShiftStartChange}
-            value={shiftStart}
-            options={timelogsPerUser && generateTimelogOptions()}
-          />
-        </ToggleDisplay>
         <ToggleDisplay display={shiftStartInput === 'insert'}>
           <CustomRangeContainer>
             <DateControl

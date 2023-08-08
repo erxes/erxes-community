@@ -24,9 +24,20 @@ import { PopoverButton } from '@erxes/ui/src/styles/main';
 import Icon from '@erxes/ui/src/components/Icon';
 import { dateFormat } from '../../constants';
 import * as dayjs from 'dayjs';
-import { compareStartAndEndTimeOfSingleDate } from '../../utils';
+import {
+  compareStartAndEndTimeOfSingleDate,
+  prepareCurrentUserOption
+} from '../../utils';
+import { IUser } from '@erxes/ui/src/auth/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
+  currentUser: IUser;
+  departments: IDepartment[];
+  branches: IBranch[];
+
+  isCurrentUserAdmin: boolean;
+
   absenceTypes: IAbsenceType[];
   history: any;
   queryParams: any;
@@ -58,12 +69,19 @@ type RequestDates = {
 
 export default (props: Props) => {
   const {
+    currentUser,
+
+    departments,
+    branches,
+
     absenceTypes,
     queryParams,
     submitRequest,
     contentProps,
     checkInOutRequest,
-    submitCheckInOut
+    submitCheckInOut,
+
+    isCurrentUserAdmin
   } = props;
 
   type RequestByTime = {
@@ -78,6 +96,23 @@ export default (props: Props) => {
     };
 
     byTime: RequestByTime;
+  };
+
+  const returnTotalUserOptions = () => {
+    const totalUserOptions: string[] = [];
+
+    for (const dept of departments) {
+      totalUserOptions.push(...dept.userIds);
+    }
+
+    for (const branch of branches) {
+      totalUserOptions.push(...branch.userIds);
+    }
+
+    if (currentUser) {
+      totalUserOptions.push(currentUser._id);
+    }
+    return totalUserOptions;
   };
 
   const { closeModal } = contentProps;
@@ -196,6 +231,13 @@ export default (props: Props) => {
     closeModal();
   };
 
+  const filterParams = isCurrentUserAdmin
+    ? {}
+    : {
+        ids: returnTotalUserOptions(),
+        excludeIds: false
+      };
+
   if (checkInOutRequest) {
     return (
       <FlexColumn marginNum={10}>
@@ -210,6 +252,8 @@ export default (props: Props) => {
 
         <SelectTeamMembers
           queryParams={queryParams}
+          filterParams={filterParams}
+          customOption={prepareCurrentUserOption(currentUser)}
           customField="employeeId"
           label={'Team member'}
           onSelect={onUserSelect}
@@ -495,6 +539,8 @@ export default (props: Props) => {
       </MarginY>
       <SelectTeamMembers
         customField="employeeId"
+        filterParams={filterParams}
+        customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}

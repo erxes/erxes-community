@@ -9,10 +9,12 @@ import { dateFormat, timeFormat } from '../../constants';
 import Tip from '@erxes/ui/src/components/Tip';
 import { returnDeviceTypes } from '../../utils';
 import Icon from '@erxes/ui/src/components/Icon';
-import TimelogForm from '../../containers/timeclock/TimelogForm';
+import TimeEditForm from '../../containers/timeclock/TimeEditForm';
 import { TextAlignCenter } from '../../styles';
 
 type Props = {
+  isCurrentUserAdmin: boolean;
+
   history?: any;
   timelogsPerUser?: ITimelog[];
   timeclock: ITimeclock;
@@ -35,30 +37,11 @@ class Row extends React.Component<Props> {
     />
   );
 
-  renderTimeLogs = () => {
-    const { timelogsPerUser } = this.props;
+  editTimeclockContent = (contentProps: any, timeclock: ITimeclock) => {
+    return <TimeEditForm contentProps={contentProps} timeclock={timeclock} />;
   };
 
-  editShiftTimeContent = (contentProps: any, timeclock: ITimeclock) => {
-    const getStartDate = dayjs(timeclock.shiftStart)
-      .add(-1, 'day')
-      .format(dateFormat);
-    const getEndDate = dayjs(timeclock.shiftStart)
-      .add(1, 'day')
-      .format(dateFormat);
-
-    return (
-      <TimelogForm
-        contentProps={contentProps}
-        startDate={getStartDate}
-        endDate={getEndDate}
-        userId={timeclock.user._id}
-        timeclock={timeclock}
-      />
-    );
-  };
-
-  editShiftTimeTrigger = () => (
+  editTimeclockTrigger = () => (
     <Button btnStyle="link">
       <Icon icon="edit-3" />
     </Button>
@@ -91,21 +74,27 @@ class Row extends React.Component<Props> {
         </td>
         <td>{shiftDate}</td>
         <td>{shiftStartTime}</td>
-        <td>{returnDeviceTypes(timeclock.deviceType)[0]}</td>
-        <td>{shiftEndTime}</td>
-        <td>{returnDeviceTypes(timeclock.deviceType)[1]}</td>
-        <td>{overNightShift ? 'O' : ''}</td>
         <td>
-          {timeclock.branchName ? timeclock.branchName : timeclock.deviceName}
+          {timeclock.inDeviceType || returnDeviceTypes(timeclock.deviceType)[0]}
         </td>
+        <td>{timeclock.inDevice || '-'}</td>
+        <td>{shiftEndTime}</td>
+        <td>{overNightShift ? 'O' : '-'}</td>
+        <td>
+          {timeclock.shiftActive
+            ? '-'
+            : timeclock.outDeviceType ||
+              returnDeviceTypes(timeclock.deviceType)[1]}
+        </td>
+        <td>{timeclock.outDevice || '-'}</td>
         <td>
           <TextAlignCenter>
             <ModalTrigger
               size="lg"
               title="Edit Shift"
-              trigger={this.editShiftTimeTrigger()}
+              trigger={this.editTimeclockTrigger()}
               content={contentProps =>
-                this.editShiftTimeContent(contentProps, timeclock)
+                this.editTimeclockContent(contentProps, timeclock)
               }
             />
             <Tip text={__('Delete')} placement="top">

@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import { execSync } from 'child_process';
 import isSameFile from '../util/is-same-file';
 import * as yaml from 'yaml';
+import exec from '../util/exec';
 
 const { NODE_ENV, SUPERGRAPH_POLL_INTERVAL_MS } = process.env;
 
@@ -38,15 +39,25 @@ const createSupergraphConfig = (proxyTargets: ErxesProxyTarget[]) => {
       }
     };
   }
-  fs.writeFileSync(superGraphConfigNext, yaml.stringify(config), {
-    encoding: 'utf-8'
-  });
 
-  if (
-    !fs.existsSync(supergraphConfigPath) ||
-    !isSameFile(supergraphConfigPath, superGraphConfigNext)
-  ) {
-    execSync(`cp ${superGraphConfigNext}  ${supergraphConfigPath}`);
+  if (NODE_ENV === 'production') {
+    if (fs.existsSync(supergraphConfigPath)) {
+      return;
+    }
+    fs.writeFileSync(supergraphConfigPath, yaml.stringify(config), {
+      encoding: 'utf-8'
+    });
+  } else {
+    fs.writeFileSync(superGraphConfigNext, yaml.stringify(config), {
+      encoding: 'utf-8'
+    });
+
+    if (
+      !fs.existsSync(supergraphConfigPath) ||
+      !isSameFile(supergraphConfigPath, superGraphConfigNext)
+    ) {
+      execSync(`cp ${superGraphConfigNext}  ${supergraphConfigPath}`);
+    }
   }
 };
 
@@ -57,12 +68,8 @@ const supergraphComposeOnce = async () => {
       return;
     }
 
-    execSync(
-      `rover supergraph compose --config ${supergraphConfigPath} --output ${supergraphPath} --elv2-license=accept --log=error`,
-      {
-        stdio: 'inherit',
-        encoding: 'utf-8'
-      }
+    await exec(
+      `rover supergraph compose --config ${supergraphConfigPath} --output ${supergraphPath} --elv2-license=accept --log=error`
     );
 
     // Running execSync('rover') causes the container to exit with code 137 later. Make the container quit without waiting for that to happen.
@@ -71,11 +78,8 @@ const supergraphComposeOnce = async () => {
   } else {
     const superGraphqlNext = supergraphPath + '.next';
 
-    execSync(
-      `yarn rover supergraph compose --config ${supergraphConfigPath} --output ${superGraphqlNext} --elv2-license=accept`,
-      {
-        stdio: 'inherit'
-      }
+    await exec(
+      `yarn rover supergraph compose --config ${supergraphConfigPath} --output ${superGraphqlNext} --elv2-license=accept`
     );
 
     if (

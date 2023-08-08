@@ -2,13 +2,17 @@ import { Document, Schema } from 'mongoose';
 import { field } from './utils';
 
 export interface ITimeClock {
-  userId?: string;
+  userId: string;
   shiftStart: Date;
   shiftEnd?: Date;
   shiftActive?: boolean;
   branchName?: string;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
 }
 
 export interface ITimeClockDocument extends ITimeClock, Document {
@@ -16,8 +20,8 @@ export interface ITimeClockDocument extends ITimeClock, Document {
 }
 
 export interface ITimeLog {
-  userId?: string;
-  timelog?: Date;
+  userId: string;
+  timelog: Date;
   deviceSerialNo?: string;
 }
 
@@ -72,6 +76,7 @@ export interface ISchedule {
   scheduleChecked?: boolean;
   submittedByAdmin?: boolean;
   totalBreakInMins?: number;
+  createdByRequest?: boolean;
   shiftIds?: string[];
 }
 
@@ -91,6 +96,7 @@ export interface IShift {
   configShiftStart?: string;
   configShiftEnd?: string;
   scheduleConfigId?: string;
+  lunchBreakInMins?: number;
 }
 
 export interface IShiftDocument extends IShift, Document {
@@ -155,6 +161,8 @@ export const timeLogSchema = new Schema({
   timelog: field({ type: Date, label: 'Shift starting time', index: true })
 });
 
+timeLogSchema.index({ userId: 1, timelog: 1, deviceSerialNo: 1 });
+
 export const timeclockSchema = new Schema({
   _id: field({ pkey: true }),
   userId: field({ type: String, label: 'User', index: true }),
@@ -176,20 +184,45 @@ export const timeclockSchema = new Schema({
   deviceType: field({
     type: String,
     label: 'Which device used for clock in/out'
+  }),
+  inDevice: field({
+    type: String,
+    label: 'check in device name',
+    optional: true
+  }),
+  outDevice: field({
+    type: String,
+    label: 'check out device name',
+    optional: true
+  }),
+  inDeviceType: field({
+    type: String,
+    label: 'check in device type',
+    optional: true
+  }),
+  outDeviceType: field({
+    type: String,
+    label: 'check out device type',
+    optional: true
   })
+});
+
+timeclockSchema.index({
+  userId: 1,
+  shiftStart: 1,
+  shiftEnd: 1,
+  shiftActive: 1
 });
 
 export const absenceTypeSchema = new Schema({
   _id: field({ pkey: true }),
-  name: field({ type: String, label: 'Absence type' }),
-
+  name: field({ type: String, label: 'Absence type', index: true }),
   requestType: field({ type: String, label: 'Type of a request' }),
   requestTimeType: field({ type: String, label: 'Either by day or by hours' }),
   requestHoursPerDay: field({
     type: Number,
     label: 'Hours per day if requestTimeType is by day'
   }),
-
   explRequired: field({
     type: Boolean,
     label: 'whether absence type requires explanation'
@@ -203,6 +236,8 @@ export const absenceTypeSchema = new Schema({
     label: 'whether absence type is shift request'
   })
 });
+
+absenceTypeSchema.index({ name: 1, requestType: 1 });
 
 export const absenceSchema = new Schema({
   _id: field({ pkey: true }),
@@ -250,6 +285,8 @@ export const absenceSchema = new Schema({
   })
 });
 
+absenceSchema.index({ userId: 1, startTime: 1, endTime: 1 });
+
 export const scheduleSchema = new Schema({
   _id: field({ pkey: true }),
   userId: field({ type: String, label: 'User', index: true }),
@@ -278,10 +315,17 @@ export const scheduleSchema = new Schema({
   }),
   totalBreakInMins: field({
     type: Number,
-    label: 'Total break time in mins',
-    default: false
+    label: 'Total break time in mins'
+  }),
+  createdByRequest: field({
+    type: Boolean,
+    label: 'Whether schedule was created by shift request',
+    default: false,
+    optional: true
   })
 });
+
+scheduleSchema.index({ userId: 1, solved: 1, status: 1 });
 
 export const scheduleShiftSchema = new Schema({
   _id: field({ pkey: true }),
@@ -306,12 +350,14 @@ export const scheduleShiftSchema = new Schema({
     type: Boolean,
     label: 'to be sure of whether shift occurs overnight'
   }),
-
+  lunchBreakInMins: field({
+    type: Number,
+    label: 'lunch break of the shift'
+  }),
   chosenScheduleConfigId: field({
     type: String,
     label: '_id of a chosen schedule config when creating schedule'
   }),
-
   solved: field({
     type: Boolean,
     default: false,
@@ -337,7 +383,8 @@ export const scheduleConfigSchema = new Schema({
   _id: field({ pkey: true }),
   scheduleName: field({
     type: String,
-    label: 'Name of the schedule'
+    label: 'Name of the schedule',
+    index: true
   }),
   lunchBreakInMins: field({
     type: Number,
@@ -357,16 +404,22 @@ export const scheduleConfigSchema = new Schema({
 export const deviceConfigSchema = new Schema({
   _id: field({ pkey: true }),
   deviceName: field({ type: String, label: 'Name of the device' }),
-  serialNo: field({ type: String, label: 'Serial number of the device' }),
+  serialNo: field({
+    type: String,
+    label: 'Serial number of the device',
+    index: true
+  }),
   extractRequired: field({
     type: Boolean,
     label: 'whether extract from the device'
   })
 });
 
+deviceConfigSchema.index({ serialNo: 1 });
+
 export const reportCheckSchema = new Schema({
   _id: field({ pkey: true }),
-  userId: field({ type: String, label: 'User of the report' }),
+  userId: field({ type: String, label: 'User of the report', index: true }),
   startDate: field({ type: String, label: 'Start date of report' }),
   endDate: field({
     type: String,
@@ -401,6 +454,8 @@ export interface IScheduleReport {
   totalMinsLate?: string;
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
+  shiftDuration?: number;
+  checked?: boolean;
 }
 
 export interface IUserReport {
@@ -413,26 +468,32 @@ export interface IUserReport {
   scheduleReport: IScheduleReport[];
 
   totalMinsWorked?: number;
-  totalMinsWorkedToday?: number;
-  totalMinsWorkedThisMonth?: number;
-  totalDaysWorkedThisMonth?: number;
 
   totalMinsScheduled?: number;
-  totalMinsScheduledToday?: number;
-  totalMinsScheduledThisMonth?: number;
-  totalDaysScheduledThisMonth?: number;
 
   totalMinsLate?: number;
-  totalMinsLateToday?: number;
-  totalMinsLateThisMonth?: number;
   totalAbsenceMins?: number;
-  totalMinsAbsenceThisMonth?: number;
+
+  totalHoursWorkedSelectedDay?: number;
+  totalHoursScheduledSelectedDay?: number;
+  totalHoursAbsentSelectedDay?: number;
+  totalMinsLateSelectedDay?: number;
+
+  totalHoursWorkedSelectedMonth?: number;
+  totalHoursScheduledSelectedMonth: number;
+  totalHoursAbsentSelectedMonth?: number;
+  totalMinsLateSelectedMonth?: number;
+
+  totalDaysScheduledSelectedMonth?: number;
+  totalDaysWorkedSelectedMonth?: number;
 }
 
 export interface IUserExportReport {
   firstName?: string;
   lastName?: string;
   branchName?: string;
+  employeeId?: string;
+
   position?: string;
   totalDaysWorked?: number;
   totalHoursWorked?: string;
@@ -444,12 +505,26 @@ export interface IUserExportReport {
   totalHoursOvertime?: string;
   totalHoursOvernight?: string;
 
-  totalHoursBreak?: string;
-  totalHoursBreak2?: string;
-
-  totalMinsLate?: string;
+  totalHoursBreakScheduled?: string;
+  totalHoursBreakTaken?: string;
 
   absenceInfo?: IUserAbsenceInfo;
+
+  totalMinsLate?: number | string;
+  totalAbsenceMins?: number;
+
+  totalHoursWorkedSelectedDay?: number;
+  totalHoursScheduledSelectedDay?: number;
+  totalHoursAbsentSelectedDay?: number;
+  totalMinsLateSelectedDay?: number;
+
+  totalHoursWorkedSelectedMonth?: number;
+  totalHoursScheduledSelectedMonth?: number;
+  totalHoursAbsentSelectedMonth?: number;
+  totalMinsLateSelectedMonth?: number;
+
+  totalDaysScheduledSelectedMonth?: number;
+  totalDaysWorkedSelectedMonth?: number;
 
   scheduleReport?: IScheduleReport[];
 }
