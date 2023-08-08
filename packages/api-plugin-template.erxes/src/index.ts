@@ -9,7 +9,7 @@ import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import { filterXSS } from 'xss';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { ApolloServer } from 'apollo-server-express';
 import * as cookieParser from 'cookie-parser';
 

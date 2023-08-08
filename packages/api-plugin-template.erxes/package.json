@@ -8,6 +8,7 @@
     "test": "jest --coverage --forceExit --runInBand"
   },
   "dependencies": {
+    "@apollo/subgraph": "^2.4.12",
     "apollo-server-core": "^3.6.1",
     "apollo-server-express": "^3.6.1"
   }

@@ -20,5 +20,9 @@
     "nodejs-file-downloader": "^4.10.6",
     "sqlstring": "^2.3.2",
     "ts-node": "^10.4.0"
+  },
+  "resolutions": {
+    "@cubejs-backend/server/**/graphql" : "^16.7.1",
+    "@cubejs-backend/server-core/**/graphql" : "^16.7.1"
   }
 }
