@@ -2,124 +2,115 @@ import { generateModels, IModels } from './connectionResolver';
 import {
   sendFormsMessage,
   sendCoreMessage,
-  sendProductsMessage
+  sendProductsMessage,
+  fetchSegment
 } from './messageBroker';
 import * as moment from 'moment';
 import { IUserDocument } from '@erxes/api-utils/src/types';
 
 const prepareData = async (
   models: IModels,
-  _subdomain: string,
+  subdomain: string,
   query: any
 ): Promise<any[]> => {
-  const { page, perPage } = query;
-
-  const skip = (page - 1) * perPage;
+  const { segmentData, page, perPage } = query;
 
   let data: any[] = [];
 
-  const assetsFilter: any = {};
+  const skip = (page - 1) * perPage;
 
-  data = await models.PosOrders.find(assetsFilter)
-    .skip(skip)
-    .limit(perPage)
-    .lean();
+  const boardItemsFilter: any = {};
+  let itemIds = [];
+
+  if (segmentData.conditions) {
+    itemIds = await fetchSegment(subdomain, '', { page, perPage }, segmentData);
+
+    boardItemsFilter._id = { $in: itemIds };
+  }
+
+  if (!segmentData) {
+    data = await models.PosOrders.find(boardItemsFilter)
+      .skip(skip)
+      .limit(perPage)
+      .lean();
+  }
+
+  data = await models.PosOrders.find(boardItemsFilter).lean();
 
   return data;
 };
 
 const prepareDataCount = async (
   models: IModels,
-  _subdomain: string,
-  _query: any
+  subdomain: string,
+  query: any
 ): Promise<any> => {
+  const { segmentData } = query;
+
   let data = 0;
+  const boardItemsFilter: any = {};
 
-  const assetsFilter: any = {};
+  if (segmentData.conditions) {
+    const itemIds = await fetchSegment(
+      subdomain,
+      '',
+      { scroll: true, page: 1, perPage: 10000 },
+      segmentData
+    );
 
-  data = await models.PosOrders.find(assetsFilter).count();
+    boardItemsFilter._id = { $in: itemIds };
+  }
+
+  data = await models.PosOrders.find(boardItemsFilter).count();
 
   return data;
-};
-const getCustomFieldsData = async (item, fieldId) => {
-  let value;
-  if (item.customFieldsData && item.customFieldsData.length > 0) {
-    for (const customFeild of item.customFieldsData) {
-      if (customFeild.field === fieldId) {
-        value = customFeild.value;
-
-        if (Array.isArray(value)) {
-          value = value.join(', ');
-        }
-
-        return {
-          value
-        };
-      }
-    }
-  }
-  return { value };
 };
 
 export const fillValue = async (
   models: IModels,
   subdomain: string,
   column: string,
-  item: any
+  order: any
 ): Promise<string> => {
-  let value = item[column];
+  let value = order[column];
 
   switch (column) {
     case 'createdAt':
-      value = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss');
-
+      value = moment(order.createdAt).format('YYYY-MM-DD HH:mm:ss');
       break;
     case 'branchId':
-      const branchId = await models.PosOrders.findOne({
-        branchId: item.branchId
-      }).lean();
-      value = branchId ? branchId.branchId : 'branchId not found';
+      value = order.branchId ? order.branchId : 'branchId not found';
       break;
     case 'departmentId':
-      const departmentId = await models.PosOrders.findOne({
-        departmentId: item.departmentId
-      }).lean();
-      value = departmentId
-        ? departmentId.departmentId
-        : 'departmentId not found';
+      const departmentId = order.departmentId;
+      sendCoreMessage({
+        subdomain,
+        action: 'departments.findOne',
+        data: { _id: departmentId },
+        isRPC: true
+      });
+      value = departmentId ? departmentId : 'departmentId not found';
       break;
     case 'customerId':
-      const customerId = await models.PosOrders.findOne({
-        customerId: item.customerId
-      }).lean();
-      value = customerId ? customerId.customerId : 'customerId not found';
+      value = order.customerId ? order.customerId : 'customerId not found';
       break;
     case 'registerNumber':
-      const registerNumber = await models.PosOrders.findOne({
-        registerNumber: item.registerNumber
-      }).lean();
-      value = registerNumber
-        ? registerNumber.registerNumber
+      value = order.registerNumber
+        ? order.registerNumber
         : 'registerNumber not found';
       break;
     case 'totalAmount':
-      const totalAmount = await models.PosOrders.findOne({
-        totalAmount: item.totalAmount
-      }).lean();
-      value = totalAmount ? totalAmount.totalAmount : 'totalAmount not found';
+      value = order.totalAmount ? order.totalAmount : 'totalAmount not found';
       break;
     case 'number':
-      const number = await models.PosOrders.findOne({
-        number: item.number
-      }).lean();
-      value = number ? number.number : 'number not found';
+      value = order.number ? order.number : 'number not found';
       break;
     case 'userId':
       const createdUser: IUserDocument | null = await sendCoreMessage({
         subdomain,
         action: 'users.findOne',
         data: {
-          _id: item.userId
+          _id: order.userId
         },
         isRPC: true
       });
@@ -128,30 +119,24 @@ export const fillValue = async (
 
       break;
     case 'convertDealId':
-      const convertDealId = await models.PosOrders.findOne({
-        convertDealId: item.convertDealId
-      }).lean();
-      value = convertDealId
-        ? convertDealId.convertDealId
+      value = order.convertDealId
+        ? order.convertDealId
         : 'convertDealId not found';
       break;
     case 'billId':
-      const billId = await models.PosOrders.findOne({
-        billId: item.billId
-      }).lean();
-      value = billId ? billId.billId : 'billId not found';
+      value = order.billId ? order.billId : 'billId not found';
       break;
     default:
       break;
   }
 
-  return value || '-';
+  return value || '';
 };
 
-const filposOrderValue = async (subdomain, column, item) => {
+const filposOrderitemValue = async (subdomain, column, item) => {
   const items = item.items;
 
-  const productDocs: any[] = [];
+  const itemsDocs: any[] = [];
 
   for (const itemData of items) {
     let product;
@@ -177,7 +162,7 @@ const filposOrderValue = async (subdomain, column, item) => {
             },
             isRPC: true
           })) || {};
-        value = product.name;
+        value = `${product.code} - ${product.name}`;
       case 'items.unitPrice':
         value = itemData.unitPrice;
         break;
@@ -197,17 +182,16 @@ const filposOrderValue = async (subdomain, column, item) => {
 
     result[column] = value;
 
-    productDocs.push(result);
+    itemsDocs.push(result);
   }
 
-  return productDocs;
+  return itemsDocs;
 };
 export const IMPORT_EXPORT_TYPES = [
   {
     text: 'Pos Orders',
     contentType: 'pos',
-    icon: 'server-alt',
-    skipFilter: true
+    icon: 'server-alt'
   }
 ];
 
@@ -229,31 +213,15 @@ export default {
       totalCount = results;
 
       for (const column of columnsConfig) {
-        if (column.startsWith('customFieldsData')) {
-          const fieldId = column.split('.')[1];
-          const field = await sendFormsMessage({
-            subdomain,
-            action: 'fields.findOne',
-            data: {
-              query: {
-                _id: fieldId
-              }
-            },
-            isRPC: true
-          });
-
-          headers.push(`customFieldsData.${field.text}.${fieldId}`);
+        if (column.startsWith('items')) {
+          headers.push(column);
         } else {
           headers.push(column);
         }
       }
 
       for (const header of headers) {
-        if (header.startsWith('customFieldsData')) {
-          excelHeader.push(header.split('.')[1]);
-        } else {
-          excelHeader.push(header);
-        }
+        excelHeader.push(header);
       }
     } catch (e) {
       return {
@@ -275,66 +243,52 @@ export default {
       const results = await prepareData(models, subdomain, data);
 
       for (const column of columnsConfig) {
-        if (column.startsWith('customFieldsData')) {
-          const fieldId = column.split('.')[1];
-          const field = await sendFormsMessage({
-            subdomain,
-            action: 'fields.findOne',
-            data: {
-              query: { _id: fieldId }
-            },
-            isRPC: true
-          });
-
-          headers.push(`customFieldsData.${field.text}.${fieldId}`);
-        } else if (column.startsWith('items')) {
+        if (column.startsWith('items')) {
           headers.push(column);
         } else {
           headers.push(column);
         }
       }
 
-      for (const item of results) {
+      for (const order of results) {
         const result = {};
-        const productDocs = [] as any;
-        const productsArray = [] as any;
+        const OrderItemsDocs = [] as any;
+        const posOrderItemsArray = [] as any;
 
         for (const column of headers) {
-          if (column.startsWith('customFieldsData')) {
-            const fieldId = column.split('.')[2];
-            const fieldName = column.split('.')[1];
-
-            const { value } = await getCustomFieldsData(item, fieldId);
-
-            result[fieldName] = value || '-';
-          } else if (column.startsWith('items')) {
-            const productItem = await filposOrderValue(subdomain, column, item);
-
-            productDocs.push(productItem);
+          let posOrderItem = {};
+          if (column.startsWith('items')) {
+            posOrderItem = {
+              ...posOrderItem,
+              ...(await filposOrderitemValue(subdomain, column, order))
+            };
           } else {
-            const value = await fillValue(models, subdomain, column, item);
-
-            result[column] = value || '-';
+            posOrderItem = {
+              ...posOrderItem,
+              [column]: await fillValue(models, subdomain, column, order)
+            };
           }
+          console.log(posOrderItem, 'posOrderItem');
+          OrderItemsDocs.push(posOrderItem);
         }
 
-        if (productDocs.length > 0) {
-          for (let i = 0; i < productDocs.length; i++) {
+        if (OrderItemsDocs.length > 0) {
+          for (let i = 0; i < OrderItemsDocs.length; i++) {
             const sortedItem = [] as any;
 
-            for (const productDoc of productDocs) {
-              sortedItem.push(productDoc[i]);
+            for (const posOrderDoc of OrderItemsDocs) {
+              sortedItem.push(posOrderDoc[i]);
             }
 
-            productsArray.push(sortedItem);
+            posOrderItemsArray.push(sortedItem);
           }
         }
 
-        if (productDocs.length > 0) {
+        if (OrderItemsDocs.length > 0) {
           let index = 0;
 
-          for (const productElement of productsArray) {
-            const mergedObject = Object.assign({}, ...productElement);
+          for (const posOrderElement of posOrderItemsArray) {
+            const mergedObject = Object.assign({}, ...posOrderElement);
             if (index === 0) {
               docs.push({
                 ...result,
