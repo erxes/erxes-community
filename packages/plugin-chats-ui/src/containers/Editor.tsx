@@ -35,8 +35,7 @@ const EditorContainer = (props: Props) => {
     Alert.error(error.message);
   }
 
-  const { chatDetail } = data;
-  const { participantUsers } = chatDetail;
+  const { participantUsers = [] } = data?.chatDetail || {};
   const mentions = [] as any;
   participantUsers &&
     participantUsers.map((user: any) => {
@@ -49,15 +48,20 @@ const EditorContainer = (props: Props) => {
 
   const sendMessage = (variables, callback: () => void) => {
     const { attachments, mentionedUserIds, content } = variables;
+    let defaultContent = content;
+
     if (!(content || mentionedUserIds || attachments)) {
       return;
     }
 
+    if (!content) {
+      defaultContent = '<p></p>';
+    }
     const relatedId = (reply && reply._id) || null;
 
     addMutation({
       variables: {
-        content,
+        content: defaultContent,
         chatId,
         relatedId,
         attachments,

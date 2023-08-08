@@ -104,11 +104,18 @@ const Editor = (props: Props) => {
     setUploadLoading(true);
     uploadHandler({
       files,
+      maxHeight: 725,
+      maxWidth: 725,
       beforeUpload: () => {
         return;
       },
 
-      afterUpload: ({ response, fileInfo }) => {
+      afterUpload: ({ status, response, fileInfo }) => {
+        if (status !== 'ok') {
+          Alert.error(response.statusText);
+          return setUploadLoading(false);
+        }
+        Alert.success('Success');
         setAttachments([
           ...attachments,
           Object.assign({ url: response }, fileInfo)
@@ -127,7 +134,7 @@ const Editor = (props: Props) => {
           <Tip text={__('Audio')}>
             <label>
               <Icon icon="audio" />
-              <input type="file" onChange={() => {}} multiple={true} />
+              <input type="file" multiple={true} />
             </label>
           </Tip>
           <Tip text={__('Audio')}>
@@ -209,7 +216,7 @@ const Editor = (props: Props) => {
       return (
         <AttachmentIndicator>
           <Attachment>
-            <div>Uploading...</div>
+            Uploading...
             {<SmallLoader />}
           </Attachment>
         </AttachmentIndicator>

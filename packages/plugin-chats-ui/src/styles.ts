@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { colors, dimensions } from '@erxes/ui/src/styles';
 import { darken, rgba } from '@erxes/ui/src/styles/ecolor';
@@ -51,17 +51,43 @@ export const IconButton = styled.button`
   }
 `;
 
-export const Button = styledTS<{ isRecording: boolean }>(styled.button)`
-         background-color: ${props =>
-           props.isRecording ? colors.colorShadowGray : 'none'};
+export const VoiceRecordWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 ${dimensions.coreSpacing}px;
+`;
+
+export const RecordButton = styledTS<{ isRecording: boolean }>(styled.button)`
+  background-color: ${props =>
+    props.isRecording ? colors.colorShadowGray : 'none'};
   border-radius: 100%;
   border: none;
   cursor: pointer;
   padding: 0 5px;
   transition: transform 0.3s ease-in-out;
+  margin-right: 5px;
 
-  ${props => props.isRecording && 'transform: scale(1.4)'}
-         `;
+  animation: ${props =>
+    props.isRecording &&
+    css`
+      ${pulse} 1s infinite;
+    `};
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
 
 export const Title = styled.h5`
   margin: 0;
@@ -72,7 +98,6 @@ export const Title = styled.h5`
 
 export const ChatActions = styled.div`
   z-index: 1;
-  visibility: hidden;
 
   position: absolute;
   right: ${dimensions.coreSpacing}px;
@@ -224,6 +249,7 @@ export const ChatListWrapper = styled.div`
   padding-left: 0;
   margin: 0;
   margin-bottom: 0.5em;
+  z-index: 0;
 `;
 
 export const ChatItemWrapper = styledTS<{
@@ -256,6 +282,7 @@ export const ChatItemWrapper = styledTS<{
     cursor: pointer;
     transition: 0.2s;
   }
+  z-index: 0
 `;
 
 export const ChatGroupAvatar = styled.div`
@@ -540,16 +567,17 @@ export const MessageOption = styled.button`
   }
 `;
 
-export const MessageAttachmentWrapper = styled.div`
+export const MessageAttachmentWrapper = styledTS<{ isWidget?: boolean }>(
+  styled.div
+)`
   max-width: 560px;
   height: auto;
   overflow: hidden;
   position: relative;
 
   & img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
+    max-width: ${props => (props.isWidget ? '250px' : '300px')};
+    height: ${props => (props.isWidget ? '200px' : '100%')};
     right: 0;
   }
 `;

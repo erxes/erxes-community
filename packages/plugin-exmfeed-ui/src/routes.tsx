@@ -3,18 +3,18 @@ import { Route } from 'react-router-dom';
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import queryString from 'query-string';
 
-const Home = asyncComponent(() =>
+const List = asyncComponent(() =>
   import(/* webpackChunkName: "Plugin exm feed" */ './containers/Home')
 );
 
-const home = ({ location, history }) => {
+const Home = ({ location, history }) => {
   return (
-    <Home queryParams={queryString.parse(location.search)} history={history} />
+    <List queryParams={queryString.parse(location.search)} history={history} />
   );
 };
 
 const ExmRoutes = () => (
-  <Route path="/erxes-plugin-exm-feed/home" component={home} />
+  <Route path="/erxes-plugin-exm-feed/home" component={Home} />
 );
 
 export default ExmRoutes;

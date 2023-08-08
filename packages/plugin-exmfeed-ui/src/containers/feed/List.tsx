@@ -6,6 +6,7 @@ import List from '../../components/feed/List';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { gql } from '@apollo/client';
+import WelcomeList from '../../components/WelcomeList';
 
 type Props = {
   queryParams: any;
@@ -59,6 +60,10 @@ export default function ListContainer(props: Props) {
   };
 
   const { list, totalCount } = feedResponse.data.exmFeed || {};
+
+  if (contentType === 'welcome') {
+    return <WelcomeList list={list} totalCount={totalCount} limit={limit} />;
+  }
 
   return (
     <List

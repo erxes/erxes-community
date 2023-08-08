@@ -13,10 +13,11 @@ type Props = {
   chatId: string;
   setReply: (message: any) => void;
   currentUser: IUser;
+  isWidget?: boolean;
 };
 
 const MessageListContainer = (props: Props) => {
-  const { chatId } = props;
+  const { chatId, isWidget } = props;
 
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
@@ -26,11 +27,6 @@ const MessageListContainer = (props: Props) => {
       variables: { chatId, skip: 0 }
     }
   );
-  const {
-    loading: notificationLoading,
-    error: notificationError,
-    data: notificationData
-  } = useQuery(gql(queries.notificationsGetConfigurations), {});
 
   useEffect(() => {
     refetch();
@@ -83,15 +79,15 @@ const MessageListContainer = (props: Props) => {
     });
   };
 
-  if (loading || notificationLoading) {
+  if (loading) {
     return <Spinner />;
   }
 
-  if (error || notificationError) {
+  if (error) {
     Alert.error(error.message);
   }
 
-  const chatMessages = (data && data.chatMessages.list) || [];
+  const chatMessages = (data && data.chatMessages?.list) || [];
 
   return (
     <Component
@@ -100,6 +96,7 @@ const MessageListContainer = (props: Props) => {
       isAllMessages={chatMessages.length < (page + 1) * 20}
       setReply={props.setReply}
       loadEarlierMessage={loadEarlierMessage}
+      isWidget={isWidget}
     />
   );
 };

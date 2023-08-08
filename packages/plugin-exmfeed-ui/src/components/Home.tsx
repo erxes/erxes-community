@@ -34,6 +34,14 @@ export default function Home(props: Props) {
       );
     }
 
+    if (currentTab === 'welcome') {
+      return (
+        <>
+          <List queryParams={queryParams} contentType={currentTab} />
+        </>
+      );
+    }
+
     return (
       <>
         <Form contentType={currentTab} />
@@ -45,51 +53,48 @@ export default function Home(props: Props) {
   const renderContent = () => {
     return (
       <FeedLayout>
-        <Row>
-          <Col width={50}>
-            <Tabs full={true}>
-              <TabTitle
-                className={currentTab === 'post' ? 'active' : ''}
-                onClick={() => onClickTab('post')}
-              >
-                Post
-              </TabTitle>
-              <TabTitle
-                className={currentTab === 'event' ? 'active' : ''}
-                onClick={() => onClickTab('event')}
-              >
-                Event
-              </TabTitle>
-              <TabTitle
-                className={currentTab === 'bravo' ? 'active' : ''}
-                onClick={() => onClickTab('bravo')}
-              >
-                Bravo{' '}
-                <Link
-                  target="_blank"
-                  to={`/settings/properties?type=exmFeedBravo`}
-                >
-                  <Icon color="black" icon="cog" />
-                </Link>
-              </TabTitle>
-              <TabTitle
-                className={currentTab === 'thankyou' ? 'active' : ''}
-                onClick={() => onClickTab('thankyou')}
-              >
-                Thank you
-              </TabTitle>
-              <TabTitle
-                className={currentTab === 'publicHoliday' ? 'active' : ''}
-                onClick={() => onClickTab('publicHoliday')}
-              >
-                Public holiday
-              </TabTitle>
-            </Tabs>
-            <TabContent>{renderTabContent()}</TabContent>
-          </Col>
-          <Col>hi</Col>
-          <Col>hi</Col>
-        </Row>
+        <Tabs full={true}>
+          <TabTitle
+            className={currentTab === 'post' ? 'active' : ''}
+            onClick={() => onClickTab('post')}
+          >
+            Post
+          </TabTitle>
+          <TabTitle
+            className={currentTab === 'event' ? 'active' : ''}
+            onClick={() => onClickTab('event')}
+          >
+            Event
+          </TabTitle>
+          <TabTitle
+            className={currentTab === 'bravo' ? 'active' : ''}
+            onClick={() => onClickTab('bravo')}
+          >
+            Bravo{' '}
+            <Link target="_blank" to={`/settings/properties?type=exmFeedBravo`}>
+              <Icon color="black" icon="cog" />
+            </Link>
+          </TabTitle>
+          <TabTitle
+            className={currentTab === 'thankyou' ? 'active' : ''}
+            onClick={() => onClickTab('thankyou')}
+          >
+            Thank you
+          </TabTitle>
+          <TabTitle
+            className={currentTab === 'publicHoliday' ? 'active' : ''}
+            onClick={() => onClickTab('publicHoliday')}
+          >
+            Public holiday
+          </TabTitle>
+          <TabTitle
+            className={currentTab === 'welcome' ? 'active' : ''}
+            onClick={() => onClickTab('welcome')}
+          >
+            Welcome
+          </TabTitle>
+        </Tabs>
+        <TabContent>{renderTabContent()}</TabContent>
       </FeedLayout>
     );
   };

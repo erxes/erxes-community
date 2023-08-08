@@ -1,25 +1,35 @@
-import { CustomRangeContainer, UploadItems } from '../../styles';
+import {
+  ClearButton,
+  CustomRangeContainer,
+  SelectWrapper,
+  UploadItems
+} from '../../styles';
 import { Form, FormControl, SelectTeamMembers, Uploader } from '@erxes/ui/src/';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
 import React, { useState } from 'react';
-import { description, getDepartmentOptions, title } from '../../utils';
+import { description, title } from '../../utils';
 
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import GenerateFields from '../GenerateFields';
 import Select from 'react-select-plus';
 import { __ } from '@erxes/ui/src/utils';
+import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
+import SelectBranches from '@erxes/ui/src/team/containers/SelectBranches';
+import Icon from '@erxes/ui/src/components/Icon';
 
 type Props = {
   item?: any;
   closeModal?: () => void;
   renderButton: (props: IButtonMutateProps) => any;
   fields: any[];
+  unitList?: any[];
   departments: any[];
 };
 
 export default function EventForm(props: Props) {
-  const { item = {}, fields, departments } = props;
+  const { item = {}, fields } = props;
+  const unitList = props.unitList || [];
 
   const [attachments, setAttachment] = useState(item.attachments || []);
   const [images, setImages] = useState(item.images || []);
@@ -35,15 +45,36 @@ export default function EventForm(props: Props) {
     startDate: itemEventData.startDate,
     endDate: itemEventData.endDate
   });
+  const [departmentIds, setDepartmentIds] = useState(item.departmentIds || []);
+  const [branchIds, setBranchIds] = useState(item?.branchIds || []);
+  const [unitId, setUnitId] = useState(item?.unitId || '');
 
-  const [selectedDepartment, setSelectedDepartment] = useState<any>(null);
+  const onChangeDepartments = (option: any) => {
+    setDepartmentIds(option);
+  };
 
-  const onChangeDepartment = (option: any) => {
-    setSelectedDepartment(option);
+  const onChangeBranches = (option: any) => {
+    setBranchIds(option);
+  };
+
+  const onChangeUnit = (option: any) => {
+    setUnitId(option.value);
   };
 
   const onChangeEventData = (key, value) => {
     setEventData({ ...eventData, [key]: value });
+  };
+
+  const renderClearButton = () => {
+    if (unitId) {
+      return (
+        <ClearButton onClick={() => setUnitId('')}>
+          <Icon icon="times" />
+        </ClearButton>
+      );
+    }
+
+    return null;
   };
 
   const renderContent = (formProps: IFormProps) => {
@@ -117,14 +148,37 @@ export default function EventForm(props: Props) {
           value={eventData.where}
           onChange={(e: any) => onChangeEventData('where', e.target.value)}
         />
-        <Select
-          placeholder="Choose one department"
-          name="departmentId"
-          value={selectedDepartment}
-          onChange={onChangeDepartment}
-          multi={false}
-          options={getDepartmentOptions(departments)}
+
+        <SelectDepartments
+          label="Choose department"
+          name="departmentIds"
+          initialValue={departmentIds}
+          onSelect={onChangeDepartments}
+          multi={true}
         />
+
+        <SelectBranches
+          name="branchIds"
+          label="Choose Branches"
+          multi={true}
+          initialValue={branchIds}
+          onSelect={onChangeBranches}
+        />
+
+        <SelectWrapper>
+          <Select
+            name={'unitId'}
+            multi={false}
+            placeholder={'Choose Unit'}
+            value={unitId}
+            onChange={onChangeUnit}
+            options={unitList.map(unit => ({
+              value: unit._id,
+              label: unit.title
+            }))}
+          />
+          {renderClearButton()}
+        </SelectWrapper>
 
         <GenerateFields
           fields={fields}
@@ -156,7 +210,9 @@ export default function EventForm(props: Props) {
             recipientIds,
             customFieldsData,
             eventData,
-            department: selectedDepartment ? selectedDepartment.label : null
+            departmentIds,
+            branchIds,
+            unitId
           },
           isSubmitted,
           callback: closeModal

@@ -32,12 +32,20 @@ export default function FormContainer(props: Props) {
     }
   });
 
+  const unitResponse = useQuery(gql(queries.unitsMain), {
+    variables: {}
+  });
+
   const { data: dataDepartment, loading: loadingDepartment } = useQuery(
     gql(queries.departments)
   );
 
   if (loadingDepartment) {
     return <Spinner />;
+  }
+
+  if (unitResponse.loading) {
+    return <Spinner objective={true} />;
   }
 
   const renderButton = ({
@@ -81,10 +89,13 @@ export default function FormContainer(props: Props) {
 
   const fields = (data && data.fields) || [];
 
+  const unitList = unitResponse.data.unitsMain.list || [];
+
   const updateProps = {
     ...props,
     fields,
     departments: dataDepartment && dataDepartment.departments,
+    unitList,
     renderButton
   };
 

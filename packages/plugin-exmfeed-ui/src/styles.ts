@@ -260,5 +260,29 @@ export const Sidebar = styled.ul`
     &:hover {
       background: ${colors.bgLight};
     }
+`;
+
+export const SelectWrapper = styled.div`
+  position: relative;
+
+  .Select-clear-zone {
+    visibility: hidden;
+  }
+`;
+
+export const ClearButton = styled.div`
+  position: absolute;
+  right: 18px;
+  font-size: 16px;
+  top: 50%;
+  width: 18px;
+  z-index: 2;
+  color: #999;
+  line-height: 24px;
+  margin-top: -14px;
+
+  &:hover {
+    color: #ea475d;
+    cursor: pointer;
   }
 `;
