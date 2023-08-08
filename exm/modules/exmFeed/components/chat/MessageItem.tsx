@@ -85,11 +85,11 @@ const MessageItem = (props: Props) => {
         )}
         <MessageBody me={isMe} id="MessageBody">
           <Tip placement="top" text="Reply">
-            <MessageOption id="test"
+            <MessageOption 
               onClick={() => props.setReply(message)}
               innerRef={actionRef}
             >
-              <Icon icon="reply" color="secondary" />
+              <Icon icon="reply" color="#9d9d9d" />
             </MessageOption>
           </Tip>
           <Tip
