@@ -6,19 +6,19 @@ import {
   LikeCommentShare,
   NavItem,
   NewsFeedLayout,
-  TextFeed,
-} from "../../styles";
+  TextFeed
+} from '../../styles';
 
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownToggle from "../../../common/DropdownToggle";
-import Form from "../../containers/feed/Form";
-import Icon from "../../../common/Icon";
-import LoadMore from "../../../common/LoadMore";
-import ModalTrigger from "../../../common/ModalTrigger";
-import React from "react";
-import dayjs from "dayjs";
-import { getUserAvatar } from "../../../utils";
-import { readFile } from "../../../common/utils";
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownToggle from '../../../common/DropdownToggle';
+import Form from '../../containers/feed/Form';
+import Icon from '../../../common/Icon';
+import LoadMore from '../../../common/LoadMore';
+import ModalTrigger from '../../../common/ModalTrigger';
+import React from 'react';
+import dayjs from 'dayjs';
+import { getUserAvatar } from '../../../utils';
+import { readFile } from '../../../common/utils';
 
 type Props = {
   list: any;
@@ -33,7 +33,7 @@ export default function List({
   deleteItem,
   pinItem,
   totalCount,
-  limit,
+  limit
 }: Props) {
   const editItem = (item) => {
     const trigger = (
@@ -59,6 +59,24 @@ export default function List({
   const renderItem = (item: any) => {
     const createdUser = item.createdUser || {};
 
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    let links = [];
+    let updatedDescription = '';
+
+    if (item.description) {
+      const matches = item.description.match(urlRegex);
+
+      if (matches) {
+        updatedDescription = matches.reduce(
+          (prevDescription, link) => prevDescription.replace(link, ''),
+          item.description
+        );
+
+        links = matches;
+      }
+    }
+
     return (
       <div key={item._id}>
         <HeaderFeed>
@@ -68,7 +86,7 @@ export default function List({
                 (createdUser &&
                   createdUser.details &&
                   createdUser.details.fullName) ||
-                "author"
+                'author'
               }
               src={getUserAvatar(createdUser)}
             />
@@ -86,7 +104,7 @@ export default function List({
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
+                {dayjs(item.createdAt).format('MM/DD/YYYY h:mm A')}{' '}
                 <b>#{item.contentType}</b>
               </p>
             </div>
@@ -105,7 +123,7 @@ export default function List({
                   </li>
                   <li>
                     <a onClick={() => pinItem(item._id)}>
-                      {item.isPinned ? "UnPin" : "Pin"}
+                      {item.isPinned ? 'UnPin' : 'Pin'}
                     </a>
                   </li>
                 </Dropdown.Menu>
@@ -115,7 +133,22 @@ export default function List({
         </HeaderFeed>
         <TextFeed>
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
-          <p dangerouslySetInnerHTML={{ __html: item.description }} />
+          <p dangerouslySetInnerHTML={{ __html: updatedDescription }} />
+          {links.map((link, index) => {
+            return (
+              <iframe
+                key={index}
+                width="640"
+                height="390"
+                src={String(link)
+                  .replace('watch?v=', 'embed/')
+                  .replace('youtu.be/', 'youtube.com/embed/')
+                  .replace('share/', 'embed/')}
+                title="Video"
+                allowFullScreen={true}
+              />
+            );
+          })}
         </TextFeed>
         {(item.attachments || []).map((a, index) => {
           return (
