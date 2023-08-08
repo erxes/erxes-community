@@ -35,7 +35,7 @@ const downloadRouter = async () => {
   }
   const args = [
     '-c',
-    `cd ${downloadsPath} && curl -sSL https://router.apollo.dev/download/nix/v1.10.2 | sh`
+    `cd ${downloadsPath} && curl -sSL https://router.apollo.dev/download/nix/v1.26.0 | sh`
   ];
   spawnSync('sh', args, { stdio: 'inherit' });
 };
@@ -45,14 +45,15 @@ const createRouterConfig = () => {
     // Don't rewrite in production if it exists. Delete and restart to update the config
     return;
   }
-  const rhaiPath = path.resolve(__dirname, 'rhai/main.rhai');
+  const rhaiPath = path.resolve(__dirname, 'rhai');
 
   const config = {
     include_subgraph_errors: {
       all: true
     },
     rhai: {
-      main: rhaiPath
+      scripts: rhaiPath,
+      main: 'main.rhai'
     },
     cors: {
       allow_credentials: true,
@@ -91,6 +92,18 @@ const startRouter = async (
   downloadRouter();
 
   const devOptions = ['--dev', '--hot-reload'];
+
+  console.log("-------------------------------routerConfigPath--------------------------------")
+  console.log([
+    ...(NODE_ENV === 'development' ? devOptions : []),
+    '--log',
+    NODE_ENV === 'development' ? 'warn' : 'error',
+    `--supergraph`,
+    supergraphPath,
+    `--config`,
+    routerConfigPath
+  ]);
+  console.log("----------------------------------------------------------------------")
 
   const routerProcess = spawn(
     routerPath,

@@ -100,7 +100,7 @@ const stopRouter = () => {
   app.use(cors(corsOptions));
 
   const targets: ErxesProxyTarget[] = await retryGetProxyTargets();
-  await apolloRouter(targets);
+  apolloRouterProcess = await apolloRouter(targets);
 
   applyProxiesCoreless(app, targets);
 
@@ -154,7 +154,7 @@ const stopRouter = () => {
         subscriptionServer.dispose();
       } catch (e) {}
     }
-    stopRouter();
+    await stopRouter();
     process.exit(0);
   });
 });
