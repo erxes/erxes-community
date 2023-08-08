@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import AbsenceList from '../../components/absence/AbsenceList';
@@ -14,16 +14,8 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import { Alert, confirm } from '@erxes/ui/src/utils';
 import { IAttachment } from '@erxes/ui/src/types';
 import { generateParams } from '../../utils';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 
 type Props = {
-  currentUser: IUser;
-  departments: IDepartment[];
-  branches: IBranch[];
-
-  isCurrentUserAdmin: boolean;
-
   history: any;
   queryParams: any;
   explanation?: string;
@@ -139,6 +131,7 @@ const ListContainer = (props: FinalProps) => {
     submitCheckInOutRequestMutation({
       variables: {
         checkType: type,
+        userId: `${userId}`,
         checkTime: dateVal
       }
     })
@@ -167,8 +160,8 @@ export default withProps<Props>(
   compose(
     graphql<Props, AbsenceQueryResponse>(gql(queries.requestsMain), {
       name: 'listAbsenceQuery',
-      options: ({ queryParams, isCurrentUserAdmin }) => ({
-        variables: { ...generateParams(queryParams), isCurrentUserAdmin },
+      options: ({ queryParams }) => ({
+        variables: generateParams(queryParams),
         fetchPolicy: 'network-only'
       })
     }),

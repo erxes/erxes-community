@@ -6,20 +6,15 @@ import { FlexColumnCustom, SidebarActions, SidebarHeader } from '../../styles';
 import { CustomRangeContainer } from '../../styles';
 import DateControl from '@erxes/ui/src/components/form/DateControl';
 import Button from '@erxes/ui/src/components/Button';
+import SelectDepartments from '@erxes/ui-settings/src/departments/containers/SelectDepartments';
 import Select from 'react-select-plus';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
-import { IUser } from '@erxes/ui/src/auth/types';
-import { prepareCurrentUserOption } from '../../utils';
+import { IBranch } from '@erxes/ui/src/team/types';
 
 type Props = {
-  currentUser: IUser;
-  isCurrentUserAdmin: boolean;
-
   queryParams: any;
   history: any;
-  branches: IBranch[];
-  departments: IDepartment[];
+  branchesList: IBranch[];
 };
 // get 1st of the next Month
 const NOW = new Date();
@@ -28,45 +23,10 @@ const startOfNextMonth = new Date(NOW.getFullYear(), NOW.getMonth() + 1, 1);
 const startOfThisMonth = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
 
 const LeftSideBar = (props: Props) => {
-  const {
-    history,
-    branches,
-    queryParams,
-    departments,
-    currentUser,
-    isCurrentUserAdmin
-  } = props;
-
+  const { history, branchesList, queryParams } = props;
   const [currUserIds, setUserIds] = useState(queryParams.userIds);
-
   const [selectedBranches, setBranches] = useState(queryParams.branchIds);
-  const [selectedDepartments, setDepartments] = useState(
-    queryParams.departmentIds
-  );
-
-  const returnTotalUserOptions = () => {
-    const totalUserOptions: string[] = [];
-
-    for (const dept of departments) {
-      totalUserOptions.push(...dept.userIds);
-    }
-
-    for (const branch of branches) {
-      totalUserOptions.push(...branch.userIds);
-    }
-
-    totalUserOptions.push(currentUser._id);
-
-    return totalUserOptions;
-  };
-
-  const filterParams = isCurrentUserAdmin
-    ? {}
-    : {
-        ids: returnTotalUserOptions(),
-        excludeIds: false
-      };
-
+  const [deptIds, setDeptIds] = useState(queryParams.departmentIds);
   const [startDate, setStartDate] = useState(
     queryParams.startDate || startOfThisMonth
   );
@@ -112,16 +72,8 @@ const LeftSideBar = (props: Props) => {
     setParams('endDate', startOfNextMonth);
   }
 
-  const renderDepartmentOptions = (depts: IDepartment[]) => {
-    return depts.map(dept => ({
-      value: dept._id,
-      label: dept.title,
-      userIds: dept.userIds
-    }));
-  };
-
-  const renderBranchOptions = (branchesList: IBranch[]) => {
-    return branchesList.map(branch => ({
+  const renderBranchOptions = (branches: any[]) => {
+    return branches.map(branch => ({
       value: branch._id,
       label: branch.title,
       userIds: branch.userIds
@@ -140,16 +92,10 @@ const LeftSideBar = (props: Props) => {
     setParams('branchIds', selectedBranchIds);
   };
 
-  const onDepartmentSelect = selectedDepartment => {
-    setDepartments(selectedDepartment);
+  const onDepartmentSelect = dept => {
+    setDeptIds(dept);
 
-    const selectedDepartmentIds: string[] = [];
-
-    selectedDepartment.map(department => {
-      selectedDepartmentIds.push(department.value);
-    });
-
-    setParams('departmentIds', selectedDepartmentIds);
+    setParams('departmentIds', dept);
   };
 
   const onMemberSelect = selectedUsers => {
@@ -201,24 +147,19 @@ const LeftSideBar = (props: Props) => {
   return (
     <Sidebar wide={true} hasBorder={true} header={renderSidebarHeader()}>
       <FlexColumnCustom marginNum={20}>
-        <div>
-          <ControlLabel>Departments</ControlLabel>
-          <Select
-            value={selectedDepartments}
-            onChange={onDepartmentSelect}
-            placeholder="Select departments"
-            multi={true}
-            options={departments && renderDepartmentOptions(departments)}
-          />
-        </div>
+        <SelectDepartments
+          isRequired={false}
+          defaultValue={deptIds}
+          onChange={onDepartmentSelect}
+        />
         <div>
           <ControlLabel>Branches</ControlLabel>
           <Select
             value={selectedBranches}
             onChange={onBranchSelect}
-            placeholder="Select branches"
+            placeholder="Select branch"
             multi={true}
-            options={branches && renderBranchOptions(branches)}
+            options={branchesList && renderBranchOptions(branchesList)}
           />
         </div>
         <div>
@@ -228,8 +169,6 @@ const LeftSideBar = (props: Props) => {
             customField="employeeId"
             label="Select team member"
             name="userIds"
-            customOption={prepareCurrentUserOption(currentUser)}
-            filterParams={filterParams}
             queryParams={queryParams}
             onSelect={onMemberSelect}
           />

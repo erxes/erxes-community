@@ -24,24 +24,18 @@ import Icon from '@erxes/ui/src/components/Icon';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import { Row } from '../../styles';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import { IBranch } from '@erxes/ui/src/team/types';
 import { Alert, __ } from '@erxes/ui/src/utils';
-import { compareStartAndEndTime, prepareCurrentUserOption } from '../../utils';
+import { compareStartAndEndTime } from '../../utils';
 import Datetime from '@nateradebaugh/react-datetime';
 import Tip from '@erxes/ui/src/components/Tip';
 import { dateFormat } from '../../constants';
-import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
-  currentUser: IUser;
-  isCurrentUserAdmin: boolean;
-
-  branches: IBranch[];
-  departments: IDepartment[];
-
   scheduleOfMembers: any;
   queryParams: any;
   history: any;
+  branchesList: IBranch[];
   modalContentType: string;
   scheduleConfigs: IScheduleConfig[];
 
@@ -52,47 +46,17 @@ type Props = {
 
 function ScheduleForm(props: Props) {
   const {
-    currentUser,
-    isCurrentUserAdmin,
     queryParams,
     closeModal,
-
-    branches,
-    departments,
-
+    branchesList,
     modalContentType,
     scheduleConfigs,
     checkDuplicateScheduleShifts
   } = props;
 
-  const returnTotalUserOptions = () => {
-    const totalUserOptions: string[] = [];
-
-    for (const dept of departments) {
-      totalUserOptions.push(...dept.userIds);
-    }
-
-    for (const branch of branches) {
-      totalUserOptions.push(...branch.userIds);
-    }
-
-    if (currentUser) {
-      totalUserOptions.push(currentUser._id);
-    }
-
-    return totalUserOptions;
-  };
-
   if (!scheduleConfigs.length) {
     Alert.error('Please add schedule config in configuration section!');
   }
-
-  const filterParams = isCurrentUserAdmin
-    ? {}
-    : {
-        ids: returnTotalUserOptions(),
-        excludeIds: false
-      };
 
   // prepare schedule configsObject
   const scheduleConfigsObject = {};
@@ -129,8 +93,8 @@ function ScheduleForm(props: Props) {
 
   const [overlayTrigger, setOverlayTrigger] = useState<any>(null);
 
-  const renderBranchOptions = (branchesList: any[]) => {
-    return branchesList.map(branch => ({
+  const renderBranchOptions = (branches: any[]) => {
+    return branches.map(branch => ({
       value: branch._id,
       label: branch.title,
       userIds: branch.userIds
@@ -238,8 +202,7 @@ function ScheduleForm(props: Props) {
     return {
       shiftStart: shift.shiftStart,
       shiftEnd: shift.shiftEnd,
-      scheduleConfigId: shift.scheduleConfigId,
-      lunchBreakInMins: shift.lunchBreakInMins
+      scheduleConfigId: shift.scheduleConfigId
     };
   });
 
@@ -431,30 +394,10 @@ function ScheduleForm(props: Props) {
     );
   };
 
-  const dateSelection = () => (
-    <div style={{ width: '78%', marginRight: '0.5rem' }}>
-      <OverlayTrigger
-        ref={overlay => setOverlayTrigger(overlay)}
-        placement="top-start"
-        trigger="click"
-        overlay={renderDateSelection()}
-        container={this}
-        rootClose={this}
-      >
-        <PopoverButton>
-          {__('Please select date')}
-          <Icon icon="angle-down" />
-        </PopoverButton>
-      </OverlayTrigger>
-    </div>
-  );
-
   const modalContent = () => (
     <FlexColumn marginNum={10}>
       <SelectTeamMembers
         customField="employeeId"
-        filterParams={filterParams}
-        customOption={prepareCurrentUserOption(currentUser)}
         queryParams={queryParams}
         label={'Team member'}
         onSelect={onUserSelect}
@@ -462,7 +405,6 @@ function ScheduleForm(props: Props) {
         name="userId"
       />
       {displayTotalDaysHoursBreakMins()}
-      {dateSelection()}
       {renderWeekDays()}
       {actionButtons('employee')}
     </FlexColumn>
@@ -515,7 +457,7 @@ function ScheduleForm(props: Props) {
                 onChange={onBranchSelect}
                 placeholder="Select branch"
                 multi={true}
-                options={branches && renderBranchOptions(branches)}
+                options={branchesList && renderBranchOptions(branchesList)}
               />
             </Row>
           </div>
@@ -526,8 +468,6 @@ function ScheduleForm(props: Props) {
             <div style={{ width: '100%' }}>
               <SelectTeamMembers
                 customField="employeeId"
-                filterParams={filterParams}
-                customOption={prepareCurrentUserOption(currentUser)}
                 queryParams={queryParams}
                 label={'Select team member'}
                 onSelect={onUserSelect}

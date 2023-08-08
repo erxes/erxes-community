@@ -1,24 +1,22 @@
 import { getEnv, isEnabled, withProps } from '@erxes/ui/src/utils/core';
 import queryString from 'query-string';
 import * as compose from 'lodash.flowright';
-import { graphql } from '@apollo/client/react/hoc';
-import { gql } from '@apollo/client';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
 import React from 'react';
 import ReportList from '../../components/report/ReportList';
 import { queries } from '../../graphql';
 import { BranchesQueryResponse, ReportsQueryResponse } from '../../types';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { generateParams } from '../../utils';
-import { IUser } from '@erxes/ui/src/auth/types';
+import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 
 type Props = {
   history: any;
   queryParams: any;
   searchValue?: string;
-  isCurrentUserAdmin: boolean;
 
   reportType?: string;
-  currentUser: IUser;
 
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
@@ -31,7 +29,7 @@ type FinalProps = {
 } & Props;
 
 const ListContainer = (props: FinalProps) => {
-  const { listReportsQuery, queryParams, currentUser } = props;
+  const { listReportsQuery, queryParams } = props;
   const { branchId, deptId } = queryParams;
 
   if (listReportsQuery && listReportsQuery.loading) {
@@ -40,8 +38,7 @@ const ListContainer = (props: FinalProps) => {
 
   const exportReport = () => {
     const stringified = queryString.stringify({
-      ...queryParams,
-      currentUserId: currentUser._id
+      ...queryParams
     });
 
     const { REACT_APP_API_URL } = getEnv();
@@ -70,11 +67,10 @@ export default withProps<Props>(
     graphql<Props, ReportsQueryResponse>(gql(queries.timeclockReports), {
       name: 'listReportsQuery',
       skip: isEnabled('bichil') || false,
-      options: ({ queryParams, reportType, isCurrentUserAdmin }) => ({
+      options: ({ queryParams, reportType }) => ({
         variables: {
           ...generateParams(queryParams),
-          reportType,
-          isCurrentUserAdmin
+          reportType
         },
         fetchPolicy: 'network-only'
       })

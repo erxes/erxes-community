@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from 'react-apollo';
 import { withProps } from '@erxes/ui/src/utils/core';
 import React from 'react';
 import ScheduleList from '../../components/schedule/ScheduleList';
@@ -14,37 +14,26 @@ import {
 } from '../../types';
 import { mutations, queries } from '../../graphql';
 import { Alert, confirm } from '@erxes/ui/src/utils';
-import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
+import { IBranch } from '@erxes/ui/src/team/types';
 import { generatePaginationParams } from '@erxes/ui/src/utils/router';
 import Spinner from '@erxes/ui/src/components/Spinner';
 import { dateFormat, timeFormat } from '../../constants';
 import * as dayjs from 'dayjs';
 import { AlertContainer } from '../../styles';
-import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
-  currentUser: IUser;
-
-  isCurrentUserAdmin: boolean;
-  isCurrentUserSupervisor?: boolean;
-
-  branches: IBranch[];
-  departments: IDepartment[];
-
   history: any;
   queryParams: any;
-
   userId?: string;
   userIds?: string[];
-
   scheduleId?: string;
   scheduleStatus?: string;
-
   shiftId?: string;
   shiftStatus?: string;
-
   requestedShifts?: IShift[];
   scheduleConfigs: IScheduleConfig[];
+
+  branchesList: IBranch[];
 
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
@@ -75,11 +64,7 @@ const ListContainer = (props: FinalProps) => {
   const solveSchedule = (scheduleId: string, status: string) => {
     solveScheduleMutation({
       variables: { _id: scheduleId, status: `${status}` }
-    })
-      .then(() => {
-        Alert.success('Successfully solved a schedule request');
-      })
-      .catch(err => Alert.error(err.message));
+    });
   };
 
   const solveShift = (shiftId: string, status: string) => {
@@ -88,7 +73,13 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
-  const submitRequest = (variables: any) => {
+  const submitRequest = (variables: {
+    userIds: string[];
+    shifts: IShift[];
+    totalBreakInMins?: number | string;
+    scheduleConfigId?: string;
+    closeModal: () => void;
+  }) => {
     const userId = `${variables.userIds}`;
     sendScheduleReqMutation({
       variables: {
@@ -103,7 +94,15 @@ const ListContainer = (props: FinalProps) => {
       .catch(err => Alert.error(err.message));
   };
 
-  const submitSchedule = (variables: any) => {
+  const submitSchedule = (variables: {
+    branchIds: string[];
+    departmentIds: string[];
+    userIds: string[];
+    shifts: IShift[];
+    totalBreakInMins?: number | string;
+    scheduleConfigId?: string;
+    closeModal: () => any;
+  }) => {
     submitScheduleMutation({ variables })
       .then(() => {
         Alert.success('Successfully submitted schedule');
@@ -244,10 +243,9 @@ export default withProps<Props>(
   compose(
     graphql<Props, ScheduleQueryResponse>(gql(queries.schedulesMain), {
       name: 'listSchedulesMain',
-      options: ({ queryParams, isCurrentUserAdmin }) => ({
+      options: ({ queryParams }) => ({
         variables: {
           ...generatePaginationParams(queryParams || {}),
-          isCurrentUserAdmin,
           startDate: queryParams.startDate,
           endDate: queryParams.endDate,
           userIds: queryParams.userIds,
@@ -264,7 +262,7 @@ export default withProps<Props>(
         name: 'sendScheduleReqMutation',
         options: ({ userId, requestedShifts }) => ({
           variables: {
-            userId,
+            userId: `${userId}`,
             shifts: requestedShifts
           },
           refetchQueries: ['schedulesMain']
@@ -275,7 +273,7 @@ export default withProps<Props>(
       name: 'submitScheduleMutation',
       options: ({ userIds, requestedShifts }) => ({
         variables: {
-          userIds,
+          userIds: `${userIds}`,
           shifts: `${requestedShifts}`
         },
         refetchQueries: ['schedulesMain']
