@@ -656,15 +656,16 @@ export const WidgetChatWrapper = styled.div`
   bottom: 0;
   right: 0;
   display: flex;
-  z-index: 9999;
+  z-index: 5;
   justify-content: flex-end;
   align-content: flex-end;
+  align-items: flex-end;
 `;
 
 export const WidgetChatWindowWrapper = styled.div`
   position: relative;
-  width: 350px;
-  max-height: 400px;
+  width: 325px;
+  height: 440px;
   margin: 0 ${dimensions.coreSpacing / 2}px;
   display: flex;
   flex-direction: column;
@@ -673,15 +674,16 @@ export const WidgetChatWindowWrapper = styled.div`
   border-radius: 5px;
   overflow: hidden;
   background-color: #f9f9f9;
+  border: 1px solid rgba(0,0,0,0.08);
 
-  -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0.5);
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
 `;
 
 export const WidgetChatWindowHeader = styled.div`
   width: 100%;
-  height: 75px;
+  height: 58px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -691,7 +693,7 @@ export const WidgetChatWindowHeader = styled.div`
 
   i {
     cursor: pointer;
-    margin: 0 ${dimensions.unitSpacing}px;
+    margin-left: 3px;
   }
   div {
     display: flex;
@@ -699,14 +701,26 @@ export const WidgetChatWindowHeader = styled.div`
 
     p {
       display: inline-block;
-      font-weight: bold;
+      font-weight: 600;
       display: flex;
-      align-items: center;
       margin: 0;
       margin-left: ${dimensions.unitSpacing}px;
       line-height: 15px;
+      flex-direction: column;
+      font-size: .875rem;
+
+      .position {
+        color: #65676B;
+        font-weight: 400;
+        font-size: .75rem;
+      }
     }
   }
+`;
+
+export const MinimizedWidgetChatWindow = styled.div`
+  margin-bottom: ${dimensions.coreSpacing}px;
+  margin-right: ${dimensions.coreSpacing}px;
 `;
 
 export const ChatReplyInfo = styled.div`
@@ -797,10 +811,10 @@ export const ChatEditor = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${dimensions.unitSpacing}px;
 
   label {
-    margin: 0 10px;
+    margin-left: 10px;
+    margin-bottom: 0px;
     display: block;
 
     &:hover {
@@ -864,7 +878,7 @@ export const MessageReply = styled.div`
 
   font-size: 0.8em;
   color: ${colors.textSecondary};
-  background-color: ${colors.bgUnread}
+  background-color: ${colors.bgUnread};
   border-radius: 5px;
   padding: 2px ${dimensions.unitSpacing}px 2px;
   margin: 0;
@@ -879,16 +893,36 @@ export const MessageReply = styled.div`
   }
 `;
 
+export const MessageOption = styled.button`
+  background: none;
+  display: none;
+  border-radius: 100%;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  margin: auto ${dimensions.unitSpacing}px;
+
+  &:hover {
+    background-color: ${colors.bgGray};
+  }
+`;
+
 export const MessageBody = styledTS<{ me?: boolean }>(styled.div)`
   max-width: 560px;
   display: flex;
   justify-content: ${props => (props.me ? 'flex-end' : 'flex-start')};
   align-items: ${props => (props.me ? 'flex-end' : 'flex-start')};
   flex-direction: ${props => (props.me ? 'row' : 'row-reverse')};
+
+  &:hover {
+    ${MessageOption} {
+      display: inline-block;
+    }
+  }
 `;
 
 export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
-  max-width: 100%;
+  max-width: 205px;
   display: inline-block;
   overflow: hidden;
   word-wrap: break-word;
@@ -900,23 +934,11 @@ export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
   color: ${props => (props.me ? 'white' : 'initial')};
   padding: 8px;
   margin: 0;
+  font-size: .9375rem;
+  line-height: 20px;
 
   p {
     margin: 0;
-  }
-`;
-
-export const MessageOption = styled.button`
-  background: none;
-  display: inline-block;
-  border-radius: 100%;
-  border: 0;
-  outline: 0;
-  cursor: pointer;
-  margin: auto ${dimensions.unitSpacing}px;
-
-  &:hover {
-    background-color: ${colors.bgGray};
   }
 `;
 
