@@ -44,7 +44,9 @@ const commonFeedFields = `
     goingUserIds
   }
   customFieldsData
-  department
+  departmentIds
+  branchIds
+  unitId
 `;
 
 const feed = `
@@ -105,6 +107,28 @@ const departments = `
   query departments {
     departments {
       ${departmentField}
+    }
+  }
+`;
+
+const branches = `
+  query branches {
+    branches {
+      _id,
+      code,
+      title,
+      parentId
+    }
+  }
+`;
+
+const unitsMain = `
+  query unitsMain {
+    unitsMain {
+      list {
+        _id
+        title
+      }
     }
   }
 `;
@@ -247,16 +271,17 @@ const getChatIdByUserIds = `
   }
 `;
 
-
-
-export default { 
-  feed, 
-  thanks, 
-  fields, 
-  users, 
+export default {
+  feed,
+  thanks,
+  fields,
+  users,
   allUsers,
-  departments, 
+  departments,
   chats,
   chatDetail,
   chatMessages,
-  getChatIdByUserIds };
+  getChatIdByUserIds,
+  branches,
+  unitsMain
+};

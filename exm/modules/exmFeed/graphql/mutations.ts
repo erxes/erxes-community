@@ -8,7 +8,9 @@ const commonVariables = `
   $customFieldsData: JSON
   $eventData: ExmEventDataInput
   $createdAt: Date
-  $department : String
+  $departmentIds : [String]
+  $branchIds: [String]
+  $unitId: String
 `;
 
 const commonParams = `
@@ -21,7 +23,9 @@ const commonParams = `
   customFieldsData: $customFieldsData
   eventData: $eventData
   createdAt: $createdAt
-  department : $department
+  departmentIds : $departmentIds
+  branchIds: $branchIds
+  unitId: $unitId
 `;
 
 const addFeed = `
@@ -123,5 +127,5 @@ export default {
   chatAdd,
   chatRemove,
   chatMarkAsRead,
-  chatMessageAdd,
+  chatMessageAdd
 };
