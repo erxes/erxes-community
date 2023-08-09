@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifact
-          path: dist.tar
+          path: dist.tar.gz
           retention-days: 1
   docker-push:
     needs: build
