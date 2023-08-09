@@ -1,4 +1,4 @@
-FROM node:18.17.0-bookworm-slim
+FROM node:18.17.0-bullseye-slim
 
 RUN apt-get update -y
 RUN apt-get install -y curl
