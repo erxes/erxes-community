@@ -22,12 +22,18 @@ on:
       - '.github/workflows/plugin-tags-api.yaml'
 
 jobs:
-  build-artifact:
+  api:
     runs-on: ubuntu-22.04
     container:
-      image: node:18.17.0-bookworm-slim
+      image: node:18.17.0-bookworm
+
     steps:
       - uses: actions/checkout@v3
+
+      # - name: Use Node.js 18.17.x
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18.17.x
 
       # https://github.com/actions/cache/blob/main/examples.md#node---yarn
       - name: Get yarn cache directory path
@@ -51,19 +57,7 @@ jobs:
           yarn build plugin tags
           cd plugin-tags-api/.erxes
           cd dist/main/.erxes/src
-      - name: Save artifact for next the job
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifact
-          path: dist
 
-  docker-push:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Get build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifact
       - name: Build docker image
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/node-v18')
         run: |
