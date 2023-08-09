@@ -39,6 +39,7 @@ export const formDetailQuery = (isProductsEnabled: boolean) => `
           logicOperator
           logicValue
         }
+        subFieldIds
         ${
           isProductsEnabled
             ? `

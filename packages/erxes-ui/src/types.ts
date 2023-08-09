@@ -123,6 +123,7 @@ export interface IField {
   optionsValues?: string;
 
   relationType?: string;
+  subFormFieldIds?: string[];
 }
 
 export interface IFormProps {

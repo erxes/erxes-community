@@ -40,6 +40,7 @@ const fields = `
       productCategoryId
       isDefinedByErxes
       optionsValues,
+      subFieldIds
     }
   }
 `;
