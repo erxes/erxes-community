@@ -22,8 +22,10 @@ on:
       - '.github/workflows/plugin-tags-api.yaml'
 
 jobs:
-  api:
+  build:
     runs-on: ubuntu-22.04
+    container:
+      image: node:18.17.0-bookworm-slim
     steps:
       - uses: actions/checkout@v3
 
@@ -54,7 +56,24 @@ jobs:
           yarn build plugin tags
           cd plugin-tags-api/.erxes
           cd dist/main/.erxes/src
-
+      - name: Create tarball of build artifact
+        run: |
+          tar -cf dist.tar ./dist
+      - name: Save build artifact for the next job
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: dist.tar
+  docker-push:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+      - name: Extract build artifact
+        run: |
+          tar -xf dist.tar ./dist/
       - name: Build docker image
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/node-v18')
         run: |
