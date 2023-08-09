@@ -25,7 +25,7 @@ jobs:
   api:
     runs-on: ubuntu-22.04
     container:
-      image: node:18.17.0-bookworm-slim
+      image: node:18.17.0-bookworm
 
     steps:
       - uses: actions/checkout@v3
