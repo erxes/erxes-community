@@ -162,8 +162,8 @@ export class MonpayAPI extends BaseAPI {
         headers: this.headers,
         path: PAYMENTS.monpay.actions.branchLogin,
         data: {
-          username: process.env.MONPAY_COUPON_USERNAME || 'partnerBayas',
-          password: process.env.MONPAY_COUPON_PASSWORD || 'qwerty'
+          username: process.env.MONPAY_COUPON_USERNAME || '',
+          password: process.env.MONPAY_COUPON_PASSWORD || ''
         }
       });
 

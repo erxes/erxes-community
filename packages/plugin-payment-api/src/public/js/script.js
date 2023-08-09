@@ -194,7 +194,7 @@ async function onPaymentClick(payment, invoiceData, prefix) {
   amountValue = amountValue < 0 ? 0 : amountValue;
 
   amount.innerHTML =
-  amountValue.toLocaleString(undefined, {
+    amountValue.toLocaleString(undefined, {
       maximumFractionDigits: 2,
     }) + ' ₮';
 
