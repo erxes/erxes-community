@@ -58,7 +58,7 @@ jobs:
           cd dist/main/.erxes/src
       - name: Create tarball of build artifact
         run: |
-          tar -cfz dist.tar.gz ./dist
+          tar -zcf dist.tar.gz ./dist
       - name: Save build artifact for the next job
         uses: actions/upload-artifact@v3
         with:
@@ -75,7 +75,7 @@ jobs:
           name: build-artifact
       - name: Extract build artifact
         run: |
-          tar -xfz dist.tar.gz ./dist/
+          tar -zxf dist.tar.gz ./dist/
       - name: Build docker image
         if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/node-v18')
         run: |
@@ -83,13 +83,14 @@ jobs:
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           docker build -t erxes/plugin-tags-api:${GITHUB_REF#refs/heads/} -f Dockerfile .
           docker push erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
-  # delete-artifacts:
-  #   needs:
-  #     - build
-  #     - docker-push
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Delete artifacts
-  #       uses: geekyeggo/delete-artifact@v2
-  #       with:
-  #         name: build-artifact
+  delete-artifacts:
+    needs:
+      - build
+      - docker-push
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Try to delete artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: build-artifact
+          failOnError: false
