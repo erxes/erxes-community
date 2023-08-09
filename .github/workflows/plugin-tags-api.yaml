@@ -24,8 +24,6 @@ on:
 jobs:
   api:
     runs-on: ubuntu-22.04
-    container: 
-      image: node:18.17.0-bookworm-slim
     steps:
       - uses: actions/checkout@v3
 
@@ -56,26 +54,11 @@ jobs:
           yarn build plugin tags
           cd plugin-tags-api/.erxes
           cd dist/main/.erxes/src
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: dist/plugin-tags-api/.erxes
-          push: true
-          tags: erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
 
-      # - name: Build docker image
-      #   if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/node-v18')
-      #   run: |
-      #     cd dist/plugin-tags-api/.erxes
-      #     echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      #     docker build -t erxes/plugin-tags-api:${GITHUB_REF#refs/heads/} -f Dockerfile .
-      #     docker push erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
+      - name: Build docker image
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/node-v18')
+        run: |
+          cd dist/plugin-tags-api/.erxes
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker build -t erxes/plugin-tags-api:${GITHUB_REF#refs/heads/} -f Dockerfile .
+          docker push erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
