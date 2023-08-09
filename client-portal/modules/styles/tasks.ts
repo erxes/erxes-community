@@ -1,7 +1,6 @@
-import { colors, dimensions, typography } from '../styles';
-import styled from 'styled-components';
-import styledTS from 'styled-components-ts';
-import { darken, rgba } from './ecolor';
+import { colors, dimensions, typography } from "../styles";
+import styled from "styled-components";
+import styledTS from "styled-components-ts";
 
 const pWitdh = 4;
 
@@ -153,7 +152,7 @@ const TabTitle = styledTS<{ color?: string; active?: boolean }>(styled.div)`
     font-weight: 600;
   }
 
-  ${props =>
+  ${(props) =>
     props.active &&
     `
       border-bottom: 4px solid ${props.color || colors.colorPrimary};
@@ -162,30 +161,8 @@ const TabTitle = styledTS<{ color?: string; active?: boolean }>(styled.div)`
     `}
   
   &:hover {
-    color: ${props => (props.color ? props.color : colors.colorPrimary)}
+    color: ${(props) => (props.color ? props.color : colors.colorPrimary)}
   }
-`;
-
-const Label = styledTS<{ lblStyle: string; colorCode?: string }>(styled.div)`
-    border-radius: 14px;
-    padding: 3px 9px;
-    text-transform: uppercase;
-    font-size: 8px;
-    display: inline-block;
-    line-height: 1.32857143;
-    font-weight: 600;
-    background: ${({ lblStyle, colorCode }) =>
-      lblStyle === 'danger'
-        ? rgba(colors.colorCoreRed, 0.2)
-        : lblStyle === 'custom'
-        ? colorCode
-        : rgba(colors.colorCoreGreen, 0.15)};
-    color: ${({ lblStyle }) =>
-      lblStyle === 'danger'
-        ? darken(colors.colorCoreRed, 50)
-        : lblStyle === 'custom'
-        ? colors.colorWhite
-        : darken(colors.colorCoreGreen, 50)};
 `;
 
 const DetailContent = styled.div`
@@ -237,63 +214,6 @@ const Priority = styled.div`
   border-radius: 25px;
 `;
 
-const ListRow = styled.div`
-  display: flex;
-  background: ${colors.colorWhite};
-  margin-bottom: ${dimensions.unitSpacing}px;
-  padding: ${dimensions.unitSpacing + 5}px ${dimensions.coreSpacing}px;
-  border: 1px solid ${colors.borderPrimary};
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all ease 0.3s;
-
-  > div {
-    display: flex;
-    align-items: center;
-    flex: 0 0 12%;
-    font-size: 14px;
-    gap: 5px;
-    flex-wrap: wrap;
-    padding: 0 ${dimensions.unitSpacing - 5}px;
-
-    &:first-child {
-      flex: 0 0 30%;
-      text-align: left;
-      font-weight: 600;
-      text-transform: capitalize;
-    }
-  }
-
-  &:hover {
-    background: #f5f5f5;
-  }
-`;
-
-const ListHead = styled.div`
-  display: flex;
-  background-color: ${colors.bgLight};
-  padding: ${dimensions.unitSpacing + 5}px ${dimensions.coreSpacing}px;
-  border: 1px solid ${colors.borderPrimary};
-  margin-bottom: ${dimensions.unitSpacing}px;
-  border-radius: 5px;
-
-  > div {
-    display: inline-block;
-    font-weight: 600;
-    flex: 0 0 12%;
-    color: ${colors.colorCoreGray};
-    text-transform: uppercase;
-    font-size: 12px;
-    padding: 0 ${dimensions.unitSpacing - 5}px;
-
-    &:first-child {
-      flex: 0 0 30%;
-      text-align: left;
-    }
-  }
-`;
-const ListBody = styled.div``;
-
 export {
   Wrapper,
   StageTitle,
@@ -306,8 +226,4 @@ export {
   TabTitle,
   Priority,
   DetailContent,
-  Label,
-  ListHead,
-  ListRow,
-  ListBody
 };

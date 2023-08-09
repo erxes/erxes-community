@@ -1,18 +1,13 @@
-import { AppConsumer } from "../../appContext";
-import ButtonMutate from "../../common/ButtonMutate";
-import { IButtonMutateProps } from "../../common/types";
 import React from "react";
-import Register from "../components/Register";
-import { Store } from "../../types";
-import { getEnv } from "../../../utils/configs";
 import { mutations } from "../graphql";
+import Register from "../components/Register";
+import { IButtonMutateProps } from "../../common/types";
+import ButtonMutate from "../../common/ButtonMutate";
+import { getEnv } from "../../../utils/configs";
+import { AppConsumer } from "../../appContext";
+import { Store } from "../../types";
 
-type Props = {
-  setRegister: (value: boolean) => void;
-  setLogin: (value: boolean) => void;
-};
-
-function RegisterContainer(props: Props) {
+function RegisterContainer() {
   const { REACT_APP_HAS_COMPANY } = getEnv();
 
   const renderButton = ({ values, isSubmitted }: IButtonMutateProps) => {
@@ -25,6 +20,7 @@ function RegisterContainer(props: Props) {
         callback={callbackResponse}
         isSubmitted={isSubmitted}
         type="submit"
+        btnStyle="warning"
         successMessage="Succesfully registered!"
         block={true}
         uppercase={true}
@@ -35,7 +31,6 @@ function RegisterContainer(props: Props) {
   };
 
   const updatedProps = {
-    ...props,
     hasCompany: REACT_APP_HAS_COMPANY === "true",
     renderButton,
   };
@@ -43,10 +38,12 @@ function RegisterContainer(props: Props) {
   return (
     <AppConsumer>
       {({ config }: Store) => {
-        return <Register {...{ config, ...updatedProps }} />;
+        return (
+          <Register {...{config, ...updatedProps}} />
+        );
       }}
     </AppConsumer>
-  );
+  )
 }
 
 export default RegisterContainer;

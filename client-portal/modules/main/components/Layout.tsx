@@ -1,8 +1,7 @@
-import { Config, IUser } from "../../types";
-import { Container, MainContent } from "../../styles/main";
-
-import Header from "../containers/Header";
 import React from "react";
+import { Container, MainContent } from "../../styles/main";
+import Header from "../containers/Header";
+import { Config, IUser } from "../../types";
 import { getConfigColor } from "../../common/utils";
 
 type Props = {
@@ -22,7 +21,7 @@ function Layout({
   currentUser,
   headingSpacing,
   headerBottomComponent,
-  notificationsCount,
+  notificationsCount
 }: Props) {
   return (
     <>
@@ -39,9 +38,7 @@ function Layout({
         baseColor={getConfigColor(config, "baseColor")}
         bodyColor={getConfigColor(config, "bodyColor")}
       >
-        <Container large={true}>
-          {children({ config, topic, currentUser })}
-        </Container>
+        <Container>{children({ config, topic })}</Container>
       </MainContent>
 
       <div dangerouslySetInnerHTML={{ __html: config.footerHtml || "" }} />

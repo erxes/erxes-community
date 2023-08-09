@@ -1,14 +1,17 @@
-import { IUser, NotificationsQueryResponse } from '../../../types';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import Alert from '../../../utils/Alert';
-import NotificationList from '../../components/notifications/List';
-import React from 'react';
-import queries from '../../../user/graphql/queries';
+import React, { useEffect } from 'react';
+import { mutations } from '../../../user/graphql';
+import Notifications from '../../components/notifications/List';
+import {
+  IUser,
+  NotificationsCountQueryResponse,
+  NotificationsQueryResponse,
+} from '../../../types';
+import { useRouter } from 'next/router';
 
 type Props = {
   count: number;
   currentUser: IUser;
-  config: any;
   requireRead?: boolean;
 };
 
@@ -37,63 +40,25 @@ const notificationsQuery = gql`
       createdAt
       isRead
       title
-      content
-      createdUser {
-        username
-        details {
-          fullName
-          avatar
-        }
-      }
     }
   }
 `;
 
 const markAsReadMutation = gql`
-  mutation ClientPortalNotificationsMarkAsRead(
-    $ids: [String]
-    $markAll: Boolean
-  ) {
-    clientPortalNotificationsMarkAsRead(_ids: $ids, markAll: $markAll)
+  mutation ClientPortalNotificationsMarkAsRead($ids: [String]) {
+    clientPortalNotificationsMarkAsRead(_ids: $ids)
   }
 `;
 
 function NotificationsContainer(props: Props) {
-  const [markAsReadMutaion] = useMutation(markAsReadMutation, {
-    refetchQueries: [
-      {
-        query: notificationsQuery,
-        context: {
-          headers: {
-            'erxes-app-token': props.config?.erxesAppToken
-          }
-        }
+  const [markAsReadMutaion] = useMutation(markAsReadMutation);
+
+  const onClickNotification = (notificationId: string) => {
+    markAsReadMutaion({
+      variables: {
+        ids: [notificationId],
       },
-      {
-        query: gql(queries.notificationsCountQuery),
-        context: {
-          headers: {
-            'erxes-app-token': props.config?.erxesAppToken
-          }
-        }
-      }
-    ]
-  });
-
-  const markAsRead = (ids: string[]) => {
-    markAsReadMutaion({
-      variables: {
-        ids
-      }
-    });
-  };
-
-  const markAllAsRead = () => {
-    markAsReadMutaion({
-      variables: {
-        markAll: true
-      }
-    });
+    })
   };
 
   const notificationsResponse = useQuery<NotificationsQueryResponse>(
@@ -101,16 +66,13 @@ function NotificationsContainer(props: Props) {
     {
       skip: !props.currentUser,
       variables: {
+        requireRead: props.requireRead,
         page: 1,
-        perPage: 10
+        perPage: 10,
       },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
     }
   );
-
-  const showNotifications = (requireRead: boolean) => {
-    notificationsResponse.refetch({ requireRead });
-  };
 
   const notifications =
     (notificationsResponse.data &&
@@ -125,13 +87,11 @@ function NotificationsContainer(props: Props) {
     ...props,
     notifications,
     loading: notificationsResponse.loading,
-    markAsRead,
-    showNotifications,
-    markAllAsRead,
-    refetch
+    onClickNotification,
+    refetch,
   };
 
-  return <NotificationList {...updatedProps} />;
+  return <Notifications {...updatedProps} />;
 }
 
 export default NotificationsContainer;

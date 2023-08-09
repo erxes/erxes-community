@@ -1,35 +1,61 @@
-import { LoginFormWrapper, WithIconFormControl } from "../../styles/form";
 import React, { useState } from "react";
-
-import Form from "../../common/form/Form";
+import { LoginFormWrapper } from "../../styles/form";
 import FormControl from "../../common/form/Control";
+import Form from "../../common/form/Form";
 import FormGroup from "../../common/form/Group";
 import { IButtonMutateProps } from "../../common/types";
 import Icon from "../../common/Icon";
-import Layout from "../../main/containers/Layout";
-import { Store } from "../../types";
 
 type Props = {
+  handleCode: (phone: string) => void;
   renderButton: (props: IButtonMutateProps) => JSX.Element;
 };
 
-function ResetPassword({ renderButton }: Props) {
+function ResetPassword({ renderButton, handleCode }: Props) {
+  const [phone, changePhone] = useState("");
+
+  const handleSubmit = (e) => {
+    handleCode(phone);
+    e.isDefaultPrevented();
+  };
+
+  const onChange = (e) => {
+    changePhone(e.target.value);
+    e.isDefaultPrevented();
+  };
+
   const renderContent = (formProps) => {
     const { values, isSubmitted } = formProps;
 
     return (
       <>
         <FormGroup>
-          <WithIconFormControl>
-            <Icon icon="lock-alt" size={26} />
-            <FormControl
-              {...formProps}
-              name="newPassword"
-              type="password"
-              placeholder={"Enter your new password"}
-              required={true}
-            />
-          </WithIconFormControl>
+          <FormControl
+            {...formProps}
+            name="phone"
+            placeholder={"Phone"}
+            onChange={onChange}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <FormControl
+            {...formProps}
+            name="code"
+            type="code"
+            placeholder={"code"}
+            required={true}
+          />
+        </FormGroup>
+
+        <FormGroup>
+          <FormControl
+            {...formProps}
+            name="password"
+            type="password"
+            placeholder={"password"}
+            required={true}
+          />
         </FormGroup>
 
         <FormGroup>
@@ -43,18 +69,10 @@ function ResetPassword({ renderButton }: Props) {
   };
 
   return (
-    <Layout headingSpacing={true}>
-      {(props: Store) => (
-        <div className="d-flex justify-content-center">
-          <LoginFormWrapper>
-            <h2>{"Reset password"} &nbsp;</h2>
-            <p>{"Enter your new password and sign in again"}</p>
-
-            <Form renderContent={renderContent} />
-          </LoginFormWrapper>
-        </div>
-      )}
-    </Layout>
+    <LoginFormWrapper>
+      <h2>{"Reset password"} &nbsp;</h2>
+      <Form renderContent={renderContent} />
+    </LoginFormWrapper>
   );
 }
 
