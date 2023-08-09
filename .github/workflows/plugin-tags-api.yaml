@@ -24,16 +24,13 @@ on:
 jobs:
   api:
     runs-on: ubuntu-22.04
-    container:
-      image: node:18.17.0-bookworm
-
     steps:
       - uses: actions/checkout@v3
 
-      # - name: Use Node.js 18.17.x
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 18.17.x
+      - name: Use Node.js 18.17.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.17.x
 
       # https://github.com/actions/cache/blob/main/examples.md#node---yarn
       - name: Get yarn cache directory path
