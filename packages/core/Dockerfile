@@ -3,8 +3,12 @@ WORKDIR /core-api
 
 RUN apt-get update -y \
     && apt-get install -y curl tzdata \
-    && rm -rf /var/lib/apt/lists/* \
+    && apt-get autoclean  \
+    && apt-get autoremove --yes \
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/ \
     && chown -R node:node /core-api
+
+# && rm -rf /var/lib/apt/lists/* \
 
 COPY --chown=node:node . /core-api
 USER node
