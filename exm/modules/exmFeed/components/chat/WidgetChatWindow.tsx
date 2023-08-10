@@ -113,6 +113,7 @@ const WidgetChatWindow = (props: Props) => {
           currentUser={currentUser}
           chatId={chat._id}
           setReply={setReply}
+          chatType={chat.type}
         />
         <ReplyInfo reply={reply} setReply={setReply} />
         <Editor

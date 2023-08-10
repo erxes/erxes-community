@@ -10,12 +10,13 @@ import { queries, subscriptions } from '../../graphql';
 
 type Props = {
   chatId: string;
+  chatType?: string;
   setReply: (message: any) => void;
   currentUser: IUser;
 };
 
 const MessageListContainer = (props: Props) => {
-  const { chatId, currentUser } = props;
+  const { chatId, currentUser, chatType } = props;
 
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
@@ -97,6 +98,7 @@ const MessageListContainer = (props: Props) => {
       setReply={props.setReply}
       currentUser={currentUser}
       loadEarlierMessage={loadEarlierMessage}
+      chatType={chatType}
     />
   );
 };

@@ -13,10 +13,11 @@ type Props = {
   setReply: (text: string) => void;
   loadEarlierMessage: () => void;
   currentUser: IUser;
+  chatType?: string;
 };
 
 const MessageList = (props: Props) => {
-  const { messages, latestMessages, isAllMessages, currentUser } = props;
+  const { messages, latestMessages, isAllMessages, currentUser, chatType } = props;
   const messageListRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -42,10 +43,10 @@ const MessageList = (props: Props) => {
   return (
     <MessageListWrapper innerRef={messageListRef} onScroll={handleScroll}>
       {latestMessages.map(m => (
-        <MessageItem currentUser={currentUser} key={m._id} message={m} setReply={props.setReply} />
+        <MessageItem chatType={chatType} currentUser={currentUser} key={m._id} message={m} setReply={props.setReply} />
       ))}
       {messages.map(m => (
-        <MessageItem currentUser={currentUser} key={m._id} message={m} setReply={props.setReply} />
+        <MessageItem chatType={chatType} currentUser={currentUser} key={m._id} message={m} setReply={props.setReply} />
       ))}
       {!isAllMessages ? (
         <MessageItemWrapper>

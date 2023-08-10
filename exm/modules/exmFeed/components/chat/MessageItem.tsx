@@ -16,6 +16,7 @@ import {
   MessageOption,
   MessageContent,
   MessageAttachmentWrapper,
+  MessageBy,
 } from "../../styles";
 
 dayjs.extend(calendar);
@@ -24,10 +25,11 @@ type Props = {
   message: any;
   setReply: (text: string) => void;
   currentUser: IUser;
+  chatType?: string;
 };
 
 const MessageItem = (props: Props) => {
-  const { message, currentUser } = props;
+  const { message, currentUser, chatType } = props;
   const actionRef = useRef<HTMLElement>(null);
 
   const isMe = currentUser._id === message.createdUser._id;
@@ -83,9 +85,16 @@ const MessageItem = (props: Props) => {
             <p>{draftContent.contentBlocks[0].text}</p>
           </MessageReply>
         )}
+        {(chatType === "group" && !isMe) && (
+          <MessageBy>
+            {message.createdUser &&
+              (message.createdUser.details.fullName ||
+                message.createdUser.email)}
+          </MessageBy>
+        )}
         <MessageBody me={isMe} id="MessageBody">
           <Tip placement="top" text="Reply">
-            <MessageOption 
+            <MessageOption
               onClick={() => props.setReply(message)}
               innerRef={actionRef}
             >
@@ -93,7 +102,7 @@ const MessageItem = (props: Props) => {
             </MessageOption>
           </Tip>
           <Tip
-            placement={isMe ? "left" : "right"}
+            placement="top"
             text={message.createdAt && dayjs(message.createdAt).calendar()}
           >
             <MessageContent

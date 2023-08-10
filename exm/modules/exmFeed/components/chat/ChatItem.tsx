@@ -93,7 +93,7 @@ const ChatItem = (props: Props) => {
             null}
         </p>
       </ChatWrapper>
-      <ChatActions>
+      {chat && <ChatActions>
         <OverlayTrigger
           trigger="click"
           rootClose={false}
@@ -104,7 +104,7 @@ const ChatItem = (props: Props) => {
             <Icon icon="ellipsis-h" size={14} />
           </ChatActionItem>
         </OverlayTrigger>
-      </ChatActions>
+      </ChatActions>}
     </ChatItemWrapper>
     );
 };

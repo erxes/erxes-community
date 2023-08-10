@@ -737,7 +737,7 @@ export const ChatReplyInfo = styled.div`
   height: auto;
   display: block;
   overflow: hidden;
-  font-size: ${dimensions.unitSpacing}px;
+  font-size: 12px;
   color: ${colors.textSecondary};
   margin: 0;
   padding 1em;
@@ -836,6 +836,10 @@ export const ChatEditor = styled.div`
     margin: 0;
   }
 
+  input {
+    font-size: 15px;
+  }
+
   input[type='file'] {
     display: none;
   }
@@ -891,6 +895,11 @@ export const MessageReply = styled.div`
   border-radius: 5px;
   padding: 2px ${dimensions.unitSpacing}px 2px;
   margin: 0;
+  margin-top: 10px;
+
+  b {
+    font-weight: 600;
+  }
 
   p {
     margin: 0;
@@ -943,7 +952,7 @@ export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
   color: ${props => (props.me ? 'white' : 'initial')};
   padding: 8px;
   margin: 0;
-  font-size: .9375rem;
+  font-size: 15px;
   line-height: 20px;
 
   p {
@@ -963,6 +972,12 @@ export const MessageAttachmentWrapper = styled.div`
     object-fit: contain;
     right: 0;
   }
+`;
+
+export const MessageBy = styled.div`
+  color: #65676B;
+  font-weight: 400;
+  font-size: 11px;
 `;
 
 export const IconButton = styled.button`
