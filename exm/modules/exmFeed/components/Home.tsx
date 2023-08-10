@@ -14,7 +14,7 @@ import { TabTitle, Tabs } from '../../common/tabs';
 import ChatList from '../containers/chat/ChatList';
 import Form from '../containers/feed/Form';
 import { IUser } from '../../auth/types';
-import Icon from '../../common/Icon';
+// import Icon from '../../common/Icon';
 import List from '../containers/feed/List';
 import ThankForm from '../containers/feed/ThankForm';
 import ThankList from '../containers/feed/ThankList';
@@ -99,7 +99,7 @@ export default function Home(props: Props) {
             </div>
           </SingleEvent>
         </Card>
-        <Card>
+        {/* <Card>
           <label>{__('Birthdays')}</label>
           <SingleEvent>
             <Icon icon="gift" size={30} />
@@ -107,7 +107,7 @@ export default function Home(props: Props) {
               <b>Anu-Ujin Bat-Ulzii and 2 others have birthdays today.</b>
             </div>
           </SingleEvent>
-        </Card>
+        </Card> */}
         <Card>
           <ChatList
             handleActive={(_chatId) => handleActive(_chatId)}

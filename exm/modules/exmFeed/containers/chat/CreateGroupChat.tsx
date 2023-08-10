@@ -9,6 +9,7 @@ import { mutations, queries } from "../../graphql";
 
 type Props = {
   closeModal: () => void;
+  handleClickItem?: (chatId: string) => void;
 };
 
 const CreateGroupChatContainer = (props: Props) => {
@@ -31,8 +32,9 @@ const CreateGroupChatContainer = (props: Props) => {
         },
       ],
     })
-      .then(() => {
+      .then(({data}) => {
         props.closeModal();
+        props.handleClickItem(data.chatAdd._id);
       })
       .catch((error) => {
         Alert.error(error.message);

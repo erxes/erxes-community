@@ -35,7 +35,7 @@ export default function ChatList({
               <Icon icon="users" size={15} />
             </IconButton>
           }
-          content={(props) => <CreateGroupChat {...props} />}
+          content={(props) => <CreateGroupChat {...props} handleClickItem={handleActive} />}
         />
       </label>
       {chats.map((c) => {
