@@ -19,6 +19,7 @@ import {
   FileName,
   PreviewImg
 } from '../../styles';
+import VoiceRecorder from './voice/VoiceRecorder';
 
 type Props = {
   type?: string;
@@ -160,6 +161,18 @@ const Editor = (props: Props) => {
           value={message}
           onKeyDown={handleKeyDown}
         />
+        <Tip text={'Audio'}>
+            <label>
+              <Icon icon="audio" />
+              <input type="file" multiple={true} />
+            </label>
+          </Tip>
+          <Tip text={'Audio'}>
+            <VoiceRecorder
+              attachments={attachments}
+              setAttachments={setAttachments}
+            />
+          </Tip>
         <Tip placement="top" text={'Attach file'}>
           <label>
             <Icon icon="clip" size={18} />

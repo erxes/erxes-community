@@ -2,7 +2,7 @@ import { colors, dimensions } from '../styles';
 
 import { UploadBtn } from '../common/Uploader';
 import { rgba, darken } from '../styles/ecolor';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import styledTS from 'styled-components-ts';
 
 export const FeedLayout = styled.div`
@@ -126,6 +126,7 @@ export const HeaderFeed = styled.div`
       width: 40px;
       height: 40px;
       border-radius: 50%;
+      object-fit: cover;
     }
   }
 `;
@@ -541,6 +542,16 @@ export const SingleEvent = styled.div`
   }
 `;
 
+export const ChatActions = styled.div`
+  z-index: 1;
+  display: none;
+
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+`;
+
 export const ChatItemWrapper = styledTS<{
   active?: boolean;
   isWidget?: boolean;
@@ -562,6 +573,10 @@ export const ChatItemWrapper = styledTS<{
       props.isWidget ? colors.bgLight : colors.bgGray};
     cursor: pointer;
     transition: 0.2s;
+
+    ${ChatActions} {
+    display: block;
+    }
   }
 `;
 
@@ -598,18 +613,8 @@ export const ChatWrapper = styledTS<{ isSeen?: boolean }>(styled.div)`
   p { margin: 0 };
 `;
 
-export const ChatActions = styled.div`
-  z-index: 1;
-  visibility: hidden;
-
-  position: absolute;
-  right: ${dimensions.coreSpacing}px;
-  top: 50%;
-  transform: translateY(-50%);
-`;
-
 export const ChatActionItem = styled.button`
-  display: inline-block;
+  display: flex;
   color: white;
   background-color: ${colors.colorPrimary};
   margin-left: ${dimensions.unitSpacing}px;
@@ -619,6 +624,10 @@ export const ChatActionItem = styled.button`
   outline: 0;
   transition: 0.3s;
   pointer-events: auto;
+  width: 32px;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
 
   &:hover {
     background-color: ${colors.colorPrimaryDark}
@@ -666,12 +675,12 @@ export const WidgetChatWindowWrapper = styled.div`
   position: relative;
   width: 325px;
   height: 440px;
-  margin: 0 ${dimensions.coreSpacing / 2}px;
+  margin-right: ${dimensions.unitSpacing}px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-  border-radius: 5px;
+  border-radius: 8px;
   overflow: hidden;
   background-color: #f9f9f9;
   border: 1px solid rgba(0,0,0,0.08);
@@ -689,7 +698,7 @@ export const WidgetChatWindowHeader = styled.div`
   align-items: center;
   background-color: #f9f9f9;
   padding: ${dimensions.unitSpacing}px;
-  border-bottom: 2px solid ${colors.borderPrimary};
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),0 -1px rgba(0, 0, 0, 0.1) inset,0 2px 1px -1px rgba(255, 255, 255, 0.5) inset;
 
   i {
     cursor: pointer;
@@ -987,4 +996,116 @@ export const GroupChatModal = styled.div`
     border-radius: 0;
     padding: 1.5em 0;
   }
+
+  .Select-control {
+    border-radius: 0px;
+    border: 0;
+    border-bottom: 1px solid #E2E8F0;
+  }
+
+  .Select-placeholder {
+    padding: 0;
+  }
+`;
+
+export const VoiceRecordWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+export const RecordButton = styledTS<{ isRecording: boolean }>(styled.button)`
+  background-color: ${props =>
+    props.isRecording ? colors.colorShadowGray : 'none'};
+  border-radius: 100%;
+  border: none;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: transform 0.3s ease-in-out;
+  width: 31px;
+  height: 31px;
+
+  animation: ${props =>
+    props.isRecording &&
+    css`
+      ${pulse} 1s infinite;
+    `};
+`;
+
+export const ParticipantItemWrapper = styled.div`
+  position: relative;
+  margin-bottom: 10px;
+  display: flex;
+
+  a {
+    display: flex;
+    align-items: center;
+    padding: ${dimensions.unitSpacing}px 0px;
+    transition: 0.2s;
+    width: 100%;
+    font-size: 0.83em;
+    border-radius: 5px;
+  }
+
+  a:hover {
+    background-color: ${colors.bgGray};
+    transition: 0.2s;
+  }
+
+  span {
+    margin-right: 10px;
+  }
+
+  &:hover {
+    ${ChatActions} {
+    display: flex;
+    }
+  }
+`;
+
+export const ParticipantDetails = styled.div`
+  width: 100%;
+  margin: 0;
+  color: ${colors.textPrimary};
+  text-decoration: none;
+  line-height: 1;
+  height: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+  span {
+    font-size: 12px;
+  }
+`;
+
+export const ParticipantListWrapper = styled.div`
+  max-height: 100%;
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+`;
+
+export const Title = styled.h5`
+  margin: 0;
+  margin-bottom: 10px;
+  color: ${colors.textSecondary};
 `;

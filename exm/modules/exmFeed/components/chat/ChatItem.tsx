@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { OverlayTrigger, Popover } from "react-bootstrap";
 // erxes
 import Avatar from "../../../common/nameCard/Avatar";
@@ -28,8 +28,7 @@ type Props = {
 };
 
 const ChatItem = (props: Props) => {
-  const { chat, hasOptions, notContactUser, currentUser, createChat } = props;
-  const actionsRef = useRef<HTMLElement>(null);
+  const { chat, notContactUser, currentUser, createChat } = props;
 
   const users: any[] = chat?.participantUsers || [];
   const user: any =
@@ -37,24 +36,12 @@ const ChatItem = (props: Props) => {
       ? users.filter((u) => u._id !== currentUser._id)[0]
       : users[0];
 
-  const handleMouseEnter = () => {
-    if (actionsRef && actionsRef.current) {
-      actionsRef.current.style.visibility = "visible";
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (actionsRef && actionsRef.current) {
-      actionsRef.current.style.visibility = "hidden";
-    }
-  };
-
   const handleClick = () => {
     if(chat) {
       props.handleClickItem(chat._id);
     }
     if(notContactUser){
-      createChat([notContactUser._id, currentUser._id])
+      createChat([notContactUser._id, currentUser._id]);
     }
   };
 
@@ -75,9 +62,6 @@ const ChatItem = (props: Props) => {
     <ChatItemWrapper
       id="ChatItemWrapper"
       isWidget={true}
-      onClick={handleClick}
-      onMouseEnter={() => hasOptions && handleMouseEnter()}
-      onMouseLeave={() => hasOptions && handleMouseLeave()}
     >
       {chat &&
         (chat.type === "direct" ? (
@@ -98,6 +82,7 @@ const ChatItem = (props: Props) => {
             ? true
             : chat?.isSeen
         }
+        onClick={handleClick}
       >
         <p>
           {chat && chat.type === "direct"
@@ -108,11 +93,11 @@ const ChatItem = (props: Props) => {
             null}
         </p>
       </ChatWrapper>
-      <ChatActions innerRef={actionsRef}>
+      <ChatActions>
         <OverlayTrigger
           trigger="click"
-          rootClose={true}
-          placement="bottom"
+          rootClose={false}
+          placement="bottom-start"
           overlay={popoverContextMenu}
         >
           <ChatActionItem>
@@ -121,7 +106,7 @@ const ChatItem = (props: Props) => {
         </OverlayTrigger>
       </ChatActions>
     </ChatItemWrapper>
-  );
+    );
 };
 
 export default ChatItem;

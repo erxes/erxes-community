@@ -32,11 +32,10 @@ export default function ChatList({
           title="Create a group chat"
           trigger={
             <IconButton>
-              <Icon icon="users" size={12} />
+              <Icon icon="users" size={15} />
             </IconButton>
           }
           content={(props) => <CreateGroupChat {...props} />}
-          hideHeader={true}
         />
       </label>
       {chats.map((c) => {
@@ -73,6 +72,7 @@ export default function ChatList({
               currentUser={currentUser}
               notContactUser={user}
               hasOptions={true}
+              handleClickItem={handleActive}
             />
           );
         }
