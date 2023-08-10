@@ -1,13 +1,13 @@
-import * as animations from "./animations";
+import * as animations from './animations';
 
-import Alert from "./Alert";
-import { IUserDoc } from "../auth/types";
-import React from "react";
-import confirm from "./confirmation/confirm";
-import { getEnv } from "../../utils/configs";
-import parseMD from "./parseMd";
-import toggleCheckBoxes from "./toggleCheckBoxes";
-import urlParser from "./urlParser";
+import Alert from './Alert';
+import { IUserDoc } from '../auth/types';
+import React from 'react';
+import confirm from './confirmation/confirm';
+import { getEnv } from '../../utils/configs';
+import parseMD from './parseMd';
+import toggleCheckBoxes from './toggleCheckBoxes';
+import urlParser from './urlParser';
 
 type FileInfo = {
   name: string;
@@ -17,7 +17,7 @@ type FileInfo = {
 };
 
 type AfterUploadParams = {
-  status: "ok" | "error";
+  status: 'ok' | 'error';
   response: any;
   fileInfo: FileInfo;
 };
@@ -55,32 +55,34 @@ export const deleteHandler = (params: {
   url?: string;
   afterUpload: ({ status }: { status: string }) => any;
 }) => {
-  const { REACT_APP_API_URL } = getEnv();
+  const { REACT_APP_DOMAIN } = getEnv();
 
-  const {
-    url = `${REACT_APP_API_URL}/delete-file`,
-    fileName,
-    afterUpload,
-  } = params;
+  let url = `${REACT_APP_DOMAIN}/gateway/pl:core/delete-file`;
+
+  if (REACT_APP_DOMAIN.includes('localhost')) {
+    url = `${REACT_APP_DOMAIN}/pl:core/delete-file`;
+  }
+
+  const { fileName, afterUpload } = params;
 
   fetch(`${url}`, {
-    method: "post",
+    method: 'post',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     },
     body: `fileName=${fileName}`,
-    credentials: "include",
+    credentials: 'include'
   }).then((response) => {
     response
       .text()
       .then((text) => {
         if (!response.ok) {
           return afterUpload({
-            status: text,
+            status: text
           });
         }
 
-        return afterUpload({ status: "ok" });
+        return afterUpload({ status: 'ok' });
       })
       .catch((error) => {
         Alert.error(error.message);
@@ -97,12 +99,12 @@ const sendDesktopNotification = (doc: { title: string; content?: string }) => {
 
     const notification = new Notification(doc.title, {
       body: doc.content,
-      icon: "/favicon.png",
-      dir: "ltr",
+      icon: '/favicon.png',
+      dir: 'ltr'
     });
 
     // notify by sound
-    const audio = new Audio("/sound/notify.mp3");
+    const audio = new Audio('/sound/notify.mp3');
     audio.play();
 
     notification.onclick = () => {
@@ -112,21 +114,21 @@ const sendDesktopNotification = (doc: { title: string; content?: string }) => {
   };
 
   // Browser doesn't support Notification api
-  if (!("Notification" in window)) {
+  if (!('Notification' in window)) {
     return;
   }
 
-  if (Notification.permission === "granted") {
+  if (Notification.permission === 'granted') {
     return notify();
   }
 
-  if (Notification.permission !== "denied") {
+  if (Notification.permission !== 'denied') {
     Notification.requestPermission((permission) => {
-      if (!("permission" in Notification)) {
+      if (!('permission' in Notification)) {
         (Notification as any).permission = permission;
       }
 
-      if (permission === "granted") {
+      if (permission === 'granted') {
         return notify();
       }
     });
@@ -135,20 +137,20 @@ const sendDesktopNotification = (doc: { title: string; content?: string }) => {
 
 export const getThemeItem = (code) => {
   const configs = JSON.parse(
-    typeof window !== "undefined"
-      ? localStorage.getItem("erxes_theme_configs")
-      : "[]"
+    typeof window !== 'undefined'
+      ? localStorage.getItem('erxes_theme_configs')
+      : '[]'
   );
   const config = (configs || []).find(
     (c) => c.code === `THEME_${code.toUpperCase()}`
   );
 
-  return config ? config.value : "";
+  return config ? config.value : '';
 };
 
 export const bustIframe = () => {
   if (window.self === window.top) {
-    const antiClickjack = document.getElementById("anti-clickjack");
+    const antiClickjack = document.getElementById('anti-clickjack');
 
     if (antiClickjack && antiClickjack.parentNode) {
       antiClickjack.parentNode.removeChild(antiClickjack);
@@ -159,14 +161,14 @@ export const bustIframe = () => {
 };
 
 export const cleanIntegrationKind = (name: string) => {
-  if (name.includes("nylas")) {
-    name = name.replace("nylas-", "");
+  if (name.includes('nylas')) {
+    name = name.replace('nylas-', '');
   }
-  if (name.includes("smooch")) {
-    name = name.replace("smooch-", "");
+  if (name.includes('smooch')) {
+    name = name.replace('smooch-', '');
   }
-  if (name === "lead") {
-    name = "forms";
+  if (name === 'lead') {
+    name = 'forms';
   }
   return name;
 };
@@ -191,44 +193,56 @@ export const readFile = (value: string): string => {
   if (
     !value ||
     urlParser.isValidURL(value) ||
-    value.includes("http") ||
-    value.startsWith("/")
+    value.includes('http') ||
+    value.startsWith('/')
   ) {
     return value;
   }
 
-  const { REACT_APP_API_URL } = getEnv();
+  const { REACT_APP_DOMAIN } = getEnv();
 
-  return `${REACT_APP_API_URL}/read-file?key=${value}`;
+  if (REACT_APP_DOMAIN.includes('localhost')) {
+    return `${REACT_APP_DOMAIN}/read-file?key=${value}`;
+  }
+  return `${REACT_APP_DOMAIN}/gateway/pl:core/read-file?key=${value}`;
 };
 
 export const getUserAvatar = (user: IUserDoc) => {
   if (!user) {
-    return "";
+    return '';
   }
 
   const details = user.details;
 
   if (!details || !details.avatar) {
-    return "/images/avatar-colored.svg";
+    return '/images/avatar-colored.svg';
   }
 
   return readFile(details.avatar);
 };
 
+const getURL = () => {
+  const { REACT_APP_DOMAIN } = getEnv();
+
+  if (REACT_APP_DOMAIN.includes('localhost')) {
+    return `${REACT_APP_DOMAIN}/upload-file`;
+  }
+  return `${REACT_APP_DOMAIN}/gateway/pl:core/upload-file`;
+};
+
 const uploadHandler = async (params: Params) => {
-  const { REACT_APP_API_URL, REACT_APP_FILE_UPLOAD_MAX_SIZE } = getEnv();
+  const { REACT_APP_FILE_UPLOAD_MAX_SIZE } = getEnv();
 
   const {
     files,
     beforeUpload,
     afterUpload,
     afterRead,
-    url = `${REACT_APP_API_URL}/upload-file`,
-    kind = "main",
-    responseType = "text",
+    url = getURL(),
+    kind = 'main',
+    responseType = 'text',
     userId,
-    extraFormData = [],
+    extraFormData = []
   } = params;
 
   if (!files) {
@@ -250,10 +264,10 @@ const uploadHandler = async (params: Params) => {
       name: file.name,
       size: file.size,
       type: file.type,
-      duration: 0,
+      duration: 0
     } as any;
 
-    if (file.type.includes("audio") || file.type.includes("video")) {
+    if (file.type.includes('audio') || file.type.includes('video')) {
       const duration = await getVideoDuration(file);
 
       fileInfo = { ...fileInfo, duration };
@@ -281,32 +295,32 @@ const uploadHandler = async (params: Params) => {
       }
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append('file', file);
 
       for (const data of extraFormData) {
         formData.append(data.key, data.value);
       }
 
       fetch(`${url}?kind=${kind}`, {
-        method: "post",
+        method: 'post',
         body: formData,
-        credentials: "include",
-        ...(userId ? { headers: { userId } } : {}),
+        credentials: 'include',
+        ...(userId ? { headers: { userId } } : {})
       })
         .then((response) => {
           response[responseType]()
             .then((text) => {
               if (!response.ok) {
                 return afterUpload({
-                  status: "error",
+                  status: 'error',
                   response,
-                  fileInfo,
+                  fileInfo
                 });
               }
 
               // after upload
               if (afterUpload) {
-                afterUpload({ status: "ok", response: text, fileInfo });
+                afterUpload({ status: 'ok', response: text, fileInfo });
               }
             })
             .catch((error) => {
@@ -342,5 +356,5 @@ export {
   toggleCheckBoxes,
   urlParser,
   sendDesktopNotification,
-  uploadHandler,
+  uploadHandler
 };
