@@ -27,6 +27,20 @@ jobs:
     container:
       image: node:18.17.0-bookworm-slim
     steps:
+      - name: Setup docker
+        run: |
+          apt-get update
+          apt-get install -y ca-certificates curl gnupg
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          chmod a+r /etc/apt/keyrings/docker.gpg
+          echo \
+            "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+            "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update
+          apt-get install -y docker-ce docker-ce-cli docker-ce-cli containerd.io docker-buildx-plugin
+
       - uses: actions/checkout@v3
 
       # https://github.com/actions/cache/blob/main/examples.md#node---yarn
@@ -52,33 +66,30 @@ jobs:
           cd plugin-tags-api/.erxes
           cd dist/main/.erxes/src
 
-      - name: Setup docker
-        uses: docker-practice/actions-setup-docker@master
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v2
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: dist/plugin-tags-api/.erxes
-          push: true
-          tags: erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
+      # - name: Build and push
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: dist/plugin-tags-api/.erxes
+      #     push: true
+      #     tags: erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
           
 
-      # - name: Build docker image
-      #   if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
-      #   run: |
-      #     cd dist/plugin-tags-api/.erxes
-      #     echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      #     docker build -t erxes/plugin-tags-api:${GITHUB_REF#refs/heads/} -f Dockerfile .
-      #     docker push erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
+      - name: Build docker image
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging')
+        run: |
+          cd dist/plugin-tags-api/.erxes
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker build -t erxes/plugin-tags-api:${GITHUB_REF#refs/heads/} -f Dockerfile .
+          docker push erxes/plugin-tags-api:${GITHUB_REF#refs/heads/}
