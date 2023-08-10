@@ -117,11 +117,11 @@ class ClassificationForm extends React.Component<Props, State> {
       this.state.classificationChangeList?.map(mur => ({
         description: `${mur.classification}->${mur.newClassification}`,
         invDate: this.state.invDate,
-        total: mur.list.reduce((a, b) => a + b.leaseAmount, 0),
+        total: mur.list.reduce((a, b) => a + b.loanBalanceAmount, 0),
         classification: mur.classification,
         newClassification: mur.newClassification,
         dtl: mur.list?.map(a => ({
-          amount: a.leaseAmount,
+          amount: a.loanBalanceAmount,
           contractId: a._id,
           currency: a.currency
         }))

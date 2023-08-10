@@ -130,6 +130,18 @@ class ClassificationHistoryList extends React.Component<IProps, State> {
               <th>
                 <SortHandler sortField={'total'} label={__('Total')} />
               </th>
+              <th>
+                <SortHandler
+                  sortField={'classification'}
+                  label={__('Classification')}
+                />
+              </th>
+              <th>
+                <SortHandler
+                  sortField={'newClassification'}
+                  label={__('New classification')}
+                />
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -146,12 +158,6 @@ class ClassificationHistoryList extends React.Component<IProps, State> {
           </tbody>
         </Table>
       </ClassificationHistoryTableWrapper>
-    );
-
-    const addTrigger = (
-      <Button btnStyle="success" size="small" icon="plus-circle">
-        {__('Add periodLock')}
-      </Button>
     );
 
     let actionBarLeft: React.ReactNode;
