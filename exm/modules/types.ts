@@ -1,4 +1,4 @@
-interface IAttachment {
+export interface IAttachment {
   name: string;
   url: string;
   size: number;

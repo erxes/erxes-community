@@ -4,11 +4,11 @@ import { colors, dimensions } from "../../styles";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownToggle from "../../common/DropdownToggle";
 import { IUser } from "../../auth/types";
-import Icon from "../../common/Icon";
+// import Icon from "../../common/Icon";
 import Link from "next/link";
 import NameCard from "../../common/nameCard/NameCard";
 import React from "react";
-import Search from "../containers/Search";
+// import Search from "../containers/Search";
 import { __ } from "../../../utils";
 import styled from "styled-components";
 
@@ -78,14 +78,14 @@ const QuickNavigation = ({ currentUser }: { currentUser: IUser }) => {
   return (
     <nav id={"SettingsNav"}>
       <MainContainer>
-        <NavItem>
+        {/* <NavItem>
           <Search />
-        </NavItem>
+        </NavItem> */}
       </MainContainer>
       <SideContainer>
         <RightTopbar>
-          <Icon icon="bell" size={22} />
-          <Icon icon="settings" size={18} />
+          {/* <Icon icon="bell" size={22} />
+          <Icon icon="settings" size={18} /> */}
           <Dropdown alignRight={true}>
             <Dropdown.Toggle as={DropdownToggle} id="dropdown-user">
               <UserHelper>

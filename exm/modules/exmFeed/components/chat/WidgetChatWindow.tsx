@@ -13,6 +13,8 @@ import {
   WidgetChatWindowHeader,
   MinimizedWidgetChatWindow,
 } from "../../styles";
+import { OverlayTrigger, Popover } from "react-bootstrap";
+import ParticipantList from "./participants/ParticipantList";
 
 type Props = {
   chat: any;
@@ -47,6 +49,12 @@ const WidgetChatWindow = (props: Props) => {
     setIsMinimized(!isMinimized);
   };
 
+  const popoverContent = (
+    <Popover id="groupMembers-popover">
+      <ParticipantList chat={chat} />
+    </Popover>
+  );
+
   const showActiveChat = () => {
     if (isMinimized) {
       return (
@@ -70,10 +78,10 @@ const WidgetChatWindow = (props: Props) => {
             {chat.type === "direct" ? (
               <Avatar user={user} size={32} />
             ) : (
-              <ChatGroupAvatar>
-                <Avatar user={users[0]} size={24} />
-                <Avatar user={users[1]} size={24} />
-              </ChatGroupAvatar>
+                <ChatGroupAvatar>
+                  <Avatar user={users[0]} size={24} />
+                  <Avatar user={users[1]} size={24} />
+                </ChatGroupAvatar>
             )}
             <p>
               {chat.name || user.details?.fullName || user.email}
@@ -81,6 +89,16 @@ const WidgetChatWindow = (props: Props) => {
                 <div className="position">{user.details?.position}</div>
               )}
             </p>
+            {chat.type === "group" && (
+              <OverlayTrigger
+                trigger="click"
+                rootClose={false}
+                placement="bottom"
+                overlay={popoverContent}
+              >
+                <Icon icon="downarrow-2" size={14} />
+              </OverlayTrigger>
+            )}
           </div>
           <div>
             <Icon icon="minus-1" size={24} onClick={() => handleMinimize()} />

@@ -229,6 +229,11 @@ const Sidebar = styled.ul`
     &:hover {
       color: ${colors.textSecondary};
     }
+
+    p {
+      margin: 0;
+      font-size: 10px;
+    }
   }
 `;
 

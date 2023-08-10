@@ -116,6 +116,18 @@ const chatMessageAdd = `
   }
 `;
 
+const chatAddOrRemoveMember = `
+  mutation chatAddOrRemoveMember($id: String!, $type: ChatMemberModifyType, $userIds: [String]) {
+    chatAddOrRemoveMember(_id: $id, type: $type, userIds: $userIds)
+  }
+`;
+
+const chatMakeOrRemoveAdmin = `
+  mutation chatMakeOrRemoveAdmin($id: String!, $userId: String!) {
+    chatMakeOrRemoveAdmin(_id: $id, userId: $userId)
+  }
+`;
+
 export default {
   addFeed,
   editFeed,
@@ -127,5 +139,7 @@ export default {
   chatAdd,
   chatRemove,
   chatMarkAsRead,
-  chatMessageAdd
+  chatMessageAdd,
+  chatAddOrRemoveMember,
+  chatMakeOrRemoveAdmin
 };
