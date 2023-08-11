@@ -5,35 +5,36 @@ import {
   Row,
   SingleEvent,
   TabContent,
-  WidgetChatWrapper
-} from '../styles';
-import { MainContainer, SideContainer } from '../../layout/styles';
-import React, { useState } from 'react';
-import { TabTitle, Tabs } from '../../common/tabs';
+  WidgetChatWrapper,
+} from "../styles";
+import { MainContainer, SideContainer } from "../../layout/styles";
+import React, { useState } from "react";
+import { TabTitle, Tabs } from "../../common/tabs";
 
-import ChatList from '../containers/chat/ChatList';
-import Form from '../containers/feed/Form';
-import { IUser } from '../../auth/types';
+import ChatList from "../containers/chat/ChatList";
+import Form from "../containers/feed/Form";
+import { IUser } from "../../auth/types";
 // import Icon from '../../common/Icon';
-import List from '../containers/feed/List';
-import ThankForm from '../containers/feed/ThankForm';
-import ThankList from '../containers/feed/ThankList';
-import { Wrapper } from '../../layout';
-import { __ } from '../../../utils';
-import WidgetChatWindow from '../containers/chat/WidgetChatWindow';
+import List from "../containers/feed/List";
+import ThankForm from "../containers/feed/ThankForm";
+import ThankList from "../containers/feed/ThankList";
+import { Wrapper } from "../../layout";
+import { __ } from "../../../utils";
+import WidgetChatWindow from "../containers/chat/WidgetChatWindow";
 
 type Props = {
   queryParams: any;
+  todayEvents?: any;
   currentUser: IUser;
 };
 
-const LOCALSTORAGE_KEY = 'erxes_active_chats';
+const LOCALSTORAGE_KEY = "erxes_active_chats";
 
 export default function Home(props: Props) {
-  const [currentTab, setCurrentTab] = useState('post');
-  const { queryParams, currentUser } = props;
+  const [currentTab, setCurrentTab] = useState("post");
+  const { queryParams, currentUser, todayEvents } = props;
   const [activeChatIds, setActiveChatIds] = useState<any[]>(
-    JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]')
+    JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || "[]")
   );
 
   const onClickTab = (type: string) => {
@@ -59,7 +60,7 @@ export default function Home(props: Props) {
   };
 
   const renderTabContent = () => {
-    if (currentTab === 'thankyou') {
+    if (currentTab === "thankyou") {
       return (
         <>
           <ThankForm queryParams={queryParams} />
@@ -68,7 +69,7 @@ export default function Home(props: Props) {
       );
     }
 
-    if (currentTab === 'welcome') {
+    if (currentTab === "welcome") {
       return (
         <>
           <List queryParams={queryParams} contentType={currentTab} />
@@ -88,15 +89,29 @@ export default function Home(props: Props) {
     return (
       <>
         <Card>
-          <label>{__('Today`s events')}</label>
+          <label>{__("Today`s events")}</label>
           <SingleEvent>
-            <div className="image-wrapper">
-              <img src="/static/event.jpg" alt="event-img" />
-            </div>
-            <div>
-              <b>IT Department Manager Blogger Entrepenour list</b>
-              <span>thu, oct 13 6:30pm</span>
-            </div>
+            {todayEvents
+              ? todayEvents.map((e) => {
+                  if (e === null) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      {e.images.length > 0 && (
+                        <div className="image-wrapper">
+                          <img src={e.images[0]} alt="event-img" />
+                        </div>
+                      )}
+                      <div>
+                        <b>{e.title}</b>
+                        <span>{e.eventData.where}</span>
+                      </div>
+                    </>
+                  );
+                })
+              : "There is no Event"}
           </SingleEvent>
         </Card>
         {/* <Card>
@@ -124,39 +139,39 @@ export default function Home(props: Props) {
         <FeedLayout>
           <Row>
             <MainContainer>
+              <Tabs full={true}>
+                <TabTitle
+                  className={currentTab === "post" ? "active" : ""}
+                  onClick={() => onClickTab("post")}
+                >
+                  Post
+                </TabTitle>
+                <TabTitle
+                  className={currentTab === "event" ? "active" : ""}
+                  onClick={() => onClickTab("event")}
+                >
+                  Event
+                </TabTitle>
+                <TabTitle
+                  className={currentTab === "bravo" ? "active" : ""}
+                  onClick={() => onClickTab("bravo")}
+                >
+                  Bravo
+                </TabTitle>
+                <TabTitle
+                  className={currentTab === "publicHoliday" ? "active" : ""}
+                  onClick={() => onClickTab("publicHoliday")}
+                >
+                  Public holiday
+                </TabTitle>
+                <TabTitle
+                  className={currentTab === "welcome" ? "active" : ""}
+                  onClick={() => onClickTab("welcome")}
+                >
+                  Welcome
+                </TabTitle>
+              </Tabs>
               <OverflowWrapper>
-                <Tabs full={true}>
-                  <TabTitle
-                    className={currentTab === 'post' ? 'active' : ''}
-                    onClick={() => onClickTab('post')}
-                  >
-                    Post
-                  </TabTitle>
-                  <TabTitle
-                    className={currentTab === 'event' ? 'active' : ''}
-                    onClick={() => onClickTab('event')}
-                  >
-                    Event
-                  </TabTitle>
-                  <TabTitle
-                    className={currentTab === 'bravo' ? 'active' : ''}
-                    onClick={() => onClickTab('bravo')}
-                  >
-                    Bravo
-                  </TabTitle>
-                  <TabTitle
-                    className={currentTab === 'publicHoliday' ? 'active' : ''}
-                    onClick={() => onClickTab('publicHoliday')}
-                  >
-                    Public holiday
-                  </TabTitle>
-                  <TabTitle
-                    className={currentTab === 'welcome' ? 'active' : ''}
-                    onClick={() => onClickTab('welcome')}
-                  >
-                    Welcome
-                  </TabTitle>
-                </Tabs>
                 <TabContent>{renderTabContent()}</TabContent>
               </OverflowWrapper>
             </MainContainer>
@@ -181,7 +196,7 @@ export default function Home(props: Props) {
 
   return (
     <Wrapper
-      header={<Wrapper.Header title={'Feed'} />}
+      header={<Wrapper.Header title={"Feed"} />}
       content={renderContent()}
       transparent={true}
       initialOverflow={true}

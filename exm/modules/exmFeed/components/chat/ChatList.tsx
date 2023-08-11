@@ -5,7 +5,8 @@ import ChatItem from "../../containers/chat/ChatItem";
 import ModalTrigger from "../../../common/ModalTrigger";
 import Icon from "../../../common/Icon";
 import CreateGroupChat from "../../containers/chat/CreateGroupChat";
-import { IconButton } from "../../styles";
+import { IconButton, ChatListHeader } from "../../styles";
+import Tip from "../../../common/Tip";
 
 type Props = {
   users: IUser[];
@@ -26,18 +27,22 @@ export default function ChatList({
 
   return (
     <>
-      <label>
-        {__("Your group")}
+      <ChatListHeader>
+        <label>{__("Your group")}</label>
         <ModalTrigger
           title="Create a group chat"
           trigger={
             <IconButton>
-              <Icon icon="users" size={15} />
+              <Tip placement="top" text="Create group chat">
+                <Icon icon="users" size={15} />
+              </Tip>
             </IconButton>
           }
-          content={(props) => <CreateGroupChat {...props} handleClickItem={handleActive} />}
+          content={(props) => (
+            <CreateGroupChat {...props} handleClickItem={handleActive} />
+          )}
         />
-      </label>
+      </ChatListHeader>
       {chats.map((c) => {
         if (c.type === "group") {
           return (

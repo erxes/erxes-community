@@ -28,6 +28,7 @@ type Props = {
   departments: any[];
   branches: any[];
   units: any[];
+  isEdit?: boolean;
 };
 
 export default function PostForm(props: Props) {
@@ -157,7 +158,11 @@ export default function PostForm(props: Props) {
     );
   };
 
-  const content = (datas) => <Form {...datas} renderContent={renderContent} />;
+  const content = (datas?) => <Form {...datas} renderContent={renderContent} />;
+
+  if(props.isEdit) {
+    return content();
+  }
 
   return (
     <CreateFormContainer>

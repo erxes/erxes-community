@@ -59,14 +59,32 @@ const WidgetChatWindow = (props: Props) => {
     if (isMinimized) {
       return (
         <MinimizedWidgetChatWindow onClick={() => handleMinimize()}>
-          {chat.type === "direct" ? (
-            <Avatar user={user} size={36} />
-          ) : (
-            <ChatGroupAvatar>
-              <Avatar user={users[0]} size={24} />
-              <Avatar user={users[1]} size={24} />
-            </ChatGroupAvatar>
-          )}
+          <WidgetChatWindowHeader>
+            <div>
+              {chat.type === "direct" ? (
+                <Avatar user={user} size={23} />
+              ) : (
+                <ChatGroupAvatar>
+                  <Avatar user={users[0]} size={18} />
+                  <Avatar user={users[1]} size={18} />
+                </ChatGroupAvatar>
+              )}
+              <p>
+                {chat.name || user.details?.fullName || user.email}
+                {chat.type === "direct" && (
+                  <div className="position">{user.details?.position}</div>
+                )}
+              </p>
+            </div>
+            <div>
+              <Icon icon="minus-1" size={20} onClick={() => handleMinimize()} />
+              <Icon
+                icon="times"
+                size={24}
+                onClick={() => props.handleActive(chat._id)}
+              />
+            </div>
+          </WidgetChatWindowHeader>
         </MinimizedWidgetChatWindow>
       );
     }
@@ -78,13 +96,13 @@ const WidgetChatWindow = (props: Props) => {
             {chat.type === "direct" ? (
               <Avatar user={user} size={32} />
             ) : (
-                <ChatGroupAvatar>
-                  <Avatar user={users[0]} size={24} />
-                  <Avatar user={users[1]} size={24} />
-                </ChatGroupAvatar>
+              <ChatGroupAvatar>
+                <Avatar user={users[0]} size={24} />
+                <Avatar user={users[1]} size={24} />
+              </ChatGroupAvatar>
             )}
             <p>
-              {chat.name || user.details?.fullName || user.email}
+            <div className="name">{chat.name || user.details?.fullName || user.email}</div>
               {chat.type === "direct" && (
                 <div className="position">{user.details?.position}</div>
               )}

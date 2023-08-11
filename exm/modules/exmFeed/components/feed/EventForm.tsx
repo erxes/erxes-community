@@ -5,12 +5,16 @@ import { description, getDepartmentOptions, title } from "../../utils";
 
 import ControlLabel from "../../../common/form/Label";
 import DateControl from "../../../common/form/DateControl";
-import { Form } from "../../../common/form";
+import { Form, FormGroup } from "../../../common/form";
 import FormControl from "../../../common/form/Control";
 import GenerateFields from "../GenerateFields";
 import Select from "react-select-plus";
 import SelectTeamMembers from "../../../common/team/containers/SelectTeamMembers";
 import Uploader from "../../../common/Uploader";
+import { CreateFormContainer, CreateInput, FlexRow } from "../../styles";
+import ModalTrigger from "../../../common/ModalTrigger";
+import NameCard from "../../../common/nameCard/NameCard";
+import { __ } from "../../../../utils";
 
 type Props = {
   item?: any;
@@ -18,6 +22,7 @@ type Props = {
   renderButton: (props: IButtonMutateProps) => any;
   fields: any[];
   departments: any[];
+  isEdit?: boolean;
 };
 
 export default function EventForm(props: Props) {
@@ -54,7 +59,7 @@ export default function EventForm(props: Props) {
 
     return (
       <>
-        <span>
+        <FormGroup>
           <FormControl
             componentClass="radio"
             name="visibility"
@@ -77,11 +82,11 @@ export default function EventForm(props: Props) {
           >
             Private
           </FormControl>
-        </span>
+        </FormGroup>
         {eventData.visibility === "private" && (
           <>
             <SelectTeamMembers
-              label="Who"
+              label="Invite people"
               name="recipientIds"
               initialValue={recipientIds}
               onSelect={setRecipientIds}
@@ -110,15 +115,17 @@ export default function EventForm(props: Props) {
           />
         </CustomRangeContainer>
 
-        {title(formProps, item)}
-        {description(formProps, item)}
+        <FormGroup>{title(formProps, item)}</FormGroup>
+        <FormGroup>{description(formProps, item)}</FormGroup>
 
-        <FormControl
-          placeholder="Where"
-          componentClass="textarea"
-          value={eventData.where}
-          onChange={(e: any) => onChangeEventData("where", e.target.value)}
-        />
+        <FormGroup>
+          <FormControl
+            placeholder="Where"
+            componentClass="textarea"
+            value={eventData.where}
+            onChange={(e: any) => onChangeEventData("where", e.target.value)}
+          />
+        </FormGroup>
         <Select
           placeholder="Choose one department"
           name="departmentId"
@@ -128,24 +135,28 @@ export default function EventForm(props: Props) {
           options={getDepartmentOptions(departments)}
         />
 
-        <GenerateFields
-          fields={fields}
-          customFieldsData={customFieldsData}
-          setCustomFieldsData={setCustomFieldsData}
-        />
+        <FormGroup>
+          <GenerateFields
+            fields={fields}
+            customFieldsData={customFieldsData}
+            setCustomFieldsData={setCustomFieldsData}
+          />
+        </FormGroup>
+        <FormGroup>
+          <UploadItems>
+            <div>
+              <ControlLabel>Add attachments:</ControlLabel>
+              <Uploader
+                defaultFileList={attachments || []}
+                onChange={setAttachment}
+              />
+            </div>
+          </UploadItems>
+        </FormGroup>
         <UploadItems>
           <div>
-            <Uploader
-              defaultFileList={attachments || []}
-              onChange={setAttachment}
-            />
-            <ControlLabel>Add attachments:</ControlLabel>
-          </div>
-        </UploadItems>
-        <UploadItems>
-          <div>
-            <Uploader defaultFileList={images || []} onChange={setImages} />
             <ControlLabel>Add images:</ControlLabel>
+            <Uploader defaultFileList={images || []} onChange={setImages} />
           </div>
         </UploadItems>
         {renderButton({
@@ -167,5 +178,24 @@ export default function EventForm(props: Props) {
     );
   };
 
-  return <Form renderContent={renderContent} />;
+  const content = (datas?) => <Form {...datas} renderContent={renderContent} />;
+
+  if(props.isEdit) {
+    return content();
+  }
+
+  return (
+    <CreateFormContainer>
+      <FlexRow>
+        <NameCard.Avatar user={{}} size={45} />
+        <ModalTrigger
+          dialogClassName="create-post"
+          size="lg"
+          title="Create post"
+          trigger={<CreateInput>{__("Create new event")}</CreateInput>}
+          content={content}
+        />
+      </FlexRow>
+    </CreateFormContainer>
+  );
 }
