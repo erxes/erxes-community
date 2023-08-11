@@ -23,10 +23,12 @@ type Props = {
   fields: any[];
   departments: any[];
   isEdit?: boolean;
+  branches: any[];
+  units: any[];
 };
 
 export default function EventForm(props: Props) {
-  const { item = {}, fields, departments } = props;
+  const { item = {}, fields, departments, branches, units } = props;
 
   const [attachments, setAttachment] = useState(item.attachments || []);
   const [images, setImages] = useState(item.images || []);
@@ -43,10 +45,20 @@ export default function EventForm(props: Props) {
     endDate: itemEventData.endDate,
   });
 
-  const [selectedDepartment, setSelectedDepartment] = useState<any>(null);
+  const [departmentIds, setDepartmentIds] = useState(item?.departmentIds || []);
+  const [branchIds, setBranchIds] = useState(item?.branchIds || []);
+  const [unitId, setUnitId] = useState(item?.unitId || "");
 
   const onChangeDepartment = (option: any) => {
-    setSelectedDepartment(option);
+    setDepartmentIds(option.map((data) => data.value) || []);
+  };
+
+  const onChangeBranch = (option: any) => {
+    setBranchIds(option.map((data) => data.value) || []);
+  };
+
+  const onChangeUnit = (option: any) => {
+    setUnitId(option?.value || "");
   };
 
   const onChangeEventData = (key, value) => {
@@ -127,11 +139,11 @@ export default function EventForm(props: Props) {
           />
         </FormGroup>
         <Select
-          placeholder="Choose one department"
+          placeholder="Choose department"
           name="departmentId"
-          value={selectedDepartment}
+          value={departmentIds}
           onChange={onChangeDepartment}
-          multi={false}
+          multi={true}
           options={getDepartmentOptions(departments)}
         />
 
@@ -143,6 +155,27 @@ export default function EventForm(props: Props) {
           />
         </FormGroup>
         <FormGroup>
+          <Select
+            placeholder="Choose branch"
+            name="branchIds"
+            value={branchIds}
+            onChange={onChangeBranch}
+            multi={true}
+            options={getDepartmentOptions(branches)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Select
+            placeholder="Choose unit"
+            name="unitId"
+            value={unitId}
+            onChange={onChangeUnit}
+            multi={false}
+            options={getDepartmentOptions(units)}
+          />
+        </FormGroup>
+
+        <FormGroup>
           <UploadItems>
             <div>
               <ControlLabel>Add attachments:</ControlLabel>
@@ -153,6 +186,12 @@ export default function EventForm(props: Props) {
             </div>
           </UploadItems>
         </FormGroup>
+
+        <GenerateFields
+          fields={fields}
+          customFieldsData={customFieldsData}
+          setCustomFieldsData={setCustomFieldsData}
+        />
         <UploadItems>
           <div>
             <ControlLabel>Add images:</ControlLabel>
@@ -169,7 +208,9 @@ export default function EventForm(props: Props) {
             recipientIds,
             customFieldsData,
             eventData,
-            department: selectedDepartment ? selectedDepartment.label : null,
+            departmentIds,
+            branchIds,
+            unitId,
           },
           isSubmitted,
           callback: closeModal,
@@ -180,7 +221,7 @@ export default function EventForm(props: Props) {
 
   const content = (datas?) => <Form {...datas} renderContent={renderContent} />;
 
-  if(props.isEdit) {
+  if (props.isEdit) {
     return content();
   }
 
