@@ -38,14 +38,14 @@ export default {
     },
     serialize: (value: any) => {
       if (value instanceof Date) {
-        return value;
+        return value.toISOString();
       }
 
       if (value.toISOString) {
         return value.toISOString();
       }
 
-      return new Date(value);
+      return new Date(value).toISOString();
     },
 
     // @ts-ignore

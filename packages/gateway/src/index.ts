@@ -102,7 +102,7 @@ const stopRouter = () => {
   const targets: ErxesProxyTarget[] = await retryGetProxyTargets();
   apolloRouterProcess = await apolloRouter(targets);
 
-  applyProxiesCoreless(app, targets);
+  await applyProxiesCoreless(app, targets);
 
   // The error handler must be before any other error middleware and after all controllers
   app.use(Sentry.Handlers.errorHandler());
@@ -146,8 +146,9 @@ const stopRouter = () => {
 
 (['SIGINT', 'SIGTERM'] as NodeJS.Signals[]).forEach(sig => {
   process.on(sig, async () => {
+    console.log(`Exiting on signal ${sig}`);
     if (NODE_ENV === 'development') {
-      clearCache();
+      await clearCache();
     }
     if (subscriptionServer) {
       try {

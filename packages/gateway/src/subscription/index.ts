@@ -73,6 +73,8 @@ export async function startSubscriptionServer(
     } catch (e) { }
   }
 
+  // const apolloRouterPort = await getApolloRouterPort();
+
   disposable = useServer(
     {
       execute,

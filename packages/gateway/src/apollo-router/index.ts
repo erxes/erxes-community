@@ -13,6 +13,7 @@ import {
   downloadsPath
 } from './paths';
 import supergraphCompose from './supergraph-compose';
+// import * as getPort from 'get-port';
 
 const {
   DOMAIN,
@@ -23,7 +24,20 @@ const {
   APOLLO_ROUTER_PORT
 } = process.env;
 
+// let _apolloRouterPort: number | undefined;
+// export const getApolloRouterPort = async (): Promise<number> => {
+  // if(!_apolloRouterPort) {
+  //   _apolloRouterPort = Number(APOLLO_ROUTER_PORT) || (await getPort());
+  // }
+  // if(!_apolloRouterPort){
+  //   throw new Error("Cannot find free port for Apollo Router");
+  // }
+  // console.log("router port ", _apolloRouterPort);
+  // return _apolloRouterPort;
+// }
+
 export const apolloRouterPort = Number(APOLLO_ROUTER_PORT) || 50_000;
+
 
 const downloadRouter = async () => {
   if (NODE_ENV === 'production') {
@@ -40,20 +54,20 @@ const downloadRouter = async () => {
   spawnSync('sh', args, { stdio: 'inherit' });
 };
 
-const createRouterConfig = () => {
+const createRouterConfig = async () => {
   if (NODE_ENV === 'production' && fs.existsSync(routerConfigPath)) {
     // Don't rewrite in production if it exists. Delete and restart to update the config
     return;
   }
-  const rhaiPath = path.resolve(__dirname, 'rhai');
+  // const rhaiPath = path.resolve(__dirname, 'rhai/main.rhai');
 
   const config = {
     include_subgraph_errors: {
       all: true
     },
     rhai: {
-      scripts: rhaiPath,
-      main: 'main.rhai'
+      scripts: path.resolve(__dirname, 'rhai'),
+      main: "main.rhai"
     },
     cors: {
       allow_credentials: true,
