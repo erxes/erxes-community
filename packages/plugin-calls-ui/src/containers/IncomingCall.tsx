@@ -16,8 +16,6 @@ const IncomingCallContainer = () => {
 
   const callData = data && data.phoneCallReceived;
 
-  console.log('callData', callData);
-
   return <IncomingCall callData={callData} />;
 };
 
