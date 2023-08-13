@@ -115,7 +115,7 @@ const MessageItem = (props: Props) => {
           {renderAttachments()}
         </MessageAttachmentWrapper>
       </MessageWrapper>
-      {!isMe && <Avatar user={message.createdUser} size={36} />}
+      {!isMe && <Avatar user={message.createdUser} size={28} />}
     </MessageItemWrapper>
   );
 };

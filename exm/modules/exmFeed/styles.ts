@@ -38,7 +38,7 @@ export const Row = styled.div`
 `;
 
 export const TabContent = styled.div`
-  margin: 20px auto;
+  margin: 20px auto 0;
 `;
 
 export const ButtonWrap = styled.div`
@@ -90,6 +90,10 @@ export const NewsFeedLayout = styled.div`
       width: 100%;
       border-top: 1px solid #ddd;
     }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   > button {
@@ -105,7 +109,7 @@ export const OverflowWrapper = styled.div`
   overflow: auto;
   position: relative;
   flex: 1;
-  max-height: 100vh;
+  max-height: calc(100vh - 150px);
 `;
 
 export const HeaderFeed = styled.div`
@@ -177,6 +181,20 @@ export const FeedActions = styledTS<{ showPin?: boolean | undefined }>(
   > i {
     visibility: ${props => (props.showPin ? 'visible' : 'hidden')};
     color: #e91e27
+  }
+
+  p {
+    font-size: 13px;
+  }
+
+  b {
+    font-size: 15px;
+  }
+
+  li {
+    padding: 0 20px;
+    gap: 5px;
+    display: flex;
   }
 `;
 
@@ -505,9 +523,6 @@ export const LearnItemDescription = styled.div`
 `;
 
 export const SingleEvent = styled.div`
-  display: flex;
-  align-items: center;
-  
   .image-wrapper {
     overflow: hidden;
     width: 70px;
@@ -636,6 +651,11 @@ export const ChatActionItem = styled.button`
   }
 `;
 
+export const ChatListHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 export const ContextMenuList = styled.div`
   display: flex;
   justify-content: center;
@@ -711,12 +731,19 @@ export const WidgetChatWindowHeader = styled.div`
     p {
       display: inline-block;
       font-weight: 600;
-      display: flex;
       margin: 0;
       margin-left: ${dimensions.unitSpacing}px;
       line-height: 15px;
       flex-direction: column;
-      font-size: .875rem;
+      font-size: 16px;
+      .name {
+        height: 15px;
+        max-width: 186px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+      }
 
       .position {
         color: #65676B;
@@ -730,6 +757,27 @@ export const WidgetChatWindowHeader = styled.div`
 export const MinimizedWidgetChatWindow = styled.div`
   margin-bottom: ${dimensions.coreSpacing}px;
   margin-right: ${dimensions.coreSpacing}px;
+
+  ${WidgetChatWindowHeader} {
+    height: 40px;
+    border-radius: 20px;
+    width: 250px;
+
+    p {
+      max-width: 130px;
+      font-size: 14px;
+    }
+
+    span:first-child {
+      bottom: 2px;
+      left: 0px;
+    }
+
+    span:last-child {
+      top: 4px;
+      right: 5px;
+    }  
+  }
 `;
 
 export const ChatReplyInfo = styled.div`
@@ -946,11 +994,11 @@ export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
   word-wrap: break-word;
   word-break: break-word;
 
-  border-radius: 5px;
+  border-radius: 17px;
   background-color: ${props =>
     props.me ? colors.colorPrimary : colors.bgGray};
   color: ${props => (props.me ? 'white' : 'initial')};
-  padding: 8px;
+  padding: 8px 14px;
   margin: 0;
   font-size: 15px;
   line-height: 20px;

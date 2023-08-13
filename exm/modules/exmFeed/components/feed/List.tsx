@@ -6,19 +6,21 @@ import {
   LikeCommentShare,
   NavItem,
   NewsFeedLayout,
-  TextFeed
-} from '../../styles';
+  TextFeed,
+} from "../../styles";
 
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownToggle from '../../../common/DropdownToggle';
-import Form from '../../containers/feed/Form';
-import Icon from '../../../common/Icon';
-import LoadMore from '../../../common/LoadMore';
-import ModalTrigger from '../../../common/ModalTrigger';
-import React from 'react';
-import dayjs from 'dayjs';
-import { getUserAvatar } from '../../../utils';
-import { readFile } from '../../../common/utils';
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownToggle from "../../../common/DropdownToggle";
+import Form from "../../containers/feed/Form";
+import Icon from "../../../common/Icon";
+import LoadMore from "../../../common/LoadMore";
+import ModalTrigger from "../../../common/ModalTrigger";
+import React from "react";
+import dayjs from "dayjs";
+import { getUserAvatar } from "../../../utils";
+import { readFile } from "../../../common/utils";
+import withCurrentUser from "../../../auth/containers/withCurrentUser";
+import { IUser } from "../../../types";
 
 type Props = {
   list: any;
@@ -28,13 +30,18 @@ type Props = {
   limit: number;
 };
 
-export default function List({
+type FinalProps = {
+  currentUser: IUser;
+} & Props;
+
+function List({
   list,
   deleteItem,
   pinItem,
   totalCount,
-  limit
-}: Props) {
+  limit,
+  currentUser
+}: FinalProps) {
   const editItem = (item) => {
     const trigger = (
       <span>
@@ -48,12 +55,13 @@ export default function List({
           contentType={item.contentType}
           item={item}
           transparent={true}
+          isEdit={true}
           {...props}
         />
       );
     };
 
-    return <ModalTrigger title="Edit" trigger={trigger} content={content} />;
+    return <ModalTrigger title="Edit" size="lg" trigger={trigger} content={content} />;
   };
 
   const renderItem = (item: any) => {
@@ -62,14 +70,14 @@ export default function List({
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     let links = [];
-    let updatedDescription = '';
+    let updatedDescription = "";
 
     if (item.description) {
       const matches = item.description.match(urlRegex);
 
       if (matches) {
         updatedDescription = matches.reduce(
-          (prevDescription, link) => prevDescription.replace(link, ''),
+          (prevDescription, link) => prevDescription.replace(link, ""),
           item.description
         );
 
@@ -86,7 +94,7 @@ export default function List({
                 (createdUser &&
                   createdUser.details &&
                   createdUser.details.fullName) ||
-                'author'
+                "author"
               }
               src={getUserAvatar(createdUser)}
             />
@@ -104,31 +112,32 @@ export default function List({
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format('MM/DD/YYYY h:mm A')}{' '}
+                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
                 <b>#{item.contentType}</b>
               </p>
             </div>
           </FeedActions>
           <FeedActions showPin={item.isPinned}>
-            <Icon icon="map-pin-alt" size={16} />
-            <NavItem>
+            <Icon icon="map-pin-alt" size={18} />
+            {currentUser._id === createdUser._id && <NavItem>
               <Dropdown alignRight={true}>
                 <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
                   <Icon icon="ellipsis-h" size={14} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  <li>{editItem(item)}</li>
-                  <li>
+                  <li><Icon icon="edit" size={15}/>{editItem(item)}</li>
+                  <li><Icon icon="trash" size={15}/>
                     <a onClick={() => deleteItem(item._id)}>Delete</a>
                   </li>
                   <li>
+                    <Icon icon="map-pin-alt" size={15} />
                     <a onClick={() => pinItem(item._id)}>
-                      {item.isPinned ? 'UnPin' : 'Pin'}
+                      {item.isPinned ? "UnPin" : "Pin"}
                     </a>
                   </li>
                 </Dropdown.Menu>
               </Dropdown>
-            </NavItem>
+            </NavItem>}
           </FeedActions>
         </HeaderFeed>
         <TextFeed>
@@ -141,9 +150,9 @@ export default function List({
                 width="640"
                 height="390"
                 src={String(link)
-                  .replace('watch?v=', 'embed/')
-                  .replace('youtu.be/', 'youtube.com/embed/')
-                  .replace('share/', 'embed/')}
+                  .replace("watch?v=", "embed/")
+                  .replace("youtu.be/", "youtube.com/embed/")
+                  .replace("share/", "embed/")}
                 title="Video"
                 allowFullScreen={true}
               />
@@ -203,3 +212,10 @@ export default function List({
     </NewsFeedLayout>
   );
 }
+
+
+const WithCurrentUser = withCurrentUser(List);
+
+export default (props: Props) => {
+  return <WithCurrentUser {...props} />;
+};

@@ -127,6 +127,8 @@ hr {
   border: none;
   z-index: 9;
   border-radius: 8px;
+  max-height: 350px;
+  overflow: scroll;
 }
 
 #contextmenu-popover {

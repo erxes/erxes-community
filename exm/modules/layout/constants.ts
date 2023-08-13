@@ -5,6 +5,6 @@ export const MAIN_NAVIGATION = [
     { key: 'learn', url: '/learn', value: 'Learn', icon: 'notes', desc: 'Coming soon' },
     { key: 'leaderboard', url: '#', value: 'Leaderboard', icon: 'award', desc: 'Coming soon' },
     { key: 'structure', url: '#', value: 'Structure', icon: 'layer-group', desc: 'Coming soon' },
-    { key: 'score', url: '#', value: 'Score', icon: 'bolt-alt', desc: 'Coming soon' }
+    // { key: 'score', url: '#', value: 'Score', icon: 'bolt-alt', desc: 'Coming soon' }
   ];
   

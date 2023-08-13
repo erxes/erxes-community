@@ -17,6 +17,7 @@ type Props = {
   item?: any;
   transparent?: boolean;
   closeModal?: () => void;
+  isEdit?: boolean;
 };
 
 export default function FormContainer(props: Props) {
