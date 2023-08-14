@@ -213,13 +213,17 @@ export default function EventForm(props: Props) {
             unitId,
           },
           isSubmitted,
-          callback: closeModal,
+          callback: closeModal ? closeModal : insideCloseModal,
         })}
       </>
     );
   };
 
-  const content = (datas?) => <Form {...datas} renderContent={renderContent} />;
+  let insideCloseModal;
+  const content = (datas?) => {
+    insideCloseModal = datas ? datas.closeModal : props.closeModal;
+    return <Form {...datas} renderContent={renderContent} />;
+  };
 
   if (props.isEdit) {
     return content();
