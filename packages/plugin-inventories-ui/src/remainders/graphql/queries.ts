@@ -56,25 +56,25 @@ const remainderProducts = `
   }
 `;
 
-const remaindersLogs = `
-  query remaindersLogs(
+const remaindersLog = `
+  query remaindersLog(
     $categoryId: String,
     $productIds: [String]
     $searchValue: String,
-    $search: String
     $departmentId: String
     $branchId: String
+    $beginDate: Date
+    $endDate: Date
   ) {
-    remaindersLogs(
+    remaindersLog(
       categoryId: $categoryId,
       productIds: $productIds,
       searchValue: $searchValue,
-      search: $search,
       departmentId: $departmentId,
       branchId: $branchId,
-    ) {
-      _id
-    }
+      beginDate: $beginDate,
+      endDate: $endDate,
+    )
   }
 `;
 
@@ -83,5 +83,5 @@ const productCategories = productQueries.productCategories;
 export default {
   remainderProducts,
   productCategories,
-  remaindersLogs
+  remaindersLog
 };

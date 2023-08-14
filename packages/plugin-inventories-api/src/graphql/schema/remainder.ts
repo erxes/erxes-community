@@ -61,10 +61,12 @@ export const queries = `
   ): RemainderProducts
   remaindersLog(
     categoryId: String,
-    productIds: [String]
+    productIds: [String],
     searchValue: String,
-    departmentId: String
-    branchId: String
+    departmentId: String,
+    branchId: String,
+    beginDate: Date,
+    endDate: Date
   ): JSON
 `;
 

@@ -91,9 +91,17 @@ export const initBroker = async cl => {
     'processes:performs.aggregate',
     async ({ subdomain, data }) => {
       const models = await generateModels(subdomain);
+
+      const { aggregate, replacers } = data;
+      for (const repl of replacers || []) {
+        try {
+          eval(repl);
+        } catch (e) {}
+      }
+
       return {
         status: 'success',
-        data: await models.Performs.aggregate(data)
+        data: await models.Performs.aggregate(aggregate)
       };
     }
   );

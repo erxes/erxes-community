@@ -1,10 +1,8 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import * as compose from 'lodash.flowright';
 import { gql } from '@apollo/client';
 
 //erxes
-import { Alert } from '@erxes/ui/src/utils';
 import Spinner from '@erxes/ui/src/components/Spinner';
 
 // local
@@ -15,17 +13,20 @@ type Props = {
   queryParams: any;
 };
 
-const BarcodeGeneratorContainer = (props: Props) => {
+const RemaindersLogContainer = (props: Props) => {
   const { queryParams } = props;
 
-  const remaindersLogQuery: any = useQuery(gql(queries.remaindersLogs), {
-    variables: {
-      categoryId: queryParams.categoryId,
-      productIds: queryParams.productIds,
-      searchValue: queryParams.searchValue,
-      departmentId: queryParams.departmentId,
-      branchId: queryParams.branchId
-    },
+  const params = {
+    beginDate: queryParams.beginDate,
+    endDate: queryParams.endDate,
+    categoryId: queryParams.categoryId,
+    productIds: queryParams.productIds,
+    searchValue: queryParams.searchValue,
+    departmentId: queryParams.departmentId,
+    branchId: queryParams.branchId
+  };
+  const remaindersLogQuery: any = useQuery(gql(queries.remaindersLog), {
+    variables: params,
     fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true
   });
@@ -38,7 +39,9 @@ const BarcodeGeneratorContainer = (props: Props) => {
     ? remaindersLogQuery.data.remaindersLog
     : ({} as any);
 
-  return <RemaindersLogComponent remaindersLog={remaindersLog} />;
+  return (
+    <RemaindersLogComponent remaindersLog={remaindersLog} params={params} />
+  );
 };
 
-export default BarcodeGeneratorContainer;
+export default RemaindersLogContainer;

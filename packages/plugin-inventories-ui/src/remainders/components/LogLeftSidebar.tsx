@@ -1,3 +1,4 @@
+import moment from 'moment';
 import ControlLabel from '@erxes/ui/src/components/form/Label';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 import FormGroup from '@erxes/ui/src/components/form/Group';
@@ -11,40 +12,38 @@ import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProdu
 //erxes
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
 import Button from '@erxes/ui/src/components/Button';
-import FormControl from '@erxes/ui/src/components/form/Control';
-import FormLabel from '@erxes/ui/src/components/form/Label';
-import Box from '@erxes/ui/src/components/Box';
-import { FormWrapper, DateContainer } from '@erxes/ui/src/styles/main';
 import { __, router } from '@erxes/ui/src/utils/core';
 import { useHistory } from 'react-router-dom';
 //local
-import { SidebarContent, SidebarFilters } from '../../styles';
+import { SidebarFilters } from '../../styles';
 import Tip from '@erxes/ui/src/components/Tip';
 import Icon from '@erxes/ui/src/components/Icon';
 
 const { Section } = Wrapper.Sidebar;
 
 type Props = {
-  config: any;
-  handleChangeConfig: (key: string, value: any) => void;
   handlePrint: () => void;
 };
 
 const LogLeftSidebar = (props: Props) => {
-  const { config, handleChangeConfig, handlePrint } = props;
+  const { handlePrint } = props;
   const history = useHistory();
 
   const categoryId = router.getParam(history, 'categoryId');
-  const products = router.getParam(history, 'products');
+  const productIds = router.getParam(history, 'productIds');
   const branchId = router.getParam(history, 'branchId');
   const departmentId = router.getParam(history, 'departmentId');
+  const beginDate = router.getParam(history, 'beginDate');
+  const endDate = router.getParam(history, 'endDate');
 
   const clearFilter = () => {
     router.setParams(history, {
       categoryId: null,
       branchId: null,
       departmentId: null,
-      page: 1
+      productIds: null,
+      endDate: null,
+      beginDate: null
     });
   };
 
@@ -57,7 +56,12 @@ const LogLeftSidebar = (props: Props) => {
       <Section.Title>
         {__('Filters')}
         <Section.QuickButtons>
-          {(branchId || departmentId || categoryId) && (
+          {(branchId ||
+            departmentId ||
+            categoryId ||
+            (productIds || []).length ||
+            endDate ||
+            beginDate) && (
             <a href="#cancel" tabIndex={0} onClick={clearFilter}>
               <Tip text={__('Clear filter')} placement="bottom">
                 <Icon icon="cancel-1" />
@@ -68,6 +72,38 @@ const LogLeftSidebar = (props: Props) => {
       </Section.Title>
       <SidebarFilters>
         <List id="SettingsSidebar">
+          <FormGroup>
+            <ControlLabel>{__('Begin Date')}</ControlLabel>
+            <Datetime
+              inputProps={{ placeholder: 'Click to select a date' }}
+              dateFormat="YYYY MM DD"
+              timeFormat=""
+              viewMode={'days'}
+              closeOnSelect
+              utc
+              input
+              value={beginDate || null}
+              onChange={date =>
+                setFilter('beginDate', moment(date).format('YYYY/MM/DD HH:mm'))
+              }
+            />
+          </FormGroup>
+          <FormGroup>
+            <ControlLabel>{__('End Date')}</ControlLabel>
+            <Datetime
+              inputProps={{ placeholder: 'Click to select a date' }}
+              dateFormat="YYYY MM DD"
+              timeFormat=""
+              viewMode={'days'}
+              closeOnSelect
+              utc
+              input
+              value={endDate || null}
+              onChange={date =>
+                setFilter('endDate', moment(date).format('YYYY/MM/DD HH:mm'))
+              }
+            />
+          </FormGroup>
           <FormGroup>
             <ControlLabel>Branch</ControlLabel>
             <SelectBranches
@@ -111,11 +147,11 @@ const LogLeftSidebar = (props: Props) => {
             />
           </FormGroup>
           <FormGroup>
-            <ControlLabel>Product Category</ControlLabel>
+            <ControlLabel>Products</ControlLabel>
             <SelectProducts
               label="Choose product"
-              name="productId"
-              initialValue={products}
+              name="productIds"
+              initialValue={productIds}
               customOption={{
                 value: '',
                 label: '...Clear product filter'
