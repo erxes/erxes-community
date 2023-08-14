@@ -59,19 +59,21 @@ const remainderProducts = `
 const remaindersLogs = `
   query remaindersLogs(
     $categoryId: String,
+    $productIds: [String]
     $searchValue: String,
-    ${listParamsDef}
+    $search: String
+    $departmentId: String
+    $branchId: String
   ) {
     remaindersLogs(
       categoryId: $categoryId,
+      productIds: $productIds,
       searchValue: $searchValue,
-      ${listParamsValue}
+      search: $search,
+      departmentId: $departmentId,
+      branchId: $branchId,
     ) {
-      products {
-        ${remainderProductFields}
-      }
-
-      totalCount
+      _id
     }
   }
 `;
