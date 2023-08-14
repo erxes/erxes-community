@@ -56,9 +56,30 @@ const remainderProducts = `
   }
 `;
 
+const remaindersLogs = `
+  query remaindersLogs(
+    $categoryId: String,
+    $searchValue: String,
+    ${listParamsDef}
+  ) {
+    remaindersLogs(
+      categoryId: $categoryId,
+      searchValue: $searchValue,
+      ${listParamsValue}
+    ) {
+      products {
+        ${remainderProductFields}
+      }
+
+      totalCount
+    }
+  }
+`;
+
 const productCategories = productQueries.productCategories;
 
 export default {
   remainderProducts,
-  productCategories
+  productCategories,
+  remaindersLogs
 };
