@@ -40,7 +40,7 @@ function List({
   pinItem,
   totalCount,
   limit,
-  currentUser
+  currentUser,
 }: FinalProps) {
   const editItem = (item) => {
     const trigger = (
@@ -50,18 +50,28 @@ function List({
     );
 
     const content = (props) => {
+      const { closeModal } = props;
+
       return (
         <Form
           contentType={item.contentType}
           item={item}
           transparent={true}
           isEdit={true}
+          closeModal={closeModal}
           {...props}
         />
       );
     };
 
-    return <ModalTrigger title="Edit" size="lg" trigger={trigger} content={content} />;
+    return (
+      <ModalTrigger
+        title="Edit"
+        size="lg"
+        trigger={trigger}
+        content={content}
+      />
+    );
   };
 
   const renderItem = (item: any) => {
@@ -119,25 +129,31 @@ function List({
           </FeedActions>
           <FeedActions showPin={item.isPinned}>
             <Icon icon="map-pin-alt" size={18} />
-            {currentUser._id === createdUser._id && <NavItem>
-              <Dropdown alignRight={true}>
-                <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
-                  <Icon icon="ellipsis-h" size={14} />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <li><Icon icon="edit" size={15}/>{editItem(item)}</li>
-                  <li><Icon icon="trash" size={15}/>
-                    <a onClick={() => deleteItem(item._id)}>Delete</a>
-                  </li>
-                  <li>
-                    <Icon icon="map-pin-alt" size={15} />
-                    <a onClick={() => pinItem(item._id)}>
-                      {item.isPinned ? "UnPin" : "Pin"}
-                    </a>
-                  </li>
-                </Dropdown.Menu>
-              </Dropdown>
-            </NavItem>}
+            {currentUser._id === createdUser._id && (
+              <NavItem>
+                <Dropdown alignRight={true}>
+                  <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
+                    <Icon icon="ellipsis-h" size={14} />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <li>
+                      <Icon icon="edit" size={15} />
+                      {editItem(item)}
+                    </li>
+                    <li>
+                      <Icon icon="trash" size={15} />
+                      <a onClick={() => deleteItem(item._id)}>Delete</a>
+                    </li>
+                    <li>
+                      <Icon icon="map-pin-alt" size={15} />
+                      <a onClick={() => pinItem(item._id)}>
+                        {item.isPinned ? "UnPin" : "Pin"}
+                      </a>
+                    </li>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </NavItem>
+            )}
           </FeedActions>
         </HeaderFeed>
         <TextFeed>
@@ -212,7 +228,6 @@ function List({
     </NewsFeedLayout>
   );
 }
-
 
 const WithCurrentUser = withCurrentUser(List);
 

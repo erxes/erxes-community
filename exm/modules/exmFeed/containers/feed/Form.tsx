@@ -101,6 +101,7 @@ export default function FormContainer(props: Props) {
     departments: (dataDepartment && dataDepartment.departments) || [],
     units: (dataUnit && dataUnit.unitsMain.list) || [],
     branches: dataBranch && dataBranch.branches,
+    closeModal: props.closeModal,
 
     renderButton
   };

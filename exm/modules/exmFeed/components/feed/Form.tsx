@@ -4,21 +4,21 @@ import {
   CreateFormContainer,
   CreateInput,
   FlexRow,
-  UploadItems
-} from '../../styles';
-import { Form, FormGroup } from '../../../common/form';
-import { IButtonMutateProps, IFormProps } from '../../../common/types';
-import React, { useState } from 'react';
-import { description, getDepartmentOptions, title } from '../../utils';
+  UploadItems,
+} from "../../styles";
+import { Form, FormGroup } from "../../../common/form";
+import { IButtonMutateProps, IFormProps } from "../../../common/types";
+import React, { useState } from "react";
+import { description, getDepartmentOptions, title } from "../../utils";
 
-import ControlLabel from '../../../common/form/Label';
-import GenerateFields from '../GenerateFields';
-import Icon from '../../../common/Icon';
-import ModalTrigger from '../../../common/ModalTrigger';
-import NameCard from '../../../common/nameCard/NameCard';
-import Select from 'react-select-plus';
-import Uploader from '../../../common/Uploader';
-import { __ } from '../../../../utils';
+import ControlLabel from "../../../common/form/Label";
+import GenerateFields from "../GenerateFields";
+import Icon from "../../../common/Icon";
+import ModalTrigger from "../../../common/ModalTrigger";
+import NameCard from "../../../common/nameCard/NameCard";
+import Select from "react-select-plus";
+import Uploader from "../../../common/Uploader";
+import { __ } from "../../../../utils";
 
 type Props = {
   renderButton: (props: IButtonMutateProps) => any;
@@ -45,7 +45,7 @@ export default function PostForm(props: Props) {
   );
   const [departmentIds, setDepartmentIds] = useState(item?.departmentIds || []);
   const [branchIds, setBranchIds] = useState(item?.branchIds || []);
-  const [unitId, setUnitId] = useState(item?.unitId || '');
+  const [unitId, setUnitId] = useState(item?.unitId || "");
 
   const onChangeDepartment = (option: any) => {
     setDepartmentIds(option.map((data) => data.value) || []);
@@ -56,7 +56,7 @@ export default function PostForm(props: Props) {
   };
 
   const onChangeUnit = (option: any) => {
-    setUnitId(option?.value || '');
+    setUnitId(option?.value || "");
   };
 
   const renderContent = (formProps: IFormProps) => {
@@ -143,24 +143,29 @@ export default function PostForm(props: Props) {
           values: {
             title: values.title,
             description: values.description ? values.description : null,
-            contentType: 'post',
+            contentType: "post",
             images,
             attachments,
             customFieldsData,
             departmentIds,
             branchIds,
-            unitId
+            unitId,
           },
           isSubmitted,
-          callback: closeModal
+          callback: closeModal ? closeModal : insideCloseModal,
         })}
       </>
     );
   };
 
-  const content = (datas?) => <Form {...datas} renderContent={renderContent} />;
+  let insideCloseModal;
+  const content = (datas?) => {
+    insideCloseModal = datas ? datas.closeModal : props.closeModal;
 
-  if(props.isEdit) {
+    return <Form {...datas} renderContent={renderContent} />;
+  };
+
+  if (props.isEdit) {
     return content();
   }
 
@@ -172,7 +177,7 @@ export default function PostForm(props: Props) {
           dialogClassName="create-post"
           size="lg"
           title="Create post"
-          trigger={<CreateInput>{__('What`s on your mind?')}</CreateInput>}
+          trigger={<CreateInput>{__("What`s on your mind?")}</CreateInput>}
           content={content}
         />
       </FlexRow>
@@ -184,7 +189,7 @@ export default function PostForm(props: Props) {
           trigger={
             <AdditionalItem>
               <Icon icon="picture" size={16} />
-              <span>{__('Photo/video')}</span>
+              <span>{__("Photo/video")}</span>
             </AdditionalItem>
           }
           content={content}
