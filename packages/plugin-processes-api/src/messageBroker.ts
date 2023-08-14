@@ -78,6 +78,25 @@ export const initBroker = async cl => {
       return { data: [...needProductIds, ...resProductIds], status: 'success' };
     }
   );
+
+  consumeRPCQueue('processes:performs.find', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+    return {
+      status: 'success',
+      data: await models.Performs.find(data).lean()
+    };
+  });
+
+  consumeRPCQueue(
+    'processes:performs.aggregate',
+    async ({ subdomain, data }) => {
+      const models = await generateModels(subdomain);
+      return {
+        status: 'success',
+        data: await models.Performs.aggregate(data)
+      };
+    }
+  );
 };
 
 export const sendCommonMessage = async (
