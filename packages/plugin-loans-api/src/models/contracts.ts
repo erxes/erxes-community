@@ -166,6 +166,11 @@ export const loadContractClass = (models: IModels) => {
      * Remove Contract category
      */
     public static async removeContracts(_ids) {
+      const transactions = await models.Transactions.count({
+        contractId: _ids
+      });
+      if (transactions > 0)
+        throw new Error('You can not delete contract with transaction');
       await models.Schedules.deleteMany({
         contractId: { $in: _ids }
       });
