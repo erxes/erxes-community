@@ -9,16 +9,21 @@ import Spinner from '../../../common/Spinner';
 import { confirm } from '../../../utils';
 import gql from 'graphql-tag';
 
+import { useRouter } from 'next/router';
+
 type Props = {
   queryParams: any;
   contentType: string;
 };
 
 export default function ListContainer(props: Props) {
-  const { queryParams, contentType } = props;
+  const { contentType } = props;
+  const router = useRouter();
 
   const limit =
-    queryParams && queryParams.limit ? parseInt(queryParams.limit, 10) : 20;
+    router && router.query?.limit
+      ? parseInt(String(router.query?.limit), 10)
+      : 20;
 
   const feedResponse = useQuery(gql(queries.feed), {
     variables: {
