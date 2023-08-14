@@ -37,10 +37,10 @@ const ChatItem = (props: Props) => {
       : users[0];
 
   const handleClick = () => {
-    if(chat) {
+    if (chat) {
       props.handleClickItem(chat._id);
     }
-    if(notContactUser){
+    if (notContactUser) {
       createChat([notContactUser._id, currentUser._id]);
     }
   };
@@ -58,11 +58,34 @@ const ChatItem = (props: Props) => {
     </Popover>
   );
 
+  const renderInfo = () => {
+    if (notContactUser) {
+      return (
+        <>
+          <p>
+            {(notContactUser && notContactUser.details.fullName) ||
+              notContactUser?.email ||
+              null}
+          </p>
+          <span>{notContactUser?.details?.position}</span>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <p>
+          {chat && chat.type === "direct"
+            ? user?.details.fullName || user?.email
+            : chat?.name}
+        </p>
+        <span>{chat && chat.participantUsers[0].details.position}</span>
+      </>
+    );
+  };
+
   return (
-    <ChatItemWrapper
-      id="ChatItemWrapper"
-      isWidget={true}
-    >
+    <ChatItemWrapper id="ChatItemWrapper" isWidget={true}>
       {chat &&
         (chat.type === "direct" ? (
           <Avatar user={user} size={36} />
@@ -77,36 +100,32 @@ const ChatItem = (props: Props) => {
 
       <ChatWrapper
         isSeen={
-          notContactUser ? true :
-          chat?.lastMessage?.createdUser?._id === currentUser?._id
+          notContactUser
+            ? true
+            : chat?.lastMessage?.createdUser?._id === currentUser?._id
             ? true
             : chat?.isSeen
         }
         onClick={handleClick}
       >
-        <p>
-          {chat && chat.type === "direct"
-            ? user?.details.fullName || user?.email
-            : chat?.name}
-          {(notContactUser && notContactUser.details.fullName) ||
-            notContactUser?.email ||
-            null}
-        </p>
+        {renderInfo()}
       </ChatWrapper>
-      {chat && <ChatActions>
-        <OverlayTrigger
-          trigger="click"
-          rootClose={false}
-          placement="bottom-start"
-          overlay={popoverContextMenu}
-        >
-          <ChatActionItem>
-            <Icon icon="ellipsis-h" size={14} />
-          </ChatActionItem>
-        </OverlayTrigger>
-      </ChatActions>}
+      {chat && (
+        <ChatActions>
+          <OverlayTrigger
+            trigger="click"
+            rootClose={false}
+            placement="bottom-start"
+            overlay={popoverContextMenu}
+          >
+            <ChatActionItem>
+              <Icon icon="ellipsis-h" size={14} />
+            </ChatActionItem>
+          </OverlayTrigger>
+        </ChatActions>
+      )}
     </ChatItemWrapper>
-    );
+  );
 };
 
 export default ChatItem;

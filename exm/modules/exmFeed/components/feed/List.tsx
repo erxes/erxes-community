@@ -93,6 +93,10 @@ function List({
 
         links = matches;
       }
+
+      else {
+        updatedDescription = item.description;
+      }
     }
 
     return (
@@ -189,11 +193,11 @@ function List({
         {(item.images || []).map((image, index) => {
           return <img key={index} alt={image.name} src={readFile(image.url)} />;
         })}
-        <LikeCommentShare>
+        {/* <LikeCommentShare>
           <b>{item.likeCount} Like</b>
           <b>{item.commentCount} Comments</b>
           <b>Share</b>
-        </LikeCommentShare>
+        </LikeCommentShare> */}
       </div>
     );
   };

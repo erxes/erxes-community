@@ -204,6 +204,10 @@ export const FeedActions = styledTS<{ showPin?: boolean | undefined }>(
 
 export const TextFeed = styled.div`
   padding: 0 20px 15px;
+
+  iframe {
+    width: 100%;
+  }
 `;
 
 export const LikeCommentShare = styled.div`
@@ -629,7 +633,15 @@ export const ChatWrapper = styledTS<{ isSeen?: boolean }>(styled.div)`
   font-weight: ${props => (props.isSeen ? 'normal !important' : 'bold')};
   text-decoration: none;
 
-  p { margin: 0 };
+  p { 
+    margin: 0; 
+    color: #444;
+  };
+
+  span {
+    color: #666;
+    font-size: 13px !important;
+  }
 `;
 
 export const ChatActionItem = styled.button`
