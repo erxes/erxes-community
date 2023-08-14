@@ -109,6 +109,10 @@ export const OverflowWrapper = styled.div`
   overflow: auto;
   position: relative;
   flex: 1;
+  max-height: 100vh;
+`;
+  
+export const FeedWrapper = styled(OverflowWrapper)`
   max-height: calc(100vh - 150px);
 `;
 
@@ -1171,4 +1175,30 @@ export const Title = styled.h5`
   margin: 0;
   margin-bottom: 10px;
   color: ${colors.textSecondary};
+`;
+
+export const NoEvent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const SearchInput = styledTS<{ active?: boolean }>(styled.div)`
+  border: 1px solid ${colors.borderPrimary};
+  border-radius: 20px;
+  height: 40px;
+  position: relative;
+  transition: .3s all;
+  width: 100%;
+  display: flex;
+  padding: 10px 15px;
+  align-items: center;
+  position: relative;
+  font-size: 12px;
+  margin-bottom: 20px;
+
+  input {
+    border: none !important;
+  }
 `;

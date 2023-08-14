@@ -86,7 +86,7 @@ const ChatItem = (props: Props) => {
       >
         <p>
           {chat && chat.type === "direct"
-            ? user.details.fullName || user.email
+            ? user?.details.fullName || user?.email
             : chat?.name}
           {(notContactUser && notContactUser.details.fullName) ||
             notContactUser?.email ||

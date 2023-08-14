@@ -6,6 +6,8 @@ import {
   SingleEvent,
   TabContent,
   WidgetChatWrapper,
+  NoEvent,
+  FeedWrapper,
 } from "../styles";
 import { MainContainer, SideContainer } from "../../layout/styles";
 import React, { useState } from "react";
@@ -21,6 +23,7 @@ import ThankList from "../containers/feed/ThankList";
 import { Wrapper } from "../../layout";
 import { __ } from "../../../utils";
 import WidgetChatWindow from "../containers/chat/WidgetChatWindow";
+import Icon from "../../common/Icon";
 
 type Props = {
   queryParams: any;
@@ -85,6 +88,13 @@ export default function Home(props: Props) {
     );
   };
 
+  const NoTodaysEvent = (
+    <NoEvent>
+      <Icon icon="calendar-alt" size={33} />
+      There is no event
+    </NoEvent>
+  );
+
   const renderRightSidebar = () => {
     return (
       <>
@@ -92,26 +102,28 @@ export default function Home(props: Props) {
           <label>{__("Today`s events")}</label>
           <SingleEvent>
             {todayEvents
-              ? todayEvents.map((e) => {
-                  if (e === null) {
-                    return null;
-                  }
+              ? todayEvents.every((v) => v === null)
+                ? NoTodaysEvent
+                : todayEvents.map((e) => {
+                    if (e === null) {
+                      return null;
+                    }
 
-                  return (
-                    <>
-                      {e.images.length > 0 && (
-                        <div className="image-wrapper">
-                          <img src={e.images[0]} alt="event-img" />
+                    return (
+                      <>
+                        {e.images.length > 0 && (
+                          <div className="image-wrapper">
+                            <img src={e.images[0]} alt="event-img" />
+                          </div>
+                        )}
+                        <div>
+                          <b>{e.title}</b>
+                          <span>{e.eventData.where}</span>
                         </div>
-                      )}
-                      <div>
-                        <b>{e.title}</b>
-                        <span>{e.eventData.where}</span>
-                      </div>
-                    </>
-                  );
-                })
-              : "There is no Event"}
+                      </>
+                    );
+                  })
+              : NoTodaysEvent}
           </SingleEvent>
         </Card>
         {/* <Card>
@@ -171,9 +183,9 @@ export default function Home(props: Props) {
                   Welcome
                 </TabTitle>
               </Tabs>
-              <OverflowWrapper>
+              <FeedWrapper>
                 <TabContent>{renderTabContent()}</TabContent>
-              </OverflowWrapper>
+              </FeedWrapper>
             </MainContainer>
             <SideContainer>
               <OverflowWrapper>{renderRightSidebar()}</OverflowWrapper>
