@@ -3,19 +3,14 @@ import {
   IContract,
   IContractDocument
 } from '../../../models/definitions/contracts';
-import { gatherDescriptions } from '../../../utils';
-import {
-  checkPermission,
-  putCreateLog,
-  putDeleteLog,
-  putUpdateLog
-} from '@erxes/api-utils/src';
+import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker, {
+import {
   sendCardsMessage,
   sendCoreMessage,
   sendMessageBroker
 } from '../../../messageBroker';
+import { createLog, deleteLog, updateLog } from '../../../logUtils';
 
 const contractMutations = {
   contractsAdd: async (
@@ -32,17 +27,7 @@ const contractMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putCreateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await createLog(subdomain, user, logData);
 
     return contract;
   },
@@ -67,17 +52,7 @@ const contractMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -109,17 +84,7 @@ const contractMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -142,17 +107,7 @@ const contractMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -178,13 +133,8 @@ const contractMutations = {
         object: contract,
         extraParams: { models }
       };
-      const descriptions = gatherDescriptions(logData);
-      await putDeleteLog(
-        subdomain,
-        messageBroker(),
-        { ...logData, ...descriptions },
-        user
-      );
+
+      await deleteLog(subdomain, user, logData);
     }
 
     return contractIds;
