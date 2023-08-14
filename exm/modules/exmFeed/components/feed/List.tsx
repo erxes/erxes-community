@@ -3,7 +3,7 @@ import {
   AvatarImg,
   FeedActions,
   HeaderFeed,
-  LikeCommentShare,
+  // LikeCommentShare,
   NavItem,
   NewsFeedLayout,
   TextFeed,

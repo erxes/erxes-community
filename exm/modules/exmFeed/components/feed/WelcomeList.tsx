@@ -2,7 +2,7 @@ import {
   AvatarImg,
   FeedActions,
   HeaderFeed,
-  LikeCommentShare,
+  // LikeCommentShare,
   NewsFeedLayout,
   TextFeed
 } from '../../styles';
@@ -60,11 +60,11 @@ export default function WelcomeList({ list, totalCount, limit }: Props) {
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
           <p dangerouslySetInnerHTML={{ __html: item.description }} />
         </TextFeed>
-        <LikeCommentShare>
+        {/* <LikeCommentShare>
           <b>{item.likeCount} Like</b>
           <b>{item.commentCount} Comments</b>
           <b>Share</b>
-        </LikeCommentShare>
+        </LikeCommentShare> */}
       </div>
     );
   };
