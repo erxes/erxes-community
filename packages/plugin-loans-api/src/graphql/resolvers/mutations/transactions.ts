@@ -7,7 +7,6 @@ import {
 } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
 import messageBroker, { sendMessageBroker } from '../../../messageBroker';
-import redis from '../../../redis';
 import {
   ITransaction,
   ITransactionDocument
@@ -60,7 +59,7 @@ const transactionMutations = {
     });
 
     const updated = await models.Transactions.updateTransaction(
-      redis,
+      subdomain,
       _id,
       doc
     );
