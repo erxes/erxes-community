@@ -21,6 +21,7 @@ import { getUserAvatar } from "../../../utils";
 import { readFile } from "../../../common/utils";
 import withCurrentUser from "../../../auth/containers/withCurrentUser";
 import { IUser } from "../../../types";
+import AttachmentWithPreview from "../../../common/AttachmentWithPreview";
 
 type Props = {
   list: any;
@@ -92,9 +93,7 @@ function List({
         );
 
         links = matches;
-      }
-
-      else {
+      } else {
         updatedDescription = item.description;
       }
     }
@@ -190,9 +189,12 @@ function List({
             </a>
           );
         })}
-        {(item.images || []).map((image, index) => {
-          return <img key={index} alt={image.name} src={readFile(image.url)} />;
-        })}
+        {item.images.length > 0 && (
+          <AttachmentWithPreview
+            attachment={item.images[0]}
+            attachments={item.images}
+          />
+        )}
         {/* <LikeCommentShare>
           <b>{item.likeCount} Like</b>
           <b>{item.commentCount} Comments</b>

@@ -89,6 +89,8 @@ export const NewsFeedLayout = styled.div`
     > img {
       width: 100%;
       border-top: 1px solid #ddd;
+      max-height: 400px;
+      object-fit: cover;
     }
 
     &:last-child {

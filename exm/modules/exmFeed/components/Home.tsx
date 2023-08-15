@@ -101,7 +101,7 @@ export default function Home(props: Props) {
     return (
       <>
         <Card>
-          <label>{__("Today`s events")}</label>
+          <label>{__("Today's events")}</label>
           <SingleEvent>
             {todayEvents
               ? todayEvents.every((v) => v === null)
