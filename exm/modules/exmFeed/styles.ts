@@ -1251,3 +1251,12 @@ export const MoreAttachment = styled.div`
   width: fit-content;
   margin: auto;
 `;
+
+export const EventInfo = styled.div`
+  gap: 5px;
+  display: grid;
+
+  i {
+    margin-right: 8px;
+  }
+`;

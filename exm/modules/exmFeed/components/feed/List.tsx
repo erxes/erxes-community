@@ -9,6 +9,7 @@ import {
   TextFeed,
   AttachmentContainer,
   MoreAttachment,
+  EventInfo
 } from "../../styles";
 
 import Dropdown from "react-bootstrap/Dropdown";
@@ -148,6 +149,34 @@ function List({
       );
     };
 
+    const renderEventInfo = () => {
+      const { eventData } = item;
+
+      return (
+        <EventInfo>
+          <div>
+            <Icon icon="wallclock" />
+            {dayjs(eventData.startDate).format("MM/DD/YYYY h:mm A")} ~ {dayjs(eventData.endDate).format("MM/DD/YYYY h:mm A")}
+          </div>
+          <div>
+            <Icon icon="users" />
+            {eventData.goingUserIds.length} Going • {eventData.interestedUserIds.length}{" "}
+            Interested
+          </div>
+          <div>
+            <Icon icon="user" />
+            Event by{" "}
+            {item.createdUser.details?.fullName ||
+              item.createdUser.username ||
+              item.createdUser.email}
+          </div>
+          <div>
+            <Icon icon="location-point" />{eventData.where}
+          </div>
+        </EventInfo>
+      );
+    };
+
     return (
       <div key={item._id}>
         <HeaderFeed>
@@ -212,6 +241,7 @@ function List({
         <TextFeed>
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
           <p dangerouslySetInnerHTML={{ __html: updatedDescription }} />
+          {item.contentType === "event" && renderEventInfo()}
           {links.map((link, index) => {
             return (
               <iframe
