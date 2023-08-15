@@ -63,7 +63,7 @@ const ChatItem = (props: Props) => {
       return (
         <>
           <p>
-            {(notContactUser && notContactUser.details.fullName) ||
+            {(notContactUser && notContactUser.details?.fullName) ||
               notContactUser?.email ||
               null}
           </p>

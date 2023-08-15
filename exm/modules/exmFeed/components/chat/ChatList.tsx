@@ -28,6 +28,7 @@ export default function ChatList({
 
   const [searchValue, setSearchValue] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredGroupChat, setFilteredGroupChat] = useState([]);
 
   const search = (e) => {
     const inputValue = e.target.value;
@@ -47,38 +48,57 @@ export default function ChatList({
         );
       })
     );
+    setFilteredGroupChat(
+      chats.filter((chat) => {
+        if (chat.type === "group") {
+          return chat.name.toLowerCase().includes(inputValue.toLowerCase());
+        }
+      })
+    );
   };
 
   const renderUsers = () => {
     if (searchValue !== "") {
-      if (filteredUsers.length > 0) {
-        return filteredUsers.map((user) => {
-          if (!contactedUsers.includes(user._id)) {
-            return (
+      if (filteredUsers.length > 0 || filteredGroupChat.length > 0) {
+        return (
+          <>
+            {filteredGroupChat.map((groupChat) => (
               <ChatItem
-                key={user._id}
                 currentUser={currentUser}
-                notContactUser={user}
-                hasOptions={true}
-                handleClickItem={handleActive}
+                chat={groupChat}
+                handleClickItem={() => handleActive(groupChat._id)}
+                key={groupChat.name}
               />
-            );
-          }
+            ))}
+            {filteredUsers.map((user) => {
+              if (!contactedUsers.includes(user._id)) {
+                return (
+                  <ChatItem
+                    key={user._id}
+                    currentUser={currentUser}
+                    notContactUser={user}
+                    hasOptions={true}
+                    handleClickItem={handleActive}
+                  />
+                );
+              }
 
-          return chats.map((chat) => {
-            if (chat.participantUsers[0]._id === user._id) {
-              return (
-                <ChatItem
-                  currentUser={currentUser}
-                  chat={chat}
-                  handleClickItem={() => handleActive(chat._id)}
-                />
-              );
-            }
+              return chats.map((chat) => {
+                if (chat.participantUsers[0]._id === user._id) {
+                  return (
+                    <ChatItem
+                      currentUser={currentUser}
+                      chat={chat}
+                      handleClickItem={() => handleActive(chat._id)}
+                    />
+                  );
+                }
 
-            return null;
-          });
-        });
+                return null;
+              });
+            })}
+          </>
+        );
       }
 
       return (
