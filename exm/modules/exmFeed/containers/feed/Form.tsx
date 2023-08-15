@@ -43,15 +43,7 @@ export default function FormContainer(props: Props) {
     gql(queries.unitsMain)
   );
 
-  if (loadingDepartment) {
-    return <Spinner />;
-  }
-
-  if (loadingBranch) {
-    return <Spinner />;
-  }
-
-  if (loadingUnit) {
+  if (loadingDepartment || loadingBranch || loadingUnit) {
     return <Spinner />;
   }
 

@@ -82,7 +82,7 @@ const ChatItem = (props: Props) => {
         <span>
           {chat &&
             chat.type === "direct" &&
-            chat.participantUsers[0].details.position}
+            user?.details.position}
         </span>
       </>
     );
