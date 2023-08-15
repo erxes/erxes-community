@@ -7,6 +7,8 @@ import {
   NavItem,
   NewsFeedLayout,
   TextFeed,
+  AttachmentContainer,
+  MoreAttachment,
 } from "../../styles";
 
 import Dropdown from "react-bootstrap/Dropdown";
@@ -97,6 +99,54 @@ function List({
         updatedDescription = item.description;
       }
     }
+
+    const renderImages = () => {
+      if (item.images.length === 1) {
+        return (
+          <AttachmentWithPreview
+            attachment={item.images[0]}
+            attachments={item.images}
+          />
+        );
+      }
+
+      if (item.images.length === 2) {
+        return (
+          <>
+            <AttachmentWithPreview
+              attachment={item.images[0]}
+              attachments={item.images}
+            />
+            <AttachmentWithPreview
+              attachment={item.images[1]}
+              attachments={item.images}
+            />
+          </>
+        );
+      }
+
+      return (
+        <>
+          <AttachmentWithPreview
+            attachment={item.images[0]}
+            attachments={item.images}
+          />
+          <div>
+            <AttachmentWithPreview
+              attachment={item.images[1]}
+              attachments={item.images}
+            />
+            <AttachmentWithPreview
+              attachment={item.images[2]}
+              attachments={item.images}
+            />
+            {item.images.length > 3 && (
+              <MoreAttachment>+ {item.images.length - 3} more</MoreAttachment>
+            )}
+          </div>
+        </>
+      );
+    };
 
     return (
       <div key={item._id}>
@@ -190,10 +240,9 @@ function List({
           );
         })}
         {item.images.length > 0 && (
-          <AttachmentWithPreview
-            attachment={item.images[0]}
-            attachments={item.images}
-          />
+          <AttachmentContainer attachmentLength={item.images.length}>
+            {renderImages()}
+          </AttachmentContainer>
         )}
         {/* <LikeCommentShare>
           <b>{item.likeCount} Like</b>

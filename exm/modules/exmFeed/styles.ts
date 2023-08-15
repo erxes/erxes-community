@@ -85,13 +85,6 @@ export const NewsFeedLayout = styled.div`
     border-radius: 10px;
     background: ${colors.colorWhite};
     border: 1px solid ${colors.borderPrimary};
-    
-    > img {
-      width: 100%;
-      border-top: 1px solid #ddd;
-      max-height: 400px;
-      object-fit: cover;
-    }
 
     &:last-child {
       margin-bottom: 0;
@@ -1226,4 +1219,35 @@ export const ChatListSpacing = styled.div`
 export const FlexAlignCenter = styled.div`
   display: flex;
   align-items: center;
+`;
+
+export const AttachmentContainer = styledTS<{attachmentLength: number}>(styled.div)`
+  > div {
+    display: flex;
+    margin-top: 5px;
+    border-top: 1px solid #ddd;
+
+    > img {
+      object-fit: cover;
+      max-height: 200px;
+      border-right: 1px solid #ddd;
+      ${props => props.attachmentLength === 3 ? `width: 50%;` : `width: 33%;`}
+    }
+  }
+
+  > img {
+    object-fit: cover;
+    ${props => (props.attachmentLength === 1 || props.attachmentLength > 2) ? `
+      width: 100%;
+      border-top: 1px solid #ddd;
+      max-height: 400px;
+      ` : props.attachmentLength === 2 ? `
+      width: 50%;` : ``}
+  }
+`;
+
+export const MoreAttachment = styled.div`
+  height: fit-content;
+  width: fit-content;
+  margin: auto;
 `;
