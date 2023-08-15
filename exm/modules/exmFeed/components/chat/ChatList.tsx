@@ -6,8 +6,15 @@ import ModalTrigger from "../../../common/ModalTrigger";
 import Icon from "../../../common/Icon";
 import FormControl from "../../../common/form/Control";
 import CreateGroupChat from "../../containers/chat/CreateGroupChat";
-import { IconButton, ChatListHeader, SearchInput, NoEvent } from "../../styles";
+import {
+  IconButton,
+  ChatListHeader,
+  SearchInput,
+  NoEvent,
+  ChatListSpacing,
+} from "../../styles";
 import Tip from "../../../common/Tip";
+import { TabTitle, Tabs } from "../../../common/tabs";
 
 type Props = {
   users: IUser[];
@@ -29,6 +36,7 @@ export default function ChatList({
   const [searchValue, setSearchValue] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filteredGroupChat, setFilteredGroupChat] = useState([]);
+  const [currentTab, setCurrentTab] = useState("Chats");
 
   const search = (e) => {
     const inputValue = e.target.value;
@@ -54,6 +62,82 @@ export default function ChatList({
           return chat.name.toLowerCase().includes(inputValue.toLowerCase());
         }
       })
+    );
+  };
+
+  const renderTabContent = () => {
+    if (currentTab === "Group chats") {
+      return (
+        <>
+          <ChatListHeader>
+            <ModalTrigger
+              title="Create a group chat"
+              trigger={<label>{__("Create a group chat")}</label>}
+              content={(props) => (
+                <CreateGroupChat {...props} handleClickItem={handleActive} />
+              )}
+            />
+            <ModalTrigger
+              title="Create a group chat"
+              trigger={
+                <IconButton>
+                  <Tip placement="top" text="Create group chat">
+                    <Icon icon="users" size={15} />
+                  </Tip>
+                </IconButton>
+              }
+              content={(props) => (
+                <CreateGroupChat {...props} handleClickItem={handleActive} />
+              )}
+            />
+          </ChatListHeader>
+          {chats.map((c) => {
+            if (c.type === "group") {
+              return (
+                <ChatItem
+                  chat={c}
+                  currentUser={currentUser}
+                  handleClickItem={() => handleActive(c._id)}
+                />
+              );
+            }
+            return null;
+          })}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {chats.map((chat) => {
+          if (chat.type === "direct") {
+            return (
+              <ChatItem
+                currentUser={currentUser}
+                chat={chat}
+                handleClickItem={() => handleActive(chat._id)}
+              />
+            );
+          }
+
+          return null;
+        })}
+        {users.map((user) => {
+          if (!contactedUsers.includes(user._id)) {
+            return (
+              <ChatItem
+                key={user._id}
+                currentUser={currentUser}
+                notContactUser={user}
+                hasOptions={true}
+                handleClickItem={handleActive}
+              />
+            );
+          }
+
+          return null;
+        })}
+      </>
     );
   };
 
@@ -111,63 +195,21 @@ export default function ChatList({
 
     return (
       <>
-        <ChatListHeader>
-          <label>{__("Your group")}</label>
-          <ModalTrigger
-            title="Create a group chat"
-            trigger={
-              <IconButton>
-                <Tip placement="top" text="Create group chat">
-                  <Icon icon="users" size={15} />
-                </Tip>
-              </IconButton>
-            }
-            content={(props) => (
-              <CreateGroupChat {...props} handleClickItem={handleActive} />
-            )}
-          />
-        </ChatListHeader>
-        {chats.map((c) => {
-          if (c.type === "group") {
-            return (
-              <ChatItem
-                chat={c}
-                currentUser={currentUser}
-                handleClickItem={() => handleActive(c._id)}
-              />
-            );
-          }
-          return null;
-        })}
-        <label>{__("Contacts")}</label>
-        {chats.map((chat) => {
-          if (chat.type === "direct") {
-            return (
-              <ChatItem
-                currentUser={currentUser}
-                chat={chat}
-                handleClickItem={() => handleActive(chat._id)}
-              />
-            );
-          }
-
-          return null;
-        })}
-        {users.map((user) => {
-          if (!contactedUsers.includes(user._id)) {
-            return (
-              <ChatItem
-                key={user._id}
-                currentUser={currentUser}
-                notContactUser={user}
-                hasOptions={true}
-                handleClickItem={handleActive}
-              />
-            );
-          }
-
-          return null;
-        })}
+        <Tabs full={true}>
+          <TabTitle
+            className={currentTab === "Chats" ? "active" : ""}
+            onClick={() => setCurrentTab("Chats")}
+          >
+            {__("Chats")}
+          </TabTitle>
+          <TabTitle
+            className={currentTab === "Group chats" ? "active" : ""}
+            onClick={() => setCurrentTab("Group chats")}
+          >
+            {__("Group chats")}
+          </TabTitle>
+        </Tabs>
+        <ChatListSpacing>{renderTabContent()}</ChatListSpacing>
       </>
     );
   };

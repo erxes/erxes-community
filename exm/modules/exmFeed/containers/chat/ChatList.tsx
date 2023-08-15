@@ -11,7 +11,11 @@ type Props = {
 
 const ChatListContainer = (props: Props) => {
   const { currentUser } = props;
-  const usersQuery = useQuery(gql(queries.allUsers));
+  const usersQuery = useQuery(gql(queries.allUsers), {
+    variables: {
+      isActive: true
+    }
+  });
   const chatsQuery = useQuery(gql(queries.chats));
 
   if (usersQuery.loading) {

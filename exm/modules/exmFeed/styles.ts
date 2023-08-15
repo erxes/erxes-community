@@ -586,11 +586,6 @@ export const ChatItemWrapper = styledTS<{
   padding: ${dimensions.unitSpacing}px 0;
   transition: 0.2s;
 
-  &:first-child {
-    border-top: ${props =>
-      props.isWidget && `1px solid ${colors.borderPrimary}`};
-  }
-
   &:hover {
     background-color: ${props =>
       props.isWidget ? colors.bgLight : colors.bgGray};
@@ -670,6 +665,10 @@ export const ChatActionItem = styled.button`
 export const ChatListHeader = styled.div`
   display: flex;
   justify-content: space-between;
+
+  label {
+    cursor: pointer;
+  }
 `;
 
 export const ContextMenuList = styled.div`
@@ -1208,9 +1207,12 @@ export const SearchInput = styledTS<{ active?: boolean }>(styled.div)`
   align-items: center;
   position: relative;
   font-size: 12px;
-  margin-bottom: 20px;
 
   input {
     border: none !important;
   }
+`;
+
+export const ChatListSpacing = styled.div`
+  margin-top: 10px;
 `;
