@@ -1,8 +1,9 @@
 import ChatList from "../../components/chat/ChatList";
 import { IUser } from "../../../auth/types";
 import gql from "graphql-tag";
-import { queries } from "../../graphql";
-import { useQuery } from "@apollo/client";
+import { queries, mutations } from "../../graphql";
+import { useQuery, useMutation } from "@apollo/client";
+import Alert from "../../../utils/Alert";
 
 type Props = {
   currentUser: IUser;
@@ -13,10 +14,20 @@ const ChatListContainer = (props: Props) => {
   const { currentUser } = props;
   const usersQuery = useQuery(gql(queries.allUsers), {
     variables: {
-      isActive: true
-    }
+      isActive: true,
+    },
   });
   const chatsQuery = useQuery(gql(queries.chats));
+  const [togglePinnedChat] = useMutation(gql(mutations.chatToggleIsPinned));
+
+  const togglePinned = (chatId) => {
+    togglePinnedChat({
+      variables: { id: chatId },
+      refetchQueries: [{ query: gql(queries.chats) }],
+    }).catch((error) => {
+      Alert.error(error.message);
+    });
+  };
 
   if (usersQuery.loading) {
     return null;
@@ -32,6 +43,7 @@ const ChatListContainer = (props: Props) => {
       {...props}
       users={users}
       chats={chatsQuery.data?.chats.list || []}
+      togglePinned={togglePinned}
     />
   );
 };

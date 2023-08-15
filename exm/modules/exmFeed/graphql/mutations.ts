@@ -128,6 +128,12 @@ const chatMakeOrRemoveAdmin = `
   }
 `;
 
+const chatToggleIsPinned = `
+  mutation chatToggleIsPinned($id: String!) {
+    chatToggleIsPinned(_id: $id)
+  }
+`;
+
 export default {
   addFeed,
   editFeed,
@@ -141,5 +147,6 @@ export default {
   chatMarkAsRead,
   chatMessageAdd,
   chatAddOrRemoveMember,
-  chatMakeOrRemoveAdmin
+  chatMakeOrRemoveAdmin,
+  chatToggleIsPinned
 };

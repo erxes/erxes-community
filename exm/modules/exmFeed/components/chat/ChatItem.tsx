@@ -25,6 +25,7 @@ type Props = {
   markAsRead?: () => void;
   notContactUser?: IUser;
   currentUser: IUser;
+  handlePin: (chatId: string) => void;
 };
 
 const ChatItem = (props: Props) => {
@@ -48,6 +49,9 @@ const ChatItem = (props: Props) => {
   const popoverContextMenu = (
     <Popover id="contextmenu-popover">
       <ContextMenuList>
+        <ContextMenuItem onClick={() => props.handlePin(chat._id)}>
+          {chat?.isPinned ? "Unpin" : "Pin"}
+        </ContextMenuItem>
         <ContextMenuItem onClick={() => props.markAsRead()}>
           {chat && chat.isSeen ? "Mark as unread" : "Mark as read"}
         </ContextMenuItem>
@@ -79,11 +83,7 @@ const ChatItem = (props: Props) => {
             ? user?.details.fullName || user?.email
             : chat?.name}
         </p>
-        <span>
-          {chat &&
-            chat.type === "direct" &&
-            user?.details.position}
-        </span>
+        <span>{chat && chat.type === "direct" && user?.details.position}</span>
       </>
     );
   };

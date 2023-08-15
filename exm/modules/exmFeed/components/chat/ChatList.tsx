@@ -21,6 +21,7 @@ type Props = {
   chats: any[];
   currentUser: IUser;
   handleActive?: (chatId: string) => void;
+  togglePinned: (chatId) => void;
 };
 
 export default function ChatList({
@@ -28,6 +29,7 @@ export default function ChatList({
   chats,
   currentUser,
   handleActive,
+  togglePinned,
 }: Props) {
   const contactedUsers = chats.map(
     (c) => c.type === "direct" && c.participantUsers[0]?._id
@@ -37,6 +39,51 @@ export default function ChatList({
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [filteredGroupChat, setFilteredGroupChat] = useState([]);
   const [currentTab, setCurrentTab] = useState("Chats");
+  const [pinnedChatIds, setPinnedChatIds] = useState(
+    chats?.filter((chat: any) => chat.isPinned === true) || []
+  );
+
+  const updatePinned = (_chats: any[]) => {
+    setPinnedChatIds(_chats);
+  };
+
+  const checkPinned = (_chatId: string) => {
+    return pinnedChatIds.indexOf(_chatId) !== -1;
+  };
+
+  const handlePin = (_chatId: string) => {
+    if (checkPinned(_chatId)) {
+      updatePinned(pinnedChatIds.filter((c) => c !== _chatId));
+      togglePinned(_chatId);
+    } else {
+      updatePinned([...pinnedChatIds, _chatId]);
+      togglePinned(_chatId);
+    }
+  };
+
+  const renderPinnedChats = () => {
+    if (pinnedChatIds.length !== 0) {
+      return (
+        <>
+          <label>Pinned</label>
+          {chats.map(
+            (c) =>
+              c.isPinned && (
+                <ChatItem
+                  key={c._id}
+                  chat={c}
+                  handlePin={handlePin}
+                  currentUser={currentUser}
+                  handleClickItem={() => handleActive(c._id)}
+                />
+              )
+          )}
+        </>
+      );
+    }
+    
+    return null;
+  };
 
   const search = (e) => {
     const inputValue = e.target.value;
@@ -98,6 +145,7 @@ export default function ChatList({
                   chat={c}
                   currentUser={currentUser}
                   handleClickItem={() => handleActive(c._id)}
+                  handlePin={handlePin}
                 />
               );
             }
@@ -109,13 +157,16 @@ export default function ChatList({
 
     return (
       <>
+        {pinnedChatIds.length !== 0 && renderPinnedChats()}
+        <label>Recent</label>
         {chats.map((chat) => {
-          if (chat.type === "direct") {
+          if (!chat.isPinned && chat.type === "direct") {
             return (
               <ChatItem
                 currentUser={currentUser}
                 chat={chat}
                 handleClickItem={() => handleActive(chat._id)}
+                handlePin={handlePin}
               />
             );
           }
@@ -131,6 +182,7 @@ export default function ChatList({
                 notContactUser={user}
                 hasOptions={true}
                 handleClickItem={handleActive}
+                handlePin={handlePin}
               />
             );
           }
@@ -152,6 +204,7 @@ export default function ChatList({
                 chat={groupChat}
                 handleClickItem={() => handleActive(groupChat._id)}
                 key={groupChat.name}
+                handlePin={handlePin}
               />
             ))}
             {filteredUsers.map((user) => {
@@ -163,6 +216,7 @@ export default function ChatList({
                     notContactUser={user}
                     hasOptions={true}
                     handleClickItem={handleActive}
+                    handlePin={handlePin}
                   />
                 );
               }
@@ -174,6 +228,7 @@ export default function ChatList({
                       currentUser={currentUser}
                       chat={chat}
                       handleClickItem={() => handleActive(chat._id)}
+                      handlePin={handlePin}
                     />
                   );
                 }

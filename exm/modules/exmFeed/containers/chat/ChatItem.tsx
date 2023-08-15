@@ -15,6 +15,7 @@ type Props = {
   hasOptions?: boolean;
   handleClickItem?: (chatId: string) => void;
   currentUser: IUser;
+  handlePin: (chatId: string) => void;
   notContactUser?: IUser;
 };
 

@@ -141,6 +141,7 @@ const chats = `
         name
         type
         isSeen
+        isPinned
         lastMessage {
           content
           createdAt

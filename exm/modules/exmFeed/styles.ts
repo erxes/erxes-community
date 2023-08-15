@@ -208,6 +208,10 @@ export const TextFeed = styled.div`
   iframe {
     width: 100%;
   }
+
+  p {
+    margin-bottom: 19px;
+  }
 `;
 
 export const LikeCommentShare = styled.div`
