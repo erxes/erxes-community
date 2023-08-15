@@ -1220,3 +1220,8 @@ export const SearchInput = styledTS<{ active?: boolean }>(styled.div)`
 export const ChatListSpacing = styled.div`
   margin-top: 10px;
 `;
+
+export const FlexAlignCenter = styled.div`
+  display: flex;
+  align-items: center;
+`;

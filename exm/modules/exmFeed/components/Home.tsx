@@ -8,6 +8,7 @@ import {
   WidgetChatWrapper,
   NoEvent,
   FeedWrapper,
+  FlexAlignCenter
 } from "../styles";
 import { MainContainer, SideContainer } from "../../layout/styles";
 import React, { useState } from "react";
@@ -24,6 +25,7 @@ import { Wrapper } from "../../layout";
 import { __ } from "../../../utils";
 import WidgetChatWindow from "../containers/chat/WidgetChatWindow";
 import Icon from "../../common/Icon";
+import { readFile } from "../../common/utils";
 
 type Props = {
   queryParams: any;
@@ -110,17 +112,17 @@ export default function Home(props: Props) {
                     }
 
                     return (
-                      <>
+                      <FlexAlignCenter key={e._id}>
                         {e.images.length > 0 && (
                           <div className="image-wrapper">
-                            <img src={e.images[0]} alt="event-img" />
+                            <img src={readFile(e.images[0].url)} alt="event-img" />
                           </div>
                         )}
                         <div>
                           <b>{e.title}</b>
                           <span>{e.eventData.where}</span>
                         </div>
-                      </>
+                      </FlexAlignCenter>
                     );
                   })
               : NoTodaysEvent}
