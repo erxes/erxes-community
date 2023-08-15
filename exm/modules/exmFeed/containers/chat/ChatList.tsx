@@ -29,7 +29,7 @@ const ChatListContainer = (props: Props) => {
     });
   };
 
-  if (usersQuery.loading) {
+  if (usersQuery.loading || chatsQuery.loading) {
     return null;
   }
 

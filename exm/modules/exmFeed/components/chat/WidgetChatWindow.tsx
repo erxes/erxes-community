@@ -102,7 +102,9 @@ const WidgetChatWindow = (props: Props) => {
               </ChatGroupAvatar>
             )}
             <p>
-            <div className="name">{chat.name || user.details?.fullName || user.email}</div>
+              <div className="name">
+                {chat.name || user?.details?.fullName || user?.email}
+              </div>
               {chat.type === "direct" && (
                 <div className="position">{user.details?.position}</div>
               )}

@@ -61,14 +61,15 @@ export default function ChatList({
     }
   };
 
-  const renderPinnedChats = () => {
+  const renderPinnedChats = (isGroup?: boolean) => {
     if (pinnedChatIds.length !== 0) {
       return (
         <>
           <label>Pinned</label>
           {chats.map(
             (c) =>
-              c.isPinned && (
+              c.isPinned &&
+              (isGroup ? c.type === "group" : c.type === "direct") && (
                 <ChatItem
                   key={c._id}
                   chat={c}
@@ -81,7 +82,7 @@ export default function ChatList({
         </>
       );
     }
-    
+
     return null;
   };
 
@@ -116,6 +117,7 @@ export default function ChatList({
     if (currentTab === "Group chats") {
       return (
         <>
+          {pinnedChatIds.length !== 0 && renderPinnedChats(true)}
           <ChatListHeader>
             <ModalTrigger
               title="Create a group chat"
@@ -157,7 +159,7 @@ export default function ChatList({
 
     return (
       <>
-        {pinnedChatIds.length !== 0 && renderPinnedChats()}
+        {pinnedChatIds.length !== 0 && renderPinnedChats(false)}
         <label>Recent</label>
         {chats.map((chat) => {
           if (!chat.isPinned && chat.type === "direct") {
