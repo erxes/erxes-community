@@ -7,10 +7,10 @@ import * as fs from 'fs';
 import * as yaml from 'yaml';
 import { ErxesProxyTarget } from 'src/proxy/targets';
 import {
+  dirTempPath,
   routerConfigPath,
   routerPath,
-  supergraphPath,
-  downloadsPath
+  supergraphPath
 } from './paths';
 import supergraphCompose from './supergraph-compose';
 // import * as getPort from 'get-port';
@@ -26,18 +26,17 @@ const {
 
 // let _apolloRouterPort: number | undefined;
 // export const getApolloRouterPort = async (): Promise<number> => {
-  // if(!_apolloRouterPort) {
-  //   _apolloRouterPort = Number(APOLLO_ROUTER_PORT) || (await getPort());
-  // }
-  // if(!_apolloRouterPort){
-  //   throw new Error("Cannot find free port for Apollo Router");
-  // }
-  // console.log("router port ", _apolloRouterPort);
-  // return _apolloRouterPort;
+// if(!_apolloRouterPort) {
+//   _apolloRouterPort = Number(APOLLO_ROUTER_PORT) || (await getPort());
+// }
+// if(!_apolloRouterPort){
+//   throw new Error("Cannot find free port for Apollo Router");
+// }
+// console.log("router port ", _apolloRouterPort);
+// return _apolloRouterPort;
 // }
 
 export const apolloRouterPort = Number(APOLLO_ROUTER_PORT) || 50_000;
-
 
 const downloadRouter = async () => {
   if (NODE_ENV === 'production') {
@@ -49,7 +48,7 @@ const downloadRouter = async () => {
   }
   const args = [
     '-c',
-    `cd ${downloadsPath} && curl -sSL https://router.apollo.dev/download/nix/v1.26.0 | sh`
+    `cd ${dirTempPath} && curl -sSL https://router.apollo.dev/download/nix/v1.26.0 | sh`
   ];
   spawnSync('sh', args, { stdio: 'inherit' });
 };
@@ -67,7 +66,7 @@ const createRouterConfig = async () => {
     },
     rhai: {
       scripts: path.resolve(__dirname, 'rhai'),
-      main: "main.rhai"
+      main: 'main.rhai'
     },
     cors: {
       allow_credentials: true,
@@ -103,7 +102,7 @@ const startRouter = async (
 ): Promise<ChildProcess> => {
   await supergraphCompose(proxyTargets);
   await createRouterConfig();
-  downloadRouter();
+  await downloadRouter();
 
   const devOptions = ['--dev', '--hot-reload'];
 
