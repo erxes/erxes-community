@@ -134,6 +134,16 @@ const chatToggleIsPinned = `
   }
 `;
 
+const emojiReact = `
+  mutation emojiReact(
+    $contentId: String!
+    $contentType: ReactionContentType!
+    $type: String
+  ) {
+    emojiReact(contentId: $contentId, contentType: $contentType, type: $type)
+  }
+`;
+
 export default {
   addFeed,
   editFeed,
@@ -148,5 +158,6 @@ export default {
   chatMessageAdd,
   chatAddOrRemoveMember,
   chatMakeOrRemoveAdmin,
-  chatToggleIsPinned
+  chatToggleIsPinned,
+  emojiReact
 };

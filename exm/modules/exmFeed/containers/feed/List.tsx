@@ -1,15 +1,15 @@
-import { mutations, queries } from '../../graphql';
-import { useMutation, useQuery } from '@apollo/client';
+import { mutations, queries } from "../../graphql";
+import { useMutation, useQuery } from "@apollo/client";
 
-import Alert from '../../../utils/Alert';
-import List from '../../components/feed/List';
-import WelcomeList from '../../components/feed/WelcomeList';
-import React from 'react';
-import Spinner from '../../../common/Spinner';
-import { confirm } from '../../../utils';
-import gql from 'graphql-tag';
+import Alert from "../../../utils/Alert";
+import List from "../../components/feed/List";
+import WelcomeList from "../../components/feed/WelcomeList";
+import React from "react";
+import Spinner from "../../../common/Spinner";
+import { confirm } from "../../../utils";
+import gql from "graphql-tag";
 
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 type Props = {
   queryParams: any;
@@ -28,12 +28,13 @@ export default function ListContainer(props: Props) {
   const feedResponse = useQuery(gql(queries.feed), {
     variables: {
       limit,
-      contentTypes: [contentType || 'post']
-    }
+      contentTypes: [contentType || "post"],
+    },
   });
 
   const [deleteMutation] = useMutation(gql(mutations.deleteFeed));
   const [pinMutation] = useMutation(gql(mutations.pinFeed));
+  const [heartMutation] = useMutation(gql(mutations.emojiReact));
 
   if (feedResponse.loading) {
     return <Spinner objective={true} />;
@@ -42,7 +43,7 @@ export default function ListContainer(props: Props) {
   const pinItem = (_id: string) => {
     pinMutation({ variables: { _id } })
       .then(() => {
-        Alert.success('Success!');
+        Alert.success("Success!");
 
         feedResponse.refetch();
       })
@@ -55,7 +56,7 @@ export default function ListContainer(props: Props) {
     confirm().then(() => {
       deleteMutation({ variables: { _id } })
         .then(() => {
-          Alert.success('You successfully deleted.');
+          Alert.success("You successfully deleted.");
 
           feedResponse.refetch();
         })
@@ -65,10 +66,22 @@ export default function ListContainer(props: Props) {
     });
   };
 
+  const handleHearted = (_id) => {
+    heartMutation({
+      variables: { contentId: _id, contentType: "exmFeed", type: "heart" },
+    })
+      .then(() => {
+        feedResponse.refetch();
+      })
+      .catch((error) => {
+        Alert.error(error.message);
+      });
+  };
+
   const { list, totalCount } = feedResponse.data?.exmFeed || {};
 
-  if (contentType === 'welcome') {
-    return <WelcomeList list={list} totalCount={totalCount} limit={limit} />;
+  if (contentType === "welcome") {
+    return <WelcomeList list={list} handleHearted={handleHearted} totalCount={totalCount} limit={limit} />;
   }
 
   return (
@@ -78,6 +91,7 @@ export default function ListContainer(props: Props) {
       list={list}
       totalCount={totalCount}
       limit={limit}
+      handleHearted={handleHearted}
     />
   );
 }

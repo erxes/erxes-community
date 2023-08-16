@@ -3,13 +3,13 @@ import {
   AvatarImg,
   FeedActions,
   HeaderFeed,
-  // LikeCommentShare,
+  LikeCommentShare,
   NavItem,
   NewsFeedLayout,
   TextFeed,
   AttachmentContainer,
   MoreAttachment,
-  EventInfo
+  EventInfo,
 } from "../../styles";
 
 import Dropdown from "react-bootstrap/Dropdown";
@@ -31,6 +31,7 @@ type Props = {
   totalCount: number;
   deleteItem: (_id: string) => void;
   pinItem: (_id: string) => void;
+  handleHearted: (_id: string) => void;
   limit: number;
 };
 
@@ -45,6 +46,7 @@ function List({
   totalCount,
   limit,
   currentUser,
+  handleHearted
 }: FinalProps) {
   const editItem = (item) => {
     const trigger = (
@@ -156,12 +158,13 @@ function List({
         <EventInfo>
           <div>
             <Icon icon="wallclock" />
-            {dayjs(eventData.startDate).format("MM/DD/YYYY h:mm A")} ~ {dayjs(eventData.endDate).format("MM/DD/YYYY h:mm A")}
+            {dayjs(eventData.startDate).format("MM/DD/YYYY h:mm A")} ~{" "}
+            {dayjs(eventData.endDate).format("MM/DD/YYYY h:mm A")}
           </div>
           <div>
             <Icon icon="users" />
-            {eventData.goingUserIds.length} Going • {eventData.interestedUserIds.length}{" "}
-            Interested
+            <b>{eventData.goingUserIds.length}</b> Going •{" "}
+            <b>{eventData.interestedUserIds.length}</b> Interested
           </div>
           <div>
             <Icon icon="user" />
@@ -171,7 +174,8 @@ function List({
               item.createdUser.email}
           </div>
           <div>
-            <Icon icon="location-point" />{eventData.where}
+            <Icon icon="location-point" />
+            {eventData.where}
           </div>
         </EventInfo>
       );
@@ -274,11 +278,11 @@ function List({
             {renderImages()}
           </AttachmentContainer>
         )}
-        {/* <LikeCommentShare>
-          <b>{item.likeCount} Like</b>
-          <b>{item.commentCount} Comments</b>
-          <b>Share</b>
-        </LikeCommentShare> */}
+        <LikeCommentShare>
+          <b onClick={() => handleHearted(item._id)}><Icon color={`${item.isHearted && 'red'}`} icon='heart-2'/> {item.heartCount}</b>
+          <b><Icon icon="comment-1"/> {item.commentCount}</b>
+          {/* <b>Share</b> */}
+        </LikeCommentShare>
       </div>
     );
   };

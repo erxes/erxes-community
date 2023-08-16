@@ -216,10 +216,7 @@ export const LikeCommentShare = styled.div`
 
   b {
     margin-right: 20px;
-  }
-  b:last-of-type {
-    margin-left: auto;
-    margin-right: 0px;
+    cursor: pointer;
   }
 `;
 

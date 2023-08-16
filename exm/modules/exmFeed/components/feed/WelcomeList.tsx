@@ -2,24 +2,30 @@ import {
   AvatarImg,
   FeedActions,
   HeaderFeed,
-  // LikeCommentShare,
+  LikeCommentShare,
   NewsFeedLayout,
-  TextFeed
-} from '../../styles';
+  TextFeed,
+} from "../../styles";
 
-import Icon from '../../../common/Icon';
-import LoadMore from '../../../common/LoadMore';
-import React from 'react';
-import dayjs from 'dayjs';
-import { getUserAvatar } from '../../../utils';
+import Icon from "../../../common/Icon";
+import LoadMore from "../../../common/LoadMore";
+import React from "react";
+import dayjs from "dayjs";
+import { getUserAvatar } from "../../../utils";
 
 type Props = {
   list: any;
   totalCount: number;
   limit: number;
+  handleHearted: (_id: string) => void;
 };
 
-export default function WelcomeList({ list, totalCount, limit }: Props) {
+export default function WelcomeList({
+  list,
+  totalCount,
+  limit,
+  handleHearted,
+}: Props) {
   const renderItem = (item: any) => {
     const createdUser = item.createdUser || {};
 
@@ -32,7 +38,7 @@ export default function WelcomeList({ list, totalCount, limit }: Props) {
                 (createdUser &&
                   createdUser.details &&
                   createdUser.details.fullName) ||
-                'author'
+                "author"
               }
               src={getUserAvatar(createdUser)}
             />
@@ -50,7 +56,7 @@ export default function WelcomeList({ list, totalCount, limit }: Props) {
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format('MM/DD/YYYY h:mm A')}{' '}
+                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
                 <b>#{item.contentType}</b>
               </p>
             </div>
@@ -60,11 +66,16 @@ export default function WelcomeList({ list, totalCount, limit }: Props) {
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
           <p dangerouslySetInnerHTML={{ __html: item.description }} />
         </TextFeed>
-        {/* <LikeCommentShare>
-          <b>{item.likeCount} Like</b>
-          <b>{item.commentCount} Comments</b>
-          <b>Share</b>
-        </LikeCommentShare> */}
+        <LikeCommentShare>
+          <b onClick={() => handleHearted(item._id)}>
+            <Icon color={`${item.isHearted && "red"}`} icon="heart-2" />{" "}
+            {item.heartCount}
+          </b>
+          <b>
+            <Icon icon="comment-1" /> {item.commentCount}
+          </b>
+          {/* <b>Share</b> */}
+        </LikeCommentShare>
       </div>
     );
   };
