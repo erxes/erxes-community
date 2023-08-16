@@ -272,6 +272,33 @@ const getChatIdByUserIds = `
   }
 `;
 
+const comments = `
+  query comments($contentId: String!, $contentType: ReactionContentType!, $parentId: String) {
+    comments(contentId: $contentId, contentType: $contentType, parentId: $parentId) {
+      list {
+        _id
+        comment
+        createdUser {
+          _id
+          details {
+            avatar
+            firstName
+            fullName
+            lastName
+            position
+          }
+          email
+          username
+        }
+        createdAt
+        parentId
+        contentId
+      }
+    }
+  }
+`
+
+
 export default {
   feed,
   thanks,
@@ -284,5 +311,6 @@ export default {
   chatMessages,
   getChatIdByUserIds,
   branches,
-  unitsMain
+  unitsMain,
+  comments
 };

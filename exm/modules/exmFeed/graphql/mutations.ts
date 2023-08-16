@@ -144,6 +144,25 @@ const emojiReact = `
   }
 `;
 
+const commentAdd = `
+  mutation commentAdd(
+    $contentId: String!
+    $contentType: ReactionContentType!
+    $comment: String!
+    $parentId: String
+  ){
+    commentAdd(contentId: $contentId, contentType: $contentType, comment: $comment, parentId: $parentId) {
+      _id
+    }
+  }
+`;
+
+const commentRemove =`
+  mutation commentRemove($_id: String!) {
+    commentRemove(_id: $_id)
+  }
+`;
+
 export default {
   addFeed,
   editFeed,
@@ -159,5 +178,7 @@ export default {
   chatAddOrRemoveMember,
   chatMakeOrRemoveAdmin,
   chatToggleIsPinned,
-  emojiReact
+  emojiReact,
+  commentAdd,
+  commentRemove
 };

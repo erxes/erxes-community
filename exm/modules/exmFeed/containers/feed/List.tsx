@@ -66,7 +66,7 @@ export default function ListContainer(props: Props) {
     });
   };
 
-  const handleHearted = (_id) => {
+  const handleHearted = (_id: string) => {
     heartMutation({
       variables: { contentId: _id, contentType: "exmFeed", type: "heart" },
     })
@@ -81,7 +81,14 @@ export default function ListContainer(props: Props) {
   const { list, totalCount } = feedResponse.data?.exmFeed || {};
 
   if (contentType === "welcome") {
-    return <WelcomeList list={list} handleHearted={handleHearted} totalCount={totalCount} limit={limit} />;
+    return (
+      <WelcomeList
+        list={list}
+        handleHearted={handleHearted}
+        totalCount={totalCount}
+        limit={limit}
+      />
+    );
   }
 
   return (

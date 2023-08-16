@@ -25,6 +25,7 @@ import { readFile } from "../../../common/utils";
 import withCurrentUser from "../../../auth/containers/withCurrentUser";
 import { IUser } from "../../../types";
 import AttachmentWithPreview from "../../../common/AttachmentWithPreview";
+import Comments from "../../containers/feed/comment";
 
 type Props = {
   list: any;
@@ -46,7 +47,7 @@ function List({
   totalCount,
   limit,
   currentUser,
-  handleHearted
+  handleHearted,
 }: FinalProps) {
   const editItem = (item) => {
     const trigger = (
@@ -279,8 +280,25 @@ function List({
           </AttachmentContainer>
         )}
         <LikeCommentShare>
-          <b onClick={() => handleHearted(item._id)}><Icon color={`${item.isHearted && 'red'}`} icon='heart-2'/> {item.heartCount}</b>
-          <b><Icon icon="comment-1"/> {item.commentCount}</b>
+          <b onClick={() => handleHearted(item._id)}>
+            <Icon color={`${item.isHearted && "red"}`} icon="heart-2" />{" "}
+            {item.heartCount}
+          </b>
+          <ModalTrigger
+            title="Comment"
+            size="lg"
+            trigger={
+              <b>
+                <Icon icon="comment-1" /> {item.commentCount}
+              </b>
+            }
+            content={(props) => (
+              <Comments
+                contentId={item._id}
+                {...props}
+              />
+            )}
+          />
           {/* <b>Share</b> */}
         </LikeCommentShare>
       </div>

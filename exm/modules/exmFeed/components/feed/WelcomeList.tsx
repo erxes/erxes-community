@@ -12,6 +12,8 @@ import LoadMore from "../../../common/LoadMore";
 import React from "react";
 import dayjs from "dayjs";
 import { getUserAvatar } from "../../../utils";
+import Comments from "../../containers/feed/comment";
+import ModalTrigger from "../../../common/ModalTrigger";
 
 type Props = {
   list: any;
@@ -71,9 +73,21 @@ export default function WelcomeList({
             <Icon color={`${item.isHearted && "red"}`} icon="heart-2" />{" "}
             {item.heartCount}
           </b>
-          <b>
-            <Icon icon="comment-1" /> {item.commentCount}
-          </b>
+          <ModalTrigger
+            title="Comment"
+            size="lg"
+            trigger={
+              <b>
+                <Icon icon="comment-1" /> {item.commentCount}
+              </b>
+            }
+            content={(props) => (
+              <Comments
+                contentId={item._id}
+                {...props}
+              />
+            )}
+          />
           {/* <b>Share</b> */}
         </LikeCommentShare>
       </div>

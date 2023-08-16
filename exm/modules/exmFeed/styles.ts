@@ -1257,3 +1257,47 @@ export const EventInfo = styled.div`
     margin-right: 8px;
   }
 `;
+
+export const ModalFooter = styled.div`
+  text-align: right;
+  margin-top: 30px;
+`;
+
+export const CommentForm = styledTS<{ isReply?: boolean }>(styled.div)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: ${props =>
+    props.isReply
+      ? `${dimensions.coreSpacing}px 0 0 0`
+      : `${dimensions.coreSpacing}px 0`};
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 5px;
+  
+  input {
+    border: none;
+  }
+`;
+
+export const CommentContainer = styled.div`
+  border: 1px solid ${colors.borderPrimary};
+  padding: ${dimensions.coreSpacing}px;
+  border-radius: 5px;
+  margin-top: ${dimensions.coreSpacing}px;
+
+  p {
+    margin-left: 50px;
+  }
+`;
+
+export const ActionBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${dimensions.unitSpacing}px;
+`;
+
+export const Reply = styled.div`
+  margin-left: ${dimensions.coreSpacing * 2}px;
+`;
