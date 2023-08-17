@@ -108,19 +108,21 @@ export default function EventForm(props: Props) {
         )}
         <CustomRangeContainer>
           <DateControl
+            {...formProps}
             value={eventData.startDate}
             required={true}
             name="startDate"
             onChange={(date) => onChangeEventData("startDate", date)}
-            placeholder={"Start date"}
+            placeholder={"Start date (required)"}
             dateFormat={"YYYY-MM-DD HH:mm:ss"}
             timeFormat={true}
           />
           <DateControl
+            {...formProps}
             value={eventData.endDate}
             required={true}
             name="endDate"
-            placeholder={"End date"}
+            placeholder={"End date (required)"}
             onChange={(date) => onChangeEventData("endDate", date)}
             dateFormat={"YYYY-MM-DD HH:mm:ss"}
             timeFormat={true}
@@ -194,7 +196,7 @@ export default function EventForm(props: Props) {
         />
         <UploadItems>
           <div>
-            <ControlLabel>Add images:</ControlLabel>
+            <ControlLabel required={true}>Add images:</ControlLabel>
             <Uploader defaultFileList={images || []} onChange={setImages} />
           </div>
         </UploadItems>

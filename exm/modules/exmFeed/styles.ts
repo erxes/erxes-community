@@ -529,6 +529,8 @@ export const LearnItemDescription = styled.div`
 export const SingleEvent = styled.div`
   max-height: 225px;
   overflow: auto;
+  border: 1px solid #dadada;
+  border-radius: 8px;
 
   .image-wrapper {
     overflow: hidden;
@@ -1219,7 +1221,22 @@ export const ChatListSpacing = styled.div`
 export const FlexAlignCenter = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  padding: 8px;
+  position: relative;
+  
+  &:before {
+    border-bottom: 1px solid #dadada;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 8px;
+    width: calc(100% - 85px);
+    width: 100%;
+  }
+
+  &:last-child:before {
+    border-bottom: none;
+  }
 
   > div{
     width: calc( 100% - 70px );
