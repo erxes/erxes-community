@@ -34,7 +34,6 @@ export default function ListContainer(props: Props) {
 
   const [deleteMutation] = useMutation(gql(mutations.deleteFeed));
   const [pinMutation] = useMutation(gql(mutations.pinFeed));
-  const [heartMutation] = useMutation(gql(mutations.emojiReact));
 
   if (feedResponse.loading) {
     return <Spinner objective={true} />;
