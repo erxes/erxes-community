@@ -97,6 +97,7 @@ export default function ListContainer(props: Props) {
       pinItem={pinItem}
       list={list}
       totalCount={totalCount}
+      contentType={contentType}
       limit={limit}
       handleHearted={handleHearted}
     />

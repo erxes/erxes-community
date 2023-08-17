@@ -34,6 +34,7 @@ type Props = {
   pinItem: (_id: string) => void;
   handleHearted: (_id: string) => void;
   limit: number;
+  contentType: string;
 };
 
 type FinalProps = {
@@ -47,6 +48,7 @@ function List({
   totalCount,
   limit,
   currentUser,
+  contentType,
   handleHearted,
 }: FinalProps) {
   const editItem = (item) => {
@@ -302,20 +304,28 @@ function List({
 
   const renderList = () => {
     const datas = list || [];
-    const pinnedList = datas.filter(
-      (data) =>
-        data.isPinned &&
-        ((data.eventData?.visibility === "private" &&
-          data.recipientIds.includes(currentUser._id)) ||
-          data.eventData?.visibility === "public")
-    );
-    const normalList = datas.filter(
-      (data) =>
-        !data.isPinned &&
-        ((data.eventData?.visibility === "private" &&
-          data.recipientIds.includes(currentUser._id)) ||
-          data.eventData?.visibility === "public")
-    );
+    let pinnedList;
+    let normalList;
+
+    if (contentType === "event") {
+      pinnedList = datas.filter(
+        (data) =>
+          data.isPinned &&
+          ((data.eventData?.visibility === "private" &&
+            data.recipientIds.includes(currentUser._id)) ||
+            data.eventData?.visibility === "public")
+      );
+      normalList = datas.filter(
+        (data) =>
+          !data.isPinned &&
+          ((data.eventData?.visibility === "private" &&
+            data.recipientIds.includes(currentUser._id)) ||
+            data.eventData?.visibility === "public")
+      );
+    } else {
+      pinnedList = datas.filter((data) => data.isPinned);
+      normalList = datas.filter((data) => !data.isPinned);
+    }
 
     const showList = (items) => {
       return items.map((filteredItem) => renderItem(filteredItem));
