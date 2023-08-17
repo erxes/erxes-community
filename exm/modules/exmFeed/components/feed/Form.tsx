@@ -152,7 +152,7 @@ export default function PostForm(props: Props) {
             unitId,
           },
           isSubmitted,
-          callback: closeModal ? closeModal : insideCloseModal,
+          callback: props.isEdit ? closeModal : insideCloseModal,
         })}
       </>
     );

@@ -15,7 +15,7 @@ const Comments: React.FC<{ contentId: string }> = ({ contentId }) => {
     },
   });
 
-  const renderButton = ({ values, isSubmitted }: IButtonMutateProps) => {
+  const renderButton = ({ values, isSubmitted, callback }: IButtonMutateProps) => {
     return (
       <ButtonMutate
         mutation={mutations.commentAdd}
@@ -26,6 +26,7 @@ const Comments: React.FC<{ contentId: string }> = ({ contentId }) => {
         icon="send"
         children=""
         successMessage="You successfully write a comment"
+        callback={callback}
       />
     );
   };

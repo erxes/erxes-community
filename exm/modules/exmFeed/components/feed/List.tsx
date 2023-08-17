@@ -292,12 +292,7 @@ function List({
                 <Icon icon="comment-1" /> {item.commentCount}
               </b>
             }
-            content={(props) => (
-              <Comments
-                contentId={item._id}
-                {...props}
-              />
-            )}
+            content={(props) => <Comments contentId={item._id} {...props} />}
           />
           {/* <b>Share</b> */}
         </LikeCommentShare>
@@ -307,8 +302,20 @@ function List({
 
   const renderList = () => {
     const datas = list || [];
-    const pinnedList = datas.filter((data) => data.isPinned);
-    const normalList = datas.filter((data) => !data.isPinned);
+    const pinnedList = datas.filter(
+      (data) =>
+        data.isPinned &&
+        ((data.eventData?.visibility === "private" &&
+          data.recipientIds.includes(currentUser._id)) ||
+          data.eventData?.visibility === "public")
+    );
+    const normalList = datas.filter(
+      (data) =>
+        !data.isPinned &&
+        ((data.eventData?.visibility === "private" &&
+          data.recipientIds.includes(currentUser._id)) ||
+          data.eventData?.visibility === "public")
+    );
 
     const showList = (items) => {
       return items.map((filteredItem) => renderItem(filteredItem));

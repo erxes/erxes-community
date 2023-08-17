@@ -71,7 +71,7 @@ export default function FormContainer(props: Props) {
         mutation={variables._id ? mutations.editFeed : mutations.addFeed}
         variables={variables}
         callback={callBackResponse}
-        refetchQueries={[{ query: gql(queries.feed) }]}
+        refetchQueries={['feed']}
         isSubmitted={isSubmitted}
         block={true}
         btnStyle="default"

@@ -527,6 +527,9 @@ export const LearnItemDescription = styled.div`
 `;
 
 export const SingleEvent = styled.div`
+  max-height: 225px;
+  overflow: auto;
+
   .image-wrapper {
     overflow: hidden;
     width: 70px;
@@ -1216,6 +1219,27 @@ export const ChatListSpacing = styled.div`
 export const FlexAlignCenter = styled.div`
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
+
+  > div{
+    width: calc( 100% - 70px );
+
+    b {
+      max-height: 35px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+    span {
+      line-height: 18px;
+      width: 100%;
+      display: flex;
+      max-height: 36px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 `;
 
 export const AttachmentContainer = styledTS<{attachmentLength: number}>(styled.div)`
