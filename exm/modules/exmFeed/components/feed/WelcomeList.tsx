@@ -14,19 +14,18 @@ import dayjs from "dayjs";
 import { getUserAvatar } from "../../../utils";
 import Comments from "../../containers/feed/comment";
 import ModalTrigger from "../../../common/ModalTrigger";
+import Heart from "../../containers/feed/Heart";
 
 type Props = {
   list: any;
   totalCount: number;
   limit: number;
-  handleHearted: (_id: string) => void;
 };
 
 export default function WelcomeList({
   list,
   totalCount,
   limit,
-  handleHearted,
 }: Props) {
   const renderItem = (item: any) => {
     const createdUser = item.createdUser || {};
@@ -69,10 +68,7 @@ export default function WelcomeList({
           <p dangerouslySetInnerHTML={{ __html: item.description }} />
         </TextFeed>
         <LikeCommentShare>
-          <b onClick={() => handleHearted(item._id)}>
-            <Icon color={`${item.isHearted && "red"}`} icon="heart-2" />{" "}
-            {item.heartCount}
-          </b>
+          <Heart _id={item._id} />
           <ModalTrigger
             title="Comment"
             size="lg"
@@ -81,12 +77,7 @@ export default function WelcomeList({
                 <Icon icon="comment-1" /> {item.commentCount}
               </b>
             }
-            content={(props) => (
-              <Comments
-                contentId={item._id}
-                {...props}
-              />
-            )}
+            content={(props) => <Comments contentId={item._id} {...props} />}
           />
           {/* <b>Share</b> */}
         </LikeCommentShare>

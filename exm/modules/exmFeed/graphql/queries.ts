@@ -296,8 +296,19 @@ const comments = `
       }
     }
   }
-`
+`;
 
+const emojiCount = `
+  query emojiCount($contentId: String!, $contentType: ReactionContentType!, $type: String!) {
+    emojiCount(contentId: $contentId, contentType: $contentType, type: $type)
+  }
+`;
+
+const emojiIsReacted = `
+  query emojiIsReacted($contentId: String!, $contentType: ReactionContentType!, $type: String!) {
+    emojiIsReacted(contentId: $contentId, contentType: $contentType, type: $type)
+  }
+`;
 
 export default {
   feed,
@@ -312,5 +323,7 @@ export default {
   getChatIdByUserIds,
   branches,
   unitsMain,
-  comments
+  comments,
+  emojiCount,
+  emojiIsReacted
 };

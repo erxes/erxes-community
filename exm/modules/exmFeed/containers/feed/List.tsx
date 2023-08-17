@@ -66,25 +66,12 @@ export default function ListContainer(props: Props) {
     });
   };
 
-  const handleHearted = (_id: string) => {
-    heartMutation({
-      variables: { contentId: _id, contentType: "exmFeed", type: "heart" },
-    })
-      .then(() => {
-        feedResponse.refetch();
-      })
-      .catch((error) => {
-        Alert.error(error.message);
-      });
-  };
-
   const { list, totalCount } = feedResponse.data?.exmFeed || {};
 
   if (contentType === "welcome") {
     return (
       <WelcomeList
         list={list}
-        handleHearted={handleHearted}
         totalCount={totalCount}
         limit={limit}
       />
@@ -99,7 +86,6 @@ export default function ListContainer(props: Props) {
       totalCount={totalCount}
       contentType={contentType}
       limit={limit}
-      handleHearted={handleHearted}
     />
   );
 }

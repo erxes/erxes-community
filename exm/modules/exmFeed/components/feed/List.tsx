@@ -26,13 +26,13 @@ import withCurrentUser from "../../../auth/containers/withCurrentUser";
 import { IUser } from "../../../types";
 import AttachmentWithPreview from "../../../common/AttachmentWithPreview";
 import Comments from "../../containers/feed/comment";
+import Heart from '../../containers/feed/Heart';
 
 type Props = {
   list: any;
   totalCount: number;
   deleteItem: (_id: string) => void;
   pinItem: (_id: string) => void;
-  handleHearted: (_id: string) => void;
   limit: number;
   contentType: string;
 };
@@ -49,7 +49,6 @@ function List({
   limit,
   currentUser,
   contentType,
-  handleHearted,
 }: FinalProps) {
   const editItem = (item) => {
     const trigger = (
@@ -282,10 +281,7 @@ function List({
           </AttachmentContainer>
         )}
         <LikeCommentShare>
-          <b onClick={() => handleHearted(item._id)}>
-            <Icon color={`${item.isHearted && "red"}`} icon="heart-2" />{" "}
-            {item.heartCount}
-          </b>
+          <Heart _id={item._id}/>
           <ModalTrigger
             title="Comment"
             size="lg"
