@@ -25,11 +25,11 @@ export default function HomeContainer(props: Props) {
     events.data.exmFeed &&
     events.data.exmFeed.list.map((e) => {
       if (
-        e.eventData.startDate?.slice(0, 10) <= today &&
-        today <= e.eventData.endDate?.slice(0, 10)
-      ) {
-        return e;
-      }
+        dayjs(e.eventData.startDate).format('YYYY-MM-DD') <= today &&
+        today <= dayjs(e.eventData.endDate).format('YYYY-MM-DD')
+        ) {
+          return e;
+        }
 
       return null;
     });

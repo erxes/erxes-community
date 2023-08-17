@@ -141,7 +141,7 @@ export default function ChatList({
             />
           </ChatListHeader>
           {chats.map((c) => {
-            if (c.type === "group") {
+            if (!c.isPinned && c.type === "group") {
               return (
                 <ChatItem
                   chat={c}

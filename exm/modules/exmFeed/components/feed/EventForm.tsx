@@ -109,7 +109,7 @@ export default function EventForm(props: Props) {
         <CustomRangeContainer>
           <DateControl
             value={eventData.startDate}
-            required={false}
+            required={true}
             name="startDate"
             onChange={(date) => onChangeEventData("startDate", date)}
             placeholder={"Start date"}
@@ -118,7 +118,7 @@ export default function EventForm(props: Props) {
           />
           <DateControl
             value={eventData.endDate}
-            required={false}
+            required={true}
             name="endDate"
             placeholder={"End date"}
             onChange={(date) => onChangeEventData("endDate", date)}
