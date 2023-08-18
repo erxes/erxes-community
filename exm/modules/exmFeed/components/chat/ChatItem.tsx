@@ -1,5 +1,4 @@
 import React from "react";
-import { OverlayTrigger, Popover } from "react-bootstrap";
 // erxes
 import Avatar from "../../../common/nameCard/Avatar";
 import Icon from "../../../common/Icon";
