@@ -677,7 +677,7 @@ export const ContextMenuList = styled.div`
   justify-content: center;
   align-items: flex-top;
   flex-direction: column;
-  padding: 0.5em;
+  padding: 0 0.5em;
 `;
 
 export const ContextMenuItem = styledTS<{ color?: string }>(styled.button)`
@@ -687,9 +687,11 @@ export const ContextMenuItem = styledTS<{ color?: string }>(styled.button)`
   outline: 0;
   border-radius: 5px;
   color: ${props => props.color || colors.textPrimary};
-  padding: 1em;
+  padding: 10px;
   text-align: left;
   cursor: pointer;
+  margin-left: 0 !important;
+  align-self: center !important;
 
   &:hover {
     background-color: ${colors.bgActive};

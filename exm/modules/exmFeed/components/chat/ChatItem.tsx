@@ -14,6 +14,8 @@ import {
   ContextMenuList,
   ContextMenuItem,
 } from "../../styles";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownToggle from "../../../common/DropdownToggle";
 
 type Props = {
   chat?: any;
@@ -45,22 +47,6 @@ const ChatItem = (props: Props) => {
       createChat([notContactUser._id, currentUser._id]);
     }
   };
-
-  const popoverContextMenu = (
-    <Popover id="contextmenu-popover">
-      <ContextMenuList>
-        <ContextMenuItem onClick={() => props.handlePin(chat._id)}>
-          {chat?.isPinned ? "Unpin" : "Pin"}
-        </ContextMenuItem>
-        <ContextMenuItem onClick={() => props.markAsRead()}>
-          {chat && chat.isSeen ? "Mark as unread" : "Mark as read"}
-        </ContextMenuItem>
-        <ContextMenuItem color="red" onClick={() => props.remove()}>
-          Delete Chat
-        </ContextMenuItem>
-      </ContextMenuList>
-    </Popover>
-  );
 
   const renderInfo = () => {
     if (notContactUser) {
@@ -116,16 +102,26 @@ const ChatItem = (props: Props) => {
       </ChatWrapper>
       {chat && (
         <ChatActions>
-          <OverlayTrigger
-            trigger="click"
-            rootClose={false}
-            placement="bottom-start"
-            overlay={popoverContextMenu}
-          >
-            <ChatActionItem>
-              <Icon icon="ellipsis-h" size={14} />
-            </ChatActionItem>
-          </OverlayTrigger>
+          <Dropdown alignRight={true}>
+            <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
+              <ChatActionItem>
+                <Icon icon="ellipsis-h" size={14} />
+              </ChatActionItem>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <ContextMenuList>
+                <ContextMenuItem onClick={() => props.handlePin(chat._id)}>
+                  {chat?.isPinned ? "Unpin" : "Pin"}
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => props.markAsRead()}>
+                  {chat && chat.isSeen ? "Mark as unread" : "Mark as read"}
+                </ContextMenuItem>
+                <ContextMenuItem color="red" onClick={() => props.remove()}>
+                  Delete Chat
+                </ContextMenuItem>
+              </ContextMenuList>
+            </Dropdown.Menu>
+          </Dropdown>
         </ChatActions>
       )}
     </ChatItemWrapper>
