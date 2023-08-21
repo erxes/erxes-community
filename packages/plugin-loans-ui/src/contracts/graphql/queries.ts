@@ -46,6 +46,8 @@ const contractFields = `
   classification
   expiredDays
   loanBalanceAmount
+  storedInterest
+  lastStoredDate
 `;
 
 const listParamsDef = `

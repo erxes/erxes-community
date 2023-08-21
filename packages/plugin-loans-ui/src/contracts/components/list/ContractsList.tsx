@@ -28,6 +28,7 @@ import withConsumer from '../../../withConsumer';
 import { IUser } from '@erxes/ui/src/auth/types';
 import { __ } from 'coreui/utils';
 import ClassificationForm from '../../containers/ClassificationForm';
+import StoreInterestForm from '../../containers/StoreInterestForm';
 // import Sidebar from './Sidebar';
 
 interface IProps extends IRouterProps {
@@ -220,20 +221,26 @@ class ContractsList extends React.Component<IProps, State> {
         return <ClassificationForm {...props} contracts={bulk} />;
       };
 
+      const storeInterestForm = props => {
+        return <StoreInterestForm {...props} contracts={bulk} />;
+      };
+
       actionBarLeft = (
         <BarItems>
-          {can('contractsRemove', currentUser) && (
-            <Button
-              btnStyle="danger"
-              size="small"
-              icon="cancel-1"
-              onClick={onClick}
-            >
-              {__('Delete')}
-            </Button>
-          )}
           <ModalTrigger
-            title={`${__('New transaction')}`}
+            title={`${__('Store interest')}`}
+            trigger={
+              <Button btnStyle="success" size="small" icon="database">
+                {__('Store interest')}
+              </Button>
+            }
+            autoOpenKey="showStoreInterest"
+            size="lg"
+            content={storeInterestForm}
+            backDrop="static"
+          />
+          <ModalTrigger
+            title={`${__('Change classification')}`}
             trigger={
               <Button btnStyle="warning" size="small" icon="cancel-1">
                 {__('Change classification')}
@@ -244,6 +251,16 @@ class ContractsList extends React.Component<IProps, State> {
             content={classificationForm}
             backDrop="static"
           />
+          {can('contractsRemove', currentUser) && (
+            <Button
+              btnStyle="danger"
+              size="small"
+              icon="cancel-1"
+              onClick={onClick}
+            >
+              {__('Delete')}
+            </Button>
+          )}
         </BarItems>
       );
     }

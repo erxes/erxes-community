@@ -165,10 +165,10 @@ class ClassificationForm extends React.Component<Props, State> {
       <table style={{ width: '100%' }}>
         <thead>
           <tr>
-            <th>number</th>
-            <th>classification</th>
-            <th>expiredDays</th>
-            <th>new classification</th>
+            <th>{__('number')}</th>
+            <th>{__('classification')}</th>
+            <th>{__('expiredDays')}</th>
+            <th>{__('new classification')}</th>
           </tr>
         </thead>
         {this.state.classificationChangeList.map((a, cIndex) => {

@@ -103,6 +103,8 @@ export interface IContract {
 
   dealId?: string;
   currency: string;
+  storedInterest: number;
+  lastStoredDate: Date;
 }
 
 export interface IContractDocument extends IContract, Document {
@@ -357,6 +359,16 @@ export const contractSchema = schemaHooksWrapper(
       type: String,
       default: 'MNT',
       label: 'contract currency of lease'
+    }),
+    storedInterest: field({
+      type: Number,
+      optional: true,
+      label: 'Stored Interest'
+    }),
+    lastStoredDate: field({
+      type: Date,
+      optional: true,
+      label: 'Last Stored Date'
     })
   }),
   'erxes_contractSchema'
