@@ -1,4 +1,4 @@
-FROM node:18.17.0-bookworm-slim
+FROM node:18.17.1-bookworm-slim
 WORKDIR /erxes-plugin-api
 RUN chown -R node:node /erxes-plugin-api
 COPY --chown=node:node . /erxes-plugin-api
