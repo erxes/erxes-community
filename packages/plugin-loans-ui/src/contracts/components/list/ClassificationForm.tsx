@@ -78,13 +78,15 @@ function generateList(contractTypes, contracts) {
     currentContracts.map(contract => {
       let newClassification = 'NORMAL';
 
-      if (type.config.badExpirationDay < (contract.expiredDays || 0))
+      if (type?.config?.badExpirationDay < (contract.expiredDays || 0))
         newClassification = 'BAD';
-      else if (type.config.negativeExpirationDay < (contract.expiredDays || 0))
+      else if (
+        type?.config?.negativeExpirationDay < (contract.expiredDays || 0)
+      )
         newClassification = 'NEGATIVE';
-      else if (type.config.doubtExpirationDay < (contract.expiredDays || 0))
+      else if (type?.config?.doubtExpirationDay < (contract.expiredDays || 0))
         newClassification = 'DOUBTFUL';
-      else if (type.config.expiredExpirationDay < (contract.expiredDays || 0))
+      else if (type?.config?.expiredExpirationDay < (contract.expiredDays || 0))
         newClassification = 'EXPIRED';
 
       addClassification(
