@@ -1,4 +1,5 @@
-import { CHAT_TYPE, IChatMessage } from '../../../models/definitions/chat';
+import { CHAT_TYPE } from '../../../models/definitions/chat';
+import * as strip from 'strip';
 import { graphqlPubsub } from '../../../configs';
 import { checkPermission } from '@erxes/api-utils/src/permissions';
 import { sendCoreMessage } from '../../../messageBroker';
@@ -86,7 +87,21 @@ const chatMutations = {
     }
 
     if (chat.type === CHAT_TYPE.GROUP) {
-      await checkChatAdmin(models.Chats, user._id);
+      if (chat.participantIds.length > 1) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $pull: {
+              participantIds: { $in: user?._id },
+              adminIds: { $in: user?._id }
+            }
+          }
+        );
+
+        return 'Success';
+      }
+
+      return models.Chats.removeChat(_id);
     }
 
     return models.Chats.removeChat(_id);
@@ -155,20 +170,75 @@ const chatMutations = {
     return seen;
   },
 
+  chatToggleIsPinned: async (_root, { _id }, { models }) => {
+    const chat = await models.Chats.findOne({ _id });
+
+    if (chat) {
+      graphqlPubsub.publish('chatInserted', {
+        userId: chat.createdUser?._id
+      });
+
+      await models.Chats.updateOne(
+        { _id },
+        { $set: { isPinned: !chat.isPinned } }
+      );
+
+      return !chat.isPinned;
+    }
+    return false;
+  },
+
+  chatToggleIsWithNotification: async (_root, { _id }, { models }) => {
+    const chat = await models.Chats.findOne({ _id });
+
+    if (chat) {
+      graphqlPubsub.publish('chatInserted', {
+        userId: chat.createdUser?._id
+      });
+
+      await models.Chats.updateOne(
+        { _id },
+        { $set: { isWithNotification: !chat.isWithNotification } }
+      );
+
+      return !chat.isWithNotification;
+    }
+    return false;
+  },
+
   chatMessageAdd: async (_root, args, { models, user }) => {
     if (!args.content) {
+      throw new Error('Content is required');
+    }
+
+    // <img> tags wrapped inside empty <p> tag should be allowed
+    const contentValid =
+      args.content.indexOf('<img') !== -1 ? true : strip(args.content);
+
+    // if there is no attachments and no content then throw content required error
+    if (args?.attachments.length === 0 && !contentValid) {
       throw new Error('Content is required');
     }
 
     const message = await models.ChatMessages.createChatMessage(args, user._id);
 
     await models.Chats.updateOne(
-      { _id: message.chatId },
-      { $set: { updatedAt: new Date() } }
+      {
+        _id: message.chatId
+      },
+      {
+        $set: {
+          updatedAt: new Date()
+        }
+      }
     );
 
     graphqlPubsub.publish('chatMessageInserted', {
       chatMessageInserted: message
+    });
+
+    graphqlPubsub.publish('chatReceivedNotification', {
+      chatReceivedNotification: message
     });
 
     const chat = await models.Chats.getChat(message.chatId);
@@ -211,16 +281,19 @@ const chatMutations = {
   chatMessageToggleIsPinned: async (_root, { _id }, { models }) => {
     const message = await models.ChatMessages.findOne({ _id });
 
-    graphqlPubsub.publish('chatMessageInserted', {
-      chatId: message.chatId
-    });
+    if (message) {
+      graphqlPubsub.publish('chatMessageInserted', {
+        chatId: message.chatId
+      });
 
-    await models.ChatMessages.updateOne(
-      { _id },
-      { $set: { isPinned: !message.isPinned } }
-    );
+      await models.ChatMessages.updateOne(
+        { _id },
+        { $set: { isPinned: !message.isPinned } }
+      );
 
-    return !message.isPinned;
+      return !message.isPinned;
+    }
+    return false;
   },
 
   chatAddOrRemoveMember: async (
@@ -228,14 +301,14 @@ const chatMutations = {
     { _id, userIds, type },
     { models, user }
   ) => {
-    await checkChatAdmin(models.Chats, user._id);
-
     const chat = await models.Chats.getChat(_id);
 
     if ((chat.participantIds || []).length === 1) {
-      await models.Chats.removeChat(_id);
+      if (type === 'remove') {
+        await models.Chats.removeChat(_id);
 
-      return 'Chat removed';
+        return 'Chat removed';
+      }
     }
 
     // while user is removing himself or herself
@@ -295,6 +368,95 @@ const chatMutations = {
     });
 
     return 'ok';
+  },
+
+  chatForward: async (_root, { userIds, ...args }, { user, models }) => {
+    if (userIds && userIds.length > 0) {
+      const participantIds = [...(userIds || [])];
+
+      if (!participantIds.includes(user._id)) {
+        participantIds.push(user._id);
+      }
+
+      let newChat = await models.Chats.findOne({
+        type: 'direct',
+        participantIds: {
+          $all: participantIds,
+          $size: participantIds.length
+        }
+      });
+
+      if (!newChat) {
+        newChat = await models.Chats.createChat(
+          {
+            participantIds,
+            type: 'direct'
+          },
+          user._id
+        );
+
+        graphqlPubsub.publish('chatInserted', {
+          userId: user._id
+        });
+
+        args.chatId = newChat._id;
+      }
+
+      if (newChat) {
+        args.chatId = newChat._id;
+      }
+    }
+
+    const message = await models.ChatMessages.createChatMessage(args, user._id);
+
+    await models.Chats.updateOne(
+      {
+        _id: message.chatId
+      },
+      {
+        $set: {
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    graphqlPubsub.publish('chatMessageInserted', {
+      chatMessageInserted: message
+    });
+
+    graphqlPubsub.publish('chatReceivedNotification', {
+      chatReceivedNotification: message
+    });
+
+    const chat = await models.Chats.getChat(message.chatId);
+
+    const recievers = chat.participantIds.filter(i => i !== user._id);
+
+    sendCoreMessage({
+      subdomain: 'os',
+      action: 'sendMobileNotification',
+      data: {
+        title: `${user?.details?.fullName || user?.fullName} sent you chat`,
+        body: strip_html(args.content),
+        receivers: recievers,
+        data: {
+          type: 'chats',
+          id: chat._id
+        }
+      }
+    });
+
+    for (const reciever of recievers) {
+      graphqlPubsub.publish('chatUnreadCountChanged', {
+        userId: reciever
+      });
+
+      graphqlPubsub.publish('chatInserted', {
+        userId: reciever
+      });
+    }
+
+    return message;
   }
 };
 

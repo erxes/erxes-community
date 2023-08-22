@@ -562,9 +562,6 @@ span.red {
 }
 #myModal {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 9999;
 }
 .qpay-modal {
@@ -602,6 +599,13 @@ span.red {
     padding: 8px 16px;
     line-height: initial;
   }
+}
+.monpay-coupon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 .info {
   align-items: center;

@@ -18,8 +18,19 @@ export default async function cpUserMiddleware(
 
   if (
     [
+      'clientPortalGetLast',
+      'clientPortalGetConfigs',
+      'clientPortalGetConfig',
+      'clientPortalConfigsTotalCount',
+      'clientPortalConfigUpdate',
+      'clientPortalRemove',
+      'clientPortalGetAllowedFields',
       'clientPortalLogin',
-      'clientPortalLoginRegister',
+      'clientPortalLogout',
+      'clientPortalLoginWithPhone',
+      'clientPortalLoginWithSocialPay',
+      'clientPortalRegister',
+      'clientPortalVerifyOTP',
       'clientPortalRefreshToken',
       'clientPortalGetConfigByDomain',
       'clientPortalRefreshToken',

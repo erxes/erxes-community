@@ -69,7 +69,12 @@ const WidgetChatWindow = (props: FinalProps) => {
           onClick={() => props.handleActive(chat._id, true)}
         />
       </WidgetChatWindowHeader>
-      <MessageList chatId={chat._id} setReply={setReply} />
+      <MessageList
+        chatId={chat._id}
+        setReply={setReply}
+        currentUser={currentUser}
+        isWidget={true}
+      />
       <ReplyInfo reply={reply} setReply={setReply} />
       <Editor
         chatId={chat._id}

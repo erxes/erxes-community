@@ -48,7 +48,7 @@ class MonpayConfigForm extends React.Component<Props, State> {
     const { payment } = this.props;
     const generatedValues = {
       name: values.paymentName,
-      kind: this.props.metaData.kind,
+      kind: PAYMENT_KINDS.MONPAY,
       status: 'active',
       config: {
         username: values.username,
@@ -103,7 +103,7 @@ class MonpayConfigForm extends React.Component<Props, State> {
           {this.renderItem('username', 'Branch username')}
           {this.renderItem('accountId', 'Account ID', '', true)}
 
-          {this.props.metaData.link && (
+          {this.props.metaData && this.props.metaData.link && (
             <a href={this.props.metaData.link} target="_blank" rel="noreferrer">
               {__('Contact with Monpay')}
             </a>

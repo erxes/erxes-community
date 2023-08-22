@@ -7,14 +7,17 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 import Component from '../../components/messages/MessageList';
 import { queries, subscriptions } from '../../graphql';
 import { Alert } from '@erxes/ui/src/utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   chatId: string;
   setReply: (message: any) => void;
+  currentUser: IUser;
+  isWidget?: boolean;
 };
 
 const MessageListContainer = (props: Props) => {
-  const { chatId } = props;
+  const { chatId, isWidget } = props;
 
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
@@ -33,15 +36,11 @@ const MessageListContainer = (props: Props) => {
 
   useSubscription(gql(subscriptions.chatMessageInserted), {
     variables: { chatId },
-    onSubscriptionData: ({ subscriptionData }) => {
-      if (!subscriptionData.data) {
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      if (!data) {
         return null;
       }
-
-      setLatestMessages([
-        subscriptionData.data.chatMessageInserted,
-        ...latestMessages
-      ]);
+      setLatestMessages([data.chatMessageInserted, ...latestMessages]);
     }
   });
 
@@ -88,7 +87,7 @@ const MessageListContainer = (props: Props) => {
     Alert.error(error.message);
   }
 
-  const chatMessages = (data && data.chatMessages.list) || [];
+  const chatMessages = (data && data.chatMessages?.list) || [];
 
   return (
     <Component
@@ -97,6 +96,7 @@ const MessageListContainer = (props: Props) => {
       isAllMessages={chatMessages.length < (page + 1) * 20}
       setReply={props.setReply}
       loadEarlierMessage={loadEarlierMessage}
+      isWidget={isWidget}
     />
   );
 };

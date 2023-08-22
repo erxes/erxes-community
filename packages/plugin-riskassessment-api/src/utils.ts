@@ -3,11 +3,12 @@ import { IModels, models } from './connectionResolver';
 import {
   sendCardsMessage,
   sendCoreMessage,
-  sendFormsMessage
+  sendFormsMessage,
+  sendTagsMessage
 } from './messageBroker';
 
 export const validRiskIndicators = async params => {
-  if (serviceDiscovery.isEnabled('tags') && !params.tagIds) {
+  if (serviceDiscovery.isEnabled('tags') && !params?.tagIds?.length) {
     throw new Error('Please select some tags');
   }
   if (await models?.RiskIndicators.findOne({ name: params.name })) {
@@ -523,4 +524,22 @@ export const generateSort = (sortField, sortDirection) => {
     sort = { [sortField]: sortDirection };
   }
   return sort;
+};
+
+export const getFilterTagIds = async (subdomain, ids) => {
+  let tagIds: string[] = [];
+  for (const _id of ids) {
+    const childrenIds = (
+      await sendTagsMessage({
+        subdomain,
+        action: 'withChilds',
+        data: { query: { _id }, fields: { _id: 1 } },
+        isRPC: true,
+        defaultValue: []
+      })
+    ).map(child => child._id);
+    tagIds = [...tagIds, ...childrenIds];
+  }
+
+  return tagIds;
 };

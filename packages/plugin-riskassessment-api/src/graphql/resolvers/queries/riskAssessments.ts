@@ -1,12 +1,23 @@
 import { checkPermission, paginate } from '@erxes/api-utils/src';
+import { IUserDocument } from '@erxes/api-utils/src/types';
 import { IContext, IModels } from '../../../connectionResolver';
 import { statusColors } from '../../../constants';
 import { sendCardsMessage } from '../../../messageBroker';
 import { generateSort } from '../../../utils';
 import { RiskAssessmentGroupParams } from '../types';
 
-const generateFilter = async (params, models: IModels, subdomain: string) => {
-  let filter: any = {};
+const generateFilter = async (
+  params,
+  models: IModels,
+  subdomain: string,
+  user: IUserDocument
+) => {
+  let filter: any = {
+    $or: [
+      { 'permittedUserIds.0': { $exists: false } },
+      { permittedUserIds: { $in: [user?._id] } }
+    ]
+  };
 
   if (params.cardType) {
     filter.cardType = params.cardType;
@@ -99,12 +110,42 @@ const generateFilter = async (params, models: IModels, subdomain: string) => {
     filter.cardId = { $in: cardIds };
   }
 
+  if (params?.cardFilter && filter.cardType) {
+    const { name, value, values, regex } = params?.cardFilter;
+
+    let cardFilter = {
+      [name]: regex ? { $regex: new RegExp(`^${value}$`, 'i') } : value
+    };
+
+    if (!!values?.length) {
+      cardFilter[name] = { $in: values };
+    }
+
+    const cards = await sendCardsMessage({
+      subdomain,
+      action: `${filter.cardType}s.find`,
+      data: cardFilter,
+      isRPC: true,
+      defaultValue: []
+    });
+
+    const cardIds = cards.map(card => card._id);
+
+    filter.cardId = { $in: cardIds };
+  }
+
+  if (params.cardIds) {
+    filter.cardId = {
+      $in: [...(filter?.cardId?.$in || []), ...params.cardIds]
+    };
+  }
+
   return filter;
 };
 
 const RiskAssessmentQueries = {
-  async riskAssessments(_root, params, { models, subdomain }: IContext) {
-    const filter = await generateFilter(params, models, subdomain);
+  async riskAssessments(_root, params, { models, subdomain, user }: IContext) {
+    const filter = await generateFilter(params, models, subdomain, user);
 
     const { sortField, sortDirection } = params;
     const sort = generateSort(sortField, sortDirection);
@@ -115,19 +156,46 @@ const RiskAssessmentQueries = {
   async riskAssessmentsTotalCount(
     _root,
     params,
-    { models, subdomain }: IContext
+    { models, subdomain, user }: IContext
   ) {
-    const filter = await generateFilter(params, models, subdomain);
+    const filter = await generateFilter(params, models, subdomain, user);
     return await models.RiskAssessments.countDocuments(filter);
   },
-  async riskAssessmentDetail(_root, { id, ...params }, { models }: IContext) {
-    return models.RiskAssessments.riskAssessmentDetail(id, params);
+  async riskAssessmentDetail(
+    _root,
+    { id, ...params },
+    { models, user }: IContext
+  ) {
+    return models.RiskAssessments.riskAssessmentDetail(id, params, user);
   },
-  async riskAssessment(_root, { cardId, cardType }, { models }: IContext) {
-    return await models.RiskAssessments.find({
+  async riskAssessment(
+    _root,
+    { cardId, cardType },
+    { models, user }: IContext
+  ) {
+    const riskAssessments = await models.RiskAssessments.find({
       cardId,
       cardType
-    });
+    }).lean();
+
+    const result: any[] = [];
+
+    for (let riskAssessment of riskAssessments) {
+      if (
+        !!riskAssessment?.permittedUserIds?.length &&
+        !riskAssessment.permittedUserIds.includes(user._id)
+      ) {
+        result.push({
+          _id: riskAssessment._id,
+          permittedUserIds: riskAssessment?.permittedUserIds,
+          status: 'You does not have permit on risk assessment'
+        });
+      } else {
+        result.push(riskAssessment);
+      }
+    }
+
+    return result;
   },
 
   async riskAssessmentGroups(

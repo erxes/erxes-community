@@ -10,6 +10,10 @@ export type IPlan = {
   status: string;
   createdAt: string;
   modiefiedAt: string;
+  createDate: string;
+  startDate: string;
+  closeDate: string;
+  cardIds: string[];
 };
 
 export type ISchedule = {
@@ -18,7 +22,8 @@ export type ISchedule = {
   structureTypeIds: string[];
   assignedUserIds: string[];
   groupId?: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   customFieldsData?: any;
 };
 
@@ -39,9 +44,9 @@ export const schedulesSchema = new Schema({
     optional: true
   }),
   groupId: field({ type: String, label: 'groupId', optional: true }),
-  structureTypeIds: field({
-    type: [String],
-    label: 'Structure Type Ids',
+  structureTypeId: field({
+    type: String,
+    label: 'Structure Type Id',
     required: true
   }),
   assignedUserIds: field({
@@ -49,7 +54,6 @@ export const schedulesSchema = new Schema({
     label: 'AssignUserIds',
     optional: true
   }),
-  date: field({ type: Date, label: 'Date', required: true }),
   status: field({
     type: String,
     label: 'Status',
@@ -60,7 +64,8 @@ export const schedulesSchema = new Schema({
     type: Schema.Types.Mixed,
     label: 'CustomFieldsData',
     optional: true
-  })
+  }),
+  createdAt: field({ type: Date, label: 'Created At', default: Date.now })
 });
 
 const configSchema = new Schema({
@@ -73,19 +78,29 @@ const configSchema = new Schema({
 export const plansSchema = new Schema({
   _id: field({ pkey: true }),
   name: field({ type: String, label: 'Name', required: true }),
+  plannerId: field({ type: String, label: 'Planner Id', required: true }),
   structureType: field({
     type: String,
     label: 'Structure Type',
     required: true
   }),
+  structureTypeId: field({
+    type: String,
+    label: 'General Structure Id',
+    required: true
+  }),
   configs: field({ type: configSchema, label: 'configs' }),
-  plannerId: field({ type: String, label: 'Planner Id', required: true }),
+  createdAt: field({ type: Date, label: 'createdAt', default: Date.now }),
+  modifiedAt: field({ type: Date, label: 'modifiedAt', default: Date.now }),
+  createDate: field({ type: Date, label: 'createDate' }),
+  startDate: field({ type: Date, label: 'startDate' }),
+  closeDate: field({ type: Date, label: 'closeDate' }),
+  cardIds: field({ type: [String], label: 'Created Card IDs', optional: true }),
+  tagId: field({ type: String, label: 'General Tag Id', optional: true }),
   status: field({
     type: String,
     label: 'Status',
     enum: ['active', 'archived'],
     default: 'active'
-  }),
-  createdAt: field({ type: Date, label: 'createdAt', default: Date.now }),
-  modifiedAt: field({ type: Date, label: 'modifiedAt', default: Date.now })
+  })
 });

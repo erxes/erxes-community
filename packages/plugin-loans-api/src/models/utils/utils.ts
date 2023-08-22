@@ -303,7 +303,7 @@ export const getRandomNumber = () => {
 export const getNumber = async (models: IModels, contractTypeId: string) => {
   const preNumbered = await models.Contracts.findOne({
     contractTypeId: contractTypeId
-  }).sort({ number: -1 });
+  }).sort({ createdAt: -1 });
 
   const type = await models.ContractTypes.getContractType({
     _id: contractTypeId
@@ -374,7 +374,7 @@ export const getUnduePercent = async (
 
   if (contractType?.unduePercent > 0) return contractType?.unduePercent / 100;
 
-  return 0.2;
+  return 0;
 };
 
 export const getChanged = (old, anew) => {

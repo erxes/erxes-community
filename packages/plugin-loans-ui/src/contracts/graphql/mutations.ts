@@ -44,6 +44,7 @@ const commonFields = `
   $dealId: String
 
   $relContractId: String
+  $currency:String
 `;
 
 const commonVariables = `
@@ -90,12 +91,15 @@ const commonVariables = `
   dealId: $dealId
 
   relContractId: $relContractId
+  currency: $currency
 `;
 
 const contractsAdd = `
   mutation contractsAdd(${commonFields}) {
     contractsAdd(${commonVariables}) {
       _id
+      number
+      contractTypeId
       ${contractDetailFields}
     }
   }
@@ -154,6 +158,24 @@ const fixSchedules = `
   }
 `;
 
+const changeClassification = `
+  mutation ClassificationsAdd($classifications: JSON) {
+    classificationsAdd(classifications: $classifications) {
+      _id
+      description
+      invDate
+      classification
+      total
+      newClassification
+      dtl {
+        amount
+        contractId
+        currency
+      }
+    }
+  }
+`;
+
 export default {
   contractsAdd,
   contractsEdit,
@@ -162,5 +184,6 @@ export default {
   regenSchedules,
   fixSchedules,
   contractsClose,
-  getProductsData
+  getProductsData,
+  changeClassification
 };

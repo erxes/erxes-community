@@ -12,6 +12,7 @@ export interface IPosOrderItem {
   bonusVoucherId?: string;
   isPackage?: boolean;
   isTake?: boolean;
+  manufacturedDate?: string;
 }
 export interface IPosOrderItemDocument extends IPosOrderItem, Document {
   _id: string;
@@ -111,7 +112,8 @@ const posOrderItemSchema = schemaHooksWrapper(
       type: Boolean,
       label: 'inner or skip ebarimt',
       default: false
-    })
+    }),
+    manufacturedDate: field({ type: String, label: 'manufactured' })
   }),
   'erxes_posOrderItem'
 );
@@ -161,12 +163,12 @@ export const posOrderSchema = schemaHooksWrapper(
       label: 'Previous bill id if it is changed'
     }),
     type: field({ type: String, label: 'Order type' }),
-    userId: field({ type: String, label: 'Created user id' }),
+    userId: field({ type: String, label: 'Created user' }),
 
     items: field({ type: [posOrderItemSchema], label: 'items' }),
     branchId: field({ type: String, label: 'Branch' }),
     departmentId: field({ type: String, label: 'Department' }),
-    posToken: field({ type: String, optional: true }),
+    posToken: field({ type: String, optional: true, label: 'Token' }),
 
     syncedErkhet: field({ type: Boolean, default: false }),
     syncErkhetInfo: field({

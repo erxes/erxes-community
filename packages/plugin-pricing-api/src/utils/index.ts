@@ -10,11 +10,12 @@ import {
   calculatePriceAdjust
 } from './rule';
 import { getAllowedProducts } from './product';
-import { Plan, CalculatedRule, OrderItem } from '../types';
+import { CalculatedRule, OrderItem } from '../types';
+import { IPricingPlanDocument } from '../models/definitions/pricingPlan';
 
 // Finding valid discounts
-export const getMainConditions: any = (branchId, departmentId) => {
-  const now = dayjs(new Date());
+export const getMainConditions: any = (branchId?, departmentId?, date?) => {
+  const now = dayjs(date || new Date());
   const nowISO = now.toISOString();
 
   return {
@@ -115,9 +116,9 @@ export const checkPricing = async (
     }
   }
 
-  const plans: Plan[] = await models.PricingPlans.find(conditions).sort(
-    sortArgs
-  );
+  const plans: IPricingPlanDocument[] = await models.PricingPlans.find(
+    conditions
+  ).sort(sortArgs);
 
   if (plans.length === 0) {
     return;
