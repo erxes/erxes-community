@@ -1,0 +1,240 @@
+import { gql } from "@apollo/client"
+
+const commonFields = `
+  _id
+  name
+  code
+`
+
+export const orderFields = `
+  createdAt
+  modifiedAt
+  status
+  slotCode
+  customerId
+  customerType
+  printedEbarimt
+  origin
+  type
+  deliveryInfo
+ 
+`
+export const orderItemBaseFields = `
+ _id
+ discountAmount
+`
+export const orderItemFields = `
+    ${orderItemBaseFields}
+    unitPrice
+    orderId
+    productName
+    count
+    productId
+    isPackage
+    isTake
+    status
+    productImgUrl
+    discountPercent
+    bonusCount
+    manufacturedDate
+`
+
+const customerFields = `
+  _id
+  primaryPhone
+  firstName
+  primaryEmail
+  lastName
+`
+
+const putResponseFields = `
+  date
+  vat
+  cityTax
+  registerNo
+  billId
+  lottery
+  qrData
+  success
+  lotteryWarningMsg
+  errorCode
+  message
+  getInformation
+  returnBillId
+  billType
+  taxType
+  stocks
+  amount
+`
+
+const commonDetailFields = `
+  _id
+  paidDate
+  cashAmount
+  totalAmount
+  mobileAmount
+  number
+  paidDate
+  registerNumber
+  billType
+  billId
+  paidAmounts {
+    _id
+    amount
+    info
+    type
+  }
+`
+
+const orderDetail = gql`
+  query orderDetail($_id: String) {
+    orderDetail(_id: $_id) {
+      ${commonDetailFields}
+      ${orderFields}
+      items {
+        ${orderItemFields}
+      }
+      customer {
+        ${customerFields}
+      }
+      customerType
+    }
+  }
+`
+
+export const ebarimtDetail = gql`
+  query EbarimtDetail($_id: String) {
+    orderDetail(_id: $_id) {
+      ${commonDetailFields}
+      items {
+        ${orderItemBaseFields}
+      }
+      customer {
+        ${customerFields}
+      }
+      putResponses {
+        ${putResponseFields}
+      }
+      user {
+        ${customerFields}
+      }
+    }
+  }
+`
+
+export const ordersCheckCompany = `
+  query ordersCheckCompany($registerNumber: String!) {
+    ordersCheckCompany(registerNumber: $registerNumber)
+  }
+`
+
+export const queryParamsDefs = `
+  $searchValue: String,
+  $statuses: [String],
+  $customerId: String,
+  $customerType: String,
+  $startDate: Date,
+  $endDate: Date,
+  $dateType: String,
+  $isPaid: Boolean,
+  $page: Int,
+  $perPage: Int,
+  $sortField: String,
+  $sortDirection: Int
+`
+
+export const queryParamsValues = `
+  searchValue: $searchValue,
+  statuses: $statuses,
+  customerId: $customerId,
+  customerType: $customerType,
+  startDate: $startDate,
+  endDate: $endDate,
+  dateType: $dateType,
+  isPaid: $isPaid,
+  page: $page,
+  perPage: $perPage,
+  sortField: $sortField,
+  sortDirection: $sortDirection,
+`
+
+const fullOrders = gql`
+  query fullOrders(${queryParamsDefs}) {
+    fullOrders(${queryParamsValues}) {
+      ${orderFields}
+      items {
+        _id
+        unitPrice
+        orderId
+        productName
+        count
+        productId
+        isPackage
+        isTake
+        status
+      }
+    }
+  }
+`
+
+const activeOrders = gql`
+query ActiveOrders(${queryParamsDefs}) {
+  fullOrders(${queryParamsValues}) {
+    _id
+    status
+    number
+    type
+    paidDate
+  }
+}
+`
+
+const ordersHistory = gql`
+  query OrdersHistory(${queryParamsDefs}) {
+    fullOrders(${queryParamsValues}) {
+      _id
+      status
+      number
+      totalAmount
+      type
+      createdAt
+      modifiedAt
+      paidDate
+    }
+  }
+`
+
+const slots = `
+  query poscSlots {
+    poscSlots{
+      _id
+      code
+      name
+    }
+  }
+`
+
+const ordersTotalCount = gql`
+  query OrdersTotalCount(
+    ${queryParamsDefs}
+  ) {
+    ordersTotalCount(
+      ${queryParamsValues}
+    )
+  }
+`
+
+const queries = {
+  commonFields,
+  orderFields,
+  orderItemFields,
+  orderDetail,
+  ordersCheckCompany,
+  fullOrders,
+  slots,
+  ordersTotalCount,
+  ordersHistory,
+  activeOrders,
+}
+
+export default queries
