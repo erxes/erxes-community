@@ -59,3 +59,8 @@ export const LEASE_TYPES = {
 
   ALL: ['finance', 'salvage']
 };
+
+export const STORED_INTEREST_TYPES = {
+  STORED_INTEREST: 'storedInterest',
+  OUT_BALANCE: 'outBalance'
+};

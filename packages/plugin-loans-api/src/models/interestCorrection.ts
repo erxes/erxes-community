@@ -1,17 +1,13 @@
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
 import {
-  IClassification,
-  IClassificationDocument,
-  classificationSchema
-} from './definitions/classification';
-import {
   IInterestCorrection,
-  IInterestCorrectionDocument
+  IInterestCorrectionDocument,
+  InterestCorrectionSchema
 } from './definitions/interestCorrection';
 
 export const loanInterestCorrectionClass = (models: IModels) => {
-  class Classification {
+  class InterestCorrection {
     public static async createInterestCorrection(
       interestCorrection: IInterestCorrection
     ) {
@@ -38,13 +34,13 @@ export const loanInterestCorrectionClass = (models: IModels) => {
       return res;
     }
   }
-  classificationSchema.loadClass(Classification);
-  return classificationSchema;
+  InterestCorrectionSchema.loadClass(InterestCorrection);
+  return InterestCorrectionSchema;
 };
 
 export interface IInterestCorrectionModel
   extends Model<IInterestCorrectionDocument> {
-  createClassification(classification: IClassification);
-  getClassification(_id: string);
-  updateClassification(_id, classification: IClassification);
+  createInterestCorrection(interestCorrection: IInterestCorrection);
+  getInterestCorrection(_id: string);
+  updateInterestCorrection(_id, interestCorrection: IInterestCorrection);
 }

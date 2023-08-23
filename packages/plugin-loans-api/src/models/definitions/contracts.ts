@@ -363,6 +363,7 @@ export const contractSchema = schemaHooksWrapper(
     storedInterest: field({
       type: Number,
       optional: true,
+      default: 0,
       label: 'Stored Interest'
     }),
     lastStoredDate: field({

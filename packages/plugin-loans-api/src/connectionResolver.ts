@@ -33,6 +33,11 @@ import {
   loanInterestCorrectionClass
 } from './models/interestCorrection';
 import { IInterestCorrectionDocument } from './models/definitions/interestCorrection';
+import {
+  IStoredInterestModel,
+  loanStoredInterestClass
+} from './models/storedInterest';
+import { IStoredInterestDocument } from './models/definitions/storedInterest';
 
 export interface IModels {
   PeriodLocks: IPeriodLockModel;
@@ -46,6 +51,7 @@ export interface IModels {
   General: IGeneralModel;
   Classification: IClassificationModel;
   InterestCorrection: IInterestCorrectionModel;
+  StoredInterest: IStoredInterestModel;
 }
 
 export interface IContext extends IMainContext {
@@ -115,6 +121,14 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     'loan_interest_correction',
     loanInterestCorrectionClass(models)
   ) as IInterestCorrectionModel;
+
+  models.StoredInterest = db.model<
+    IStoredInterestDocument,
+    IStoredInterestModel
+  >(
+    'loan_stored_interest',
+    loanStoredInterestClass(models)
+  ) as IStoredInterestModel;
 
   return models;
 };

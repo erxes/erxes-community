@@ -1,26 +1,22 @@
 import { Document, Schema } from 'mongoose';
 import { schemaHooksWrapper, field } from './utils';
 
-export interface IClassification {
+export interface IStoredInterest {
   description: string;
   invDate: Date;
-  total: number;
-  classification: string;
-  newClassification: string;
-  dtl: {
-    amount: number;
-    contractId: string;
-    currency: string;
-  }[];
+  prevStoredDate: Date;
+  amount: number;
+  contractId: string;
+  type: string;
 }
 
-export interface IClassificationDocument extends IClassification, Document {
+export interface IStoredInterestDocument extends IStoredInterest, Document {
   _id: string;
   createdAt?: Date;
   createdBy?: string;
 }
 
-export const classificationSchema = schemaHooksWrapper(
+export const storedInterestSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     number: field({
@@ -33,10 +29,16 @@ export const classificationSchema = schemaHooksWrapper(
     invDate: field({
       type: Date,
       default: new Date(),
-      label: 'Created at'
+      label: 'invoice date'
     }),
-    contractId: field({ type: String, min: 0, label: 'total' }),
-    amount: field({ type: Number, min: 0, label: 'total' }),
+    prevStoredDate: field({
+      type: Date,
+      default: new Date(),
+      label: 'Prev stored date'
+    }),
+    contractId: field({ type: String, min: 0, label: 'contractId' }),
+    amount: field({ type: Number, min: 0, label: 'amount' }),
+    periodLockId: field({ type: String, min: 0, label: 'periodLockId' }),
     createdAt: field({
       type: Date,
       default: () => new Date(),

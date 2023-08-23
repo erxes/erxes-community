@@ -126,14 +126,6 @@ class BasicInfoSection extends React.Component<Props, State> {
             )}
             <li>
               <ModalTrigger
-                title={__('Interest stop')}
-                trigger={<a href="#toClose">{__('Interest stop')}</a>}
-                size="lg"
-                content={interestChangeForm}
-              />
-            </li>
-            <li>
-              <ModalTrigger
                 title={__('Interest correction')}
                 trigger={<a href="#toClose">{__('Interest correction')}</a>}
                 size="lg"
