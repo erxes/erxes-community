@@ -1,4 +1,4 @@
-FROM node:18.17.1-bookworm-slim
+FROM node:12.19-alpine
 WORKDIR /client-portal/
 RUN chown -R node:node /client-portal
 COPY --chown=node:node . /client-portal
