@@ -17,6 +17,8 @@ const listParamsDef = `
   $customerType: String
   $posId: String
   $types: [String]
+  $statuses: [String]
+  $excludeStatuses: [String]
 `;
 
 const listParamsValue = `
@@ -35,6 +37,8 @@ const listParamsValue = `
   customerType: $customerType
   posId: $posId
   types: $types
+  statuses: $statuses
+  excludeStatuses: $excludeStatuses
 `;
 
 export const orderFields = `
@@ -162,7 +166,7 @@ const coverFields = `
   userId
   details {
     _id
-    paidType    
+    paidType
     paidSummary {
       _id
       kind
@@ -247,6 +251,12 @@ const posOrderRecords = `
   }
 `;
 
+const posOrderRecordsCount = `
+  query posOrderRecordsCount(${listParamsDef}) {
+    posOrderRecordsCount(${listParamsValue})
+  }
+`;
+
 export default {
   posOrders,
   posOrdersSummary,
@@ -255,5 +265,6 @@ export default {
   productCategories,
   covers,
   coverDetail,
-  posOrderRecords
+  posOrderRecords,
+  posOrderRecordsCount
 };

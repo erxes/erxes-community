@@ -95,6 +95,9 @@ export const types = () => `
     currency:String
     storedInterest:Float
     lastStoredDate:Date
+    isPayFirstMonth: Boolean
+    downPayment: Float
+    isBarter: Boolean
   }
 
 
@@ -200,6 +203,9 @@ const commonFields = `
   dealId: String
   skipInterestCalcMonth: Float
   currency:String
+  isPayFirstMonth: Boolean
+  downPayment: Float
+  isBarter: Boolean
 `;
 
 export const mutations = `

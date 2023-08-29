@@ -48,7 +48,7 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     primaryEmail: String
     lastName: String
   }
-  
+
   type PosOrder {
     ${posOrderFields(contactsEnabled)}
   }
@@ -109,6 +109,9 @@ const queryParams = `
   posId: String
   posToken: String
   types: [String]
+  statuses: [String]
+  excludeStatuses: [String] 
+  hasPaidDate: Boolean 
 `;
 
 export const queries = `
@@ -118,6 +121,7 @@ export const queries = `
   posOrdersSummary(${queryParams}): JSON
   posOrdersTotalCount(${queryParams}): JSON
   posOrderRecords(${queryParams}): [PosOrderRecord]
+  posOrderRecordsCount(${queryParams}): Int
 `;
 
 export const mutations = `
