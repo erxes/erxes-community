@@ -166,8 +166,8 @@ class TransactionForm extends React.Component<Props, State> {
           </FormWrapper>
           {this.renderRowTr('Total must pay', 'total')}
           {this.renderRowTr('Payment', 'payment')}
-          {this.renderRowTr('Stored Interest', 'storedInterest', true)}
-          {this.renderRowTr('Interest Nonce', 'interestNonce')}
+          {this.renderRowTr('Stored Interest', 'storedInterest')}
+          {this.renderRowTr('Interest Nonce', 'calcInterest')}
           {this.renderRowTr('Loss', 'undue')}
           {this.renderRowTr('Insurance', 'insurance')}
           {this.renderRowTr('Debt', 'debt')}
@@ -193,8 +193,8 @@ class TransactionForm extends React.Component<Props, State> {
         </FormWrapper>
         {this.renderRow('total', 'total')}
         {this.renderRow('payment', 'payment')}
-        {this.renderRow('interest eve', 'interestEve')}
-        {this.renderRow('interest nonce', 'interestNonce')}
+        {this.renderRow('interest eve', 'storedInterest')}
+        {this.renderRow('interest nonce', 'calcInterest')}
         {this.renderRow('undue', 'undue')}
         {this.renderRow('insurance', 'insurance')}
         {this.renderRow('debt', 'debt')}
