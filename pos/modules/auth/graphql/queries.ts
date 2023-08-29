@@ -59,7 +59,7 @@ const getPaymentConfig = gql`
 `
 
 const getCoverConfig = gql`
-  query getConfigConfig {
+  query getCoverConfig {
     currentConfig {
       paymentTypes
       paymentIds

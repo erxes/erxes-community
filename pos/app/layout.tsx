@@ -36,7 +36,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <head />
         <body
           className={cn(
-            "h-screen w-screen overflow-hidden bg-background font-sans text-xs font-medium antialiased xl:text-sm",
+            "h-screen w-screen overflow-hidden bg-background font-sans text-xs font-medium antialiased xl:text-sm flex flex-col",
             fontSans.variable
           )}
         >

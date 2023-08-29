@@ -6,7 +6,7 @@ import {
   paidAmountsAtom,
   unPaidAmountAtom,
 } from "@/store/order.store"
-import { useAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 
 import { IPaymentType } from "@/types/config.types"
 import { ALL_BANK_CARD_TYPES } from "@/lib/constants"
@@ -26,7 +26,7 @@ export const useCheckNotSplit = () => {
   const [mobileAmount] = useAtom(mobileAmountAtom)
   const [paidAmounts] = useAtom(paidAmountsAtom)
   const [unPaidAmount] = useAtom(unPaidAmountAtom)
-  const [, setCurrentAmount] = useAtom(currentAmountAtom)
+  const setCurrentAmount = useSetAtom(currentAmountAtom)
   const [paymentType, setType] = useAtom(currentPaymentTypeAtom)
   const paymentTypes = filterPaymentTypes(pTs)
 
@@ -56,14 +56,14 @@ export const useCheckNotSplit = () => {
     })
 
   const handleSetType = (type: string) => {
-    if (notSplitPts.includes(type)) {
+    if (!notSplitPts.includes(type)) {
       setCurrentAmount(unPaidAmount)
       setType(type)
     }
     setType(type)
   }
 
-  const disableInput = notSplitPts.includes(paymentType)
+  const disableInput = notSplitPts.includes(paymentType || "")
 
   return { mappedPts, handleSetType, disableInput, paidNotSplit }
 }

@@ -19,6 +19,7 @@ export function DatePicker({
   date,
   setDate,
   disabled,
+  className,
   ...props
 }: CalendarProps & {
   date: Date
@@ -31,7 +32,8 @@ export function DatePicker({
           variant={"outline"}
           className={cn(
             "w-[250px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
+            className
           )}
           disabled={!!disabled}
         >

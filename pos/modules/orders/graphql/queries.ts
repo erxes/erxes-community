@@ -26,7 +26,6 @@ export const orderItemBaseFields = `
 export const orderItemFields = `
     ${orderItemBaseFields}
     unitPrice
-    orderId
     productName
     count
     productId
@@ -98,6 +97,57 @@ const orderDetail = gql`
         ${customerFields}
       }
       customerType
+    }
+  }
+`
+
+const historyDetail = gql`
+  query HistoryDetail($id: String) {
+    orderDetail(_id: $id) {
+      _id
+      createdAt
+      status
+      number
+      dueDate
+      modifiedAt
+      type
+      slotCode
+      user {
+        primaryPhone
+        primaryEmail
+        email
+      }
+      cashAmount
+      mobileAmount
+      totalAmount
+      finalAmount
+      paidAmounts {
+        _id
+        type
+        amount
+        info
+      }
+      paidDate
+      billType
+      customerType
+      customer {
+        primaryPhone
+        firstName
+        primaryEmail
+        lastName
+      }
+
+      deliveryInfo
+
+      items {
+        ${orderItemFields}
+      }
+      registerNumber
+      printedEbarimt
+      billId
+      putResponses {
+        ${putResponseFields}
+      }
     }
   }
 `
@@ -235,6 +285,7 @@ const queries = {
   ordersTotalCount,
   ordersHistory,
   activeOrders,
+  historyDetail,
 }
 
 export default queries

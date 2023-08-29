@@ -1,7 +1,3 @@
-import useGolomt from "@/modules/checkout/hooks/useGolomt"
-import useKhanCard from "@/modules/checkout/hooks/useKhanCard"
-import useTDB from "@/modules/checkout/hooks/useTDB"
-import { paymentConfigAtom } from "@/store/config.store"
 import { SelectProps } from "@radix-ui/react-select"
 import { useAtom } from "jotai"
 
@@ -15,54 +11,59 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { useCheckNotSplit } from "../../hooks/usePaymentType"
+import usePossiblePaymentTerms from "../../hooks/usePossiblePaymentTerms"
 
 const SelectPaymentType = ({ disabled, ...props }: SelectProps) => {
-  const [config] = useAtom(paymentConfigAtom)
-  const { paymentIds } = config || {}
-  const { loading, isAlive } = useKhanCard({skipCheck: true})
-  const { paymentType: tdbInfo } = useTDB()
-  const { isIncluded } = useGolomt()
-  const { mappedPts, paidNotSplit } = useCheckNotSplit()
-
-  const disabledItems = !!paidNotSplit
+  const {
+    loadingKhan,
+    disabledTerms,
+    paymentIds,
+    khan,
+    tdb,
+    golomt,
+    mappedPts,
+  } = usePossiblePaymentTerms()
 
   return (
-    <Select {...props} disabled={loading || disabled}>
+    <Select {...props} disabled={loadingKhan || disabled}>
       <SelectTrigger>
         <SelectValue placeholder="сонгох" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value="cash" disabled={disabledItems}>
+          <SelectItem value="cash" disabled={disabledTerms}>
             Бэлнээр
           </SelectItem>
           {!!paymentIds?.length && (
-            <SelectItem value="mobile" disabled={disabledItems}>
+            <SelectItem value="mobile" disabled={disabledTerms}>
               Цахимаар
             </SelectItem>
           )}
 
-          {isAlive && (
+          {khan && (
             <SelectItem
               value={BANK_CARD_TYPES.KHANBANK}
-              disabled={disabledItems}
+              disabled={disabledTerms}
             >
               Хаан банк
             </SelectItem>
           )}
-          {!!tdbInfo && (
-            <SelectItem value={BANK_CARD_TYPES.TDB} disabled={disabledItems}>
+          {!!tdb && (
+            <SelectItem value={BANK_CARD_TYPES.TDB} disabled={disabledTerms}>
               ХXБанк
             </SelectItem>
           )}
-          {isIncluded && (
-            <SelectItem value={BANK_CARD_TYPES.GOLOMT} disabled={disabledItems}>
+          {golomt && (
+            <SelectItem value={BANK_CARD_TYPES.GOLOMT} disabled={disabledTerms}>
               Голомт банк
             </SelectItem>
           )}
           {mappedPts.map((payment) => (
-            <SelectItem value={payment.type} disabled={payment.disabled}>
+            <SelectItem
+              value={payment.type}
+              disabled={payment.disabled}
+              key={payment.type}
+            >
               {payment.title}
             </SelectItem>
           ))}

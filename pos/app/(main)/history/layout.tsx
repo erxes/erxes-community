@@ -1,10 +1,9 @@
-import { ReactNode } from "react"
 import Link from "next/link"
 import { HistoryIcon } from "lucide-react"
 
 import HeaderLayout from "@/components/header/headerLayout"
 
-const HistoryLayout = ({ children }: { children: ReactNode }) => {
+const HistoryLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <HeaderLayout>

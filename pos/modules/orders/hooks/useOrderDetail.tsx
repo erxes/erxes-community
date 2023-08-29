@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { activeOrderAtom, setOrderStatesAtom } from "@/store/order.store"
-import { DocumentNode, useLazyQuery } from "@apollo/client"
+import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client"
 import { useAtom } from "jotai"
 
 import { IOrder } from "@/types/order.types"
@@ -10,11 +10,13 @@ import { queries } from "../graphql"
 const useOrderDetail = (args?: {
   query?: DocumentNode
   onCompleted?: (data: any) => void
+  skip?: boolean
+  variables?: OperationVariables
 }): {
   loading: boolean
   orderDetail?: IOrder
 } => {
-  const { query, onCompleted } = args || {}
+  const { query, onCompleted, skip, variables } = args || {}
 
   const [activeOrderId] = useAtom(activeOrderAtom)
   const [, setOrderStates] = useAtom(setOrderStatesAtom)
@@ -33,11 +35,12 @@ const useOrderDetail = (args?: {
   )
 
   useEffect(() => {
-    !!activeOrderId &&
+    if ((!!activeOrderId || !!variables) && !skip) {
       getOrderDetail({
-        variables: { _id: activeOrderId },
+        variables: variables || { _id: activeOrderId },
       })
-  }, [activeOrderId, getOrderDetail])
+    }
+  }, [activeOrderId, getOrderDetail, skip, variables])
 
   const { orderDetail } = data || {}
   return { loading, orderDetail }

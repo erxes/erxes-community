@@ -1,9 +1,9 @@
-import { IOrderStatus } from './order.types'
+import { IOrderStatus } from "./order.types"
 
 export interface IFilter {
-  searchValue: string | undefined
+  searchValue: string
   statuses: IOrderStatus[]
-  customerId: string | undefined
+  customerId: string | null
   startDate: string | undefined
   endDate: string | undefined
   isPaid: boolean | undefined

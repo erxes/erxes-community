@@ -41,10 +41,12 @@ const useFullOrders = ({
   fetchPolicy = "network-only",
   query,
   variables,
+  onCountCompleted,
 }: {
   fetchPolicy?: WatchQueryFetchPolicy
   query?: DocumentNode
   variables?: IVariables
+  onCountCompleted?: (data: any) => void
 }): IFullOrdersResult => {
   const PER_PAGE = (variables || {}).perPage || 28
 
@@ -60,10 +62,15 @@ const useFullOrders = ({
     fetchPolicy,
   })
 
+  const { page, perPage, ...restVariables } = variables || {}
   const [getOrdersTotalCount, { loading: loadCount, data: countData }] =
     useLazyQuery(queries.ordersTotalCount, {
-      variables,
+      variables: restVariables,
       fetchPolicy,
+      onCompleted(data) {
+        const { ordersTotalCount } = data || {}
+        !!onCountCompleted && onCountCompleted(ordersTotalCount)
+      },
     })
 
   const fullOrders = (data || {}).fullOrders || []

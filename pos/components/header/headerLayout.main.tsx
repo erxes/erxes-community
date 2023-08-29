@@ -11,7 +11,7 @@ const HeaderLayout = ({ children }: { children?: React.ReactNode }) => {
   const { details, email } = currentUser || {}
   const { fullName, position } = details || {}
   return (
-    <header className="flex flex-none items-center border-b px-5 py-3">
+    <header className="flex flex-none items-center border-b px-5 py-3 print:hidden">
       <div className="flex w-auto items-center  sm:w-1/3">
         <HeaderMenu />
         <Logo />

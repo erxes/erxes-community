@@ -65,7 +65,9 @@ export const HorizontalScrollMenu = ({
   )
 }
 
-export const ScrollMenuItem = (props: ItemProps) => <div {...props} />
+export const ScrollMenuItem = ({ itemID, ...props }: ItemProps) => (
+  <div {...props} />
+)
 
 function Arrow({
   children,

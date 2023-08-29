@@ -1,12 +1,15 @@
 "use client"
 
 import { useUsers } from "@/modules/auth/hooks/useUser"
-import { filterAtom } from "@/store/history.store"
+import { defaultFilter, filterAtom } from "@/store/history.store"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { formatISO, subDays } from "date-fns"
 import { useAtom } from "jotai"
+import { SearchIcon, XIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { IOrderStatus } from "@/types/order.types"
 import { ORDER_STATUSES } from "@/lib/constants"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -28,9 +31,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 
 const FormSchema = z.object({
-  search: z.string().optional(),
+  searchValue: z.string(),
   dateType: z.string().optional(),
   range: z
     .object({
@@ -38,23 +42,74 @@ const FormSchema = z.object({
       to: z.date(),
     })
     .optional(),
-  status: z.array(z.string()).optional(),
+  statuses: z.array(z.string()).optional(),
   customerType: z.string().optional(),
-  customerId: z.string().optional(),
+  customerId: z.string().nullable(),
   isPaid: z.boolean().optional(),
   sort: z.string().optional(),
 })
 
 const Filter = () => {
-  const [values, setFilter] = useAtom(filterAtom)
+  const [filter, setFilter] = useAtom(filterAtom)
+
+  const {
+    searchValue,
+    startDate,
+    endDate,
+    statuses,
+    customerId,
+    isPaid,
+    sortField,
+    sortDirection,
+  } = defaultFilter
+
+  const defaultValues = {
+    searchValue,
+    range: {
+      from: new Date(startDate || defaultFilter.startDate),
+      to: new Date(endDate || defaultFilter.startDate),
+    },
+    statuses,
+    customerId: customerId || "empty_field",
+    isPaid: typeof isPaid === "boolean" ? isPaid : undefined,
+    sort:
+      sortField && sortDirection
+        ? sortField + (sortDirection === 1 ? "_asc" : "_desc")
+        : "createdAt_asc",
+  }
 
   const { users } = useUsers()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    values,
+    defaultValues,
   })
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => console.log(data)
+  const onSubmit = ({
+    searchValue,
+    dateType,
+    range,
+    statuses,
+    customerType,
+    customerId,
+    isPaid,
+    sort,
+  }: z.infer<typeof FormSchema>) => {
+    const { from, to } = range || {}
+    const sortField = sort?.split("_")[0]
+    const sortDirection = sort?.split("_")[1] === "asc" ? 1 : -1
+    setFilter({
+      ...filter,
+      page: 1,
+      searchValue,
+      statuses: (statuses || []) as IOrderStatus[],
+      customerId: customerId === "empty_field" ? null : customerId,
+      startDate: formatISO(new Date(from || subDays(new Date(), 10))),
+      endDate: formatISO(new Date(to || new Date())),
+      isPaid: typeof isPaid === "boolean" ? isPaid : undefined,
+      sortField,
+      sortDirection,
+    })
+  }
 
   return (
     <div className="px-4 py-3">
@@ -66,12 +121,12 @@ const Filter = () => {
         >
           <FormField
             control={form.control}
-            name="search"
+            name="searchValue"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Хайх</FormLabel>
                 <FormControl>
-                  <Input placeholder="Хайх..." {...field} />
+                  <Input placeholder="Хайх..." {...field} value={field.value} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,7 +152,7 @@ const Filter = () => {
           />
           <FormField
             control={form.control}
-            name="status"
+            name="statuses"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Хайх</FormLabel>
@@ -123,11 +178,25 @@ const Filter = () => {
               <FormItem>
                 <FormLabel>Хэрэглэгч сонгох</FormLabel>
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ? field.value : ""}
+                    onValueChange={(value) => {
+                      if (value === "empty_field") {
+                        field.onChange(null)
+                      } else {
+                        field.onChange(value)
+                      }
+                    }}
+                  >
                     <SelectTrigger className="col-span-2">
                       <SelectValue placeholder="Хэрэглэгч сонгох" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem
+                        value="empty_field"
+                        className="h-8"
+                      ></SelectItem>
+
                       {users.map(({ _id, primaryEmail, email }) => (
                         <SelectItem value={_id} key={_id}>
                           {primaryEmail || email}
@@ -152,16 +221,16 @@ const Filter = () => {
                       <SelectValue placeholder="Ангилал сонгох" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="createdAt_asc">
+                      <SelectItem value="createdAt_desc">
                         Сүүлд нэмэгдсэн
                       </SelectItem>
-                      <SelectItem value="createdAt_desc">
+                      <SelectItem value="createdAt_asc">
                         Эхэлж нэмэгдсэн
                       </SelectItem>
-                      <SelectItem value="modifiedAt_asc">
+                      <SelectItem value="modifiedAt_desc">
                         Сүүлд өөрчилсөн
                       </SelectItem>
-                      <SelectItem value="modifiedAt_desc">
+                      <SelectItem value="modifiedAt_asc">
                         Эхэлж өөрчилсөн
                       </SelectItem>
                     </SelectContent>
@@ -177,8 +246,8 @@ const Filter = () => {
             render={({ field }) => (
               <FormItem className="flex h-10 items-center space-x-2">
                 <FormControl>
-                  <Checkbox
-                    checked={field.value}
+                  <Switch
+                    checked={!!field.value}
                     onCheckedChange={field.onChange}
                   />
                 </FormControl>
@@ -187,8 +256,20 @@ const Filter = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" variant={"secondary"}>
-            Шүүх
+          <Button type="submit">
+            <SearchIcon className="h-5 w-5 mr-1" />
+            Хайх
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              form.reset()
+              setFilter(defaultFilter)
+            }}
+          >
+            <XIcon className="h-5 w-5 mr-1" />
+            Цэвэрлэх
           </Button>
         </form>
       </Form>

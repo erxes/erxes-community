@@ -16,7 +16,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const Pagination = ({ totalCount }: { totalCount: number }) => {
+const Pagination = ({
+  totalCount,
+  loading,
+}: {
+  totalCount: number
+  loading: boolean
+}) => {
   const [filter, setFilter] = useAtom(filterAtom)
   const totalPage = Math.ceil(totalCount / (filter.perPage || 10))
 
@@ -27,8 +33,16 @@ const Pagination = ({ totalCount }: { totalCount: number }) => {
       <Select
         value={(filter.perPage || 10).toString()}
         onValueChange={(value) =>
-          setFilter({ ...filter, perPage: Number(value) })
+          setFilter({
+            ...filter,
+            perPage: Number(value),
+            page:
+              filter.page > Math.ceil(totalCount / Number(value))
+                ? 1
+                : filter.page,
+          })
         }
+        disabled={loading}
       >
         <SelectTrigger className="h-8 w-[70px]">
           <SelectValue />
@@ -50,7 +64,7 @@ const Pagination = ({ totalCount }: { totalCount: number }) => {
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => setFilter({ ...filter, page: 1 })}
-            disabled={filter.page === 1}
+            disabled={filter.page === 1 || loading}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeftIcon className="h-4 w-4" />
@@ -58,7 +72,7 @@ const Pagination = ({ totalCount }: { totalCount: number }) => {
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={filter.page === 1}
+            disabled={filter.page === 1 || loading}
             onClick={() => setFilter({ ...filter, page: filter.page - 1 })}
           >
             <span className="sr-only">Go to previous page</span>
@@ -67,7 +81,7 @@ const Pagination = ({ totalCount }: { totalCount: number }) => {
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            disabled={filter.page === totalPage}
+            disabled={filter.page === totalPage || loading}
             onClick={() => setFilter({ ...filter, page: filter.page + 1 })}
           >
             <span className="sr-only">Go to next page</span>
@@ -77,7 +91,7 @@ const Pagination = ({ totalCount }: { totalCount: number }) => {
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => setFilter({ ...filter, page: totalPage })}
-            disabled={filter.page === totalPage}
+            disabled={filter.page === totalPage || loading}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRightIcon className="h-4 w-4" />

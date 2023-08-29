@@ -1,12 +1,13 @@
 import {
   coverConfigAtom,
-  setCoverConfigAtom,
-  setEbarimtConfigAtom,
+  ebarimtConfigAtom,
+  paymentConfigAtom,
 } from "@/store/config.store"
 import { useQuery } from "@apollo/client"
-import { useAtom } from "jotai"
+import { useSetAtom } from "jotai"
 
-import { IConfig, IPaymentConfig } from "@/types/config.types"
+import { IConfig, IPaymentConfig, IPaymentType } from "@/types/config.types"
+import { strToObj } from "@/lib/utils"
 
 import { queries } from "../graphql"
 
@@ -30,8 +31,10 @@ const useConfig = (
   loading: boolean
 } => {
   const { onCompleted, skip } = options || {}
-  const [, setEbarimtConfig] = useAtom(setEbarimtConfigAtom)
-  const [, setCoverConfig] = useAtom(setCoverConfigAtom)
+  const setEbarimtConfig = useSetAtom(ebarimtConfigAtom)
+  const setCoverConfig = useSetAtom(coverConfigAtom)
+  const setPaymentConfig = useSetAtom(paymentConfigAtom)
+
   const { data, loading } = useQuery(queryObject[type], {
     onCompleted({ currentConfig }) {
       if (type === "ebarimt") {
@@ -39,6 +42,16 @@ const useConfig = (
       }
       if (type === "cover") {
         setCoverConfig(currentConfig)
+      }
+      if (type === "payment") {
+        const { paymentTypes, ...rest } = currentConfig
+
+        const paymentTypeWithConfig = paymentTypes.map((pt: IPaymentType) => ({
+          ...pt,
+          config: strToObj(pt.config),
+        }))
+
+        setPaymentConfig({ ...rest, paymentTypes: paymentTypeWithConfig })
       }
       onCompleted && onCompleted(currentConfig)
     },

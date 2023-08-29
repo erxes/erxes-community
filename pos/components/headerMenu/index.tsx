@@ -25,6 +25,8 @@ import { Separator } from "../ui/separator"
 
 const HeaderMenu = () => {
   const mode = getMode()
+  const menu =
+    mode === "market" ? supermarketMenu : supermarketMenu.concat(progressMenu)
   return (
     <div
       className={cn(
@@ -73,7 +75,7 @@ const MenuItem = ({ href, Icon, text }: any) => (
   </li>
 )
 
-const menu = [
+const supermarketMenu = [
   {
     href: "history",
     Icon: HistoryIcon,
@@ -90,6 +92,14 @@ const menu = [
     text: "Хаалт",
   },
   {
+    href: "settings",
+    Icon: SettingsIcon,
+    text: "Тохиргоо",
+  },
+]
+
+const progressMenu = [
+  {
     href: "progress",
     Icon: PackagePlus,
     text: "Бэлтгэл",
@@ -98,11 +108,6 @@ const menu = [
     href: "waiting",
     Icon: HourglassIcon,
     text: "Хүлээлгэ",
-  },
-  {
-    href: "settings",
-    Icon: SettingsIcon,
-    text: "Тохиргоо",
   },
 ]
 export default HeaderMenu
