@@ -36,30 +36,56 @@ class CategoryStatusFilter extends React.Component<IProps> {
     return (
       <Box
         extraButtons={extraButtons}
-        title={__('Filter category by status')}
+        title={__('Filter by status')}
         name="showFilterByType"
       >
         <SidebarList>
-          {categoryStatusChoises(__).map(
-            ({ value, label }: { value: string; label: string }) => {
-              return (
-                <li key={Math.random()}>
-                  <a
-                    href="#filter"
-                    tabIndex={0}
-                    className={
-                      router.getParam(history, [paramKey]) === value
-                        ? 'active'
-                        : ''
-                    }
-                    onClick={onClick.bind(this, paramKey, value)}
-                  >
-                    <FieldStyle>{label}</FieldStyle>
-                  </a>
-                </li>
-              );
-            }
-          )}
+          <li>
+            <Box title={__('FILTER PRODUCT BY STATUS')} name="showfilerByType">
+              {categoryStatusChoises(__).map(
+                ({ value, label }: { value: string; label: string }) =>
+                  (value === 'active' || value === 'deleted') && (
+                    <a
+                      href="#filter"
+                      tabIndex={0}
+                      className={
+                        router.getParam(history, [paramKey]) === value
+                          ? 'active'
+                          : ''
+                      }
+                      onClick={onClick.bind(this, paramKey, value)}
+                    >
+                      <FieldStyle>{label}</FieldStyle>
+                    </a>
+                  )
+              )}
+            </Box>
+
+            <Box
+              title={__('FILTER CATEGORY BY STATUS')}
+              name="showFilterByType"
+            >
+              {categoryStatusChoises(__).map(
+                ({ value, label }: { value: string; label: string }) =>
+                  (value === 'disabled' || value === 'archived') && (
+                    <li key={Math.random()}>
+                      <a
+                        href="#filter"
+                        tabIndex={0}
+                        className={
+                          router.getParam(history, [paramKey]) === value
+                            ? 'active'
+                            : ''
+                        }
+                        onClick={onClick.bind(this, paramKey, value)}
+                      >
+                        <FieldStyle>{label}</FieldStyle>
+                      </a>
+                    </li>
+                  )
+              )}
+            </Box>
+          </li>
         </SidebarList>
       </Box>
     );
