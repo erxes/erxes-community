@@ -16,6 +16,7 @@ import TagFilter from '../../containers/TagFilter';
 import { IProductCategory } from '../../types';
 import ProductTypeFilter from '../product/filters/ProdcutTypeFilter';
 import CategoryStatusFilter from '../product/filters/CategoryStatusFilter';
+import ProductStatusFilter from '../product/filters/ProductStatusFilter';
 import SegmentFilter from '../product/filters/SegmentFilter';
 import { pluginsOfProductCategoryActions } from 'coreui/pluginUtils';
 import { isEnabled } from '@erxes/ui/src/utils/core';
@@ -192,6 +193,7 @@ class List extends React.Component<IProps> {
           <SegmentFilter loadingMainQuery={this.props.loading} />
         )}
         <CategoryStatusFilter />
+        <ProductStatusFilter />
         <ProductTypeFilter />
         {isEnabled('tags') && <TagFilter />}
       </Sidebar>

@@ -1,7 +1,8 @@
 import { generateCategoryOptions } from '@erxes/ui/src/utils';
 import {
   PRODUCT_TYPE_CHOISES,
-  PRODUCT_CATEGORIES_STATUS_FILTER
+  PRODUCT_CATEGORIES_STATUS_FILTER,
+  PRODUCT_STATUS_FILTER
 } from './constants';
 
 export { generateCategoryOptions };
@@ -31,7 +32,21 @@ export const categoryStatusChoises = __ => {
 
   return options;
 };
+export const productStatusChoises = __ => {
+  const options: Array<{
+    value: string;
+    label: string;
+  }> = [];
 
+  for (const key of Object.keys(PRODUCT_STATUS_FILTER)) {
+    options.push({
+      value: key,
+      label: __(PRODUCT_STATUS_FILTER[key])
+    });
+  }
+
+  return options;
+};
 export const isValidBarcode = (barcode: string): boolean => {
   // check length
   if (

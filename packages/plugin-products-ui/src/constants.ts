@@ -9,6 +9,10 @@ export const PRODUCT_CATEGORIES_STATUS_FILTER = {
   disabled: 'Disabled',
   archived: 'Archived'
 };
+export const PRODUCT_STATUS_FILTER = {
+  active: 'Active',
+  deleted: 'Deleted'
+};
 
 export const CONFIGS_KEY_LABELS = {
   isRequireUOM: 'is required UOM'
