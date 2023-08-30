@@ -31,6 +31,7 @@ export const categoryStatusChoises = __ => {
 
   return options;
 };
+
 export const isValidBarcode = (barcode: string): boolean => {
   // check length
   if (
