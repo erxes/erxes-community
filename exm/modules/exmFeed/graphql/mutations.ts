@@ -163,6 +163,14 @@ const commentRemove =`
   }
 `;
 
+const chatForward = `
+  mutation chatForward($chatId: String, $userIds: [String], $content: String, $attachments: [JSON]) {
+    chatForward(chatId: $chatId, userIds: $userIds, content: $content, attachments: $attachments) {
+      _id
+    }
+  }
+`
+
 export default {
   addFeed,
   editFeed,
@@ -180,5 +188,6 @@ export default {
   chatToggleIsPinned,
   emojiReact,
   commentAdd,
-  commentRemove
+  commentRemove,
+  chatForward
 };

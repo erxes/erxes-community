@@ -2,6 +2,7 @@ import React from "react";
 // erxes
 import Avatar from "../../../common/nameCard/Avatar";
 import Icon from "../../../common/Icon";
+import Button from "../../../common/Button";
 import { IUser } from "../../../auth/types";
 // local
 import {
@@ -27,10 +28,21 @@ type Props = {
   notContactUser?: IUser;
   currentUser: IUser;
   handlePin: (chatId: string) => void;
+  isForward?: boolean;
+  forwardChat?: (chatId?: string) => void;
+  forwardedChatIds?: string[];
 };
 
 const ChatItem = (props: Props) => {
-  const { chat, notContactUser, currentUser, createChat } = props;
+  const {
+    chat,
+    notContactUser,
+    currentUser,
+    createChat,
+    isForward,
+    forwardChat,
+    forwardedChatIds,
+  } = props;
 
   const users: any[] = chat?.participantUsers || [];
   const user: any =
@@ -73,6 +85,65 @@ const ChatItem = (props: Props) => {
     );
   };
 
+  const handleChatForward = () => {
+    if (chat) {
+      forwardChat(chat._id);
+    }
+    if (notContactUser) {
+      createChat([notContactUser._id, currentUser._id]);
+    }
+  };
+
+  const renderChatActions = () => {
+    if (isForward) {
+      return (forwardedChatIds || []).includes(chat?._id) ? (
+        <Button
+          btnStyle="link"
+          disabled={true}
+          size="small"
+          onClick={() => handleChatForward()}
+        >
+          Sent
+        </Button>
+      ) : (
+        <Button
+          btnStyle="simple"
+          size="small"
+          onClick={() => handleChatForward()}
+        >
+          Send
+        </Button>
+      );
+    }
+
+    return (
+      chat && (
+        <ChatActions>
+          <Dropdown alignRight={true}>
+            <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
+              <ChatActionItem>
+                <Icon icon="ellipsis-h" size={14} />
+              </ChatActionItem>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <ContextMenuList>
+                <ContextMenuItem onClick={() => props.handlePin(chat._id)}>
+                  {chat?.isPinned ? "Unpin" : "Pin"}
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => props.markAsRead()}>
+                  {chat && chat.isSeen ? "Mark as unread" : "Mark as read"}
+                </ContextMenuItem>
+                <ContextMenuItem color="red" onClick={() => props.remove()}>
+                  Delete Chat
+                </ContextMenuItem>
+              </ContextMenuList>
+            </Dropdown.Menu>
+          </Dropdown>
+        </ChatActions>
+      )
+    );
+  };
+
   return (
     <ChatItemWrapper id="ChatItemWrapper" isWidget={true}>
       {chat &&
@@ -99,30 +170,7 @@ const ChatItem = (props: Props) => {
       >
         {renderInfo()}
       </ChatWrapper>
-      {chat && (
-        <ChatActions>
-          <Dropdown alignRight={true}>
-            <Dropdown.Toggle as={DropdownToggle} id="comment-settings">
-              <ChatActionItem>
-                <Icon icon="ellipsis-h" size={14} />
-              </ChatActionItem>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <ContextMenuList>
-                <ContextMenuItem onClick={() => props.handlePin(chat._id)}>
-                  {chat?.isPinned ? "Unpin" : "Pin"}
-                </ContextMenuItem>
-                <ContextMenuItem onClick={() => props.markAsRead()}>
-                  {chat && chat.isSeen ? "Mark as unread" : "Mark as read"}
-                </ContextMenuItem>
-                <ContextMenuItem color="red" onClick={() => props.remove()}>
-                  Delete Chat
-                </ContextMenuItem>
-              </ContextMenuList>
-            </Dropdown.Menu>
-          </Dropdown>
-        </ChatActions>
-      )}
+      {renderChatActions()}
     </ChatItemWrapper>
   );
 };

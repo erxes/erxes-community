@@ -18,6 +18,7 @@ import {
   MessageAttachmentWrapper,
   MessageBy,
 } from "../../styles";
+import ChatForward from "../../containers/chat/ChatForward";
 
 dayjs.extend(calendar);
 
@@ -85,7 +86,7 @@ const MessageItem = (props: Props) => {
             <p>{draftContent.contentBlocks[0].text}</p>
           </MessageReply>
         )}
-        {(chatType === "group" && !isMe) && (
+        {chatType === "group" && !isMe && (
           <MessageBy>
             {message.createdUser &&
               (message.createdUser.details.fullName ||
@@ -101,6 +102,11 @@ const MessageItem = (props: Props) => {
               <Icon icon="reply" color="#9d9d9d" />
             </MessageOption>
           </Tip>
+          <ChatForward
+            content={message.content}
+            attachments={message.attachments}
+            currentUser={currentUser}
+          />
           <Tip
             placement="top"
             text={message.createdAt && dayjs(message.createdAt).calendar()}

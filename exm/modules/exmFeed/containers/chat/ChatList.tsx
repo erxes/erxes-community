@@ -8,6 +8,9 @@ import Alert from "../../../utils/Alert";
 type Props = {
   currentUser: IUser;
   handleActive?: (chatId: string) => void;
+  isForward?: boolean;
+  forwardChat?: (chatId?: string) => void;
+  forwardedChatIds?: string[];
 };
 
 const ChatListContainer = (props: Props) => {
@@ -44,6 +47,7 @@ const ChatListContainer = (props: Props) => {
       users={users}
       chats={chatsQuery.data?.chats.list || []}
       togglePinned={togglePinned}
+      forwardChat={props.forwardChat}
     />
   );
 };

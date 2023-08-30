@@ -984,7 +984,7 @@ export const MessageOption = styled.button`
   border: 0;
   outline: 0;
   cursor: pointer;
-  margin: auto ${dimensions.unitSpacing}px;
+  margin: auto;
 
   &:hover {
     background-color: ${colors.bgGray};
@@ -997,6 +997,7 @@ export const MessageBody = styledTS<{ me?: boolean }>(styled.div)`
   justify-content: ${props => (props.me ? 'flex-end' : 'flex-start')};
   align-items: ${props => (props.me ? 'flex-end' : 'flex-start')};
   flex-direction: ${props => (props.me ? 'row' : 'row-reverse')};
+  gap: 5px;
 
   &:hover {
     ${MessageOption} {

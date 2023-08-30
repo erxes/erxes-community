@@ -17,6 +17,9 @@ type Props = {
   currentUser: IUser;
   handlePin: (chatId: string) => void;
   notContactUser?: IUser;
+  isForward?: boolean;
+  forwardChat?: (chatId?: string) => void;
+  forwardedChatIds?: string[];
 };
 
 const ChatItemContainer = (props: Props) => {
@@ -59,7 +62,12 @@ const ChatItemContainer = (props: Props) => {
       ],
     })
       .then(({ data }) => {
-        handleClickItem(data.chatAdd._id);
+        if (handleClickItem) {
+          handleClickItem(data.chatAdd._id);
+        }
+        if (props.forwardChat) {
+          props.forwardChat(data.chatAdd._id);
+        }
       })
       .catch((error) => {
         Alert.error(error.message);
@@ -72,6 +80,7 @@ const ChatItemContainer = (props: Props) => {
       createChat={(userIds) => createChat(userIds)}
       remove={remove}
       markAsRead={markAsRead}
+      forwardChat={props.forwardChat}
     />
   );
 };

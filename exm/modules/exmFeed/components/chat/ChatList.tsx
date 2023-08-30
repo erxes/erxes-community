@@ -22,6 +22,9 @@ type Props = {
   currentUser: IUser;
   handleActive?: (chatId: string) => void;
   togglePinned: (chatId) => void;
+  isForward?: boolean;
+  forwardChat?: (chatId?: string) => void;
+  forwardedChatIds?: string[];
 };
 
 export default function ChatList({
@@ -30,6 +33,9 @@ export default function ChatList({
   currentUser,
   handleActive,
   togglePinned,
+  isForward,
+  forwardChat,
+  forwardedChatIds,
 }: Props) {
   const contactedUsers = chats.map(
     (c) => c.type === "direct" && c.participantUsers[0]?._id
@@ -76,6 +82,9 @@ export default function ChatList({
                   handlePin={handlePin}
                   currentUser={currentUser}
                   handleClickItem={() => handleActive(c._id)}
+                  isForward={isForward}
+                  forwardChat={forwardChat}
+                  forwardedChatIds={forwardedChatIds}
                 />
               )
           )}
@@ -119,26 +128,38 @@ export default function ChatList({
         <>
           {pinnedChatIds.length !== 0 && renderPinnedChats(true)}
           <ChatListHeader>
-            <ModalTrigger
-              title="Create a group chat"
-              trigger={<label>{__("Create a group chat")}</label>}
-              content={(props) => (
-                <CreateGroupChat {...props} handleClickItem={handleActive} />
-              )}
-            />
-            <ModalTrigger
-              title="Create a group chat"
-              trigger={
-                <IconButton>
-                  <Tip placement="top" text="Create group chat">
-                    <Icon icon="users" size={15} />
-                  </Tip>
-                </IconButton>
-              }
-              content={(props) => (
-                <CreateGroupChat {...props} handleClickItem={handleActive} />
-              )}
-            />
+            {isForward ? (
+              "Your groups"
+            ) : (
+              <>
+                <ModalTrigger
+                  title="Create a group chat"
+                  trigger={<label>{__("Create a group chat")}</label>}
+                  content={(props) => (
+                    <CreateGroupChat
+                      {...props}
+                      handleClickItem={handleActive}
+                    />
+                  )}
+                />
+                <ModalTrigger
+                  title="Create a group chat"
+                  trigger={
+                    <IconButton>
+                      <Tip placement="top" text="Create group chat">
+                        <Icon icon="users" size={15} />
+                      </Tip>
+                    </IconButton>
+                  }
+                  content={(props) => (
+                    <CreateGroupChat
+                      {...props}
+                      handleClickItem={handleActive}
+                    />
+                  )}
+                />
+              </>
+            )}
           </ChatListHeader>
           {chats.map((c) => {
             if (!c.isPinned && c.type === "group") {
@@ -148,6 +169,9 @@ export default function ChatList({
                   currentUser={currentUser}
                   handleClickItem={() => handleActive(c._id)}
                   handlePin={handlePin}
+                  isForward={isForward}
+                  forwardChat={forwardChat}
+                  forwardedChatIds={forwardedChatIds}
                 />
               );
             }
@@ -169,6 +193,9 @@ export default function ChatList({
                 chat={chat}
                 handleClickItem={() => handleActive(chat._id)}
                 handlePin={handlePin}
+                isForward={isForward}
+                forwardChat={forwardChat}
+                forwardedChatIds={forwardedChatIds}
               />
             );
           }
@@ -185,6 +212,9 @@ export default function ChatList({
                 hasOptions={true}
                 handleClickItem={handleActive}
                 handlePin={handlePin}
+                isForward={isForward}
+                forwardChat={forwardChat}
+                forwardedChatIds={forwardedChatIds}
               />
             );
           }
@@ -207,6 +237,9 @@ export default function ChatList({
                 handleClickItem={() => handleActive(groupChat._id)}
                 key={groupChat.name}
                 handlePin={handlePin}
+                isForward={isForward}
+                forwardChat={forwardChat}
+                forwardedChatIds={forwardedChatIds}
               />
             ))}
             {filteredUsers.map((user) => {
@@ -219,6 +252,9 @@ export default function ChatList({
                     hasOptions={true}
                     handleClickItem={handleActive}
                     handlePin={handlePin}
+                    isForward={isForward}
+                    forwardChat={forwardChat}
+                    forwardedChatIds={forwardedChatIds}
                   />
                 );
               }
@@ -231,6 +267,9 @@ export default function ChatList({
                       chat={chat}
                       handleClickItem={() => handleActive(chat._id)}
                       handlePin={handlePin}
+                      isForward={isForward}
+                      forwardChat={forwardChat}
+                      forwardedChatIds={forwardedChatIds}
                     />
                   );
                 }
