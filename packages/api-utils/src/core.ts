@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import * as strip from 'strip';
-import * as Random from 'meteor-random';
+import { nanoid } from 'nanoid';
 import { IUserDocument } from './types';
 import { IPermissionDocument } from './definitions/permissions';
 
@@ -222,7 +222,7 @@ export const getUniqueValue = async (
   defaultValue?: string
 ) => {
   const getRandomValue = (type: string) =>
-    type === 'email' ? generateRandomEmail() : Random.id();
+    type === 'email' ? generateRandomEmail() : nanoid();
 
   let uniqueValue = defaultValue || getRandomValue(fieldName);
 

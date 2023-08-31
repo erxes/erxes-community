@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import * as Random from 'meteor-random';
+import { nanoid } from 'nanoid';
 
 import { IAttachment } from '@erxes/api-utils/src/types';
 import { ICustomer } from './types';
@@ -47,7 +47,7 @@ const prepareEmailHeader = (
   const header: any = {
     'X-SES-CONFIGURATION-SET': configSet || 'erxes',
     CustomerId: customerId,
-    MailMessageId: Random.id()
+    MailMessageId: nanoid()
   };
 
   if (engageMessageId) {
