@@ -65,7 +65,7 @@ export const HorizontalScrollMenu = ({
   )
 }
 
-export const ScrollMenuItem = ({ itemID, ...props }: ItemProps) => (
+export const ScrollMenuItem = ({ itemId, ...props }: ItemProps) => (
   <div {...props} />
 )
 

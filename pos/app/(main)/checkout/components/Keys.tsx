@@ -1,5 +1,6 @@
+import useHandlePayment from "@/modules/checkout/hooks/useHandlePayment"
 import { currentAmountAtom } from "@/store"
-import { useAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"
@@ -18,14 +19,15 @@ const Keys = () => {
 }
 
 const ControlButton = ({ value }: { value: string | number }) => {
-  const [amount, setAmount] = useAtom(currentAmountAtom)
+  const amount = useAtomValue(currentAmountAtom)
+  const { handleValueChange } = useHandlePayment()
   const handleClick = () => {
-    if (value === "C") return setAmount(0)
+    if (value === "C") return handleValueChange("0")
 
     if (value === "CE")
-      return setAmount(Number(amount.toString().slice(0, -1) || 0))
+      return handleValueChange(amount.toString().slice(0, -1) || "0")
 
-    return setAmount(Number(amount.toString() + value))
+    return handleValueChange(amount.toString() + value)
   }
 
   return (

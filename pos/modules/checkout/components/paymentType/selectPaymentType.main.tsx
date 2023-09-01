@@ -26,6 +26,7 @@ const SelectPaymentTypeMain = () => {
     golomt,
     mappedPts,
   } = usePossiblePaymentTerms()
+  
 
   const { loading } = useConfig("payment")
 
@@ -33,29 +34,52 @@ const SelectPaymentTypeMain = () => {
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <Term Icon={Wallet} title="Бэлнээр" type="cash" />
+      <Term
+        Icon={Wallet}
+        title="Бэлнээр"
+        type="cash"
+        disabled={disabledTerms || loadingKhan}
+      />
       {!!paymentIds?.length && (
-        <Term Icon={SmartphoneNfcIcon} title="Цахимаар" type="mobile" />
+        <Term
+          Icon={SmartphoneNfcIcon}
+          title="Цахимаар"
+          type="mobile"
+          disabled={disabledTerms}
+        />
       )}
       {khan && (
         <Term
           Icon={LandmarkIcon}
           title="Хаан банк"
           type={BANK_CARD_TYPES.KHANBANK}
+          disabled={disabledTerms}
         />
       )}
       {!!tdb && (
-        <Term Icon={LandmarkIcon} title="ХX банк" type={BANK_CARD_TYPES.TDB} />
+        <Term
+          Icon={LandmarkIcon}
+          title="ХX банк"
+          type={BANK_CARD_TYPES.TDB}
+          disabled={disabledTerms}
+        />
       )}
       {!!golomt && (
         <Term
           Icon={LandmarkIcon}
           title="Голомт банк"
           type={BANK_CARD_TYPES.GOLOMT}
+          disabled={disabledTerms}
         />
       )}
       {mappedPts.map((payment) => (
-        <Term Icon={CoinsIcon} title={payment.title} type={payment.type} />
+        <Term
+          Icon={CoinsIcon}
+          title={payment.title}
+          type={payment.type}
+          key={payment.type}
+          disabled={payment.disabled || disabledTerms}
+        />
       ))}
     </div>
   )
@@ -65,10 +89,12 @@ const Term = ({
   Icon,
   title,
   type,
+  disabled,
 }: {
   Icon: LucideIcon
   title: string
   type: string
+  disabled?: boolean
 }) => {
   const { handleSetType } = useCheckNotSplit()
 
@@ -77,6 +103,7 @@ const Term = ({
       variant="secondary"
       className="flex items-center bg-transparent text-white p-4 font-semibold text-sm rounded-lg border border-slate-500 h-auto hover:bg-secondary/10 justify-between"
       onClick={() => handleSetType(type)}
+      disabled={disabled}
     >
       <span className="flex items-center">
         <Icon className="mr-2" /> {title}

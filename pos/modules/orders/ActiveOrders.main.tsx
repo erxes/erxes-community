@@ -48,7 +48,7 @@ const ActiveOrders = () => {
               <Button
                 size="sm"
                 loading={loading}
-                className="whitespace-nowrap font-bold"
+                className="whitespace-nowrap font-bold my-2"
                 onClick={handleLoadMore}
               >
                 Цааш үзэх {fullOrders.length} / {totalCount}

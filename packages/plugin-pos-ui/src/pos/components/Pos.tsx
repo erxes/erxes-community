@@ -352,11 +352,11 @@ class Pos extends React.Component<Props, State> {
                 onClick={this.onStepClick}
                 noButton={true}
               >
-                <Appearance
+                {/* <Appearance
                   onChange={this.onChange}
                   uiOptions={uiOptions}
                   logoPreviewUrl={logoPreviewUrl}
-                />
+                /> */}
               </Step>
               <Step
                 img="/images/icons/erxes-14.svg"

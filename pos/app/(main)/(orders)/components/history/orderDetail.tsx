@@ -12,7 +12,6 @@ import {
   CheckCircle,
   CircleIcon,
   GaugeCircle,
-  GaugeCircleIcon,
   HashIcon,
   LampIcon,
   LucideIcon,
@@ -26,7 +25,6 @@ import {
 import { IOrderStatus } from "@/types/order.types"
 import { ORDER_STATUSES } from "@/lib/constants"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 import Items from "./items"

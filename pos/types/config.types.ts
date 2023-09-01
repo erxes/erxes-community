@@ -7,6 +7,9 @@ export interface IConfig {
   cashierIds?: string[]
   adminIds?: string[]
   createdAt?: string
+  waitingScreen?: {
+    isActive?: boolean
+  }
   uiOptions?: {
     colors: string
     logo: string

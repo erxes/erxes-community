@@ -1,14 +1,26 @@
 import { currentAmountAtom, currentPaymentTypeAtom } from "@/store"
-import { useAtom, useSetAtom } from "jotai"
+import { unPaidAmountAtom } from "@/store/order.store"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Keys from "@/app/(main)/checkout/components/Keys"
 
+import useHandlePayment from "../../hooks/useHandlePayment"
+import { useCheckNotSplit } from "../../hooks/usePaymentType"
+import PaymentSheet from "./paymentSheet"
+
 const PaymentType = () => {
   const setPaymentTerm = useSetAtom(currentPaymentTypeAtom)
-  const [amount, setAmount] = useAtom(currentAmountAtom)
+  const {
+    handleValueChange,
+    handlePay,
+    loading,
+    currentAmount,
+    notPaidAmount,
+  } = useHandlePayment()
+  const { disableInput } = useCheckNotSplit()
 
   return (
     <div>
@@ -19,14 +31,22 @@ const PaymentType = () => {
             <Input
               className="border-none px-2 "
               focus={false}
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
+              value={currentAmount.toLocaleString()}
+              onChange={(e) => handleValueChange(e.target.value)}
+              disabled={disableInput}
             />
           </div>
-          <span className="text-slate-300">Үлдэгдэл: ₮</span>
+          <span className="text-slate-300">
+            Үлдэгдэл: {notPaidAmount - currentAmount}₮
+          </span>
         </div>
         <div className="flex-auto flex items-center gap-1">
-          <Button className="bg-green-500 hover:bg-green-500/90 whitespace-nowrap font-bold">
+          <Button
+            className="bg-green-500 hover:bg-green-500/90 whitespace-nowrap font-bold"
+            loading={loading}
+            onClick={handlePay}
+            disabled={notPaidAmount === 0}
+          >
             Гүйлгээ хийх
           </Button>
           <Button
@@ -40,6 +60,7 @@ const PaymentType = () => {
         </div>
       </div>
       <Keys />
+      <PaymentSheet />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { activeOrderAtom, setOrderStatesAtom } from "@/store/order.store"
 import { DocumentNode, OperationVariables, useLazyQuery } from "@apollo/client"
-import { useAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 
 import { IOrder } from "@/types/order.types"
 
@@ -19,7 +19,7 @@ const useOrderDetail = (args?: {
   const { query, onCompleted, skip, variables } = args || {}
 
   const [activeOrderId] = useAtom(activeOrderAtom)
-  const [, setOrderStates] = useAtom(setOrderStatesAtom)
+  const setOrderStates= useSetAtom(setOrderStatesAtom)
 
   const [getOrderDetail, { data, loading }] = useLazyQuery(
     query || queries.orderDetail,

@@ -11,8 +11,8 @@ import { useAtom } from "jotai"
 
 import { Label } from "@/components/ui/label"
 
-import Ebarimt from "./components/ebarimt/ebarimt.market"
-import PaidTypes from "./components/paymentType/paidTypes.market"
+import BillType from "./components/ebarimt/billType"
+import PaidTypes from "./components/paymentType/paidTypes"
 import PaymentTypes from "./components/paymentTypes/paymentTypes.market"
 
 const Checkout = () => {
@@ -35,7 +35,7 @@ const Checkout = () => {
             </>
           )}
           {isItemsRegistered && <PaymentTypes />}
-          {isReadyToPrint && <Ebarimt />}
+          {isReadyToPrint && <BillType />}
         </div>
       </div>
       <div className="flex-none space-y-3">

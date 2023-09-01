@@ -1,16 +1,18 @@
 import usePrintBill from "@/modules/checkout/hooks/usePrintBill"
-import useReciept from "@/lib/useReciept"
 import { activeOrderAtom, setInitialAtom } from "@/store/order.store"
 import { ebarimtSheetAtom } from "@/store/ui.store"
-import { useAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 
+import useReciept from "@/lib/useReciept"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+// import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 const MakePayment = () => {
   const [activeOrder] = useAtom(activeOrderAtom)
-  const [, setInitial] = useAtom(setInitialAtom)
+  const setInitial = useSetAtom(setInitialAtom)
+
   const { changeVisiblity, loading, disabled, printBill } = usePrintBill()
+
   const [open] = useAtom(ebarimtSheetAtom)
 
   const { iframeRef } = useReciept({
@@ -31,15 +33,18 @@ const MakePayment = () => {
       >
         Баримт хэвлэх
       </Button>
-      <Sheet open={open} onOpenChange={() => changeVisiblity(false)}>
-        <SheetContent closable className="flex flex-col p-4 sm:max-w-xs">
-          <iframe
-            ref={iframeRef}
-            src={"/reciept/ebarimt/" + activeOrder + "?type=lol"}
-            className="w-100 block flex-auto overflow-y-auto"
-          />
-        </SheetContent>
-      </Sheet>
+      {/* <Sheet open={open} onOpenChange={() => changeVisiblity(false)}>
+        <SheetContent closable className="flex flex-col p-4 sm:max-w-xs"> */}
+      {open && (
+        <iframe
+          ref={iframeRef}
+          src={"/reciept/ebarimt/" + activeOrder}
+          className="absolute h-1 w-1"
+          style={{ top: 10000, left: 10000 }}
+        />
+      )}
+      {/* </SheetContent>
+      </Sheet> */}
     </>
   )
 }

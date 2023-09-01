@@ -4,17 +4,10 @@ const posCurrentUser = gql`
   query posCurrentUser {
     posCurrentUser {
       _id
-      username
       email
-      isOwner
-
       details {
-        avatar
         fullName
-        shortName
         position
-        description
-        operatorPhone
       }
     }
   }
@@ -32,6 +25,7 @@ const configFields = `
   cashierIds
   adminIds
   token
+  waitingScreen
   uiOptions {
     colors
     logo

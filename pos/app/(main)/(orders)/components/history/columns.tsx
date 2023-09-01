@@ -7,7 +7,7 @@ import HistoryItemAction from "./historyItemAction"
 
 const formatDate = (info: CellContext<IOrderHistory, unknown>) =>
   info.getValue()
-    ? format(new Date(info.getValue() as string), "yyyy.MM.dd HH.mm")
+    ? format(new Date(info.getValue() as string), "yyyy.MM.dd HH:mm")
     : "-"
 
 const columns: ColumnDef<IOrderHistory>[] = [

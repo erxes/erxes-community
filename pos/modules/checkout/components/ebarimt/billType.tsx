@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 
 const CheckRegister = dynamic(() => import("./checkRegister.market"))
 
-const Ebarimt = () => {
+const BillType = () => {
   const [billType, setBillType] = useAtom(billTypeAtom)
   const { skipEbarimt, allowInnerBill } = useRenderEbarimt()
   const { printBill, loading } = usePrintBill()
@@ -59,4 +59,4 @@ const Ebarimt = () => {
   )
 }
 
-export default Ebarimt
+export default BillType

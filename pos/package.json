@@ -1,6 +1,6 @@
 {
-  "name": "next-template",
-  "version": "0.0.2",
+  "name": "erxes-pos",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev -p 7002",
@@ -19,6 +19,7 @@
     "@radix-ui/react-alert-dialog": "^1.0.4",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.4",
     "@radix-ui/react-dropdown-menu": "^2.0.5",
     "@radix-ui/react-label": "^2.0.2",

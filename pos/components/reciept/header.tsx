@@ -31,7 +31,7 @@ const EbarimtHeader = () => {
           alt=""
           height={32}
           width={100}
-          className="h-8 w-auto"
+          className="h-8 w-auto object-contain"
         />
         <p className="pl-2 font-bold leading-5">Erxes Mongolia LLC</p>
       </header>

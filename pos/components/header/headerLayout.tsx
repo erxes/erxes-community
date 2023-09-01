@@ -15,7 +15,10 @@ const Main = dynamic(() => import("@/components/header/headerLayout.main"), {
   loading,
 })
 
-const HeaderLayout = (props: { children?: React.ReactNode }) => {
+const HeaderLayout = (props: {
+  children?: React.ReactNode
+  hideUser?: boolean
+}) => {
   const mode = getMode()
 
   return (

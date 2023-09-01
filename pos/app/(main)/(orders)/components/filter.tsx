@@ -1,18 +1,18 @@
 "use client"
 
-import { useUsers } from "@/modules/auth/hooks/useUser"
-import { defaultFilter, filterAtom } from "@/store/history.store"
+import { SetAtom } from "@/store"
+import { defaultFilter } from "@/store/history.store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { formatISO, subDays } from "date-fns"
-import { useAtom } from "jotai"
+import { SetStateAction } from "jotai"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { IFilter } from "@/types/history.types"
 import { IOrderStatus } from "@/types/order.types"
 import { ORDER_STATUSES } from "@/lib/constants"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { DatePickerWithRange } from "@/components/ui/date-range-picker"
 import { FacetedFilter } from "@/components/ui/faceted-filter"
 import {
@@ -43,21 +43,24 @@ const FormSchema = z.object({
     })
     .optional(),
   statuses: z.array(z.string()).optional(),
-  customerType: z.string().optional(),
-  customerId: z.string().nullable(),
   isPaid: z.boolean().optional(),
   sort: z.string().optional(),
 })
 
-const Filter = () => {
-  const [filter, setFilter] = useAtom(filterAtom)
-
+const Filter = ({
+  filter,
+  setFilter,
+  loading,
+}: {
+  filter: IFilter
+  setFilter: SetAtom<[SetStateAction<IFilter>], void>
+  loading?: boolean
+}) => {
   const {
     searchValue,
     startDate,
     endDate,
     statuses,
-    customerId,
     isPaid,
     sortField,
     sortDirection,
@@ -70,7 +73,6 @@ const Filter = () => {
       to: new Date(endDate || defaultFilter.startDate),
     },
     statuses,
-    customerId: customerId || "empty_field",
     isPaid: typeof isPaid === "boolean" ? isPaid : undefined,
     sort:
       sortField && sortDirection
@@ -78,7 +80,6 @@ const Filter = () => {
         : "createdAt_asc",
   }
 
-  const { users } = useUsers()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues,
@@ -89,8 +90,6 @@ const Filter = () => {
     dateType,
     range,
     statuses,
-    customerType,
-    customerId,
     isPaid,
     sort,
   }: z.infer<typeof FormSchema>) => {
@@ -102,7 +101,6 @@ const Filter = () => {
       page: 1,
       searchValue,
       statuses: (statuses || []) as IOrderStatus[],
-      customerId: customerId === "empty_field" ? null : customerId,
       startDate: formatISO(new Date(from || subDays(new Date(), 10))),
       endDate: formatISO(new Date(to || new Date())),
       isPaid: typeof isPaid === "boolean" ? isPaid : undefined,
@@ -112,11 +110,10 @@ const Filter = () => {
   }
 
   return (
-    <div className="px-4 py-3">
-      <div className="text-sm font-semibold">Талбараар шүүх</div>
+    <div className="px-4">
       <Form {...form}>
         <form
-          className="mb-4 grid grid-cols-4 items-end gap-2"
+          className="grid grid-cols-4 items-end gap-2"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -171,50 +168,13 @@ const Filter = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="customerId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Хэрэглэгч сонгох</FormLabel>
-                <FormControl>
-                  <Select
-                    value={field.value ? field.value : ""}
-                    onValueChange={(value) => {
-                      if (value === "empty_field") {
-                        field.onChange(null)
-                      } else {
-                        field.onChange(value)
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="col-span-2">
-                      <SelectValue placeholder="Хэрэглэгч сонгох" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        value="empty_field"
-                        className="h-8"
-                      ></SelectItem>
 
-                      {users.map(({ _id, primaryEmail, email }) => (
-                        <SelectItem value={_id} key={_id}>
-                          {primaryEmail || email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="sort"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ангилал сонгох</FormLabel>
+                <FormLabel>Эрэмблэх</FormLabel>
                 <FormControl>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="col-span-2">
@@ -240,6 +200,7 @@ const Filter = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="isPaid"
@@ -256,13 +217,15 @@ const Filter = () => {
               </FormItem>
             )}
           />
-          <Button type="submit">
+          <div />
+          <Button type="submit" disabled={loading}>
             <SearchIcon className="h-5 w-5 mr-1" />
             Хайх
           </Button>
           <Button
             type="button"
             variant="secondary"
+            disabled={loading}
             onClick={() => {
               form.reset()
               setFilter(defaultFilter)

@@ -1,5 +1,5 @@
-import { SelectProps } from "@radix-ui/react-select"
-import { useAtom } from "jotai"
+import { currentPaymentTypeAtom } from "@/store"
+import { useAtomValue } from "jotai"
 
 import { BANK_CARD_TYPES } from "@/lib/constants"
 import {
@@ -11,9 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+import { useCheckNotSplit } from "../../hooks/usePaymentType"
 import usePossiblePaymentTerms from "../../hooks/usePossiblePaymentTerms"
 
-const SelectPaymentType = ({ disabled, ...props }: SelectProps) => {
+const SelectPaymentType = () => {
   const {
     loadingKhan,
     disabledTerms,
@@ -23,9 +24,11 @@ const SelectPaymentType = ({ disabled, ...props }: SelectProps) => {
     golomt,
     mappedPts,
   } = usePossiblePaymentTerms()
+  const type = useAtomValue(currentPaymentTypeAtom)
+  const { handleSetType } = useCheckNotSplit()
 
   return (
-    <Select {...props} disabled={loadingKhan || disabled}>
+    <Select disabled={loadingKhan} value={type} onValueChange={handleSetType}>
       <SelectTrigger>
         <SelectValue placeholder="сонгох" />
       </SelectTrigger>
@@ -61,7 +64,7 @@ const SelectPaymentType = ({ disabled, ...props }: SelectProps) => {
           {mappedPts.map((payment) => (
             <SelectItem
               value={payment.type}
-              disabled={payment.disabled}
+              disabled={payment.disabled || disabledTerms}
               key={payment.type}
             >
               {payment.title}

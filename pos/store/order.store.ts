@@ -113,6 +113,7 @@ export const setOrderStatesAtom = atom(
     get,
     set,
     {
+      _id,
       customer,
       customerType,
       items,
@@ -130,6 +131,7 @@ export const setOrderStatesAtom = atom(
       number,
     }: IOrder
   ) => {
+    set(activeOrderAtom, _id || "")
     set(customerAtom, customer || null)
     set(customerTypeAtom, customerType || "")
     set(cartAtom, items)

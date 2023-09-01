@@ -33,7 +33,7 @@ const HistoryTable = ({
     getCoreRowModel: getCoreRowModel(),
   })
   return (
-    <div className="mx-4 rounded-md border">
+    <div className="mx-4 rounded-md border mt-4">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

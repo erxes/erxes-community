@@ -1,5 +1,7 @@
 import Link from "next/link"
 import Logout from "@/modules/auth/components/logout"
+import { configAtom } from "@/store/config.store"
+import { useAtomValue } from "jotai"
 import {
   FileBarChart2Icon,
   HistoryIcon,
@@ -25,8 +27,15 @@ import { Separator } from "../ui/separator"
 
 const HeaderMenu = () => {
   const mode = getMode()
+  const config = useAtomValue(configAtom)
   const menu =
-    mode === "market" ? supermarketMenu : supermarketMenu.concat(progressMenu)
+    mode === "market"
+      ? supermarketMenu
+      : supermarketMenu.concat(
+          config?.waitingScreen?.isActive
+            ? [progressMenu, waitingMenu]
+            : progressMenu
+        )
   return (
     <div
       className={cn(
@@ -98,16 +107,16 @@ const supermarketMenu = [
   },
 ]
 
-const progressMenu = [
-  {
-    href: "progress",
-    Icon: PackagePlus,
-    text: "Бэлтгэл",
-  },
-  {
-    href: "waiting",
-    Icon: HourglassIcon,
-    text: "Хүлээлгэ",
-  },
-]
+const progressMenu = {
+  href: "progress",
+  Icon: PackagePlus,
+  text: "Бэлтгэл",
+}
+
+const waitingMenu = {
+  href: "waiting",
+  Icon: HourglassIcon,
+  text: "Хүлээлгэ",
+}
+
 export default HeaderMenu
