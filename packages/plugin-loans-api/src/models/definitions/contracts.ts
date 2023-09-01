@@ -108,6 +108,8 @@ export interface IContract {
   isPayFirstMonth: boolean;
   downPayment: number;
   isBarter: boolean;
+  isStoppedInterest: boolean;
+  stoppedInterestDate: Date;
 }
 
 export interface IContractDocument extends IContract, Document {
@@ -388,6 +390,15 @@ export const contractSchema = schemaHooksWrapper(
       type: Boolean,
       default: false,
       label: 'Is Barter'
+    }),
+    isStoppedInterest: field({
+      type: Boolean,
+      default: false,
+      label: 'Is stopped interest'
+    }),
+    stoppedInterestDate: field({
+      type: Date,
+      label: 'Stopped interest date'
     })
   }),
   'erxes_contractSchema'

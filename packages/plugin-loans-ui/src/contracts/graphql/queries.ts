@@ -232,6 +232,7 @@ export const closeInfo = `
       interestNonce
       payment
       insurance
+      storedInterest
       debt
       total
     }

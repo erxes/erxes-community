@@ -48,15 +48,32 @@ class InterestChangeContainer extends React.Component<FinalProps, State> {
         closeModal();
       };
 
+      let mutation: any = undefined;
+
+      switch (values.type) {
+        case 'stopInterest':
+          mutation = mutations.stopInterest;
+          break;
+        case 'interestChange':
+          mutation = mutations.interestChange;
+          break;
+        case 'interestReturn':
+          mutation = mutations.interestReturn;
+          break;
+
+        default:
+          break;
+      }
+
       return (
         <ButtonMutate
-          mutation={mutations.contractsClose}
+          mutation={mutation}
           variables={values}
           callback={afterSave}
           refetchQueries={getRefetchQueries()}
           isSubmitted={isSubmitted}
           type="submit"
-          successMessage={__(`You successfully closed this contract`)}
+          successMessage={__(`You successfully change interest this contract`)}
         >
           {__('Save')}
         </ButtonMutate>

@@ -1,11 +1,14 @@
 import { Document, Schema } from 'mongoose';
 import { schemaHooksWrapper, field } from './utils';
-
+import { INTEREST_CORRECTION_TYPE } from './constants';
 export interface IInterestCorrection {
   description: string;
   invDate: Date;
-  amount: number;
+  interestAmount: number;
+  lossAmount: number;
+  contractId: string;
   type: string;
+  isStopLoss: boolean;
 }
 
 export interface IInterestCorrectionDocument
@@ -30,8 +33,11 @@ export const InterestCorrectionSchema = schemaHooksWrapper(
       default: new Date(),
       label: 'Created at'
     }),
-    amount: field({ type: Number, min: 0, label: 'total' }),
+    interestAmount: field({ type: Number, min: 0, label: 'Interest Amount' }),
+    lossAmount: field({ type: Number, min: 0, label: 'Loss Amount' }),
+    contractId: field({ type: String, min: 0, label: 'Contract Id' }),
     type: field({ type: String, label: 'type' }),
+    isStopLoss: field({ type: Boolean, label: 'is Stop loss' }),
     createdAt: field({
       type: Date,
       default: () => new Date(),

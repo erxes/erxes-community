@@ -8,8 +8,7 @@ import {
   MainStyleFormColumn as FormColumn,
   MainStyleFormWrapper as FormWrapper,
   MainStyleModalFooter as ModalFooter,
-  MainStyleScrollWrapper as ScrollWrapper,
-  SelectTeamMembers
+  MainStyleScrollWrapper as ScrollWrapper
 } from '@erxes/ui/src';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IButtonMutateProps, IFormProps } from '@erxes/ui/src/types';
@@ -30,7 +29,7 @@ type Props = {
 type State = {
   type: string;
   description: string;
-  amount: number;
+  interestAmount: number;
 };
 
 class InterestChangeForm extends React.Component<Props, State> {
@@ -38,9 +37,9 @@ class InterestChangeForm extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      type: '',
+      type: 'stopInterest',
       description: '',
-      amount: 0
+      interestAmount: 0
     };
   }
 
@@ -56,6 +55,11 @@ class InterestChangeForm extends React.Component<Props, State> {
     return {
       contractId: finalValues._id,
       ...this.state,
+      interestAmount: Number(
+        this.state.type === 'stopInterest'
+          ? this.props.closeInfo.storedInterest
+          : this.state.interestAmount
+      ),
       description: this.state.description,
       invDate: this.props.invDate,
       type: this.state.type
@@ -76,7 +80,7 @@ class InterestChangeForm extends React.Component<Props, State> {
   onChangeField = e => {
     const name = (e.target as HTMLInputElement).name;
     const value = (e.target as HTMLInputElement).value;
-    this.setState({ [name]: value } as unknown);
+    this.setState({ [name]: value } as any);
   };
 
   onFieldClick = e => {
@@ -104,7 +108,7 @@ class InterestChangeForm extends React.Component<Props, State> {
       <>
         {this.renderRow('Total', 'total')}
         {this.renderRow('Payment', 'payment')}
-        {this.renderRow('Interest', 'interest')}
+        {this.renderRow('Interest', 'storedInterest')}
         {this.renderRow('Loss', 'undue')}
         {this.renderRow('Insurance', 'insurance')}
         {this.renderRow('Debt', 'debt')}
@@ -113,7 +117,6 @@ class InterestChangeForm extends React.Component<Props, State> {
   };
 
   renderContent = (formProps: IFormProps) => {
-    const contract = this.props.contract || ({} as IContract);
     const { closeModal, renderButton, onChangeDate } = this.props;
     const { values, isSubmitted } = formProps;
 
@@ -150,26 +153,28 @@ class InterestChangeForm extends React.Component<Props, State> {
                   required={true}
                   onChange={this.onChangeField}
                 >
-                  {['stopInterest', 'changeInterest'].map((typeName, index) => (
-                    <option key={index} value={typeName}>
-                      {typeName}
-                    </option>
-                  ))}
+                  {['stopInterest', 'interestChange', 'interestReturn'].map(
+                    (typeName, index) => (
+                      <option key={index} value={typeName}>
+                        {typeName}
+                      </option>
+                    )
+                  )}
                 </FormControl>
               </FormGroup>
             </FormColumn>
           </FormWrapper>
-          {this.state.type === 'changeInterest' && (
+          {this.state.type !== 'stopInterest' && (
             <FormWrapper>
               <FormColumn>
                 <FormGroup>
                   <ControlLabel>{__('Interest Change to')}</ControlLabel>
                   <FormControl
                     {...formProps}
-                    name="amount"
+                    name="interestAmount"
                     type="number"
                     useNumberFormat
-                    value={this.state.description || ''}
+                    value={this.state.interestAmount || ''}
                     onChange={this.onChangeField}
                   />
                 </FormGroup>
