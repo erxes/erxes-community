@@ -9,7 +9,10 @@ import {
   MainStyleFormWrapper as FormWrapper,
   MainStyleModalFooter as ModalFooter,
   MainStyleScrollWrapper as ScrollWrapper,
-  SelectTeamMembers
+  SelectTeamMembers,
+  TabTitle,
+  Tabs as MainTabs,
+  Table
 } from '@erxes/ui/src';
 import { __ } from 'coreui/utils';
 import { DateContainer } from '@erxes/ui/src/styles/main';
@@ -20,7 +23,7 @@ import { WEEKENDS } from '../../../constants';
 import SelectContractType, {
   ContractTypeById
 } from '../../../contractTypes/containers/SelectContractType';
-import SelectContract, { ContractById } from '../../containers/SelectContract';
+import SelectContract from '../../containers/SelectContract';
 import { IContract, IContractDoc } from '../../types';
 import SelectCustomers from '@erxes/ui-contacts/src/customers/containers/SelectCustomers';
 import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
@@ -92,6 +95,153 @@ function isGreaterNumber(value: any, compareValue: any) {
   value = Number(value || 0);
   compareValue = Number(compareValue || 0);
   return value > compareValue;
+}
+
+interface ITabItem {
+  component: any;
+  label: string;
+}
+
+interface ITabs {
+  tabs: ITabItem[];
+}
+
+function Tabs({ tabs }: ITabs) {
+  const [tabIndex, setTabIndex] = React.useState(0);
+  return (
+    <>
+      <MainTabs grayBorder>
+        {tabs.map((tab, index) => (
+          <TabTitle
+            style={{
+              backgroundColor: index === tabIndex && 'rgba(128,128,128,0.2)'
+            }}
+            key={`tab${tab.label}`}
+            onClick={() => setTabIndex(index)}
+          >
+            {tab.label}
+          </TabTitle>
+        ))}
+      </MainTabs>
+
+      <div style={{ width: '100%', marginTop: 20 }}>
+        {tabs?.[tabIndex]?.component}
+      </div>
+    </>
+  );
+}
+
+function GraphicForm() {
+  const [value, setValue] = React.useState<any>({});
+
+  function onChangeValue({ target }: any) {
+    setValue(a => ({ ...a, [target.name]: target.value }));
+  }
+
+  const renderFormGroup = (label, props) => {
+    return (
+      <FormGroup>
+        <ControlLabel required={!label.includes('Amount')}>
+          {__(label)}
+        </ControlLabel>
+        <FormControl {...props} />
+      </FormGroup>
+    );
+  };
+
+  const renderContent = () => {
+    return (
+      <>
+        <ScrollWrapper>
+          <FormWrapper>
+            <FormColumn>
+              <FormGroup>
+                <ControlLabel required={true}>{__('Repayment')}</ControlLabel>
+                <FormControl
+                  name="repayment"
+                  componentClass="select"
+                  value={value.repayment}
+                  required={true}
+                  onChange={onChangeValue}
+                >
+                  {['fixed', 'equal', 'custom'].map((typeName, index) => (
+                    <option key={index} value={typeName}>
+                      {typeName}
+                    </option>
+                  ))}
+                </FormControl>
+              </FormGroup>
+              {renderFormGroup('Tenor', {
+                type: 'number',
+                name: 'tenor',
+                useNumberFormat: true,
+                value: value.tenor || 0,
+                onChange: onChangeValue
+              })}
+            </FormColumn>
+            <FormColumn>
+              {renderFormGroup('Lease Amount', {
+                type: 'number',
+                name: 'leaseAmount',
+                useNumberFormat: true,
+                fixed: 2,
+                value: value.leaseAmount || 0,
+                onChange: onChangeValue
+              })}
+              {value.repayment === 'custom' &&
+                renderFormGroup('Custom payment Amount', {
+                  type: 'number',
+                  name: 'paymentAmount',
+                  useNumberFormat: true,
+                  fixed: 2,
+                  value: value.paymentAmount || 0,
+                  onChange: onChangeValue
+                })}
+            </FormColumn>
+
+            <FormColumn>
+              <FormGroup>
+                <ControlLabel required>{__('Schedule Days')}</ControlLabel>
+                <Select
+                  required
+                  className="flex-item"
+                  placeholder={__('Choose an schedule Days')}
+                  value={value.scheduleDays}
+                  onChange={onChangeValue}
+                  multi={true}
+                  options={new Array(31).fill(1).map((row, index) => ({
+                    value: row + index,
+                    label: row + index
+                  }))}
+                />
+              </FormGroup>
+            </FormColumn>
+          </FormWrapper>
+          {value.repayment === 'custom' && (
+            <Table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Schedule day</th>
+                  <th>Payment</th>
+                  <th>Interest</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2</td>
+                  <td>2023-04-20</td>
+                  <td>1,000,000.00</td>
+                  <td>15,000</td>
+                </tr>
+              </tbody>
+            </Table>
+          )}
+        </ScrollWrapper>
+      </>
+    );
+  };
+  return <Form renderContent={renderContent} />;
 }
 
 class ContractForm extends React.Component<Props, State> {
@@ -877,6 +1027,17 @@ class ContractForm extends React.Component<Props, State> {
   };
 
   render() {
+    return (
+      <Tabs
+        tabs={[
+          {
+            label: 'Гэрээ',
+            component: <Form renderContent={this.renderContent} />
+          },
+          { label: 'Хуваарь', component: <GraphicForm /> }
+        ]}
+      />
+    );
     return <Form renderContent={this.renderContent} />;
   }
 }
