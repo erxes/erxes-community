@@ -1,5 +1,5 @@
+import { randomLowercase } from '@erxes/api-utils/src/random';
 import * as faker from 'faker';
-import { nanoid } from 'nanoid';
 
 export const getUniqueValue = async (
   collection: any,
@@ -7,7 +7,7 @@ export const getUniqueValue = async (
   defaultValue?: string
 ) => {
   const getRandomValue = (type: string) =>
-    type === 'email' ? faker.internet.email().toLowerCase() : nanoid();
+    type === 'email' ? faker.internet.email().toLowerCase() : randomLowercase();
 
   let uniqueValue = defaultValue || getRandomValue(fieldName);
 

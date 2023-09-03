@@ -1,8 +1,8 @@
 import * as mongoose from 'mongoose';
 import * as strip from 'strip';
-import { nanoid } from 'nanoid';
 import { IUserDocument } from './types';
 import { IPermissionDocument } from './definitions/permissions';
+import { randomLowercase } from '@erxes/api-utils/src/random';
 
 export const getEnv = ({
   name,
@@ -222,7 +222,7 @@ export const getUniqueValue = async (
   defaultValue?: string
 ) => {
   const getRandomValue = (type: string) =>
-    type === 'email' ? generateRandomEmail() : nanoid();
+    type === 'email' ? generateRandomEmail() : randomLowercase();
 
   let uniqueValue = defaultValue || getRandomValue(fieldName);
 
