@@ -491,7 +491,7 @@ async function startServer() {
     if (imports) {
       if (imports.prepareImportDocs) {
         consumeRPCQueue(
-          `${configs.name}:imports:prepareImportDocs`,
+          `${configs.name}:imports.prepareImportDocs`,
           async args => ({
             status: 'success',
             data: await imports.prepareImportDocs(args)
@@ -501,7 +501,7 @@ async function startServer() {
 
       if (imports.insertImportItems) {
         consumeRPCQueue(
-          `${configs.name}:imports:insertImportItems`,
+          `${configs.name}:imports.insertImportItems`,
           async args => ({
             status: 'success',
             data: await imports.insertImportItems(args)
@@ -513,7 +513,7 @@ async function startServer() {
     if (exporter) {
       if (exporter.prepareExportData) {
         consumeRPCQueue(
-          `${configs.name}:exporter:prepareExportData`,
+          `${configs.name}:exporter.prepareExportData`,
           async args => ({
             status: 'success',
             data: await exporter.prepareExportData(args)
@@ -523,7 +523,7 @@ async function startServer() {
 
       if (exporter.getExportDocs) {
         consumeRPCQueue(
-          `${configs.name}:exporter:getExportDocs`,
+          `${configs.name}:exporter.getExportDocs`,
           async args => ({
             status: 'success',
             data: await exporter.getExportDocs(args)
