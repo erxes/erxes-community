@@ -16,11 +16,15 @@ export const callsSchema = new Schema({
 
 export const integrationSchema: Schema<any> = new Schema({
   inboxId: String,
-  username: String,
-  password: String,
   wsServer: String,
   phone: String,
-  operatorIds: [String],
+  operatorMaps: [
+    {
+      erxesUserId: String,
+      gsUser: String,
+      gsPassword: String
+    }
+  ],
   token: String
 });
 

@@ -4,3 +4,9 @@ export type IUserCall = IUser & {
   time: string;
   isMissedCall: boolean;
 };
+
+export type Operator = {
+  userId: string;
+  gsUsername: string;
+  gsPassword: string;
+};
