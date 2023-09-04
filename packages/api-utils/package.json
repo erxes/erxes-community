@@ -17,6 +17,8 @@
     "babel-preset-gatsby-package": "^0.5.2"
   },
   "dependencies": {
+    "@apollo/server" : "^4.9.3",
+    "@apollo/subgraph": "^2.4.12",
     "agentkeepalive": "^4.3.0",
     "amqplib": "^0.10.2",
     "crypto": "^1.0.1",
@@ -26,6 +28,7 @@
     "graphql": "^16.7.1",
     "graphql-redis-subscriptions": "^1.4.0",
     "graphql-subscriptions": "^1.1.0",
+    "graphql-tag" : "^2.12.6",
     "ioredis": "^4.28.2",
     "lodash": "^4.17.21",
     "nanoid" : "^3.3.6",

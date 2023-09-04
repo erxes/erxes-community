@@ -8,10 +8,6 @@
     "test": "jest --coverage --forceExit --runInBand"
   },
   "dependencies": {
-    "@apollo/server" : "^4.9.3",
-    "@apollo/subgraph": "^2.4.12",
-    "agentkeepalive": "^4.3.0",
-    "graphql-tag" : "^2.12.6",
-    "node-fetch": "^2.6.7"
+
   }
 }
