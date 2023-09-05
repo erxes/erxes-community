@@ -10,18 +10,17 @@ import {
   printTypeAtom,
   putResponsesAtom,
   setOrderStatesAtom,
-  setRegisterNumberAtom,
 } from "@/store/order.store"
 import { useAtom } from "jotai"
 
 import { BILL_TYPES } from "@/lib/constants"
 import { getMode } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import Amount from "@/components/reciept/Amount"
-import EbarimtSkeleton from "@/components/reciept/Skeleton"
-import Footer from "@/components/reciept/footer"
-import EbarimtHeader from "@/components/reciept/header"
-import PutResponses from "@/components/reciept/putResponses"
+import Amount from "@/app/reciept/components/Amount"
+import EbarimtSkeleton from "@/app/reciept/components/Skeleton"
+import Footer from "@/app/reciept/components/footer"
+import EbarimtHeader from "@/app/reciept/components/header"
+import PutResponses from "@/app/reciept/components/putResponses"
 
 const Reciept = ({ params }: { params: Params }) => {
   const { id } = params
@@ -70,7 +69,6 @@ const Reciept = ({ params }: { params: Params }) => {
       window.removeEventListener("afterprint", handleAfterPrint)
     }
   }, [handleAfterPrint])
-
 
   if (loading || loadingDetail || !activeOrder) return <EbarimtSkeleton />
 

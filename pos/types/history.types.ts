@@ -2,7 +2,7 @@ import { IOrderStatus } from "./order.types"
 
 export interface IFilter {
   searchValue: string
-  statuses: IOrderStatus[]
+  statuses: string[]
   customerId: string | null
   startDate: string | undefined
   endDate: string | undefined

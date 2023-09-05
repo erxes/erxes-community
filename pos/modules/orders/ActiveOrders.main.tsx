@@ -35,7 +35,7 @@ const ActiveOrders = () => {
   }, [])
 
   return (
-    <>
+    <div className="flex-auto overflow-hidden">
       <HorizontalScrollMenu>
         {[
           ...fullOrders.map((order) => (
@@ -57,7 +57,7 @@ const ActiveOrders = () => {
           </ScrollMenuItem>,
         ]}
       </HorizontalScrollMenu>
-    </>
+    </div>
   )
 }
 

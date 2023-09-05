@@ -5,25 +5,40 @@ import { CheckIcon } from "lucide-react"
 
 import { IOrder } from "@/types/order.types"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const ChooseOrder = ({ number, status, _id }: IOrder) => {
   const [activeOrder, setActiveOrder] = useAtom(activeOrderAtom)
   const [, setInitialState] = useAtom(setInitialAtom)
 
   return (
-    <Button
-      className={statusVariants({ status })}
-      onClick={() =>
-        activeOrder === _id ? setInitialState() : setActiveOrder(_id)
-      }
-    >
-      {(number || "").split("_")[1]}
-      {activeOrder === _id && (
-        <span className="absolute -right-2 -top-2  rounded-full border-2 border-white bg-inherit p-1 text-white">
-          <CheckIcon className="h-3 w-3" strokeWidth={4} />
-        </span>
-      )}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className={statusVariants({ status })}
+            onClick={() =>
+              activeOrder === _id ? setInitialState() : setActiveOrder(_id)
+            }
+          >
+            {(number || "").split("_")[1]}
+            {activeOrder === _id && (
+              <span className="absolute -right-2 -top-2  rounded-full border-2 border-white bg-inherit p-1 text-white">
+                <CheckIcon className="h-3 w-3" strokeWidth={4} />
+              </span>
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{number}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 

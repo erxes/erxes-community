@@ -13,16 +13,7 @@ export const ORDER_TYPES = {
   OUT: ["loss", "spend", "reject"],
 }
 
-export const ORDER_STATUSES: {
-  ALL: IOrderStatus[]
-  NEW: "new"
-  DOING: "doing"
-  REDOING: "reDoing"
-  DONE: "done"
-  COMPLETE: "complete"
-  PENDING: "pending"
-  DISABLED: IOrderStatus[]
-} = {
+export const ORDER_STATUSES = {
   NEW: "new",
   DOING: "doing",
   REDOING: "reDoing",
@@ -31,6 +22,7 @@ export const ORDER_STATUSES: {
   PENDING: "pending",
   ALL: ["new", "doing", "done", "complete", "reDoing", "pending"],
   DISABLED: ["done", "complete"],
+  ACTIVE: ["new", "doing", "reDoing", "pending"],
 }
 
 export const ORDER_ITEM_STATUSES = {

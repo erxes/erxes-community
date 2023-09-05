@@ -2,6 +2,7 @@ import { CellContext, ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 
 import { IOrderHistory } from "@/types/order.types"
+import { Badge } from "@/components/ui/badge"
 
 import HistoryItemAction from "./historyItemAction"
 
@@ -19,7 +20,7 @@ const columns: ColumnDef<IOrderHistory>[] = [
   {
     accessorKey: "status",
     header: "Cтатус",
-    cell: (info) => info.getValue(),
+    cell: (info) => <Badge>{info.getValue() as React.ReactNode}</Badge>,
   },
   {
     accessorKey: "totalAmount",

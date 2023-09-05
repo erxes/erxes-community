@@ -7,16 +7,16 @@ import {
   useLazyQuery,
 } from "@apollo/client"
 
-import { IOrder, IOrderStatus } from "@/types/order.types"
+import { IOrder } from "@/types/order.types"
 
 import { queries, subscriptions } from "../graphql"
 
-const checkIsArray = (statuses: IOrderStatus[]) =>
+const checkIsArray = (statuses: string[]) =>
   Array.isArray(statuses) ? statuses : [statuses]
 
 interface IVariables {
   searchValue?: string | null
-  statuses?: IOrderStatus[]
+  statuses?: string[]
   customerId?: string | null
   startDate?: string | null
   endDate?: string | null
@@ -30,9 +30,9 @@ interface IVariables {
 interface IFullOrdersResult {
   loading: boolean
   fullOrders: IOrder[]
-  subToOrderStatuses: (subStatuses: IOrderStatus[], callBack?: any) => void // Replace 'any' with the appropriate type for callBack
+  subToOrderStatuses: (subStatuses: string[], callBack?: any) => void // Replace 'any' with the appropriate type for callBack
   refetch: () => void
-  subToItems: (subStatuses: IOrderStatus[], callBack?: any) => void // Replace 'any' with the appropriate type for callBack
+  subToItems: (subStatuses: string[], callBack?: any) => void // Replace 'any' with the appropriate type for callBack
   totalCount: number
   handleLoadMore: () => void
 }
@@ -77,7 +77,7 @@ const useFullOrders = ({
   const totalCount = (countData || {}).ordersTotalCount || 0
 
   const subToOrderStatuses = useCallback(
-    (subStatuses: IOrderStatus[], callBack?: any) =>
+    (subStatuses: string[], callBack?: any) =>
       subscribeToMore({
         document: gql(subscriptions.ordersOrdered),
         variables: { statuses: checkIsArray(subStatuses) },
@@ -95,7 +95,7 @@ const useFullOrders = ({
   )
 
   const subToItems = useCallback(
-    (subStatuses: IOrderStatus[], callBack?: any) =>
+    (subStatuses: string[], callBack?: any) =>
       subscribeToMore({
         document: gql(subscriptions.orderItemsOrdered),
         variables: { statuses: checkIsArray(subStatuses) },

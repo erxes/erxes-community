@@ -23,6 +23,7 @@ const orderChangeStatus = gql`
   mutation orderChangeStatus($_id: String!, $status: String) {
     orderChangeStatus(_id: $_id, status: $status) {
       _id
+      status
     }
   }
 `

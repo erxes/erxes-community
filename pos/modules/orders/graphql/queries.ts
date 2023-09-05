@@ -172,6 +172,24 @@ export const ebarimtDetail = gql`
   }
 `
 
+export const progressDetail = gql`
+  query ProgressDetail($id: String) {
+    orderDetail(_id: $id) {
+      _id
+      modifiedAt
+      number
+      items {
+        _id
+        productName
+        unitPrice
+        count
+      }
+      deliveryInfo
+      type
+    }
+  }
+`
+
 export const ordersCheckCompany = `
   query ordersCheckCompany($registerNumber: String!) {
     ordersCheckCompany(registerNumber: $registerNumber)
@@ -254,6 +272,39 @@ const ordersHistory = gql`
   }
 `
 
+const progressHistory = gql`
+  query ProgressHistory(${queryParamsDefs}) {
+    fullOrders(${queryParamsValues}) {
+      _id
+      status
+      number
+      type
+      items {
+        _id
+        isTake
+        isPackage
+        productName
+        count
+        status
+      }
+      modifiedAt
+      paidDate
+      dueDate
+    }
+  }
+`
+
+const progressDoneOrders = gql`
+ query ProgressDone(${queryParamsDefs}) {
+   fullOrders(${queryParamsValues}) {
+     _id
+     status
+     number
+     type
+   }
+ }
+`
+
 const slots = `
   query poscSlots {
     poscSlots{
@@ -286,6 +337,9 @@ const queries = {
   ordersHistory,
   activeOrders,
   historyDetail,
+  progressHistory,
+  progressDoneOrders,
+  progressDetail,
 }
 
 export default queries

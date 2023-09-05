@@ -51,20 +51,15 @@ const Filter = ({
   filter,
   setFilter,
   loading,
+  allowedStatuses,
 }: {
   filter: IFilter
   setFilter: SetAtom<[SetStateAction<IFilter>], void>
   loading?: boolean
+  allowedStatuses?: string[]
 }) => {
-  const {
-    searchValue,
-    startDate,
-    endDate,
-    statuses,
-    isPaid,
-    sortField,
-    sortDirection,
-  } = defaultFilter
+  const { searchValue, startDate, endDate, isPaid, sortField, sortDirection } =
+    defaultFilter
 
   const defaultValues = {
     searchValue,
@@ -72,7 +67,7 @@ const Filter = ({
       from: new Date(startDate || defaultFilter.startDate),
       to: new Date(endDate || defaultFilter.startDate),
     },
-    statuses,
+    statuses: allowedStatuses || ORDER_STATUSES.ALL,
     isPaid: typeof isPaid === "boolean" ? isPaid : undefined,
     sort:
       sortField && sortDirection
@@ -155,10 +150,12 @@ const Filter = ({
                 <FormLabel>Хайх</FormLabel>
                 <FormControl>
                   <FacetedFilter
-                    options={ORDER_STATUSES.ALL.map((status) => ({
-                      label: status,
-                      value: status,
-                    }))}
+                    options={(allowedStatuses || ORDER_STATUSES.ALL).map(
+                      (status) => ({
+                        label: status,
+                        value: status,
+                      })
+                    )}
                     title="Төлөвүүд"
                     values={field.value}
                     onSelect={field.onChange}
@@ -228,7 +225,10 @@ const Filter = ({
             disabled={loading}
             onClick={() => {
               form.reset()
-              setFilter(defaultFilter)
+              setFilter({
+                ...defaultFilter,
+                statuses: allowedStatuses || ORDER_STATUSES.ALL,
+              })
             }}
           >
             <XIcon className="h-5 w-5 mr-1" />
