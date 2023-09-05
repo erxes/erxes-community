@@ -1,6 +1,10 @@
 import PaidType from "@/modules/checkout/components/paymentType/paidType.main"
 import PaidTypes from "@/modules/checkout/components/paymentType/paidTypes"
-import { orderNumberAtom, unPaidAmountAtom } from "@/store/order.store"
+import {
+  orderNumberAtom,
+  orderTotalAmountAtom,
+  unPaidAmountAtom,
+} from "@/store/order.store"
 import { AnimatePresence, motion } from "framer-motion"
 import { useAtomValue } from "jotai"
 import { CheckCircle2Icon, CircleIcon } from "lucide-react"
@@ -8,6 +12,7 @@ import { CheckCircle2Icon, CircleIcon } from "lucide-react"
 const Detail = () => {
   const number = useAtomValue(orderNumberAtom)
   const unpaid = useAtomValue(unPaidAmountAtom)
+  const totalAmount = useAtomValue(orderTotalAmountAtom)
   return (
     <>
       <div className="flex flex-col items-center gap-3 flex-auto pt-4">
@@ -22,7 +27,7 @@ const Detail = () => {
           )}
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-black">49,500</h1>
+          <h1 className="text-xl font-black">{totalAmount.toLocaleString()}</h1>
           <p className="text-semibold text-slate-600">Нийт төлөх</p>
         </div>
         <div className="w-full flex flex-col items-center">

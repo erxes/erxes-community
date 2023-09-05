@@ -17,16 +17,10 @@ import DataTable from "./components/table"
 import { queries } from "./graphql"
 
 const Cover = () => {
-  // const { users, loading } = useUsers()
-  // const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 15),
     to: new Date(),
   })
-  // const mappedUsers = users.map(({ _id, firstName, lastName, email }) => ({
-  //   value: _id,
-  //   label: firstName && lastName ? `${firstName} ${lastName}` : email || "",
-  // }))
   const { data, loading: loadingCovers } = useQuery(queries.covers, {
     variables: {
       startDate: dateRange?.from,
@@ -43,19 +37,6 @@ const Cover = () => {
             date={dateRange}
             setDate={setDateRange}
           />
-          {/* {loading ? (
-            <div className="flex h-10 items-center space-x-3 rounded-md border border-dashed px-3">
-              <Skeleton className="h-5 w-5 rounded-full" />
-              <Skeleton className="h-5 w-20 rounded-md" />
-            </div>
-          ) : (
-            <FacetedFilter
-              options={mappedUsers}
-              title="Посын хэрэглэгчид"
-              values={selectedUsers}
-              onSelect={(values) => setSelectedUsers(values)}
-            />
-          )} */}
         </div>
         <Button Component={Link} href="/cover/create">
           <AlarmPlus className="mr-2 h-4 w-4" />

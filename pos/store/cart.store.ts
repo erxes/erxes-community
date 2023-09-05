@@ -1,11 +1,15 @@
 import { atom } from "jotai"
 
-import { OrderItem, OrderItemInput } from "@/types/order.types"
+import {
+  IOrderItemStatus,
+  OrderItem,
+  OrderItemInput,
+} from "@/types/order.types"
 import { IProduct } from "@/types/product.types"
 import { ORDER_STATUSES } from "@/lib/constants"
 
 interface IUpdateItem {
-  productId?: string
+  _id: string
   count?: number
   isTake?: boolean
 }
@@ -14,21 +18,19 @@ export const changeCount = (
   product: IUpdateItem,
   cart: OrderItem[]
 ): OrderItem[] => {
-  const { productId, count, isTake } = product
+  const { _id, count, isTake } = product
 
   if (typeof isTake !== "undefined") {
-    return cart.map((item) =>
-      item.productId === productId ? { ...item, isTake } : item
-    )
+    return cart.map((item) => (item._id === _id ? { ...item, isTake } : item))
   }
 
   if (typeof count !== "undefined") {
     const newCart = cart.map((item) =>
-      item.productId === productId ? { ...item, count } : item
+      item._id === _id ? { ...item, count } : item
     )
 
     if (count === -1) {
-      return newCart.filter((item) => item.productId !== productId)
+      return newCart.filter((item) => item._id !== _id)
     }
 
     return newCart
@@ -42,15 +44,16 @@ export const addToCart = (
   cart: OrderItem[]
 ): OrderItem[] => {
   const prevItem = cart.find(
-    ({ productId, status, manufacturedDate }) =>
+    ({ productId, status, manufacturedDate, isTake }) =>
       productId === product._id &&
       status === ORDER_STATUSES.NEW &&
-      manufacturedDate === product.manufacturedDate
+      manufacturedDate == product.manufacturedDate &&
+      !isTake
   )
 
   if (prevItem) {
-    const { productId, count } = prevItem
-    return changeCount({ productId, count: count + 1 }, cart)
+    const { _id, count } = prevItem
+    return changeCount({ _id, count: count + 1 }, cart)
   }
 
   const { unitPrice, _id, name } = product
@@ -61,7 +64,7 @@ export const addToCart = (
     count: 1,
     unitPrice,
     productName: name,
-    status: ORDER_STATUSES.NEW,
+    status: ORDER_STATUSES.NEW as IOrderItemStatus,
   }
 
   return [cartItem, ...cart]

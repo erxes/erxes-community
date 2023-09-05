@@ -1,5 +1,6 @@
 import { CustomerT, CustomerTypeT } from "./customer.types"
 
+export type IOrderItemStatus = "new" | "done" | "confirm"
 export interface OrderItemInput {
   _id: string
   productId: string
@@ -7,7 +8,7 @@ export interface OrderItemInput {
   unitPrice: number
   isPackage?: boolean
   isTake?: boolean
-  status?: string
+  status?: IOrderItemStatus
   manufacturedDate?: string
 }
 
@@ -39,7 +40,7 @@ export interface IOrderCommon {
   type?: IOrderType
   customerId?: string
   customerType?: CustomerTypeT
-  deliveryInfo?: object
+  deliveryInfo?: { [key: string]: string; description: string }
   billType?: IBillType
   registerNumber?: string
   slotCode?: string

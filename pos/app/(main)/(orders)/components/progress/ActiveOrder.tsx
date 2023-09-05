@@ -88,7 +88,7 @@ const ActiveOrder = ({
 
         <CardFooter className="justify-end gap-2">
           {type === "delivery" && <DeliveryInfo />}
-          <ChangeOrderStatus _id={_id} items={items}/>
+          <ChangeOrderStatus _id={_id} items={items} status={status}/>
         </CardFooter>
       </Card>
     </Collapsible>

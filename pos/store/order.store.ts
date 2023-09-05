@@ -54,13 +54,23 @@ export const printTypeAtom = atom<string | null>(null)
 export const slotCodeAtom = atom<string | null>(null)
 
 // delivery
-export const deliveryInfoAtom = atom<object | null>(null)
+export const deliveryInfoAtom = atom<{
+  [key: string]: string
+  description: string
+} | null>(null)
+
 export const setDeliveryInfoAtom = atom(
   () => "",
-  (get, set, update: object) => {
-    set(deliveryInfoAtom, update)
+  (get, set, update: string) => {
+    set(deliveryInfoAtom, {
+      ...(get(deliveryInfoAtom) || {}),
+      description: update,
+    })
   }
 )
+
+export const dueDateAtom = atom<Date | null>(new Date())
+
 // payment
 export const orderTotalAmountAtom = atom<number>(0)
 export const cashAmountAtom = atom<number>(0)
@@ -103,6 +113,7 @@ export const setInitialAtom = atom(
     set(orderNumberAtom, "")
     set(paymentSheetAtom, false)
     set(customerSearchAtom, "")
+    set(dueDateAtom, null)
   }
 )
 
@@ -129,6 +140,7 @@ export const setOrderStatesAtom = atom(
       putResponses,
       user,
       number,
+      dueDate,
     }: IOrder
   ) => {
     set(activeOrderAtom, _id || "")
@@ -148,5 +160,6 @@ export const setOrderStatesAtom = atom(
     set(orderUserAtom, user || null)
     set(orderNumberAtom, number || "")
     set(customerSearchAtom, customer?.primaryPhone || customer?._id || "")
+    set(dueDateAtom, new Date(dueDate || ""))
   }
 )

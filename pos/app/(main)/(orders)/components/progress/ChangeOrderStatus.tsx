@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button"
 const ChangeOrderStatus = ({
   _id,
   items,
+  status,
 }: {
   _id: string
   items: OrderItem[]
+  status?: string
 }) => {
   const setShowReciept = useSetAtom(showRecieptAtom)
 
@@ -43,7 +45,8 @@ const ChangeOrderStatus = ({
     const doneItems = items.filter(
       (item) => item.status === ORDER_STATUSES.DONE
     )
-    if (doneItems.length > 0) handleChangeStatus(ORDER_STATUSES.DOING)
+    if (doneItems.length > 0 && status !== ORDER_STATUSES.DOING)
+      handleChangeStatus(ORDER_STATUSES.DOING)
 
     if (doneItems.length === items.length)
       handleChangeStatus(ORDER_STATUSES.DONE)

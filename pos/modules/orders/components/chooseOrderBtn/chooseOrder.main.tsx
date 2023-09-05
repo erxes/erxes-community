@@ -35,7 +35,9 @@ const ChooseOrder = ({ number, status, _id }: IOrder) => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{number}</p>
+          <p>
+            {(number || "").split("_")[0]} {status}
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

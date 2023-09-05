@@ -62,8 +62,9 @@ const EbarimtMain = () => {
               disabled={disabled}
               onClick={printBill}
               loading={loading}
+              className="font-semibold"
             >
-              Save changes
+              Баримт хэвлэх
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -71,8 +72,8 @@ const EbarimtMain = () => {
           <iframe
             ref={iframeRef}
             src={"/reciept/ebarimt/" + activeOrder}
-           className="absolute h-1 w-1"
-              style={{ top: 10000, left: 10000 }}
+            className="absolute h-1 w-1"
+            style={{ top: 10000, left: 10000 }}
           />
         )}
       </Dialog>

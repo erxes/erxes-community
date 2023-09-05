@@ -1,13 +1,14 @@
 import BuyAction from "@/modules/checkout/components/buyAction/buyAction.main"
 import Cart from "@/modules/checkout/components/cart/cart.main"
 import TotalAmount from "@/modules/checkout/components/totalAmount/totalAmount.main"
+import Customer from "@/modules/customer"
 import OrderDetail from "@/modules/orders/OrderDetail.main"
+import ShowDeliveryInfo from "@/modules/orders/components/DeliveryInputs/ShowDeliveryInfo"
 import ChooseType from "@/modules/orders/components/chooseType/chooseType.main"
 import Search from "@/modules/products/components/search/search.main"
 import ProductCategories from "@/modules/products/productCategories.main"
 import Products from "@/modules/products/products.main"
 
-import Customer from "@/modules/customer"
 import Header from "@/components/header/header.main"
 
 const MainIndexPage = () => {
@@ -31,8 +32,9 @@ const MainIndexPage = () => {
                 <Customer />
               </div>
               <Cart />
-              <div className="grid flex-none grid-cols-2 gap-3 p-4">
+              <div className="grid flex-none grid-cols-2 gap-2 p-4">
                 <TotalAmount />
+                <ShowDeliveryInfo />
                 <ChooseType />
                 <BuyAction />
               </div>

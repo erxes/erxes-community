@@ -13,6 +13,16 @@ export const ORDER_TYPES = {
   OUT: ["loss", "spend", "reject"],
 }
 
+export const typeTextDef: any = {
+  eat: "Зааланд",
+  take: "Авч явах",
+  delivery: "Хүргэлтээр",
+  loss: "Хорогдол",
+  spend: "Зарлагадсан",
+  reject: "Гологдол",
+  before: "Урьдчилсан",
+}
+
 export const ORDER_STATUSES = {
   NEW: "new",
   DOING: "doing",

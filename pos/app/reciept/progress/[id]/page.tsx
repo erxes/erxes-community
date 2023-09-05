@@ -7,6 +7,7 @@ import { useQuery } from "@apollo/client"
 import { format } from "date-fns"
 
 import { IPutResponse, OrderItem } from "@/types/order.types"
+import { Separator } from "@/components/ui/separator"
 
 import Stocks from "../../components/Stocks"
 
@@ -38,7 +39,7 @@ const Progress = ({ params }: { params: Params }) => {
     data?.orderDetail || {}
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 text-xs">
       <div className="flex items-center justify-between font-semibold text-xs">
         <span className="">Erxes pos</span>
         <span>#{(number || "").split("_")[1]}</span>
@@ -50,19 +51,29 @@ const Progress = ({ params }: { params: Params }) => {
         </span>
       </div>
 
-      <Stocks
-        stocks={(items || []).map((item: OrderItem) => ({
-          name: item.productName,
-          qty: item.count,
-          unitPrice: item.unitPrice,
-          totalAmount: item.count * item.unitPrice,
-        }))}
-      />
+      <div>
+        <div className="flex items-center justify-between font-semibold">
+          <span>Бараа</span>
+          <span>Т/Ш</span>
+        </div>
+        <Separator />
+        {items.map((item: OrderItem) => (
+          <div className="flex items-center justify-between">
+            <span>{item.productName}</span>
+            <span>x{item.count}</span>
+          </div>
+        ))}
+      </div>
 
       {type === "delivery" && !!deliveryInfo && (
         <div>
-          Хүргэлтын мэдээлэл:{" "}
-          <div dangerouslySetInnerHTML={{ __html: deliveryInfo }} />
+          <div className="font-semibold">Хүргэлтын мэдээлэл:</div>
+          {Object.keys(deliveryInfo).map((key) => (
+            <div className="flex">
+              <span className="font-semibold pr-1">{key}:</span>
+              <span>{deliveryInfo[key]}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>

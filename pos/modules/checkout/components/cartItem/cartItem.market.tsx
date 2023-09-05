@@ -2,7 +2,7 @@
 
 import { updateCartAtom } from "@/store/cart.store"
 import { motion } from "framer-motion"
-import { useAtom } from "jotai"
+import { useSetAtom } from "jotai"
 import { MinusIcon, PlusIcon, X } from "lucide-react"
 
 import { OrderItem } from "@/types/order.types"
@@ -11,17 +11,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 const CartItem = ({
+  _id,
   index,
-  productId,
   count,
   productName,
   unitPrice,
 }: OrderItem & { index: number }) => {
-  const [, updateCart] = useAtom(updateCartAtom)
+  const updateCart = useSetAtom(updateCartAtom)
   const formattedIndex = (index + 1).toString().padStart(2, "0")
 
   const handleUpdate = (newCount: number | string) =>
-    updateCart({ productId, count: Number(newCount) })
+    updateCart({ _id, count: Number(newCount) })
 
   return (
     <motion.div

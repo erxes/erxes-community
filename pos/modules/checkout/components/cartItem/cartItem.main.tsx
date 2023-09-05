@@ -1,6 +1,6 @@
 import { updateCartAtom } from "@/store/cart.store"
-import { AnimationProps, Variants, motion } from "framer-motion"
-import { useAtom } from "jotai"
+import { Variants, motion } from "framer-motion"
+import { useSetAtom } from "jotai"
 import { Minus, Plus } from "lucide-react"
 
 import { OrderItem } from "@/types/order.types"
@@ -16,14 +16,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
+import CartItemStatus from "./cartItemStatus"
+
 const CartItem = ({
   productName,
   count,
   unitPrice,
-  productId,
+  status,
   isTake,
+  _id,
 }: OrderItem) => {
-  const [, changeItem] = useAtom(updateCartAtom)
+  const changeItem = useSetAtom(updateCartAtom)
 
   return (
     <motion.div
@@ -36,15 +39,15 @@ const CartItem = ({
         duration: 0.3,
       }}
     >
-      <Label className="flex w-1/12 items-center" htmlFor={productId}>
+      <Label className="flex w-1/12 items-center" htmlFor={_id}>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Checkbox
-                id={productId}
+                id={_id}
                 checked={isTake}
                 onCheckedChange={(checked) =>
-                  changeItem({ productId, isTake: !!checked })
+                  changeItem({ _id, isTake: !!checked })
                 }
               />
             </TooltipTrigger>
@@ -68,7 +71,7 @@ const CartItem = ({
           </Tooltip>
         </TooltipProvider>
         <div className="mt-1 flex items-center">
-          <span className="h-2 w-2 rounded bg-warning"></span>
+          <CartItemStatus status={status} />
           <div className="ml-2 text-xs font-extrabold">
             {formatNum(unitPrice)}₮
           </div>
@@ -77,21 +80,19 @@ const CartItem = ({
       <div className="flex w-5/12 items-center justify-end">
         <Button
           className={countBtnClass}
-          onClick={() => changeItem({ productId, count: (count || 0) - 1 })}
+          onClick={() => changeItem({ _id, count: (count || 0) - 1 })}
         >
           <Minus className="h-3 w-3" strokeWidth={4} />
         </Button>
         <Input
           className="mx-2 w-8 border-none p-1 text-center text-sm font-semibold [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           type="number"
-          onChange={(e) =>
-            changeItem({ productId, count: Number(e.target.value) })
-          }
+          onChange={(e) => changeItem({ _id, count: Number(e.target.value) })}
           value={count}
         />
         <Button
           className={countBtnClass}
-          onClick={() => changeItem({ productId, count: (count || 0) + 1 })}
+          onClick={() => changeItem({ _id, count: (count || 0) + 1 })}
         >
           <Plus className="h-3 w-3" strokeWidth={4} />
         </Button>
