@@ -1,0 +1,37 @@
+name: POS UI CI
+
+on:
+  push:
+    branches:
+      - dev
+      - staging
+    paths:
+      - 'pos/**'
+      - '.github/workflows/pos-ui.yaml'
+
+jobs:
+  pos-ui:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Use Node.js 14.20.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.20.x
+
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          cd pos
+          rm -rf node_modules
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: Build docker image
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/build-test' )
+        run: |
+          cd pos
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          DOCKER_BUILDKIT=1 docker build -t erxes/pos-ui:${GITHUB_REF#refs/heads/} -f Dockerfile .
+          docker push erxes/pos-ui:${GITHUB_REF#refs/heads/}
