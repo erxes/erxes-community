@@ -76,18 +76,35 @@ const chatMutations = {
   },
 
   chatEdit: async (_root, { _id, ...doc }, { models, user }) => {
-    return models.Chats.updateChat(_id, doc);
+    return models.Chats.updateChat(_id, doc, user);
   },
 
   chatRemove: async (_root, { _id }, { models, user }) => {
-    const chat = await models.Chats.findOne({ _id });
+    const chat = await models.Chats.findOne({
+      _id,
+      participantIds: { $in: [user._id] }
+    });
 
     if (!chat) {
       throw new Error('Chat not found');
     }
 
     if (chat.type === CHAT_TYPE.GROUP) {
-      await checkChatAdmin(models.Chats, user._id);
+      if (chat.participantIds.length > 1) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $pull: {
+              participantIds: { $in: user?._id },
+              adminIds: { $in: user?._id }
+            }
+          }
+        );
+
+        return 'Success';
+      }
+
+      return models.Chats.removeChat(_id);
     }
 
     return models.Chats.removeChat(_id);
@@ -103,7 +120,7 @@ const chatMutations = {
     let seen;
 
     if (lastMessage) {
-      const chat = await models.Chats.getChat(_id);
+      const chat = await models.Chats.getChat(_id, user._id);
 
       const seenInfos = chat.seenInfos || [];
 
@@ -156,38 +173,73 @@ const chatMutations = {
     return seen;
   },
 
-  chatToggleIsPinned: async (_root, { _id }, { models }) => {
-    const chat = await models.Chats.findOne({ _id });
+  chatToggleIsPinned: async (_root, { _id }, { models, user }) => {
+    const chat = await models.Chats.findOne({
+      _id,
+      participantIds: { $in: [user._id] }
+    });
+
+    const isPinnedUser = chat && chat.isPinnedUserIds.includes(user._id);
 
     if (chat) {
       graphqlPubsub.publish('chatInserted', {
         userId: chat.createdUser?._id
       });
 
-      await models.Chats.updateOne(
-        { _id },
-        { $set: { isPinned: !chat.isPinned } }
-      );
+      if (!isPinnedUser) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $push: { isPinnedUserIds: [user._id] }
+          }
+        );
+      }
 
-      return !chat.isPinned;
+      if (isPinnedUser) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $pull: { isPinnedUserIds: { $in: [user._id] } }
+          }
+        );
+      }
+
+      return true;
     }
     return false;
   },
 
-  chatToggleIsWithNotification: async (_root, { _id }, { models }) => {
-    const chat = await models.Chats.findOne({ _id });
+  chatToggleIsWithNotification: async (_root, { _id }, { models, user }) => {
+    const chat = await models.Chats.findOne({
+      _id,
+      participantIds: { $in: [user._id] }
+    });
+    const muteUser = chat && chat.muteUserIds.includes(user._id);
 
     if (chat) {
       graphqlPubsub.publish('chatInserted', {
         userId: chat.createdUser?._id
       });
 
-      await models.Chats.updateOne(
-        { _id },
-        { $set: { isWithNotification: !chat.isWithNotification } }
-      );
+      if (!muteUser) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $push: { muteUserIds: [user._id] }
+          }
+        );
+      }
 
-      return !chat.isWithNotification;
+      if (muteUser) {
+        await models.Chats.updateOne(
+          { _id },
+          {
+            $pull: { muteUserIds: { $in: [user._id] } }
+          }
+        );
+      }
+
+      return true;
     }
     return false;
   },
@@ -227,9 +279,11 @@ const chatMutations = {
       chatReceivedNotification: message
     });
 
-    const chat = await models.Chats.getChat(message.chatId);
+    const chat = await models.Chats.getChat(message.chatId, user._id);
 
-    const recievers = chat.participantIds.filter(i => i !== user._id);
+    const recievers = chat.participantIds.filter(
+      value => !chat.muteUserIds.includes(value)
+    );
 
     sendCoreMessage({
       subdomain: 'os',
@@ -287,9 +341,8 @@ const chatMutations = {
     { _id, userIds, type },
     { models, user }
   ) => {
-    await checkChatAdmin(models.Chats, user._id);
-
-    const chat = await models.Chats.getChat(_id);
+    const chat = await models.Chats.getChat(_id, user._id);
+    // const chat = await models.Chats.getChat(_id);
 
     if ((chat.participantIds || []).length === 1) {
       if (type === 'remove') {
@@ -418,7 +471,9 @@ const chatMutations = {
 
     const chat = await models.Chats.getChat(message.chatId);
 
-    const recievers = chat.participantIds.filter(i => i !== user._id);
+    const recievers = chat.participantIds.filter(
+      value => !chat.muteUserIds.includes(value)
+    );
 
     sendCoreMessage({
       subdomain: 'os',
