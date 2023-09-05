@@ -23,10 +23,10 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Use Node.js 14.20.x
+      - name: Use Node.js 16.14.x
         uses: actions/setup-node@v1
         with:
-          node-version: 14.20.x
+          node-version: 16.14.x
 
       - uses: actions/checkout@v2
 
