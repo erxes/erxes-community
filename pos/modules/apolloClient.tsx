@@ -37,10 +37,10 @@ const authLink = setContext((_, { headers }) => {
 const wsLink: any =
   typeof window !== "undefined"
     ? new GraphQLWsLink(
-        createClient({
-          url: env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || "",
-        })
-      )
+      createClient({
+        url: env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || "",
+      })
+    )
     : null
 
 const httpLinkWithMiddleware = authLink.concat(httpLink)
@@ -52,13 +52,13 @@ type Definintion = {
 const splitLink =
   typeof window !== "undefined"
     ? split(
-        ({ query }) => {
-          const { kind, operation }: Definintion = getMainDefinition(query)
-          return kind === "OperationDefinition" && operation === "subscription"
-        },
-        wsLink,
-        httpLinkWithMiddleware
-      )
+      ({ query }) => {
+        const { kind, operation }: Definintion = getMainDefinition(query)
+        return kind === "OperationDefinition" && operation === "subscription"
+      },
+      wsLink,
+      httpLinkWithMiddleware
+    )
     : httpLinkWithMiddleware
 
 export const client = new ApolloClient({
