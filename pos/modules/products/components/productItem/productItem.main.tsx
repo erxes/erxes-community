@@ -27,7 +27,6 @@ const ProductItem = ({
       onClick={() => addToCart({ name, _id, unitPrice })}
     >
       <Image
-        noWrap
         src={(attachment || {}).url || ""}
         alt=""
         width={200}
