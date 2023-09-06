@@ -1,5 +1,6 @@
+import LoginContainer from "@/modules/auth/login"
+
 import Image from "@/components/ui/image"
-import LoginContainer from '@/modules/auth/login'
 
 const Login = () => {
   return (
@@ -13,10 +14,9 @@ const Login = () => {
               fallBack={"/logo-dark.png"}
               height={48}
               width={96}
-              noWrap
             />
           </div>
-          <h5 className='pb-3 text-lg font-extrabold text-primary'>Welcome to Butenorgil!</h5>
+         
           <LoginContainer />
         </div>
       </div>

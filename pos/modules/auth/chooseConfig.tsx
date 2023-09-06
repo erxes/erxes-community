@@ -17,7 +17,7 @@ const ChooseConfig = () => {
   const [config] = useAtom(configAtom)
   const [configs] = useAtom(configsAtom)
   const [chooseConfig, { loading }] = useMutation(mutations.chooseConfig, {
-    refetchQueries: [{ query: queries.currentConfig }, "currentConfig"],
+    refetchQueries: [{ query: queries.currentConfig }, "CurrentConfig"],
   })
 
   const handleChange = (value: string) => {
@@ -27,25 +27,30 @@ const ChooseConfig = () => {
   if (!configs || configs.length < 2) return null
 
   return (
-    <div className="mb-3 space-y-1">
-      <Label>Choose pos</Label>
-      <Select
-        disabled={loading}
-        value={config?.token}
-        onValueChange={handleChange}
-      >
-        <SelectTrigger loading={loading}>
-          <SelectValue placeholder="сонгох" />
-        </SelectTrigger>
-        <SelectContent>
-          {(configs || []).map(({ token, name }: any) => (
-            <SelectItem key={token} value={token}>
-              {name} - {token}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <>
+      <h5 className="pb-3 text-lg font-extrabold text-primary">
+        Welcome to {config?.name}!
+      </h5>
+      <div className="mb-3 space-y-1">
+        <Label>Choose pos</Label>
+        <Select
+          disabled={loading}
+          value={config?.token}
+          onValueChange={handleChange}
+        >
+          <SelectTrigger loading={loading}>
+            <SelectValue placeholder="сонгох" />
+          </SelectTrigger>
+          <SelectContent>
+            {(configs || []).map(({ token, name }: any) => (
+              <SelectItem key={token} value={token}>
+                {name} - {token}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </>
   )
 }
 

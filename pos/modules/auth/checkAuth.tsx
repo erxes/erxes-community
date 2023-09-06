@@ -4,7 +4,7 @@
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { configAtom, configsAtom, currentUserAtom } from "@/store/config.store"
-import { useAtom } from "jotai"
+import { useAtomValue } from "jotai"
 import { Loader2, ServerOffIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -29,9 +29,9 @@ const checkValidAuth = (currentUser: any, config: any) => {
 }
 
 const CheckAuth = ({ children }: any) => {
-  const [configs] = useAtom(configsAtom)
-  const [currentUser] = useAtom(currentUserAtom)
-  const [config] = useAtom(configAtom)
+  const configs = useAtomValue(configsAtom)
+  const currentUser = useAtomValue(currentUserAtom)
+  const config = useAtomValue(configAtom)
 
   const pathname = usePathname()
   const router = useRouter()

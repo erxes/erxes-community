@@ -34,7 +34,7 @@ const configFields = `
 `
 
 const currentConfig = gql`
-  query currentConfig {
+  query CurrentConfig {
     currentConfig {
       ${configFields}
     }
@@ -42,7 +42,7 @@ const currentConfig = gql`
 `
 
 const getPaymentConfig = gql`
-  query getPaymentConfig {
+  query GetPaymentConfig {
     currentConfig {
       erxesAppToken
       paymentIds
@@ -53,7 +53,7 @@ const getPaymentConfig = gql`
 `
 
 const getCoverConfig = gql`
-  query getCoverConfig {
+  query GetCoverConfig {
     currentConfig {
       paymentTypes
       paymentIds
@@ -90,6 +90,30 @@ const getEbarimtConfig = gql`
   }
 `
 
+const getWholeConfig = gql`
+  query WholeConfig {
+    currentConfig {
+      ${configFields}
+      erxesAppToken
+      paymentIds
+      paymentTypes
+      permissionConfig
+      branchId
+      createdAt
+      departmentId
+      ebarimtConfig {
+        ebarimtUrl
+        companyRD
+        footerText
+        hasCopy
+      }
+      uiOptions {
+        receiptIcon
+      }
+    }
+  }
+`
+
 const configs = gql`
   query posclientConfigs {
     posclientConfigs {
@@ -121,6 +145,7 @@ const queries = {
   getEbarimtConfig,
   getCoverConfig,
   posUsers,
+  getWholeConfig,
 }
 
 export default queries

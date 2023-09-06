@@ -63,15 +63,17 @@ const useFullOrders = ({
   })
 
   const { page, perPage, ...restVariables } = variables || {}
-  const [getOrdersTotalCount, { loading: loadCount, data: countData }] =
-    useLazyQuery(queries.ordersTotalCount, {
-      variables: restVariables,
-      fetchPolicy,
-      onCompleted(data) {
-        const { ordersTotalCount } = data || {}
-        !!onCountCompleted && onCountCompleted(ordersTotalCount)
-      },
-    })
+  const [
+    getOrdersTotalCount,
+    { loading: loadCount, data: countData, refetch: refetchCount },
+  ] = useLazyQuery(queries.ordersTotalCount, {
+    variables: restVariables,
+    fetchPolicy,
+    onCompleted(data) {
+      const { ordersTotalCount } = data || {}
+      !!onCountCompleted && onCountCompleted(ordersTotalCount)
+    },
+  })
 
   const fullOrders = (data || {}).fullOrders || []
   const totalCount = (countData || {}).ordersTotalCount || 0
@@ -86,6 +88,7 @@ const useFullOrders = ({
           const changedOrder = subscriptionData.data.ordersOrdered
           if (changedOrder) {
             refetch()
+            refetchCount()
             callBack && callBack()
           }
           return prev
