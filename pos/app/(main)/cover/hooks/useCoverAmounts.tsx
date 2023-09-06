@@ -1,7 +1,5 @@
 import { useParams } from "next/navigation"
-import {
-  setCoverAmountAtom,
-} from "@/store/cover.store"
+import { setCoverAmountAtom } from "@/store/cover.store"
 import { useLazyQuery } from "@apollo/client"
 import { useAtom } from "jotai"
 

@@ -17,7 +17,7 @@ export const currentPaymentTypeAtom = atom<string>(
 
 export const customerSearchAtom = atom<string>("")
 
-export const reportDateAtom = atom<Date | null>(null) 
+export const reportDateAtom = atom<Date | null>(null)
 
 const JotaiProvider = ({ children }: { children: React.ReactNode }) => {
   return <Provider>{children}</Provider>

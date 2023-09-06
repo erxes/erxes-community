@@ -41,7 +41,7 @@ const ConfigsFetch = () => {
     onError(error) {
       return toast({ description: error.message, variant: "destructive" })
     },
-    refetchQueries: [{ query: queries.currentConfig }, "currentConfig"],
+    refetchQueries: ["currentConfig"],
   })
   const onSubmit = (data: z.infer<typeof FormSchema>) =>
     posConfigsFetch({ variables: data })

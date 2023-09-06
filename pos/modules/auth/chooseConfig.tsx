@@ -17,7 +17,7 @@ const ChooseConfig = () => {
   const [config] = useAtom(configAtom)
   const [configs] = useAtom(configsAtom)
   const [chooseConfig, { loading }] = useMutation(mutations.chooseConfig, {
-    refetchQueries: [{ query: queries.currentConfig }, "CurrentConfig"],
+    refetchQueries: ["CurrentConfig"],
   })
 
   const handleChange = (value: string) => {

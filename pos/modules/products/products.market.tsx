@@ -6,7 +6,7 @@ import { useProducts } from "./hooks/useProducts"
 const Products = () => {
   const { products, loading, handleLoadMore } = useProducts()
 
-  if (loading) return <div className='mt-4'>loading...</div>
+  if (loading) return <div className="mt-4">loading...</div>
 
   return (
     <ScrollArea className="mt-4 flex-auto">

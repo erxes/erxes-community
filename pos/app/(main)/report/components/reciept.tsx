@@ -132,13 +132,17 @@ const Receipt = ({ date, report }: any) => {
         <p>Хэвлэсэн: {format(new Date(), "yyyy.MM.dd HH:mm")}</p>
       </header>
       {Object.keys(report || {}).map((userId) => renderUser(report[userId]))}
-      <footer className='space-y-1'>
+      <footer className="space-y-1">
         <p>
           <label>Гарын үсэг:</label>
           <span> _____________________</span>
         </p>
 
-        <Button onClick={() => window.print()} className="print:hidden w-full" size="sm">
+        <Button
+          onClick={() => window.print()}
+          className="print:hidden w-full"
+          size="sm"
+        >
           Хэвлэх
         </Button>
       </footer>

@@ -2,7 +2,7 @@
 
 import { beginDateAtom, endDateAtom } from "@/store/cover.store"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format, getHours, setHours, setMinutes } from "date-fns"
+import { format, setHours, setMinutes } from "date-fns"
 import { useAtom } from "jotai"
 import { useForm } from "react-hook-form"
 import * as z from "zod"

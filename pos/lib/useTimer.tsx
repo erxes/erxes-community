@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { format, parseISO } from "date-fns"
+import { parseISO } from "date-fns"
 
 const useTimer = (targetDate: string) => {
   const [remainingTime, setRemainingTime] = useState<number>(

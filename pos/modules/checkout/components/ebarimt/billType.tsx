@@ -7,10 +7,10 @@ import { useAtom } from "jotai"
 
 import { IBillType } from "@/types/order.types"
 import { BILL_TYPES } from "@/lib/constants"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { cn } from '@/lib/utils'
 
 const CheckRegister = dynamic(() => import("./checkRegister.market"))
 
@@ -29,7 +29,10 @@ const BillType = () => {
   return (
     <>
       <RadioGroup
-        className={cn("flex items-center pb-4 pt-3", showInner ? 'justify-between' : 'space-x-4')}
+        className={cn(
+          "flex items-center pb-4 pt-3",
+          showInner ? "justify-between" : "space-x-4"
+        )}
         value={(!skipEbarimt && billType) || undefined}
         onValueChange={(value) => setBillType(value as IBillType)}
         id="ebarimt"

@@ -52,9 +52,19 @@ export interface IEbarimtConfig {
   uiOptions: {
     receiptIcon: string
   }
+  name: string
 }
 
-export interface ISettingsConfig {}
+export interface ISettingsConfig {
+  branchId: string
+  createdAt: string
+  departmentId: string
+  paymentTypes: IPaymentType[]
+  ebarimtConfig: {
+    ebarimtUrl: string
+    companyRD: string
+  }
+}
 
 export interface ICurrentUser {
   _id: string

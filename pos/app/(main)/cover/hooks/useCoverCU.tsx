@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client"
 
 import { useToast } from "@/components/ui/use-toast"
 
-import { mutations, queries } from "../graphql"
+import { mutations } from "../graphql"
 
 const useCoverCU = () => {
   const { id } = useParams()
@@ -11,19 +11,14 @@ const useCoverCU = () => {
 
   const [createCover, { loading }] = useMutation(mutations.coversAdd, {
     onError,
-    refetchQueries: [{ query: queries.covers }, "Covers"],
+    refetchQueries: ["Covers"],
   })
 
   const [editCover, { loading: loadingEdit }] = useMutation(
     mutations.coversEdit,
     {
       onError,
-      refetchQueries: [
-        { query: queries.covers },
-        "Covers",
-        { query: queries.coverDetail },
-        "CoverDetail",
-      ],
+      refetchQueries: ["Covers", "CoverDetail"],
     }
   )
 

@@ -21,7 +21,7 @@ const CustomAmounts = () => {
     })
   }
 
-  return ( 
+  return (
     <>
       {[...nonBankPts].map((pt) => (
         <Amount {...pt} amount={(calcAmounts || {})[pt.type]} key={pt.type} />

@@ -11,13 +11,15 @@ import SettingsButton from "./components/Button"
 import { mutations } from "./graphql"
 
 const refetchQueries = {
-  product: [{ query: queries.products }, "poscP"],
+  products: ["poscProducts", "poscProductCategories", "productsCount"],
+  config: ["SettingConfig"],
+  slots: ["SettingConfig"],
 }
 
 const SyncConfig = ({
   configType,
   ...rest
-}: ButtonProps & { configType: string }) => {
+}: ButtonProps & { configType: "products" | "config" | "slots" }) => {
   const { toast } = useToast()
 
   const success = () =>
@@ -34,7 +36,7 @@ const SyncConfig = ({
     }
   )
 
-  const [syncConfig, { loading, error }] = useMutation(mutations.syncConfig, {
+  const [syncConfig, { loading }] = useMutation(mutations.syncConfig, {
     variables: {
       type: configType,
     },
@@ -47,7 +49,7 @@ const SyncConfig = ({
     onError(error) {
       return toast({ description: error.message, variant: "destructive" })
     },
-    refetchQueries: [],
+    refetchQueries: refetchQueries[configType],
   })
 
   const handleClick = () => syncConfig()

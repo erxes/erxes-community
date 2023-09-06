@@ -2,6 +2,7 @@
 
 import useConfig from "@/modules/auth/hooks/useConfig"
 import ChooseTheme from "@/modules/settings/ChooseTheme"
+import GolomtConfig from "@/modules/settings/components/GolomtConfig"
 import Grid from "@/modules/settings/components/Grid"
 import StatusExplain from "@/modules/settings/components/StatusExplain"
 import { configAtom, currentUserAtom } from "@/store/config.store"
@@ -9,7 +10,6 @@ import { useAtom } from "jotai"
 import { Loader2 } from "lucide-react"
 
 import Image from "@/components/ui/image"
-import GolomtConfig from '@/modules/settings/components/GolomtConfig'
 
 const Settings = () => {
   const [user] = useAtom(currentUserAtom)

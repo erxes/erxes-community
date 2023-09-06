@@ -16,11 +16,16 @@ const Logout = () => {
     `,
     {
       onError,
-      refetchQueries: [queries.posCurrentUser, "posCurrentUser"],
+      refetchQueries: [queries.posCurrentUser],
     }
   )
   return (
-    <Button onClick={() => logout()} loading={loading} variant='ghost' className='w-full justify-start'>
+    <Button
+      onClick={() => logout()}
+      loading={loading}
+      variant="ghost"
+      className="w-full justify-start"
+    >
       <LogOutIcon className="mr-2 h-5 w-5" aria-hidden="true" />
       Гарах
     </Button>

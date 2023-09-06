@@ -1,5 +1,4 @@
 import { queries } from "@/modules/orders/graphql"
-import useOrderDetail from "@/modules/orders/hooks/useOrderDetail"
 import { detailIdAtom } from "@/store/history.store"
 import { useQuery } from "@apollo/client"
 import { format } from "date-fns"

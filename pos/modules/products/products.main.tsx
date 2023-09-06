@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect } from "react"
+import { Loader2Icon } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import ProductItem from "./components/productItem/productItem.main"
@@ -29,7 +31,10 @@ const Products = () => {
         ))}
       </div>
       {productsCount > FETCH_MORE_PER_PAGE && (
-        <div className="h-5 bg-rose-300" ref={ref} />
+        <Button className="w-full my-3" ref={ref} variant="outline">
+          <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
+          Уншиж байна ( {products.length} / {productsCount} )
+        </Button>
       )}
     </ScrollArea>
   )

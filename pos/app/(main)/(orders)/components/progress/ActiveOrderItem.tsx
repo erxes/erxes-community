@@ -1,5 +1,5 @@
 import { mutations } from "@/modules/orders/graphql"
-import { gql, useMutation } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { Loader2Icon, SoupIcon, TruckIcon } from "lucide-react"
 
 import { OrderItem } from "@/types/order.types"

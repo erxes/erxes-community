@@ -16,7 +16,7 @@ const Login = () => {
               width={96}
             />
           </div>
-         
+
           <LoginContainer />
         </div>
       </div>

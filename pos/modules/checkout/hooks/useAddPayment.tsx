@@ -9,7 +9,7 @@ const useAddPayment = (options?: { onError?: (errors: any) => void }) => {
   const { onError } = options || {}
   const { onError: error } = useToast()
   const [addPayment, { loading }] = useMutation(mutations.ordersAddPayment, {
-    refetchQueries: [{ query: queries.orderDetail }, "orderDetail"],
+    refetchQueries: ["orderDetail"],
     onError: (e) => {
       error(e)
       onError && onError(e)

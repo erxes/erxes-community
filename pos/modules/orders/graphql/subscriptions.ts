@@ -1,4 +1,4 @@
-import { orderFields } from './queries';
+import { orderFields } from "./queries"
 
 const ordersOrdered = `
   subscription ordersOrdered($statuses: [String], $customerId: String) {
@@ -17,18 +17,18 @@ const ordersOrdered = `
       }
     }
   }
-`;
+`
 const orderItemsOrdered = `
   subscription orderItemsOrdered($statuses: [String]) {
     orderItemsOrdered(statuses: $statuses) {
       _id
     }
   }
-`;
+`
 
 const subscriptions = {
   ordersOrdered,
   orderItemsOrdered,
-};
+}
 
-export default subscriptions;
+export default subscriptions

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Products from "@/modules/products/products.market"
+import { searchAtom } from "@/store"
 import { searchPopoverAtom } from "@/store/ui.store"
 import { AnimatePresence, motion } from "framer-motion"
 import { useAtom } from "jotai"
@@ -15,7 +16,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { searchAtom } from '@/store'
 
 const Content = motion(PopoverContent)
 

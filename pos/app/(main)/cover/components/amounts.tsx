@@ -1,8 +1,6 @@
 import { beginDateAtom } from "@/store/cover.store"
 import { useAtom } from "jotai"
 
-import { Separator } from "@/components/ui/separator"
-
 import Khaan from "./Khaan"
 import CashAmounts from "./cash-amounts"
 import CustomAmounts from "./custom-amounts"

@@ -1,5 +1,3 @@
-import { IOrderStatus } from "@/types/order.types"
-
 export const ORDER_TYPES = {
   TAKE: "take",
   EAT: "eat",

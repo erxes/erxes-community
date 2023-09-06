@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useEffect } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import {
   configAtom,
   setConfigsAtom,
@@ -18,23 +18,18 @@ const Configs = ({ children }: { children: ReactNode }) => {
   const setConfigs = useSetAtom(setConfigsAtom)
   const setCurrentUser = useSetAtom(setCurrentUserAtom)
   const setConfig = useSetAtom(configAtom)
+  const [loadingConfigs, setLoadingConfigs] = useState(true)
 
   const { loading, data } = useQuery(queries.posCurrentUser)
 
   const { data: config, loading: loadingConfig } = useQuery(
-    queries.currentConfig,
-    {
-      onCompleted(data) {
-        console.log(data)
-        setConfig(data?.currentConfig)
-      },
-      fetchPolicy: "network-only",
-    }
+    queries.currentConfig
   )
 
-  const { loading: loadingConfigs } = useQuery(queries.configs, {
+  useQuery(queries.configs, {
     onCompleted: (data) => {
       setConfigs(data.posclientConfigs)
+      setLoadingConfigs(false)
     },
   })
 

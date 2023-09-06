@@ -8,6 +8,7 @@ import {
   ICurrentUser,
   IEbarimtConfig,
   IPaymentConfig,
+  ISettingsConfig,
 } from "@/types/config.types"
 
 export const configAtom = atom<IConfig | null>(null)
@@ -25,6 +26,61 @@ export const setCurrentUserAtom = atom(
   null,
   (get, set, update: ICurrentUser | null) => {
     set(currentUserAtom, update)
+  }
+)
+
+export const setWholeConfig = atom(
+  null,
+  (
+    get,
+    set,
+    update: IConfig &
+      IPaymentConfig &
+      IEbarimtConfig &
+      ICoverConfig &
+      ISettingsConfig
+  ) => {
+    const {
+      erxesAppToken,
+      paymentIds,
+      paymentTypes,
+      permissionConfig,
+      createdAt,
+      ebarimtConfig,
+      uiOptions,
+      name,
+      _id,
+      cashierIds,
+      adminIds,
+      token,
+      waitingScreen,
+    } = update
+
+    set(configAtom, {
+      _id,
+      name,
+      cashierIds,
+      adminIds,
+      createdAt,
+      token,
+      waitingScreen,
+    })
+    set(paymentConfigAtom, {
+      erxesAppToken,
+      paymentIds,
+      paymentTypes,
+      permissionConfig,
+    })
+    set(ebarimtConfigAtom, {
+      ebarimtConfig,
+      uiOptions,
+      name,
+      paymentTypes,
+    })
+    set(coverConfigAtom, {
+      paymentIds,
+      paymentTypes,
+    })
   }
 )
 // 86614853

@@ -8,6 +8,7 @@ const useProductCategories = (): {
     _id: string
     name: string
     isRoot: boolean
+    order: string
   }[]
 } => {
   const { loading, data } = useQuery(queries.productCategories, {

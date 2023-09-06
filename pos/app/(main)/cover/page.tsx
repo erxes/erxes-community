@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useUsers } from "@/modules/auth/hooks/useUser"
 import { useQuery } from "@apollo/client"
 import { subDays } from "date-fns"
 import { AlarmPlus } from "lucide-react"
@@ -10,8 +9,6 @@ import { DateRange } from "react-day-picker"
 
 import { Button } from "@/components/ui/button"
 import { DatePickerWithRange } from "@/components/ui/date-range-picker"
-import { FacetedFilter } from "@/components/ui/faceted-filter"
-import { Skeleton } from "@/components/ui/skeleton"
 
 import DataTable from "./components/table"
 import { queries } from "./graphql"

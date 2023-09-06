@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { mutations } from "@/modules/orders/graphql"
 import { showRecieptAtom } from "@/store/progress.store"
 import { useMutation } from "@apollo/client"
@@ -7,7 +7,6 @@ import { CheckIcon } from "lucide-react"
 
 import { OrderItem } from "@/types/order.types"
 import { ORDER_STATUSES } from "@/lib/constants"
-import useReciept from "@/lib/useReciept"
 import { Button } from "@/components/ui/button"
 
 const ChangeOrderStatus = ({

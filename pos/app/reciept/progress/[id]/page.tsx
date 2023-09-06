@@ -6,10 +6,8 @@ import { queries } from "@/modules/orders/graphql"
 import { useQuery } from "@apollo/client"
 import { format } from "date-fns"
 
-import { IPutResponse, OrderItem } from "@/types/order.types"
+import { OrderItem } from "@/types/order.types"
 import { Separator } from "@/components/ui/separator"
-
-import Stocks from "../../components/Stocks"
 
 const Progress = ({ params }: { params: Params }) => {
   const { id } = params
@@ -58,7 +56,7 @@ const Progress = ({ params }: { params: Params }) => {
         </div>
         <Separator />
         {items.map((item: OrderItem) => (
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" key={item._id}>
             <span>{item.productName}</span>
             <span>x{item.count}</span>
           </div>
@@ -69,7 +67,7 @@ const Progress = ({ params }: { params: Params }) => {
         <div>
           <div className="font-semibold">Хүргэлтын мэдээлэл:</div>
           {Object.keys(deliveryInfo).map((key) => (
-            <div className="flex">
+            <div className="flex" key={key}>
               <span className="font-semibold pr-1">{key}:</span>
               <span>{deliveryInfo[key]}</span>
             </div>

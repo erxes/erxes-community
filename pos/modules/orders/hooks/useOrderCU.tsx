@@ -67,7 +67,7 @@ const useOrderCU = (onCompleted?: (id: string) => void) => {
         const { _id } = (data || {}).ordersEdit || {}
         return onCompleted && onCompleted(_id)
       },
-      refetchQueries: [{ query: queries.orderDetail }, "orderDetail"],
+      refetchQueries: ["orderDetail"],
       onError,
     }
   )

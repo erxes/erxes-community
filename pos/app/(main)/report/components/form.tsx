@@ -9,7 +9,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { useSetAtom } from "jotai"
-import { Loader2Icon, SearchIcon } from "lucide-react"
+import { SearchIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 

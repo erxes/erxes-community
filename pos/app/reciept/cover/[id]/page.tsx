@@ -34,7 +34,7 @@ const Cover = ({ params }: { params: Params }) => {
     details,
   } = data?.coverDetail || {}
 
-  const { paymentTypes, paymentIds } = config || {}
+  const { paymentTypes } = config || {}
 
   const cashDetail = details.find(
     (detail: Detail) => detail.paidType === "cashAmount"
@@ -77,8 +77,8 @@ const Cover = ({ params }: { params: Params }) => {
             <span className="w-1/3 text-right">Дүн</span>
           </div>
           <Separator />
-          {cashDetail?.paidSummary.map((ps: PaidSum) => (
-            <div className="flex items-center">
+          {cashDetail?.paidSummary.map((ps: PaidSum, i: number) => (
+            <div className="flex items-center" key={i}>
               <span className="w-1/3">{ps.kindOfVal}</span>
               <span className="w-1/3 text-center">{ps.value}</span>
               <span className="w-1/3 text-right">
@@ -107,8 +107,8 @@ const Cover = ({ params }: { params: Params }) => {
         </div>
       )}
 
-      {nonCash.map((ps: Detail) => (
-        <div>
+      {nonCash.map((ps: Detail, i: number) => (
+        <div key={i}>
           <div className="font-semibold">{getTitle(ps.paidType)}</div>
           <div className="flex items-center">
             <span className="w-1/3">Систем дүн</span>
@@ -124,7 +124,9 @@ const Cover = ({ params }: { params: Params }) => {
                   {Number(ps.paidDetail) - (ps.paidSummary[0].amount || 0)}
                 </span>
               </>
-            ): <div className="w-2/3"/>}
+            ) : (
+              <div className="w-2/3" />
+            )}
             <span className="w-1/3 text-right">{ps.paidSummary[0].amount}</span>
           </div>
           <Separator />

@@ -1,4 +1,4 @@
-import { currentAmountsAtom, detailsAtom } from "@/store/cover.store"
+import { currentAmountsAtom } from "@/store/cover.store"
 import { useAtom } from "jotai"
 
 import { IPaymentType } from "@/types/config.types"

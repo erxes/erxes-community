@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table"
 import { useAtomValue } from "jotai"
 
-import { IOrder, IOrderHistory } from "@/types/order.types"
+import { IOrderHistory } from "@/types/order.types"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,

@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import { configAtom } from "@/store/config.store"
 import { setInitialAtom } from "@/store/order.store"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 
 import Image from "@/components/ui/image"
 

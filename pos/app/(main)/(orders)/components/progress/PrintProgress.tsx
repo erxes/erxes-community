@@ -1,5 +1,5 @@
 import { showRecieptAtom } from "@/store/progress.store"
-import { useAtom, useAtomValue } from "jotai"
+import { useAtom } from "jotai"
 
 import useReciept from "@/lib/useReciept"
 

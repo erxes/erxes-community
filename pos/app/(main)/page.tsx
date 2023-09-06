@@ -1,4 +1,5 @@
-'use client'
+"use client"
+
 import dynamic from "next/dynamic"
 
 import { getMode } from "@/lib/utils"

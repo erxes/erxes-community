@@ -26,7 +26,6 @@ const SelectPaymentTypeMain = () => {
     golomt,
     mappedPts,
   } = usePossiblePaymentTerms()
-  
 
   const { loading } = useConfig("payment")
 

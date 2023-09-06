@@ -5,7 +5,6 @@ import {
   orderTotalAmountAtom,
   unPaidAmountAtom,
 } from "@/store/order.store"
-import { AnimatePresence, motion } from "framer-motion"
 import { useAtomValue } from "jotai"
 import { CheckCircle2Icon, CircleIcon } from "lucide-react"
 

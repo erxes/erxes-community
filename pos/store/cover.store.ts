@@ -120,7 +120,7 @@ export const setCoverDetailAtom = atom(
     let amounts = {} as { [key: string]: number }
     exceptCash.forEach((detail) => {
       amounts[detail.paidType] = detail.paidSummary[0].value || 0
-    }) 
+    })
     set(currentAmountsAtom, amounts)
     set(descriptionAtom, description || "")
   }

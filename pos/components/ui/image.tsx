@@ -5,14 +5,13 @@ import NextImage, { ImageLoaderProps, ImageProps } from "next/image"
 import { Package } from "lucide-react"
 
 import { cn, readFile } from "@/lib/utils"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 
 const Image: FC<
   ImageProps & {
     src?: string
     alt?: string
     fallBack?: string
-    withLoader?: boolean
-    contain?: boolean
   }
 > = (props) => {
   const {
@@ -23,15 +22,13 @@ const Image: FC<
     width,
     height,
     fallBack,
-    withLoader,
     sizes,
     className,
-    contain,
     ...rest
   } = props
   const fixedSrc = readFile(src || "")
 
-  const [isImageLoading, setIsImageLoading] = useState(withLoader)
+  const [isImageLoading, setIsImageLoading] = useState(true)
   const [srcI, setSrcI] = useState(fixedSrc || fallBack || "/product.png")
   const handleComplete = () => setIsImageLoading(false)
 
@@ -50,7 +47,7 @@ const Image: FC<
     onError,
   }
 
-  if (srcI === "/product.png")
+  if (srcI === "/product.png" || !srcI)
     return (
       <Package
         className={cn("p-4 text-zinc-300", className)}
@@ -63,12 +60,7 @@ const Image: FC<
       {...updatedProps}
       loader={!fixedSrc.startsWith("/") ? cloudflareLoader : undefined}
       onLoadingComplete={handleComplete}
-      className={cn(
-        "next-image",
-        className,
-        isImageLoading && "blur-2xl",
-        contain ? "object-contain" : "object-contain"
-      )}
+      className={cn(className, isImageLoading && "blur-2xl")}
       sizes={
         sizes ||
         `(max-width: 768px) 20vw,
@@ -81,14 +73,9 @@ const Image: FC<
 
 export function cloudflareLoader({ src, width, quality }: ImageLoaderProps) {
   const params = [`width=${width}`, `quality=${quality || 75}`, "format=auto"]
-  return `https://erxes.io/cdn-cgi/image/${params.join(",")}/${normalizeSrc(
-    src
-  )}`
+  return `https://erxes.io/cdn-cgi/image/${params.join(",")}/${src}`
 }
 
 //xos.techstore.mn/gateway/read-file?key=0.021508049013006180.51531201349981501.png
-const normalizeSrc = (src: string) => {
-  return src.startsWith("/") ? process.env.NEXT_PUBLIC_DOMAIN + src : src
-}
 
 export default memo(Image)

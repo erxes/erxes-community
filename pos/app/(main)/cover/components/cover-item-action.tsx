@@ -5,7 +5,6 @@ import { Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 
 import { Cover } from "@/types/cover.types"
-import useReciept from "@/lib/useReciept"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +28,7 @@ import {
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { toast, useToast } from "@/components/ui/use-toast"
 
-import { mutations, queries } from "../graphql"
+import { mutations } from "../graphql"
 
 const CoverItemAction = ({ row }: { row: Row<Cover> }) => {
   const { _id, status } = row.original || {}
@@ -50,7 +49,7 @@ const CoverItemAction = ({ row }: { row: Row<Cover> }) => {
       actionType === "delete" && toast({ description: "Амжилттай устлаа" })
     },
     onError,
-    refetchQueries: [{ query: queries.covers }, "covers"],
+    refetchQueries: ["covers"],
   }
 
   const [coversConfirm, { loading }] = useMutation(

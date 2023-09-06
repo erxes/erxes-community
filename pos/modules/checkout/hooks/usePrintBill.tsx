@@ -38,7 +38,7 @@ const usePrintBill = () => {
       onCompleted() {
         changeVisiblity(true)
       },
-      refetchQueries: [{ query: queries.orderDetail }, "orderDetail"],
+      refetchQueries: ["orderDetail"],
       onError,
     }
   )

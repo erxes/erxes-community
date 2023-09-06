@@ -1,6 +1,6 @@
 import useHandlePayment from "@/modules/checkout/hooks/useHandlePayment"
 import { currentAmountAtom } from "@/store"
-import { useAtom, useAtomValue } from "jotai"
+import { useAtomValue } from "jotai"
 
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { Button } from "@/components/ui/button"

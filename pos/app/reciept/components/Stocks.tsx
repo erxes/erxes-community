@@ -1,4 +1,3 @@
-import { OrderItem } from "@/types/order.types"
 import { formatNum } from "@/lib/utils"
 
 interface IStock {
