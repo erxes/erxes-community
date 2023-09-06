@@ -19,7 +19,7 @@ const useOrderDetail = (args?: {
   const { query, onCompleted, skip, variables } = args || {}
 
   const [activeOrderId] = useAtom(activeOrderAtom)
-  const setOrderStates= useSetAtom(setOrderStatesAtom)
+  const setOrderStates = useSetAtom(setOrderStatesAtom)
 
   const [getOrderDetail, { data, loading }] = useLazyQuery(
     query || queries.orderDetail,
@@ -27,8 +27,9 @@ const useOrderDetail = (args?: {
       fetchPolicy: "network-only",
       onCompleted(data: { orderDetail?: IOrder }) {
         const { orderDetail } = data || {}
-        if (!query && !onCompleted)
+        if (!query && !onCompleted) {
           return !!orderDetail && setOrderStates(orderDetail)
+        }
         if (!!onCompleted) return onCompleted(orderDetail)
       },
     }

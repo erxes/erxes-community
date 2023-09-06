@@ -12,6 +12,7 @@ import { setContext } from "@apollo/client/link/context"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import { createClient } from "graphql-ws"
+import fetch from "isomorphic-unfetch"
 
 import { getEnv } from "@/lib/utils"
 
@@ -26,6 +27,7 @@ const customHeaders = {
 const httpLink: any = new HttpLink({
   uri: `${env.NEXT_PUBLIC_MAIN_API_DOMAIN}/graphql`,
   credentials: "include",
+  fetch,
 })
 
 const authLink = setContext((_, { headers }) => {

@@ -1,4 +1,5 @@
 import {
+  configAtom,
   coverConfigAtom,
   ebarimtConfigAtom,
   paymentConfigAtom,
@@ -34,6 +35,7 @@ const useConfig = (
   const setEbarimtConfig = useSetAtom(ebarimtConfigAtom)
   const setCoverConfig = useSetAtom(coverConfigAtom)
   const setPaymentConfig = useSetAtom(paymentConfigAtom)
+  const setConfig = useSetAtom(configAtom)
 
   const { data, loading } = useQuery(queryObject[type], {
     onCompleted({ currentConfig }) {
@@ -52,6 +54,9 @@ const useConfig = (
         }))
 
         setPaymentConfig({ ...rest, paymentTypes: paymentTypeWithConfig })
+      }
+      if (type === "main") {
+        setConfig(currentConfig)
       }
       onCompleted && onCompleted(currentConfig)
     },

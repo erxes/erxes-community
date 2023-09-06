@@ -7,31 +7,30 @@ import {
   setCurrentUserAtom,
 } from "@/store/config.store"
 import { useQuery } from "@apollo/client"
-import { useAtom } from "jotai"
+import { useSetAtom } from "jotai"
 import { Loader2 } from "lucide-react"
 
 import { hexToHsl } from "@/lib/utils"
 
 import { queries } from "./graphql"
-import useConfig from "./hooks/useConfig"
 
 const Configs = ({ children }: { children: ReactNode }) => {
-  const [, setConfigs] = useAtom(setConfigsAtom)
-  const [, setCurrentUser] = useAtom(setCurrentUserAtom)
-  const [curConfig, setConfig] = useAtom(configAtom)
+  const setConfigs = useSetAtom(setConfigsAtom)
+  const setCurrentUser = useSetAtom(setCurrentUserAtom)
+  const setConfig = useSetAtom(configAtom)
 
-  const { loading } = useQuery(queries.posCurrentUser, {
-    onCompleted: (data) => {
-      setCurrentUser(data.posCurrentUser)
-    },
-  })
+  const { loading, data } = useQuery(queries.posCurrentUser)
 
-  const { config, loading: loadingConfig } = useConfig("main", {
-    onCompleted: (data) => {
-      setConfig(data)
-    },
-    skip: !!curConfig,
-  })
+  const { data: config, loading: loadingConfig } = useQuery(
+    queries.currentConfig,
+    {
+      onCompleted(data) {
+        console.log(data)
+        setConfig(data?.currentConfig)
+      },
+      fetchPolicy: "network-only",
+    }
+  )
 
   const { loading: loadingConfigs } = useQuery(queries.configs, {
     onCompleted: (data) => {
@@ -39,21 +38,26 @@ const Configs = ({ children }: { children: ReactNode }) => {
     },
   })
 
-  const currentConfig = (config || {}).currentConfig
-  const { uiOptions } = currentConfig || {}
-
-  const { colors, logo } = uiOptions || {}
-
-  const primary = (colors || {}).primary
+  useEffect(() => {
+    setCurrentUser(data?.posCurrentUser)
+  }, [data])
 
   useEffect(() => {
+    const currentConfig = (config || {}).currentConfig
+
+    if (currentConfig) {
+      setConfig(currentConfig)
+    }
+
+    const { primary } = currentConfig?.uiOptions?.colors || {}
+
     if (primary) {
       document.documentElement.style.setProperty(
         "--primary",
         hexToHsl(primary || "#4f33af")
       )
     }
-  }, [primary])
+  }, [config])
 
   if (loading || loadingConfig || loadingConfigs)
     return (
