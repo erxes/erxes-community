@@ -18,7 +18,6 @@ const pricingPlanMutations = {
     { models, subdomain, user }: IContext
   ) => {
     const create = await models.PricingPlans.createPlan(doc, user._id);
-
     await putCreateLog(
       models,
       subdomain,

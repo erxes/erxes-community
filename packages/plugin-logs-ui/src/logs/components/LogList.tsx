@@ -112,7 +112,12 @@ const moduleOptions = [
   { value: 'emailTemplate', label: 'Email templates' },
   { value: 'importHistory', label: 'Import histories' },
   { value: 'script', label: 'Scripts' },
-  { value: 'pricing:pricingPlan', label: 'PricingPlan' }
+  { value: 'pricing:pricingPlan', label: 'PricingPlan' },
+  { value: 'loyalties:donateCampaign', label: 'donate Campaign' },
+  { value: 'loyalties:lotteryCampaign', label: 'lottery Campaign' },
+  { value: 'loyalties:spinCampaign', label: 'spin Campaign' },
+  { value: 'loyalties:assignmentCampaign', label: 'assignment Campaign' },
+  { value: 'loyalties:voucherCampaign', label: 'voucher Campaign' }
 ];
 
 const breadcrumb = [
