@@ -5,7 +5,6 @@ import NextImage, { ImageLoaderProps, ImageProps } from "next/image"
 import { Package } from "lucide-react"
 
 import { cn, readFile } from "@/lib/utils"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 
 const Image: FC<
   ImageProps & {
