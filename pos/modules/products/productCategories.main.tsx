@@ -59,16 +59,18 @@ const ProductCategories = () => {
           </SheetHeader>
           <div className="flex">
             <div className="space-y-2 py-4 w-1/3">
-              {categories.map((e) => (
-                <Button
-                  variant="outline"
-                  className="w-full justify-between text-xs"
-                  key={e._id}
-                >
-                  {e.name}
-                  <ChevronRightIcon className="h-4 w-4" />
-                </Button>
-              ))}
+              {categories
+                .filter((e) => e.isRoot)
+                .map((e) => (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between text-xs"
+                    key={e._id}
+                  >
+                    {e.name}
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </Button>
+                ))}
             </div>
           </div>
         </SheetContent>

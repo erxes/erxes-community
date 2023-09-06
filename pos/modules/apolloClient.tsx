@@ -17,24 +17,25 @@ import { getEnv } from "@/lib/utils"
 
 const env = getEnv()
 
+const customHeaders = {
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "cross-site",
+}
+
 const httpLink: any = new HttpLink({
   uri: `${env.NEXT_PUBLIC_MAIN_API_DOMAIN}/graphql`,
-  credentials: "include"
+  credentials: "include",
 })
 
 const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      "Access-Control-Allow-Origin": env.NEXT_PUBLIC_MAIN_API_DOMAIN,
-      'Access-Control-Allow-Credentials': true,
-      "Accept": 'application/json, text/plan',
-      "Content-Type": 'application/json;charset=UTF-8',
-      "Cache-Control": 'no-cache, no-store, must-revalidate',
-      "Pragma": "no-cache",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Fetch-Site": "same-site"
+      ...customHeaders,
+      "Access-Control-Allow-Origin": (
+        env.NEXT_PUBLIC_MAIN_API_DOMAIN || ""
+      ).replace("/gateway", ""),
     },
   }
 })
@@ -42,10 +43,10 @@ const authLink = setContext((_, { headers }) => {
 const wsLink: any =
   typeof window !== "undefined"
     ? new GraphQLWsLink(
-      createClient({
-        url: env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || "",
-      })
-    )
+        createClient({
+          url: env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || "",
+        })
+      )
     : null
 
 const httpLinkWithMiddleware = authLink.concat(httpLink)
@@ -57,13 +58,13 @@ type Definintion = {
 const splitLink =
   typeof window !== "undefined"
     ? split(
-      ({ query }) => {
-        const { kind, operation }: Definintion = getMainDefinition(query)
-        return kind === "OperationDefinition" && operation === "subscription"
-      },
-      wsLink,
-      httpLinkWithMiddleware
-    )
+        ({ query }) => {
+          const { kind, operation }: Definintion = getMainDefinition(query)
+          return kind === "OperationDefinition" && operation === "subscription"
+        },
+        wsLink,
+        httpLinkWithMiddleware
+      )
     : httpLinkWithMiddleware
 
 export const client = new ApolloClient({

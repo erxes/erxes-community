@@ -17,7 +17,7 @@ const MainIndexPage = () => {
       <Header />
       <section className="flex flex-auto items-stretch overflow-hidden">
         <div className="flex h-full w-2/3 flex-col p-4 pr-0">
-          <div className="-mt-1 flex flex-none items-center pb-3 pr-3">
+          <div className="-mt-1 flex flex-none items-center pb-3 pr-3 overflow-hidden">
             <Search />
             <div className="flex flex-auto overflow-hidden">
               <ProductCategories />

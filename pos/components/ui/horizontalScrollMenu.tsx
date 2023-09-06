@@ -44,7 +44,10 @@ export const HorizontalScrollMenu = ({
         }
       })
   return (
-    <div className="relative w-full flex-auto flex-col" onMouseLeave={dragStop}>
+    <div
+      className="relative flex-auto flex-col overflow-hidden"
+      onMouseLeave={dragStop}
+    >
       <ScrollMenu
         scrollContainerClassName={cn(
           "flex overflow-y-hidden scrollbar-hide",
