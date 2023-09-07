@@ -91,7 +91,7 @@ export default function WelcomeList({ list, totalCount, loadMore }: Props) {
     };
 
     const handleIntersection = (inView) => {
-      if (inView) {
+      if (inView && list.length !== totalCount) {
         loadMore();
       }
     };
@@ -102,7 +102,9 @@ export default function WelcomeList({ list, totalCount, loadMore }: Props) {
         <InView onChange={handleIntersection}>
           {({ inView, ref }) => (
             <div ref={ref} style={{ height: '10px' }}>
-              {inView && <Spinner objective={true} />}
+              {inView && list.length !== totalCount && (
+                <Spinner objective={true} />
+              )}
             </div>
           )}
         </InView>
