@@ -147,15 +147,14 @@ export default withProps<Props>(
         options: ({ queryParams }) => ({
           variables: {
             categoryId: queryParams.categoryId,
-            status: queryParams.status,
+            status: queryParams.productStatus,
             tag: queryParams.tag,
             searchValue: queryParams.searchValue,
             type: queryParams.type,
             segment: queryParams.segment,
             segmentData: queryParams.segmentData,
             ...generatePaginationParams(queryParams)
-          },
-          fetchPolicy: 'network-only'
+          }
         })
       }
     ),
@@ -164,14 +163,13 @@ export default withProps<Props>(
       options: ({ queryParams }) => ({
         variables: {
           categoryId: queryParams.categoryId,
-          status: queryParams.status,
+          status: queryParams.productStatus,
           tag: queryParams.tag,
           searchValue: queryParams.searchValue,
           type: queryParams.type,
           segment: queryParams.segment,
           segmentData: queryParams.segmentData
-        },
-        fetchPolicy: 'network-only'
+        }
       })
     }),
     graphql<Props, ProductRemoveMutationResponse, { productIds: string[] }>(
