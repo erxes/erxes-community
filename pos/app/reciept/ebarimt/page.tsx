@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect } from "react"
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher"
 import useConfig from "@/modules/auth/hooks/useConfig"
 import { ebarimtDetail } from "@/modules/orders/graphql/queries"
 import useOrderDetail from "@/modules/orders/hooks/useOrderDetail"
@@ -21,9 +20,12 @@ import EbarimtSkeleton from "@/app/reciept/components/Skeleton"
 import Footer from "@/app/reciept/components/footer"
 import EbarimtHeader from "@/app/reciept/components/header"
 import PutResponses from "@/app/reciept/components/putResponses"
+import { useSearchParams } from 'next/navigation'
 
-const Reciept = ({ params }: { params: Params }) => {
-  const { id } = params
+const Reciept = () => {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') 
+
   const mode = getMode()
   const [type, setType] = useAtom(printTypeAtom)
   const [putResponses] = useAtom(putResponsesAtom)

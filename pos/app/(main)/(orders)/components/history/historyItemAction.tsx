@@ -37,7 +37,7 @@ const HistoryItemAction = ({ row }: CellContext<IOrderHistory, unknown>) => {
           <MoreHorizontal className="h-4 w-4" />
           {showEbarimt && (
             <iframe
-              src={`/reciept/ebarimt/${_id}`}
+              src={`/reciept/ebarimt?id=${_id}`}
               className="absolute h-1 w-1"
               style={{ top: 10000, left: 10000 }}
               ref={iframeRef}

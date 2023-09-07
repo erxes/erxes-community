@@ -35,7 +35,7 @@ const Cover = () => {
             setDate={setDateRange}
           />
         </div>
-        <Button Component={Link} href="/cover/create">
+        <Button Component={Link} href="/cover/detail?id=create">
           <AlarmPlus className="mr-2 h-4 w-4" />
           Нэмэх
         </Button>

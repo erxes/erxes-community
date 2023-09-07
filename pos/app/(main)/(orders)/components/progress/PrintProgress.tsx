@@ -18,7 +18,7 @@ const PrintProgress = () => {
           ref={iframeRef}
           className="absolute h-1 w-1"
           style={{ top: 10000, left: 10000 }}
-          src={`/reciept/progress/${showRecieptId}`}
+          src={`/reciept/progress?id=${showRecieptId}`}
         />
       )}
     </>

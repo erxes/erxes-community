@@ -88,7 +88,7 @@ const CoverItemAction = ({ row }: { row: Row<Cover> }) => {
               {disabled ? (
                 "Өөрчлөх"
               ) : (
-                <Link href={`/cover/${_id}`}>Өөрчлөх</Link>
+                <Link href={`/cover?id=${_id}`}>Өөрчлөх</Link>
               )}
             </DropdownMenuItem>
             <AlertDialogTrigger
@@ -141,7 +141,7 @@ const CoverItemAction = ({ row }: { row: Row<Cover> }) => {
           {openSheet && (
             <iframe
               // ref={iframeRef}
-              src={"/reciept/cover/" + _id}
+              src={"/reciept/cover?id=" + _id}
               className="w-100 block flex-auto overflow-y-auto"
             />
           )}

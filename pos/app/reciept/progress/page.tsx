@@ -1,16 +1,17 @@
 "use client"
 
 import { useCallback, useEffect } from "react"
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher"
 import { queries } from "@/modules/orders/graphql"
 import { useQuery } from "@apollo/client"
 import { format } from "date-fns"
 
 import { OrderItem } from "@/types/order.types"
 import { Separator } from "@/components/ui/separator"
+import { useSearchParams } from 'next/navigation'
 
-const Progress = ({ params }: { params: Params }) => {
-  const { id } = params
+const Progress = () => {
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') 
 
   const { loading, data } = useQuery(queries.progressDetail, {
     variables: { id },
