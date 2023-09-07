@@ -11,6 +11,7 @@ import { useSetAtom } from "jotai"
 import { Loader2 } from "lucide-react"
 
 import { hexToHsl } from "@/lib/utils"
+import { useToast } from "@/components/ui/use-toast"
 
 import { queries } from "./graphql"
 
@@ -19,6 +20,7 @@ const Configs = ({ children }: { children: ReactNode }) => {
   const setCurrentUser = useSetAtom(setCurrentUserAtom)
   const setConfig = useSetAtom(configAtom)
   const [loadingConfigs, setLoadingConfigs] = useState(true)
+  const { onError } = useToast()
 
   const { loading, data } = useQuery(queries.posCurrentUser)
 
@@ -30,6 +32,10 @@ const Configs = ({ children }: { children: ReactNode }) => {
     onCompleted: (data) => {
       setConfigs(data.posclientConfigs)
       setLoadingConfigs(false)
+    },
+    onError: (error) => {
+      setLoadingConfigs(false)
+      onError(error)
     },
   })
 
