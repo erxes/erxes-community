@@ -1,6 +1,6 @@
-import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import React from 'react';
 import { Route } from 'react-router-dom';
+import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
 import queryString from 'query-string';
 
 const List = asyncComponent(() =>

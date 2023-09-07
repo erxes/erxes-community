@@ -13,11 +13,12 @@ type Props = {
   style?: any;
   color?: string;
   isActive?: boolean;
+  className?: string;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 };
 
 function Icon(props: Props) {
-  const { isActive, color } = props;
+  const { isActive, color, className } = props;
 
   let changedColor = color || '';
 
@@ -28,7 +29,7 @@ function Icon(props: Props) {
   return (
     <IconStyle
       {...props}
-      className={`icon-${props.icon}`}
+      className={`icon-${props.icon} ${className}`}
       color={changedColor}
     />
   );

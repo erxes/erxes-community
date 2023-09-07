@@ -1,13 +1,16 @@
+import { Col, FeedLayout, TabContent } from '../styles';
 import React, { useState } from 'react';
+import { TabTitle, Tabs } from '@erxes/ui/src/components/tabs/index';
+
+import Form from '../containers/feed/Form';
 import Icon from '@erxes/ui/src/components/Icon';
+import LeftSidebar from './LeftSidebar';
 import { Link } from 'react-router-dom';
+import List from '../containers/feed/List';
+import { Row } from '@erxes/ui-settings/src/styles';
+import ThankForm from '../containers/feed/ThankForm';
+import ThankList from '../containers/feed/ThankList';
 import { Wrapper } from '@erxes/ui/src/layout';
-import { Tabs, TabTitle } from '@erxes/ui/src/components/tabs/index';
-import Form from '../containers/Form';
-import ThankForm from '../containers/ThankForm';
-import List from '../containers/List';
-import { FeedLayout, MainContent, TabContent } from '../styles';
-import ThankList from '../containers/ThankList';
 
 type Props = {
   queryParams: any;
@@ -101,7 +104,9 @@ export default function Home(props: Props) {
       header={
         <Wrapper.Header title={'Feed'} breadcrumb={[{ title: 'Feed' }]} />
       }
-      content={<MainContent>{renderContent()}</MainContent>}
+      leftSidebar={<LeftSidebar />}
+      content={renderContent()}
+      hasBorder={true}
     />
   );
 }
