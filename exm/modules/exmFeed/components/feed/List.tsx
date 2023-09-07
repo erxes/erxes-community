@@ -9,32 +9,34 @@ import {
   TextFeed,
   AttachmentContainer,
   MoreAttachment,
-  EventInfo,
-} from "../../styles";
+  EventInfo
+} from '../../styles';
 
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownToggle from "../../../common/DropdownToggle";
-import Form from "../../containers/feed/Form";
-import Icon from "../../../common/Icon";
-import LoadMore from "../../../common/LoadMore";
-import ModalTrigger from "../../../common/ModalTrigger";
-import React from "react";
-import dayjs from "dayjs";
-import { getUserAvatar } from "../../../utils";
-import { readFile } from "../../../common/utils";
-import withCurrentUser from "../../../auth/containers/withCurrentUser";
-import { IUser } from "../../../types";
-import AttachmentWithPreview from "../../../common/AttachmentWithPreview";
-import Comments from "../../containers/feed/comment";
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownToggle from '../../../common/DropdownToggle';
+import Form from '../../containers/feed/Form';
+import Icon from '../../../common/Icon';
+import ModalTrigger from '../../../common/ModalTrigger';
+import React from 'react';
+import dayjs from 'dayjs';
+import { getUserAvatar } from '../../../utils';
+import { readFile } from '../../../common/utils';
+import withCurrentUser from '../../../auth/containers/withCurrentUser';
+import { IUser } from '../../../types';
+import AttachmentWithPreview from '../../../common/AttachmentWithPreview';
+import Comments from '../../containers/feed/comment';
 import Heart from '../../containers/feed/Heart';
+
+import { InView } from 'react-intersection-observer';
+import Spinner from '../../../common/Spinner';
 
 type Props = {
   list: any;
   totalCount: number;
   deleteItem: (_id: string) => void;
   pinItem: (_id: string) => void;
-  limit: number;
   contentType: string;
+  loadMore: () => void;
 };
 
 type FinalProps = {
@@ -45,10 +47,9 @@ function List({
   list,
   deleteItem,
   pinItem,
-  totalCount,
-  limit,
   currentUser,
   contentType,
+  loadMore
 }: FinalProps) {
   const editItem = (item) => {
     const trigger = (
@@ -88,14 +89,14 @@ function List({
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
     let links = [];
-    let updatedDescription = "";
+    let updatedDescription = '';
 
     if (item.description) {
       const matches = item.description.match(urlRegex);
 
       if (matches) {
         updatedDescription = matches.reduce(
-          (prevDescription, link) => prevDescription.replace(link, ""),
+          (prevDescription, link) => prevDescription.replace(link, ''),
           item.description
         );
 
@@ -160,17 +161,17 @@ function List({
         <EventInfo>
           <div>
             <Icon icon="wallclock" />
-            {dayjs(eventData.startDate).format("MM/DD/YYYY h:mm A")} ~{" "}
-            {dayjs(eventData.endDate).format("MM/DD/YYYY h:mm A")}
+            {dayjs(eventData.startDate).format('MM/DD/YYYY h:mm A')} ~{' '}
+            {dayjs(eventData.endDate).format('MM/DD/YYYY h:mm A')}
           </div>
           <div>
             <Icon icon="users" />
-            <b>{eventData.goingUserIds.length}</b> Going •{" "}
+            <b>{eventData.goingUserIds.length}</b> Going •{' '}
             <b>{eventData.interestedUserIds.length}</b> Interested
           </div>
           <div>
             <Icon icon="user" />
-            Event by{" "}
+            Event by{' '}
             {item.createdUser.details?.fullName ||
               item.createdUser.username ||
               item.createdUser.email}
@@ -192,7 +193,7 @@ function List({
                 (createdUser &&
                   createdUser.details &&
                   createdUser.details.fullName) ||
-                "author"
+                'author'
               }
               src={getUserAvatar(createdUser)}
             />
@@ -210,7 +211,7 @@ function List({
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
+                {dayjs(item.createdAt).format('MM/DD/YYYY h:mm A')}{' '}
                 <b>#{item.contentType}</b>
               </p>
             </div>
@@ -235,7 +236,7 @@ function List({
                     <li>
                       <Icon icon="map-pin-alt" size={15} />
                       <a onClick={() => pinItem(item._id)}>
-                        {item.isPinned ? "UnPin" : "Pin"}
+                        {item.isPinned ? 'UnPin' : 'Pin'}
                       </a>
                     </li>
                   </Dropdown.Menu>
@@ -247,7 +248,7 @@ function List({
         <TextFeed>
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
           <p dangerouslySetInnerHTML={{ __html: updatedDescription }} />
-          {item.contentType === "event" && renderEventInfo()}
+          {item.contentType === 'event' && renderEventInfo()}
           {links.map((link, index) => {
             return (
               <iframe
@@ -255,9 +256,9 @@ function List({
                 width="640"
                 height="390"
                 src={String(link)
-                  .replace("watch?v=", "embed/")
-                  .replace("youtu.be/", "youtube.com/embed/")
-                  .replace("share/", "embed/")}
+                  .replace('watch?v=', 'embed/')
+                  .replace('youtu.be/', 'youtube.com/embed/')
+                  .replace('share/', 'embed/')}
                 title="Video"
                 allowFullScreen={true}
               />
@@ -281,7 +282,7 @@ function List({
           </AttachmentContainer>
         )}
         <LikeCommentShare>
-          <Heart _id={item._id}/>
+          <Heart _id={item._id} />
           <ModalTrigger
             title="Comment"
             size="lg"
@@ -303,20 +304,20 @@ function List({
     let pinnedList;
     let normalList;
 
-    if (contentType === "event") {
+    if (contentType === 'event') {
       pinnedList = datas.filter(
         (data) =>
           data.isPinned &&
-          ((data.eventData?.visibility === "private" &&
+          ((data.eventData?.visibility === 'private' &&
             data.recipientIds.includes(currentUser._id)) ||
-            data.eventData?.visibility === "public")
+            data.eventData?.visibility === 'public')
       );
       normalList = datas.filter(
         (data) =>
           !data.isPinned &&
-          ((data.eventData?.visibility === "private" &&
+          ((data.eventData?.visibility === 'private' &&
             data.recipientIds.includes(currentUser._id)) ||
-            data.eventData?.visibility === "public")
+            data.eventData?.visibility === 'public')
       );
     } else {
       pinnedList = datas.filter((data) => data.isPinned);
@@ -327,26 +328,28 @@ function List({
       return items.map((filteredItem) => renderItem(filteredItem));
     };
 
+    const handleIntersection = (inView) => {
+      if (inView) {
+        loadMore();
+      }
+    };
+
     return (
       <>
         {showList(pinnedList)}
         {showList(normalList)}
+        <InView onChange={handleIntersection}>
+          {({ inView, ref }) => (
+            <div ref={ref} style={{ height: '10px' }}>
+              {inView && <Spinner objective={true} />}
+            </div>
+          )}
+        </InView>
       </>
     );
   };
 
-  return (
-    <NewsFeedLayout>
-      {renderList()}
-      <LoadMore
-        perPage={limit}
-        all={totalCount}
-        history={undefined}
-        location={undefined}
-        match={undefined}
-      />
-    </NewsFeedLayout>
-  );
+  return <NewsFeedLayout>{renderList()}</NewsFeedLayout>;
 }
 
 const WithCurrentUser = withCurrentUser(List);

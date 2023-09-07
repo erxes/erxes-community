@@ -50,8 +50,8 @@ const commonFeedFields = `
 `;
 
 const feed = `
-  query feed($title: String, $limit: Int, $contentTypes: [ContentType]) {
-    exmFeed(title: $title, limit: $limit, contentTypes: $contentTypes) {
+  query feed($title: String, $limit: Int, $skip: Int, $contentTypes: [ContentType]) {
+    exmFeed(title: $title, limit: $limit, skip: $skip, contentTypes: $contentTypes) {
       list {
         ${commonFeedFields}
       }

@@ -4,29 +4,27 @@ import {
   HeaderFeed,
   LikeCommentShare,
   NewsFeedLayout,
-  TextFeed,
-} from "../../styles";
+  TextFeed
+} from '../../styles';
 
-import Icon from "../../../common/Icon";
-import LoadMore from "../../../common/LoadMore";
-import React from "react";
-import dayjs from "dayjs";
-import { getUserAvatar } from "../../../utils";
-import Comments from "../../containers/feed/comment";
-import ModalTrigger from "../../../common/ModalTrigger";
-import Heart from "../../containers/feed/Heart";
+import Icon from '../../../common/Icon';
+import React from 'react';
+import dayjs from 'dayjs';
+import { getUserAvatar } from '../../../utils';
+import Comments from '../../containers/feed/comment';
+import ModalTrigger from '../../../common/ModalTrigger';
+import Heart from '../../containers/feed/Heart';
+
+import { InView } from 'react-intersection-observer';
+import Spinner from '../../../common/Spinner';
 
 type Props = {
   list: any;
   totalCount: number;
-  limit: number;
+  loadMore: () => void;
 };
 
-export default function WelcomeList({
-  list,
-  totalCount,
-  limit,
-}: Props) {
+export default function WelcomeList({ list, totalCount, loadMore }: Props) {
   const renderItem = (item: any) => {
     const createdUser = item.createdUser || {};
 
@@ -39,7 +37,7 @@ export default function WelcomeList({
                 (createdUser &&
                   createdUser.details &&
                   createdUser.details.fullName) ||
-                "author"
+                'author'
               }
               src={getUserAvatar(createdUser)}
             />
@@ -57,7 +55,7 @@ export default function WelcomeList({
                 </p>
               ) : null}
               <p>
-                {dayjs(item.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
+                {dayjs(item.createdAt).format('MM/DD/YYYY h:mm A')}{' '}
                 <b>#{item.contentType}</b>
               </p>
             </div>
@@ -92,19 +90,25 @@ export default function WelcomeList({
       return items.map((filteredItem) => renderItem(filteredItem));
     };
 
-    return <>{showList(datas)}</>;
+    const handleIntersection = (inView) => {
+      if (inView) {
+        loadMore();
+      }
+    };
+
+    return (
+      <>
+        {showList(datas)}{' '}
+        <InView onChange={handleIntersection}>
+          {({ inView, ref }) => (
+            <div ref={ref} style={{ height: '10px' }}>
+              {inView && <Spinner objective={true} />}
+            </div>
+          )}
+        </InView>
+      </>
+    );
   };
 
-  return (
-    <NewsFeedLayout>
-      {renderList()}
-      <LoadMore
-        perPage={limit}
-        all={totalCount}
-        history={undefined}
-        location={undefined}
-        match={undefined}
-      />
-    </NewsFeedLayout>
-  );
+  return <NewsFeedLayout>{renderList()}</NewsFeedLayout>;
 }
