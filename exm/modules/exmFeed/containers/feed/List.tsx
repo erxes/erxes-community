@@ -18,7 +18,6 @@ export default function ListContainer(props: Props) {
 
   const feedResponse = useQuery(gql(queries.feed), {
     variables: {
-      limit: 3,
       contentTypes: [contentType || 'post']
     }
   });
