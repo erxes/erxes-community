@@ -18,7 +18,7 @@ import { getEnv } from "@/lib/utils"
 
 const env = getEnv()
 
-const customHeaders = {
+export const customHeaders = {
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "cross-site",
