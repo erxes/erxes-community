@@ -71,7 +71,7 @@ const EbarimtMain = () => {
         {open && (
           <iframe
             ref={iframeRef}
-            src={"/reciept/ebarimt/" + activeOrder}
+            src={"/reciept/ebarimt?id=" + activeOrder}
             className="absolute h-1 w-1"
             style={{ top: 10000, left: 10000 }}
           />

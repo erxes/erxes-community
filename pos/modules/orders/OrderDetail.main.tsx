@@ -1,9 +1,11 @@
-import { useMemo } from "react"
-import { useSearchParams } from "next/navigation"
+
 import { OperationVariables } from "@apollo/client"
 import { Loader2Icon } from "lucide-react"
 
 import useOrderDetail from "./hooks/useOrderDetail"
+import { useEffect } from 'react'
+import { useSetAtom } from 'jotai'
+import { setOrderStatesAtom } from '@/store/order.store'
 
 const OrderDetail = ({
   children,
@@ -12,7 +14,12 @@ const OrderDetail = ({
   children: any
   variables?: OperationVariables
 }) => {
-  const { loading } = useOrderDetail({ variables: variables })
+  const setOrderStates = useSetAtom(setOrderStatesAtom)
+  const { loading, orderDetail } = useOrderDetail({ variables: variables, onCompleted: () => null })
+
+  useEffect(() => {
+    orderDetail && setOrderStates(orderDetail)
+  }, [orderDetail, setOrderStates]);
 
   if (loading)
     return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import useConfig from "@/modules/auth/hooks/useConfig"
 import { setCoverDetailAtom } from "@/store/cover.store"
 import { useQuery } from "@apollo/client"
@@ -16,8 +16,8 @@ import CoverCU from "../components/coverCU"
 import { queries } from "../graphql"
 
 const CoverDetail = () => {
-  const params = useParams()
-  const { id } = params || {}
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') 
   const { onError } = useToast()
   const [, setCover] = useAtom(setCoverDetailAtom)
 
@@ -30,12 +30,6 @@ const CoverDetail = () => {
     onCompleted(data) {
       const { coverDetail } = data || {}
       setCover(coverDetail || {})
-      // getCoverAmounts({
-      //   variables: {
-      //     endDate: coverDetail.endDate,
-      //     id,
-      //   },
-      // })
     },
     onError,
   })
