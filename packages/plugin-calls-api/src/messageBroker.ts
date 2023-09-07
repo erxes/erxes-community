@@ -1,7 +1,7 @@
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
 import { serviceDiscovery } from './configs';
-import { Callss, Integrations } from './models';
 import { generateToken } from './utils';
+import { generateModels } from './connectionResolver';
 
 let client;
 
@@ -10,18 +10,20 @@ export const initBroker = async cl => {
 
   const { consumeQueue, consumeRPCQueue } = client;
 
-  consumeQueue('calls:send', async ({ data }) => {
-    Callss.send(data);
+  // consumeQueue('calls:send', async ({ subdomain, data }) => {
+  //   const models = await generateModels(subdomain);
+  //   models.Calls.send(data);
 
-    return {
-      status: 'success'
-    };
-  });
+  //   return {
+  //     status: 'success',
+  //   };
+  // });
 
-  consumeRPCQueue('calls:find', async ({ data }) => {
+  consumeRPCQueue('calls:find', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
     return {
       status: 'success',
-      data: await Callss.find({})
+      data: await models.Calls.find({})
     };
   });
 
@@ -30,18 +32,17 @@ export const initBroker = async cl => {
     async (args: ISendMessageArgs): Promise<any> => {
       const { subdomain, data } = args;
       const { integrationId, doc } = data;
+      const models = generateModels(subdomain);
       const docData = JSON.parse(doc.data);
+      console.log('docData:', docData);
+      // const { username, password, ...rest } = docData;
 
-      const { username, password, ...rest } = docData;
+      const token = await generateToken(integrationId);
 
-      const token = await generateToken(integrationId, username, password);
-
-      await Integrations.create({
+      await (await models).Integrations.create({
         inboxId: integrationId,
-        username,
-        password,
         token,
-        ...rest
+        ...docData
       });
 
       return {
@@ -53,10 +54,10 @@ export const initBroker = async cl => {
   consumeRPCQueue(
     'calls:api_to_integrations',
     async (args: ISendMessageArgs): Promise<any> => {
-      const { data } = args;
+      const { subdomain, data } = args;
       const { inboxId, action } = data;
-
-      const integration = await Integrations.findOne({ inboxId });
+      const models = await generateModels(subdomain);
+      const integration = await models.Integrations.findOne({ inboxId });
 
       if (!integration) {
         return {
@@ -67,6 +68,11 @@ export const initBroker = async cl => {
 
       switch (action) {
         case 'getConfigs':
+          return {
+            status: 'success',
+            data: integration
+          };
+        case 'getDetails':
           return {
             status: 'success',
             data: integration

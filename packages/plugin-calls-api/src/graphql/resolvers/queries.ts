@@ -1,27 +1,27 @@
-import { Callss, Types, Integrations } from '../../models';
-import { IContext } from '@erxes/api-utils/src/types';
+import { IContext } from '../../connectionResolver';
+import { Types } from '../../models';
 
 const callsQueries = {
-  callss(_root, { typeId }, _context: IContext) {
+  callss(_root, { typeId }, { models }: IContext) {
     const selector: any = {};
 
     if (typeId) {
       selector.typeId = typeId;
     }
 
-    return Callss.find(selector).sort({ order: 1, name: 1 });
+    return models.Calls.find(selector).sort({ order: 1, name: 1 });
   },
 
   callsTypes(_root, _args, _context: IContext) {
     return Types.find({});
   },
 
-  callssTotalCount(_root, _args, _context: IContext) {
-    return Callss.find({}).countDocuments();
+  callssTotalCount(_root, _args, { models }: IContext) {
+    return models.Calls.find({}).countDocuments();
   },
 
-  callsIntegrationDetail(_root, { integrationId }, _context: IContext) {
-    return Integrations.findOne({ inboxId: integrationId });
+  callsIntegrationDetail(_root, { integrationId }, { models }: IContext) {
+    return models.Integrations.findOne({ inboxId: integrationId });
   }
 };
 

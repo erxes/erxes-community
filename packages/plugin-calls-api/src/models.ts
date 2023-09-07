@@ -6,39 +6,6 @@ export const typeSchema = new Schema({
   name: String
 });
 
-export const callsSchema = new Schema({
-  name: String,
-  createdAt: Date,
-  expiryDate: Date,
-  checked: Boolean,
-  typeId: String
-});
-
-export const integrationSchema: Schema<any> = new Schema({
-  inboxId: String,
-  wsServer: String,
-  phone: String,
-  operatorMaps: [
-    {
-      erxesUserId: String,
-      gsUser: String,
-      gsPassword: String
-    }
-  ],
-  token: String
-});
-
-export const loadIntegrationClass = () => {
-  class Integration {}
-  integrationSchema.loadClass(Integration);
-  return integrationSchema;
-};
-
-export const Integrations = model<any, any>(
-  'calls_integrations',
-  loadIntegrationClass()
-);
-
 export const loadTypeClass = () => {
   class Type {
     public static async getType(_id: string) {
@@ -68,47 +35,7 @@ export const loadTypeClass = () => {
   return typeSchema;
 };
 
-export const loadCallsClass = () => {
-  class Calls {
-    public static async getCalls(_id: string) {
-      const calls = await Callss.findOne({ _id });
-
-      if (!calls) {
-        throw new Error('Calls not found');
-      }
-
-      return calls;
-    }
-
-    // create
-    public static async createCalls(doc) {
-      return Callss.create({
-        ...doc,
-        createdAt: new Date()
-      });
-    }
-    // update
-    public static async updateCalls(_id: string, doc) {
-      await Callss.updateOne({ _id }, { $set: { ...doc } }).then(err =>
-        console.error(err)
-      );
-    }
-    // remove
-    public static async removeCalls(_id: string) {
-      return Callss.deleteOne({ _id });
-    }
-  }
-
-  callsSchema.loadClass(Calls);
-
-  return callsSchema;
-};
-
-loadCallsClass();
 loadTypeClass();
 
 // tslint:disable-next-line
 export const Types = model<any, any>('calls_types', typeSchema);
-
-// tslint:disable-next-line
-export const Callss = model<any, any>('callss', callsSchema);

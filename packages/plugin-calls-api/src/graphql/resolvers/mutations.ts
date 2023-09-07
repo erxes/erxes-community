@@ -1,26 +1,33 @@
-import { Callss, Types, Integrations } from '../../models';
-import { IContext } from '@erxes/api-utils/src/types';
+import { Types } from '../../models';
 import * as jwt from 'jsonwebtoken';
 import { generateToken } from '../../utils';
+import { IContext } from '../../connectionResolver';
+import { ICalls } from '../../models/definitions/calls';
+
+interface ICallsEdit extends ICalls {
+  _id: string;
+}
 
 const callsMutations = {
   /**
    * Creates a new calls
    */
-  async callssAdd(_root, doc, _context: IContext) {
-    return Callss.createCalls(doc);
+  async callssAdd(_root, doc, { models }: IContext) {
+    return models.Calls.createCalls(doc);
   },
+
   /**
    * Edits a new calls
    */
-  async callssEdit(_root, { _id, ...doc }, _context: IContext) {
-    return Callss.updateCalls(_id, doc);
+  async callssEdit(_root, { _id, ...doc }: ICallsEdit, { models }: IContext) {
+    return models.Calls.updateCalls(_id, doc);
   },
+
   /**
    * Removes a single calls
    */
-  async callssRemove(_root, { _id }, _context: IContext) {
-    return Callss.removeCalls(_id);
+  async callssRemove(_root, { _id }, { models }: IContext) {
+    return models.Calls.removeCalls(_id);
   },
 
   /**
@@ -36,22 +43,22 @@ const callsMutations = {
 
   async callsTypesEdit(_root, { _id, ...doc }, _context: IContext) {
     return Types.updateType(_id, doc);
-  },
-
-  async callsIntegrationUpdate(_root, { configs }, _context: IContext) {
-    const { inboxId, username, password, ...data } = configs;
-
-    const token = await generateToken(inboxId, username, password);
-
-    const integration = await Integrations.findOneAndUpdate(
-      { inboxId },
-      { $set: { ...data, token, username, password } },
-      {
-        returnOriginal: false
-      }
-    );
-    return integration;
   }
+
+  // async callsIntegrationUpdate(_root, { configs }, _context: IContext) {
+  //   const { inboxId, username, password, ...data } = configs;
+
+  //   const token = await generateToken(inboxId, username, password);
+
+  //   const integration = await Integrations.findOneAndUpdate(
+  //     { inboxId },
+  //     { $set: { ...data, token, username, password } },
+  //     {
+  //       returnOriginal: false
+  //     }
+  //   );
+  //   return integration;
+  // }
 };
 
 export default callsMutations;

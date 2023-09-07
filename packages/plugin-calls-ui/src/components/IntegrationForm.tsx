@@ -46,6 +46,7 @@ class IntegrationForm extends React.Component<Props, State> {
       brandId: values.brandId,
       kind: 'calls',
       data: {
+        phone: values.phone,
         wsServer: values.wsServer,
         operators: finalOperators
       }
