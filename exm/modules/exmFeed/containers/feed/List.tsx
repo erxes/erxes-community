@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import Alert from '../../../utils/Alert';
 import List from '../../components/feed/List';
 import WelcomeList from '../../components/feed/WelcomeList';
-import React, { useState } from 'react';
+import React from 'react';
 import { confirm } from '../../../utils';
 import gql from 'graphql-tag';
 
@@ -86,7 +86,7 @@ export default function ListContainer(props: Props) {
   };
 
   const exmFeed = feedResponse.data?.exmFeed.list || [];
-  const totalCount = feedResponse.data?.exmFeed.totalCount || 1;
+  const totalCount = feedResponse.data?.exmFeed.totalCount || 0;
 
   if (contentType === 'welcome') {
     return (

@@ -49,6 +49,7 @@ function List({
   pinItem,
   currentUser,
   contentType,
+  totalCount,
   loadMore
 }: FinalProps) {
   const editItem = (item) => {
@@ -329,7 +330,7 @@ function List({
     };
 
     const handleIntersection = (inView) => {
-      if (inView) {
+      if (inView && list.length !== totalCount) {
         loadMore();
       }
     };
@@ -341,7 +342,9 @@ function List({
         <InView onChange={handleIntersection}>
           {({ inView, ref }) => (
             <div ref={ref} style={{ height: '10px' }}>
-              {inView && <Spinner objective={true} />}
+              {inView && list.length !== totalCount && (
+                <Spinner objective={true} />
+              )}
             </div>
           )}
         </InView>
