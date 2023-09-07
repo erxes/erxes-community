@@ -30,12 +30,13 @@ const Products = () => {
           <ProductItem key={product._id} {...product} />
         ))}
       </div>
-      {productsCount > FETCH_MORE_PER_PAGE && (
-        <Button className="w-full my-3" ref={ref} variant="outline">
-          <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
-          Уншиж байна ( {products.length} / {productsCount} )
-        </Button>
-      )}
+      {productsCount > FETCH_MORE_PER_PAGE &&
+        products.length < productsCount && (
+          <Button className="w-full my-3" ref={ref} variant="outline">
+            <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
+            Уншиж байна ( {products.length} / {productsCount} )
+          </Button>
+        )}
     </ScrollArea>
   )
 }
