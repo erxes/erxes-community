@@ -15,51 +15,96 @@ interface IProps extends IRouterProps {
 class CategoryStatusFilter extends React.Component<IProps> {
   render() {
     const { history } = this.props;
+    const productParam = 'productStatus';
+    const categoryParam = 'categoryStatus';
 
     const onClear = () => {
-      router.setParams(history, { status: null });
+      router.setParams(history, { productStatus: null });
+      router.setParams(history, { categoryStatus: null });
     };
 
-    const extraButtons = router.getParam(history, 'status') && (
+    const productStatus = router.getParam(history, productParam);
+    const categoryStatus = router.getParam(history, categoryParam);
+
+    const extraButtons = (productStatus || categoryStatus) && (
       <a href="#cancel" tabIndex={0} onClick={onClear}>
         <Icon icon="cancel-1" />
       </a>
     );
 
-    const paramKey = 'status';
-
     const onClick = (key, value) => {
+      console.log('key', key);
+      console.log('value', value);
       router.setParams(history, { [key]: value });
       router.setParams(history, { categoryId: null });
+      if (key === 'productStatus') {
+        router.setParams(history, { categoryStatus: null });
+      } else {
+        router.setParams(history, { productStatus: null });
+      }
     };
 
     return (
       <Box
         extraButtons={extraButtons}
-        title={__('Filter category by status')}
+        title={__('Filter by status')}
         name="showFilterByType"
       >
         <SidebarList>
-          {categoryStatusChoises(__).map(
-            ({ value, label }: { value: string; label: string }) => {
-              return (
-                <li key={Math.random()}>
-                  <a
-                    href="#filter"
-                    tabIndex={0}
-                    className={
-                      router.getParam(history, [paramKey]) === value
-                        ? 'active'
-                        : ''
-                    }
-                    onClick={onClick.bind(this, paramKey, value)}
-                  >
-                    <FieldStyle>{label}</FieldStyle>
-                  </a>
-                </li>
-              );
-            }
-          )}
+          <p
+            style={{
+              marginLeft: '20px',
+              marginTop: '10px',
+              fontWeight: 500
+            }}
+          >
+            {__('FILTER PRODUCT BY STATUS')}
+          </p>
+          <ul style={{ paddingLeft: '40px' }}>
+            {categoryStatusChoises(__).map(
+              ({ value, label }: { value: string; label: string }) =>
+                (value === 'active' || value === 'deleted') && (
+                  <li key={Math.random()} style={{ display: 'list-item' }}>
+                    <a
+                      href="#filter"
+                      tabIndex={0}
+                      className={
+                        router.getParam(history, [productParam]) === value
+                          ? 'active'
+                          : ''
+                      }
+                      onClick={onClick.bind(this, productParam, value)}
+                    >
+                      <FieldStyle>{label}</FieldStyle>
+                    </a>
+                  </li>
+                )
+            )}
+          </ul>
+          <p style={{ marginLeft: '20px', marginTop: '10px', fontWeight: 500 }}>
+            {__('FILTER CATEGORY BY STATUS')}
+          </p>
+          <ul>
+            {categoryStatusChoises(__).map(
+              ({ value, label }: { value: string; label: string }) =>
+                (value === 'disabled' || value === 'archived') && (
+                  <li key={Math.random()}>
+                    <a
+                      href="#filter"
+                      tabIndex={0}
+                      className={
+                        router.getParam(history, [categoryParam]) === value
+                          ? 'active'
+                          : ''
+                      }
+                      onClick={onClick.bind(this, categoryParam, value)}
+                    >
+                      <FieldStyle>{label}</FieldStyle>
+                    </a>
+                  </li>
+                )
+            )}
+          </ul>
         </SidebarList>
       </Box>
     );
