@@ -15,11 +15,11 @@ import { useAtom } from "jotai"
 import { BILL_TYPES } from "@/lib/constants"
 import { getMode } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import Amount from "@/app/reciept/components/Amount"
-import EbarimtSkeleton from "@/app/reciept/components/Skeleton"
-import Footer from "@/app/reciept/components/footer"
-import EbarimtHeader from "@/app/reciept/components/header"
-import PutResponses from "@/app/reciept/components/putResponses"
+import Amount from "@/app/(page)/reciept/components/Amount"
+import EbarimtSkeleton from "@/app/(page)/reciept/components/Skeleton"
+import Footer from "@/app/(page)/reciept/components/footer"
+import EbarimtHeader from "@/app/(page)/reciept/components/header"
+import PutResponses from "@/app/(page)/reciept/components/putResponses"
 import { useSearchParams } from 'next/navigation'
 
 const Reciept = () => {
