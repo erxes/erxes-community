@@ -1,4 +1,3 @@
-import { PaymentType } from "./payment.types"
 
 export interface IConfig {
   _id: string
@@ -7,6 +6,7 @@ export interface IConfig {
   cashierIds?: string[]
   adminIds?: string[]
   createdAt?: string
+  description?:string
   waitingScreen?: {
     isActive?: boolean
   }

@@ -26,6 +26,7 @@ const Logo = () => {
         <Image
           alt="logo"
           src={logo || "/logo-dark.png"}
+          fallBack="/logo-dark.png"
           height={24}
           width={48}
           className="object-contain"

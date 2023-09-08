@@ -1,6 +1,6 @@
 import "@/styles/globals.css"
 import { Metadata } from "next"
-import ApolloProvider from "@/modules/apolloClient"
+import ApolloProvider from "@/modules/ApolloProvider"
 import JotaiProvider from "@/store"
 
 import { siteConfig } from "@/config/site"
@@ -33,22 +33,20 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang="en" suppressHydrationWarning>
-        <head />
+        <head>
+          <script defer type="text/javascript" src="/js/env.js" />
+          <script defer type="text/javascript" src="/js/main.js" />
+        </head>
         <body
           className={cn(
             "h-screen w-screen overflow-hidden bg-background font-sans text-xs font-medium antialiased xl:text-sm flex flex-col",
             fontSans.variable
           )}
         >
-          {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
           <ApolloProvider>
             <JotaiProvider>{children}</JotaiProvider>
           </ApolloProvider>
-          {/* <TailwindIndicator /> */}
-          {/* </ThemeProvider> */}
           <Toaster />
-          <script defer type="text/javascript" src="/js/env.js" />
-          <script defer type="text/javascript" src="/js/main.js" />
         </body>
       </html>
     </>

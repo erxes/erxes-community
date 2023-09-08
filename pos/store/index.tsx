@@ -19,6 +19,8 @@ export const customerSearchAtom = atom<string>("")
 
 export const reportDateAtom = atom<Date | null>(null)
 
+export const productCountAtom = atom<number>(0)
+
 const JotaiProvider = ({ children }: { children: React.ReactNode }) => {
   return <Provider>{children}</Provider>
 }

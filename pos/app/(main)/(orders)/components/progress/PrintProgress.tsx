@@ -7,7 +7,6 @@ const PrintProgress = () => {
   const [showRecieptId, setShowRecieptId] = useAtom(showRecieptAtom)
   const { iframeRef } = useReciept({
     onCompleted() {
-      console.log("------")
       setShowRecieptId(null)
     },
   })
