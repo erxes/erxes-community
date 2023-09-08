@@ -33,8 +33,6 @@ class CategoryStatusFilter extends React.Component<IProps> {
     );
 
     const onClick = (key, value) => {
-      console.log('key', key);
-      console.log('value', value);
       router.setParams(history, { [key]: value });
       router.setParams(history, { categoryId: null });
       if (key === 'productStatus') {
