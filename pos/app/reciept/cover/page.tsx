@@ -10,7 +10,7 @@ import { Detail, PaidSum } from "@/types/cover.types"
 import { ALL_BANK_CARD_TYPES } from "@/lib/constants"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { queries } from "@/app/(page)/(main)/cover/graphql"
+import { queries } from "@/app/(main)/cover/graphql"
 import { useSearchParams } from 'next/navigation'
 
 const Cover = () => {

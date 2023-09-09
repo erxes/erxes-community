@@ -1,5 +1,7 @@
+/* eslint-disable @next/next/no-before-interactive-script-outside-document */
 import "@/styles/globals.css"
 import { Metadata } from "next"
+import Script from "next/script"
 import ApolloProvider from "@/modules/ApolloProvider"
 import JotaiProvider from "@/store"
 
@@ -34,8 +36,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <>
       <html lang="en" suppressHydrationWarning>
         <head>
-          <script defer type="text/javascript" src="/js/env.js" />
-          <script defer type="text/javascript" src="/js/main.js" />
+          <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="/js/env.js"
+          />
+          {/* <Script
+            strategy="beforeInteractive"
+            type="text/javascript"
+            src="/js/main.js"
+          /> */}
         </head>
         <body
           className={cn(

@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai"
 
 import { IPaymentType } from "@/types/config.types"
 import { Button } from "@/components/ui/button"
-import PrintLayout from "@/app/(page)/reciept/layout"
+import PrintLayout from "@/app/reciept/layout"
 
 const formatNum = (num?: number) => (num || 0).toLocaleString()
 const Flex = ({

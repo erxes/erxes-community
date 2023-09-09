@@ -5,7 +5,7 @@ import { XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import Keys from "@/app/(page)/(main)/checkout/components/Keys"
+import Keys from "@/app/(main)/checkout/components/Keys"
 
 import useHandlePayment from "../../hooks/useHandlePayment"
 import { useCheckNotSplit } from "../../hooks/usePaymentType"
