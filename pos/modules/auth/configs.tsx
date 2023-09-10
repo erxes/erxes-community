@@ -41,7 +41,7 @@ const Configs = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     setCurrentUser(data?.posCurrentUser)
-  }, [data])
+  }, [data, setCurrentUser])
 
   useEffect(() => {
     const currentConfig = (config || {}).currentConfig
@@ -58,7 +58,7 @@ const Configs = ({ children }: { children: ReactNode }) => {
         hexToHsl(primary || "#4f33af")
       )
     }
-  }, [config])
+  }, [config, setConfig])
 
   if (loading || loadingConfig || loadingConfigs)
     return (

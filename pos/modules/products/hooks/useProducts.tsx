@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { activeCategoryAtom, searchAtom } from "@/store"
-import { gql, useQuery } from "@apollo/client"
-import { useAtom } from "jotai"
+import { activeCategoryAtom, productCountAtom, searchAtom } from "@/store"
+import { useQuery } from "@apollo/client"
+import { useAtom, useSetAtom } from "jotai"
 
 import { IProduct, IUseProducts } from "@/types/product.types"
 
@@ -17,6 +17,7 @@ export const useProducts = (props?: {
   const [search] = useAtom(searchAtom)
   const [searchValue, setSearchValue] = useState(search)
   const [categoryId] = useAtom(activeCategoryAtom)
+  const setProductCount = useSetAtom(productCountAtom)
 
   const { data, loading, fetchMore } = useQuery(queries.products, {
     variables: {
@@ -28,6 +29,7 @@ export const useProducts = (props?: {
     skip,
     onCompleted(data) {
       const products = (data || {}).poscProducts || []
+
       !!onCompleted && onCompleted(products)
     },
   })
@@ -35,6 +37,9 @@ export const useProducts = (props?: {
     variables: {
       categoryId,
       searchValue,
+    },
+    onCompleted(data) {
+      setProductCount((data || {}).poscProductsTotalCount || 0)
     },
   })
 

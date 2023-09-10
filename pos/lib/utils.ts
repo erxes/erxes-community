@@ -55,7 +55,10 @@ export const getLocal = (name: string) => {
 
 export const setLocal = (name: string, value: any) => {
   if (typeof window !== "undefined") {
-    localStorage.setItem(name, JSON.stringify(value))
+    localStorage.setItem(
+      name,
+      typeof value === "string" ? value : JSON.stringify(value)
+    )
   }
 }
 

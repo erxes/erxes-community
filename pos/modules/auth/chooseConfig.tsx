@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { mutations, queries } from "./graphql"
+import { mutations } from "./graphql"
 
 const ChooseConfig = () => {
   const [config] = useAtom(configAtom)
@@ -42,9 +42,9 @@ const ChooseConfig = () => {
             <SelectValue placeholder="сонгох" />
           </SelectTrigger>
           <SelectContent>
-            {(configs || []).map(({ token, name }: any) => (
+            {(configs || []).map(({ token, name, description }) => (
               <SelectItem key={token} value={token}>
-                {name} - {token}
+                {name} {!!description && `- ${description}`}
               </SelectItem>
             ))}
           </SelectContent>

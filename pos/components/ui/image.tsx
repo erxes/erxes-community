@@ -48,18 +48,15 @@ const Image: FC<
 
   if (srcI === "/product.png" || !srcI)
     return (
-      <Package
-        className={cn("p-4 text-zinc-300", className)}
-        strokeWidth={0.8}
-      />
+      <Package className={cn("text-zinc-300", className)} strokeWidth={0.8} />
     )
 
   return (
     <NextImage
       {...updatedProps}
-      loader={!fixedSrc.startsWith("/") ? cloudflareLoader : undefined}
+      loader={!srcI.startsWith("/") ? cloudflareLoader : undefined}
       onLoadingComplete={handleComplete}
-      className={cn(className, isImageLoading && "blur-2xl")}
+      className={cn(className, isImageLoading && "blur-2xl", "text-black")}
       sizes={
         sizes ||
         `(max-width: 768px) 20vw,

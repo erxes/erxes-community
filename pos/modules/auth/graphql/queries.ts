@@ -119,6 +119,7 @@ const configs = gql`
     posclientConfigs {
       name
       token
+      description
     }
   }
 `

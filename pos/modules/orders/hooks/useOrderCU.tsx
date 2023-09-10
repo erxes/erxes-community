@@ -15,7 +15,7 @@ import { useAtom } from "jotai"
 import { getMode } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 
-import { mutations, queries } from "../graphql"
+import { mutations } from "../graphql"
 
 const useOrderCU = (onCompleted?: (id: string) => void) => {
   const { toast } = useToast()
