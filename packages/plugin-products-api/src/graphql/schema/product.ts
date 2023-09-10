@@ -69,7 +69,16 @@ export const types = (tagsAvailable, contactsAvailable) => `
     ${contactsAvailable ? 'vendor: Company' : ''}
     taxType: String
     taxCode: String
+  }
 
+  type productSimilarityGroup {
+    title: String
+    fieldId: String
+  }
+
+  type productSimilarity {
+    products: [Product],
+    groups: [productSimilarityGroup],
   }
 `;
 
@@ -133,6 +142,7 @@ export const queries = `
   productsGroupCounts(only: String, segment: String, segmentData: String): JSON
   productDetail(_id: String): Product
   productCountByTags: JSON
+  productSimilarities(_id: String!): productSimilarity
 `;
 
 export const mutations = `

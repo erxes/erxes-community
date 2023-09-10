@@ -204,7 +204,7 @@ class CategoryMask extends React.Component<Props, State> {
       return (
         <>
           <FormGroup>
-            <ControlLabel>FieldGroup</ControlLabel>
+            <ControlLabel>Field Group</ControlLabel>
             <FormControl
               name="fieldGroup"
               disabled={!isEdit}

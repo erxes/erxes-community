@@ -24,7 +24,7 @@ interface IQueryParams {
   boardId?: string;
   segment?: string;
   segmentData?: string;
-  groupCatDiffVals: boolean;
+  isFirstSimilarity?: boolean;
 }
 
 const generateFilter = async (
@@ -187,6 +187,10 @@ const productQueries = {
       params
     );
 
+    const similarityGroups = await models.ProductsConfigs.getConfig(
+      'similarityGroup'
+    );
+    const codeMasks = Object.keys(similarityGroups);
     const { sortField, sortDirection, ...pagintationArgs } = params;
 
     let sort: any = { code: 1 };
@@ -259,6 +263,66 @@ const productQueries = {
     }
 
     return counts;
+  },
+
+  async productSimilarities(_root, _id, { models }: IContext) {
+    const product = await models.Products.getProduct({ _id });
+
+    const getRegex = str => {
+      return new RegExp(
+        `^${str
+          .replace(/\./g, '\\.')
+          .replace(/\*/g, '.')
+          .replace(/_/g, '.')}.*`,
+        'igu'
+      );
+    };
+
+    const similarityGroups = await models.ProductsConfigs.getConfig(
+      'similarityGroup'
+    );
+    const codeMasks = Object.keys(similarityGroups);
+    const customerFieldIds = (product.customFieldsData || []).map(
+      cf => cf.field
+    );
+
+    const matchedMasks = codeMasks.filter(
+      cm =>
+        product.code.match(getRegex(cm)) &&
+        (similarityGroups[cm].rules || [])
+          .map(sg => sg.fieldId)
+          .filter(sgf => customerFieldIds.includes(sgf)).length ===
+          (similarityGroups[cm].rules || []).length
+    );
+
+    const codeRegexs: any[] = [];
+    const fieldIds: string[] = [];
+    const groups: { title: string; fieldId: string }[] = [];
+    for (const matchedMask of matchedMasks) {
+      codeRegexs.push({ code: { $in: [getRegex(matchedMask)] } });
+
+      for (const rule of similarityGroups[matchedMask].rules || []) {
+        const { fieldId, title } = rule;
+        if (!fieldIds.includes(fieldId)) {
+          fieldIds.push(fieldId);
+          groups.push({ title, fieldId });
+        }
+      }
+    }
+
+    const filters: any = {
+      $and: [
+        {
+          $or: codeRegexs,
+          'customFieldData.field': { $in: fieldIds }
+        }
+      ]
+    };
+
+    return {
+      products: await models.Products.find(filters),
+      groups
+    };
   },
 
   async productCategories(
