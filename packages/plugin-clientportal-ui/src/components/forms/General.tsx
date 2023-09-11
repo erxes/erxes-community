@@ -383,7 +383,27 @@ function General({
             'ticketToggle',
             ticketToggle || false
           )}
-
+        {isEnabled('cards') &&
+          renderFeatureBlock(
+            'deals',
+            <>
+              {renderControl({
+                label: 'Deals',
+                subtitle: 'Shown name on menu',
+                formValueName: 'dealLabel',
+                formValue: dealLabel,
+                placeholder: 'Please enter a label for Deal'
+              })}
+              {renderBoardSelect({
+                type: 'deal',
+                stageId: dealStageId,
+                pipelineId: dealPipelineId,
+                boardId: dealBoardId
+              })}
+            </>,
+            'dealToggle',
+            dealToggle || false
+          )}
         {isEnabled('cards') &&
           renderFeatureBlock(
             'deals',

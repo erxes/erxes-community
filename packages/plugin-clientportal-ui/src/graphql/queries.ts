@@ -65,6 +65,7 @@ export const commonFields = `
   kbToggle
   publicTaskToggle
   ticketToggle
+  dealToggle
   taskToggle
   dealToggle
   purchaseToggle

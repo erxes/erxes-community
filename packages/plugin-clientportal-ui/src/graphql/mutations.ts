@@ -45,6 +45,7 @@ const createOrUpdateConfig = `
     $kbToggle: Boolean
     $publicTaskToggle: Boolean
     $ticketToggle: Boolean
+    $dealToggle: Boolean
     $taskToggle: Boolean
     $dealToggle: Boolean
     $purchaseToggle: Boolean
@@ -73,6 +74,7 @@ const createOrUpdateConfig = `
       taskPublicPipelineId: $taskPublicPipelineId,
       taskPublicLabel: $taskPublicLabel,
       ticketLabel: $ticketLabel,
+      dealLabel: $dealLabel,
       taskLabel: $taskLabel,
       dealLabel: $dealLabel,
       purchaseLabel: $purchaseLabel,
@@ -100,6 +102,7 @@ const createOrUpdateConfig = `
       kbToggle: $kbToggle,
       publicTaskToggle: $publicTaskToggle,
       ticketToggle: $ticketToggle,
+      dealToggle: $dealToggle,
       taskToggle: $taskToggle,
       dealToggle: $dealToggle,
       purchaseToggle: $purchaseToggle,

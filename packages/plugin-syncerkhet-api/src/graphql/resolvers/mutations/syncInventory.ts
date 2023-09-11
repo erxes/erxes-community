@@ -45,7 +45,7 @@ const inventoryMutations = {
       categoryOfId[cat._id] = cat;
     }
 
-    const productCodes = products.map(p => p.code) || [];
+    const productCodes = products.map((p) => p.code) || [];
     const response = await sendRequest({
       url: process.env.ERKHET_URL + '/get-api/',
       method: 'GET',
@@ -67,8 +67,8 @@ const inventoryMutations = {
     const deleteProducts: any = [];
     let matchedCount = 0;
 
-    let result = JSON.parse(response).map(r => r.fields);
-    const resultCodes = result.map(r => r.code) || [];
+    let result = JSON.parse(response).map((r) => r.fields);
+    const resultCodes = result.map((r) => r.code) || [];
 
     const productByCode = {};
     for (const product of products) {
@@ -139,7 +139,7 @@ const inventoryMutations = {
       isRPC: true
     });
 
-    const categoryCodes = categories.map(c => c.code);
+    const categoryCodes = categories.map((c) => c.code);
 
     if (!categoryCodes) {
       throw new Error('No category codes found.');
@@ -160,20 +160,22 @@ const inventoryMutations = {
     if (!response || Object.keys(JSON.parse(response)).length === 0) {
       throw new Error('Erkhet data not found.');
     }
-    let result = JSON.parse(response).map(r => r.fields);
+    let result = JSON.parse(response).map((r) => r.fields);
 
     // for update
-    const matchedErkhetData = result.filter(r => {
-      if (categoryCodes.find(p => p === r.code)) {
+    const matchedErkhetData = result.filter((r) => {
+      if (categoryCodes.find((p) => p === r.code)) {
         return r;
       }
     });
     // for create
-    const otherErkhetData = result.filter(r => !matchedErkhetData.includes(r));
+    const otherErkhetData = result.filter(
+      (r) => !matchedErkhetData.includes(r)
+    );
     // for delete
     let otherCategories: any[] = [];
     for (const code of categoryCodes) {
-      if (result.every(r => r.code !== code)) {
+      if (result.every((r) => r.code !== code)) {
         const response = await sendProductsMessage({
           subdomain,
           action: 'categories.findOne',

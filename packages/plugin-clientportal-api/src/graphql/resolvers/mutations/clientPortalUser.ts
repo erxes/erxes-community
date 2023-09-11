@@ -929,7 +929,6 @@ const clientPortalUserMutations = {
     { models, requestInfo, res }: IContext
   ) => {
     const authHeader = requestInfo.headers.authorization;
-
     if (!authHeader) {
       throw new Error('Invalid refresh token');
     }

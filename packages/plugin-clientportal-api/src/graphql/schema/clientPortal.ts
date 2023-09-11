@@ -143,7 +143,6 @@ ${
     kbToggle: Boolean,
     publicTaskToggle: Boolean,
     ticketToggle: Boolean,
-    taskToggle: Boolean,
     dealToggle: Boolean,
     purchaseToggle: Boolean,
 
@@ -232,7 +231,7 @@ export const queries = (cardAvailable, kbAvailable, formsAvailable) => `
   }
 `;
 
-export const mutations = cardAvailable => `
+export const mutations = (cardAvailable) => `
   clientPortalConfigUpdate (
     _id: String
     name: String
@@ -247,6 +246,7 @@ export const mutations = cardAvailable => `
     knowledgeBaseLabel: String
     knowledgeBaseTopicId: String
     ticketLabel: String
+    dealLabel: String
     taskLabel: String
     dealLabel: String
     purchaseLabel: String

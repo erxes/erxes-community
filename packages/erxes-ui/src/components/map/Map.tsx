@@ -366,7 +366,6 @@ const Map = (props: IMapProps) => {
       addListeners(marker, 'your location');
     }
   };
-
   const isChildModal = localStorage.getItem('isChildModal');
   return isChildModal === 'true' ? (
     <MapContainer id={props.id + '1'} fullHeight={props.fullHeight} />
