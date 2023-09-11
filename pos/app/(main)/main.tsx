@@ -5,9 +5,9 @@ import Customer from "@/modules/customer"
 import OrderDetail from "@/modules/orders/OrderDetail.main"
 import ShowDeliveryInfo from "@/modules/orders/components/DeliveryInputs/ShowDeliveryInfo"
 import ChooseType from "@/modules/orders/components/chooseType/chooseType.main"
+import Products from "@/modules/products"
 import Search from "@/modules/products/components/search/search.main"
 import ProductCategories from "@/modules/products/productCategories.main"
-import Products from "@/modules/products/products.main"
 
 import Header from "@/components/header/header.main"
 

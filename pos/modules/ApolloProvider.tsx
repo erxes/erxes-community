@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 
-import { setLocal } from "@/lib/utils"
-
 const Apollo = dynamic(() => import("./apolloClient"))
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +31,10 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
     const envs = (window as any).env
 
     Object.keys(envs).forEach((envKey) =>
-      setLocal(`pos_env_${envKey}`, envs[envKey as keyof typeof envs])
+      localStorage.setItem(
+        `pos_env_${envKey}`,
+        envs[envKey as keyof typeof envs]
+      )
     )
     setLoading(false)
   }, [])

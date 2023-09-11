@@ -56,7 +56,7 @@ const SelectPaymentType = () => {
               ХXБанк
             </SelectItem>
           )}
-          {golomt && (
+          {!!golomt && (
             <SelectItem value={BANK_CARD_TYPES.GOLOMT} disabled={disabledTerms}>
               Голомт банк
             </SelectItem>

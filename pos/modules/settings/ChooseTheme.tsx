@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { getMode, setLocal } from "@/lib/utils"
 import {
@@ -28,8 +28,9 @@ const ChooseTheme = () => {
           <SelectValue placeholder="сонгох" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="main">POS & fullmode</SelectItem>
-          <SelectItem value="market">Supermarket & fullmode </SelectItem>
+          <SelectItem value="main">Үндсэн</SelectItem>
+          <SelectItem value="market">Дэлгүүр</SelectItem>
+          <SelectItem value="coffee-shop">Кофе шоп</SelectItem>
           <SelectItem value="kiosk">Kiosk</SelectItem>
           <SelectItem value="waiting">Waiting Screen</SelectItem>
           <SelectItem value="kitchen">Kitchen Screen</SelectItem>

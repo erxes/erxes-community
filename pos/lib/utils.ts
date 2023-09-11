@@ -43,22 +43,28 @@ export const getEnv = (): any => {
   return envs
 }
 
-export const getLocal = (name: string) => {
-  if (typeof window !== "undefined") {
-    try {
-      return JSON.parse(localStorage.getItem(name) || "")
-    } catch (error) {
-      console.error("error", error)
+// Get a value from localStorage
+export function getLocal<T>(key: string): T | undefined {
+  try {
+    const serializedValue = localStorage.getItem(key)
+    if (serializedValue !== null) {
+      return JSON.parse(serializedValue)
+    } else {
+      return undefined
     }
+  } catch (error) {
+    console.error("Error getting data from localStorage:", error)
+    return undefined
   }
 }
 
-export const setLocal = (name: string, value: any) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(
-      name,
-      typeof value === "string" ? value : JSON.stringify(value)
-    )
+// Set a value in localStorage
+export function setLocal<T>(key: string, value: T): void {
+  try {
+    const serializedValue = JSON.stringify(value)
+    localStorage.setItem(key, serializedValue)
+  } catch (error) {
+    console.error("Error storing data in localStorage:", error)
   }
 }
 

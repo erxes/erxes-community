@@ -4,15 +4,15 @@ import dynamic from "next/dynamic"
 
 import { getMode } from "@/lib/utils"
 
-const Market = dynamic(() => import("@/app/(main)/market"))
-const Main = dynamic(() => import("@/app/(main)/main"))
+const Market = dynamic(() => import("./market"))
+const Main = dynamic(() => import("./main"))
 
 export default function IndexPage() {
   const mode = getMode()
   return (
     <>
       {mode === "market" && <Market />}
-      {mode === "main" && <Main />}
+      {["main", "coffee-shop"].includes(mode) && <Main />}
     </>
   )
 }

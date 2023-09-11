@@ -1,4 +1,3 @@
-
 export interface IConfig {
   _id: string
   name: string
@@ -6,7 +5,7 @@ export interface IConfig {
   cashierIds?: string[]
   adminIds?: string[]
   createdAt?: string
-  description?:string
+  description?: string
   waitingScreen?: {
     isActive?: boolean
   }
@@ -82,4 +81,4 @@ export interface ICurrentUser {
   }
 }
 
-export type modeT = "market" | "main" | "kiosk"
+export type modeT = "market" | "main" | "kiosk" | "coffee-shop" 
