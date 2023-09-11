@@ -234,10 +234,10 @@ export const listenIntegration = async (
       } catch (e) {
         await models.Logs.createLog({
           type: 'error',
-          message: e.message,
+          message: e.message + ' 3 ',
           errorStack: e.stack
         });
-
+        console.log('listen integration error ============', e);
         throw e;
       }
     });
@@ -262,10 +262,10 @@ export const listenIntegration = async (
     } catch (e) {
       await models.Logs.createLog({
         type: 'error',
-        message: e.message,
+        message: e.message + ' 1 ',
         errorStack: e.stack
       });
-
+      console.log('save message error ============', e);
       throw e;
     }
   });
@@ -273,7 +273,7 @@ export const listenIntegration = async (
   imap.once('error', async e => {
     await models.Logs.createLog({
       type: 'error',
-      message: e.message,
+      message: e.message + ' 2 ',
       errorStack: e.stack
     });
 
