@@ -295,6 +295,12 @@ const productQueries = {
           (similarityGroups[cm].rules || []).length
     );
 
+    if (!matchedMasks.length) {
+      return {
+        products: await models.Products.find({ _id })
+      };
+    }
+
     const codeRegexs: any[] = [];
     const fieldIds: string[] = [];
     const groups: { title: string; fieldId: string }[] = [];
@@ -314,7 +320,7 @@ const productQueries = {
       $and: [
         {
           $or: codeRegexs,
-          'customFieldData.field': { $in: fieldIds }
+          'customFieldsData.field': { $in: fieldIds }
         }
       ]
     };
