@@ -11,7 +11,8 @@ import SelectDepartments from '@erxes/ui/src/team/containers/SelectDepartments';
 import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
 import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
 import Tip from '@erxes/ui/src/components/Tip';
-import { __, router } from '@erxes/ui/src/utils';
+import { router } from '@erxes/ui/src/utils';
+import { __ } from 'coreui/utils';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { MenuFooter, SidebarFilters } from '../../styles';
 import { SidebarList as List } from '@erxes/ui/src/layout';
@@ -247,7 +248,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
               </FormGroup>
               {this.renderSpec()}
               <FormGroup>
-                <ControlLabel>{__('In Branch')}</ControlLabel>
+                <ControlLabel>{__('Spend Branch')}</ControlLabel>
                 <SelectBranches
                   label="Choose branch"
                   name="inBranchId"
@@ -261,7 +262,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <ControlLabel>{__('In Department')}</ControlLabel>
+                <ControlLabel>{__('Spend Department')}</ControlLabel>
                 <SelectDepartments
                   label="Choose department"
                   name="inDepartmentId"
@@ -277,7 +278,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <ControlLabel>{__('Out Branch')}</ControlLabel>
+                <ControlLabel>{__('Receipt Branch')}</ControlLabel>
                 <SelectBranches
                   label="Choose branch"
                   name="outBranchId"
@@ -291,7 +292,7 @@ class DetailLeftSidebar extends React.Component<Props, State> {
                 />
               </FormGroup>
               <FormGroup>
-                <ControlLabel>{__('Out Department')}</ControlLabel>
+                <ControlLabel>{__('Receipt Department')}</ControlLabel>
                 <SelectDepartments
                   label="Choose department"
                   name="outDepartmentId"

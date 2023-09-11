@@ -178,11 +178,12 @@ export const importProducts = async (
               $set: {
                 ...product,
                 [`prices.${token}`]: product.unitPrice,
-                sku: product.sku || 'ш',
+                uom: product.uom || 'ш',
                 attachment: attachmentUrlChanger(product.attachment),
                 attachmentMore: (product.attachmentMore || []).map(a =>
                   attachmentUrlChanger(a)
-                )
+                ),
+                [`isCheckRems.${token}`]: product.isCheckRem
               },
               $addToSet: { tokens: token }
             },
@@ -258,6 +259,7 @@ export const extractConfig = async (subdomain, doc) => {
   return {
     name: doc.name,
     description: doc.description,
+    pdomain: doc.pdomain,
     productDetails: doc.productDetails,
     adminIds: doc.adminIds,
     cashierIds: doc.cashierIds,
@@ -276,6 +278,7 @@ export const extractConfig = async (subdomain, doc) => {
     kioskExcludeCategoryIds: doc.kioskExcludeCategoryIds,
     kioskExcludeProductIds: doc.kioskExcludeProductIds,
     deliveryConfig: doc.deliveryConfig,
+    cardsConfig: doc.cardsConfig,
     posId: doc._id,
     erxesAppToken: doc.erxesAppToken,
     isOnline: doc.isOnline,
@@ -285,7 +288,9 @@ export const extractConfig = async (subdomain, doc) => {
     allowBranchIds: doc.allowBranchIds,
     checkRemainder: doc.checkRemainder,
     permissionConfig: doc.permissionConfig,
-    allowTypes: doc.allowTypes
+    allowTypes: doc.allowTypes,
+    isCheckRemainder: doc.isCheckRemainder,
+    checkExcludeCategoryIds: doc.checkExcludeCategoryIds
   };
 };
 
@@ -319,9 +324,25 @@ export const receiveProduct = async (models: IModels, data) => {
       tokens.push(token);
     }
     const info = action === 'update' ? updatedDocument : object;
+    if (info.attachment && info.attachment.url) {
+      const FILE_PATH = `${await getServerAddress(
+        'localhost',
+        'core'
+      )}/read-file`;
+      info.attachment.url =
+        info.attachment.url.indexOf('http') === -1
+          ? `${FILE_PATH}?key=${info.attachment.url}`
+          : info.attachment.url;
+    }
+
     return await models.Products.updateOne(
       { _id: object._id },
-      { ...info, tokens },
+      {
+        ...info,
+        [`prices.${token}`]: info.unitPrice,
+        [`isCheckRems.${token}`]: info.isCheckRem,
+        tokens
+      },
       { upsert: true }
     );
   }
@@ -428,7 +449,7 @@ export const receivePosConfig = async (
       throw new Error('token not found');
     }
 
-    config = await models.Configs.createConfig(token);
+    config = await models.Configs.createConfig(token, pos.name);
   }
 
   await models.Configs.updateConfig(config._id, {
@@ -445,4 +466,5 @@ export const receivePosConfig = async (
 
   await importUsers(models, adminUsers, token, true);
   await importUsers(models, cashiers, token, false);
+  return models.Configs.findOne({ _id: config._id }).lean();
 };

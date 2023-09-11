@@ -27,7 +27,6 @@ import {
   KEY_LABELS,
   LANGUAGES,
   LOG_RETENTION_DURATION,
-  MEASUREMENTS,
   SERVICE_TYPES
 } from '@erxes/ui-settings/src/general/constants';
 import { IConfigsMap } from '@erxes/ui-settings/src/general/types';
@@ -222,6 +221,35 @@ class GeneralSettings extends React.Component<Props, State> {
     );
   }
 
+  renderCloudflare() {
+    const { configsMap } = this.state;
+
+    return (
+      <CollapseContent
+        title={__('Cloudflare')}
+        description={__('Cloudflare R2 Bucket, Images & Stream CDN configs')}
+      >
+        {this.renderItem('CLOUDFLARE_ACCOUNT_ID')}
+        {this.renderItem('CLOUDFLARE_API_TOKEN')}
+        {this.renderItem('CLOUDFLARE_ACCESS_KEY_ID')}
+        {this.renderItem('CLOUDFLARE_SECRET_ACCESS_KEY')}
+        {this.renderItem('CLOUDFLARE_BUCKET_NAME')}
+        {this.renderItem('CLOUDFLARE_ACCOUNT_HASH')}
+        <FormGroup>
+          <ControlLabel>{KEY_LABELS.CLOUDFLARE_USE_CDN}</ControlLabel>
+          <p>{__('Upload images/videos to Cloudflare cdn')}</p>
+          <FormControl
+            componentClass={'checkbox'}
+            checked={configsMap.CLOUDFLARE_USE_CDN}
+            onChange={(e: any) => {
+              this.onChangeConfig('CLOUDFLARE_USE_CDN', e.target.checked);
+            }}
+          />
+        </FormGroup>
+      </CollapseContent>
+    );
+  }
+
   render() {
     const { configsMap, language } = this.state;
 
@@ -274,15 +302,6 @@ class GeneralSettings extends React.Component<Props, State> {
             />
           </FormGroup>
 
-          <FormGroup>
-            <ControlLabel>Unit of measurement</ControlLabel>
-            <Select
-              options={MEASUREMENTS}
-              value={configsMap.dealUOM}
-              onChange={this.onChangeMultiCombo.bind(this, 'dealUOM')}
-              multi={true}
-            />
-          </FormGroup>
           <FormGroup>
             <ControlLabel>
               {__('Team members who can access every branches')}
@@ -413,6 +432,8 @@ class GeneralSettings extends React.Component<Props, State> {
             {this.renderItem('GOOGLE_CLOUD_STORAGE_BUCKET')}
           </FormGroup>
         </CollapseContent>
+
+        {this.renderCloudflare()}
 
         <CollapseContent title="AWS S3">
           <Info>

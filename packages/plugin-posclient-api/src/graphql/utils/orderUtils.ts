@@ -19,6 +19,9 @@ import * as moment from 'moment';
 import { debugError } from '@erxes/api-utils/src/debuggers';
 import { isValidBarcode } from './otherUtils';
 import { IProductDocument } from '../../models/definitions/products';
+import { checkLoyalties } from './loyalties';
+import { checkPricing } from './pricing';
+import { checkRemainders } from './products';
 
 interface IDetailItem {
   count: number;
@@ -27,12 +30,6 @@ interface IDetailItem {
   barcode: string;
   productId: string;
 }
-
-export const getPureDate = (date?: Date) => {
-  const ndate = date ? new Date(date) : new Date();
-  const diffTimeZone = ndate.getTimezoneOffset() * 1000 * 60;
-  return new Date(ndate.getTime() - diffTimeZone);
-};
 
 export const generateOrderNumber = async (
   models: IModels,
@@ -48,13 +45,28 @@ export const generateOrderNumber = async (
   let suffix = '0001';
   let number = `${todayStr}_${beginNumber}${suffix}`;
 
-  const latestOrder = ((await models.Orders.find({
-    number: { $regex: new RegExp(`^${todayStr}_${beginNumber}*`) },
-    posToken: config.token
-  })
-    .sort({ number: -1 })
-    .limit(1)
-    .lean()) || [])[0];
+  let latestOrder;
+
+  const latestOrders = await models.Orders.aggregate([
+    {
+      $match: {
+        posToken: config.token,
+        number: { $regex: new RegExp(`^${todayStr}_${beginNumber}*`) }
+      }
+    },
+    {
+      $project: {
+        number: 1,
+        number_len: { $strLenCP: '$number' }
+      }
+    },
+    { $sort: { number_len: -1, number: -1 } },
+    { $limit: 1 }
+  ]);
+
+  if (latestOrders.length) {
+    latestOrder = latestOrders[0];
+  }
 
   if (latestOrder && latestOrder._id) {
     const parts = latestOrder.number.split('_');
@@ -78,16 +90,70 @@ export const generateOrderNumber = async (
   return number;
 };
 
-export const validateOrder = async (models: IModels, doc: IOrderInput) => {
+export const validateOrder = async (
+  subdomain: string,
+  models: IModels,
+  config: IConfigDocument,
+  doc: IOrderInput
+) => {
   const { items = [] } = doc;
 
   if (items.filter(i => !i.isPackage).length < 1) {
     throw new Error('Products missing in order. Please add products');
   }
 
+  const products = await models.Products.find({
+    _id: { $in: items.map(i => i.productId) }
+  }).lean();
+  const productIds = products.map(p => p._id);
+
   for (const item of items) {
     // will throw error if product is not found
-    await models.Products.getProduct({ _id: item.productId });
+    if (!productIds.includes(item.productId)) {
+      throw new Error('Products missing in order');
+    }
+  }
+
+  if (
+    config.isCheckRemainder &&
+    (doc.branchId || config.branchId) &&
+    doc.type !== 'before'
+  ) {
+    const checkProducts = products.filter(
+      p => (p.isCheckRems || {})[config.token] || false
+    );
+
+    if (checkProducts.length) {
+      const result = await checkRemainders(
+        subdomain,
+        config,
+        checkProducts,
+        doc.branchId || config.branchId
+      );
+
+      const errors: string[] = [];
+      const withRemProductById = {};
+      for (const product of result) {
+        withRemProductById[product._id] = product;
+      }
+
+      for (const item of items) {
+        const product = withRemProductById[item.productId];
+        if (!product) {
+          continue;
+        }
+
+        if (product.remainder < item.count) {
+          errors.push(
+            `#${product.code} - ${product.name} have a potential sales balance of ${product.remainder}`
+          );
+        }
+      }
+
+      if (errors.length) {
+        throw new Error(errors.join(', '));
+      }
+    }
   }
 };
 
@@ -149,7 +215,8 @@ export const updateOrderItems = async (
       bonusCount: item.bonusCount,
       bonusVoucherId: item.bonusVoucherId,
       isPackage: item.isPackage,
-      isTake: item.isTake
+      isTake: item.isTake,
+      manufacturedDate: item.manufacturedDate
     };
 
     if (itemIds.includes(item._id)) {
@@ -187,7 +254,8 @@ export const prepareEbarimtData = async (
   config: IEbarimtConfig,
   items: IOrderItemDocument[] = [],
   orderBillType: string,
-  registerNumber?: string
+  registerNumber?: string,
+  paymentTypes?: any[]
 ) => {
   if (!config) {
     throw new Error('has not ebarimt config');
@@ -214,6 +282,32 @@ export const prepareEbarimtData = async (
     }
   }
 
+  let itemAmountPrePercent = 0;
+  const preTaxPaymentTypes = (paymentTypes || []).filter(p =>
+    (p.config || '').includes('preTax: true')
+  );
+  if (
+    preTaxPaymentTypes.length &&
+    order.paidAmounts &&
+    order.paidAmounts.length
+  ) {
+    let preSentAmount = 0;
+    for (const preTaxPaymentType of preTaxPaymentTypes) {
+      const matchOrderPays = order.paidAmounts.filter(
+        pa => pa.type === preTaxPaymentType.type
+      );
+      if (matchOrderPays.length) {
+        for (const matchOrderPay of matchOrderPays) {
+          preSentAmount += matchOrderPay.amount;
+        }
+      }
+    }
+
+    if (preSentAmount && preSentAmount <= order.totalAmount) {
+      itemAmountPrePercent = (preSentAmount / order.totalAmount) * 100;
+    }
+  }
+
   const productIds = items.map(item => item.productId);
   const products = await models.Products.find({ _id: { $in: productIds } });
   const productsById = {};
@@ -225,9 +319,11 @@ export const prepareEbarimtData = async (
   const details: IDetailItem[] = [];
   const detailsFree: IDetailItem[] = [];
   const details0: IDetailItem[] = [];
+  const detailsInner: (IDetailItem & { itemId: string })[] = [];
   let amountDefault = 0;
   let amountFree = 0;
   let amount0 = 0;
+  let amountInner = 0;
 
   for (const item of items) {
     const product = productsById[item.productId];
@@ -237,7 +333,8 @@ export const prepareEbarimtData = async (
       continue;
     }
 
-    const amount = (item.count || 0) * (item.unitPrice || 0);
+    const tempAmount = (item.count || 0) * (item.unitPrice || 0);
+    const amount = tempAmount - (tempAmount / 100) * itemAmountPrePercent;
 
     const stock = {
       count: item.count,
@@ -253,6 +350,13 @@ export const prepareEbarimtData = async (
     } else if (product.taxType === '3' && billType === '3') {
       details0.push({ ...stock, barcode: product.taxCode });
       amount0 += amount;
+    } else if (product.taxType === '5') {
+      detailsInner.push({
+        ...stock,
+        barcode: product.taxCode,
+        itemId: item._id
+      });
+      amountInner += amount;
     } else {
       let trueBarcode = '';
       for (const barcode of product.barcodes) {
@@ -322,6 +426,26 @@ export const prepareEbarimtData = async (
     });
   }
 
+  if (detailsInner && detailsInner.length) {
+    if (calcCashAmount > amountInner) {
+      cashAmount = amountInner;
+      calcCashAmount -= amountInner;
+    } else {
+      cashAmount = calcCashAmount;
+      calcCashAmount = 0;
+    }
+    result.push({
+      ...commonOderInfo,
+      hasVat: false,
+      hasCityTax: false,
+      itemIds: detailsInner.map(di => di.itemId),
+      inner: true,
+      details: detailsInner,
+      cashAmount,
+      nonCashAmount: amountInner - cashAmount
+    });
+  }
+
   if (details && details.length) {
     if (calcCashAmount > amountDefault) {
       cashAmount = amountDefault;
@@ -369,7 +493,28 @@ const getMatchMaps = (matchOrders, lastCatProdMaps, product) => {
   return;
 };
 
+const checkPrices = async (subdomain, preparedDoc, config) => {
+  const { type } = preparedDoc;
+
+  if (ORDER_TYPES.SALES.includes(type)) {
+    preparedDoc = await checkLoyalties(subdomain, preparedDoc);
+    preparedDoc = await checkPricing(subdomain, preparedDoc, config);
+    return preparedDoc;
+  }
+
+  if (ORDER_TYPES.OUT.includes(type)) {
+    for (const item of preparedDoc.items || []) {
+      item.discountPercent = 100;
+      item.discountAmount = item.count * item.unitPrice;
+      item.unitPrice = 0;
+    }
+  }
+
+  return preparedDoc;
+};
+
 export const prepareOrderDoc = async (
+  subdomain: string,
   doc: IOrderInput,
   config: IConfigDocument,
   models: IModels
@@ -503,7 +648,7 @@ export const prepareOrderDoc = async (
     }
   }
 
-  return { ...doc, items };
+  return await checkPrices(subdomain, { ...doc, items }, config);
 };
 
 export const checkOrderStatus = (order: IOrderDocument) => {
@@ -520,7 +665,7 @@ export const checkOrderAmount = (order: IOrderDocument, amount: number) => {
     mobileAmount +
     (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
 
-  if (amount < 0 && paidAmount <= order.totalAmount) {
+  if (amount < 0 && paidAmount < order.totalAmount) {
     throw new Error('Amount less 0');
   }
 

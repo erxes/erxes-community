@@ -153,6 +153,9 @@ export const afterMutationHandlers = async (subdomain, params) => {
     for (const pos of poss) {
       if (await isInProduct(subdomain, models, pos, params.object._id)) {
         const item = params.updatedDocument || params.object;
+        const firstUnitPrice = params.updatedDocument
+          ? params.updatedDocument.unitPrice
+          : params.object.unitPrice;
 
         const pricing = await sendPricingMessage({
           subdomain,
@@ -164,6 +167,7 @@ export const afterMutationHandlers = async (subdomain, params) => {
             branchId: pos.branchId,
             products: [
               {
+                itemId: item._id,
                 productId: item._id,
                 quantity: 1,
                 price: item.unitPrice
@@ -182,14 +186,34 @@ export const afterMutationHandlers = async (subdomain, params) => {
             unitPrice = 0;
           }
 
+          let isCheckRem = false;
+          if (pos.isCheckRemainder) {
+            const excludeCategoryIds = await getChildCategories(
+              subdomain,
+              pos.checkExcludeCategoryIds
+            );
+
+            if (!excludeCategoryIds.includes(item.categoryId)) {
+              isCheckRem = true;
+            }
+          }
+
           if (params.updatedDocument) {
             params.updatedDocument.unitPrice = unitPrice;
+            params.updatedDocument.isCheckRem = isCheckRem;
           } else {
             params.object.unitPrice = unitPrice;
+            params.object.isCheckRem = isCheckRem;
           }
         }
 
         await handler(subdomain, { ...params }, action, 'product', pos);
+
+        if (params.updatedDocument) {
+          params.updatedDocument.unitPrice = firstUnitPrice;
+        } else {
+          params.object.unitPrice = firstUnitPrice;
+        }
       }
     }
     return;

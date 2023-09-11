@@ -16,6 +16,9 @@ const listParamsDef = `
   $customerId: String
   $customerType: String
   $posId: String
+  $types: [String]
+  $statuses: [String]
+  $excludeStatuses: [String]
 `;
 
 const listParamsValue = `
@@ -33,6 +36,9 @@ const listParamsValue = `
   customerId: $customerId
   customerType: $customerType
   posId: $posId
+  types: $types
+  statuses: $statuses
+  excludeStatuses: $excludeStatuses
 `;
 
 export const orderFields = `
@@ -58,6 +64,10 @@ export const orderFields = `
   userId
   items
   posToken
+  branchId
+  departmentId
+  branch
+  department
 
   syncedErkhet
 
@@ -67,6 +77,8 @@ export const orderFields = `
     _id
     email
   }
+  convertDealId
+  returnInfo
 `;
 
 const posOrders = `
@@ -80,6 +92,12 @@ const posOrders = `
 const posOrdersSummary = `
   query posOrdersSummary(${listParamsDef}) {
     posOrdersSummary(${listParamsValue})
+  }
+`;
+
+const posOrdersGroupSummary = `
+  query posOrdersGroupSummary(${listParamsDef}, $groupField: String) {
+    posOrdersGroupSummary(${listParamsValue}, groupField: $groupField)
   }
 `;
 
@@ -104,6 +122,8 @@ const posOrderDetail = `
       syncErkhetInfo
       putResponses
       deliveryInfo
+      deal
+      dealLink
     }
   }
 `;
@@ -153,7 +173,7 @@ const coverFields = `
   userId
   details {
     _id
-    paidType    
+    paidType
     paidSummary {
       _id
       kind
@@ -190,6 +210,7 @@ const coverParams = `
   $sortField: String
   $sortDirection: Int
   $posId: String
+  $posToken: String
   $startDate: Date
   $endDate: Date
   $userId: String
@@ -201,6 +222,7 @@ const coverParamsVal = `
   sortField: $sortField
   sortDirection: $sortDirection
   posId: $posId
+  posToken: $posToken
   startDate: $startDate
   endDate: $endDate
   userId: $userId
@@ -214,6 +236,12 @@ const covers = `
   }
 `;
 
+const coversCount = `
+  query posCoversCount(${coverParams}) {
+    posCoversCount(${coverParamsVal})
+  }
+`;
+
 const coverDetail = `
   query posCoverDetail($_id: String!) {
     posCoverDetail(_id: $_id) {
@@ -222,12 +250,38 @@ const coverDetail = `
   }
 `;
 
+const posOrderRecords = `
+  query posOrderRecords(${listParamsDef}) {
+    posOrderRecords(${listParamsValue}) {
+      ${orderFields}
+      customer {
+        _id
+        code
+        primaryPhone
+        firstName
+        primaryEmail
+        lastName
+      }
+    }
+  }
+`;
+
+const posOrderRecordsCount = `
+  query posOrderRecordsCount(${listParamsDef}) {
+    posOrderRecordsCount(${listParamsValue})
+  }
+`;
+
 export default {
   posOrders,
   posOrdersSummary,
+  posOrdersGroupSummary,
   posOrderDetail,
   posProducts,
   productCategories,
   covers,
-  coverDetail
+  coversCount,
+  coverDetail,
+  posOrderRecords,
+  posOrderRecordsCount
 };

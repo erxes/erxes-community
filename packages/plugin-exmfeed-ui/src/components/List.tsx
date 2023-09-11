@@ -19,8 +19,11 @@ import {
   LikeCommentShare,
   HeaderFeed,
   TextFeed,
-  FeedActions
+  FeedActions,
+  MoreAttachment,
+  AttachmentContainer
 } from '../styles';
+import AttachmentWithPreview from '@erxes/ui/src/components/AttachmentWithPreview';
 
 const AvatarImg = FilterableListStyles.AvatarImg;
 
@@ -62,6 +65,72 @@ export default function List({
 
   const renderItem = (item: any) => {
     const createdUser = item.createdUser || {};
+
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    let links = [];
+    let updatedDescription = '';
+
+    if (item.description) {
+      const matches = item.description.match(urlRegex);
+
+      if (matches) {
+        updatedDescription = matches.reduce(
+          (prevDescription, link) => prevDescription.replace(link, ''),
+          item.description
+        );
+
+        links = matches;
+      }
+    }
+
+    const renderImages = () => {
+      if (item.images.length === 1) {
+        return (
+          <AttachmentWithPreview
+            attachment={item.images[0]}
+            attachments={item.images}
+          />
+        );
+      }
+
+      if (item.images.length === 2) {
+        return (
+          <>
+            <AttachmentWithPreview
+              attachment={item.images[0]}
+              attachments={item.images}
+            />
+            <AttachmentWithPreview
+              attachment={item.images[1]}
+              attachments={item.images}
+            />
+          </>
+        );
+      }
+
+      return (
+        <>
+          <AttachmentWithPreview
+            attachment={item.images[0]}
+            attachments={item.images}
+          />
+          <div>
+            <AttachmentWithPreview
+              attachment={item.images[1]}
+              attachments={item.images}
+            />
+            <AttachmentWithPreview
+              attachment={item.images[2]}
+              attachments={item.images}
+            />
+            {item.images.length > 3 && (
+              <MoreAttachment>+ {item.images.length - 3} more</MoreAttachment>
+            )}
+          </div>
+        </>
+      );
+    };
 
     return (
       <div key={item._id}>
@@ -118,7 +187,22 @@ export default function List({
         </HeaderFeed>
         <TextFeed>
           <b dangerouslySetInnerHTML={{ __html: item.title }} />
-          <p dangerouslySetInnerHTML={{ __html: item.description }} />
+          <p dangerouslySetInnerHTML={{ __html: updatedDescription }} />
+          {links.map((link, index) => {
+            return (
+              <iframe
+                key={index}
+                width="640"
+                height="390"
+                src={String(link)
+                  .replace('watch?v=', 'embed/')
+                  .replace('share/', 'embed/')}
+                title="Video"
+                frameBorder="0"
+                allowFullScreen={true}
+              />
+            );
+          })}
         </TextFeed>
         {(item.attachments || []).map((a, index) => {
           return (
@@ -132,8 +216,29 @@ export default function List({
           );
         })}
         {(item.images || []).map((image, index) => {
-          return <img key={index} alt={image.name} src={readFile(image.url)} />;
+          if (image.url.includes('mp4')) {
+            return (
+              <video
+                key={index}
+                width="100%"
+                height="100%"
+                controls={true}
+                autoPlay={true}
+              >
+                <source src={readFile(image.url)} type="video/mp4" />
+              </video>
+            );
+          }
+
+          return '';
         })}
+
+        {item.images.length > 0 && (
+          <AttachmentContainer attachmentLength={item.images.length}>
+            {renderImages()}
+          </AttachmentContainer>
+        )}
+
         <LikeCommentShare>
           <b>{item.likeCount} Like</b>
           <b>{item.commentCount} Comments</b>

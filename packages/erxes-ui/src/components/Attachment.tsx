@@ -9,6 +9,7 @@ import colors from '../styles/colors';
 import { rgba } from '../styles/ecolor';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
+import VideoPlayer from './VideoPlayer';
 
 export const AttachmentWrapper = styled.div`
   border-radius: 4px;
@@ -85,12 +86,54 @@ const AttachmentName = styled.span`
   line-height: 20px;
 `;
 
+const AttachmentsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 10px 20px;
+
+  i {
+    font-size: 10px;
+    margin-left: 15px;
+    cursor: pointer;
+    &:hover {
+      color: #555;
+    }
+  }
+  > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+`;
+
+const AttachmentInfo = styled.div`
+  display: flex;
+  width: calc(100% - 25px);
+
+  > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 5px;
+    max-height: 20px;
+  }
+`;
+
+const FlexCenter = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
 type Props = {
   attachment: IAttachment;
   scrollBottom?: () => void;
+  removeAttachment?: (index: number) => void;
   additionalItem?: React.ReactNode;
   simple?: boolean;
   large?: boolean;
+  withoutPreview?: boolean;
 
   index?: number;
   attachments?: IAttachment[];
@@ -107,6 +150,15 @@ class Attachment extends React.Component<Props> {
       scrollBottom();
     }
   };
+
+  renderFileSize(size: number) {
+    if (size > 1000000) {
+      return <>({Math.round(size / 1000000)}MB)</>;
+    }
+    if (size > 1000) {
+      return <>({Math.round(size / 1000)}kB)</>;
+    }
+  }
 
   renderOtherInfo = attachment => {
     const name = attachment.name || attachment.url || '';
@@ -127,7 +179,7 @@ class Attachment extends React.Component<Props> {
           <span>
             {attachment.size && (
               <div>
-                {__('Size')}: {Math.round(attachment.size / 1000)}kB
+                {__('Size')}: {this.renderFileSize(attachment.size)}
               </div>
             )}
             {attachment.type && (
@@ -139,6 +191,32 @@ class Attachment extends React.Component<Props> {
           {this.props.additionalItem}
         </Meta>
       </>
+    );
+  };
+
+  renderWithoutPreview = () => {
+    const { attachments, removeAttachment } = this.props;
+
+    return (
+      <FlexCenter>
+        {attachments && (
+          <AttachmentsContainer>
+            {attachments.map((att, i) => (
+              <div key={i}>
+                <AttachmentInfo>
+                  <a href={att.url}>{att.name}</a>
+                  {this.renderFileSize(att.size || 0)}
+                </AttachmentInfo>
+                <Icon
+                  size={10}
+                  icon="cancel"
+                  onClick={() => removeAttachment && removeAttachment(i)}
+                />
+              </div>
+            ))}
+          </AttachmentsContainer>
+        )}
+      </FlexCenter>
     );
   };
 
@@ -161,15 +239,57 @@ class Attachment extends React.Component<Props> {
     );
   };
 
-  renderVideoFile = attachment => {
+  renderVideoFile = (attachment, simple?: boolean) => {
+    const options = {
+      autoplay: false,
+      playbackRates: [0.5, 1, 1.25, 1.5, 2],
+      controls: true,
+      width: '100%',
+      sources: [
+        {
+          src: readFile(attachment.url),
+          type: 'video/mp4'
+        }
+      ]
+    };
+
+    if (simple) {
+      return <VideoPlayer options={options} />;
+    }
     return (
       <AttachmentWrapper>
         <ItemInfo>
-          <video controls={true} loop={true}>
-            <source src={attachment.url} type="video/mp4" />
-            {__('Your browser does not support the video tag')}.
-          </video>
+          <VideoPlayer options={options} />
         </ItemInfo>
+        {this.renderOtherInfo(attachment)}
+      </AttachmentWrapper>
+    );
+  };
+
+  renderVideoStream = (attachment: IAttachment, simple?: boolean) => {
+    const options = {
+      autoplay: false,
+      playbackRates: [0.5, 1, 1.25, 1.5, 2],
+      controls: true,
+      width: '100%',
+      sources: [
+        {
+          src: attachment.url,
+          type: 'application/x-mpegURL'
+        }
+      ]
+    };
+
+    if (simple) {
+      return <VideoPlayer options={options} />;
+    }
+
+    return (
+      <AttachmentWrapper>
+        <ItemInfo>
+          <VideoPlayer options={options} />
+        </ItemInfo>
+        {this.renderOtherInfo(attachment)}
       </AttachmentWrapper>
     );
   };
@@ -179,7 +299,7 @@ class Attachment extends React.Component<Props> {
       <ImageWithPreview
         onLoad={this.onLoadImage}
         alt={attachment.url}
-        src={attachment.url}
+        src={readFile(attachment.url)}
       />
     );
   }
@@ -187,7 +307,21 @@ class Attachment extends React.Component<Props> {
   renderAudioFile(attachment) {
     return (
       <audio controls={true}>
-        <source src={attachment.url} type="audio/ogg" />
+        <source src={readFile(attachment.url)} type="audio/ogg" />
+      </audio>
+    );
+  }
+  renderAudioWavFile(attachment) {
+    return (
+      <audio controls={true}>
+        <source src={readFile(attachment.url)} type="audio/wav" />
+      </audio>
+    );
+  }
+  renderMp3File(attachment) {
+    return (
+      <audio controls={true}>
+        <source src={readFile(attachment.url)} type="audio/mpeg" />
       </audio>
     );
   }
@@ -197,7 +331,14 @@ class Attachment extends React.Component<Props> {
       return null;
     }
 
-    const { simple } = this.props;
+    const { simple, withoutPreview } = this.props;
+
+    const url = attachment.url || attachment.name || '';
+    const fileExtension = url.split('.').pop();
+
+    if (withoutPreview) {
+      return this.renderWithoutPreview();
+    }
 
     if (attachment.type.startsWith('image')) {
       if (simple) {
@@ -207,16 +348,17 @@ class Attachment extends React.Component<Props> {
       return this.renderOtherFile(attachment);
     }
 
-    if (attachment.type === 'audio') {
+    if (attachment.type.includes('audio')) {
       return this.renderAudioFile(attachment);
     }
 
-    if (attachment.type === 'video') {
-      return this.renderVideoFile(attachment);
+    if (url.includes('cloudflarestream.com')) {
+      return this.renderVideoStream(attachment, simple);
     }
 
-    const url = attachment.url || attachment.name || '';
-    const fileExtension = url.split('.').pop();
+    if (attachment.type.includes('video')) {
+      return this.renderVideoFile(attachment, simple);
+    }
 
     let filePreview;
 
@@ -239,8 +381,19 @@ class Attachment extends React.Component<Props> {
       case 'audio':
         filePreview = this.renderAudioFile(attachment);
         break;
+      case 'wav':
+        filePreview = this.renderAudioWavFile(attachment);
+        break;
+      case 'wave':
+        filePreview = this.renderAudioWavFile(attachment);
+        break;
+      case 'm3u8':
+        filePreview = this.renderVideoStream(attachment);
+        break;
       case 'zip':
       case 'csv':
+        filePreview = this.renderOtherFile(attachment);
+        break;
       case 'doc':
       case 'ppt':
       case 'psd':
@@ -248,6 +401,8 @@ class Attachment extends React.Component<Props> {
       case 'txt':
       case 'rar':
       case 'mp3':
+        filePreview = this.renderMp3File(attachment);
+        break;
       case 'pdf':
       case 'png':
       case 'xls':

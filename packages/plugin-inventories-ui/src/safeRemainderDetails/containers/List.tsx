@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation } from '@apollo/client';
 import { router } from '@erxes/ui/src/utils';
 import queryString from 'query-string';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 // erxes
 import Alert from '@erxes/ui/src/utils/Alert';
@@ -31,7 +31,7 @@ function ListContainer() {
       remainderId: id,
       status: queryParams.status,
       diffType: queryParams.diffType,
-      productCategoryId: queryParams.productCategoryId,
+      productCategoryIds: queryParams.productCategoryIds,
       ...router.generatePaginationParams(queryParams || {})
     }
   });
@@ -43,7 +43,7 @@ function ListContainer() {
         remainderId: id,
         status: queryParams.status,
         diffType: queryParams.diffType,
-        productCategoryId: queryParams.productCategoryId
+        productCategoryIds: queryParams.productCategoryIds
       }
     }
   );

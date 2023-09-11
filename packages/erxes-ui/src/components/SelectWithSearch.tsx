@@ -7,9 +7,8 @@ import Icon from './Icon';
 import React from 'react';
 import Select from 'react-select-plus';
 import colors from '../styles/colors';
-import debounce from 'lodash/debounce';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import styled from 'styled-components';
 
 export const SelectValue = styled.div`
@@ -67,6 +66,7 @@ const ClearButton = styled.div`
 `;
 
 type Props = {
+  initialValuesProvided: boolean;
   initialValues: string[];
   searchValue: string;
   search: (search: string, loadMore?: boolean) => void;
@@ -121,8 +121,24 @@ class SelectWithSearch extends React.Component<
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    const { queryName, customQuery, generateOptions } = nextProps;
+    const {
+      queryName,
+      customQuery,
+      initialValues,
+      generateOptions
+    } = nextProps;
+
+    const { initialValuesProvided } = this.props;
     const { selectedValues } = this.state;
+
+    // trigger clearing values by initialValues prop
+    if (
+      initialValuesProvided &&
+      (!initialValues || !initialValues.length) &&
+      selectedValues.length
+    ) {
+      this.setState({ selectedValues: [] });
+    }
 
     if (customQuery.loading !== this.props.customQuery.loading) {
       const datas = customQuery[queryName] || [];
@@ -199,7 +215,7 @@ class SelectWithSearch extends React.Component<
     const selectSingle = (option: IOption) => {
       const selectedOptionValue = option ? option.value : '';
 
-      onSelect(selectedOptionValue, name);
+      onSelect(selectedOptionValue, name, option?.extraValue);
 
       this.setState({
         selectedValues: [selectedOptionValue],
@@ -314,7 +330,11 @@ type WrapperProps = {
   queryName: string;
   name: string;
   label: string;
-  onSelect: (values: string[] | string, name: string) => void;
+  onSelect: (
+    values: string[] | string,
+    name: string,
+    extraValue?: string
+  ) => void;
   generateOptions: (datas: any[]) => IOption[];
   customQuery?: any;
   multi?: boolean;
@@ -368,6 +388,7 @@ class Wrapper extends React.Component<
     return (
       <Component
         {...this.props}
+        initialValuesProvided={initialValue ? true : false}
         initialValues={initialValues}
         abortController={abortController}
         search={this.search}

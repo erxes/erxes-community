@@ -1,9 +1,10 @@
+import { generateModels } from '../connectionResolver';
 import {
   sendContactsMessage,
   sendCoreMessage,
   sendProductsMessage
 } from '../messageBroker';
-import { sendCommonMessage } from '../messageBrokerErkhet';
+import { sendRPCMessage } from '../messageBrokerErkhet';
 
 export const getPureDate = (date: Date) => {
   const ndate = new Date(date);
@@ -106,6 +107,34 @@ export const getPostData = async (subdomain, pos, order) => {
     payments[pos.erkhetConfig.defaultPay] = sumSaleAmount;
   }
 
+  let customerCode = '';
+  const customerType = order.customerType || 'customer';
+  if (customerType === 'company') {
+    customerCode = customerCode = (
+      (await sendContactsMessage({
+        subdomain,
+        action: 'companies.findOne',
+        data: {
+          _id: order.customerId
+        },
+        isRPC: true,
+        defaultValue: {}
+      })) || {}
+    ).code;
+  } else {
+    customerCode = (
+      (await sendContactsMessage({
+        subdomain,
+        action: 'customers.findOne',
+        data: {
+          _id: order.customerId
+        },
+        isRPC: true,
+        defaultValue: {}
+      })) || {}
+    ).code;
+  }
+
   const orderInfos = [
     {
       date: getPureDate(order.paidDate)
@@ -123,17 +152,7 @@ export const getPostData = async (subdomain, pos, order) => {
         ? true
         : false,
       billType: order.billType,
-      customerCode: (
-        (await sendContactsMessage({
-          subdomain,
-          action: 'customers.findOne',
-          data: {
-            _id: order.customerId
-          },
-          isRPC: true,
-          defaultValue: {}
-        })) || {}
-      ).code,
+      customerCode,
       description: `${pos.name}`,
       number: `${pos.erkhetConfig.beginNumber || ''}${order.number}`,
       details,
@@ -154,6 +173,7 @@ export const getPostData = async (subdomain, pos, order) => {
 
 export const orderDeleteToErkhet = async (subdomain, pos, order) => {
   let erkhetConfig = await getConfig(subdomain, 'ERKHET', {});
+  const models = await generateModels(subdomain);
 
   if (
     !erkhetConfig ||
@@ -164,29 +184,48 @@ export const orderDeleteToErkhet = async (subdomain, pos, order) => {
     return;
   }
 
-  const orderInfos = [
-    {
-      date: order.paidDate,
-      orderId: order._id,
-      returnKind: 'hard'
-    }
-  ];
-
-  let userEmail = pos.erkhetConfig.userEmail;
-
-  const postData = {
-    userEmail,
-    token: erkhetConfig.apiToken,
-    apiKey: erkhetConfig.apiKey,
-    apiSecret: erkhetConfig.apiSecret,
-    orderInfos: JSON.stringify(orderInfos)
-  };
-
-  return await sendCommonMessage('rpc_queue:erxes-automation-erkhet', {
-    action: 'get-response-return-order',
-    isJson: true,
-    isEbarimt: false,
-    payload: JSON.stringify(postData),
-    thirdService: true
+  const syncLog = await models.SyncLogs.syncLogsAdd({
+    contentType: 'pos:order',
+    createdAt: new Date(),
+    contentId: order._id,
+    consumeData: order,
+    consumeStr: JSON.stringify(order)
   });
+  try {
+    const orderInfos = [
+      {
+        date: order.paidDate,
+        orderId: order._id,
+        returnKind: 'hard'
+      }
+    ];
+
+    let userEmail = pos.erkhetConfig.userEmail;
+
+    const postData = {
+      userEmail,
+      token: erkhetConfig.apiToken,
+      apiKey: erkhetConfig.apiKey,
+      apiSecret: erkhetConfig.apiSecret,
+      orderInfos: JSON.stringify(orderInfos)
+    };
+
+    return await sendRPCMessage(
+      models,
+      syncLog,
+      'rpc_queue:erxes-automation-erkhet',
+      {
+        action: 'get-response-return-order',
+        isJson: true,
+        isEbarimt: false,
+        payload: JSON.stringify(postData),
+        thirdService: true
+      }
+    );
+  } catch (e) {
+    await models.SyncLogs.updateOne(
+      { _id: syncLog._id },
+      { $set: { error: e.message } }
+    );
+  }
 };

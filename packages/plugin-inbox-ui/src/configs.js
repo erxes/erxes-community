@@ -8,6 +8,8 @@ module.exports = {
     './automation': './src/automations/automation.tsx',
     './unreadCount': './src/inbox/containers/UnreadCount.tsx',
     './actionForms': './src/settings/integrations/containers/ActionForms',
+    './emailWidget': './src/inbox/containers/EmailWidget.tsx',
+    './integrationDetailsForm': './src/forms/components/CallproEditForm.tsx',
   },
   routes: {
     url: 'http://localhost:3009/remoteEntry.js',
@@ -109,6 +111,14 @@ module.exports = {
       scope: 'inbox',
       action: 'scriptsAll',
       permissions: ['manageScripts', 'showScripts']
+    },
+    {
+      text: "Send an Email",
+      url: "/emailWidget",
+      icon: "icon-envelope",
+      location: "topNavigation",
+      scope: "inbox",
+      component: "./emailWidget",
     }
   ],
   customNavigationLabel: [
@@ -118,4 +128,5 @@ module.exports = {
       scope: "inbox",
     }
   ],
+  integrationDetailsForm: './integrationDetailsForm',
 };

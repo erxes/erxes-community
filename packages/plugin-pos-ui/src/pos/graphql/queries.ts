@@ -2,6 +2,7 @@ export const posCommonFields = `
   _id
   name
   description
+  pdomain
   createdAt
   token
   erxesAppToken
@@ -46,6 +47,8 @@ export const posCommonFields = `
   checkRemainder
   permissionConfig
   allowTypes
+  isCheckRemainder
+  checkExcludeCategoryIds
 `;
 
 const commonParamDefs = `

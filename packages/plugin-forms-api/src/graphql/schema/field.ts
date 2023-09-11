@@ -82,6 +82,8 @@ export const fieldsTypes = ({ products }) => `
     locationOptions: [LocationOption]
     objectListConfigs: [ObjectListConfig]
     optionsValues: String
+    subFieldIds: [String]
+    subFields: [Field]
 
     ${
       products
@@ -93,6 +95,8 @@ export const fieldsTypes = ({ products }) => `
     
     ${fieldCommonFields}
     logics: [Logic]
+
+    relationType: String
   }
 
   input OrderItem {
@@ -114,6 +118,7 @@ export const fieldsTypes = ({ products }) => `
     locationOptions: [LocationOptionInput]
     objectListConfigs: [objectListConfigInput]
     optionsValues: String
+    subFieldIds: [String]
     ${fieldCommonFields}
   }
 
@@ -130,6 +135,7 @@ export const fieldsQueries = `
   fields(contentType: String!, contentTypeId: String, isVisible: Boolean, searchable: Boolean, isVisibleToCreate: Boolean, pipelineId: String): [Field]
   fieldsCombinedByContentType(contentType: String!, usageType: String, excludedNames: [String], segmentId: String, config: JSON, onlyDates: Boolean): JSON
   fieldsDefaultColumnsConfig(contentType: String!): [ColumnConfigItem]
+  fieldsGetRelations(contentType: String!, isVisibleToCreate: Boolean): [Field]
 `;
 
 const fieldsCommonFields = `
@@ -176,6 +182,7 @@ export const fieldsGroupsTypes = `
     isMultiple: Boolean
     isVisible: Boolean
     isVisibleInDetail: Boolean
+    alwaysOpen: Boolean
     isDefinedByErxes: Boolean
     fields: [Field]
     lastUpdatedUserId: String
@@ -196,6 +203,7 @@ const fieldsGroupsCommonFields = `
   code: String
   isMultiple: Boolean
   isVisible: Boolean
+  alwaysOpen: Boolean
   isVisibleInDetail: Boolean
   config: JSON
 

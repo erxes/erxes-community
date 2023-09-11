@@ -27,7 +27,6 @@ export const types = `
   type PoscProduct {
     ${commonFieldDefs}
     type: String
-    sku: String
     barcodes: [String]
     barcodeDescription: String
     unitPrice: Float
@@ -38,13 +37,12 @@ export const types = `
     tagIds: [String]
     vendorId: String
     attachmentMore: [Attachment]
-    supply: String
-    productCount: Int
-    minimiumCount: Int
-    uomId: String
+    uom: String
     subUoms: JSON
     category: PosProductCategory
-    remainder: Int
+    remainder: Float
+    remainders: [JSON]
+    isCheckRem: Boolean
   }
 `;
 
@@ -60,9 +58,11 @@ const productsQueryParams = `
 `;
 
 const productCategoriesParams = `
-  parentId: String, 
-  searchValue: String, 
-  excludeEmpty: Boolean, 
+  parentId: String,
+  withChild: Boolean,
+  searchValue: String,
+  status: String,
+  excludeEmpty: Boolean,
   meta: String,
 `;
 const commonParams = `
@@ -74,7 +74,7 @@ const commonParams = `
 
 export const queries = `
   poscProductCategories(
-    ${productCategoriesParams} 
+    ${productCategoriesParams}
     ${commonParams}
   ): [PosProductCategory]
   poscProductCategoriesTotalCount(${productCategoriesParams}): Int
@@ -87,6 +87,6 @@ export const queries = `
   poscProductsTotalCount(
     ${productsQueryParams}
   ): Int
-  poscProductDetail(_id: String): PoscProduct
+  poscProductDetail(_id: String, branchId: String): PoscProduct
   getPriceInfo(productId: String!): String
 `;

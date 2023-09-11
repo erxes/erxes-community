@@ -3,19 +3,16 @@ const productParamsDef = `
   $type: String,
   $categoryId: String,
   $description: String,
-  $sku: String,
   $barcodes: [String],
+  $variants: JSON,
   $barcodeDescription: String,
   $unitPrice: Float,
   $code: String
   $customFieldsData: JSON,
   $attachment: AttachmentInput,
   $attachmentMore: [AttachmentInput],
-  $supply: String,
-  $productCount: Int,
-  $minimiumCount: Int,
   $vendorId: String,
-  $uomId: String,
+  $uom: String,
   $subUoms: JSON,
   $taxType: String,
   $taxCode: String
@@ -28,7 +25,9 @@ const productCategoryParamsDef = `
   $description: String,
   $attachment: AttachmentInput,
   $status: String,
-  $meta: String
+  $meta: String,
+  $maskType: String,
+  $mask: JSON
 `;
 
 const productParams = `
@@ -36,19 +35,16 @@ const productParams = `
   type: $type,
   categoryId: $categoryId,
   description: $description,
-  sku: $sku,
   barcodes: $barcodes,
+  variants: $variants,
   barcodeDescription: $barcodeDescription,
   unitPrice: $unitPrice,
   code: $code,
   customFieldsData: $customFieldsData,
   attachment: $attachment,
   attachmentMore: $attachmentMore,
-  supply: $supply,
-  productCount: $productCount,
-  minimiumCount: $minimiumCount,
   vendorId: $vendorId,
-  uomId: $uomId,
+  uom: $uom,
   subUoms: $subUoms,
   taxType: $taxType,
   taxCode: $taxCode
@@ -61,7 +57,9 @@ const productCategoryParams = `
   description: $description,
   attachment: $attachment,
   status: $status,
-  meta: $meta
+  meta: $meta,
+  maskType: $maskType,
+  mask: $mask,
 `;
 
 const productAdd = `
@@ -108,44 +106,11 @@ const productsConfigsUpdate = `
   }
 `;
 
-// UOM
-
-const uomsAdd = `
-  mutation uomsAdd($name: String, $code: String) {
-    uomsAdd(name: $name, code: $code) {
-      _id
-      name
-      code
-      createdAt
-    }
-  }
-`;
-
-const uomsEdit = `
-  mutation uomsEdit($id: String!, $name: String, $code: String) {
-    uomsEdit(_id: $id, name: $name, code: $code) {
-      _id
-      name
-      code
-      createdAt
-    }
-  }
-`;
-
-const uomsRemove = `
-  mutation uomsRemove($uomIds: [String!]) {
-    uomsRemove(uomIds: $uomIds)
-  }
-`;
-
 export default {
   productAdd,
   productEdit,
   productsRemove,
   productCategoryAdd,
   productCategoryEdit,
-  productsConfigsUpdate,
-  uomsAdd,
-  uomsEdit,
-  uomsRemove
+  productsConfigsUpdate
 };

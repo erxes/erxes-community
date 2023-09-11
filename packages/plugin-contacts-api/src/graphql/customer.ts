@@ -9,7 +9,7 @@ export const types = (tagsEnabled, inboxEnabled) => `
   }
 
   type Customer @key(fields: "_id") @cacheControl(maxAge: 3) {
-    _id: String!
+    _id: String
     state: String
     createdAt: Date
     modifiedAt: Date
@@ -27,6 +27,8 @@ export const types = (tagsEnabled, inboxEnabled) => `
     emails: [String]
     primaryPhone: String
     phones: [String]
+    primaryAddress: JSON
+    addresses: [JSON]
 
     phone: String
     tagIds: [String]
@@ -91,6 +93,7 @@ const queryParams = `
   birthDate: Date
   dateFilters: String
   segmentData: String
+  emailValidationStatus:String
   ${conformityQueryFields}
 `;
 
@@ -111,6 +114,8 @@ const fields = `
   emails: [String]
   primaryPhone: String
   phones: [String]
+  primaryAddress: JSON
+  addresses: [JSON]
   ownerId: String
   position: String
   department: String

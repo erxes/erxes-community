@@ -29,12 +29,14 @@ export type IScreenConfig = {
   type: string;
   value: number;
   contentUrl?: string;
+  showType?: string;
 };
 
 export type IPos = {
   _id: string;
   name: string;
   description?: string;
+  pdomain?: string;
   createdAt: Date;
   productDetails?: string[];
   token: string;
@@ -66,6 +68,8 @@ export type IPos = {
   checkRemainder?: boolean;
   permissionConfig?: any;
   allowTypes?: string[];
+  isCheckRemainder: boolean;
+  checkExcludeCategoryIds: string[];
 };
 
 export type ISlot = {

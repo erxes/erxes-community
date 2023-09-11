@@ -5,9 +5,9 @@ import { IModels } from './connectionResolver';
 export default {
   'cards:ticket': ['update', 'delete'],
   'cards:task': ['update', 'delete'],
+  'knowledgebase:knowledgeBaseArticle': ['create', 'update'],
   'cards:deal': ['update', 'delete'],
-
-  'knowledgebase:knowledgeBaseArticle': ['create', 'update']
+  'cards:purchase': ['update', 'delete']
 };
 
 export const afterMutationHandlers = async (
@@ -16,14 +16,18 @@ export const afterMutationHandlers = async (
   params
 ) => {
   if (
-    ['cards:task', 'cards:ticket', 'cards:deal'].includes(params.type) &&
+    ['cards:task', 'cards:ticket', 'cards:deal', 'cards:purchase'].includes(
+      params.type
+    ) &&
     params.action === 'update'
   ) {
     await cardUpdateHandler(models, subdomain, params);
   }
 
   if (
-    ['cards:task', 'cards:ticket', 'cards:deal'].includes(params.type) &&
+    ['cards:task', 'cards:ticket', 'cards:deal', 'cards:purchase'].includes(
+      params.type
+    ) &&
     params.action === 'delete'
   ) {
     await cardDeleteHandler(models, subdomain, params);

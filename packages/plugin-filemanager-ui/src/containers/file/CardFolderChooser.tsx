@@ -7,8 +7,8 @@ import {
 
 import CardFileChooser from '../../components/file/CardFileChooser';
 import React from 'react';
-import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { queries } from '../../graphql';
 import { withProps } from '@erxes/ui/src/utils';
 
@@ -35,7 +35,10 @@ const CardFolderChooser = (props: FinalProps) => {
   }
 
   const folders = filemanagerFoldersQuery.filemanagerFolders || [];
-  const folderId = Object.keys(folders[0]).length !== 0 ? folders[0]._id : '';
+  const folderId =
+    folders.length && Object.keys(folders[0]).length !== 0
+      ? folders[0]._id
+      : '';
   const relatedFiles =
     relatedFilesContentTypeQuery.filemanagerGetRelatedFilesContentType || [];
 

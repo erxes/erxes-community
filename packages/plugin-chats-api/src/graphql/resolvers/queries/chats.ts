@@ -6,20 +6,29 @@ import { IUserDocument } from '@erxes/api-utils/src/types';
 import { sendCoreMessage } from '../../../messageBroker';
 
 const chatQueries = {
-  chats: async (_root, { type, limit, skip }, { models, user }) => {
+  chats: async (_root, { type, limit, skip, position }, { models, user }) => {
     const filter: any = { participantIds: { $in: [user._id] } };
 
     if (type) {
       filter.type = type;
     }
 
-    return {
-      list: await models.Chats.find(filter)
-        .sort({ updatedAt: -1 })
-        .skip(skip || 0)
-        .limit(limit || 10),
-      totalCount: await models.Chats.find(filter).countDocuments()
+    if (position) {
+      filter.position = position;
+    }
+
+    const chats = await models.Chats.find({
+      ...filter
+    })
+      .sort({ updatedAt: -1 })
+      .skip(skip || 0)
+      .limit(limit || 10);
+
+    const result = {
+      list: [...chats],
+      totalCount: await models.Chats.countDocuments(filter)
     };
+    return result;
   },
 
   chatDetail: async (
@@ -27,7 +36,10 @@ const chatQueries = {
     { _id },
     { models, user }: { models: IModels; user: IUserDocument }
   ) => {
-    const chat = models.Chats.findOne({ _id });
+    const chat = models.Chats.findOne({
+      _id,
+      participantIds: { $in: [user._id] }
+    });
 
     graphqlPubsub.publish('chatUnreadCountChanged', {
       userId: user._id
@@ -52,7 +64,7 @@ const chatQueries = {
     });
 
     if (lastMessage) {
-      const chat = await models.Chats.getChat(chatId);
+      const chat = await models.Chats.getChat(chatId, user._id);
 
       const seenInfos = chat.seenInfos || [];
 
@@ -87,9 +99,9 @@ const chatQueries = {
       }
     }
 
-    const chat = await models.Chats.getChat(chatId);
+    const chat = await models.Chats.getChat(chatId, user._id);
 
-    if (!getIsSeen(models, chat, user)) {
+    if (await getIsSeen(models, chat, user)) {
       graphqlPubsub.publish('chatUnreadCountChanged', {
         userId: user._id
       });

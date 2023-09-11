@@ -1,3 +1,5 @@
+import { gql, useQuery } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import { queries as formQueries } from '@erxes/ui-forms/src/forms/graphql';
 import { SidebarListItem } from '@erxes/ui-settings/src/styles';
 import {
@@ -9,7 +11,6 @@ import {
   EmptyState,
   FormControl,
   FormGroup,
-  generateTree,
   Icon,
   Pagination,
   SelectWithSearch,
@@ -17,7 +18,8 @@ import {
   Spinner,
   Tip,
   Wrapper,
-  __
+  __,
+  generateTree
 } from '@erxes/ui/src';
 import {
   ColorPick,
@@ -26,12 +28,10 @@ import {
   FormWrapper
 } from '@erxes/ui/src/styles/main';
 import { IFormProps, IOption, IQueryParams } from '@erxes/ui/src/types';
-import { withProps } from '@erxes/ui/src/utils/core';
+import { isEnabled, withProps } from '@erxes/ui/src/utils/core';
 import { removeParams, setParams } from '@erxes/ui/src/utils/router';
-import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
 import React from 'react';
-import { graphql, useQuery } from 'react-apollo';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import TwitterPicker from 'react-color/lib/Twitter';
@@ -47,7 +47,7 @@ import { queries as riskIndicatorsGroupQueries } from '../indicator/groups/graph
 import { OperationTypes } from '../operations/common/types';
 import { queries as operationQueries } from '../operations/graphql';
 import { FormContainer, FormGroupRow } from '../styles';
-import { calculateMethods, COLORS } from './constants';
+import { COLORS, calculateMethods } from './constants';
 import { CustomFormGroupProps } from './types';
 
 export const DefaultWrapper = ({
@@ -69,7 +69,7 @@ export const DefaultWrapper = ({
   content: JSX.Element;
   sidebar?: JSX.Element;
   isPaginationHide?: boolean;
-  subMenu: { title: string; link: string }[];
+  subMenu?: { title: string; link: string }[];
 }) => {
   if (loading) {
     return <Spinner objective />;
@@ -140,11 +140,7 @@ export function SelectIndicators({
   initialValue?: string | string[];
   name: string;
   ignoreIds?: string[];
-  filterParams?: {
-    branchIds?: string[];
-    departmentIds?: string[];
-    operationIds?: string[];
-  };
+  filterParams?: any;
 }) {
   function generetaOption(array: RiskIndicatorsType[] = []): IOption[] {
     let list: any[] = [];
@@ -197,11 +193,7 @@ export function SelectIndicatorGroups({
   initialValue?: string | string[];
   name: string;
   ignoreIds?: string[];
-  filterParams?: {
-    branchIds?: string[];
-    departmentIds?: string[];
-    operationIds?: string[];
-  };
+  filterParams?: any;
 }) {
   function generetaOption(array: RiskIndicatorsType[] = []): IOption[] {
     let list: any[] = [];
@@ -240,6 +232,7 @@ type SelectCustomFieldProps = {
   name: string;
   initialValue: string;
   customOption?: IOption;
+  configs?: any[];
   onSelect: ({
     value,
     label,
@@ -253,46 +246,41 @@ type SelectCustomFieldProps = {
 };
 
 type SelectCustomFieldFinalProps = {
-  fields: any;
+  fieldsQuery: any;
 } & SelectCustomFieldProps;
 
 class SelectCustomFieldsComponent extends React.Component<
-  SelectCustomFieldFinalProps
+  { options: any[]; defaultValue: any } & SelectCustomFieldFinalProps
 > {
   constructor(props) {
     super(props);
   }
 
-  render() {
-    const { label, initialValue, onSelect, fields } = this.props;
-    if (fields?.loading) {
-      return null;
+  componentDidMount() {
+    if (!!this?.props?.defaultValue) {
+      const { defaultValue, configs = [] } = this.props;
+      const { name, value = [], label } = defaultValue || {};
+
+      const updateConfigs = value.map(val => {
+        const config = configs.find(config => config.value === val.value);
+        return config ? config : val;
+      });
+
+      this.props.onSelect({
+        _id: name.replace('customFieldsData.', ''),
+        label,
+        value: updateConfigs
+      });
     }
+  }
 
-    const options =
-      fields?.fieldsCombinedByContentType
-        .map(
-          ({ _id, label, name, selectOptions }) =>
-            selectOptions && {
-              _id,
-              label,
-              name,
-              value: selectOptions
-            }
-        )
-        .filter(field => field) || [];
+  render() {
+    const { label, defaultValue, onSelect, options } = this.props;
 
-    const handleChange = e => {
-      const _id = e?.name.replace('customFieldsData.', '');
-      onSelect({ value: e?.value, label: e?.label, _id });
+    const handleChange = ({ name, value, label }) => {
+      const _id = (name || '').replace('customFieldsData.', '');
+      onSelect({ value, label, _id });
     };
-
-    const defaultValue = !!initialValue
-      ? options.find(
-          option =>
-            option.name.replace('customFieldsData.', '') === initialValue
-        )
-      : null;
 
     return (
       <Select
@@ -306,21 +294,50 @@ class SelectCustomFieldsComponent extends React.Component<
   }
 }
 
+function SelectCustomFieldsContainer(props: SelectCustomFieldFinalProps) {
+  const { initialValue, fieldsQuery } = props;
+  if (fieldsQuery?.loading) {
+    return null;
+  }
+
+  const { fieldsCombinedByContentType = [] } = fieldsQuery || {};
+
+  const options = fieldsCombinedByContentType
+    .filter(({ selectOptions }) => !!selectOptions)
+    .map(({ selectOptions, ...field }) => ({
+      ...field,
+      value: selectOptions
+    }));
+
+  const defaultValue = !!initialValue
+    ? options.find(option => option.name.includes(initialValue))
+    : null;
+
+  const updatedProps = {
+    ...props,
+    options,
+    defaultValue
+  };
+
+  return <SelectCustomFieldsComponent {...updatedProps} />;
+}
+
 export const SelectCustomFields = withProps<SelectCustomFieldProps>(
   compose(
     graphql<SelectCustomFieldProps>(
       gql(formQueries.fieldsCombinedByContentType),
       {
-        name: 'fields',
+        name: 'fieldsQuery',
         skip: ({ type }) => !type,
         options: ({ type }) => ({
           variables: {
             contentType: `cards:${type}`
-          }
+          },
+          fetchPolicy: 'no-cache'
         })
       }
     )
-  )(SelectCustomFieldsComponent)
+  )(SelectCustomFieldsContainer)
 );
 
 export const SelectOperations = ({
@@ -332,7 +349,8 @@ export const SelectOperations = ({
   customOption,
   skip,
   operation,
-  onSelect
+  onSelect,
+  filterParams
 }: {
   queryParams?: IQueryParams;
   label: string;
@@ -343,6 +361,7 @@ export const SelectOperations = ({
   name: string;
   skip?: string[];
   operation?: OperationTypes;
+  filterParams?: { ids: string[] };
 }) => {
   const defaultValue = queryParams ? queryParams[name] : initialValue;
 
@@ -358,7 +377,10 @@ export const SelectOperations = ({
         space = '\u00A0 \u00A0 '.repeat(foundedString.length);
       }
 
-      list.push({ label: `${space} ${operation.name}`, value: operation._id });
+      list.push({
+        label: `${space} ${operation.name}`,
+        value: operation._id
+      });
     }
 
     if (skip) {
@@ -376,6 +398,7 @@ export const SelectOperations = ({
       generateOptions={generateOptions}
       onSelect={onSelect}
       customQuery={operationQueries.operations}
+      filterParams={filterParams}
       customOption={
         customOption ? customOption : { value: '', label: 'Choose a Operation' }
       }
@@ -604,6 +627,13 @@ export function FilterByTags({
   history: any;
   queryParams: any;
 }) {
+  if (!isEnabled('tags')) {
+    return (
+      <Box name="tags" title="Filter by Tags">
+        <EmptyState text="Not Aviable Tags" icon="info-circle" />
+      </Box>
+    );
+  }
   const { data, error, loading } = useQuery(gql(tagsQuery), {
     variables: { type: 'riskassessment:riskassessment' }
   });
@@ -656,6 +686,7 @@ export function FilterByTags({
       title="Filter by Tags"
       extraButtons={extraButtons}
       collapsible
+      isOpen
     >
       <SidebarList>
         {generateTree(

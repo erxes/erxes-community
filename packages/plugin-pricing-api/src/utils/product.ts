@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { sendProductsMessage, sendSegmentsMessage } from '../messageBroker';
+import { IPricingPlanDocument } from '../models/definitions/pricingPlan';
 
 /**
  * Get parent orders of products
@@ -43,14 +44,18 @@ export const getChildCategories = async (subdomain: string, categoryIds) => {
  */
 export const getAllowedProducts = async (
   subdomain: string,
-  plan: any,
+  plan: IPricingPlanDocument,
   productIds: string[]
 ): Promise<string[]> => {
   switch (plan.applyType) {
     case 'bundle': {
-      let difference = _.difference(plan.productsBundle, productIds);
-      if (difference.length === 0) return [...plan.productsBundle];
-      else return [];
+      let pIds: string[] = [];
+      for (const bundles of plan.productsBundle || []) {
+        let difference = _.difference(bundles, productIds);
+        if (difference.length === 0)
+          pIds = pIds.concat(_.intersection(productIds, bundles));
+      }
+      return pIds;
     }
 
     case 'product': {
@@ -59,7 +64,7 @@ export const getAllowedProducts = async (
 
     case 'segment': {
       let productIdsInSegments: string[] = [];
-      for (const segment of plan.segments) {
+      for (const segment of plan.segments || []) {
         productIdsInSegments = productIdsInSegments.concat(
           await sendSegmentsMessage({
             subdomain,
@@ -71,6 +76,36 @@ export const getAllowedProducts = async (
         );
       }
       return _.intersection(productIds, productIdsInSegments);
+    }
+
+    case 'vendor': {
+      const limit = await sendProductsMessage({
+        subdomain,
+        action: 'count',
+        data: {
+          query: {
+            vendorId: { $in: plan.vendors || [] }
+          }
+        },
+        isRPC: true,
+        defaultValue: 0
+      });
+
+      const products = await sendProductsMessage({
+        subdomain,
+        action: 'find',
+        data: {
+          query: {
+            vendorId: { $in: plan.vendors || [] }
+          },
+          field: { _id: 1 },
+          limit
+        },
+        isRPC: true,
+        defaultValue: []
+      });
+      const productIdsInVendors = products.map(p => p._id);
+      return _.intersection(productIds, productIdsInVendors);
     }
 
     case 'category': {

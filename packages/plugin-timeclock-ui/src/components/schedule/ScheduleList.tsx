@@ -1,12 +1,12 @@
 import Button from '@erxes/ui/src/components/Button';
 import { __ } from '@erxes/ui/src/utils';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import Tip from '@erxes/ui/src/components/Tip';
 import Wrapper from '@erxes/ui/src/layout/components/Wrapper';
-import { CustomRow, FlexRowLeft, RowField, ToggleButton } from '../../styles';
+import { FilterItem, FlexRow, FlexRowLeft, ToggleButton } from '../../styles';
 
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import ScheduleForm from './ScheduleForm';
 import { ISchedule, IScheduleConfig, IShift } from '../../types';
 import dayjs from 'dayjs';
@@ -22,14 +22,24 @@ import Table from '@erxes/ui/src/components/table';
 import { IUser } from '@erxes/ui/src/auth/types';
 import Icon from '@erxes/ui/src/components/Icon';
 import Select from 'react-select-plus';
+import { Title } from '@erxes/ui-settings/src/styles';
+import { ControlLabel, FormGroup } from '@erxes/ui/src/components/form';
 
 type Props = {
-  scheduleOfMembers: ISchedule[];
+  currentUser: IUser;
+  isCurrentUserAdmin: boolean;
+  isCurrentUserSupervisor?: boolean;
+
   queryParams: any;
   history: any;
-  branchesList: IBranch[];
+
+  departments: IDepartment[];
+  branches: IBranch[];
+
+  scheduleOfMembers: ISchedule[];
   scheduleConfigs: IScheduleConfig[];
   totalCount: number;
+
   solveSchedule: (scheduleId: string, status: string) => void;
   solveShift: (shiftId: string, status: string) => void;
   submitRequest: (
@@ -48,6 +58,8 @@ type Props = {
   ) => void;
   removeScheduleShifts: (_id: string, type: string) => void;
 
+  checkDuplicateScheduleShifts: (values: any) => any;
+
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
   getPagination: (pagination: any) => void;
@@ -60,11 +72,11 @@ function ScheduleList(props: Props) {
     totalCount,
     queryParams,
     solveSchedule,
-    solveShift,
     removeScheduleShifts,
     getActionBar,
     showSideBar,
-    getPagination
+    getPagination,
+    isCurrentUserSupervisor
   } = props;
 
   const [selectedScheduleStatus, setScheduleStatus] = useState(
@@ -181,23 +193,30 @@ function ScheduleList(props: Props) {
       >
         <Icon icon="subject" />
       </ToggleButton>
-      <div style={{ width: '20%' }}>
-        <Select
-          value={selectedScheduleStatus}
-          onChange={onSelectScheduleStatus}
-          placeholder="Select Schedule"
-          multi={false}
-          options={['Approved', 'Rejected', 'Pending'].map(el => ({
-            value: el,
-            label: el
-          }))}
-        />
-      </div>
+
+      <Title
+        style={{ marginRight: '10px' }}
+      >{` Total: ${scheduleOfMembers.length}`}</Title>
     </FlexRowLeft>
   );
 
   const actionBarRight = (
-    <>
+    <FlexRow>
+      <FilterItem>
+        <FormGroup>
+          <ControlLabel>Select type</ControlLabel>
+          <Select
+            value={selectedScheduleStatus}
+            onChange={onSelectScheduleStatus}
+            placeholder="Select Schedule"
+            multi={false}
+            options={['Approved', 'Rejected', 'Pending'].map(el => ({
+              value: el,
+              label: el
+            }))}
+          />
+        </FormGroup>
+      </FilterItem>
       <ModalTrigger
         title={__('Send schedule request')}
         size="lg"
@@ -205,13 +224,15 @@ function ScheduleList(props: Props) {
         content={modalContent}
       />
 
-      <ModalTrigger
-        size="lg"
-        title={__('Schedule config - Admin')}
-        trigger={adminConfigTrigger}
-        content={adminConfigContent}
-      />
-    </>
+      {isCurrentUserSupervisor && (
+        <ModalTrigger
+          size="lg"
+          title={__('Schedule config - Admin')}
+          trigger={adminConfigTrigger}
+          content={adminConfigContent}
+        />
+      )}
+    </FlexRow>
   );
 
   const actionBar = (
@@ -261,9 +282,11 @@ function ScheduleList(props: Props) {
           <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
             {__('Total Break')}
           </th>
-          <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
-            {__('Member checked')}
-          </th>
+          {!isEnabled('bichil') && (
+            <th rowSpan={2} style={{ border: '1px solid #EEE' }}>
+              {__('Member checked')}
+            </th>
+          )}
           {daysAndDatesHeaders.map(column => {
             return (
               <th
@@ -399,17 +422,23 @@ function ScheduleList(props: Props) {
     ).size;
 
     let totalHoursScheduled = 0;
+    let totalBreakInMins = 0;
 
     scheduleOfMember.shifts.map(shift => {
       totalHoursScheduled +=
         (new Date(shift.shiftEnd).getTime() -
           new Date(shift.shiftStart).getTime()) /
         (1000 * 3600);
+
+      totalBreakInMins += shift.lunchBreakInMins || 0;
     });
 
-    const totalBreakInHours = scheduleOfMember.totalBreakInMins
-      ? (scheduleOfMember.totalBreakInMins / 60).toFixed(1)
-      : 0;
+    const totalBreakInHours = totalBreakInMins / 60;
+
+    if (totalHoursScheduled) {
+      totalHoursScheduled -= totalBreakInHours;
+    }
+
     return (
       <tr style={{ textAlign: 'left' }}>
         <td
@@ -452,9 +481,9 @@ function ScheduleList(props: Props) {
         <td>{name}</td>
         <td>{employeeId}</td>
         <td>{totalDaysScheduled}</td>
-        <td>{totalHoursScheduled}</td>
-        <td>{totalBreakInHours}</td>
-        <td>{scheduleChecked}</td>
+        <td>{totalHoursScheduled.toFixed(1)}</td>
+        <td>{totalBreakInHours.toFixed(1)}</td>
+        {!isEnabled('bichil') && <td>{scheduleChecked}</td>}
         {renderScheduleShifts(scheduleOfMember.shifts, user._id)}
       </tr>
     );

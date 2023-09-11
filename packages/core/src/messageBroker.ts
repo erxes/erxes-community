@@ -31,7 +31,7 @@ export const initBroker = async options => {
   client = await initBrokerCore(options);
 
   // do not receive messages in crons worker
-  const { consumeQueue, consumeRPCQueue } = client;
+  const { consumeQueue, consumeRPCQueue, consumeRPCQueueMq } = client;
 
   consumeQueue(
     'core:manage-installation-notification',
@@ -378,6 +378,17 @@ export const initBroker = async options => {
     };
   });
 
+  consumeRPCQueue('core:users.comparePassword', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+
+    const { password, userPassword } = data;
+
+    return {
+      status: 'success',
+      data: await models.Users.comparePassword(password, userPassword)
+    };
+  });
+
   consumeRPCQueue(
     'core:brands.findOne',
     async ({ subdomain, data: { query } }) => {
@@ -475,21 +486,33 @@ export const initBroker = async options => {
     };
   });
 
-  consumeRPCQueue('core:imports:prepareImportDocs', async args => {
+  consumeRPCQueue('core:imports.insertImportItems', async args => {
+    return {
+      status: 'success',
+      data: await imports.insertImportItems(args)
+    };
+  });
+
+  consumeRPCQueue('core:imports.prepareImportDocs', async args => {
     return {
       status: 'success',
       data: await imports.prepareImportDocs(args)
     };
   });
 
-  consumeRPCQueue('core:imports:insertImportItems', async args => ({
-    status: 'success',
-    data: await imports.insertImportItems(args)
-  }));
-
-  consumeRPCQueue('core:exporter:prepareExportData', async args => ({
+  consumeRPCQueue('core:exporter.prepareExportData', async args => ({
     status: 'success',
     data: await exporter.prepareExportData(args)
+  }));
+
+  consumeRPCQueue('core:exporter.getExportDocs', async args => ({
+    status: 'success',
+    data: await exporter.getExportDocs(args)
+  }));
+
+  consumeRPCQueueMq('core:isServiceEnabled', async args => ({
+    status: 'success',
+    data: await serviceDiscovery.isEnabled(args)
   }));
 
   return client;

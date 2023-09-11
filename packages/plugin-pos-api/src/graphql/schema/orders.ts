@@ -22,6 +22,10 @@ const posOrderFields = contactsEnabled => `
   items: JSON,
   posToken: String,
   posName: String,
+  branchId: String,
+  departmentId: String,
+  branch: JSON,
+  department: JSON,
   user: User,
   ${
     contactsEnabled
@@ -32,6 +36,8 @@ const posOrderFields = contactsEnabled => `
   }
   syncedErkhet: Boolean,
   origin: String
+  convertDealId: String
+  returnInfo: JSON
 `;
 
 export const types = ({ contactsEnabled, productsEnabled }) => `
@@ -43,7 +49,7 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     primaryEmail: String
     lastName: String
   }
-  
+
   type PosOrder {
     ${posOrderFields(contactsEnabled)}
   }
@@ -53,6 +59,12 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     syncErkhetInfo: String
     putResponses: JSON
     deliveryInfo: JSON
+    deal: JSON
+    dealLink: String
+  }
+
+  type PosOrderRecord {
+    ${posOrderFields(contactsEnabled)}
   }
 
   type PosProduct {
@@ -60,7 +72,7 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
     name: String
     code: String
     type: String
-    sku: String
+    uom: String
     unitPrice: Float
     categoryId: String
     createdAt: Date,
@@ -78,13 +90,6 @@ export const types = ({ contactsEnabled, productsEnabled }) => `
   type PosProducts {
     products: [PosProduct],
     totalCount: Float,
-  }
-
-  type CheckOrderResponse {
-    orderId: String
-    isSynced: Boolean
-    syncedDate: Date
-    syncedBillNumber: String
   }
 `;
 
@@ -104,6 +109,14 @@ const queryParams = `
   customerType: String
   posId: String
   posToken: String
+  types: [String]
+  statuses: [String]
+  excludeStatuses: [String] 
+  hasPaidDate: Boolean 
+`;
+
+const groupParams = `
+  groupField: String
 `;
 
 export const queries = `
@@ -111,7 +124,10 @@ export const queries = `
   posOrderDetail(_id: String): PosOrderDetail
   posProducts(${queryParams} categoryId: String, searchValue: String): PosProducts
   posOrdersSummary(${queryParams}): JSON
+  posOrdersGroupSummary(${queryParams}, ${groupParams}): JSON
   posOrdersTotalCount(${queryParams}): JSON
+  posOrderRecords(${queryParams}): [PosOrderRecord]
+  posOrderRecordsCount(${queryParams}): Int
 `;
 
 export const mutations = `

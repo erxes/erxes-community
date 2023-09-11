@@ -1,6 +1,6 @@
 const chatMessageAdd = `
-  mutation chatMessageAdd($chatId: String!, $content: String!, $relatedId: String, $attachments: [JSON]) {
-    chatMessageAdd(chatId: $chatId, content: $content, relatedId: $relatedId, attachments: $attachments) {
+  mutation chatMessageAdd($chatId: String!, $content: String!, $relatedId: String, $attachments: [JSON], $mentionedUserIds: [String]) {
+    chatMessageAdd(chatId: $chatId, content: $content, relatedId: $relatedId, attachments: $attachments, mentionedUserIds: $mentionedUserIds) {
       _id
     }
   }
@@ -9,6 +9,14 @@ const chatMessageAdd = `
 const chatAdd = `
   mutation chatAdd($name: String, $type: ChatType!, $participantIds: [String]) {
     chatAdd(name: $name, type: $type, participantIds: $participantIds) {
+      _id
+    }
+  }
+`;
+
+const chatEdit = `
+  mutation chatEdit($id: String!, $name: String) {
+    chatEdit(_id: $id, name: $name) {
       _id
     }
   }
@@ -38,11 +46,19 @@ const chatAddOrRemoveMember = `
   }
 `;
 
+const chatToggleIsPinned = `
+  mutation chatToggleIsPinned($id: String!) {
+    chatToggleIsPinned(_id: $id)
+  }
+`;
+
 export default {
   chatMessageAdd,
   chatAdd,
+  chatEdit,
   chatRemove,
   chatMarkAsRead,
   chatMakeOrRemoveAdmin,
-  chatAddOrRemoveMember
+  chatAddOrRemoveMember,
+  chatToggleIsPinned
 };

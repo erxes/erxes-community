@@ -6,6 +6,8 @@ const chats = `
         name
         type
         isSeen
+        isPinned
+        isPinnedUserIds
         lastMessage {
           content
           createdAt
@@ -19,6 +21,7 @@ const chats = `
             }
             lastSeenMessageId
           }
+          attachments
         }
         createdUser {
           _id
@@ -136,9 +139,27 @@ const getChatIdByUserIds = `
   }
 `;
 
+const getUnreadChatCount = `
+  query getUnreadChatCount{
+    getUnreadChatCount
+  }
+
+`;
+const notificationsGetConfigurations = `
+  query notificationsGetConfigurations {
+          notificationsGetConfigurations {
+            _id
+            notifType
+            isAllowed
+          }
+        }
+`;
+
 export default {
   chats,
   chatDetail,
   chatMessages,
-  getChatIdByUserIds
+  getChatIdByUserIds,
+  getUnreadChatCount,
+  notificationsGetConfigurations
 };

@@ -15,6 +15,7 @@ export let serviceDiscovery;
 export default {
   name: 'productplaces',
   permissions,
+  hasSubscriptions: true,
   graphql: async sd => {
     serviceDiscovery = sd;
     return {
@@ -40,6 +41,7 @@ export default {
     graphqlPubsub = options.pubsubClient;
   },
   meta: {
-    afterMutations
+    afterMutations,
+    permissions
   }
 };

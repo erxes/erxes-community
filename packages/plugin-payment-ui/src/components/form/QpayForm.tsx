@@ -17,6 +17,7 @@ type Props = {
   closeModal: () => void;
   isWechatpay?: boolean;
   payment?: IPaymentDocument;
+  metaData?: any;
 };
 
 type State = {
@@ -118,6 +119,12 @@ class QpayConfigForm extends React.Component<Props, State> {
           {this.renderItem('qpayMerchantUser', 'Username')}
           {this.renderItem('qpayMerchantPassword', 'Password', '', true)}
           {this.renderItem('qpayInvoiceCode', 'Invoice code')}
+
+          {this.props.metaData && this.props.metaData.link && (
+            <a href={this.props.metaData.link} target="_blank" rel="noreferrer">
+              {__('Contact with QPay')}
+            </a>
+          )}
         </SettingsContent>
 
         <ModalFooter>

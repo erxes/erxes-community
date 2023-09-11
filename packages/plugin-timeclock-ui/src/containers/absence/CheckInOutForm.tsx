@@ -7,8 +7,8 @@ import {
 } from '../../types';
 import { Alert, withProps } from '@erxes/ui/src/utils';
 import * as compose from 'lodash.flowright';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { graphql } from '@apollo/client/react/hoc';
+import { gql } from '@apollo/client';
 import { mutations, queries } from '../../graphql';
 import CheckInOutForm from '../../components/absence/CheckInOutForm';
 import React from 'react';
@@ -104,18 +104,13 @@ export default withProps<Props>(
 
     graphql<Props, TimeClockQueryResponse>(gql(mutations.timeclockEdit), {
       name: 'timeclockEditMutation',
-      options: ({ timeclockId, shiftStart, shiftEnd, shiftActive }) => ({
-        variables: { _id: timeclockId, shiftStart, shiftEnd, shiftActive },
+      options: () => ({
         refetchQueries: ['timeclocksMain']
       })
     }),
 
     graphql<Props, TimeClockQueryResponse>(gql(mutations.timeclockCreate), {
-      name: 'timeclockCreateMutation',
-      options: ({ userId, shiftStart, shiftEnd, shiftActive }) => ({
-        variables: { userId, shiftStart, shiftEnd, shiftActive },
-        refetchQueries: ['timeclocksMain']
-      })
+      name: 'timeclockCreateMutation'
     }),
 
     graphql<Props, AbsenceMutationResponse>(

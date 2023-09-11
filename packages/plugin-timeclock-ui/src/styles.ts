@@ -23,6 +23,15 @@ const ConfigFormWrapper = styled.div`
   }
 `;
 
+const AlertContainer = styled.div`
+  > div {
+    > div {
+      align-items: start;
+      overflow: scroll;
+      height: 600px;
+    }
+  }
+`;
 const SidebarHeader = styledTS<{
   spaceBottom?: boolean;
   uppercase?: boolean;
@@ -35,6 +44,32 @@ const SidebarHeader = styledTS<{
   font-size: ${typography.fontSizeHeading8}px;
   flex-direction: column;
   margin: 0px ${dimensions.coreSpacing}px;
+`;
+
+const CustomWidth = styledTS<{
+  widthPercent: number;
+}>(styled.div)`
+
+width: ${props => props.widthPercent}%;
+margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  > div {
+    flex: 1;
+    input[type='text'] {
+      border: none;
+      height: 34px;
+      padding: 5px 0;
+      color: #444;
+      border-bottom: 1px solid;
+      border-color: #ddd;
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      font-size: 13px;
+    }
+  }
 `;
 
 const CustomRangeContainer = styled.div`
@@ -157,6 +192,7 @@ const FlexCenter = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
 `;
 
 const SidebarActions = styled.div`
@@ -282,12 +318,12 @@ const DateName = styled.div`
   text-align: center;
 `;
 
-const MarginX = styled.div`
-  margin: 0 ${dimensions.coreSpacing}px;
+const MarginX = styledTS<{ margin: number }>(styled.div)`
+  margin: 0 ${props => props.margin}px;
 `;
 
-const MarginY = styled.div`
-  margin: ${dimensions.unitSpacing}px 0;
+const MarginY = styledTS<{ margin: number }>(styled.div)`
+  margin: ${props => props.margin}px 0;
 `;
 
 const RowField = styled.div`
@@ -358,5 +394,7 @@ export {
   TextAlignCenter,
   TextAlignRight,
   CustomCollapseRow,
-  CustomLabel
+  CustomLabel,
+  AlertContainer,
+  CustomWidth
 };

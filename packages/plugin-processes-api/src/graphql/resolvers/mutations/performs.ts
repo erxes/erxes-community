@@ -1,13 +1,13 @@
 // import { moduleCheckPermission } from '@erxes/api-utils/src/permissions';
-import {
-  putCreateLog,
-  putUpdateLog,
-  putDeleteLog,
-  MODULE_NAMES
-} from '../../../logUtils';
 import { IContext } from '../../../connectionResolver';
-import { IPerform } from '../../../models/definitions/performs';
+import {
+  MODULE_NAMES,
+  putCreateLog,
+  putDeleteLog,
+  putUpdateLog
+} from '../../../logUtils';
 import { sendInventoriesMessage } from '../../../messageBroker';
+import { IPerform } from '../../../models/definitions/performs';
 
 const performMutations = {
   /**
@@ -25,36 +25,6 @@ const performMutations = {
       typeId: doc.overallWorkKey.typeId,
       createdAt: new Date(),
       createdBy: user._id
-    });
-
-    // processes in or inventories credit
-    await sendInventoriesMessage({
-      subdomain,
-      action: 'remainders.updateMany',
-      data: {
-        branchId: doc.inBranchId,
-        departmentId: doc.inDepartmentId,
-        productsData: (doc.inProducts || []).map(ip => ({
-          productId: ip.productId,
-          uomId: ip.uomId,
-          diffCount: -1 * ip.quantity
-        }))
-      }
-    });
-
-    // processes out or inventories debit
-    await sendInventoriesMessage({
-      subdomain,
-      action: 'remainders.updateMany',
-      data: {
-        branchId: doc.outBranchId,
-        departmentId: doc.outDepartmentId,
-        productsData: (doc.outProducts || []).map(op => ({
-          productId: op.productId,
-          uomId: op.uomId,
-          diffCount: op.quantity
-        }))
-      }
     });
 
     await putCreateLog(
@@ -82,6 +52,11 @@ const performMutations = {
     // to update count status, inProducts, outProducts
 
     const perform = await models.Performs.getPerform(doc._id);
+
+    if (perform.status === 'confirmed') {
+      throw new Error('Cannot be edited because it is confirmed');
+    }
+
     const updatedPerform = await models.Performs.updatePerform(
       doc._id,
       {
@@ -93,84 +68,6 @@ const performMutations = {
       },
       perform
     );
-
-    const inProductsByProductId = {};
-    for (const data of perform.inProducts) {
-      inProductsByProductId[data.productId] = {
-        uomId: data.uomId,
-        diffCount: data.quantity
-      };
-    }
-
-    for (const updatedData of updatedPerform.inProducts) {
-      const oldData = inProductsByProductId[updatedData.productId];
-      if (oldData) {
-        oldData.diffCount = oldData.diffCount - updatedData.quantity;
-      } else {
-        inProductsByProductId[updatedData.productId] = {
-          uomId: updatedData.uomId,
-          diffCount: -1 * updatedData.quantity
-        };
-      }
-    }
-
-    const inProductsData: any[] = [];
-    for (const productId of Object.keys(inProductsByProductId)) {
-      inProductsData.push({
-        productId,
-        ...inProductsByProductId[productId]
-      });
-    }
-
-    // processes in or inventories credit
-    await sendInventoriesMessage({
-      subdomain,
-      action: 'remainders.updateMany',
-      data: {
-        branchId: doc.inBranchId,
-        departmentId: doc.inDepartmentId,
-        productsData: inProductsData
-      }
-    });
-
-    const outProductsByProductId = {};
-    for (const data of perform.outProducts) {
-      outProductsByProductId[data.productId] = {
-        uomId: data.uomId,
-        diffCount: -1 * data.quantity
-      };
-    }
-
-    for (const updatedData of updatedPerform.outProducts) {
-      const oldData = outProductsByProductId[updatedData.productId];
-      if (oldData) {
-        oldData.diffCount = oldData.diffCount + updatedData.quantity;
-      } else {
-        outProductsByProductId[updatedData.productId] = {
-          uomId: updatedData.uomId,
-          diffCount: updatedData.quantity
-        };
-      }
-    }
-
-    const outProductsData: any[] = [];
-    for (const productId of Object.keys(outProductsByProductId)) {
-      outProductsData.push({
-        productId,
-        ...outProductsByProductId[productId]
-      });
-    }
-
-    // processes out or inventories debit
-    await sendInventoriesMessage({
-      subdomain,
-      action: 'remainders.updateMany',
-      data: {
-        branchId: doc.outBranchId,
-        departmentId: doc.outDepartmentId,
-        productsData: outProductsData
-      }
-    });
 
     await putUpdateLog(
       models,
@@ -195,7 +92,106 @@ const performMutations = {
     { user, models, subdomain }: IContext
   ) {
     const perform = await models.Performs.getPerform(_id);
+
+    if (perform.status === 'confirmed') {
+      throw new Error('Cannot be deleted because it is confirmed');
+    }
+
     const removeResponse = await models.Performs.removePerform(_id);
+
+    await putDeleteLog(
+      models,
+      subdomain,
+      {
+        type: MODULE_NAMES.PERFORM,
+        object: perform
+      },
+      user
+    );
+
+    return removeResponse;
+  },
+
+  async performConfirm(
+    _root,
+    { _id, endAt }: { _id: string; endAt: Date },
+    { user, models, subdomain }: IContext
+  ) {
+    const perform = await models.Performs.getPerform(_id);
+
+    if (perform.status === 'confirmed') {
+      throw new Error('Already confirmed');
+    }
+
+    // processes in or inventories credit
+    await sendInventoriesMessage({
+      subdomain,
+      action: 'remainders.updateMany',
+      data: {
+        branchId: perform.inBranchId,
+        departmentId: perform.inDepartmentId,
+        productsData: (perform.inProducts || []).map(ip => ({
+          productId: ip.productId,
+          uom: ip.uom,
+          diffCount: -1 * ip.quantity
+        }))
+      }
+    });
+
+    // processes out or inventories debit
+    await sendInventoriesMessage({
+      subdomain,
+      action: 'remainders.updateMany',
+      data: {
+        branchId: perform.outBranchId,
+        departmentId: perform.outDepartmentId,
+        productsData: (perform.outProducts || []).map(op => ({
+          productId: op.productId,
+          uom: op.uom,
+          diffCount: op.quantity
+        }))
+      }
+    });
+
+    const updatedPerform = await models.Performs.updatePerform(
+      _id,
+      {
+        ...perform,
+        endAt,
+        status: 'confirmed',
+        modifiedAt: new Date(),
+        modifiedBy: user._id
+      },
+      perform
+    );
+
+    await putUpdateLog(
+      models,
+      subdomain,
+      {
+        type: MODULE_NAMES.PERFORM,
+        newData: {
+          ...updatedPerform
+        },
+        object: perform,
+        updatedDocument: updatedPerform
+      },
+      user
+    );
+
+    return updatedPerform;
+  },
+
+  async performAbort(
+    _root,
+    { _id }: { _id: string },
+    { user, models, subdomain }: IContext
+  ) {
+    const perform = await models.Performs.getPerform(_id);
+
+    if (perform.status !== 'confirmed') {
+      throw new Error('Cannot be abort because not confirmed');
+    }
 
     // processes in or inventories credit
     await sendInventoriesMessage({
@@ -206,7 +202,7 @@ const performMutations = {
         departmentId: perform.inDepartmentId,
         productsData: (perform.inProducts || []).map(data => ({
           productId: data.productId,
-          uomId: data.uomId,
+          uom: data.uom,
           diffCount: data.quantity
         }))
       }
@@ -221,23 +217,38 @@ const performMutations = {
         departmentId: perform.outDepartmentId,
         productsData: (perform.outProducts || []).map(data => ({
           productId: data.productId,
-          uomId: data.uomId,
+          uom: data.uom,
           diffCount: -1 * data.quantity
         }))
       }
     });
 
-    await putDeleteLog(
+    const updatedPerform = await models.Performs.updatePerform(
+      _id,
+      {
+        ...perform,
+        status: 'draft',
+        modifiedAt: new Date(),
+        modifiedBy: user._id
+      },
+      perform
+    );
+
+    await putUpdateLog(
       models,
       subdomain,
       {
         type: MODULE_NAMES.PERFORM,
-        object: perform
+        newData: {
+          ...updatedPerform
+        },
+        object: perform,
+        updatedDocument: updatedPerform
       },
       user
     );
 
-    return removeResponse;
+    return updatedPerform;
   }
 };
 

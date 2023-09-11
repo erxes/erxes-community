@@ -147,7 +147,7 @@ export class PutData<IListArgs extends IPutDataArgs> {
       code: detail.productCode,
       barCode: detail.barcode || this.defaultGScode,
       name: detail.productName,
-      measureUnit: detail.sku || 'ш',
+      measureUnit: detail.uom || 'ш',
       qty: format_number(detail.count),
       unitPrice: format_number(detail.amount / detail.count),
       totalAmount: format_number(detail.amount),
@@ -195,6 +195,7 @@ export class PutData<IListArgs extends IPutDataArgs> {
 
     return {
       date: this.params.date,
+      number: this.params.number,
       cashAmount: format_number(sumAmount),
       nonCashAmount: format_number(0),
 
@@ -209,6 +210,7 @@ export class PutData<IListArgs extends IPutDataArgs> {
       stocks,
 
       customerNo: this.params.customerCode,
+      customerName: this.params.customerName,
       billIdSuffix: Math.round(
         Math.random() * (999999 - 100000) + 100000
       ).toString(),
@@ -219,7 +221,11 @@ export class PutData<IListArgs extends IPutDataArgs> {
   }
 }
 
-export const returnBill = async (models: IModels, doc, config) => {
+export const returnBill = async (
+  models: IModels,
+  doc: { contentType: string; contentId: string; number: string },
+  config: any
+) => {
   const url = config.ebarimtUrl || '';
   const { contentType, contentId } = doc;
 
@@ -247,7 +253,7 @@ export const returnBill = async (models: IModels, doc, config) => {
 
     const date = prePutResponse.date;
 
-    if (!prePutResponse.billId || !rd || !date) {
+    if (!prePutResponse.billId || !date) {
       continue;
     }
 
@@ -265,6 +271,7 @@ export const returnBill = async (models: IModels, doc, config) => {
       sendInfo: { ...data },
       contentId,
       contentType,
+      number: doc.number,
       returnBillId: prePutResponse.billId
     });
 

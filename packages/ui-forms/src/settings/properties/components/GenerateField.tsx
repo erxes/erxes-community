@@ -32,12 +32,17 @@ import Uploader from '@erxes/ui/src/components/Uploader';
 
 type Props = {
   field: IField;
+  otherFields?: IField[];
   currentLocation?: ILocationOption;
   defaultValue?: any;
   hasLogic?: boolean;
   isEditing?: boolean;
   isPreview?: boolean;
-  onValueChange?: (data: { _id: string; value: any }) => void;
+  onValueChange?: (data: {
+    _id: string;
+    value: any;
+    extraValue?: string;
+  }) => void;
   onChangeLocationOptions?: (locationOptions: ILocationOption[]) => void;
 };
 
@@ -348,13 +353,13 @@ export default class GenerateField extends React.Component<Props, State> {
   }
 
   renderExtraFields({ id, value }, type, filteredPlugin) {
-    const onSelect = e => {
+    const onSelect = (_id, value, extraValue) => {
       const { onValueChange } = this.props;
 
       if (onValueChange) {
-        this.setState({ value: e });
+        this.setState({ value: _id });
 
-        onValueChange({ _id: id, value: e });
+        onValueChange({ _id: id, value: _id, extraValue });
       }
     };
 
@@ -506,6 +511,29 @@ export default class GenerateField extends React.Component<Props, State> {
 
     return (
       <SelectProductCategory defaultValue={value} onChange={onChangeCategory} />
+    );
+  }
+
+  renderParentField() {
+    const { field } = this.props;
+
+    if (field.type !== 'parentField') {
+      return null;
+    }
+
+    const otherFields = this.props.otherFields || [];
+
+    const subFields =
+      otherFields.filter(otherField =>
+        field.subFieldIds?.includes(otherField._id)
+      ) || [];
+
+    return (
+      <>
+        {subFields.map(subField => {
+          return <GenerateField key={subField._id} field={subField} />;
+        })}
+      </>
     );
   }
 
@@ -691,10 +719,14 @@ export default class GenerateField extends React.Component<Props, State> {
         return this.renderSelectCategory(attrs);
       }
 
+      case 'parentField': {
+        return this.renderParentField();
+      }
+
       default:
         try {
           const plugins = ((window as any).plugins || []).filter(
-            plugin => plugin['formsExtraFields']
+            plugin => plugin.formsExtraFields
           );
 
           const filteredPlugin = plugins.find(plugin =>
@@ -738,7 +770,12 @@ export default class GenerateField extends React.Component<Props, State> {
   }
 
   render() {
-    const { field, hasLogic } = this.props;
+    const { field, hasLogic, otherFields = [] } = this.props;
+
+    const subFieldIds = otherFields
+      .filter(f => f.subFieldIds)
+      .map(f => f.subFieldIds)
+      .flat();
 
     return (
       <FormGroup>
@@ -748,6 +785,9 @@ export default class GenerateField extends React.Component<Props, State> {
         {this.renderAddButton()}
 
         {hasLogic && <LogicIndicator>Logic</LogicIndicator>}
+        {subFieldIds.includes(field._id) && (
+          <LogicIndicator>Sub Field</LogicIndicator>
+        )}
         {field.description ? (
           <div dangerouslySetInnerHTML={{ __html: field.description }} />
         ) : null}

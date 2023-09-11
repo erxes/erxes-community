@@ -1,5 +1,5 @@
 import { IContext } from '../../types';
-import { escapeRegExp, paginate } from '@erxes/api-utils/src/core';
+import { escapeRegExp, getPureDate, paginate } from '@erxes/api-utils/src/core';
 import { sendRequest } from '@erxes/api-utils/src/requests';
 import { sendPosMessage } from '../../../messageBroker';
 import { IConfig } from '../../../models/definitions/configs';
@@ -8,39 +8,30 @@ interface ISearchParams {
   searchValue?: string;
   startDate?: Date;
   endDate?: Date;
+  dateType: string;
   page?: number;
   perPage?: number;
   sortField?: string;
   sortDirection?: number;
   customerId?: string;
   customerType?: string;
-}
-
-interface IFullOrderParams extends ISearchParams {
+  isPaid?: boolean;
   statuses: string[];
 }
 
-export const getPureDate = (date: Date, multiplier = 1) => {
-  const ndate = new Date(date);
-  const diffTimeZone =
-    multiplier * Number(process.env.TIMEZONE || 0) * 1000 * 60 * 60;
-  return new Date(ndate.getTime() - diffTimeZone);
-};
-
-const generateFilter = (config: IConfig, params: IFullOrderParams) => {
+const generateFilter = (config: IConfig, params: ISearchParams) => {
   const {
     searchValue,
     statuses,
     customerId,
     startDate,
     endDate,
+    isPaid,
+    dateType,
     customerType
   } = params;
   const filter: any = {
-    $or: [
-      { posToken: config.token },
-      { type: 'delivery', branchId: config.branchId }
-    ]
+    $or: [{ posToken: config.token }, { subToken: config.token }]
   };
 
   if (searchValue) {
@@ -61,6 +52,10 @@ const generateFilter = (config: IConfig, params: IFullOrderParams) => {
         : customerType;
   }
 
+  if (isPaid !== undefined) {
+    filter.paidDate = { $exists: isPaid };
+  }
+
   const dateQry: any = {};
   if (startDate) {
     dateQry.$gte = getPureDate(startDate);
@@ -69,63 +64,51 @@ const generateFilter = (config: IConfig, params: IFullOrderParams) => {
     dateQry.$lte = getPureDate(endDate);
   }
   if (Object.keys(dateQry).length) {
-    filter.modifiedAt = dateQry;
+    const dateTypes = {
+      paid: 'paidDate',
+      created: 'createdAt',
+      due: 'dueDate',
+      default: 'modifiedAt'
+    };
+    filter[dateTypes[dateType || 'default']] = dateQry;
   }
 
   return { ...filter, status: { $in: statuses } };
 };
 
+const filterOrders = (params: ISearchParams, models, config) => {
+  const filter = generateFilter(config, params);
+  const { sortField, sortDirection, page, perPage } = params;
+  const sort: { [key: string]: any } = {};
+
+  if (sortField) {
+    sort[sortField] = sortDirection;
+  } else {
+    sort.createdAt = sortDirection || 1;
+  }
+
+  return paginate(
+    models.Orders.find({
+      ...filter
+    })
+      .sort(sort)
+      .lean(),
+    { page, perPage }
+  );
+};
+
 const orderQueries = {
-  orders(
-    _root,
-    { searchValue, page, perPage }: ISearchParams,
-    { models, config }: IContext
-  ) {
-    const filter: any = { posToken: config.token };
-
-    if (searchValue) {
-      filter.number = { $regex: new RegExp(escapeRegExp(searchValue), 'i') };
-    }
-
-    return paginate(
-      models.Orders.find(filter)
-        .sort({ createdAt: -1 })
-        .lean(),
-      {
-        page,
-        perPage
-      }
-    );
+  orders(_root, params: ISearchParams, { models, config }: IContext) {
+    return filterOrders(params, models, config);
   },
 
-  async fullOrders(
-    _root,
-    params: IFullOrderParams,
-    { models, config }: IContext
-  ) {
-    const filter = generateFilter(config, params);
-    const { sortField, sortDirection, page, perPage } = params;
-    const sort: { [key: string]: any } = {};
-
-    if (sortField) {
-      sort[sortField] = sortDirection;
-    } else {
-      sort.createdAt = sortDirection || 1;
-    }
-
-    return paginate(
-      models.Orders.find({
-        ...filter
-      })
-        .sort(sort)
-        .lean(),
-      { page, perPage }
-    );
+  async fullOrders(_root, params: ISearchParams, { models, config }: IContext) {
+    return filterOrders(params, models, config);
   },
 
   async ordersTotalCount(
     _root,
-    params: IFullOrderParams,
+    params: ISearchParams,
     { models, config }: IContext
   ) {
     const filter = generateFilter(config, params);
@@ -143,7 +126,7 @@ const orderQueries = {
       perPage,
       sortField,
       sortDirection
-    }: IFullOrderParams,
+    }: ISearchParams,
     { models }: IContext
   ) {
     const filter: any = {};

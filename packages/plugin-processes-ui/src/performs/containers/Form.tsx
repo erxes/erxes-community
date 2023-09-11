@@ -1,16 +1,19 @@
 import * as compose from 'lodash.flowright';
 import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import Form from '../components/Form';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
-import { graphql } from 'react-apollo';
+import { graphql } from '@apollo/client/react/hoc';
 import { IButtonMutateProps } from '@erxes/ui/src/types';
-import { IPerform, PerformDetailQueryResponse } from '../types';
+import {
+  IPerform,
+  PerformAbortMutationResponse,
+  PerformConfirmMutationResponse,
+  PerformDetailQueryResponse
+} from '../types';
 import { mutations, queries } from '../graphql';
-import { withProps } from '@erxes/ui/src/utils';
-import { UomsQueryResponse } from '@erxes/ui-products/src/types';
-import productsQueries from '@erxes/ui-products/src/graphql/queries';
+import { Alert, withProps } from '@erxes/ui/src/utils';
 import { IOverallWorkDet } from '../../overallWork/types';
 
 type Props = {
@@ -23,8 +26,9 @@ type Props = {
 
 type FinalProps = {
   performDetailQuery: PerformDetailQueryResponse;
-  uomsQuery: UomsQueryResponse;
-} & Props;
+} & Props &
+  PerformConfirmMutationResponse &
+  PerformAbortMutationResponse;
 
 class PerformFormContainer extends React.Component<
   FinalProps,
@@ -46,13 +50,11 @@ class PerformFormContainer extends React.Component<
       overallWorkDetail,
       max,
       performDetailQuery,
-      uomsQuery
+      performConfirm,
+      performAbort
     } = this.props;
 
-    if (
-      (performDetailQuery && performDetailQuery.loading) ||
-      uomsQuery.loading
-    ) {
+    if (performDetailQuery && performDetailQuery.loading) {
       return <Spinner />;
     }
 
@@ -87,19 +89,44 @@ class PerformFormContainer extends React.Component<
           isSubmitted={isSubmitted}
           type="submit"
           uppercase={false}
-          successMessage={`You successfully added a ${name}`}
+          successMessage={`You successfully ${
+            values._id ? 'updated' : 'added'
+          } a ${name}`}
           disabled={disabled}
         />
       );
     };
 
-    const allUoms = uomsQuery.uoms || [];
+    const confirmPerform = (_id: string, endAt: Date) => {
+      performConfirm({
+        variables: { _id, endAt }
+      })
+        .then(() => {
+          Alert.success('You successfully confirmed a performance');
+        })
+        .catch(e => {
+          Alert.error(e.message);
+        });
+    };
+
+    const abortPerform = (_id: string) => {
+      performAbort({
+        variables: { _id }
+      })
+        .then(() => {
+          Alert.success('You successfully aborted a performance');
+        })
+        .catch(e => {
+          Alert.error(e.message);
+        });
+    };
 
     const updatedProps = {
       ...this.props,
-      allUoms,
       perform,
-      renderButton
+      renderButton,
+      confirmPerform,
+      abortPerform
     };
 
     return (
@@ -132,8 +159,33 @@ export default withProps<Props>(
       }),
       skip: props => !props.perform || !props.perform._id
     }),
-    graphql<Props, UomsQueryResponse>(gql(productsQueries.uoms), {
-      name: 'uomsQuery'
-    })
+    graphql<Props, PerformConfirmMutationResponse, {}>(
+      gql(mutations.performConfirm),
+      {
+        name: 'performConfirm',
+        options: {
+          refetchQueries: [
+            'performs',
+            'overallWorkDetail',
+            'performsCount',
+            'performDetail'
+          ]
+        }
+      }
+    ),
+    graphql<Props, PerformAbortMutationResponse, {}>(
+      gql(mutations.performAbort),
+      {
+        name: 'performAbort',
+        options: {
+          refetchQueries: [
+            'performs',
+            'overallWorkDetail',
+            'performsCount',
+            'performDetail'
+          ]
+        }
+      }
+    )
   )(PerformFormContainer)
 );

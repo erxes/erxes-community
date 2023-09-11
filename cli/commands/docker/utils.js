@@ -17,6 +17,8 @@ const {
 
 const isSwarm = DEPLOYMENT_METHOD !== 'docker-compose';
 
+const buildPlugins = ['dev', 'staging', 'build-test'];
+
 const commonEnvs = configs => {
   const db_server_address = configs.db_server_address;
   const widgets = configs.widgets || {};
@@ -44,7 +46,8 @@ const commonEnvs = configs => {
     ELASTICSEARCH_URL: `http://${db_server_address ||
       (isSwarm ? 'erxes-dbs_elasticsearch' : 'elasticsearch')}:9200`,
     ENABLED_SERVICES_PATH: '/data/enabled-services.js',
-    MESSAGE_BROKER_PREFIX: rabbitmq.prefix || ''
+    MESSAGE_BROKER_PREFIX: rabbitmq.prefix || '',
+    SENTRY_DSN: configs.sentry_dsn,
   };
 };
 
@@ -83,8 +86,8 @@ const healthcheck = {
     '-i',
     `http://localhost:${SERVICE_INTERNAL_PORT}/health`
   ],
-  interval: '1s',
-  start_period: '5s'
+  interval: '30s',
+  start_period: '30s'
 };
 
 const generateLBaddress = address =>
@@ -159,8 +162,8 @@ const syncUI = async ({ name, image_tag, ui_location }) => {
     if (!tag) {
       s3_location = `https://erxes-plugins.s3.us-west-2.amazonaws.com/uis/${plName}`;
     } else {
-      if (tag === 'dev') {
-        s3_location = `https://erxes-dev-plugins.s3.us-west-2.amazonaws.com/uis/${plName}`;
+      if (buildPlugins.includes(tag)) {
+        s3_location = `https://erxes-${tag}-plugins.s3.us-west-2.amazonaws.com/uis/${plName}`;
       } else {
         s3_location = `https://erxes-release-plugins.s3.us-west-2.amazonaws.com/uis/${plName}/${tag}`;
       }
@@ -639,9 +642,9 @@ const up = async ({ uis, downloadLocales, fromInstaller }) => {
     'https://erxes-plugins.s3.us-west-2.amazonaws.com/pluginsMap.js';
 
   if (configs.image_tag) {
-    if (configs.image_tag === 'dev') {
+    if (buildPlugins.includes(configs.image_tag)) {
       pluginsMapLocation =
-        'https://erxes-dev-plugins.s3.us-west-2.amazonaws.com/pluginsMap.js';
+        `https://erxes-${configs.image_tag}-plugins.s3.us-west-2.amazonaws.com/pluginsMap.js`;
     } else {
       pluginsMapLocation = `https://erxes-release-plugins.s3.us-west-2.amazonaws.com/${image_tag}/pluginsMap.js`;
     }
@@ -859,6 +862,9 @@ const up = async ({ uis, downloadLocales, fromInstaller }) => {
   log('Deploy ......');
 
   if (isSwarm) {
+
+    await execCommand('docker service rm erxes_gateway', true);
+
     return execCommand(
       'docker stack deploy --compose-file docker-compose.yml erxes --with-registry-auth --resolve-image changed'
     );

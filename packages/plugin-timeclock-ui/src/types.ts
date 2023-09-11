@@ -1,5 +1,5 @@
 import { IUser } from '@erxes/ui/src/auth/types';
-import { IBranch } from '@erxes/ui/src/team/types';
+import { IBranch, IDepartment } from '@erxes/ui/src/team/types';
 import { IAttachment, QueryResponse } from '@erxes/ui/src/types';
 
 export interface ITimeclock {
@@ -12,6 +12,10 @@ export interface ITimeclock {
   employeeId?: number;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
   branchName?: string;
 }
 export interface ITimelog {
@@ -32,6 +36,10 @@ export interface IAbsence {
   solved: boolean;
   status: string;
   attachment: IAttachment;
+
+  absenceTimeType: string;
+  requestDates: string[];
+  totalHoursOfAbsence: string;
 }
 export interface IAbsenceType {
   _id: string;
@@ -57,6 +65,9 @@ export interface IUserReport {
   user: IUser;
   scheduleReport: IScheduleReport[];
 
+  branchTitles?: string[];
+  departmentTitles?: string[];
+
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
   totalMinsWorkedThisMonth?: number;
@@ -73,6 +84,9 @@ export interface IUserReport {
   totalHoursOvertime?: number;
   totalHoursOvernight?: number;
 
+  totalHoursBreakScheduled?: number;
+  totalHoursBreakTaken?: number;
+
   totalMinsLate?: number;
   totalMinsLateToday?: number;
   totalMinsLateThisMonth?: number;
@@ -82,6 +96,7 @@ export interface IUserReport {
 }
 
 export interface IUserAbsenceInfo {
+  totalHoursShiftRequest?: number;
   totalHoursWorkedAbroad?: number;
   totalHoursPaidAbsence?: number;
   totalHoursUnpaidAbsence?: number;
@@ -100,6 +115,8 @@ export interface IScheduleReport {
   scheduledStart: Date;
   scheduledEnd: Date;
   scheduledDuration: number;
+
+  lunchBreakInHrs: string;
 
   totalMinsLate: number;
   totalHoursOvertime: number;
@@ -126,6 +143,7 @@ export interface IShift {
   shiftStart: Date;
   shiftEnd: Date;
   scheduleConfigId: string;
+  lunchBreakInMins?: number;
 }
 
 export interface IShiftSchedule {
@@ -155,8 +173,9 @@ export interface IScheduleForm {
 export interface IScheduleDate {
   overnightShift?: boolean;
 
-  scheduleConfigId: string;
-  lunchBreakInMins: number;
+  scheduleConfigId?: string;
+  lunchBreakInMins?: number;
+  inputChecked?: boolean;
 
   shiftDate?: Date;
   shiftStart: Date;
@@ -210,6 +229,10 @@ export type ScheduleConfigQueryResponse = {
   scheduleConfigs: IScheduleConfig[];
 } & QueryResponse;
 
+export type DepartmentsQueryResponse = {
+  timeclockDepartments: IDepartment[];
+  departments: IDepartment[];
+};
 export type DeviceConfigsQueryResponse = {
   deviceConfigs: { list: IDeviceConfig[]; totalCount: number };
 } & QueryResponse;
@@ -220,6 +243,7 @@ export type ScheduleQueryResponse = {
 
 export type BranchesQueryResponse = {
   branches: IBranch[];
+  timeclockBranches: IBranch[];
 } & QueryResponse;
 
 export type ReportsQueryResponse = {
@@ -238,13 +262,19 @@ export type MutationVariables = {
 };
 export type AbsenceMutationVariables = {
   _id?: string;
-  startTime: Date;
-  endTime: Date;
   userId: string;
   reason: string;
+
+  absenceTypeId: string;
+  absenceTimeType: string;
+
+  totalHoursOfAbsence: string;
+
   explanation?: string;
   attachment?: IAttachment;
-  absenceTypeId?: string;
+  requestDates?: string[];
+  startTime?: Date;
+  endTime?: Date;
 };
 
 export type ScheduleMutationVariables = {
@@ -256,15 +286,16 @@ export type ScheduleMutationVariables = {
   userIds?: string[];
   scheduleConfigId?: string;
   totalBreakInMins?: number | string;
+  status?: string;
 };
 
 export type TimeLogMutationResponse = {
   extractTimeLogsFromMsSQLMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 
   createTimeClockFromLogMutation: (params: {
-    variables: { userId: string; timelog: Date };
+    variables: { userId: string; timelog: Date; inDevice?: string };
   }) => Promise<any>;
 };
 
@@ -279,7 +310,7 @@ export type TimeClockMutationResponse = {
     variables: MutationVariables;
   }) => Promise<any>;
   extractAllMsSqlDataMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 };
 
@@ -299,7 +330,7 @@ export type AbsenceMutationResponse = {
   submitCheckInOutRequestMutation: (params: {
     variables: {
       checkType: string;
-      userId: string;
+      userId?: string;
       checkTime: Date;
     };
   }) => Promise<any>;
@@ -400,5 +431,9 @@ export type ScheduleMutationResponse = {
 
   removeScheduleShiftMutation: (params: {
     variables: { _id: string };
+  }) => Promise<any>;
+
+  checkDuplicateScheduleShiftsMutation: (params: {
+    variables: ScheduleMutationVariables;
   }) => Promise<any>;
 };

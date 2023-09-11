@@ -16,6 +16,8 @@ export let debug;
 export let graphqlPubsub;
 export let mainDb;
 export let serviceDiscovery;
+export let app;
+
 dotenv.config();
 
 export default {
@@ -53,14 +55,17 @@ export default {
     context.requestInfo = requestInfo;
     context.res = res;
 
-    context.config =
-      req.posConfig && req.posConfig._id
-        ? req.posConfig
-        : (models &&
-            (await models.Configs.findOne({})
-              .sort({ createdAt: 1 })
-              .lean())) ||
-          {};
+    context.config = {};
+
+    if (req.posConfig && req.posConfig._id) {
+      context.config = req.posConfig;
+    } else {
+      if (models) {
+        if ((await models.Configs.find({}).count()) === 1) {
+          context.config = await models.Configs.findOne({}).lean();
+        }
+      }
+    }
 
     if (req.posUser) {
       context.posUser = req.posUser;
@@ -90,6 +95,7 @@ export default {
 
   onServerInit: async options => {
     mainDb = options.db;
+    app = options.app;
 
     initBroker(options.messageBrokerClient);
 

@@ -4,6 +4,7 @@ import { field, schemaHooksWrapper } from './utils';
 export interface IPos {
   name: string;
   description?: string;
+  pdomain?: string;
   userId: string;
   createdAt: Date;
   productDetails?: string;
@@ -36,6 +37,8 @@ export interface IPos {
   checkRemainder?: boolean;
   permissionConfig?: any;
   allowTypes: string[];
+  isCheckRemainder: boolean;
+  checkExcludeCategoryIds: string[];
 }
 export interface IPosDocument extends IPos, Document {
   _id: string;
@@ -69,6 +72,7 @@ export const posSchema = schemaHooksWrapper(
     _id: field({ pkey: true }),
     name: field({ type: String, label: 'Name' }),
     description: field({ type: String, label: 'Description', optional: true }),
+    pdomain: field({ type: String, optional: true, label: 'Domain' }),
     userId: field({ type: String, optional: true, label: 'Created by' }),
     createdAt: field({ type: Date, label: 'Created at' }),
     productDetails: field({ type: [String], label: 'Product fields' }),
@@ -129,7 +133,13 @@ export const posSchema = schemaHooksWrapper(
       optional: true,
       label: 'Permission'
     }),
-    allowTypes: field({ type: [String], label: 'Allow Types' })
+    allowTypes: field({ type: [String], label: 'Allow Types' }),
+    isCheckRemainder: field({ type: Boolean, label: 'is Check Remainder' }),
+    checkExcludeCategoryIds: field({
+      type: [String],
+      label: 'Check Exclude Categories'
+    }),
+    status: field({ type: String, label: 'Status', optional: true })
   }),
   'erxes_pos'
 );

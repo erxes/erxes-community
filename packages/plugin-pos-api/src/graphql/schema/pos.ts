@@ -15,6 +15,7 @@ const groupCommonFields = `
 const posCommonFields = `
   name: String
   description: String
+  pdomain: String
   productDetails: [String]
   adminIds: [String]
   cashierIds: [String]
@@ -43,6 +44,8 @@ const posCommonFields = `
   checkRemainder: Boolean
   permissionConfig: JSON
   allowTypes: [String]
+  isCheckRemainder: Boolean
+  checkExcludeCategoryIds: [String]
 `;
 
 const catProd = `

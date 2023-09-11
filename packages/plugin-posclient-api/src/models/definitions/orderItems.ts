@@ -20,6 +20,7 @@ export interface IOrderItem {
   isPackage?: boolean;
   isTake?: boolean;
   status?: string;
+  manufacturedDate?: string;
 }
 
 export interface IOrderItemDocument extends Document, IOrderItem {
@@ -39,7 +40,6 @@ export const orderItemSchema = schemaHooksWrapper(
     }),
     discountAmount: getNumberFieldDefinition({
       label: 'Discount price amount',
-      positive: true,
       optional: true
     }),
     discountPercent: getNumberFieldDefinition({
@@ -70,7 +70,13 @@ export const orderItemSchema = schemaHooksWrapper(
       label: 'status of order item',
       enum: ORDER_ITEM_STATUSES.ALL,
       default: ORDER_ITEM_STATUSES.NEW
-    })
+    }),
+    isInner: field({
+      type: Boolean,
+      label: 'inner or skip ebarimt',
+      default: false
+    }),
+    manufacturedDate: field({ type: String, label: 'manufactured' })
   }),
   'erxes_orderItem'
 );

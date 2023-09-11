@@ -5,6 +5,8 @@ import { initBroker } from './messageBroker';
 import { generateModels } from './connectionResolver';
 import * as permissions from './permissions';
 import { getSubdomain } from '@erxes/api-utils/src/core';
+import cronjobs from './cronjobs/automations';
+import tags from './tags';
 
 export let mainDb;
 export let debug;
@@ -15,7 +17,7 @@ export default {
   name: 'automations',
   permissions,
   // for fixing permissions
-  meta: { permissions },
+  meta: { permissions, cronjobs, tags },
   graphql: async sd => {
     serviceDiscovery = sd;
 

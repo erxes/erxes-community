@@ -32,7 +32,7 @@ export const queries = `
   paymentsCountByType: paymentsTotalCount
   paymentsTotalCount(kind: String, status: String): paymentsTotalCount
 
-  paymentsCheckMonpayCoupon(couponCode: String!, paymentId: String!): JSON
+  qpayGetMerchant(_id: String!): JSON
 `;
 
 const params = `
@@ -46,4 +46,27 @@ export const mutations = `
   paymentAdd(${params}): Payment
   paymentEdit(_id: String!,${params}): Payment
   paymentRemove(_id: String!): String
+
+  qpayRegisterMerchantCompany(
+    registerNumber: String
+    name: String
+    mccCode: String
+    city: String
+    district: String
+    address: String
+    phone: String
+    email: String
+  ): JSON
+
+  qpayRegisterMerchantCustomer: JSON
+
+  qpayCreateInvoice(
+    merchantId: String
+    amount: Int
+    mccCode: String
+    description: String
+    callbackUrl: String
+  ): JSON
+
+
 `;

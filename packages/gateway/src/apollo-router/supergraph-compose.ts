@@ -38,39 +38,47 @@ const createSupergraphConfig = (proxyTargets: ErxesProxyTarget[]) => {
       }
     };
   }
-  fs.writeFileSync(superGraphConfigNext, yaml.stringify(config), {
-    encoding: 'utf-8'
-  });
 
-  if (
-    !fs.existsSync(supergraphConfigPath) ||
-    !isSameFile(supergraphConfigPath, superGraphConfigNext)
-  ) {
-    execSync(`cp ${superGraphConfigNext}  ${supergraphConfigPath}`);
+  if (NODE_ENV === 'production') {
+    if (fs.existsSync(supergraphConfigPath)) {
+      return;
+    }
+    fs.writeFileSync(supergraphConfigPath, yaml.stringify(config), {
+      encoding: 'utf-8'
+    });
+  } else {
+    fs.writeFileSync(superGraphConfigNext, yaml.stringify(config), {
+      encoding: 'utf-8'
+    });
+
+    if (
+      !fs.existsSync(supergraphConfigPath) ||
+      !isSameFile(supergraphConfigPath, superGraphConfigNext)
+    ) {
+      execSync(`cp ${superGraphConfigNext}  ${supergraphConfigPath}`);
+    }
   }
 };
 
 const supergraphComposeOnce = async () => {
-  const superGraphqlNext = supergraphPath + '.next';
+  if (NODE_ENV === 'production') {
+    await execSync(
+      `rover supergraph compose --config ${supergraphConfigPath} --output ${supergraphPath} --elv2-license=accept --log=error`
+    );
+  } else {
+    const superGraphqlNext = supergraphPath + '.next';
 
-  const command =
-    process.env.NODE_ENV == 'development'
-      ? 'yarn rover'
-      : './dist/node_modules/@apollo/rover/run.js';
+    await execSync(
+      `yarn rover supergraph compose --config ${supergraphConfigPath} --output ${superGraphqlNext} --elv2-license=accept`
+    );
 
-  execSync(
-    `${command} supergraph compose --config ${supergraphConfigPath} --output ${superGraphqlNext} --elv2-license=accept`,
-    {
-      stdio: 'inherit'
+    if (
+      !fs.existsSync(supergraphPath) ||
+      !isSameFile(supergraphPath, superGraphqlNext)
+    ) {
+      execSync(`cp ${superGraphqlNext} ${supergraphPath}`);
+      console.log(`NEW Supergraph Schema was printed to ${supergraphPath}`);
     }
-  );
-
-  if (
-    !fs.existsSync(supergraphPath) ||
-    !isSameFile(supergraphPath, superGraphqlNext)
-  ) {
-    execSync(`cp ${superGraphqlNext} ${supergraphPath}`);
-    console.log(`NEW Supergraph Schema was printed to ${supergraphPath}`);
   }
 };
 

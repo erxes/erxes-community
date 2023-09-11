@@ -42,6 +42,12 @@ export interface IStorepayConfig {
   storeId: string;
 }
 
+export interface IPocketConfig {
+  merchant: string;
+  clientId: string;
+  clientSecret: string;
+}
+
 export interface IPaymentDocument extends IPayment, Document {
   _id: string;
 }
@@ -72,7 +78,10 @@ export interface IInvoice {
   status: string;
   customerType: string;
   customer?: any;
-  pluginData?: any;
+  paymentKind: string;
+  errorDescription?: string;
+
+  idOfProvider: string;
 }
 
 export interface IPaymentConfig {

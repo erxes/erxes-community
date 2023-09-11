@@ -23,12 +23,13 @@ export interface IPricingPlan {
 
   applyType: string;
 
-  products: string[];
-  productsExcluded: string[];
-  productsBundle: string[];
-  categories: string[];
-  categoriesExcluded: string[];
-  segments: string[];
+  products?: string[];
+  productsExcluded?: string[];
+  productsBundle?: string[][];
+  categories?: string[];
+  categoriesExcluded?: string[];
+  segments?: string[];
+  vendors?: string[];
 
   isStartDateEnabled?: boolean;
   isEndDateEnabled?: boolean;
@@ -122,7 +123,7 @@ export const pricingPlanSchema = new Schema({
     label: 'Excluded Products'
   }),
   productsBundle: field({
-    type: [String],
+    type: [[String]],
     label: 'Bundle Products'
   }),
   categories: field({
@@ -136,6 +137,10 @@ export const pricingPlanSchema = new Schema({
   segments: field({
     type: [String],
     label: 'Segment'
+  }),
+  vendors: field({
+    type: [String],
+    label: 'Vendor'
   }),
 
   isStartDateEnabled: field({

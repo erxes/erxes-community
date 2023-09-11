@@ -1,6 +1,7 @@
 import {
   attachmentSchema,
   customFieldSchema,
+  IAttachment,
   ICustomField
 } from '@erxes/api-utils/src/types';
 import { Schema, Document } from 'mongoose';
@@ -10,7 +11,8 @@ import { field, schemaWrapper } from './utils';
 export const PRODUCT_TYPES = {
   PRODUCT: 'product',
   SERVICE: 'service',
-  ALL: ['product', 'service']
+  UNIQUE: 'unique',
+  ALL: ['product', 'service', 'unique']
 };
 
 export const PRODUCT_STATUSES = {
@@ -26,43 +28,41 @@ export const PRODUCT_CATEGORY_STATUSES = {
   ALL: ['active', 'disabled', 'archived']
 };
 
-export const PRODUCT_SUPPLY = {
-  UNIQUE: 'unique',
-  LIMITED: 'limited',
-  UNLIMITED: 'unlimited',
-  ALL: ['unique', 'limited', 'unlimited']
+export const PRODUCT_CATEGORY_MASK_TYPES = {
+  ANY: '',
+  SOFT: 'soft',
+  HARD: 'hard',
+  ALL: ['', 'soft', 'hard']
 };
 
 export interface ISubUom {
-  uomId: string;
+  uom: string;
   ratio: number;
 }
+
 export interface IProduct {
   name: string;
   categoryId?: string;
   categoryCode?: string;
   type?: string;
   description?: string;
-  sku?: string;
   barcodes?: string[];
+  variants: { [code: string]: { image?: IAttachment; name?: string } };
   barcodeDescription?: string;
   unitPrice?: number;
   code: string;
   customFieldsData?: ICustomField[];
   productId?: string;
   tagIds?: string[];
-  attachment?: any;
-  attachmentMore?: any[];
+  attachment?: IAttachment;
+  attachmentMore?: IAttachment[];
   status?: string;
-  supply?: string;
-  productCount?: number;
-  minimiumCount?: number;
   vendorId?: string;
   vendorCode?: string;
 
   mergedIds?: string[];
 
-  uomId?: string;
+  uom?: string;
   subUoms?: ISubUom[];
   taxType?: string;
   taxCode?: string;
@@ -82,6 +82,8 @@ export interface IProductCategory {
   parentId?: string;
   attachment?: any;
   status?: string;
+  maskType?: string;
+  mask?: any;
 }
 
 export interface IProductCategoryDocument extends IProductCategory, Document {
@@ -91,7 +93,7 @@ export interface IProductCategoryDocument extends IProductCategory, Document {
 
 const subUomSchema = new Schema({
   _id: field({ pkey: true }),
-  uomId: field({ type: String, label: 'Sub unit of measurement' }),
+  uom: field({ type: String, label: 'Sub unit of measurement' }),
   ratio: field({ type: Number, label: 'ratio of sub uom to main uom' })
 });
 
@@ -119,13 +121,13 @@ export const productSchema = schemaWrapper(
       label: 'Barcodes',
       index: true
     }),
+    variants: field({ type: Object, optional: true }),
     barcodeDescription: field({
       type: String,
       optional: true,
       label: 'Barcode Description'
     }),
     description: field({ type: String, optional: true, label: 'Description' }),
-    sku: field({ type: String, optional: true, label: 'Stock keeping unit' }),
     unitPrice: field({ type: Number, optional: true, label: 'Unit price' }),
     customFieldsData: field({
       type: [customFieldSchema],
@@ -148,29 +150,10 @@ export const productSchema = schemaWrapper(
       esType: 'keyword',
       index: true
     }),
-    supply: field({
-      type: String,
-      enum: PRODUCT_SUPPLY.ALL,
-      optional: true,
-      label: 'Supply',
-      default: 'unlimited',
-      esType: 'keyword',
-      index: true
-    }),
-    productCount: field({
-      type: Number,
-      label: 'Product Count',
-      default: 0
-    }),
-    minimiumCount: field({
-      type: Number,
-      label: 'Minimium Count',
-      default: 0
-    }),
     vendorId: field({ type: String, optional: true, label: 'Vendor' }),
     mergedIds: field({ type: [String], optional: true }),
 
-    uomId: field({
+    uom: field({
       type: String,
       optional: true,
       label: 'Main unit of measurement'
@@ -208,6 +191,13 @@ export const productCategorySchema = schemaWrapper(
       type: Date,
       default: new Date(),
       label: 'Created at'
-    })
+    }),
+    maskType: field({
+      type: String,
+      optional: true,
+      label: 'Mask type',
+      enum: PRODUCT_CATEGORY_MASK_TYPES.ALL
+    }),
+    mask: field({ type: Object, label: 'Mask' })
   })
 );

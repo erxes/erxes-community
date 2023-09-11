@@ -23,6 +23,7 @@ export const types = `
     vatPercent: Int
     cityTaxPercent: Int
     footerText: String
+    hasCopy: Boolean
   }
 
   type PoscCatProd {
@@ -43,6 +44,7 @@ export const types = `
     _id: String
     name: String
     description: String
+    pdomain: String
     userId: String
     createdAt: Date
     productDetails: [String]
@@ -69,6 +71,8 @@ export const types = `
     checkRemainder: Boolean
     permissionConfig: JSON
     allowTypes: [String]
+    isCheckRemainder: Boolean
+    checkExcludeCategoryIds: [String]
   }
 `;
 

@@ -20,8 +20,10 @@ export const commonFields = `
   knowledgeBaseTopicId
   ticketLabel
   dealLabel
+  purchaseLabel
   taskPublicPipelineId
   taskPublicBoardId
+  taskPublicLabel
   taskLabel
   taskStageId
   taskPipelineId
@@ -32,6 +34,9 @@ export const commonFields = `
   dealStageId
   dealPipelineId
   dealBoardId
+  purchaseStageId
+  purchasePipelineId
+  purchaseBoardId
   styles {
     bodyColor
     headerColor
@@ -55,6 +60,7 @@ export const commonFields = `
   googleClientSecret
   googleRedirectUri
   facebookAppId
+  erxesAppToken
 
   kbToggle
   publicTaskToggle
@@ -62,6 +68,7 @@ export const commonFields = `
   dealToggle
   taskToggle
   dealToggle
+  purchaseToggle
   otpConfig {
     smsTransporterType
     content
@@ -88,6 +95,10 @@ export const commonFields = `
     emailContent
     smsContent
   }
+
+  tokenExpiration
+  refreshTokenExpiration
+  tokenPassMethod
 `;
 
 export const basicFields = `
@@ -254,6 +265,16 @@ const clientPortalComments = `
   }
 `;
 
+const fieldConfig = `
+query ClientPortalFieldConfig($fieldId: String) {
+  clientPortalFieldConfig(fieldId: $fieldId) {
+    allowedClientPortalIds
+    fieldId
+    requiredOn
+  }
+}
+`;
+
 export default {
   getConfig,
   getConfigs,
@@ -263,5 +284,6 @@ export default {
   clientPortalUsersMain,
   clientPortalUserDetail,
   clientPortalUserCounts,
-  clientPortalComments
+  clientPortalComments,
+  fieldConfig
 };

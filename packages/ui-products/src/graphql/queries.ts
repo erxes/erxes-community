@@ -9,8 +9,8 @@ const productFields = `
   vendorId
   description
   unitPrice
-  sku
   barcodes
+  variants
   barcodeDescription
   ${
     isEnabled('tags')
@@ -42,15 +42,7 @@ const productFields = `
     size
     type
   }
-  supply
-  productCount
-  minimiumCount
-  uomId
-  uom {
-    _id
-    code
-    name
-  }
+  uom
   subUoms
   taxType
   taxCode
@@ -117,6 +109,8 @@ const productCategories = `
 
       isRoot
       productCount
+      maskType
+      mask
     }
   }
 `;

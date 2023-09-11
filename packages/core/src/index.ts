@@ -1,15 +1,8 @@
-import * as apm from 'elastic-apm-node';
 import * as dotenv from 'dotenv';
+import * as Sentry from '@sentry/node';
 
 // load environment variables
 dotenv.config();
-
-if (process.env.ELASTIC_APM_HOST_NAME) {
-  apm.start({
-    serviceName: `${process.env.ELASTIC_APM_HOST_NAME}-core-api`,
-    serverUrl: 'http://172.104.115.19:8200'
-  });
-}
 
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
@@ -40,6 +33,7 @@ import { uploader } from './middlewares/fileMiddleware';
 import {
   getService,
   getServices,
+  isEnabled,
   join,
   leave,
   redis
@@ -56,12 +50,14 @@ import imports from './imports';
 import exporter from './exporter';
 import { moduleObjects } from './data/permissions/actions/permission';
 import dashboards from './dashboards';
+import { getEnabledServices } from '@erxes/api-utils/src/serviceDiscovery';
 
 const {
   JWT_TOKEN_SECRET,
   WIDGETS_DOMAIN,
   DOMAIN,
-  CLIENT_PORTAL_DOMAINS
+  CLIENT_PORTAL_DOMAINS,
+  SENTRY_DSN
 } = process.env;
 
 if (!JWT_TOKEN_SECRET) {
@@ -69,6 +65,30 @@ if (!JWT_TOKEN_SECRET) {
 }
 
 export const app = express();
+
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // Automatically instrument Node.js libraries and frameworks
+      ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations()
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0 // Profiling sample rate is relative to tracesSampleRate
+  });
+}
+
+// RequestHandler creates a separate execution context, so that all
+// transactions/spans/breadcrumbs are isolated across requests
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
 
 app.disable('x-powered-by');
 
@@ -226,7 +246,7 @@ app.post(
   '/delete-file',
   routeErrorHandling(async (req: any, res) => {
     // require login
-    if (!req.user) {
+    if (!req.headers.userid) {
       return res.end('forbidden');
     }
 
@@ -292,6 +312,19 @@ app.get('/get-import-file', async (req, res) => {
   res.sendFile(`${uploadsFolderPath}/${fileName}`);
 });
 
+app.get('/plugins/enabled/:name', async (req, res) => {
+  const result = await isEnabled(req.params.name);
+  res.json(result);
+});
+
+app.get('/plugins/enabled', async (_req, res) => {
+  const result = (await getEnabledServices()) || [];
+  res.json(result);
+});
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
+
 // Wrap the Express server
 const httpServer = createServer(app);
 
@@ -305,7 +338,7 @@ httpServer.listen(PORT, async () => {
     apolloServer.applyMiddleware({ app, path: '/graphql', cors: corsOptions });
   });
 
-  initBroker({ RABBITMQ_HOST, MESSAGE_BROKER_PREFIX, redis }).catch(e => {
+  initBroker({ RABBITMQ_HOST, MESSAGE_BROKER_PREFIX, redis, app }).catch(e => {
     debugError(`Error ocurred during message broker init ${e.message}`);
   });
 
