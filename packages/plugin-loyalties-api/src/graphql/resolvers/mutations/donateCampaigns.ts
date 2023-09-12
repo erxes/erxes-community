@@ -38,7 +38,7 @@ const donatesMutations = {
     const donateCampaign = await models.DonateCampaigns.findOne({ _id });
 
     const update = await models.DonateCampaigns.updateDonateCampaign(_id, doc);
-    console.log(doc, 'doc');
+
     await putUpdateLog(
       models,
       subdomain,

@@ -35,14 +35,6 @@ const lotteriesMutations = {
       doc
     );
 
-    // const lotteryCampaign = await models.LotteryCampaigns.getLotteryCampaign(
-    //   _id
-    // );
-
-    // console.log('lotteryCampaign', lotteryCampaign);
-    // console.log(doc, 'doc');
-    // console.log(update, 'update');
-    // return console.log(lotteryCampaign, 'lotteryCampaign');
     await putUpdateLog(
       models,
       subdomain,

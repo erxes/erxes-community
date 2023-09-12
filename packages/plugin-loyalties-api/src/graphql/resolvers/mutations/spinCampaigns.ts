@@ -14,7 +14,7 @@ const spinsMutations = {
     { models, subdomain, user }: IContext
   ) {
     const create = await models.SpinCampaigns.createSpinCampaign(doc);
-    console.log(create, 'create');
+
     await putCreateLog(
       models,
       subdomain,
