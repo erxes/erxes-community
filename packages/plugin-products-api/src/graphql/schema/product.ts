@@ -41,6 +41,8 @@ export const types = (tagsAvailable, contactsAvailable) => `
     productCount: Int
     maskType: String
     mask: JSON
+    isSimilarity: Boolean
+    similarities: JSON
   }
 
   type Product @key(fields: "_id") @cacheControl(maxAge: 3) {
@@ -112,6 +114,8 @@ const productCategoryParams = `
   status: String
   maskType: String
   mask: JSON
+  isSimilarity: Boolean
+  similarities: JSON
 `;
 
 const productsQueryParams = `

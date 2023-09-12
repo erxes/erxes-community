@@ -7,7 +7,8 @@ import { PRODUCT_STATUSES } from '../../../models/definitions/products';
 import { escapeRegExp } from '@erxes/api-utils/src/core';
 import { IContext, IModels } from '../../../connectionResolver';
 import messageBroker, { sendTagsMessage } from '../../../messageBroker';
-import { Builder, countBySegment, countByTag, IListArgs } from '../../../utils';
+import { getSimilaritiesProducts } from '../../../maskUtils';
+import { Builder, countBySegment, countByTag } from '../../../utils';
 
 interface IQueryParams {
   ids?: string[];
@@ -24,7 +25,7 @@ interface IQueryParams {
   boardId?: string;
   segment?: string;
   segmentData?: string;
-  isFirstSimilarity?: boolean;
+  isGroupedSimilarity?: string;
 }
 
 const generateFilter = async (
@@ -187,15 +188,15 @@ const productQueries = {
       params
     );
 
-    const similarityGroups = await models.ProductsConfigs.getConfig(
-      'similarityGroup'
-    );
-    const codeMasks = Object.keys(similarityGroups);
     const { sortField, sortDirection, ...pagintationArgs } = params;
 
     let sort: any = { code: 1 };
     if (sortField) {
       sort = { [sortField]: sortDirection || 1 };
+    }
+
+    if (params.isGroupedSimilarity) {
+      return await getSimilaritiesProducts(models, filter, params);
     }
 
     return afterQueryWrapper(
@@ -282,16 +283,14 @@ const productQueries = {
       'similarityGroup'
     );
     const codeMasks = Object.keys(similarityGroups);
-    const customerFieldIds = (product.customFieldsData || []).map(
-      cf => cf.field
-    );
+    const customFieldIds = (product.customFieldsData || []).map(cf => cf.field);
 
     const matchedMasks = codeMasks.filter(
       cm =>
         product.code.match(getRegex(cm)) &&
         (similarityGroups[cm].rules || [])
           .map(sg => sg.fieldId)
-          .filter(sgf => customerFieldIds.includes(sgf)).length ===
+          .filter(sgf => customFieldIds.includes(sgf)).length ===
           (similarityGroups[cm].rules || []).length
     );
 
@@ -326,7 +325,7 @@ const productQueries = {
     };
 
     return {
-      products: await models.Products.find(filters),
+      products: await models.Products.find(filters).sort({ code: 1 }),
       groups
     };
   },
