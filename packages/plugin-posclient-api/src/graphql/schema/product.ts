@@ -50,13 +50,13 @@ export const types = `
     hasSimilarity: Boolean
   }
 
-  type ProductSimilarityGroup {
+  type PoscProductSimilarityGroup {
     title: String
     fieldId: String
   }
-  type ProductSimilarity {
+  type PoscProductSimilarity {
     products: [PoscProduct],
-    groups: [ProductSimilarityGroup],
+    groups: [PoscProductSimilarityGroup],
   }
 `;
 
@@ -106,5 +106,5 @@ export const queries = `
   ): Int
   poscProductDetail(_id: String, branchId: String): PoscProduct
   getPriceInfo(productId: String!): String
-  poscProductSimilarities(_id: String!, groupedSimilarity: String): ProductSimilarity
+  poscProductSimilarities(_id: String!, groupedSimilarity: String): PoscProductSimilarity
 `;
