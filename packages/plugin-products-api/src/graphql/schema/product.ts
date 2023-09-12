@@ -71,16 +71,17 @@ export const types = (tagsAvailable, contactsAvailable) => `
     ${contactsAvailable ? 'vendor: Company' : ''}
     taxType: String
     taxCode: String
+    hasSimilarity: Boolean
   }
 
-  type productSimilarityGroup {
+  type ProductSimilarityGroup {
     title: String
     fieldId: String
   }
 
-  type productSimilarity {
+  type ProductSimilarity {
     products: [Product],
-    groups: [productSimilarityGroup],
+    groups: [ProductSimilarityGroup],
   }
 `;
 
@@ -129,6 +130,7 @@ const productsQueryParams = `
   boardId: String,
   segment: String,
   segmentData: String,
+  groupedSimilarity: String,
 `;
 
 export const queries = `
@@ -146,7 +148,7 @@ export const queries = `
   productsGroupCounts(only: String, segment: String, segmentData: String): JSON
   productDetail(_id: String): Product
   productCountByTags: JSON
-  productSimilarities(_id: String!): productSimilarity
+  productSimilarities(_id: String!): ProductSimilarity
 `;
 
 export const mutations = `

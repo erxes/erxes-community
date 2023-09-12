@@ -267,7 +267,7 @@ export const aggregatePaginator = params => {
 
 export const getSimilaritiesProducts = async (models, filter, params) => {
   const aggregates =
-    params.isGroupedSimilarity === 'config'
+    params.groupedSimilarity === 'config'
       ? groupBySameMasksAggregator()
       : groupByCategoryAggregator();
   const groupedData = await models.Products.aggregate([
