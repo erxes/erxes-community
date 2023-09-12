@@ -28,15 +28,6 @@ export const types = `
     similarities: JSON
   }
 
-  type ProductSimilarityGroup {
-    title: String
-    fieldId: String
-  }
-  type ProductSimilarity {
-    products: [PoscProduct],
-    groups: [ProductSimilarityGroup],
-  }
-
   type PoscProduct {
     ${commonFieldDefs}
     type: String
@@ -57,6 +48,15 @@ export const types = `
     remainders: [JSON]
     isCheckRem: Boolean
     hasSimilarity: Boolean
+  }
+
+  type ProductSimilarityGroup {
+    title: String
+    fieldId: String
+  }
+  type ProductSimilarity {
+    products: [PoscProduct],
+    groups: [ProductSimilarityGroup],
   }
 `;
 
