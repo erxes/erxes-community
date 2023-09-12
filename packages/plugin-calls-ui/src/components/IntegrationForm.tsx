@@ -31,16 +31,6 @@ class IntegrationForm extends React.Component<Props, State> {
   }
 
   generateDoc = (values: any) => {
-    let finalOperators: any = [];
-    this.state.operators.map((singleOperator: Operator, index: number) => {
-      singleOperator = {
-        userId: this.state.operators[index].userId,
-        gsUsername: values[`username${index}`],
-        gsPassword: values[`password${index}`]
-      };
-      finalOperators = [...finalOperators, singleOperator];
-    });
-
     return {
       name: values.name,
       brandId: values.brandId,
@@ -48,7 +38,7 @@ class IntegrationForm extends React.Component<Props, State> {
       data: {
         phone: values.phone,
         wsServer: values.wsServer,
-        operators: finalOperators
+        operators: this.state.operators
       }
     };
   };
@@ -84,6 +74,19 @@ class IntegrationForm extends React.Component<Props, State> {
       operators[index] = value;
       this.setState({ operators });
     };
+
+    const onChangeOperatorDetails = (
+      name: string,
+      value: string,
+      index: number
+    ) => {
+      const currentOperator = operators.find((l, i) => i === index);
+
+      if (currentOperator) {
+        currentOperator[name] = value;
+      }
+    };
+
     const handleAddOperation = () => {
       const temp = { userId: '', gsUsername: '', gsPassword: '' };
       const { operators } = this.state;
@@ -93,13 +96,12 @@ class IntegrationForm extends React.Component<Props, State> {
       this.setState({ operators });
     };
 
-    const handleRemoveOperation = () => {
-      const { operators } = this.state;
-
-      operators.pop();
+    const handleRemoveOperator = (index: number) => {
+      const operators = this.state.operators.filter((l, i) => i !== index);
 
       this.setState({ operators });
     };
+
     return (
       <>
         {this.renderField({ label: 'Name', fieldName: 'name', formProps })}
@@ -123,6 +125,8 @@ class IntegrationForm extends React.Component<Props, State> {
               index={index}
               formProps={formProps}
               onChange={onChangeOperators}
+              onChangeDetails={onChangeOperatorDetails}
+              removeOperator={handleRemoveOperator}
               key={index}
             />
           ))}
@@ -135,15 +139,6 @@ class IntegrationForm extends React.Component<Props, State> {
                 onClick={handleAddOperation}
               >
                 {__('Add Operator')}
-              </Button>
-
-              <Button
-                btnStyle="danger"
-                icon="times"
-                size="medium"
-                onClick={handleRemoveOperation}
-              >
-                {__('Remove Operator')}
               </Button>
             </div>
           </FormGroup>

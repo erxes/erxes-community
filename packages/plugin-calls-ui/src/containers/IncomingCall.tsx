@@ -11,20 +11,20 @@ type Props = {
 
 const IncomingCallContainer = (props: Props) => {
   const { currentUser } = props;
-  const { data } = useSubscription(gql(subscriptions.phoneCallReceived), {
-    variables: {
-      userId: currentUser ? currentUser._id : ''
-    },
-    skip: !currentUser
-  });
+  // const { data } = useSubscription(gql(subscriptions.phoneCallReceived), {
+  //   variables: {
+  //     userId: currentUser ? currentUser._id : ''
+  //   },
+  //   skip: !currentUser
+  // });
 
-  if (!data || !data.phoneCallReceived) {
-    return null;
-  }
+  // if (!data || !data.phoneCallReceived) {
+  //   return null;
+  // }
 
-  const callData = data && data.phoneCallReceived;
+  // const callData = data && data.phoneCallReceived;
 
-  return <IncomingCall callData={callData} />;
+  return <IncomingCall />;
 };
 
 const WithCurrentUser = withCurrentUser(IncomingCallContainer);

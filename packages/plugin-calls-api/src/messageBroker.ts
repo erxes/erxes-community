@@ -56,7 +56,9 @@ export const initBroker = async cl => {
     async (args: ISendMessageArgs): Promise<any> => {
       const { subdomain, data } = args;
       const { inboxId, action } = data;
+
       const models = await generateModels(subdomain);
+
       const integration = await models.Integrations.findOne({ inboxId });
 
       if (!integration) {
@@ -66,24 +68,69 @@ export const initBroker = async cl => {
         };
       }
 
-      switch (action) {
-        case 'getConfigs':
+      if (action === 'getDetails') {
+        return {
+          status: 'success',
+          data: integration
+        };
+      }
+
+      return {
+        status: 'success'
+      };
+    },
+
+    consumeRPCQueue(
+      'calls:updateIntegration',
+      async ({ subdomain, data: { integrationId, doc } }) => {
+        const details = JSON.parse(doc.data);
+        const models = await generateModels(subdomain);
+
+        const integration = await models.Integrations.findOne({
+          inboxId: integrationId
+        });
+        console.log(integration);
+        if (!integration) {
           return {
-            status: 'success',
-            data: integration
+            status: 'error',
+            errorMessage: 'Integration not found.'
           };
-        case 'getDetails':
+        }
+        console.log('********:', details);
+        await models.Integrations.updateOne(
+          { inboxId: integrationId },
+          { $set: details }
+        );
+
+        const updatedIntegration = await models.Integrations.findOne({
+          inboxId: integrationId
+        });
+
+        if (updatedIntegration) {
           return {
-            status: 'success',
-            data: integration
+            status: 'success'
           };
-        default:
-          return {
-            status: 'failed',
-            data: 'action not found.'
+        } else
+          err => {
+            return {
+              err
+            };
           };
       }
-    }
+    ),
+
+    consumeRPCQueue(
+      'calls:removeIntegrations',
+      async ({ subdomain, data: { integrationId } }) => {
+        const models = await generateModels(subdomain);
+
+        await models.Integrations.remove({ inboxId: integrationId });
+
+        return {
+          status: 'success'
+        };
+      }
+    )
   );
 };
 

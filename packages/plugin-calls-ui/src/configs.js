@@ -7,7 +7,7 @@ module.exports = {
     './call': './src/containers/Widget.tsx',
     './incomin-call': './src/containers/IncomingCall.tsx',
     './inboxIntegrationForm': './src/components/IntegrationForm.tsx',
-    './integrationEditForm': './src/components/IntegrationEditForm.tsx',
+    './integrationDetailsForm': './src/components/IntegrationEditForm.tsx',
     './integrationCustomActions': './src/components/TokenButton.tsx',
   },
   routes: {
@@ -35,7 +35,7 @@ module.exports = {
 
   inboxIntegrationForm: './inboxIntegrationForm',
   invoiceDetailRightSection: './invoiceDetailRightSection',
-  integrationEditForm: './integrationEditForm',
+  integrationDetailsForm: './integrationDetailsForm',
   integrationCustomActions: './integrationCustomActions',
   inboxIntegrations: [
     {

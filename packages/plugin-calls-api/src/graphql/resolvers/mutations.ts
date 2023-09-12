@@ -43,22 +43,18 @@ const callsMutations = {
 
   async callsTypesEdit(_root, { _id, ...doc }, _context: IContext) {
     return Types.updateType(_id, doc);
+  },
+
+  async callsIntegrationUpdate(_root, { configs }, { models }: IContext) {
+    const { inboxId, ...data } = configs;
+    const token = await generateToken(inboxId);
+
+    const integration = await models.Integrations.findOneAndUpdate(
+      { inboxId },
+      { $set: { ...data, token } }
+    );
+    return integration;
   }
-
-  // async callsIntegrationUpdate(_root, { configs }, _context: IContext) {
-  //   const { inboxId, username, password, ...data } = configs;
-
-  //   const token = await generateToken(inboxId, username, password);
-
-  //   const integration = await Integrations.findOneAndUpdate(
-  //     { inboxId },
-  //     { $set: { ...data, token, username, password } },
-  //     {
-  //       returnOriginal: false
-  //     }
-  //   );
-  //   return integration;
-  // }
 };
 
 export default callsMutations;

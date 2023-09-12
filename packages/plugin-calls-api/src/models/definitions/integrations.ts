@@ -21,7 +21,7 @@ export const integrationSchema = new Schema({
   _id: field({ pkey: true }),
   inboxId: field({ type: String, label: 'inbox id' }),
   wsServer: field({ type: String, label: 'web socket server' }),
-  phone: field({ type: String, label: 'phone number' }),
+  phone: field({ type: String, label: 'phone number', unique: true }),
   operators: field({ type: Object, label: 'Operator maps' }),
   token: field({ type: String, label: 'token' })
 });
