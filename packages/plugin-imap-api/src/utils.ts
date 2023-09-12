@@ -307,10 +307,10 @@ export const listenIntegration = async (
       }
       if (error) {
         console.error(
-          'Max retries exceeded. Could not complete the operation.'
+          'Max retries exceeded. Could not complete the operation. =============='
         );
       } else {
-        console.log('IMAP operation completed successfully.');
+        console.log('IMAP operation completed successfully. ==============');
       }
     });
   });
