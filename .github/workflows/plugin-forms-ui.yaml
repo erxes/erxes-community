@@ -39,7 +39,6 @@ on:
       - "packages/ui-leads/**"
       - "packages/ui-log/**"
       - "packages/ui-notifications/**"
-      - "packages/ui-products/**"
       - "packages/ui-segments/**"
       - "packages/ui-settings/**"
       - "packages/ui-team/**"
