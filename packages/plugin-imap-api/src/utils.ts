@@ -1,4 +1,5 @@
 import * as Imap from 'node-imap';
+import * as retry from 'retry';
 import { simpleParser } from 'mailparser';
 import { generateModels } from './connectionResolver';
 import { sendContactsMessage, sendInboxMessage } from './messageBroker';
@@ -53,7 +54,6 @@ const searchMessages = (imap, criteria) => {
         if (e.message.includes('Nothing to fetch')) {
           return resolve([]);
         }
-
         throw e;
       }
 
@@ -219,72 +219,101 @@ const saveMessages = async (
   }
 };
 
+const operation = retry.operation({
+  retries: 3,
+  factor: 2,
+  minTimeout: 1000,
+  maxTimeout: 60000,
+  randomize: true
+});
+
 export const listenIntegration = async (
   subdomain: string,
   integration: IIntegrationDocument
 ) => {
-  const models = await generateModels(subdomain);
+  const performImapOperation = async callback => {
+    const models = await generateModels(subdomain);
 
-  const imap = generateImap(integration);
+    const imap = generateImap(integration);
 
-  imap.once('ready', response => {
-    imap.openBox('INBOX', true, async (err, box) => {
+    imap.once('ready', response => {
+      imap.openBox('INBOX', true, async (err, box) => {
+        try {
+          await saveMessages(subdomain, imap, integration, ['UNSEEN']);
+        } catch (e) {
+          await models.Logs.createLog({
+            type: 'error',
+            message: e.message + ' 3 ',
+            errorStack: e.stack
+          });
+          console.log('listen integration error ============', e);
+          callback(e);
+          throw e;
+        }
+      });
+    });
+
+    imap.on('mail', async response => {
+      console.log('new messages ========', response);
+
+      const models = await generateModels(subdomain);
+
+      const updatedIntegration = await models.Integrations.findOne({
+        _id: integration._id
+      });
+
+      if (!updatedIntegration) {
+        console.log(`ending ${integration.user} imap`);
+        return imap.end();
+      }
+
       try {
         await saveMessages(subdomain, imap, integration, ['UNSEEN']);
       } catch (e) {
         await models.Logs.createLog({
           type: 'error',
-          message: e.message + ' 3 ',
+          message: e.message + ' 1 ',
           errorStack: e.stack
         });
-        console.log('listen integration error ============', e);
+        console.log('save message error ============', e);
+        callback(e);
         throw e;
       }
     });
-  });
 
-  imap.on('mail', async response => {
-    console.log('new messages ========', response);
-
-    const models = await generateModels(subdomain);
-
-    const updatedIntegration = await models.Integrations.findOne({
-      _id: integration._id
-    });
-
-    if (!updatedIntegration) {
-      console.log(`ending ${integration.user} imap`);
-      return imap.end();
-    }
-
-    try {
-      await saveMessages(subdomain, imap, integration, ['UNSEEN']);
-    } catch (e) {
+    imap.once('error', async e => {
       await models.Logs.createLog({
         type: 'error',
-        message: e.message + ' 1 ',
+        message: e.message + ' 2 ',
         errorStack: e.stack
       });
-      console.log('save message error ============', e);
-      throw e;
-    }
-  });
 
-  imap.once('error', async e => {
-    await models.Logs.createLog({
-      type: 'error',
-      message: e.message + ' 2 ',
-      errorStack: e.stack
+      console.log('on imap.once =============', e);
+      callback(e);
     });
 
-    console.log('on imap.once =============', e);
-  });
+    imap.once('end', function(e) {
+      console.log('Connection ended', e);
+    });
 
-  imap.once('end', function(e) {
-    console.log('Connection ended', e);
-  });
+    imap.connect();
+  };
 
-  imap.connect();
+  operation.attempt(currentAttempt => {
+    console.log(`Attempt ${currentAttempt} ==========`);
+    performImapOperation(error => {
+      if (operation.retry(error)) {
+        return;
+      }
+      if (error) {
+        console.error(
+          'Max retries exceeded. Could not complete the operation.'
+        );
+      } else {
+        console.log('IMAP operation completed successfully.');
+      }
+    });
+  });
 };
 
 const listen = async (subdomain: string) => {
