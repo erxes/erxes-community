@@ -12,7 +12,7 @@ export const toUpper = thing => {
 export const findAttachmentParts = (struct, attachments?) => {
   attachments = attachments || [];
 
-  for (var i = 0, len = struct.length, r; i < len; ++i) {
+  for (let i = 0, len = struct.length, _r: any; i < len; ++i) {
     if (Array.isArray(struct[i])) {
       findAttachmentParts(struct[i], attachments);
     } else {
@@ -43,8 +43,10 @@ const searchMessages = (imap, criteria) => {
   return new Promise((resolve, reject) => {
     const messages: any = [];
 
-    imap.search(criteria, function(err, results) {
-      if (err) throw err;
+    imap.search(criteria, (err, results) => {
+      if (err) {
+        throw err;
+      }
 
       let f;
 
@@ -57,11 +59,11 @@ const searchMessages = (imap, criteria) => {
         throw e;
       }
 
-      f.on('message', function(msg) {
-        msg.on('body', async function(stream) {
-          var buffer = '';
+      f.on('message', msg => {
+        msg.on('body', async stream => {
+          let buffer = '';
 
-          stream.on('data', function(chunk) {
+          stream.on('data', chunk => {
             buffer += chunk.toString('utf8');
           });
 
@@ -71,19 +73,19 @@ const searchMessages = (imap, criteria) => {
         });
       });
 
-      f.once('error', function(err) {
-        reject(err);
+      f.once('error', (error: any) => {
+        reject(error);
       });
 
-      f.once('end', async function() {
-        const results: any = [];
+      f.once('end', async () => {
+        const data: any = [];
 
         for (const buffer of messages) {
           const parsed = await simpleParser(buffer);
-          results.push(parsed);
+          data.push(parsed);
         }
 
-        resolve(results);
+        resolve(data);
       });
     });
   });
@@ -236,8 +238,8 @@ export const listenIntegration = async (
 
     const imap = generateImap(integration);
 
-    imap.once('ready', response => {
-      imap.openBox('INBOX', true, async (err, box) => {
+    imap.once('ready', _response => {
+      imap.openBox('INBOX', true, async (_err, _box) => {
         try {
           await saveMessages(subdomain, imap, integration, ['UNSEEN']);
         } catch (e) {
@@ -255,8 +257,6 @@ export const listenIntegration = async (
 
     imap.on('mail', async response => {
       console.log('new messages ========', response);
-
-      const models = await generateModels(subdomain);
 
       const updatedIntegration = await models.Integrations.findOne({
         _id: integration._id
@@ -292,7 +292,7 @@ export const listenIntegration = async (
       callback(e);
     });
 
-    imap.once('end', function(e) {
+    imap.once('end', e => {
       console.log('Connection ended', e);
     });
 
