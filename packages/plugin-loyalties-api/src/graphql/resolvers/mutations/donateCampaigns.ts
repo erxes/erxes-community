@@ -34,15 +34,17 @@ const donatesMutations = {
     { _id, ...doc }: IDonateCampaign & { _id: string },
     { models, subdomain, user }: IContext
   ) {
-    const update = await models.DonateCampaigns.updateDonateCampaign(_id, doc);
-    const donaneCampaign = await models.DonateCampaigns.getDonateCampaign(_id);
+    // const donaneCampaign = await models.DonateCampaigns.getDonateCampaign(_id);
+    const donateCampaign = await models.DonateCampaigns.findOne({ _id });
 
+    const update = await models.DonateCampaigns.updateDonateCampaign(_id, doc);
+    console.log(doc, 'doc');
     await putUpdateLog(
       models,
       subdomain,
       {
         type: MODULE_NAMES.DONATE,
-        object: donaneCampaign,
+        object: donateCampaign,
         newData: doc,
         updatedDocument: update
       },

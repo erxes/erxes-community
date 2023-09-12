@@ -14,13 +14,14 @@ const spinsMutations = {
     { models, subdomain, user }: IContext
   ) {
     const create = await models.SpinCampaigns.createSpinCampaign(doc);
-
+    console.log(create, 'create');
     await putCreateLog(
       models,
       subdomain,
       { type: MODULE_NAMES.SPIN, newData: create, object: create },
       user
     );
+    return create;
   },
 
   async spinCampaignsEdit(
@@ -28,15 +29,14 @@ const spinsMutations = {
     { _id, ...doc }: ISpinCampaign & { _id: string },
     { models, subdomain, user }: IContext
   ) {
-    const spinCampaigns = await models.SpinCampaigns.getSpinCampaign(_id);
+    const spinCampaign = await models.SpinCampaigns.findOne({ _id }).lean();
     const update = await models.SpinCampaigns.updateSpinCampaign(_id, doc);
-
     await putUpdateLog(
       models,
       subdomain,
       {
         type: MODULE_NAMES.SPIN,
-        object: spinCampaigns,
+        object: spinCampaign,
         newData: doc,
         updatedDocument: update
       },

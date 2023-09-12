@@ -29,9 +29,9 @@ const vouchersMutations = {
     { _id, ...doc }: IVoucherCampaign & { _id: string },
     { models, subdomain, user }: IContext
   ) {
-    const voucherCampaign = await models.VoucherCampaigns.getVoucherCampaign(
+    const voucherCampaign = await models.VoucherCampaigns.findOne({
       _id
-    );
+    }).lean();
 
     const update = await models.VoucherCampaigns.updateVoucherCampaign(
       _id,

@@ -10,10 +10,19 @@ import {
 
 import { IModels } from './connectionResolver';
 import messageBroker from './messageBroker';
-import { donateCampaignSchema } from './models/definitions/donateCampaigns';
-import { lotteryCampaignSchema } from './models/definitions/lotteryCampaigns';
-import { spinSchema } from './models/definitions/spins';
-import { assignmentSchema } from './models/definitions/assignments';
+import {
+  donateCampaignSchema,
+  donateAwardSchema
+} from './models/definitions/donateCampaigns';
+import {
+  lotteryCampaignSchema,
+  lotteryAwardSchema
+} from './models/definitions/lotteryCampaigns';
+import {
+  spinCampaignSchema,
+  spinAwardSchema
+} from './models/definitions/spinCampaigns';
+import { assignmentCampaignSchema } from './models/definitions/assignmentCampaigns';
 import { voucherCampaignSchema } from './models/definitions/voucherCampaigns';
 
 export const LOG_ACTIONS = {
@@ -114,10 +123,16 @@ export default {
   getSchemaLabels: ({ data: { type } }) => ({
     status: 'success',
     data: getSchemaLabels(type, [
-      { name: 'donateCampaign', schemas: [donateCampaignSchema] },
-      { name: 'lotteryCampaign', schemas: [lotteryCampaignSchema] },
-      { name: 'spinCampaign', schemas: [spinSchema] },
-      { name: 'assignmentCampaign', schemas: [assignmentSchema] },
+      {
+        name: 'donateCampaign',
+        schemas: [donateCampaignSchema, donateAwardSchema]
+      },
+      {
+        name: 'lotteryCampaign',
+        schemas: [lotteryCampaignSchema, lotteryAwardSchema]
+      },
+      { name: 'spinCampaign', schemas: [spinCampaignSchema, spinAwardSchema] },
+      { name: 'assignmentCampaign', schemas: [assignmentCampaignSchema] },
       { name: 'voucherCampaign', schemas: [voucherCampaignSchema] }
     ])
   })

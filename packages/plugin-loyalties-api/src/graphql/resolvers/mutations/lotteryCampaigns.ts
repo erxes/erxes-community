@@ -29,14 +29,20 @@ const lotteriesMutations = {
     { _id, ...doc }: ILotteryCampaign & { _id: string },
     { models, subdomain, user }: IContext
   ) {
+    const lotteryCampaign = await models.LotteryCampaigns.findOne({ _id });
     const update = await models.LotteryCampaigns.updateLotteryCampaign(
       _id,
       doc
     );
 
-    const lotteryCampaign = await models.LotteryCampaigns.getLotteryCampaign(
-      _id
-    );
+    // const lotteryCampaign = await models.LotteryCampaigns.getLotteryCampaign(
+    //   _id
+    // );
+
+    // console.log('lotteryCampaign', lotteryCampaign);
+    // console.log(doc, 'doc');
+    // console.log(update, 'update');
+    // return console.log(lotteryCampaign, 'lotteryCampaign');
     await putUpdateLog(
       models,
       subdomain,

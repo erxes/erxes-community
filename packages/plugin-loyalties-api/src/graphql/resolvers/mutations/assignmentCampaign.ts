@@ -30,9 +30,9 @@ const assignmentsMutations = {
     { _id, ...doc }: IAssignmentCampaign & { _id: string },
     { models, subdomain, user }: IContext
   ) {
-    const assignmentCampaign = await models.AssignmentCampaigns.getAssignmentCampaign(
+    const assignmentCampaign = await models.AssignmentCampaigns.findOne({
       _id
-    );
+    });
 
     const update = await models.AssignmentCampaigns.updateAssignmentCampaign(
       _id,
