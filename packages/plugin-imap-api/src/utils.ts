@@ -222,7 +222,7 @@ const saveMessages = async (
 };
 
 const operation = retry.operation({
-  retries: 3,
+  retries: 15,
   factor: 2,
   minTimeout: 1000,
   maxTimeout: 60000,
