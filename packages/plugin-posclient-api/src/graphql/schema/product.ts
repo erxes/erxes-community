@@ -106,5 +106,5 @@ export const queries = `
   ): Int
   poscProductDetail(_id: String, branchId: String): PoscProduct
   getPriceInfo(productId: String!): String
-  poscProductSimilarities(_id: String!): ProductSimilarity
+  poscProductSimilarities(_id: String!, groupedSimilarity: String): ProductSimilarity
 `;

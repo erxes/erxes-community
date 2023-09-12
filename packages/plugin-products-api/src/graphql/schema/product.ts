@@ -148,7 +148,7 @@ export const queries = `
   productsGroupCounts(only: String, segment: String, segmentData: String): JSON
   productDetail(_id: String): Product
   productCountByTags: JSON
-  productSimilarities(_id: String!): ProductSimilarity
+  productSimilarities(_id: String!, groupedSimilarity: String): ProductSimilarity
 `;
 
 export const mutations = `
