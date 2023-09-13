@@ -302,7 +302,7 @@ export const listenIntegration = async (
           }
         );
 
-        imap.end();
+        return imap.end();
       }
 
       retry && callback(e);
