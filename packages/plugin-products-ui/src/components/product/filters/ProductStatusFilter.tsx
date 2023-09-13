@@ -12,7 +12,7 @@ interface IProps extends IRouterProps {
   searchable?: boolean;
 }
 
-class CategoryStatusFilter extends React.Component<IProps> {
+class ProductStatusFilter extends React.Component<IProps> {
   render() {
     const { history } = this.props;
     const productParam = 'productStatus';
@@ -43,34 +43,32 @@ class CategoryStatusFilter extends React.Component<IProps> {
     };
 
     return (
-      <div>
-        <Box
-          extraButtons={extraButtons}
-          title={__('FILTER CATEGORY BY STATUS')}
-          name="showFilterByType"
-        >
-          <SidebarList>
-            {categoryStatusChoises(__).map(
-              ({ value, label }: { value: string; label: string }) =>
-                (value === 'disabled' || value === 'archived') && (
-                  <li key={Math.random()}>
-                    <a
-                      href="#filter"
-                      tabIndex={0}
-                      className={
-                        router.getParam(history, [categoryParam]) === value
-                          ? 'active'
-                          : ''
-                      }
-                      onClick={onClick.bind(this, categoryParam, value)}
-                    >
-                      <FieldStyle>{label}</FieldStyle>
-                    </a>
-                  </li>
-                )
-            )}
-          </SidebarList>
-        </Box>
+      <Box
+        extraButtons={extraButtons}
+        title={__('FILTER CATEGORY BY STATUS')}
+        name="showFilterByType"
+      >
+        <SidebarList>
+          {categoryStatusChoises(__).map(
+            ({ value, label }: { value: string; label: string }) =>
+              (value === 'disabled' || value === 'archived') && (
+                <li key={Math.random()}>
+                  <a
+                    href="#filter"
+                    tabIndex={0}
+                    className={
+                      router.getParam(history, [categoryParam]) === value
+                        ? 'active'
+                        : ''
+                    }
+                    onClick={onClick.bind(this, categoryParam, value)}
+                  >
+                    <FieldStyle>{label}</FieldStyle>
+                  </a>
+                </li>
+              )
+          )}
+        </SidebarList>
         <Box
           extraButtons={extraProductButton}
           title={__('FILTER PRODUCT BY STATUS')}
@@ -101,9 +99,9 @@ class CategoryStatusFilter extends React.Component<IProps> {
             )}
           </SidebarList>
         </Box>
-      </div>
+      </Box>
     );
   }
 }
 
-export default withRouter<IProps>(CategoryStatusFilter);
+export default withRouter<IProps>(ProductStatusFilter);
