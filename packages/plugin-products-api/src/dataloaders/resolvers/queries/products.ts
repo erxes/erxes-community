@@ -14,6 +14,7 @@ interface IQueryParams {
   ids?: string[];
   excludeIds?: boolean;
   type?: string;
+  status?: string;
   categoryId?: string;
   searchValue?: string;
   tag: string;
@@ -53,6 +54,9 @@ const generateFilter = async (
 
   filter.status = { $ne: PRODUCT_STATUSES.DELETED };
 
+  if (params.status) {
+    filter.status = params.status;
+  }
   if (type) {
     filter.type = type;
   }

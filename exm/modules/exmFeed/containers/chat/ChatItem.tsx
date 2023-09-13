@@ -18,8 +18,7 @@ type Props = {
   handlePin: (chatId: string) => void;
   notContactUser?: IUser;
   isForward?: boolean;
-  forwardChat?: (chatId?: string) => void;
-  forwardedChatIds?: string[];
+  forwardChat?: (id?: string, type?: string) => void;
 };
 
 const ChatItemContainer = (props: Props) => {
@@ -29,7 +28,6 @@ const ChatItemContainer = (props: Props) => {
   const { chat, handleClickItem } = props;
   const [removeMutation] = useMutation(gql(mutations.chatRemove));
   const [markAsReadMutation] = useMutation(gql(mutations.chatMarkAsRead));
-  const [chatAddMutation] = useMutation(gql(mutations.chatAdd));
 
   const getChatIdQuery = useQuery(gql(queries.getChatIdByUserIds), {
     variables: { userIds: chatUser },
@@ -75,32 +73,9 @@ const ChatItemContainer = (props: Props) => {
     }
   };
 
-  const createChat = (userIds: string[]) => {
-    chatAddMutation({
-      variables: { type: 'direct', participantIds: userIds || [] },
-      refetchQueries: [
-        {
-          query: gql(queries.chats)
-        }
-      ]
-    })
-      .then(({ data }) => {
-        if (handleClickItem) {
-          handleClickItem(data.chatAdd._id);
-        }
-        if (props.forwardChat) {
-          props.forwardChat(data.chatAdd._id);
-        }
-      })
-      .catch((error) => {
-        Alert.error(error.message);
-      });
-  };
-
   return (
     <Component
       {...props}
-      createChat={(userIds) => createChat(userIds)}
       remove={remove}
       markAsRead={markAsRead}
       forwardChat={props.forwardChat}
