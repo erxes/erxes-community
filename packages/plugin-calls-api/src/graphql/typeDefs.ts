@@ -1,13 +1,11 @@
 import { gql } from 'apollo-server-express';
 
 const integrationCommonFields = `
-_id: String
+    _id: String
     inboxId: String
-    username: String
-    password: String
     phone: String
     wsServer: String
-    operatorIds: [String]
+    operators: JSON
     token: String
 `;
 
@@ -43,6 +41,8 @@ const queries = `
   callssTotalCount: Int
 
   callsIntegrationDetail(integrationId: String!): CallsIntegrationDetailResponse
+  callsIntegrationOperator: [CallsIntegrationDetailResponse]
+  
 `;
 
 const params = `

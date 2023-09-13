@@ -5,10 +5,24 @@ import {
 } from './definitions/integrations';
 import { IModels } from '../connectionResolver';
 
-export interface IIntegrationModel extends Model<IIntegrationDocument> {}
+export interface IIntegrationModel extends Model<IIntegrationDocument> {
+  getIntegrationsByOperators(userId: string): Promise<IIntegrationDocument>;
+}
 
 export const loadIntegrationClass = (models: IModels) => {
-  class Integration {}
+  class Integration {
+    public static async getIntegrationsByOperators(userId: string) {
+      const integrations = await models.Integrations.find({
+        'operators.userId': userId
+      });
+
+      if (!integrations) {
+        throw new Error('Integrations not found');
+      }
+
+      return integrations;
+    }
+  }
 
   integrationSchema.loadClass(Integration);
 

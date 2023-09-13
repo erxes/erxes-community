@@ -34,8 +34,6 @@ export const initBroker = async cl => {
       const { integrationId, doc } = data;
       const models = generateModels(subdomain);
       const docData = JSON.parse(doc.data);
-      console.log('docData:', docData);
-      // const { username, password, ...rest } = docData;
 
       const token = await generateToken(integrationId);
 
@@ -89,14 +87,14 @@ export const initBroker = async cl => {
         const integration = await models.Integrations.findOne({
           inboxId: integrationId
         });
-        console.log(integration);
+
         if (!integration) {
           return {
             status: 'error',
             errorMessage: 'Integration not found.'
           };
         }
-        console.log('********:', details);
+
         await models.Integrations.updateOne(
           { inboxId: integrationId },
           { $set: details }
@@ -124,7 +122,7 @@ export const initBroker = async cl => {
       async ({ subdomain, data: { integrationId } }) => {
         const models = await generateModels(subdomain);
 
-        await models.Integrations.remove({ inboxId: integrationId });
+        await models.Integrations.deleteOne({ inboxId: integrationId });
 
         return {
           status: 'success'

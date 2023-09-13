@@ -1,4 +1,4 @@
-import { IContext } from '../../connectionResolver';
+import { IContext, generateModels } from '../../connectionResolver';
 import { Types } from '../../models';
 
 const callsQueries = {
@@ -22,6 +22,16 @@ const callsQueries = {
 
   callsIntegrationDetail(_root, { integrationId }, { models }: IContext) {
     return models.Integrations.findOne({ inboxId: integrationId });
+  },
+
+  async callsIntegrationOperator(_root, _args, { subdomain, user }: IContext) {
+    const models = generateModels(subdomain);
+
+    const res = (await models).Integrations.getIntegrationsByOperators(
+      user._id
+    );
+
+    return res;
   }
 };
 

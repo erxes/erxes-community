@@ -1,5 +1,5 @@
 import { Schema, Document } from 'mongoose';
-import { field, schemaHooksWrapper } from './utils';
+import { field } from './utils';
 
 interface Operator {
   userId: string;
@@ -11,7 +11,7 @@ export interface IIntegration {
   inboxId: String;
   wsServer: String;
   phone: String;
-  operatorMaps: [Operator];
+  operators: [Operator];
   token: String;
 }
 

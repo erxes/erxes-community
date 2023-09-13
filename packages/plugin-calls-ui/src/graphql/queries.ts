@@ -11,6 +11,20 @@ const callsIntegrationDetail: string = `
   }
 `;
 
+const callsIntegrationOperator: any = `
+  query callsIntegrationOperator {
+    callsIntegrationOperator {
+      _id
+      inboxId
+      operators
+      phone
+      wsServer
+      token
+    }
+  }
+`;
+
 export default {
-  callsIntegrationDetail
+  callsIntegrationDetail,
+  callsIntegrationOperator
 };
