@@ -1,4 +1,4 @@
-import { CustomerT, CustomerTypeT } from "./customer.types"
+import { Customer, CustomerType } from "./customer.types"
 
 export type IOrderItemStatus = "new" | "done" | "confirm"
 export interface OrderItemInput {
@@ -39,7 +39,7 @@ export interface IOrderCommon {
   totalAmount: number
   type?: IOrderType
   customerId?: string
-  customerType?: CustomerTypeT
+  customerType?: CustomerType
   deliveryInfo?: { [key: string]: string; description: string }
   billType?: IBillType
   registerNumber?: string
@@ -102,7 +102,7 @@ export interface IOrder extends IOrderCommon {
   number?: string
   status?: IOrderStatus
   paidAmounts?: IPaidAmount[]
-  customer?: CustomerT
+  customer?: Customer
   items: OrderItem[]
   putResponses: IPutResponse[]
   user: IOrderUser

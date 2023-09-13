@@ -27,6 +27,7 @@ const Search: React.FC = () => {
         onBlur={() => !search && setFocused(false)}
         onChange={(e) => setSearch(e.target.value)}
         value={search}
+        placeholder={focused ? "Хайх.." : ""}
       />
     </motion.div>
   )

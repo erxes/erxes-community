@@ -1,17 +1,8 @@
-import { orderItemInput, totalAmountAtom } from "@/store/cart.store"
-import {
-  activeOrderAtom,
-  billTypeAtom,
-  customerAtom,
-  customerTypeAtom,
-  deliveryInfoAtom,
-  orderTypeAtom,
-  registerNumberAtom,
-  slotCodeAtom,
-} from "@/store/order.store"
+import { orderValuesAtom } from "@/store/order.store"
 import { ApolloError, useMutation } from "@apollo/client"
-import { useAtom } from "jotai"
+import { useAtomValue } from "jotai"
 
+import { Customer } from "@/types/customer.types"
 import { getMode } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -19,30 +10,16 @@ import { mutations } from "../graphql"
 
 const useOrderCU = (onCompleted?: (id: string) => void) => {
   const { toast } = useToast()
-  const [items] = useAtom(orderItemInput)
-  const [totalAmount] = useAtom(totalAmountAtom)
-  const [type] = useAtom(orderTypeAtom)
-  const [_id] = useAtom(activeOrderAtom)
-  const [customerType] = useAtom(customerTypeAtom)
-  const [customer] = useAtom(customerAtom) || {}
-  const [registerNumber] = useAtom(registerNumberAtom)
-  const [billType] = useAtom(billTypeAtom)
-  const [slotCode] = useAtom(slotCodeAtom)
-  const [deliveryInfo] = useAtom(deliveryInfoAtom)
+  const { customer, type, _id, ...rest } = useAtomValue(orderValuesAtom)
+
   const origin = getMode()
 
   // TODO: get type default from config
   const variables = {
-    items,
+    ...rest,
     _id,
-    customerType,
-    customerId: customer?._id,
-    registerNumber,
-    billType,
-    slotCode,
+    customerId: (customer as Customer)?._id,
     origin,
-    deliveryInfo,
-    totalAmount,
     type: type || "eat",
   }
 

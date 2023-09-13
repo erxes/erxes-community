@@ -1,32 +1,40 @@
 import { useEffect, useState } from "react"
-import { activeCategoryAtom } from "@/store"
-import { useAtom } from "jotai"
+import { activeCatName, activeCategoryAtom } from "@/store"
+import { useAtom, useSetAtom } from "jotai"
 import { ArrowRight, ChevronRightIcon } from "lucide-react"
 
 import { ICategory } from "@/types/product.types"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+import useProductCategories from "../hooks/useProductCategories"
 import SubCategory from "./SubCategory"
 
 const CategoriesSheet = ({
-  rootCats,
   setOpen,
-  getCategoryByField,
-  getSubCats,
 }: {
-  rootCats: ICategory[]
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  getCategoryByField: (
-    value: string,
-    field: keyof ICategory
-  ) => ICategory | undefined
-  getSubCats: (parentOrder: string, tier?: number) => ICategory[]
 }) => {
+  const setCatName = useSetAtom(activeCatName)
+  const { categories, loading } = useProductCategories()
+
+  const getCategoryByField = (value: string, field: keyof ICategory) =>
+    categories.find((e) => e[field] === value)
+
+  const getSubCats = (parentOrder: string, tier?: number) =>
+    categories.filter(
+      ({ order }) =>
+        order !== parentOrder &&
+        order.includes(parentOrder) &&
+        (tier ? (order || "").split("/").length <= tier : true)
+    )
+
+  const rootCats = getSubCats("", 3) || []
+
   const [activeCat, setActiveCat] = useAtom(activeCategoryAtom)
 
   const [activeParent, setActiveParent] = useState<string | null>(
-    rootCats[0].order
+    rootCats[0]?.order || ""
   )
 
   useEffect(() => {
@@ -40,8 +48,13 @@ const CategoriesSheet = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeParent])
 
+  useEffect(() => {}, [])
+
+  if (loading) return <div>Loading...</div>
+
   const chooseCat = (_id: string) => {
     setActiveCat(activeCat === _id ? "" : _id)
+    setCatName(getCategoryByField(_id, "_id")?.name || "")
     setOpen(false)
   }
 

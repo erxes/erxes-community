@@ -7,7 +7,6 @@ import { useSetAtom } from "jotai"
 import { MoreHorizontal } from "lucide-react"
 
 import { IOrderHistory } from "@/types/order.types"
-import { ORDER_STATUSES } from "@/lib/constants"
 import useReciept from "@/lib/useReciept"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const HistoryItemAction = ({ row }: CellContext<IOrderHistory, unknown>) => {
-  const { _id, status, paidDate } = row.original || {}
+  const { _id, paidDate } = row.original || {}
   const router = useRouter()
   const setActiveOrder = useSetAtom(activeOrderAtom)
   const setOpenDetail = useSetAtom(detailIdAtom)
@@ -52,7 +51,7 @@ const HistoryItemAction = ({ row }: CellContext<IOrderHistory, unknown>) => {
             router.push("/")
             setActiveOrder(_id)
           }}
-          disabled={status === ORDER_STATUSES.COMPLETE && !!paidDate}
+          disabled={!!paidDate}
         >
           Идэвхтэй захиалга
         </DropdownMenuItem>

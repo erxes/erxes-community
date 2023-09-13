@@ -1,13 +1,39 @@
+import { useEffect } from "react"
+import { Loader2Icon } from "lucide-react"
+import { useInView } from "react-intersection-observer"
+
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import ProductItem from "./components/productItem/productItem.coffeeShop"
+import { FETCH_MORE_PER_PAGE, useProducts } from "./hooks/useProducts"
 
 const ProductsCoffeShop = () => {
+  const { ref, inView } = useInView({
+    threshold: 0,
+  })
+
+  const { products, productsCount, loading, handleLoadMore } = useProducts()
+
+  useEffect(() => {
+    inView && handleLoadMore()
+  }, [handleLoadMore, inView])
+
+  if (loading) return <div className="p-4">loading...</div>
   return (
     <ScrollArea className="w-full pr-3">
       <div className="grid grid-cols-3 gap-x-2 gap-y-3">
-        <ProductItem />
+        {products.map((product) => (
+          <ProductItem key={product._id} {...product} />
+        ))}
       </div>
+      {productsCount > FETCH_MORE_PER_PAGE &&
+        products.length < productsCount && (
+          <Button className="w-full my-3" ref={ref} variant="outline">
+            <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
+            Уншиж байна ( {products.length} / {productsCount} )
+          </Button>
+        )}
     </ScrollArea>
   )
 }

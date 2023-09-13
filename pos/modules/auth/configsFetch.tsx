@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 
-import { mutations, queries } from "./graphql"
+import { mutations } from "./graphql"
 
 const FormSchema = z.object({
   token: z

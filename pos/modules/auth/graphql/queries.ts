@@ -136,6 +136,14 @@ const posUsers = gql`
   }
 `
 
+const getInitialCategories = gql`
+  query InitialCategories {
+    currentConfig {
+      initialCategoryIds
+    }
+  }
+`
+
 const queries = {
   posCurrentUser,
   userChanged,
@@ -147,6 +155,7 @@ const queries = {
   getCoverConfig,
   posUsers,
   getWholeConfig,
+  getInitialCategories,
 }
 
 export default queries

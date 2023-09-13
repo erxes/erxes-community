@@ -9,7 +9,7 @@ const Layout = ({ children }: { children?: React.ReactNode }) => {
     <div className="flex h-screen w-screen items-center justify-center bg-black">
       <Button
         Component={Link}
-        className="absolute right-5 top-5 h-auto rounded-full p-1 hover:bg-white/20"
+        className="absolute right-5 top-5 h-auto rounded-full p-1 hover:bg-white/20 hover:text-white"
         variant="ghost"
         href="/"
       >

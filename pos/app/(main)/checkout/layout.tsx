@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         variant="ghost"
         size={"sm"}
         href="/"
-        className="absolute top-4 right-4 px-2 rounded-full bg-black hover:bg-slate-800"
+        className="absolute top-4 right-4 px-2 rounded-full bg-black hover:bg-slate-800 hover:text-white"
       >
         <X className="w-5 h-5" />
       </Button>

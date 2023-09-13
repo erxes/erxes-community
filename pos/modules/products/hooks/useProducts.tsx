@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { activeCategoryAtom, productCountAtom, searchAtom } from "@/store"
 import { useQuery } from "@apollo/client"
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 
 import { IProduct, IUseProducts } from "@/types/product.types"
 
@@ -16,7 +16,7 @@ export const useProducts = (props?: {
 
   const [search] = useAtom(searchAtom)
   const [searchValue, setSearchValue] = useState(search)
-  const [categoryId] = useAtom(activeCategoryAtom)
+  const categoryId = useAtomValue(activeCategoryAtom)
   const setProductCount = useSetAtom(productCountAtom)
 
   const { data, loading, fetchMore } = useQuery(queries.products, {

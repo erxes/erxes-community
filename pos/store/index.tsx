@@ -7,6 +7,7 @@ import { getMode } from "@/lib/utils"
 // products
 export const searchAtom = atom<string>("")
 export const activeCategoryAtom = atom<string>("")
+export const activeCatName = atom<string>("")
 
 // local
 export const currentAmountAtom = atom<number>(0)

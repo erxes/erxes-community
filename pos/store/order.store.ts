@@ -2,7 +2,7 @@
 
 import { atom } from "jotai"
 
-import { CustomerT, CustomerTypeT } from "@/types/customer.types"
+import { Customer, CustomerType } from "@/types/customer.types"
 import {
   IBillType,
   IOrder,
@@ -13,7 +13,7 @@ import {
 } from "@/types/order.types"
 
 import { customerSearchAtom } from "."
-import { cartAtom } from "./cart.store"
+import { cartAtom, orderItemInput, totalAmountAtom } from "./cart.store"
 import { paymentSheetAtom } from "./ui.store"
 
 // order
@@ -21,8 +21,8 @@ export const activeOrderAtom = atom<string>("")
 export const orderNumberAtom = atom<string>("")
 
 // customer
-export const customerAtom = atom<CustomerT | null>(null)
-export const customerTypeAtom = atom<CustomerTypeT>("")
+export const customerAtom = atom<Customer | null>(null)
+export const customerTypeAtom = atom<CustomerType>("")
 
 // order type
 export const orderTypeAtom = atom<IOrderType>("eat")
@@ -163,3 +163,18 @@ export const setOrderStatesAtom = atom(
     set(dueDateAtom, new Date(dueDate || ""))
   }
 )
+
+// getOrderValue
+
+export const orderValuesAtom = atom((get) => ({
+  items: get(orderItemInput),
+  totalAmount: get(totalAmountAtom),
+  type: get(orderTypeAtom),
+  _id: get(activeOrderAtom),
+  customerType: get(customerTypeAtom),
+  customer: get(customerAtom) || {},
+  registerNumber: get(registerNumberAtom),
+  billType: get(billTypeAtom),
+  slotCode: get(slotCodeAtom),
+  deliveryInfo: get(deliveryInfoAtom),
+}))

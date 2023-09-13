@@ -17,7 +17,7 @@ const MainIndexPage = () => {
       <Header />
       <section className="flex flex-auto items-stretch overflow-hidden">
         <div className="flex h-full w-2/3 flex-col p-4 pr-0">
-          <div className="-mt-1 flex flex-none items-center pb-3 pr-3 overflow-hidden">
+          <div className="-mt-1 flex flex-none items-center pb-3 pr-3">
             <Search />
             <div className="flex flex-auto overflow-hidden">
               <ProductCategories />
@@ -27,18 +27,16 @@ const MainIndexPage = () => {
         </div>
         <div className="flex w-1/3 flex-col border-l">
           <OrderDetail>
-            <>
-              <div className="p-4">
-                <Customer />
-              </div>
-              <Cart />
-              <div className="grid flex-none grid-cols-2 gap-2 p-4">
-                <TotalAmount />
-                <ShowDeliveryInfo />
-                <ChooseType />
-                <BuyAction />
-              </div>
-            </>
+            <div className="p-4">
+              <Customer />
+            </div>
+            <Cart />
+            <div className="grid flex-none grid-cols-2 gap-2 p-4">
+              <TotalAmount />
+              <ShowDeliveryInfo />
+              <ChooseType />
+              <BuyAction />
+            </div>
           </OrderDetail>
         </div>
       </section>

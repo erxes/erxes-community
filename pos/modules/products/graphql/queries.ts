@@ -58,5 +58,20 @@ const getPriceInfo = gql`
   }
 `
 
-const queries = { productCategories, products, productsCount, getPriceInfo }
+const getInitialCategory = gql`
+  query InitialCategory($_id: String) {
+    poscProductCategoryDetail(_id: $_id) {
+      _id
+      name
+    }
+  }
+`
+
+const queries = {
+  productCategories,
+  products,
+  productsCount,
+  getPriceInfo,
+  getInitialCategory,
+}
 export default queries

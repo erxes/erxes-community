@@ -1,6 +1,6 @@
-export type CustomerTypeT = "" | "user" | "company"
+export type CustomerType = "" | "user" | "company"
 
-export interface CustomerT {
+export interface Customer {
   _id: string
   code?: string
   primaryPhone?: string

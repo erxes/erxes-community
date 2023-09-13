@@ -7,7 +7,7 @@ import {
   setCurrentUserAtom,
 } from "@/store/config.store"
 import { useQuery } from "@apollo/client"
-import { useSetAtom } from "jotai"
+import { useAtom, useSetAtom } from "jotai"
 import { Loader2 } from "lucide-react"
 
 import { hexToHsl } from "@/lib/utils"
@@ -18,14 +18,15 @@ import { queries } from "./graphql"
 const Configs = ({ children }: { children: ReactNode }) => {
   const setConfigs = useSetAtom(setConfigsAtom)
   const setCurrentUser = useSetAtom(setCurrentUserAtom)
-  const setConfig = useSetAtom(configAtom)
+  const [conf, setConfig] = useAtom(configAtom)
   const [loadingConfigs, setLoadingConfigs] = useState(true)
   const { onError } = useToast()
 
   const { loading, data } = useQuery(queries.posCurrentUser)
 
   const { data: config, loading: loadingConfig } = useQuery(
-    queries.currentConfig
+    queries.currentConfig,
+    { skip: !!conf }
   )
 
   useQuery(queries.configs, {
