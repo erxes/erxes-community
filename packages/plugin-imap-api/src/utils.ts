@@ -305,7 +305,7 @@ export const listenIntegration = async (
         return imap.end();
       }
 
-      retry && callback(e);
+      isRetry && callback(e);
       throw new Error(e);
     });
 
