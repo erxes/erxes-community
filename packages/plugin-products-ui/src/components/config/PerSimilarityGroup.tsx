@@ -1,7 +1,5 @@
-import { gql } from '@apollo/client';
 import { IFieldGroup } from '@erxes/ui-forms/src/settings/properties/types';
-import { queries as fieldQueries } from '@erxes/ui-forms/src/settings/properties/graphql';
-import client from '@erxes/ui/src/apolloClient';
+import { GroupWrapper } from '@erxes/ui-segments/src/styles';
 import {
   Button,
   CollapseContent,
@@ -10,19 +8,17 @@ import {
   FormGroup,
   Tip
 } from '@erxes/ui/src/components';
+import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
 import { FormColumn, FormWrapper } from '@erxes/ui/src/styles/main';
 import { __ } from '@erxes/ui/src/utils';
 import React from 'react';
-import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
-import { isEnabled } from '@erxes/ui/src/utils/core';
 import { IConfigsMap } from '../../types';
-import { FIELDS_GROUPS_CONTENT_TYPES } from '@erxes/ui-forms/src/settings/properties/constants';
-import { GroupWrapper } from '@erxes/ui-segments/src/styles';
 
 type Props = {
   configsMap: IConfigsMap;
   config: any;
   currentConfigKey: string;
+  fieldGroups: IFieldGroup[];
   save: (configsMap: IConfigsMap) => void;
   delete: (currentConfigKey: string) => void;
 };
@@ -31,7 +27,6 @@ type State = {
   config: any;
   rules: any[];
   hasOpen: boolean;
-  fieldGroups: IFieldGroup[];
 };
 
 class PerSettings extends React.Component<Props, State> {
@@ -41,24 +36,8 @@ class PerSettings extends React.Component<Props, State> {
     this.state = {
       config: props.config,
       rules: props.config.rules || [],
-      hasOpen: false,
-      fieldGroups: []
+      hasOpen: false
     };
-
-    if (isEnabled('forms')) {
-      client
-        .query({
-          query: gql(fieldQueries.fieldsGroups),
-          variables: {
-            contentType: FIELDS_GROUPS_CONTENT_TYPES.PRODUCT
-          }
-        })
-        .then(({ data }) => {
-          this.setState({
-            fieldGroups: data ? data.fieldsGroups : [] || []
-          });
-        });
-    }
   }
 
   onSave = e => {
@@ -110,7 +89,8 @@ class PerSettings extends React.Component<Props, State> {
   };
 
   renderRules() {
-    const { rules, fieldGroups } = this.state;
+    const { fieldGroups } = this.props;
+    const { rules } = this.state;
     const onRemove = id => {
       this.setState({ rules: rules.filter(c => c.id !== id) });
     };
@@ -126,6 +106,12 @@ class PerSettings extends React.Component<Props, State> {
       const name = e.target.name;
       const value = e.target.value;
       editRule(id, { [name]: value });
+    };
+
+    const onChangeFieldGroup = (id, e) => {
+      const name = e.target.name;
+      const value = e.target.value;
+      editRule(id, { [name]: value, fieldId: '' });
     };
 
     return (rules || []).map(rule => (
@@ -155,7 +141,7 @@ class PerSettings extends React.Component<Props, State> {
                   }))
                 ]}
                 value={rule.groupId}
-                onChange={onChangeControl.bind(this, rule.id)}
+                onChange={onChangeFieldGroup.bind(this, rule.id)}
               />
             </FormGroup>
           </FormColumn>

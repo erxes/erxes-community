@@ -7,7 +7,8 @@ import { PRODUCT_STATUSES } from '../../../models/definitions/products';
 import { escapeRegExp } from '@erxes/api-utils/src/core';
 import { IContext, IModels } from '../../../connectionResolver';
 import messageBroker, { sendTagsMessage } from '../../../messageBroker';
-import { Builder, countBySegment, countByTag, IListArgs } from '../../../utils';
+import { getSimilaritiesProducts } from '../../../maskUtils';
+import { Builder, countBySegment, countByTag } from '../../../utils';
 
 interface IQueryParams {
   ids?: string[];
@@ -24,7 +25,7 @@ interface IQueryParams {
   boardId?: string;
   segment?: string;
   segmentData?: string;
-  isFirstSimilarity?: boolean;
+  groupedSimilarity?: string;
 }
 
 const generateFilter = async (
@@ -187,15 +188,15 @@ const productQueries = {
       params
     );
 
-    const similarityGroups = await models.ProductsConfigs.getConfig(
-      'similarityGroup'
-    );
-    const codeMasks = Object.keys(similarityGroups);
     const { sortField, sortDirection, ...pagintationArgs } = params;
 
     let sort: any = { code: 1 };
     if (sortField) {
       sort = { [sortField]: sortDirection || 1 };
+    }
+
+    if (params.groupedSimilarity) {
+      return await getSimilaritiesProducts(models, filter, params);
     }
 
     return afterQueryWrapper(
@@ -265,68 +266,104 @@ const productQueries = {
     return counts;
   },
 
-  async productSimilarities(_root, _id, { models }: IContext) {
+  async productSimilarities(
+    _root,
+    { _id, groupedSimilarity },
+    { models }: IContext
+  ) {
     const product = await models.Products.getProduct({ _id });
 
-    const getRegex = str => {
-      return new RegExp(
-        `^${str
-          .replace(/\./g, '\\.')
-          .replace(/\*/g, '.')
-          .replace(/_/g, '.')}.*`,
-        'igu'
+    if (groupedSimilarity === 'config') {
+      const getRegex = str => {
+        return new RegExp(
+          `^${str
+            .replace(/\./g, '\\.')
+            .replace(/\*/g, '.')
+            .replace(/_/g, '.')}.*`,
+          'igu'
+        );
+      };
+
+      const similarityGroups = await models.ProductsConfigs.getConfig(
+        'similarityGroup'
       );
-    };
 
-    const similarityGroups = await models.ProductsConfigs.getConfig(
-      'similarityGroup'
-    );
-    const codeMasks = Object.keys(similarityGroups);
-    const customerFieldIds = (product.customFieldsData || []).map(
-      cf => cf.field
-    );
+      const codeMasks = Object.keys(similarityGroups);
+      const customFieldIds = (product.customFieldsData || []).map(
+        cf => cf.field
+      );
 
-    const matchedMasks = codeMasks.filter(
-      cm =>
-        product.code.match(getRegex(cm)) &&
-        (similarityGroups[cm].rules || [])
-          .map(sg => sg.fieldId)
-          .filter(sgf => customerFieldIds.includes(sgf)).length ===
-          (similarityGroups[cm].rules || []).length
-    );
+      const matchedMasks = codeMasks.filter(
+        cm =>
+          product.code.match(getRegex(cm)) &&
+          (similarityGroups[cm].rules || [])
+            .map(sg => sg.fieldId)
+            .filter(sgf => customFieldIds.includes(sgf)).length ===
+            (similarityGroups[cm].rules || []).length
+      );
 
-    if (!matchedMasks.length) {
+      if (!matchedMasks.length) {
+        return {
+          products: await models.Products.find({ _id })
+        };
+      }
+
+      const codeRegexs: any[] = [];
+      const fieldIds: string[] = [];
+      const groups: { title: string; fieldId: string }[] = [];
+      for (const matchedMask of matchedMasks) {
+        codeRegexs.push({ code: { $in: [getRegex(matchedMask)] } });
+
+        for (const rule of similarityGroups[matchedMask].rules || []) {
+          const { fieldId, title } = rule;
+          if (!fieldIds.includes(fieldId)) {
+            fieldIds.push(fieldId);
+            groups.push({ title, fieldId });
+          }
+        }
+      }
+
+      const filters: any = {
+        $and: [
+          {
+            $or: codeRegexs,
+            'customFieldsData.field': { $in: fieldIds }
+          }
+        ]
+      };
+
+      return {
+        products: await models.Products.find(filters).sort({ code: 1 }),
+        groups
+      };
+    }
+
+    const category = await models.ProductCategories.getProductCategory({
+      _id: product.categoryId
+    });
+    if (!category.isSimilarity || !category.similarities.length) {
       return {
         products: await models.Products.find({ _id })
       };
     }
 
-    const codeRegexs: any[] = [];
-    const fieldIds: string[] = [];
-    const groups: { title: string; fieldId: string }[] = [];
-    for (const matchedMask of matchedMasks) {
-      codeRegexs.push({ code: { $in: [getRegex(matchedMask)] } });
-
-      for (const rule of similarityGroups[matchedMask].rules || []) {
-        const { fieldId, title } = rule;
-        if (!fieldIds.includes(fieldId)) {
-          fieldIds.push(fieldId);
-          groups.push({ title, fieldId });
-        }
-      }
-    }
-
+    const fieldIds = category.similarities.map(r => r.fieldId);
     const filters: any = {
       $and: [
         {
-          $or: codeRegexs,
+          categoryId: category._id,
           'customFieldsData.field': { $in: fieldIds }
         }
       ]
     };
 
+    const groups: {
+      title: string;
+      fieldId: string;
+    }[] = category.similarities.map(r => ({ ...r }));
+
     return {
-      products: await models.Products.find(filters),
+      products: await models.Products.find(filters).sort({ code: 1 }),
       groups
     };
   },

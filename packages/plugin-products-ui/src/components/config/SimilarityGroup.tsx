@@ -1,12 +1,18 @@
-import { MainStyleTitle as Title } from '@erxes/ui/src/styles/eindex';
-import { __ } from '@erxes/ui/src/utils';
+import { gql } from '@apollo/client';
+import { FIELDS_GROUPS_CONTENT_TYPES } from '@erxes/ui-forms/src/settings/properties/constants';
+import { queries as fieldQueries } from '@erxes/ui-forms/src/settings/properties/graphql';
+import { IFieldGroup } from '@erxes/ui-forms/src/settings/properties/types';
+import client from '@erxes/ui/src/apolloClient';
 import { Button, HeaderDescription } from '@erxes/ui/src/components';
 import { Wrapper } from '@erxes/ui/src/layout';
+import { MainStyleTitle as Title } from '@erxes/ui/src/styles/eindex';
+import { __ } from '@erxes/ui/src/utils';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import React from 'react';
+import { ContentBox } from '../../styles';
+import { IConfigsMap } from '../../types';
 import PerSettings from './PerSimilarityGroup';
 import Sidebar from './Sidebar';
-import { IConfigsMap } from '../../types';
-import { ContentBox } from '../../styles';
 
 type Props = {
   save: (configsMap: IConfigsMap) => void;
@@ -15,6 +21,7 @@ type Props = {
 
 type State = {
   configsMap: IConfigsMap;
+  fieldGroups: IFieldGroup[];
 };
 
 class GeneralSettings extends React.Component<Props, State> {
@@ -22,8 +29,24 @@ class GeneralSettings extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      configsMap: props.configsMap
+      configsMap: props.configsMap,
+      fieldGroups: []
     };
+
+    if (isEnabled('forms')) {
+      client
+        .query({
+          query: gql(fieldQueries.fieldsGroups),
+          variables: {
+            contentType: FIELDS_GROUPS_CONTENT_TYPES.PRODUCT
+          }
+        })
+        .then(({ data }) => {
+          this.setState({
+            fieldGroups: data ? data.fieldsGroups : [] || []
+          });
+        });
+    }
   }
 
   add = e => {
@@ -67,6 +90,7 @@ class GeneralSettings extends React.Component<Props, State> {
           currentConfigKey={key}
           save={this.props.save}
           delete={this.delete}
+          fieldGroups={this.state.fieldGroups}
         />
       );
     });
