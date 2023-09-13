@@ -82,7 +82,8 @@ export default withProps<Props>(
             status: queryParams.categoryStatus,
             parentId: queryParams.parentId
           },
-          refetchQueries: getRefetchQueries()
+          refetchQueries: getRefetchQueries(),
+          fetchPolicy: 'network-only'
         })
       }
     ),

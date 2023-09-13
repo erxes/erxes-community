@@ -339,5 +339,4 @@ requireLogin(productQueries, 'productsTotalCount');
 checkPermission(productQueries, 'products', 'showProducts', []);
 checkPermission(productQueries, 'productCategories', 'showProducts', []);
 checkPermission(productQueries, 'productCountByTags', 'showProducts', []);
-
 export default productQueries;

@@ -154,7 +154,8 @@ export default withProps<Props>(
             segment: queryParams.segment,
             segmentData: queryParams.segmentData,
             ...generatePaginationParams(queryParams)
-          }
+          },
+          fetchPolicy: 'network-only'
         })
       }
     ),

@@ -205,17 +205,7 @@ export const loadProductClass = (models: IModels, subdomain: string) => {
         response = 'updated';
       }
 
-      try {
-        // Update the status of products with the provided IDs
-        await models.Products.updateMany(
-          { _id: { $in: unUsedIds } },
-          {
-            $set: { status: PRODUCT_STATUSES.DELETED }
-          }
-        );
-      } catch (error) {
-        throw new Error(error.message);
-      }
+      await models.Products.deleteMany({ _id: { $in: unUsedIds } });
 
       return response;
     }
