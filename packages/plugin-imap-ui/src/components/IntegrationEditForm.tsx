@@ -23,7 +23,7 @@ const IntegrationEditForm = (props: IProps) => {
     name: string,
     label: string,
     defaultValue: string,
-    type: string
+    type?: string
   ) => {
     return (
       <FormGroup>
@@ -40,13 +40,19 @@ const IntegrationEditForm = (props: IProps) => {
     );
   };
 
-  const keys = ['host', 'smtpHost', 'smtpPort', 'mainUser', 'user', 'password'];
+  const keys = ['host', 'smtpHost', 'smtpPort', 'mainUser', 'user'];
 
   return (
     <>
       {keys.map(key => {
-        return renderInput(key, key, props.details[key] || '', key);
+        return renderInput(key, key, props.details[key] || '');
       })}
+      {renderInput(
+        'password',
+        'Password',
+        props.details.password || '',
+        'password'
+      )}
     </>
   );
 };
