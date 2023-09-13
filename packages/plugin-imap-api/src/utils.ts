@@ -231,7 +231,8 @@ const operation = retry.operation({
 
 export const listenIntegration = async (
   subdomain: string,
-  integration: IIntegrationDocument
+  integration: IIntegrationDocument,
+  isRetry?: boolean
 ) => {
   const performImapOperation = async callback => {
     const models = await generateModels(subdomain);
@@ -249,8 +250,7 @@ export const listenIntegration = async (
             errorStack: e.stack
           });
           console.log('listen integration error ============', e);
-          callback(e);
-          throw e;
+          isRetry && callback(e);
         }
       });
     });
@@ -259,7 +259,8 @@ export const listenIntegration = async (
       console.log('new messages ========', response);
 
       const updatedIntegration = await models.Integrations.findOne({
-        _id: integration._id
+        _id: integration._id,
+        healthStatus: 'healthy'
       });
 
       if (!updatedIntegration) {
@@ -276,7 +277,7 @@ export const listenIntegration = async (
           errorStack: e.stack
         });
         console.log('save message error ============', e);
-        callback(e);
+        isRetry && callback(e);
         throw e;
       }
     });
@@ -289,7 +290,23 @@ export const listenIntegration = async (
       });
 
       console.log('on imap.once =============', e);
-      callback(e);
+
+      if (e.message.includes('Invalid credentials')) {
+        await models.Integrations.updateOne(
+          { _id: integration._id },
+          {
+            $set: {
+              healthStatus: 'unHealthy',
+              error: `${e.message}`
+            }
+          }
+        );
+
+        imap.end();
+      }
+
+      retry && callback(e);
+      throw new Error(e);
     });
 
     imap.once('end', e => {
@@ -324,10 +341,12 @@ const listen = async (subdomain: string) => {
     message: `Started syncing integrations`
   });
 
-  const integrations = await models.Integrations.find();
+  const integrations = await models.Integrations.find({
+    healthStatus: 'healthy'
+  });
 
   for (const integration of integrations) {
-    await listenIntegration(subdomain, integration);
+    await listenIntegration(subdomain, integration, true);
   }
 };
 

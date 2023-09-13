@@ -19,7 +19,12 @@ const IntegrationEditForm = (props: IProps) => {
     props.onChange(e.target.name, e.target.value);
   };
 
-  const renderInput = (name: string, label: string, defaultValue: string) => {
+  const renderInput = (
+    name: string,
+    label: string,
+    defaultValue: string,
+    type: string
+  ) => {
     return (
       <FormGroup>
         <ControlLabel required={false}>{label}</ControlLabel>
@@ -29,6 +34,7 @@ const IntegrationEditForm = (props: IProps) => {
           autoFocus={false}
           defaultValue={defaultValue}
           onChange={onChange}
+          type={type}
         />
       </FormGroup>
     );
@@ -39,7 +45,7 @@ const IntegrationEditForm = (props: IProps) => {
   return (
     <>
       {keys.map(key => {
-        return renderInput(key, key, props.details[key] || '');
+        return renderInput(key, key, props.details[key] || '', key);
       })}
     </>
   );
