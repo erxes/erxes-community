@@ -222,7 +222,7 @@ const saveMessages = async (
 };
 
 const operation = retry.operation({
-  retries: 15,
+  retries: 3,
   factor: 2,
   minTimeout: 1000,
   maxTimeout: 60000,
@@ -234,9 +234,8 @@ export const listenIntegration = async (
   integration: IIntegrationDocument,
   isRetry?: boolean
 ) => {
+  const models = await generateModels(subdomain);
   const performImapOperation = async callback => {
-    const models = await generateModels(subdomain);
-
     const imap = generateImap(integration);
 
     imap.once('ready', _response => {
@@ -305,7 +304,7 @@ export const listenIntegration = async (
         return imap.end();
       }
 
-      retry && callback(e);
+      isRetry && callback(e);
       throw new Error(e);
     });
 
@@ -318,13 +317,23 @@ export const listenIntegration = async (
 
   operation.attempt(currentAttempt => {
     console.log(`Attempt ${currentAttempt} ==========`);
-    performImapOperation(error => {
+
+    performImapOperation(async error => {
       if (operation.retry(error)) {
         return;
       }
       if (error) {
         console.error(
           'Max retries exceeded. Could not complete the operation. =============='
+        );
+        return await models.Integrations.updateOne(
+          { _id: integration._id },
+          {
+            $set: {
+              healthStatus: 'unHealthy',
+              error: error.message || 'Max retries exceeded'
+            }
+          }
         );
       } else {
         console.log('IMAP operation completed successfully. ==============');
