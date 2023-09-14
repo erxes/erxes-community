@@ -3,10 +3,10 @@ import { queries } from "@/modules/orders/graphql"
 import useFullOrders from "@/modules/orders/hooks/useFullOrders"
 import { columnNumberAtom, filterAtom } from "@/store/progress.store"
 import { useAtomValue } from "jotai"
-import { Loader2Icon } from "lucide-react"
 
 import { ORDER_ITEM_STATUSES, ORDER_STATUSES } from "@/lib/constants"
 import { Button } from "@/components/ui/button"
+import Loader from "@/components/ui/loader"
 
 import ActiveOrder from "./ActiveOrder"
 import PrintProgress from "./PrintProgress"
@@ -59,12 +59,7 @@ const ActiveOrders = () => {
         </Button>
       )}
 
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/40">
-          <Loader2Icon className="animate-spin h-5 w-5 mr-2" />
-          Уншиж байна...
-        </div>
-      )}
+      {loading && <Loader className="absolute inset-0  bg-white/40" />}
       <PrintProgress />
     </div>
   )

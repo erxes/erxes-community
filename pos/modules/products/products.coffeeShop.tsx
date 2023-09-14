@@ -1,8 +1,8 @@
 import { useEffect } from "react"
-import { Loader2Icon } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
 import { Button } from "@/components/ui/button"
+import { LoaderIcon } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import ProductItem from "./components/productItem/productItem.coffeeShop"
@@ -30,7 +30,7 @@ const ProductsCoffeShop = () => {
       {productsCount > FETCH_MORE_PER_PAGE &&
         products.length < productsCount && (
           <Button className="w-full my-3" ref={ref} variant="outline">
-            <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
+            <LoaderIcon />
             Уншиж байна ( {products.length} / {productsCount} )
           </Button>
         )}

@@ -4,10 +4,10 @@ import { currentAmountAtom, currentPaymentTypeAtom } from "@/store"
 import { unPaidAmountAtom } from "@/store/order.store"
 import { paymentSheetAtom } from "@/store/ui.store"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { Loader2Icon } from "lucide-react"
 
 import { ALL_BANK_CARD_TYPES, BANK_CARD_TYPES } from "@/lib/constants"
 import { cn, getMode } from "@/lib/utils"
+import { LoaderIcon, LoaderText, LoaderWrapper } from "@/components/ui/loader"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 const PaymentSheet = () => {
@@ -50,10 +50,10 @@ const PaymentSheet = () => {
 export default PaymentSheet
 
 const Loading = () => (
-  <div className="flex flex-auto items-center justify-center">
-    <Loader2Icon className="mr-3 h-7 w-7 animate-spin" strokeWidth={1.2} />
-    Уншиж байна
-  </div>
+  <LoaderWrapper>
+    <LoaderIcon className="mr-3 h-7 w-7" />
+    <LoaderText />
+  </LoaderWrapper>
 )
 
 const CashSheet = dynamic(() => import("../paymentTypes/cashSheet.market"), {

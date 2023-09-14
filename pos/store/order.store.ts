@@ -14,11 +14,13 @@ import {
 
 import { customerSearchAtom } from "."
 import { cartAtom, orderItemInput, totalAmountAtom } from "./cart.store"
+import { allowTypesAtom } from "./config.store"
 import { paymentSheetAtom } from "./ui.store"
 
 // order
 export const activeOrderAtom = atom<string>("")
 export const orderNumberAtom = atom<string>("")
+export const buttonTypeAtom = atom<string | null>(null)
 
 // customer
 export const customerAtom = atom<Customer | null>(null)
@@ -26,28 +28,12 @@ export const customerTypeAtom = atom<CustomerType>("")
 
 // order type
 export const orderTypeAtom = atom<IOrderType>("eat")
-export const setOrderTypeAtom = atom(
-  () => "",
-  (get, set, update: IOrderType) => {
-    set(orderTypeAtom, update)
-  }
-)
+
 // ebarimt
 export const registerNumberAtom = atom<string>("")
-export const setRegisterNumberAtom = atom(
-  () => "",
-  (get, set, update: string) => {
-    set(registerNumberAtom, update)
-  }
-)
+
 export const billTypeAtom = atom<IBillType>(null)
 export const putResponsesAtom = atom<IPutResponse[]>([])
-export const setPutResponsesAtom = atom(
-  () => "",
-  (get, set, update: IPutResponse[]) => {
-    set(putResponsesAtom, update)
-  }
-)
 export const printTypeAtom = atom<string | null>(null)
 
 // slot
@@ -69,7 +55,7 @@ export const setDeliveryInfoAtom = atom(
   }
 )
 
-export const dueDateAtom = atom<Date | null>(new Date())
+export const dueDateAtom = atom<string | undefined>(undefined)
 
 // payment
 export const orderTotalAmountAtom = atom<number>(0)
@@ -98,7 +84,7 @@ export const setInitialAtom = atom(
     set(cartAtom, [])
     set(customerAtom, null)
     set(customerTypeAtom, "")
-    set(orderTypeAtom, "eat")
+    set(orderTypeAtom, (get(allowTypesAtom) || [])[0] || "eat")
     set(registerNumberAtom, "")
     set(billTypeAtom, null)
     set(slotCodeAtom, null)
@@ -113,7 +99,7 @@ export const setInitialAtom = atom(
     set(orderNumberAtom, "")
     set(paymentSheetAtom, false)
     set(customerSearchAtom, "")
-    set(dueDateAtom, null)
+    set(dueDateAtom, undefined), set(buttonTypeAtom, null)
   }
 )
 
@@ -160,7 +146,7 @@ export const setOrderStatesAtom = atom(
     set(orderUserAtom, user || null)
     set(orderNumberAtom, number || "")
     set(customerSearchAtom, customer?.primaryPhone || customer?._id || "")
-    set(dueDateAtom, new Date(dueDate || ""))
+    set(dueDateAtom, dueDate)
   }
 )
 
@@ -177,4 +163,6 @@ export const orderValuesAtom = atom((get) => ({
   billType: get(billTypeAtom),
   slotCode: get(slotCodeAtom),
   deliveryInfo: get(deliveryInfoAtom),
+  buttonType: get(buttonTypeAtom),
+  dueDate: get(dueDateAtom),
 }))

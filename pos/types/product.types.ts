@@ -13,6 +13,7 @@ export interface IProduct extends IProductBase {
   remainder?: number
   code?: string
   manufacturedDate?: string
+  hasSimilarity?: boolean
 }
 
 export interface IUseProducts {

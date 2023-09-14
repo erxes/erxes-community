@@ -73,7 +73,6 @@ const commonDetailFields = `
   totalAmount
   mobileAmount
   number
-  paidDate
   registerNumber
   billType
   billId
@@ -96,6 +95,7 @@ const orderDetail = gql`
       customer {
         ${customerFields}
       }
+      dueDate
       customerType
     }
   }

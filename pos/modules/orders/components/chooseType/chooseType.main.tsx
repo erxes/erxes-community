@@ -1,7 +1,9 @@
+import { allowTypesAtom } from "@/store/config.store"
 import { orderTypeAtom } from "@/store/order.store"
-import { useAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 
 import { IOrderType } from "@/types/order.types"
+import { typeTextDef } from "@/lib/constants"
 import {
   Select,
   SelectContent,
@@ -12,6 +14,7 @@ import {
 } from "@/components/ui/select"
 
 const ChooseType = () => {
+  const types = useAtomValue(allowTypesAtom)
   const [type, setType] = useAtom(orderTypeAtom)
   return (
     <Select value={type} onValueChange={(value: IOrderType) => setType(value)}>
@@ -20,9 +23,11 @@ const ChooseType = () => {
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value="eat">Зааланд</SelectItem>
-          <SelectItem value="take">Авч явах</SelectItem>
-          <SelectItem value="delivery">Хүргэлтээр</SelectItem>
+          {(types || []).map((tp) => (
+            <SelectItem value={tp} key={tp}>
+              {typeTextDef[tp]}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>

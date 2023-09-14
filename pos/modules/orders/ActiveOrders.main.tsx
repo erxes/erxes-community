@@ -14,28 +14,26 @@ import useFullOrders from "./hooks/useFullOrders"
 const ActiveOrders = () => {
   const { ALL, COMPLETE } = ORDER_STATUSES
 
-  const {
-    fullOrders,
-    loading,
-    subToOrderStatuses,
-    totalCount,
-    handleLoadMore,
-  } = useFullOrders({
-    variables: {
-      sortDirection: -1,
-      sortField: "createdAt",
-      isPaid: false,
-      statuses: ALL.filter((a) => a !== COMPLETE),
-    },
-    query: queries.activeOrders,
-  })
+  const { fullOrders, subToOrderStatuses, totalCount, handleLoadMore } =
+    useFullOrders({
+      variables: {
+        sortDirection: -1,
+        sortField: "createdAt",
+        isPaid: false,
+        statuses: ALL.filter((a) => a !== COMPLETE),
+      },
+      query: queries.activeOrders,
+    })
 
   useEffect(() => {
     subToOrderStatuses(ORDER_STATUSES.ALL)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const loading = true
+
   return (
-    <div className="flex-auto overflow-hidden">
+    <div className="flex-auto overflow-hidden h-[52px]">
       <HorizontalScrollMenu>
         {[
           ...fullOrders.map((order) => (

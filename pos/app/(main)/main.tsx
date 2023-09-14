@@ -1,3 +1,4 @@
+import AllowTypes from "@/modules/auth/allowTypes"
 import BuyAction from "@/modules/checkout/components/buyAction/buyAction.main"
 import Cart from "@/modules/checkout/components/cart/cart.main"
 import TotalAmount from "@/modules/checkout/components/totalAmount/totalAmount.main"
@@ -26,18 +27,20 @@ const MainIndexPage = () => {
           <Products />
         </div>
         <div className="flex w-1/3 flex-col border-l">
-          <OrderDetail>
-            <div className="p-4">
-              <Customer />
-            </div>
-            <Cart />
-            <div className="grid flex-none grid-cols-2 gap-2 p-4">
-              <TotalAmount />
-              <ShowDeliveryInfo />
-              <ChooseType />
-              <BuyAction />
-            </div>
-          </OrderDetail>
+          <AllowTypes>
+            <OrderDetail>
+              <div className="p-4">
+                <Customer />
+              </div>
+              <Cart />
+              <div className="grid flex-none grid-cols-2 gap-2 p-4">
+                <TotalAmount />
+                <ShowDeliveryInfo />
+                <ChooseType />
+                <BuyAction />
+              </div>
+            </OrderDetail>
+          </AllowTypes>
         </div>
       </section>
     </>

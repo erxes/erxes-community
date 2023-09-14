@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 
 import { IProduct, IUseProducts } from "@/types/product.types"
+import { getMode } from "@/lib/utils"
 
 import { queries } from "../graphql"
 
@@ -25,11 +26,11 @@ export const useProducts = (props?: {
       categoryId: categoryId,
       searchValue: searchValue,
       page: 1,
+      groupedSimilarity: getMode() === "coffee-shop" ? "config" : null,
     },
     skip,
     onCompleted(data) {
       const products = (data || {}).poscProducts || []
-
       !!onCompleted && onCompleted(products)
     },
   })
@@ -37,6 +38,7 @@ export const useProducts = (props?: {
     variables: {
       categoryId,
       searchValue,
+      groupedSimilarity: getMode() === "coffee-shop" ? "config" : null,
     },
     onCompleted(data) {
       setProductCount((data || {}).poscProductsTotalCount || 0)

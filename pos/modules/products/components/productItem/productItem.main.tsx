@@ -1,5 +1,5 @@
 import { addToCartAtom } from "@/store/cart.store"
-import { useAtom } from "jotai"
+import { useSetAtom } from "jotai"
 
 import { IProduct } from "@/types/product.types"
 import { formatNum } from "@/lib/utils"
@@ -19,7 +19,8 @@ const ProductItem = ({
   remainder,
   _id,
 }: IProduct) => {
-  const [, addToCart] = useAtom(addToCartAtom)
+  const addToCart = useSetAtom(addToCartAtom)
+
   return (
     <div
       className="relative rounded-lg border p-3 text-center "

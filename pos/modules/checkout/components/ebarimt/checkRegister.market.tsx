@@ -2,11 +2,11 @@ import { useState } from "react"
 import useCheckRegister from "@/modules/checkout/hooks/useCheckRegister"
 import { registerNumberAtom } from "@/store/order.store"
 import { useAtom } from "jotai"
-import { Loader2Icon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoaderIcon } from "@/components/ui/loader"
 
 const CheckRegister = () => {
   const [current, setCurrent] = useState("")
@@ -43,10 +43,7 @@ const CheckRegister = () => {
           onChange={(e) => setCurrent(e.target.value)}
         ></Input>
         {loading && (
-          <Loader2Icon
-            className="absolute right-2 top-2 animate-spin"
-            strokeWidth={1}
-          />
+          <LoaderIcon className="absolute right-2 top-2" strokeWidth={1} />
         )}
       </div>
       {data && (

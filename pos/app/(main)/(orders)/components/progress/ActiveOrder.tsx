@@ -32,6 +32,7 @@ const ActiveOrder = ({
   type,
   status,
   modifiedAt,
+  dueDate,
   items,
   _id,
 }: IOrder) => {
@@ -65,7 +66,7 @@ const ActiveOrder = ({
               </span>
             </div>
             <div className="inline-flex items-center space-x-1">
-              <TimerBadge createdAt={modifiedAt} />
+              <TimerBadge date={dueDate || modifiedAt} isDueDate={!!dueDate} />
               <Badge>{status}</Badge>
             </div>
           </CardTitle>
