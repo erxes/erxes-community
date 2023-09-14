@@ -8,7 +8,7 @@ import * as cors from 'cors';
 
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import { filterXSS } from 'xss';
+import * as filterXSS from 'xss';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';

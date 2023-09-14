@@ -14,7 +14,8 @@
     "@types/ioredis": "^4.28.7",
     "@types/lodash": "^4.14.178",
     "@types/node": "^17.0.7",
-    "babel-preset-gatsby-package": "^0.5.2"
+    "babel-preset-gatsby-package": "^0.5.2",
+    "ts-node": "10.9.1"
   },
   "dependencies": {
     "@apollo/server" : "^4.9.3",
