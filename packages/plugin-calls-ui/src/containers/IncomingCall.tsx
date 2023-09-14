@@ -147,7 +147,7 @@ const IncomingCallContainer = () => {
     }
   );
 
-  if (loading && !data) return <Spinner />;
+  if (loading && !data) return null;
 
   if (error) return Alert.error(error.message);
 
