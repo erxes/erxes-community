@@ -24,15 +24,13 @@ type Props = {
   isWidget?: boolean;
   hasOptions?: boolean;
   handleClickItem?: (chatId: string) => void;
-  createChat?: (userIds: string[]) => void;
   remove?: () => void;
   markAsRead?: () => void;
   notContactUser?: IUser;
   currentUser: IUser;
   handlePin: (chatId: string) => void;
   isForward?: boolean;
-  forwardChat?: (chatId?: string) => void;
-  forwardedChatIds?: string[];
+  forwardChat?: (id?: string, type?: string) => void;
   createChats: () => void;
   setChatUser: (userId: string) => void;
 };
@@ -42,10 +40,8 @@ const ChatItem = (props: Props) => {
     chat,
     notContactUser,
     currentUser,
-    createChat,
     isForward,
     forwardChat,
-    forwardedChatIds,
     createChats,
     setChatUser
   } = props;
@@ -94,25 +90,16 @@ const ChatItem = (props: Props) => {
 
   const handleChatForward = () => {
     if (chat) {
-      forwardChat(chat._id);
+      forwardChat(chat._id, 'group');
     }
     if (notContactUser) {
-      createChat([notContactUser._id, currentUser._id]);
+      forwardChat(notContactUser._id, 'direct');
     }
   };
 
   const renderChatActions = () => {
     if (isForward) {
-      return (forwardedChatIds || []).includes(chat?._id) ? (
-        <Button
-          btnStyle="link"
-          disabled={true}
-          size="small"
-          onClick={() => handleChatForward()}
-        >
-          Sent
-        </Button>
-      ) : (
+      return (
         <Button
           btnStyle="simple"
           size="small"
