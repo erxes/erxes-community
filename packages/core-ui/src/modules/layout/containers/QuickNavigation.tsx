@@ -28,6 +28,7 @@ class QuickNavigationContainer extends React.Component<Props, State> {
   }
 
   logout = () => {
+    localStorage.removeItem('config:call_integrations');
     client
       .mutate({
         mutation: gql`
