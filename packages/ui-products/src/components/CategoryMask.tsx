@@ -70,7 +70,6 @@ class CategoryMask extends React.Component<Props, State> {
     const onEdit = () => {
       this.setState({ activePerVal: perVal });
     };
-
     return (
       <td colSpan={perVal.len || 1}>
         {perVal.static || (
