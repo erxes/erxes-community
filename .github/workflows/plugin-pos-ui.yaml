@@ -6,6 +6,7 @@ on:
       - dev
       - staging
       - build-test
+      - pos
     paths:
       - "packages/erxes-ui/**"
       - "packages/ui-plugin-template/**"
@@ -21,7 +22,6 @@ on:
       - "packages/ui-settings/**"
       - "packages/ui-team/**"
       - "packages/ui-tags/**"
-      - "packages/ui-pos/**"
       - "packages/plugin-pos-ui/**"
       - ".github/workflows/plugin-pos-ui.yaml"
   pull_request:
@@ -39,13 +39,14 @@ on:
       - "packages/ui-leads/**"
       - "packages/ui-log/**"
       - "packages/ui-notifications/**"
+      - "packages/ui-products/**"
       - "packages/ui-segments/**"
       - "packages/ui-settings/**"
       - "packages/ui-team/**"
       - "packages/ui-tags/**"
-      - "packages/ui-pos/**"
-      - "packages/plugin-pos-ui/**"
-      - ".github/workflows/plugin-pos-ui.yaml"
+      - "packages/ui-products/**"
+      - "packages/plugin-products-ui/**"
+      - ".github/workflows/plugin-products-ui.yaml"
 
 jobs:
   ui:
