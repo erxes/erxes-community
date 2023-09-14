@@ -2,7 +2,7 @@ import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import { createServer } from 'http';
-import * as filterXSS from 'xss';
+import { filterXSS } from 'xss';
 import { connect } from './db/connection';
 
 import { initApolloServer } from './apolloClient';

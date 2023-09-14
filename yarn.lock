@@ -25621,20 +25621,12 @@ xpath.js@~1.1.0:
   resolved "https://registry.yarnpkg.com/xpath.js/-/xpath.js-1.1.0.tgz#3816a44ed4bb352091083d002a383dd5104a5ff1"
   integrity sha512-jg+qkfS4K8E7965sqaUl8mRngXiKb3WZGfONgE18pr03FUQiuSV6G+Ej4tS55B+rIQSFEIw3phdVAQ4pPqNWfQ==
 
-xss@^1.0.10, xss@^1.0.6:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.10.tgz#5cd63a9b147a755a14cb0455c7db8866120eb4d2"
-  integrity sha512-qmoqrRksmzqSKvgqzN0055UFWY7OKx1/9JWeRswwEVX9fCG5jcYRxa/A2DHcmZX6VJvjzHRQ2STeeVcQkrmLSw==
+xss@1.0.14:
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.14.tgz#4f3efbde75ad0d82e9921cc3c95e6590dd336694"
+  integrity sha512-og7TEJhXvn1a7kzZGQ7ETjdQVS2UfZyTlsEdDOqvQF7GoxNfY+0YLCzBy1kPdsDDx4QuNAonQPddpsn6Xl/7sw==
   dependencies:
     commander "^2.20.3"
-    cssfilter "0.0.10"
-
-xss@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.3.tgz#d04bd2558fd6c29c46113824d5e8b2a910054e23"
-  integrity sha512-LTpz3jXPLUphMMmyufoZRSKnqMj41OVypZ8uYGzvjkMV9C1EdACrhQl/EM8Qfh5htSAuMIQFOejmKAZGkJfaCg==
-  dependencies:
-    commander "^2.9.0"
     cssfilter "0.0.10"
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:

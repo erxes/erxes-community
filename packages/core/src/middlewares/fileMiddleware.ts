@@ -5,7 +5,7 @@ import { generateModels } from '../connectionResolver';
 import * as _ from 'underscore';
 import * as fileType from 'file-type';
 import * as fs from 'fs';
-import * as filterXSS from 'xss';
+import { filterXSS } from 'xss';
 
 import { checkFile, isImage, resizeImage, uploadFile } from '../data/utils';
 import { debugExternalApi } from '../debuggers';

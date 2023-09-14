@@ -48,7 +48,6 @@
     "subscriptions-transport-ws": "0.11.0",
     "underscore": "^1.13.2",
     "underscore.string": "^3.3.5",
-    "validator": "12.1.0",
-    "xss": "^1.0.10"
+    "validator": "12.1.0"
   }
 }
