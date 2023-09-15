@@ -19,20 +19,40 @@ const productCategories = gql`
 `
 
 const products = gql`
-  query poscProducts($searchValue: String, $type: String, $categoryId: String, $page: Int, $perPage: Int) {
-    poscProducts(searchValue: $searchValue, categoryId: $categoryId, type: $type, page: $page, perPage: $perPage) {
+  query poscProducts($searchValue: String, $type: String, $categoryId: String, $page: Int, $perPage: Int, $groupedSimilarity: String) {
+    poscProducts(searchValue: $searchValue, categoryId: $categoryId, type: $type, page: $page, perPage: $perPage, groupedSimilarity: $groupedSimilarity) {
       ${commonFields}
       categoryId
       unitPrice
       type
       description
       remainder
+      hasSimilarity
       attachment {
-        duration
-        name
-        size
-        type
         url
+      }
+    }
+  }
+`
+const productSimilarities = gql`
+  query PoscProductSimilarities($id: String!, $groupedSimilarity: String) {
+    poscProductSimilarities(_id: $id, groupedSimilarity: $groupedSimilarity) {
+      products {
+        ${commonFields}
+        categoryId
+        unitPrice
+        type
+        description
+        remainder
+        hasSimilarity
+        attachment {
+          url
+        }
+        hasSimilarity
+      }
+      groups {
+        fieldId
+        title
       }
     }
   }
@@ -43,11 +63,13 @@ const productsCount = gql`
     $categoryId: String
     $type: String
     $searchValue: String
+    $groupedSimilarity: String
   ) {
     poscProductsTotalCount(
       categoryId: $categoryId
       type: $type
       searchValue: $searchValue
+      groupedSimilarity: $groupedSimilarity
     )
   }
 `
@@ -73,5 +95,6 @@ const queries = {
   productsCount,
   getPriceInfo,
   getInitialCategory,
+  productSimilarities,
 }
 export default queries

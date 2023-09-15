@@ -4,7 +4,8 @@ import { currentAmountAtom } from "@/store"
 import { activeOrderAtom } from "@/store/order.store"
 import { paymentSheetAtom } from "@/store/ui.store"
 import { useAtom } from "jotai"
-import { Loader2Icon } from "lucide-react"
+
+import Loader from "@/components/ui/loader"
 
 const MobileSheet = () => {
   const [currentAmount] = useAtom(currentAmountAtom)
@@ -27,12 +28,7 @@ const MobileSheet = () => {
     },
   })
 
-  if (loading || loadingAdd)
-    return (
-      <div className="flex flex-auto items-center justify-center">
-        <Loader2Icon className="mr-1 h-5 w-5 animate-spin" /> Уншиж байна...
-      </div>
-    )
+  if (loading || loadingAdd) return <Loader />
 
   if (!invoiceUrl) return <div></div>
 

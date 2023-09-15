@@ -29,7 +29,13 @@ export type IOrderStatus =
   | "reDoing"
   | "pending"
 
-export type IOrderType = "eat" | "take" | "delivery"
+export type IOrderType =
+  | "eat"
+  | "take"
+  | "delivery"
+  | "loss"
+  | "spend"
+  | "reject"
 
 export type IBillType = "1" | "3" | "9" | null
 

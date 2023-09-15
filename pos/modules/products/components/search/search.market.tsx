@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Products from "@/modules/products/products.market"
 import { searchAtom } from "@/store"
 import { searchPopoverAtom } from "@/store/ui.store"

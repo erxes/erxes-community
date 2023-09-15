@@ -143,6 +143,13 @@ const getInitialCategories = gql`
     }
   }
 `
+const getAllowTypes = gql`
+  query AllowTypes {
+    currentConfig {
+      allowTypes
+    }
+  }
+`
 
 const queries = {
   posCurrentUser,
@@ -156,6 +163,7 @@ const queries = {
   posUsers,
   getWholeConfig,
   getInitialCategories,
+  getAllowTypes,
 }
 
 export default queries

@@ -48,8 +48,6 @@ const CategoriesSheet = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeParent])
 
-  useEffect(() => {}, [])
-
   if (loading) return <div>Loading...</div>
 
   const chooseCat = (_id: string) => {
@@ -77,7 +75,9 @@ const CategoriesSheet = ({
           <Button
             variant={"link"}
             className=" font-semibold text-sm"
-            onClick={() => chooseCat("")}
+            onClick={() => {
+              chooseCat("")
+            }}
           >
             Бүгдийг үзэх <ArrowRight className="h-5 w-5 ml-2" />
           </Button>

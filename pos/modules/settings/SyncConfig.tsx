@@ -5,14 +5,17 @@ import { useLazyQuery, useMutation } from "@apollo/client"
 import { ButtonProps } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 
-import { queries as configQueries } from "../auth/graphql"
-import { queries } from "../products/graphql"
+import { queries } from "../auth/graphql"
 import SettingsButton from "./components/Button"
 import { mutations } from "./graphql"
 
 const refetchQueries = {
   products: ["poscProducts", "poscProductCategories", "productsCount"],
-  config: ["SettingConfig"],
+  config: [
+    "SettingConfig",
+    queries.getInitialCategories,
+    queries.getAllowTypes,
+  ],
   slots: ["SettingConfig"],
 }
 
@@ -27,7 +30,7 @@ const SyncConfig = ({
       description: `${configType} has been synced successfully.`,
     })
   const [getWholeConfig, { loading: loadingConfig }] = useLazyQuery(
-    configQueries.getWholeConfig,
+    queries.getWholeConfig,
     {
       onCompleted(data) {
         const {} = data?.currentConfig || {}

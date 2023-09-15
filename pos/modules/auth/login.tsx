@@ -5,7 +5,7 @@ import { useMutation } from "@apollo/client"
 import { useToast } from "@/components/ui/use-toast"
 
 import Login from "./components/login"
-import { mutations, queries } from "./graphql"
+import { mutations } from "./graphql"
 
 const LoginContainer = () => {
   const { toast } = useToast()

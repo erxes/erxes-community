@@ -35,6 +35,7 @@ const Dates = () => {
   const [endDate, setEndDate] = useAtom(endDateAtom)
 
   const { getCoverAmounts, loading } = useCoverAmounts()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     values: {
@@ -42,6 +43,7 @@ const Dates = () => {
       time: format(endDate ? new Date(endDate as any) : new Date(), "HH:mm"),
     },
   })
+  
   const onSubmit = ({ time, endDate }: z.infer<typeof FormSchema>) => {
     const end = setMinutes(
       setHours(endDate, Number(time.split(":")[0])),

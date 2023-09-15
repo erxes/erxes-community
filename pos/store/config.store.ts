@@ -10,6 +10,7 @@ import {
   IPaymentConfig,
   ISettingsConfig,
 } from "@/types/config.types"
+import { IOrderType } from '@/types/order.types'
 
 export const configAtom = atom<IConfig | null>(null)
 
@@ -28,6 +29,7 @@ export const setCurrentUserAtom = atom(
     set(currentUserAtom, update)
   }
 )
+export const allowTypesAtom = atom<IOrderType[] | null>(null)
 
 export const setWholeConfig = atom(
   null,
@@ -83,4 +85,3 @@ export const setWholeConfig = atom(
     })
   }
 )
-// 86614853

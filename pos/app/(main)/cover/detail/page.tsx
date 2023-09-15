@@ -5,8 +5,8 @@ import useConfig from "@/modules/auth/hooks/useConfig"
 import { setCoverDetailAtom } from "@/store/cover.store"
 import { useQuery } from "@apollo/client"
 import { useAtom } from "jotai"
-import { Loader2Icon } from "lucide-react"
 
+import Loader from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -17,7 +17,7 @@ import { queries } from "../graphql"
 
 const CoverDetail = () => {
   const searchParams = useSearchParams()
-  const id = searchParams.get('id') 
+  const id = searchParams.get("id")
   const { onError } = useToast()
   const [, setCover] = useAtom(setCoverDetailAtom)
 
@@ -35,12 +35,7 @@ const CoverDetail = () => {
   })
 
   if (loading || loadingConfig) {
-    return (
-      <div className="flex flex-auto items-center justify-center">
-        <Loader2Icon className="mr-2 h-5 w-5 animate-spin" />
-        Уншиж байна...
-      </div>
-    )
+    return <Loader />
   }
 
   return (
