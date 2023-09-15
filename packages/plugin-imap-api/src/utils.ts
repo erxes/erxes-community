@@ -4,6 +4,7 @@ import { simpleParser } from 'mailparser';
 import { generateModels } from './connectionResolver';
 import { sendContactsMessage, sendInboxMessage } from './messageBroker';
 import { IIntegrationDocument } from './models';
+import { createPool } from 'generic-pool';
 
 export const toUpper = thing => {
   return thing && thing.toUpperCase ? thing.toUpperCase() : thing;
@@ -218,127 +219,145 @@ const saveMessages = async (
       })),
       type: 'INBOX'
     });
+
+    await sendInboxMessage({
+      subdomain,
+      action: 'conversationClientMessageInserted',
+      data: {
+        content: msg.html,
+        conversationId
+      }
+    });
   }
 };
 
-const operation = retry.operation({
-  retries: 3,
-  factor: 2,
-  minTimeout: 1000,
-  maxTimeout: 60000,
-  randomize: true
-});
-
 export const listenIntegration = async (
   subdomain: string,
-  integration: IIntegrationDocument,
-  isRetry?: boolean
+  integration: IIntegrationDocument
 ) => {
   const models = await generateModels(subdomain);
-  const performImapOperation = async callback => {
-    const imap = generateImap(integration);
 
-    imap.once('ready', _response => {
-      imap.openBox('INBOX', true, async (_err, _box) => {
+  const imapPool = createPool({
+    create: () => {
+      console.log('creating new imap', integration);
+      return generateImap(integration);
+    },
+    destroy: (client: any) => {
+      console.log('destroy imap', integration);
+      return client.end();
+    }
+  });
+
+  const resourcePromise = imapPool.acquire();
+
+  resourcePromise
+    .then(imap => {
+      imap.once('ready', _response => {
+        imap.openBox('INBOX', true, async (_err, _box) => {
+          try {
+            await saveMessages(subdomain, imap, integration, ['UNSEEN']);
+          } catch (e) {
+            await models.Logs.createLog({
+              type: 'error',
+              message: e.message + ' 3 ',
+              errorStack: e.stack
+            });
+            console.log('listen integration error ============', e);
+          }
+        });
+      });
+
+      imap.on('mail', async response => {
+        console.log('new messages ========', response);
+
+        const updatedIntegration = await models.Integrations.findOne({
+          _id: integration._id,
+          healthStatus: 'healthy'
+        });
+
+        if (!updatedIntegration) {
+          console.log(`ending ${integration.user} imap`);
+          return imap.end();
+        }
+
         try {
           await saveMessages(subdomain, imap, integration, ['UNSEEN']);
         } catch (e) {
           await models.Logs.createLog({
             type: 'error',
-            message: e.message + ' 3 ',
+            message: e.message + ' 1 ',
             errorStack: e.stack
           });
-          console.log('listen integration error ============', e);
-          isRetry && callback(e);
+          console.log('save message error ============', e);
+
+          throw e;
         }
       });
-    });
 
-    imap.on('mail', async response => {
-      console.log('new messages ========', response);
-
-      const updatedIntegration = await models.Integrations.findOne({
-        _id: integration._id,
-        healthStatus: 'healthy'
-      });
-
-      if (!updatedIntegration) {
-        console.log(`ending ${integration.user} imap`);
-        return imap.end();
-      }
-
-      try {
-        await saveMessages(subdomain, imap, integration, ['UNSEEN']);
-      } catch (e) {
+      imap.once('error', async e => {
         await models.Logs.createLog({
           type: 'error',
-          message: e.message + ' 1 ',
+          message: e.message + ' 2 ',
           errorStack: e.stack
         });
-        console.log('save message error ============', e);
-        isRetry && callback(e);
-        throw e;
-      }
-    });
 
-    imap.once('error', async e => {
-      await models.Logs.createLog({
-        type: 'error',
-        message: e.message + ' 2 ',
-        errorStack: e.stack
+        console.log('on imap.once =============', e);
+
+        if (e.message.includes('Invalid credentials')) {
+          await models.Integrations.updateOne(
+            { _id: integration._id },
+            {
+              $set: {
+                healthStatus: 'unHealthy',
+                error: `${e.message}`
+              }
+            }
+          );
+
+          imapPool.drain();
+        }
+
+        const operation = retry.operation({
+          retries: 5,
+          factor: 2,
+          minTimeout: 1000,
+          maxTimeout: 60000
+        });
+
+        operation.attempt(currentAttempt => {
+          console.log(`retrying ${currentAttempt}`);
+          if (currentAttempt === 5) {
+            console.log('max attempts reached');
+            imapPool.drain();
+          }
+
+          imap.connect();
+        });
       });
 
-      console.log('on imap.once =============', e);
+      imap.once('end', e => {
+        console.log('Connection ended', e);
+      });
 
-      if (e.message.includes('Invalid credentials')) {
-        await models.Integrations.updateOne(
-          { _id: integration._id },
-          {
-            $set: {
-              healthStatus: 'unHealthy',
-              error: `${e.message}`
-            }
-          }
-        );
+      imap.connect();
+    })
+    .catch(err => {
+      // handle error - this is generally a timeout or maxWaitingClients
+      // error
 
-        return imap.end();
-      }
+      console.error(err);
 
-      isRetry && callback(e);
-      throw new Error(e);
+      imapPool.drain();
     });
 
-    imap.once('end', e => {
-      console.log('Connection ended', e);
-    });
-
-    imap.connect();
-  };
-
-  operation.attempt(currentAttempt => {
-    console.log(`Attempt ${currentAttempt} ==========`);
-
-    performImapOperation(async error => {
-      if (operation.retry(error)) {
-        return;
-      }
-      if (error) {
-        console.error(
-          'Max retries exceeded. Could not complete the operation. =============='
-        );
-        return await models.Integrations.updateOne(
-          { _id: integration._id },
-          {
-            $set: {
-              healthStatus: 'unHealthy',
-              error: error.message || 'Max retries exceeded'
-            }
-          }
-        );
-      } else {
-        console.log('IMAP operation completed successfully. ==============');
-      }
-    });
+  /**
+   * Step 3 - Drain pool during shutdown (optional)
+   */
+  // Only call this once in your application -- at the point you want
+  // to shutdown and stop using this pool.
+  imapPool.drain().then(() => {
+    console.log('imapPool drained');
+    imapPool.clear();
   });
 };
 
@@ -355,7 +374,7 @@ const listen = async (subdomain: string) => {
   });
 
   for (const integration of integrations) {
-    await listenIntegration(subdomain, integration, true);
+    await listenIntegration(subdomain, integration);
   }
 };
 

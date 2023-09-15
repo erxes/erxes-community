@@ -71,7 +71,7 @@ export const initBroker = async cl => {
       });
 
       if (updatedIntegration) {
-        await listenIntegration(subdomain, updatedIntegration);
+        await listenIntegration(subdomain, integration);
       }
 
       return {

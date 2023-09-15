@@ -64,6 +64,7 @@ const productsQueryParams = `
   type: String,
   categoryId: String,
   searchValue: String,
+  vendorId: String,
   tag: String,
   ids: [String],
   excludeIds: Boolean,

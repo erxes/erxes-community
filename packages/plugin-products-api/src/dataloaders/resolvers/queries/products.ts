@@ -17,6 +17,7 @@ interface IQueryParams {
   status?: string;
   categoryId?: string;
   searchValue?: string;
+  vendorId?: string;
   tag: string;
   page?: number;
   perPage?: number;
@@ -39,6 +40,7 @@ const generateFilter = async (
     type,
     categoryId,
     searchValue,
+    vendorId,
     tag,
     ids,
     excludeIds,
@@ -120,6 +122,10 @@ const generateFilter = async (
     const { list } = await qb.runQueries();
 
     filter._id = { $in: list.map(l => l._id) };
+  }
+
+  if (vendorId) {
+    filter.vendorId = vendorId;
   }
 
   return filter;
