@@ -37,7 +37,7 @@ export const LoaderWrapper = ({
 }
 
 export const LoaderText = () => {
-  return <>Уншиж байна...</>
+  return <span>Уншиж байна...</span>
 }
 
 export default Loader

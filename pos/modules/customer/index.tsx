@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { customerSearchAtom } from "@/store"
 import { customerAtom, customerTypeAtom } from "@/store/order.store"
 import { customerPopoverAtom } from "@/store/ui.store"
@@ -8,7 +7,7 @@ import { useLazyQuery } from "@apollo/client"
 import { AnimatePresence, motion } from "framer-motion"
 import { useAtom } from "jotai"
 
-import { CustomerTypeT } from "@/types/customer.types"
+import { CustomerType as CustomerTypeT } from "@/types/customer.types"
 import { Input } from "@/components/ui/input"
 import {
   Popover,

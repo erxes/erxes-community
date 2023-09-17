@@ -13,7 +13,7 @@ import { SearchIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { CustomerT } from "@/types/customer.types"
+import { Customer } from "@/types/customer.types"
 import { Button } from "@/components/ui/button"
 import { DatePicker } from "@/components/ui/date-picker"
 import { FacetedFilter } from "@/components/ui/faceted-filter"
@@ -77,7 +77,7 @@ const ReportForm = ({
                   <Input disabled placeholder="Уншиж байна..." />
                 ) : (
                   <FacetedFilter
-                    options={(posUsers || []).map((user: CustomerT) => ({
+                    options={(posUsers || []).map((user: Customer) => ({
                       label: user.email,
                       value: user._id,
                     }))}

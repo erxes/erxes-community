@@ -38,7 +38,7 @@ const EbarimtHeader = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <p className="w-10 font-semibold">Огноо:</p>
-          <p>{!!paidDate && format(new Date(paidDate), "yyyy.MM.dd hh:mm")}</p>
+          <p>{!!paidDate && format(new Date(paidDate), "yyyy.MM.dd HH:mm")}</p>
         </div>
 
         <div className="font-medium">
