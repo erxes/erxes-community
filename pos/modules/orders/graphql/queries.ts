@@ -245,6 +245,17 @@ const fullOrders = gql`
   }
 `
 
+const ordersAtWaiting = gql`
+  query OrdersAtWaiting(${queryParamsDefs}) {
+    fullOrders(${queryParamsValues}) {
+      modifiedAt
+      number
+      status
+      _id
+    }
+  }
+`
+
 const activeOrders = gql`
 query ActiveOrders(${queryParamsDefs}) {
   fullOrders(${queryParamsValues}) {
@@ -340,6 +351,7 @@ const queries = {
   progressHistory,
   progressDoneOrders,
   progressDetail,
+  ordersAtWaiting,
 }
 
 export default queries

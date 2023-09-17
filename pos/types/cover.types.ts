@@ -1,4 +1,4 @@
-import { CustomerT } from "./customer.types"
+import { Customer } from "./customer.types"
 
 export interface PaidSum {
   _id?: string
@@ -23,7 +23,7 @@ export interface Cover {
   details?: Detail[]
   _id: string
   status: "confirm" | "new" | "unconfirm"
-  createdUser: CustomerT
-  modifiedUser?: CustomerT
+  createdUser: Customer
+  modifiedUser?: Customer
   description?: string
 }

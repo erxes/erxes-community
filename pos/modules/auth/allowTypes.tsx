@@ -24,7 +24,7 @@ const AllowTypes = ({ children }: { children: React.ReactNode }) => {
 
   if (loading) return <Loader />
 
-  return children
+  return <>{children}</>
 }
 
 export default AllowTypes

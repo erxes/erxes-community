@@ -2,7 +2,7 @@ import { configAtom, currentUserAtom } from "@/store/config.store"
 import { useQuery } from "@apollo/client"
 import { useAtomValue } from "jotai"
 
-import { CustomerT } from "@/types/customer.types"
+import { Customer } from "@/types/customer.types"
 
 import queries from "../graphql/queries"
 
@@ -15,7 +15,7 @@ const useUser = () => {
 }
 
 export const useUsers = (options?: {
-  onCompleted: (data: CustomerT) => void
+  onCompleted: (data: Customer) => void
 }) => {
   const { onCompleted } = options || {}
   const { loading, data } = useQuery(queries.posUsers, {
@@ -26,7 +26,7 @@ export const useUsers = (options?: {
 
   const { posUsers } = data || {}
 
-  return { loading, users: (posUsers as CustomerT[]) || [] }
+  return { loading, users: (posUsers as Customer[]) || [] }
 }
 
 export default useUser

@@ -15,7 +15,7 @@ const HistoryLayout = ({ children }: { children: React.ReactNode }) => {
           Хүлээлгийн дэлгэц
         </Link>
       </HeaderLayout>
-      <div className="flex-auto overflow-hidden">{children}</div>
+      <>{children}</>
     </>
   )
 }

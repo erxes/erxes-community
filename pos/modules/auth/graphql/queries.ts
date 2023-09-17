@@ -90,6 +90,14 @@ const getEbarimtConfig = gql`
   }
 `
 
+const getWaitingConfig = gql`
+  query getWaitingConfig {
+    currentConfig {
+      waitingScreen
+    }
+  }
+`
+
 const getWholeConfig = gql`
   query WholeConfig {
     currentConfig {
@@ -164,6 +172,7 @@ const queries = {
   getWholeConfig,
   getInitialCategories,
   getAllowTypes,
+  getWaitingConfig,
 }
 
 export default queries
