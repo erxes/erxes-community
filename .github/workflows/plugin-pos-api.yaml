@@ -6,7 +6,6 @@ on:
       - dev
       - staging
       - build-test
-      - pos
     paths:
       - 'packages/api-utils/**'
       - 'packages/api-plugin-template.erxes/**'
@@ -59,7 +58,7 @@ jobs:
           cd dist/main/.erxes/src
 
       - name: Build docker image
-        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/build-test' || github.ref == 'refs/heads/pos')
+        if: github.event_name == 'push' && ( github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/build-test' )
         run: |
           cd dist/plugin-pos-api/.erxes
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
