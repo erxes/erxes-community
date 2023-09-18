@@ -4,6 +4,7 @@ import { UploadBtn } from '../common/Uploader';
 import { rgba, darken } from '../styles/ecolor';
 import styled, { keyframes, css } from 'styled-components';
 import styledTS from 'styled-components-ts';
+import { TabCaption } from '../common/tabs/styles';
 
 export const FeedLayout = styled.div`
   flex: 1;
@@ -281,14 +282,13 @@ export const Col = styledTS<{ width?: number }>(styled.div)`
   padding: ${dimensions.coreSpacing}px;
 `;
 
-export const AvatarImg = styled.img`
-  width: ${dimensions.coreSpacing + 6}px;
-  height: ${dimensions.coreSpacing + 6}px;
+export const AvatarImg = styledTS<{size?: number}>(styled.img)`
+  width: ${props => props.size ? props.size : dimensions.coreSpacing + 6}px;
+  height: ${props => props.size ? props.size : dimensions.coreSpacing + 6}px;
   line-height: ${dimensions.coreSpacing + 6}px;
   border-radius: ${(dimensions.coreSpacing + 6) / 2}px;
   vertical-align: middle;
   background: ${colors.bgActive};
-  margin-right: ${dimensions.unitSpacing}px;
 `;
 
 export const CreateFormContainer = styled.div`
@@ -363,6 +363,10 @@ export const Card = styled.div`
 
   &:last-child {
     margin-bottom: 100px;
+  }
+
+  ${TabCaption} {
+    font-size: 14px;
   }
 `;
 
@@ -601,9 +605,6 @@ export const ChatItemWrapper = styledTS<{
 
 export const ChatGroupAvatar = styled.div`
   position: relative;
-  min-width: 36px;
-  max-width: 36px;
-  height: 36px;
 
   span:first-child {
     position: absolute;
@@ -755,7 +756,7 @@ export const WidgetChatWindowHeader = styled.div`
       flex-direction: column;
       font-size: 16px;
       .name {
-        height: 15px;
+        height: 20px;
         max-width: 186px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -767,6 +768,10 @@ export const WidgetChatWindowHeader = styled.div`
         color: #65676B;
         font-weight: 400;
         font-size: .75rem;
+        height: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        align-items: flex-start;
       }
     }
   }
@@ -782,8 +787,11 @@ export const MinimizedWidgetChatWindow = styled.div`
     width: 250px;
 
     p {
-      max-width: 130px;
+      max-width: 140px;
       font-size: 14px;
+      height: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     span:first-child {
@@ -1141,6 +1149,10 @@ export const ParticipantItemWrapper = styled.div`
     width: 100%;
     font-size: 0.83em;
     border-radius: 5px;
+
+    i {
+      margin: 0 0.6em;
+    }
   }
 
   a:hover {
@@ -1156,6 +1168,9 @@ export const ParticipantItemWrapper = styled.div`
     ${ChatActions} {
     display: flex;
     }
+  }
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 
@@ -1197,6 +1212,7 @@ export const NoEvent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 40px;
 `;
 
 export const SearchInput = styledTS<{ active?: boolean }>(styled.div)`
@@ -1360,4 +1376,11 @@ export const ActionBar = styled.div`
 
 export const Reply = styled.div`
   margin-left: ${dimensions.coreSpacing * 2}px;
+`;
+
+export const MembersPopoverWrapper = styled.div`
+  > button {
+    margin-bottom: 10px;
+    padding: 7px 0;
+  }
 `;

@@ -179,7 +179,9 @@ const ChatItem = (props: FinalProps) => {
               notContactUser?.email ||
               null}
           </p>
-          <span>{notContactUser?.details?.position}</span>
+          {notContactUser?.details?.position && (
+            <span>{notContactUser?.details?.position}</span>
+          )}
         </>
       );
     }
@@ -190,7 +192,9 @@ const ChatItem = (props: FinalProps) => {
           {chat && chat.type === 'direct' ? (
             <>
               {user?.details.fullName || user?.email}
-              <span> ({user?.details.position})</span>
+              {user?.details.position && (
+                <span> ({user?.details.position})</span>
+              )}
             </>
           ) : (
             chat?.name

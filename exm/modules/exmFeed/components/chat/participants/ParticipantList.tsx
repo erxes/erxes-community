@@ -15,12 +15,13 @@ import { IUser } from "../../../../types";
 
 type Props = {
   chat: any;
+  type?: string;
 };
 type FinalProps = {
   currentUser: IUser;
 } & Props;
 const ParticipantList = (props: FinalProps) => {
-  const { chat, currentUser } = props;
+  const { chat, currentUser, type } = props;
   const participantUserIds = chat?.participantUsers.map((user) => {
     return user._id;
   });
@@ -60,7 +61,7 @@ const ParticipantList = (props: FinalProps) => {
 
   return (
     <>
-      <Title>Group members</Title>
+      {type !== 'widget' && <Title>Group members</Title>}
       <ParticipantListWrapper>
         {(chat?.participantUsers || []).map((u) => (
           <ParticipantItem

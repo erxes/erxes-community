@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // erxes
 
 // local
-import ModalTrigger from '../../../common/ModalTrigger';
-import Icon from '../../../common/Icon';
-import { ParticipantItemWrapper } from '../../styles';
-import FormGroup from '../../../common/form/Group';
-import FormControl from '../../../common/form/Control';
-import Button from '../../../common/Button';
-import Uploader from '../../../common/Uploader';
+import ModalTrigger from "../../../common/ModalTrigger";
+import Icon from "../../../common/Icon";
+import { ParticipantItemWrapper } from "../../styles";
+import FormGroup from "../../../common/form/Group";
+import FormControl from "../../../common/form/Control";
+import Button from "../../../common/Button";
+import Uploader from "../../../common/Uploader";
+import { ModalFooter } from "../../../styles/main";
 
 type Props = {
   chat?: any;
@@ -18,7 +19,7 @@ type Props = {
 const GroupChat = (props: Props) => {
   const { chat, editChat } = props;
 
-  const [name, setName] = useState(chat.name || '');
+  const [name, setName] = useState(chat.name || "");
   const [featuredImage, setFeaturedImage] = useState(chat.featuredImage || []);
 
   const handleSubmit = (callback) => {
@@ -29,7 +30,6 @@ const GroupChat = (props: Props) => {
   const changeName = (p) => {
     return (
       <>
-        <h3>Change Name</h3>
         <FormGroup>
           <FormControl
             placeholder="Title"
@@ -39,20 +39,12 @@ const GroupChat = (props: Props) => {
             defaultValue={name}
           />
         </FormGroup>
-        <br />
-        <Button
-          style={{ float: 'right' }}
-          onClick={() => handleSubmit(p.closeModal)}
-        >
-          Add
-        </Button>
-        <Button
-          btnStyle="simple"
-          style={{ float: 'right', marginRight: '10px' }}
-          onClick={p.closeModal}
-        >
-          Cancel
-        </Button>
+        <ModalFooter>
+          <Button onClick={() => handleSubmit(p.closeModal)}>Save</Button>
+          <Button btnStyle="simple" onClick={p.closeModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
       </>
     );
   };
@@ -60,7 +52,6 @@ const GroupChat = (props: Props) => {
   const changeImage = (p) => {
     return (
       <>
-        <h3>Change Name</h3>
         <Uploader
           defaultFileList={featuredImage}
           onChange={setFeaturedImage}
@@ -69,20 +60,12 @@ const GroupChat = (props: Props) => {
           single={true}
           btnIconSize={30}
         />
-        <br />
-        <Button
-          style={{ float: 'right' }}
-          onClick={() => handleSubmit(p.closeModal)}
-        >
-          Add
-        </Button>
-        <Button
-          btnStyle="simple"
-          style={{ float: 'right', marginRight: '10px' }}
-          onClick={p.closeModal}
-        >
-          Cancel
-        </Button>
+        <ModalFooter>
+          <Button onClick={() => handleSubmit(p.closeModal)}>Save</Button>
+          <Button btnStyle="simple" onClick={p.closeModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
       </>
     );
   };
@@ -90,43 +73,31 @@ const GroupChat = (props: Props) => {
   return (
     <>
       <ModalTrigger
-        title="Add people"
+        title="Change group chat name"
         trigger={
           <ParticipantItemWrapper>
             <a href="#">
-              <Icon
-                icon="edit"
-                size={13}
-                color="black"
-                style={{ margin: '0 0.6em' }}
-              />
+              <Icon icon="edit" size={13} color="black" />
               Change group chat name
             </a>
           </ParticipantItemWrapper>
         }
         content={(p) => changeName(p)}
         isAnimate={true}
-        hideHeader={true}
       />
 
       <ModalTrigger
-        title="Add people"
+        title="Change group chat image"
         trigger={
           <ParticipantItemWrapper>
             <a href="#">
-              <Icon
-                icon="edit"
-                size={13}
-                color="black"
-                style={{ margin: '0 0.6em' }}
-              />
+              <Icon icon="image-edit" size={13} color="black" />
               Change group chat image
             </a>
           </ParticipantItemWrapper>
         }
         content={(p) => changeImage(p)}
         isAnimate={true}
-        hideHeader={true}
       />
     </>
   );

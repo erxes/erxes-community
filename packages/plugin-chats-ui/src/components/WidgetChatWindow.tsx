@@ -153,7 +153,7 @@ const WidgetChatWindow = (props: FinalProps) => {
             <div className="name">
               {chat.name || user.details?.fullName || user.email}
             </div>
-            {chat.type === 'direct' && (
+            {chat.type === 'direct' && user.details?.position && (
               <div className="position">{user.details?.position}</div>
             )}
           </p>
