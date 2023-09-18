@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client"
 import { useAtom } from "jotai"
 
 import { Label } from "@/components/ui/label"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select,
   SelectContent,
@@ -42,14 +41,12 @@ const ChooseConfig = () => {
           <SelectTrigger loading={loading}>
             <SelectValue placeholder="сонгох" />
           </SelectTrigger>
-          <SelectContent className="max-h-[300px]">
-            <ScrollArea>
-              {(configs || []).map(({ token, name, description }) => (
-                <SelectItem key={token} value={token}>
-                  {name} {!!description && `- ${description}`}
-                </SelectItem>
-              ))}
-            </ScrollArea>
+          <SelectContent>
+            {(configs || []).map(({ token, name, description }) => (
+              <SelectItem key={token} value={token}>
+                {name} {!!description && `- ${description}`}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
