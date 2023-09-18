@@ -71,7 +71,7 @@ class CategoryMask extends React.Component<Props, State> {
       this.setState({ activePerVal: perVal });
     };
     return (
-      <td colSpan={perVal.len || 1}>
+      <td colSpan={perVal.len || 1} key={Math.random()}>
         {perVal.static || (
           <>
             {(idEdit && (
@@ -203,7 +203,7 @@ class CategoryMask extends React.Component<Props, State> {
       return (
         <>
           <FormGroup>
-            <ControlLabel>FieldGroup</ControlLabel>
+            <ControlLabel>Field Group</ControlLabel>
             <FormControl
               name="fieldGroup"
               disabled={!isEdit}
