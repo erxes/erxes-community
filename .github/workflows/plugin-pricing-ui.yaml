@@ -47,7 +47,7 @@ on:
       - "packages/ui-pricing/**"
       - "packages/plugin-pricing-ui/**"
       - ".github/workflows/plugin-pricing-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

@@ -47,7 +47,7 @@ on:
       - "packages/ui-assets/**"
       - "packages/plugin-assets-ui/**"
       - ".github/workflows/plugin-assets-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

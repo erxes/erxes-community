@@ -47,7 +47,7 @@ on:
       - "packages/ui-loans/**"
       - "packages/plugin-loans-ui/**"
       - ".github/workflows/plugin-loans-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

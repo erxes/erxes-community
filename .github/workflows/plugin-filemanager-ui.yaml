@@ -47,7 +47,7 @@ on:
       - "packages/ui-filemanager/**"
       - "packages/plugin-filemanager-ui/**"
       - ".github/workflows/plugin-filemanager-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

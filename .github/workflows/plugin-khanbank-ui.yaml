@@ -47,7 +47,7 @@ on:
       - "packages/ui-khanbank/**"
       - "packages/plugin-khanbank-ui/**"
       - ".github/workflows/plugin-khanbank-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

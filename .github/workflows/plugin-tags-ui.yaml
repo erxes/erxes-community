@@ -47,7 +47,7 @@ on:
       - "packages/ui-tags/**"
       - "packages/plugin-tags-ui/**"
       - ".github/workflows/plugin-tags-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

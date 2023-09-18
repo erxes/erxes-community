@@ -47,7 +47,7 @@ on:
       - "packages/ui-facebook/**"
       - "packages/plugin-facebook-ui/**"
       - ".github/workflows/plugin-facebook-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

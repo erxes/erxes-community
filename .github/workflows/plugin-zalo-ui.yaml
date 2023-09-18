@@ -47,7 +47,7 @@ on:
       - "packages/ui-zalo/**"
       - "packages/plugin-zalo-ui/**"
       - ".github/workflows/plugin-zalo-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

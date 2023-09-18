@@ -47,7 +47,7 @@ on:
       - "packages/ui-notifications/**"
       - "packages/plugin-notifications-ui/**"
       - ".github/workflows/plugin-notifications-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

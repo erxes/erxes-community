@@ -47,7 +47,7 @@ on:
       - "packages/ui-imap/**"
       - "packages/plugin-imap-ui/**"
       - ".github/workflows/plugin-imap-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

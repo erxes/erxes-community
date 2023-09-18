@@ -47,7 +47,7 @@ on:
       - "packages/ui-meetings/**"
       - "packages/plugin-meetings-ui/**"
       - ".github/workflows/plugin-meetings-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

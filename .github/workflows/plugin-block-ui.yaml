@@ -47,7 +47,7 @@ on:
       - "packages/ui-block/**"
       - "packages/plugin-block-ui/**"
       - ".github/workflows/plugin-block-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

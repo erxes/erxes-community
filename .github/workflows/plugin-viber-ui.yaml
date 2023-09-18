@@ -47,7 +47,7 @@ on:
       - "packages/ui-viber/**"
       - "packages/plugin-viber-ui/**"
       - ".github/workflows/plugin-viber-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

@@ -47,7 +47,7 @@ on:
       - "packages/ui-engages/**"
       - "packages/plugin-engages-ui/**"
       - ".github/workflows/plugin-engages-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

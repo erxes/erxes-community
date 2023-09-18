@@ -47,7 +47,7 @@ on:
       - "packages/ui-timeclock/**"
       - "packages/plugin-timeclock-ui/**"
       - ".github/workflows/plugin-timeclock-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

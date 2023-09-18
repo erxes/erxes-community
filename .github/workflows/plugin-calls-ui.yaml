@@ -47,7 +47,7 @@ on:
       - "packages/ui-calls/**"
       - "packages/plugin-calls-ui/**"
       - ".github/workflows/plugin-calls-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

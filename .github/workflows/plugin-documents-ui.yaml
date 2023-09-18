@@ -47,7 +47,7 @@ on:
       - "packages/ui-documents/**"
       - "packages/plugin-documents-ui/**"
       - ".github/workflows/plugin-documents-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

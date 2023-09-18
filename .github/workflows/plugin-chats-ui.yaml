@@ -47,7 +47,7 @@ on:
       - "packages/ui-chats/**"
       - "packages/plugin-chats-ui/**"
       - ".github/workflows/plugin-chats-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

@@ -47,7 +47,7 @@ on:
       - "packages/ui-emailtemplates/**"
       - "packages/plugin-emailtemplates-ui/**"
       - ".github/workflows/plugin-emailtemplates-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

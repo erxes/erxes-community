@@ -47,7 +47,7 @@ on:
       - "packages/ui-contacts/**"
       - "packages/plugin-contacts-ui/**"
       - ".github/workflows/plugin-contacts-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

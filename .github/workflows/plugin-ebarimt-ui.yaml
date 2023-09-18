@@ -47,7 +47,7 @@ on:
       - "packages/ui-ebarimt/**"
       - "packages/plugin-ebarimt-ui/**"
       - ".github/workflows/plugin-ebarimt-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

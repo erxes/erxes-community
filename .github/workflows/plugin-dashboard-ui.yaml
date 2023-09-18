@@ -47,7 +47,7 @@ on:
       - "packages/ui-dashboard/**"
       - "packages/plugin-dashboard-ui/**"
       - ".github/workflows/plugin-dashboard-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04

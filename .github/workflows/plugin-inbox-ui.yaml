@@ -47,7 +47,7 @@ on:
       - "packages/ui-inbox/**"
       - "packages/plugin-inbox-ui/**"
       - ".github/workflows/plugin-inbox-ui.yaml"
-  
+
 jobs:
   ui:
     runs-on: ubuntu-20.04
