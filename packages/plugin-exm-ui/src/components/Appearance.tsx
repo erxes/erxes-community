@@ -9,7 +9,10 @@ import {
   Colors,
   Logos,
   AppearanceWrapper,
-  WelcomeContent
+  WelcomeContent,
+  TeamPortal,
+  FeatureRow,
+  FeatureRowItem
 } from '../styles';
 import TwitterPicker from 'react-color/lib/Twitter';
 import { ColorPick, ColorPicker } from '../styles';
@@ -31,10 +34,18 @@ type Props = {
 
 export default function Appearance(props: Props) {
   const { exm, edit } = props;
+
   const exmLogo = exm.logo;
+  const exmFavicon = exm.favicon;
   const exmAppearance = exm.appearance;
   const exmPages = exm.welcomeContent || ([] as IWelcomeContent[]);
   const [logo, setLogo] = useState(exmLogo);
+  const [favicon, setFavicon] = useState(exmFavicon);
+  const [url, setUrl] = useState(exm.url || '');
+  const [webName, setWebName] = useState(exm.webName || '');
+  const [webDescription, setWebDescription] = useState(
+    exm.webDescription || ''
+  );
   const [appearance, setAppearance] = useState(
     exmAppearance
       ? {
@@ -74,7 +85,18 @@ export default function Appearance(props: Props) {
           }
         : undefined,
       welcomeContent,
-      appearance
+      appearance,
+      webName,
+      webDescription,
+      url,
+      favicon: favicon
+        ? {
+            name: favicon.name,
+            url: favicon.url,
+            size: favicon.size,
+            type: favicon.type
+          }
+        : undefined
     });
   };
 
@@ -177,39 +199,81 @@ export default function Appearance(props: Props) {
   };
 
   return (
-    <AppearanceWrapper>
-      <GeneralWrapper>
-        <Logos>
-          <p>Logos</p>
-          <ControlLabel>{__('Logo 128x128 or 256x256')}</ControlLabel>
-          <Uploader
-            defaultFileList={logo ? [logo] : []}
-            onChange={(e: any) => onChangeAttachment(e.length ? e[0] : null)}
-            single={true}
-          />
-        </Logos>
-        <Colors>
-          <p>Colors</p>
-          <div>
-            <ControlLabel>{__('Primary color')}</ControlLabel>
-            {renderColorSelect('primaryColor', appearance.primaryColor)}
-          </div>
-          <div>
-            <ControlLabel>{__('Secondary color')}</ControlLabel>
-            {renderColorSelect('secondaryColor', appearance.secondaryColor)}
-          </div>
-        </Colors>
-        <WelcomeContent>
-          <p>Welcome content</p>
-          <Button onClick={() => onChangePageCount('add')}>+ Add Page</Button>
-          {welcomeContent.map((page, index) =>
-            renderWelcomeContent(page, index)
-          )}
-        </WelcomeContent>
-        <Button btnStyle="success" onClick={onSave}>
-          Save
-        </Button>
-      </GeneralWrapper>
-    </AppearanceWrapper>
+    // <AppearanceWrapper>
+    <GeneralWrapper>
+      <TeamPortal>
+        <p>EXM Web Appearance</p>
+        <FeatureRow>
+          <FeatureRowItem>
+            <ControlLabel>{__('Name your exm')}</ControlLabel>
+            <FormControl
+              value={webName}
+              placeholder="Name"
+              onChange={(e: any) => setWebName(e.target.value)}
+            />
+          </FeatureRowItem>
+          <FeatureRowItem>
+            <ControlLabel>{__('Describe your team portal')}</ControlLabel>
+            <FormControl
+              value={webDescription}
+              placeholder="Description"
+              onChange={(e: any) => setWebDescription(e.target.value)}
+            />
+          </FeatureRowItem>
+          <FeatureRowItem>
+            <ControlLabel>{__('Website')}</ControlLabel>
+            <FormControl
+              value={url}
+              placeholder="website"
+              onChange={(e: any) => setUrl(e.target.value)}
+            />
+          </FeatureRowItem>
+        </FeatureRow>
+      </TeamPortal>
+      <Logos>
+        <p>Logo and favicon</p>
+        <FeatureRow>
+          <FeatureRowItem>
+            <p>Logos</p>
+            <ControlLabel>{__('Logo 128x128 or 256x256')}</ControlLabel>
+            <Uploader
+              defaultFileList={logo ? [logo] : []}
+              onChange={(e: any) => onChangeAttachment(e.length ? e[0] : null)}
+              single={true}
+            />
+          </FeatureRowItem>
+          <FeatureRowItem>
+            <p>Favicon</p>
+            <ControlLabel>{__('Logo 128x128 or 256x256')}</ControlLabel>
+            <Uploader
+              defaultFileList={favicon ? [favicon] : []}
+              onChange={(e: any) => setFavicon(e.length ? e[0] : null)}
+              single={true}
+            />
+          </FeatureRowItem>
+        </FeatureRow>
+      </Logos>
+
+      <Colors>
+        <p>Colors</p>
+        <div>
+          <ControlLabel>{__('Primary color')}</ControlLabel>
+          {renderColorSelect('primaryColor', appearance.primaryColor)}
+        </div>
+        <div>
+          <ControlLabel>{__('Secondary color')}</ControlLabel>
+          {renderColorSelect('secondaryColor', appearance.secondaryColor)}
+        </div>
+      </Colors>
+      <WelcomeContent>
+        <p>Welcome content</p>
+        <Button onClick={() => onChangePageCount('add')}>+ Add Page</Button>
+        {welcomeContent.map((page, index) => renderWelcomeContent(page, index))}
+      </WelcomeContent>
+      <Button btnStyle="success" onClick={onSave}>
+        Save
+      </Button>
+    </GeneralWrapper>
+    // </AppearanceWrapper>
   );
 }

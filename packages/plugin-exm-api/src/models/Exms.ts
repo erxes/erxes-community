@@ -49,9 +49,13 @@ const scoringConfigSchema = new Schema(
 export const exmSchema = new Schema({
   _id: field({ pkey: true }),
   name: { type: String, label: 'Name' },
+  webName: { type: String, label: 'Web Name' },
+  webDescription: { type: String, label: 'Web Description' },
+  url: { type: String, label: 'Url' },
   description: { type: String, label: 'Description' },
   features: { type: [featureSchema] },
   logo: { type: Object },
+  favicon: { type: Object },
   welcomeContent: { type: [welcomeContentSchema] },
   appearance: { type: appearanceSchema },
   scoringConfig: { type: [scoringConfigSchema] },

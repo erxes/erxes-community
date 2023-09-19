@@ -5,6 +5,10 @@ const commonParamsDef = `
   $logo: AttachmentInput,
   $appearance: ExmAppearanceInput,
   $welcomeContent: [ExmWelcomeContentInput],
+  $url: String
+  $favicon: AttachmentInput
+  $webName: String
+  $webDescription: String
 `;
 
 const commonParams = `
@@ -14,6 +18,10 @@ const commonParams = `
   logo: $logo,
   appearance: $appearance,
   welcomeContent: $welcomeContent,
+  url: $url
+  favicon: $favicon
+  webName: $webName
+  webDescription: $webDescription
 `;
 
 const exmsAdd = `

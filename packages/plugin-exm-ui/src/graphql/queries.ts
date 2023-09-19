@@ -29,6 +29,10 @@ const exmGet = `
       }
       
       logo
+      url
+      favicon
+      webName
+      webDescription
     }
   }
 `;

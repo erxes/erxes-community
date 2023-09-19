@@ -40,8 +40,12 @@ export const types = _serviceDiscovery => {
     type Exm {
       _id: String
       name: String
+      webName: String
+      webDescription: String
       description: String
       logo: JSON
+      url: String
+      favicon: JSON
       features: [ExmFeature]
       welcomeContent: [ExmWelcomeContent]
       appearance: ExmAppearance
@@ -86,8 +90,12 @@ export const queries = `
 const commonParams = `
   name: String
   description: String
+  webName: String
+  webDescription: String
+  url: String
   features: [ExmFeatureInput]
   logo: AttachmentInput
+  favicon: AttachmentInput
   welcomeContent: [ExmWelcomeContentInput]
   appearance: ExmAppearanceInput
 `;
