@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 // erxes
-import Alert from '../../../utils/Alert';
-import Sidebar from '../../../layout/components/Sidebar';
-import Spinner from '../../../../modules/common/Spinner';
+import Alert from "../../../utils/Alert";
+import Sidebar from "../../../layout/components/Sidebar";
+import Spinner from "../../../../modules/common/Spinner";
 // local
-import Component from '../../components/chat/WidgetChatWindow';
-import { queries, mutations } from '../../graphql';
+import Component from "../../components/chat/WidgetChatWindow";
+import { queries, mutations } from "../../graphql";
 import { IUser } from "../../../auth/types";
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 const WidgetChatWindowContainer = (props: Props) => {
   const { chatId, currentUser } = props;
   const chatDetailQuery = useQuery(gql(queries.chatDetail), {
-    variables: { id: chatId }
+    variables: { id: chatId },
   });
 
   const [addMutation] = useMutation(gql(mutations.chatMessageAdd));
@@ -38,18 +38,14 @@ const WidgetChatWindowContainer = (props: Props) => {
 
     addMutation({
       variables: { content, chatId, relatedId, attachments },
-      refetchQueries: [{ query: gql(queries.chats) }]
-    }).catch(error => {
+      refetchQueries: [{ query: gql(queries.chats) }],
+    }).catch((error) => {
       Alert.error(error.message);
     });
   };
 
   if (chatDetailQuery.loading) {
-    return (
-      <Sidebar wide={true}>
-        <Spinner />
-      </Sidebar>
-    );
+    return <Spinner objective={true} />;
   }
 
   if (chatDetailQuery.error) {

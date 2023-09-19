@@ -31,7 +31,7 @@ type Props = {
   handlePin: (chatId: string) => void;
   isForward?: boolean;
   forwardChat?: (id?: string, type?: string) => void;
-  createChats: () => void;
+  createChat: () => void;
   setChatUser: (userId: string) => void;
 };
 
@@ -42,7 +42,7 @@ const ChatItem = (props: Props) => {
     currentUser,
     isForward,
     forwardChat,
-    createChats,
+    createChat,
     setChatUser
   } = props;
 
@@ -58,7 +58,7 @@ const ChatItem = (props: Props) => {
     }
     if (notContactUser) {
       setChatUser(notContactUser._id);
-      createChats();
+      createChat();
     }
   };
 

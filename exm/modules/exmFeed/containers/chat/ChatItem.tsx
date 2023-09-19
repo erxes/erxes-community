@@ -22,10 +22,11 @@ type Props = {
 };
 
 const ChatItemContainer = (props: Props) => {
+  const { chat, handleClickItem } = props;
+
   const [chatUser, setChatUser] = useState('');
   const [chatId, setChatId] = useState(undefined);
 
-  const { chat, handleClickItem } = props;
   const [removeMutation] = useMutation(gql(mutations.chatRemove));
   const [markAsReadMutation] = useMutation(gql(mutations.chatMarkAsRead));
 
@@ -67,7 +68,7 @@ const ChatItemContainer = (props: Props) => {
     });
   };
 
-  const createChats = () => {
+  const createChat = () => {
     if (chatId) {
       handleClickItem(chatId.getChatIdByUserIds);
     }
@@ -79,7 +80,7 @@ const ChatItemContainer = (props: Props) => {
       remove={remove}
       markAsRead={markAsRead}
       forwardChat={props.forwardChat}
-      createChats={createChats}
+      createChat={createChat}
       setChatUser={setChatUser}
     />
   );

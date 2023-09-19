@@ -131,6 +131,10 @@ hr {
   overflow: scroll;
 }
 
+#groupMembers-popover .arrow {
+  display: none;
+}
+
 #contextmenu-popover {
   left: -15px !important;
 }

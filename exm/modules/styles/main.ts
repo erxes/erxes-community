@@ -573,6 +573,11 @@ const CreatedDate = styledTS<{ isList?: boolean }>(styled.div)`
     `}
 `;
 
+const ModalFooter = styled.div`
+  text-align: right;
+  margin-top: 30px;
+`;
+
 export {
   Header,
   HeaderTop,
@@ -602,5 +607,6 @@ export {
   Content,
   NotificationList,
   InfoSection,
-  CreatedDate
+  CreatedDate,
+  ModalFooter,
 };

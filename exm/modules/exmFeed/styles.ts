@@ -4,6 +4,7 @@ import { UploadBtn } from '../common/Uploader';
 import { rgba, darken } from '../styles/ecolor';
 import styled, { keyframes, css } from 'styled-components';
 import styledTS from 'styled-components-ts';
+import { TabCaption } from '../common/tabs/styles';
 
 export const FeedLayout = styled.div`
   flex: 1;
@@ -54,7 +55,7 @@ export const UploadItems = styled.div`
     ${UploadBtn} {
       label {
         border: 1px dashed #d9d9d9;
-        background: ${rgba(colors.bgMain, .6)};
+        background: ${rgba(colors.bgMain, 0.6)};
         padding: 30px ${dimensions.headerSpacing}px;
         border-radius: ${dimensions.unitSpacing}px;
         margin-right: ${dimensions.coreSpacing}px;
@@ -62,9 +63,9 @@ export const UploadItems = styled.div`
         display: flex;
         flex-direction: column;
         align-items: center;
-        transition: all ease .3s;
+        transition: all ease 0.3s;
         font-size: 13px;
-        
+
         &:hover {
           border-color: ${colors.colorCoreBlueGray};
         }
@@ -79,7 +80,7 @@ export const UploadItems = styled.div`
 
 export const NewsFeedLayout = styled.div`
   margin-top: ${dimensions.coreSpacing}px;
-  
+
   > div {
     margin-bottom: 20px;
     border-radius: 10px;
@@ -106,7 +107,7 @@ export const OverflowWrapper = styled.div`
   flex: 1;
   max-height: 100vh;
 `;
-  
+
 export const FeedWrapper = styled(OverflowWrapper)`
   max-height: calc(100vh - 150px);
 `;
@@ -178,7 +179,7 @@ export const FeedActions = styledTS<{ showPin?: boolean | undefined }>(
   align-items: center;
 
   > i {
-    visibility: ${props => (props.showPin ? 'visible' : 'hidden')};
+    visibility: ${(props) => (props.showPin ? 'visible' : 'hidden')};
     color: #e91e27
   }
 
@@ -259,9 +260,9 @@ export const CustomRangeContainer = styled.div`
 export const FormWrap = styledTS<{ transparent?: boolean }>(styled.div)`
   form {
     padding: 10px 20px;
-    background: ${props => !props.transparent && '#f4f4f7'};
+    background: ${(props) => !props.transparent && '#f4f4f7'};
     border-radius: 10px;
-    border: ${props => !props.transparent && '1px solid #eee'} ;
+    border: ${(props) => !props.transparent && '1px solid #eee'} ;
     margin-bottom: 20px;
 
     > span,
@@ -277,18 +278,18 @@ export const FormWrap = styledTS<{ transparent?: boolean }>(styled.div)`
 `;
 
 export const Col = styledTS<{ width?: number }>(styled.div)`
-  width: ${props => (props.width ? props.width : 25)}%;
+  width: ${(props) => (props.width ? props.width : 25)}%;
   padding: ${dimensions.coreSpacing}px;
 `;
 
-export const AvatarImg = styled.img`
-  width: ${dimensions.coreSpacing + 6}px;
-  height: ${dimensions.coreSpacing + 6}px;
+export const AvatarImg = styledTS<{ size?: number }>(styled.img)`
+  width: ${(props) => (props.size ? props.size : dimensions.coreSpacing + 6)}px;
+  height: ${(props) =>
+    props.size ? props.size : dimensions.coreSpacing + 6}px;
   line-height: ${dimensions.coreSpacing + 6}px;
   border-radius: ${(dimensions.coreSpacing + 6) / 2}px;
   vertical-align: middle;
   background: ${colors.bgActive};
-  margin-right: ${dimensions.unitSpacing}px;
 `;
 
 export const CreateFormContainer = styled.div`
@@ -315,7 +316,7 @@ export const CreateInput = styled.div`
   align-items: center;
   padding: 10px 20px;
   cursor: pointer;
-  transition: all ease .3s;
+  transition: all ease 0.3s;
 
   &:hover {
     background: ${colors.bgMain};
@@ -338,7 +339,7 @@ export const AdditionalItem = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: all ease .3s;
+  transition: all ease 0.3s;
 
   &:hover {
     color: ${colors.textSecondary};
@@ -364,6 +365,10 @@ export const Card = styled.div`
   &:last-child {
     margin-bottom: 100px;
   }
+
+  ${TabCaption} {
+    font-size: 14px;
+  }
 `;
 
 export const LearnWrapper = styled.div`
@@ -375,7 +380,8 @@ export const LearnWrapper = styled.div`
   font-size: 14px;
   overflow: auto;
 
-  p, span {
+  p,
+  span {
     color: ${colors.colorCoreBlueGray};
   }
 
@@ -416,11 +422,12 @@ export const LearnBanner = styled.div`
     }
 
     a {
-
     }
 
-    h5, p, a {
-      color: ${rgba(colors.colorWhite, .9)};
+    h5,
+    p,
+    a {
+      color: ${rgba(colors.colorWhite, 0.9)};
     }
   }
 
@@ -429,7 +436,11 @@ export const LearnBanner = styled.div`
     position: absolute;
     width: 100%;
     height: 100%;
-    background: linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%);
+    background: linear-gradient(
+      360deg,
+      rgba(49, 56, 96, 0.16) 0%,
+      rgba(21, 25, 40, 0.88) 100%
+    );
   }
 
   > div {
@@ -442,7 +453,8 @@ export const LearnBanner = styled.div`
 
 export const LearnItem = styled.div`
   width: 32%;
-  margin: 0 ${dimensions.coreSpacing}px ${dimensions.coreSpacing + dimensions.coreSpacing}px 0;
+  margin: 0 ${dimensions.coreSpacing}px
+    ${dimensions.coreSpacing + dimensions.coreSpacing}px 0;
   overflow: hidden;
 
   &:nth-child(3n) {
@@ -462,13 +474,16 @@ export const LearnItem = styled.div`
       object-fit: cover;
     }
 
-
     &:before {
       content: '';
       position: absolute;
       width: 100%;
       height: 100%;
-      background: linear-gradient(360deg, rgba(49, 56, 96, 0.16) 0%, rgba(21, 25, 40, 0.88) 100%);
+      background: linear-gradient(
+        360deg,
+        rgba(49, 56, 96, 0.16) 0%,
+        rgba(21, 25, 40, 0.88) 100%
+      );
     }
   }
 `;
@@ -583,12 +598,12 @@ export const ChatItemWrapper = styledTS<{
   position: relative;
   display: flex;
   align-items: center;
-  background-color: ${props => (props.active ? colors.bgGray : 'initial')};
+  background-color: ${(props) => (props.active ? colors.bgGray : 'initial')};
   padding: ${dimensions.unitSpacing}px 0;
   transition: 0.2s;
 
   &:hover {
-    background-color: ${props =>
+    background-color: ${(props) =>
       props.isWidget ? colors.bgLight : colors.bgGray};
     cursor: pointer;
     transition: 0.2s;
@@ -601,8 +616,7 @@ export const ChatItemWrapper = styledTS<{
 
 export const ChatGroupAvatar = styled.div`
   position: relative;
-  min-width: 36px;
-  max-width: 36px;
+  width: 36px;
   height: 36px;
 
   span:first-child {
@@ -626,7 +640,7 @@ export const ChatWrapper = styledTS<{ isSeen?: boolean }>(styled.div)`
   margin: 0;
   color: ${colors.textPrimary};
   font-size: 14px !important;
-  font-weight: ${props => (props.isSeen ? 'normal !important' : 'bold')};
+  font-weight: ${(props) => (props.isSeen ? 'normal !important' : 'bold')};
   text-decoration: none;
 
   p { 
@@ -686,7 +700,7 @@ export const ContextMenuItem = styledTS<{ color?: string }>(styled.button)`
   border: 0;
   outline: 0;
   border-radius: 5px;
-  color: ${props => props.color || colors.textPrimary};
+  color: ${(props) => props.color || colors.textPrimary};
   padding: 10px;
   text-align: left;
   cursor: pointer;
@@ -721,11 +735,13 @@ export const WidgetChatWindowWrapper = styled.div`
   border-radius: 8px;
   overflow: hidden;
   background-color: #f9f9f9;
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 
-  -webkit-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),
+    0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1),
+    0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 `;
 
 export const WidgetChatWindowHeader = styled.div`
@@ -736,7 +752,8 @@ export const WidgetChatWindowHeader = styled.div`
   align-items: center;
   background-color: #f9f9f9;
   padding: ${dimensions.unitSpacing}px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),0 -1px rgba(0, 0, 0, 0.1) inset,0 2px 1px -1px rgba(255, 255, 255, 0.5) inset;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 -1px rgba(0, 0, 0, 0.1) inset,
+    0 2px 1px -1px rgba(255, 255, 255, 0.5) inset;
 
   i {
     cursor: pointer;
@@ -755,7 +772,7 @@ export const WidgetChatWindowHeader = styled.div`
       flex-direction: column;
       font-size: 16px;
       .name {
-        height: 15px;
+        height: 20px;
         max-width: 186px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -764,9 +781,13 @@ export const WidgetChatWindowHeader = styled.div`
       }
 
       .position {
-        color: #65676B;
+        color: #65676b;
         font-weight: 400;
-        font-size: .75rem;
+        font-size: 0.75rem;
+        height: 17px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        align-items: flex-start;
       }
     }
   }
@@ -782,8 +803,11 @@ export const MinimizedWidgetChatWindow = styled.div`
     width: 250px;
 
     p {
-      max-width: 130px;
+      max-width: 140px;
       font-size: 14px;
+      height: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     span:first-child {
@@ -794,7 +818,7 @@ export const MinimizedWidgetChatWindow = styled.div`
     span:last-child {
       top: 4px;
       right: 5px;
-    }  
+    }
   }
 `;
 
@@ -931,8 +955,8 @@ export const MessageItemWrapper = styledTS<{ me?: boolean }>(styled.div)`
   position: relative;
   display: flex;
   align-items: flex-end;
-  justify-content: ${props => (props.me ? 'flex-start' : 'flex-end')};
-  flex-direction: ${props => (props.me ? 'row' : 'row-reverse')};
+  justify-content: ${(props) => (props.me ? 'flex-start' : 'flex-end')};
+  flex-direction: ${(props) => (props.me ? 'row' : 'row-reverse')};
   margin: 2px;
 
   &:last-child {
@@ -943,12 +967,12 @@ export const MessageItemWrapper = styledTS<{ me?: boolean }>(styled.div)`
 export const MessageWrapper = styledTS<{ me?: boolean }>(styled.div)`
   max-width: 560px;
   display: flex;
-  align-items: ${props => (props.me ? 'flex-end' : 'flex-start')};
-  justify-content: ${props => (props.me ? 'flex-end' : 'flex-start')};
+  align-items: ${(props) => (props.me ? 'flex-end' : 'flex-start')};
+  justify-content: ${(props) => (props.me ? 'flex-end' : 'flex-start')};
   flex-direction: column;
   overflow: hidden;
   margin: 0;
-  margin-left: ${props => (!props.me ? dimensions.unitSpacing : 0)}px;
+  margin-left: ${(props) => (!props.me ? dimensions.unitSpacing : 0)}px;
 `;
 
 export const MessageReply = styled.div`
@@ -994,9 +1018,9 @@ export const MessageOption = styled.button`
 export const MessageBody = styledTS<{ me?: boolean }>(styled.div)`
   max-width: 560px;
   display: flex;
-  justify-content: ${props => (props.me ? 'flex-end' : 'flex-start')};
-  align-items: ${props => (props.me ? 'flex-end' : 'flex-start')};
-  flex-direction: ${props => (props.me ? 'row' : 'row-reverse')};
+  justify-content: ${(props) => (props.me ? 'flex-end' : 'flex-start')};
+  align-items: ${(props) => (props.me ? 'flex-end' : 'flex-start')};
+  flex-direction: ${(props) => (props.me ? 'row' : 'row-reverse')};
   gap: 5px;
 
   &:hover {
@@ -1014,9 +1038,9 @@ export const MessageContent = styledTS<{ me?: boolean }>(styled.div)`
   word-break: break-word;
 
   border-radius: 17px;
-  background-color: ${props =>
+  background-color: ${(props) =>
     props.me ? colors.colorPrimary : colors.bgGray};
-  color: ${props => (props.me ? 'white' : 'initial')};
+  color: ${(props) => (props.me ? 'white' : 'initial')};
   padding: 8px 14px;
   margin: 0;
   font-size: 15px;
@@ -1042,7 +1066,7 @@ export const MessageAttachmentWrapper = styled.div`
 `;
 
 export const MessageBy = styled.div`
-  color: #65676B;
+  color: #65676b;
   font-weight: 400;
   font-size: 11px;
 `;
@@ -1074,7 +1098,7 @@ export const GroupChatModal = styled.div`
 
   input {
     border: none;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 1px solid #e2e8f0;
     border-radius: 0;
     padding: 1.5em 0;
   }
@@ -1082,7 +1106,7 @@ export const GroupChatModal = styled.div`
   .Select-control {
     border-radius: 0px;
     border: 0;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 1px solid #e2e8f0;
   }
 
   .Select-placeholder {
@@ -1111,7 +1135,7 @@ const pulse = keyframes`
 `;
 
 export const RecordButton = styledTS<{ isRecording: boolean }>(styled.button)`
-  background-color: ${props =>
+  background-color: ${(props) =>
     props.isRecording ? colors.colorShadowGray : 'none'};
   border-radius: 100%;
   border: none;
@@ -1121,7 +1145,7 @@ export const RecordButton = styledTS<{ isRecording: boolean }>(styled.button)`
   width: 31px;
   height: 31px;
 
-  animation: ${props =>
+  animation: ${(props) =>
     props.isRecording &&
     css`
       ${pulse} 1s infinite;
@@ -1141,6 +1165,10 @@ export const ParticipantItemWrapper = styled.div`
     width: 100%;
     font-size: 0.83em;
     border-radius: 5px;
+
+    i {
+      margin: 0 0.6em;
+    }
   }
 
   a:hover {
@@ -1154,8 +1182,11 @@ export const ParticipantItemWrapper = styled.div`
 
   &:hover {
     ${ChatActions} {
-    display: flex;
+      display: flex;
     }
+  }
+  &:last-child {
+    margin-bottom: 0;
   }
 `;
 
@@ -1197,6 +1228,7 @@ export const NoEvent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 40px;
 `;
 
 export const SearchInput = styledTS<{ active?: boolean }>(styled.div)`
@@ -1226,7 +1258,7 @@ export const FlexAlignCenter = styled.div`
   align-items: center;
   padding: 8px;
   position: relative;
-  
+
   &:before {
     border-bottom: 1px solid #dadada;
     content: '';
@@ -1241,8 +1273,8 @@ export const FlexAlignCenter = styled.div`
     border-bottom: none;
   }
 
-  > div{
-    width: calc( 100% - 70px );
+  > div {
+    width: calc(100% - 70px);
 
     b {
       max-height: 35px;
@@ -1262,7 +1294,9 @@ export const FlexAlignCenter = styled.div`
   }
 `;
 
-export const AttachmentContainer = styledTS<{attachmentLength: number}>(styled.div)`
+export const AttachmentContainer = styledTS<{ attachmentLength: number }>(
+  styled.div
+)`
   > div {
     display: flex;
     margin-top: 5px;
@@ -1274,7 +1308,8 @@ export const AttachmentContainer = styledTS<{attachmentLength: number}>(styled.d
       border-top: 1px solid #ddd;
       margin-right: 5px;
       border-left: 1px solid #ddd;
-      ${props => props.attachmentLength === 3 ? `width: 50%;` : `width: 33%;`}
+      ${(props) =>
+        props.attachmentLength === 3 ? `width: 50%;` : `width: 33%;`}
 
       &:first-child {
         border-left: none;
@@ -1289,17 +1324,22 @@ export const AttachmentContainer = styledTS<{attachmentLength: number}>(styled.d
   > img {
     object-fit: cover;
 
-    ${props => (props.attachmentLength === 1 || props.attachmentLength > 2) ? `
+    ${(props) =>
+      props.attachmentLength === 1 || props.attachmentLength > 2
+        ? `
       width: 100%;
       border-top: 1px solid #ddd;
       max-height: 400px;
-      ` : props.attachmentLength === 2 ? `
+      `
+        : props.attachmentLength === 2
+        ? `
       width: 50%;
       height: 400px;
       &:last-child {
         width: calc(50% - 5px);
         margin-left: 5px;
-      }` : ``}
+      }`
+        : ``}
   }
 `;
 
@@ -1327,7 +1367,7 @@ export const CommentForm = styledTS<{ isReply?: boolean }>(styled.div)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: ${props =>
+  margin: ${(props) =>
     props.isReply
       ? `${dimensions.coreSpacing}px 0 0 0`
       : `${dimensions.coreSpacing}px 0`};
@@ -1360,4 +1400,11 @@ export const ActionBar = styled.div`
 
 export const Reply = styled.div`
   margin-left: ${dimensions.coreSpacing * 2}px;
+`;
+
+export const MembersPopoverWrapper = styled.div`
+  > button {
+    margin-bottom: 10px;
+    padding: 7px 0;
+  }
 `;

@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // erxes
-import Avatar from '../../../../modules/common/nameCard/Avatar';
-import Icon from '../../../../modules/common/Icon';
-import { IUser } from '../../../auth/types';
+import Avatar from "../../../../modules/common/nameCard/Avatar";
+import Icon from "../../../../modules/common/Icon";
+import Button from "../../../../modules/common/Button";
+import Tip from "../../../../modules/common/Tip";
+import { IUser } from "../../../auth/types";
 // local
-import MessageList from '../../containers/chat/MessageList';
-import Editor from '../../containers/chat/Editor';
-import ReplyInfo from './ReplyInfo';
+import MessageList from "../../containers/chat/MessageList";
+import Editor from "../../containers/chat/Editor";
+import ReplyInfo from "./ReplyInfo";
 import {
   ChatGroupAvatar,
   WidgetChatWindowWrapper,
   WidgetChatWindowHeader,
   MinimizedWidgetChatWindow,
-  AvatarImg
-} from '../../styles';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
-import ParticipantList from './participants/ParticipantList';
-import GroupChatAction from '../../containers/chat/GroupChatAction';
-import { readFile } from '../../../utils';
+  AvatarImg,
+  MembersPopoverWrapper,
+  ParticipantItemWrapper,
+} from "../../styles";
+import { OverlayTrigger, Popover } from "react-bootstrap";
+import ParticipantList from "./participants/ParticipantList";
+import GroupChatAction from "../../containers/chat/GroupChatAction";
+import { readFile } from "../../../utils";
 
 type Props = {
   chat: any;
@@ -34,6 +38,7 @@ const WidgetChatWindow = (props: Props) => {
   const { chat, currentUser } = props;
   const [reply, setReply] = useState<any>(null);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [popoverContentType, setPopoverContentType] = useState("main");
 
   const users: any[] = chat.participantUsers || [];
   const user: any =
@@ -52,12 +57,38 @@ const WidgetChatWindow = (props: Props) => {
     setIsMinimized(!isMinimized);
   };
 
-  const popoverContent = (
-    <Popover id="groupMembers-popover">
-      <GroupChatAction chat={chat} />
-      <ParticipantList chat={chat} />
-    </Popover>
-  );
+  const popoverContent = () => {
+    if (popoverContentType === "members") {
+      return (
+        <Popover id="groupMembers-popover">
+          <MembersPopoverWrapper>
+            <Button
+              btnStyle="link"
+              icon="arrow-left"
+              onClick={() => setPopoverContentType("main")}
+            >
+              Back
+            </Button>
+            <ParticipantList type="widget" chat={chat} />
+          </MembersPopoverWrapper>
+        </Popover>
+      );
+    }
+    if (popoverContentType === "main") {
+      return (
+        <Popover id="groupMembers-popover">
+          <GroupChatAction chat={chat} />
+          <ParticipantItemWrapper>
+            <a onClick={() => setPopoverContentType("members")}>
+              <Icon icon="users" color="black" size={13} />
+              See group members
+            </a>
+          </ParticipantItemWrapper>
+        </Popover>
+      );
+    }
+    return null;
+  };
 
   const showActiveChat = () => {
     if (isMinimized) {
@@ -65,20 +96,32 @@ const WidgetChatWindow = (props: Props) => {
         <MinimizedWidgetChatWindow onClick={() => handleMinimize()}>
           <WidgetChatWindowHeader>
             <div>
-              {chat.type === 'direct' ? (
+              {chat.type === "direct" ? (
                 <Avatar user={user} size={23} />
               ) : (
                 <ChatGroupAvatar>
-                  <Avatar user={users[0]} size={18} />
-                  <Avatar user={users[1]} size={18} />
+                  {chat.featuredImage.length > 0 ? (
+                    <AvatarImg
+                      alt={"author"}
+                      size={23}
+                      src={readFile(chat && chat.featuredImage[0].url, 60)}
+                    />
+                  ) : (
+                    <>
+                      <Avatar user={users[0]} size={18} />
+                      <Avatar user={users[1]} size={18} />
+                    </>
+                  )}
                 </ChatGroupAvatar>
               )}
-              <p>
-                {chat.name || user.details?.fullName || user.email}
-                {chat.type === 'direct' && (
-                  <div className="position">{user.details?.position}</div>
-                )}
-              </p>
+              <Tip
+                text={chat.name || user.details?.fullName || user.email}
+                placement="top"
+              >
+                <p className="name">
+                  {chat.name || user.details?.fullName || user.email}
+                </p>
+              </Tip>
             </div>
             <div>
               <Icon icon="minus-1" size={20} onClick={() => handleMinimize()} />
@@ -97,37 +140,47 @@ const WidgetChatWindow = (props: Props) => {
       <WidgetChatWindowWrapper onKeyDown={handleKeyDown}>
         <WidgetChatWindowHeader>
           <div>
-            {chat.type === 'direct' ? (
+            {chat.type === "direct" ? (
               <Avatar user={user} size={32} />
             ) : (
               <ChatGroupAvatar>
                 {chat.featuredImage.length > 0 ? (
                   <AvatarImg
-                    alt={'author'}
+                    alt={"author"}
+                    size={32}
                     src={readFile(chat && chat.featuredImage[0].url, 60)}
                   />
                 ) : (
                   <>
                     <Avatar user={users[0]} size={24} />
-                    <Avatar user={users[1]} size={24} />{' '}
+                    <Avatar user={users[1]} size={24} />{" "}
                   </>
                 )}
               </ChatGroupAvatar>
             )}
             <p>
-              <div className="name">
-                {chat.name || user?.details?.fullName || user?.email}
-              </div>
-              {chat.type === 'direct' && (
-                <div className="position">{user.details?.position}</div>
+              <Tip
+                text={chat.name || user?.details?.fullName || user?.email}
+                placement="top"
+              >
+                <div className="name">
+                  {chat.name || user?.details?.fullName || user?.email}
+                </div>
+              </Tip>
+
+              {chat.type === "direct" && (
+                <Tip text={user.details?.position} placement="top">
+                  <div className="position">{user.details?.position}</div>
+                </Tip>
               )}
             </p>
-            {chat.type === 'group' && (
+            {chat.type === "group" && (
               <OverlayTrigger
                 trigger="click"
                 rootClose={false}
                 placement="bottom"
-                overlay={popoverContent}
+                overlay={popoverContent()}
+                onExit={() => setPopoverContentType("main")}
               >
                 <Icon icon="downarrow-2" size={14} />
               </OverlayTrigger>
