@@ -3,6 +3,9 @@ import { IAttachment } from 'modules/common/types';
 interface IAppearence {
   primaryColor: string;
   secondaryColor: string;
+  bodyColor: string;
+  headerColor: string;
+  footerColor: string;
 }
 interface IFeature {
   _id: string;

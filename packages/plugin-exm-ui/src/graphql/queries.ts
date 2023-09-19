@@ -19,6 +19,9 @@ const exmGet = `
       appearance {
         primaryColor
         secondaryColor
+        bodyColor
+        headerColor
+        footerColor
       }
       
       logo

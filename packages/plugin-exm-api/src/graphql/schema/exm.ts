@@ -18,6 +18,9 @@ export const types = _serviceDiscovery => {
     type ExmAppearance {
       primaryColor: String
       secondaryColor: String
+      bodyColor: String
+      headerColor: String
+      footerColor: String
     }
 
     type ExmFeature {
@@ -53,6 +56,9 @@ export const types = _serviceDiscovery => {
     input ExmAppearanceInput {
       primaryColor: String
       secondaryColor: String
+      bodyColor: String
+      headerColor: String
+      footerColor: String
     }
 
     input ExmFeatureInput {

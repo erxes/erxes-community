@@ -41,9 +41,18 @@ export default function Appearance(props: Props) {
     exmAppearance
       ? {
           primaryColor: exmAppearance.primaryColor,
-          secondaryColor: exmAppearance.secondaryColor
+          secondaryColor: exmAppearance.secondaryColor,
+          bodyColor: exmAppearance.bodyColor,
+          headerColor: exmAppearance.headerColor,
+          footerColor: exmAppearance.footerColor
         }
-      : { primaryColor: 'red', secondaryColor: 'green' }
+      : {
+          primaryColor: 'red',
+          secondaryColor: 'green',
+          bodyColor: '',
+          headerColor: '',
+          footerColor: ''
+        }
   );
 
   const onSave = () => {
@@ -179,6 +188,18 @@ export default function Appearance(props: Props) {
           <div>
             <ControlLabel>{__('Secondary color')}</ControlLabel>
             {renderColorSelect('secondaryColor', appearance.secondaryColor)}
+          </div>
+          <div>
+            <ControlLabel>{__('Body color')}</ControlLabel>
+            {renderColorSelect('bodyColor', appearance.bodyColor)}
+          </div>
+          <div>
+            <ControlLabel>{__('Header color')}</ControlLabel>
+            {renderColorSelect('headerColor', appearance.headerColor)}
+          </div>
+          <div>
+            <ControlLabel>{__('Footer color')}</ControlLabel>
+            {renderColorSelect('footerColor', appearance.footerColor)}
           </div>
         </Colors>
         <Button btnStyle="success" onClick={onSave}>

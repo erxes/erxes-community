@@ -24,7 +24,10 @@ const featureSchema = new Schema({
 const appearanceSchema = new Schema(
   {
     primaryColor: { type: String },
-    secondaryColor: { type: String }
+    secondaryColor: { type: String },
+    bodyColor: { type: String },
+    headerColor: { type: String },
+    footerColor: { type: String }
   },
   { _id: false }
 );
