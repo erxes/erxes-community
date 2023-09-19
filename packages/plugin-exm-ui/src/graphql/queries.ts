@@ -16,13 +16,6 @@ const exmGet = `
         subContentId
       }
       
-      welcomeContent {
-        _id
-        title
-        content
-        image
-      }
-      
       appearance {
         primaryColor
         secondaryColor

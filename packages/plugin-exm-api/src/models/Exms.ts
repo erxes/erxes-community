@@ -21,13 +21,6 @@ const featureSchema = new Schema({
   subContentId: { type: String }
 });
 
-const welcomeContentSchema = new Schema({
-  _id: { type: String },
-  title: { type: String },
-  image: { type: Object },
-  content: { type: String }
-});
-
 const appearanceSchema = new Schema(
   {
     primaryColor: { type: String },
@@ -56,7 +49,6 @@ export const exmSchema = new Schema({
   features: { type: [featureSchema] },
   logo: { type: Object },
   favicon: { type: Object },
-  welcomeContent: { type: [welcomeContentSchema] },
   appearance: { type: appearanceSchema },
   scoringConfig: { type: [scoringConfigSchema] },
   createdBy: { type: String, label: 'Created by' },

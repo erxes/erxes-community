@@ -14,13 +14,6 @@ export const types = _serviceDiscovery => {
       size: Float
       duration: Float
     }
-    
-    type ExmWelcomeContent {
-      _id: String
-      title: String
-      image: JSON
-      content: String
-    }
 
     type ExmAppearance {
       primaryColor: String
@@ -47,7 +40,6 @@ export const types = _serviceDiscovery => {
       url: String
       favicon: JSON
       features: [ExmFeature]
-      welcomeContent: [ExmWelcomeContent]
       appearance: ExmAppearance
       createdAt: Date
       createdBy: String
@@ -61,13 +53,6 @@ export const types = _serviceDiscovery => {
     input ExmAppearanceInput {
       primaryColor: String
       secondaryColor: String
-    }
-
-    input ExmWelcomeContentInput {
-      _id: String
-      title: String
-      image: AttachmentInput
-      content: String
     }
 
     input ExmFeatureInput {
@@ -96,7 +81,6 @@ const commonParams = `
   features: [ExmFeatureInput]
   logo: AttachmentInput
   favicon: AttachmentInput
-  welcomeContent: [ExmWelcomeContentInput]
   appearance: ExmAppearanceInput
 `;
 
