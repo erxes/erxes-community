@@ -31,7 +31,8 @@ type Props = {
   handlePin: (chatId: string) => void;
   isForward?: boolean;
   forwardChat?: (id?: string, type?: string) => void;
-  createChats: (userIds: string[]) => void;
+  createChat: () => void;
+  setChatUser: (userId: string) => void;
 };
 
 const ChatItem = (props: Props) => {
@@ -41,7 +42,8 @@ const ChatItem = (props: Props) => {
     currentUser,
     isForward,
     forwardChat,
-    createChats,
+    createChat,
+    setChatUser
   } = props;
 
   const users: any[] = chat?.participantUsers || [];
@@ -55,7 +57,8 @@ const ChatItem = (props: Props) => {
       props.handleClickItem(chat._id);
     }
     if (notContactUser) {
-      createChats([notContactUser._id, currentUser._id]);
+      setChatUser(notContactUser._id);
+      createChat();
     }
   };
 
