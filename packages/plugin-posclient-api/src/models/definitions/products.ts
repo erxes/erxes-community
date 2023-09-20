@@ -20,7 +20,7 @@ interface IAttachment {
 }
 
 export interface ISubUom {
-  uomId: string;
+  uom: string;
   ratio: number;
 }
 interface IProductCommonFields {
@@ -38,7 +38,6 @@ export interface IPrice {
 export interface IProduct extends IProductCommonFields {
   categoryId?: string;
   type?: string;
-  sku?: string;
   barcodes?: string[];
   barcodeDescription?: string;
   prices: IPrice;
@@ -49,10 +48,12 @@ export interface IProduct extends IProductCommonFields {
   vendorCode?: string;
   mergedIds?: string[];
   attachmentMore?: IAttachment[];
-  uomId?: string;
+  uom?: string;
   subUoms?: ISubUom[];
   taxType?: string;
   taxCode?: string;
+  isCheckRems: { [token: string]: boolean };
+  sameMasks?: string[];
 }
 
 export interface IProductDocument extends IProduct, Document {
@@ -65,6 +66,15 @@ export interface IProductCategory extends IProductCommonFields {
   order: string;
   parentId?: string;
   status: string;
+  maskType?: string;
+  mask?: any;
+  isSimilarity?: boolean;
+  similarities: {
+    id: string;
+    groupId: string;
+    fieldId: string;
+    title: string;
+  }[];
 }
 
 export interface IProductCategoryDocument extends IProductCategory, Document {
@@ -75,7 +85,7 @@ export interface IProductCategoryDocument extends IProductCategory, Document {
 
 const subUomSchema = new Schema({
   _id: field({ pkey: true }),
-  uomId: field({ type: String, label: 'Sub unit of measurement' }),
+  uom: field({ type: String, label: 'Sub unit of measurement' }),
   ratio: field({ type: Number, label: 'ratio of sub uom to main uom' })
 });
 
@@ -111,13 +121,7 @@ export const productSchema = schemaWrapper(
       label: 'Tags',
       index: true
     }),
-    sku: field({
-      type: String,
-      optional: true,
-      label: 'Stock keeping unit',
-      default: 'ш'
-    }),
-    uomId: field({
+    uom: field({
       type: String,
       optional: true,
       label: 'Main unit of measurement'
@@ -150,7 +154,13 @@ export const productSchema = schemaWrapper(
     attachmentMore: field({ type: [attachmentSchema] }),
     tokens: field({ type: [String] }),
     taxType: field({ type: String, optional: true, label: 'VAT type' }),
-    taxCode: field({ type: String, optional: true, label: '' })
+    taxCode: field({ type: String, optional: true, label: '' }),
+    isCheckRems: field({
+      type: Object,
+      optional: true,
+      label: 'check remainder by token'
+    }),
+    sameMasks: field({ type: [String] })
   })
 );
 
@@ -174,7 +184,12 @@ export const productCategorySchema = schemaHooksWrapper(
       index: true
     }),
     createdAt: getDateFieldDefinition('Created at'),
-    tokens: field({ type: [String] })
+    tokens: field({ type: [String] }),
+    mask: field({ type: Object, label: 'Mask' }),
+    isSimilarity: field({ type: Boolean, label: 'is Similiraties' }),
+    similarities: field({
+      type: [{ id: String, groupId: String, fieldId: String, title: String }]
+    })
   }),
   'erxes_productCategorySchema'
 );

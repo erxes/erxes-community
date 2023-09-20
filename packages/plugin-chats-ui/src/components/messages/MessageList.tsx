@@ -11,15 +11,17 @@ type Props = {
   isAllMessages: boolean;
   setReply: (text: string) => void;
   loadEarlierMessage: () => void;
+  isWidget?: boolean;
+  chatType?: string;
 };
 
 const MessageList = (props: Props) => {
-  const { messages, latestMessages, isAllMessages } = props;
+  const { messages, latestMessages, isAllMessages, isWidget, chatType } = props;
   const messageListRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (messageListRef && messageListRef.current) {
-      let element = messageListRef.current;
+      const element = messageListRef.current;
 
       if (element) {
         element.scrollTop = 0;
@@ -29,7 +31,7 @@ const MessageList = (props: Props) => {
 
   const handleScroll = () => {
     if (messageListRef && messageListRef.current) {
-      let element = messageListRef.current;
+      const element = messageListRef.current;
 
       if (element.scrollTop === element.clientHeight - element.scrollHeight) {
         props.loadEarlierMessage();
@@ -40,10 +42,22 @@ const MessageList = (props: Props) => {
   return (
     <MessageListWrapper innerRef={messageListRef} onScroll={handleScroll}>
       {latestMessages.map(m => (
-        <MessageItem key={m._id} message={m} setReply={props.setReply} />
+        <MessageItem
+          key={m._id}
+          message={m}
+          setReply={props.setReply}
+          isWidget={isWidget}
+          chatType={chatType}
+        />
       ))}
       {messages.map(m => (
-        <MessageItem key={m._id} message={m} setReply={props.setReply} />
+        <MessageItem
+          key={m._id}
+          message={m}
+          setReply={props.setReply}
+          isWidget={isWidget}
+          chatType={chatType}
+        />
       ))}
       {!isAllMessages ? (
         <MessageItemWrapper>

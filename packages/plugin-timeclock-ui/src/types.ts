@@ -12,6 +12,10 @@ export interface ITimeclock {
   employeeId?: number;
   deviceName?: string;
   deviceType?: string;
+  inDevice?: string;
+  outDevice?: string;
+  inDeviceType?: string;
+  outDeviceType?: string;
   branchName?: string;
 }
 export interface ITimelog {
@@ -60,6 +64,9 @@ export interface IReport {
 export interface IUserReport {
   user: IUser;
   scheduleReport: IScheduleReport[];
+
+  branchTitles?: string[];
+  departmentTitles?: string[];
 
   totalMinsWorked?: number;
   totalMinsWorkedToday?: number;
@@ -136,6 +143,7 @@ export interface IShift {
   shiftStart: Date;
   shiftEnd: Date;
   scheduleConfigId: string;
+  lunchBreakInMins?: number;
 }
 
 export interface IShiftSchedule {
@@ -150,6 +158,18 @@ export interface IScheduleConfig {
   shiftStart: string;
   shiftEnd: string;
   configDays: IScheduleConfigDays[];
+}
+
+export interface IScheduleConfigOrder {
+  _id?: string;
+  userId: string;
+  orderedList: IScheduleConfigOrderItem[];
+}
+export interface IScheduleConfigOrderItem {
+  scheduleConfigId: string;
+  order: number;
+  pinned: boolean;
+  label?: string;
 }
 
 export interface IScheduleConfigDays {
@@ -167,6 +187,7 @@ export interface IScheduleDate {
 
   scheduleConfigId?: string;
   lunchBreakInMins?: number;
+  inputChecked?: boolean;
 
   shiftDate?: Date;
   shiftStart: Date;
@@ -212,6 +233,11 @@ export type PayDatesQueryResponse = {
   refetch: () => void;
   loading: boolean;
 };
+
+export type ScheduleConfigOrderQueryResponse = {
+  scheduleConfigOrder: IScheduleConfigOrder;
+} & QueryResponse;
+
 export type HolidaysQueryResponse = {
   holidays: IAbsence[];
 } & QueryResponse;
@@ -282,11 +308,11 @@ export type ScheduleMutationVariables = {
 
 export type TimeLogMutationResponse = {
   extractTimeLogsFromMsSQLMutation: (params: {
-    variables: { startDate: string; endDate: string };
+    variables: { startDate: string; endDate: string; params: any };
   }) => Promise<any>;
 
   createTimeClockFromLogMutation: (params: {
-    variables: { userId: string; timelog: Date };
+    variables: { userId: string; timelog: Date; inDevice?: string };
   }) => Promise<any>;
 };
 
@@ -427,4 +453,6 @@ export type ScheduleMutationResponse = {
   checkDuplicateScheduleShiftsMutation: (params: {
     variables: ScheduleMutationVariables;
   }) => Promise<any>;
+
+  scheduleConfigOrderEditMutation: (params: { variables: any }) => Promise<any>;
 };

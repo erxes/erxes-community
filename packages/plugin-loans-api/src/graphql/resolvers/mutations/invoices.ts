@@ -1,19 +1,13 @@
-import { gatherDescriptions } from '../../../utils';
-import {
-  checkPermission,
-  putCreateLog,
-  putDeleteLog,
-  putUpdateLog
-} from '@erxes/api-utils/src';
+import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
 import {
   IInvoice,
   IInvoiceDocument
 } from '../../../models/definitions/invoices';
+import { createLog, deleteLog, updateLog } from '../../../logUtils';
 
 const invoiceMutations = {
-  invoicesAdd: async (
+  loanInvoicesAdd: async (
     _root,
     doc: IInvoice,
     { user, models, subdomain }: IContext
@@ -31,14 +25,7 @@ const invoiceMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putCreateLog(
-      subdomain,
-      messageBroker(),
-      { ...descriptions, ...logData },
-      user
-    );
+    await createLog(subdomain, user, logData);
 
     return invoice;
   },
@@ -46,7 +33,7 @@ const invoiceMutations = {
    * Updates a invoice
    */
 
-  invoicesEdit: async (
+  loanInvoicesEdit: async (
     _root,
     { _id, ...doc }: IInvoiceDocument,
     { models, user, subdomain }: IContext
@@ -66,14 +53,7 @@ const invoiceMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      { ...descriptions, ...logData },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -82,7 +62,7 @@ const invoiceMutations = {
    * Removes invoices
    */
 
-  invoicesRemove: async (
+  loanInvoicesRemove: async (
     _root,
     { invoiceIds }: { invoiceIds: string[] },
     { models, user, subdomain }: IContext
@@ -100,21 +80,15 @@ const invoiceMutations = {
         object: invoice,
         extraParams: { models }
       };
-      const descriptions = gatherDescriptions(logData);
-      await putDeleteLog(
-        subdomain,
-        messageBroker(),
-        { ...logData, ...descriptions },
-        user
-      );
+      await deleteLog(subdomain, user, logData);
     }
 
     return invoiceIds;
   }
 };
 
-checkPermission(invoiceMutations, 'invoicesAdd', 'manageInvoices');
-checkPermission(invoiceMutations, 'invoicesEdit', 'manageInvoices');
-checkPermission(invoiceMutations, 'invoicesRemove', 'manageInvoices');
+checkPermission(invoiceMutations, 'loanInvoicesAdd', 'manageInvoices');
+checkPermission(invoiceMutations, 'loanInvoicesEdit', 'manageInvoices');
+checkPermission(invoiceMutations, 'loanInvoicesRemove', 'manageInvoices');
 
 export default invoiceMutations;

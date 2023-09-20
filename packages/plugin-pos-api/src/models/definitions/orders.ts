@@ -1,3 +1,4 @@
+import { IAttachment } from '@erxes/api-utils/src/types';
 import { Document, Schema } from 'mongoose';
 import { field, schemaHooksWrapper } from './utils';
 
@@ -12,6 +13,9 @@ export interface IPosOrderItem {
   bonusVoucherId?: string;
   isPackage?: boolean;
   isTake?: boolean;
+  manufacturedDate?: string;
+  description?: string;
+  attachment?: IAttachment;
 }
 export interface IPosOrderItemDocument extends IPosOrderItem, Document {
   _id: string;
@@ -53,6 +57,7 @@ export interface IPosOrder {
   origin?: string;
   taxInfo?: any;
   convertDealId?: string;
+  returnInfo?: any;
 }
 export interface IPosOrderDocument extends IPosOrder, Document {
   _id: string;
@@ -111,7 +116,10 @@ const posOrderItemSchema = schemaHooksWrapper(
       type: Boolean,
       label: 'inner or skip ebarimt',
       default: false
-    })
+    }),
+    manufacturedDate: field({ type: String, label: 'manufactured' }),
+    description: field({ type: String, label: 'Description' }),
+    attachment: field({ type: Object, label: 'Attachment' })
   }),
   'erxes_posOrderItem'
 );
@@ -121,6 +129,13 @@ const paidAmountSchema = new Schema({
   type: field({ type: String }),
   amount: field({ type: Number }),
   info: field({ type: Object })
+});
+
+const returnInfoSchema = new Schema({
+  cashAmount: field({ type: Number }),
+  paidAmounts: field({ type: [paidAmountSchema] }),
+  returnAt: field({ type: Date }),
+  returnBy: field({ type: String })
 });
 
 export const posOrderSchema = schemaHooksWrapper(
@@ -161,12 +176,12 @@ export const posOrderSchema = schemaHooksWrapper(
       label: 'Previous bill id if it is changed'
     }),
     type: field({ type: String, label: 'Order type' }),
-    userId: field({ type: String, label: 'Created user id' }),
+    userId: field({ type: String, label: 'Created user' }),
 
     items: field({ type: [posOrderItemSchema], label: 'items' }),
     branchId: field({ type: String, label: 'Branch' }),
     departmentId: field({ type: String, label: 'Department' }),
-    posToken: field({ type: String, optional: true }),
+    posToken: field({ type: String, optional: true, label: 'Token' }),
 
     syncedErkhet: field({ type: Boolean, default: false }),
     syncErkhetInfo: field({
@@ -185,6 +200,11 @@ export const posOrderSchema = schemaHooksWrapper(
       type: String,
       optional: true,
       label: 'Converted Deal'
+    }),
+    returnInfo: field({
+      type: returnInfoSchema,
+      optional: true,
+      label: 'Return information'
     })
   }),
   'erxes_posOrders'

@@ -7,10 +7,11 @@ const productFields = `
   code
   categoryId
   vendorId
+  status,
   description
   unitPrice
-  sku
   barcodes
+  variants
   barcodeDescription
   ${
     isEnabled('tags')
@@ -42,15 +43,7 @@ const productFields = `
     size
     type
   }
-  supply
-  productCount
-  minimiumCount
-  uomId
-  uom {
-    _id
-    code
-    name
-  }
+  uom
   subUoms
   taxType
   taxCode
@@ -61,7 +54,9 @@ const products = `
     $type: String,
     $categoryId: String,
     $tag: String,
+    $status: String,
     $searchValue: String,
+    $vendorId: String,
     $perPage: Int,
     $page: Int $ids: [String],
     $excludeIds: Boolean,
@@ -74,7 +69,9 @@ const products = `
       type: $type,
       categoryId: $categoryId,
       tag: $tag,
+      status: $status,
       searchValue: $searchValue,
+      vendorId: $vendorId,
       perPage: $perPage,
       page: $page ids: $ids,
       excludeIds: $excludeIds,
@@ -117,6 +114,10 @@ const productCategories = `
 
       isRoot
       productCount
+      maskType
+      mask
+      isSimilarity
+      similarities
     }
   }
 `;

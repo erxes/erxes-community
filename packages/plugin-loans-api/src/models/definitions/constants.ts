@@ -11,13 +11,21 @@ export const CONTRACT_STATUS = {
   ALL: ['draft', 'normal', 'bad', 'closed']
 };
 
+export const UNDUE_CALC_TYPE = {
+  FROMAMOUNT: 'fromAmount',
+  FROMINTEREST: 'fromInterest',
+  FROMTOTALPAYMENT: 'fromTotalPayment',
+  FROMENDAMOUNT: 'fromEndAmount',
+  ALL: ['fromAmount', 'fromInterest', 'fromTotalPayment', 'fromEndAmount']
+};
+
 export const CONTRACT_CLASSIFICATION = {
   NORMAL: 'NORMAL',
   EXPIRED: 'EXPIRED',
-  ABNORMAL: 'ABNORMAL',
   DOUBTFUL: 'DOUBTFUL',
+  NEGATIVE: 'NEGATIVE',
   BAD: 'BAD',
-  ALL: ['NORMAL', 'EXPIRED', 'ABNORMAL', 'DOUBTFUL', 'BAD']
+  ALL: ['NORMAL', 'EXPIRED', 'DOUBTFUL', 'NEGATIVE', 'BAD']
 };
 
 export const COLLATERAL_STATUS = {
@@ -50,4 +58,16 @@ export const LEASE_TYPES = {
   SALVAGE: 'salvage',
 
   ALL: ['finance', 'salvage']
+};
+
+export const STORED_INTEREST_TYPES = {
+  STORED_INTEREST: 'storedInterest',
+  OUT_BALANCE: 'outBalance'
+};
+
+export const INTEREST_CORRECTION_TYPE = {
+  STOP_INTEREST: 'stopInterest',
+  INTEREST_RETURN: 'interestReturn',
+  INTEREST_CHANGE: 'interestChange',
+  ALL: ['stopInterest', 'interestReturn', 'interestChange']
 };

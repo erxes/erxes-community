@@ -14,6 +14,7 @@ import { ContentBox } from '../styles';
 import { IConfigsMap } from '../types';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 
 type Props = {
   save: (configsMap: IConfigsMap) => void;
@@ -123,7 +124,17 @@ class GeneralSettings extends React.Component<Props, State> {
             'companyCategoryCode',
             'Company default category code on erkhet'
           )}
+          {this.renderItem('debtAccounts', 'Split "," account fullcode')}
         </CollapseContent>
+        {isEnabled('loans') && (
+          <CollapseContent title="Loan transaction to erkhet">
+            {this.renderItem('userEmail', 'user email')}
+            {this.renderItem(
+              'defaultCustomer',
+              'Customer default code on erkhet'
+            )}
+          </CollapseContent>
+        )}
       </ContentBox>
     );
 

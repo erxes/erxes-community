@@ -106,16 +106,17 @@ const IntegrationListContainer = (props: FinalProps) => {
 
   const editIntegration = (
     id: string,
-    { name, brandId, channelIds, data }: IntegrationMutationVariables
+    { name, brandId, channelIds, details }: IntegrationMutationVariables,
+    callback: () => void
   ) => {
-    if (!name && !brandId) {
+    if (!name || !brandId) {
       Alert.error('Name and brand must be chosen');
 
       return;
     }
 
     editCommonFields({
-      variables: { _id: id, name, brandId, channelIds, data }
+      variables: { _id: id, name, brandId, channelIds, details }
     })
       .then(response => {
         const result = response.data.integrationsEditCommonFields;
@@ -123,6 +124,8 @@ const IntegrationListContainer = (props: FinalProps) => {
         if (result && result._id) {
           Alert.success('Integration has been edited.');
         }
+
+        callback();
       })
       .catch((error: Error) => {
         Alert.error(error.message);

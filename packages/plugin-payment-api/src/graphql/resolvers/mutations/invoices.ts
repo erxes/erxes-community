@@ -40,7 +40,7 @@ const mutations = {
         const paymentData =
           dataInCookie &&
           JSON.parse(
-            Buffer.from(dataInCookie as string, 'base64').toString('ascii')
+            Buffer.from(dataInCookie as string, 'base64').toString('utf8')
           );
 
         if (
@@ -82,6 +82,18 @@ const mutations = {
     res.cookie(`paymentData_${params.contentTypeId}`, base64, cookieOptions);
 
     return `${domain}/pl:payment/gateway?params=${base64}`;
+  },
+
+  async invoicesCheck(_root, { _id }: { _id: string }, { models }: IContext) {
+    return models.Invoices.checkInvoice(_id);
+  },
+
+  async invoicesRemove(
+    _root,
+    { _ids }: { _ids: string[] },
+    { models }: IContext
+  ) {
+    return models.Invoices.removeInvoices(_ids);
   }
 };
 

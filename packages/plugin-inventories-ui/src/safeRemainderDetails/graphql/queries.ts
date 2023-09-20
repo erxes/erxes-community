@@ -55,12 +55,7 @@ export const safeRemainderItemFields = `
     name
   }
   productId
-  uom {
-    _id
-    code
-    name
-  }
-  uomId
+  uom
 `;
 
 const safeRemainderDetail = `
@@ -79,7 +74,7 @@ const safeRemainderItems = `
   query safeRemainderItems (
     $remainderId: String!
     $status: String
-    $productCategoryId: String
+    $productCategoryIds: [String]
     $diffType: String
     $searchValue: String
     $page: Int
@@ -88,7 +83,7 @@ const safeRemainderItems = `
     safeRemainderItems (
       remainderId: $remainderId,
       status: $status,
-      productCategoryId: $productCategoryId,
+      productCategoryIds: $productCategoryIds,
       diffType: $diffType,
       searchValue: $searchValue
       page: $page
@@ -103,14 +98,14 @@ const safeRemainderItemsCount = `
   query safeRemainderItemsCount (
     $remainderId: String!
     $status: String
-    $productCategoryId: String
+    $productCategoryIds: [String]
     $diffType: String
     $searchValue: String
   ) {
     safeRemainderItemsCount (
       remainderId: $remainderId,
       status: $status,
-      productCategoryId: $productCategoryId,
+      productCategoryIds: $productCategoryIds,
       diffType: $diffType,
       searchValue: $searchValue
     )

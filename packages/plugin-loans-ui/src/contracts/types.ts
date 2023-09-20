@@ -66,12 +66,16 @@ export interface IContract {
   riskExpertId: string;
   customerId: string;
   customerType: string;
+  unduePercent: number;
+  undueCalcType: string;
 
   contractType?: IContractTypeDoc;
   weekends: number[];
   useHoliday: boolean;
   dealId?: string;
   hasTransaction?: boolean;
+  currency: string;
+  expiredDays?: number;
 }
 
 export interface IContractDoc extends IContract {
@@ -116,6 +120,7 @@ export interface ICloseInfo {
   interestNonce?: number;
   payment?: number;
   insurance?: number;
+  storedInterest?: number;
   debt?: number;
   total?: number;
 }

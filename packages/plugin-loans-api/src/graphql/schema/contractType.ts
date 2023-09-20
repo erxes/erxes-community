@@ -8,12 +8,17 @@ export const types = () => `
     number: String
     vacancy: Float
     unduePercent: Float
+    undueCalcType: String
+    useMargin: Boolean
+    useSkipInterest: Boolean
+    useDebt: Boolean
     leaseType: String
     createdAt: Date
     productCategoryIds: [String]
     config: JSON
 
     productCategories: [ProductCategory]
+    currency:String
   }
 
   type ContractTypesListResponse {
@@ -45,10 +50,15 @@ const commonFields = `
   number: String
   vacancy: Float
   unduePercent: Float 
+  undueCalcType: String
+  useMargin: Boolean
+  useSkipInterest: Boolean
+  useDebt: Boolean
   leaseType: String
   createdAt: Date
   productCategoryIds: [String]
   config: JSON
+  currency:String
 `;
 
 export const mutations = `

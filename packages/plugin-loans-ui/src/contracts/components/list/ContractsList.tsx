@@ -1,5 +1,4 @@
 import {
-  __,
   Alert,
   Button,
   confirm,
@@ -27,6 +26,8 @@ import RightMenu from './RightMenu';
 import { can } from '@erxes/ui/src/utils/core';
 import withConsumer from '../../../withConsumer';
 import { IUser } from '@erxes/ui/src/auth/types';
+import { __ } from 'coreui/utils';
+import ClassificationForm from '../../containers/ClassificationForm';
 // import Sidebar from './Sidebar';
 
 interface IProps extends IRouterProps {
@@ -136,7 +137,10 @@ class ContractsList extends React.Component<IProps, State> {
                 />
               </th>
               <th>
-                <SortHandler sortField={'number'} label={__('Number')} />
+                <SortHandler
+                  sortField={'number'}
+                  label={__('Contract Number')}
+                />
               </th>
               <th>
                 <SortHandler
@@ -151,6 +155,9 @@ class ContractsList extends React.Component<IProps, State> {
                 />
               </th>
               <th>
+                <SortHandler sortField={'tenor'} label={__('Status')} />
+              </th>
+              <th>
                 <SortHandler sortField={'tenor'} label={__('Tenor')} />
               </th>
               <th>
@@ -161,6 +168,12 @@ class ContractsList extends React.Component<IProps, State> {
               </th>
               <th>
                 <SortHandler sortField={'repayment'} label={__('Repayment')} />
+              </th>
+              <th>
+                <SortHandler
+                  sortField={'classification'}
+                  label={__('Classification')}
+                />
               </th>
               <th>
                 <SortHandler
@@ -203,8 +216,24 @@ class ContractsList extends React.Component<IProps, State> {
             Alert.error(error.message);
           });
 
+      const classificationForm = props => {
+        return <ClassificationForm {...props} contracts={bulk} />;
+      };
+
       actionBarLeft = (
         <BarItems>
+          <ModalTrigger
+            title={`${__('Change classification')}`}
+            trigger={
+              <Button btnStyle="warning" size="small" icon="cancel-1">
+                {__('Change classification')}
+              </Button>
+            }
+            autoOpenKey="showTransactionModal"
+            size="lg"
+            content={classificationForm}
+            backDrop="static"
+          />
           {can('contractsRemove', currentUser) && (
             <Button
               btnStyle="danger"
@@ -212,7 +241,7 @@ class ContractsList extends React.Component<IProps, State> {
               icon="cancel-1"
               onClick={onClick}
             >
-              Delete
+              {__('Delete')}
             </Button>
           )}
         </BarItems>

@@ -299,22 +299,28 @@ export const isEnabled = (service: string) => {
  * @param {String} - value
  * @return {String} - URL
  */
-export const readFile = (value: string): string => {
+export const readFile = (value: string, width?: number): string => {
   if (
     !value ||
     urlParser.isValidURL(value) ||
-    value.includes('http') ||
-    value.startsWith('/')
+    (typeof value === 'string' && value.includes('http')) ||
+    (typeof value === 'string' && value.startsWith('/'))
   ) {
     return value;
   }
 
   const { REACT_APP_API_URL } = getEnv();
 
-  return `${REACT_APP_API_URL}/read-file?key=${value}`;
+  let url = `${REACT_APP_API_URL}/read-file?key=${value}`;
+
+  if (width) {
+    url += `&width=${width}`;
+  }
+
+  return url;
 };
 
-export const getUserAvatar = (user: IUserDoc) => {
+export const getUserAvatar = (user: IUserDoc, width?: number) => {
   if (!user) {
     return '';
   }
@@ -325,7 +331,7 @@ export const getUserAvatar = (user: IUserDoc) => {
     return '/images/avatar-colored.svg';
   }
 
-  return readFile(details.avatar);
+  return readFile(details.avatar, width);
 };
 
 export function withProps<IProps>(
@@ -532,7 +538,7 @@ export function formatValue(value) {
   return value || '-';
 }
 
-export function numberFormatter(value, fixed) {
+export function numberFormatter(value = '', fixed) {
   if (
     fixed &&
     `${value}`.includes('.') &&
@@ -544,6 +550,12 @@ export function numberFormatter(value, fixed) {
 }
 
 export function numberParser(value, fixed) {
+  if (value === '-') return '-';
+  if (RegExp('-', 'g').test(value)) {
+    value = value.replace(RegExp('-', 'g'), '');
+    value = `-${value}`;
+  }
+
   value = value!.replace(/(,*)/g, '');
 
   if (value?.includes('.')) {
@@ -680,17 +692,16 @@ export const generateTree = (
 };
 
 export const removeTypename = (obj?: any[] | any) => {
-  if (Array.isArray(obj)) {
-    return obj.map(item => {
-      delete item.__typename;
+  const deleteType = (e: any) => {
+    const { __typename, ...rest } = e;
+    return rest;
+  };
 
-      return item;
-    });
+  if (Array.isArray(obj)) {
+    return obj.map(item => deleteType(item));
   }
 
-  delete obj.__typename;
-
-  return obj;
+  return deleteType(obj);
 };
 
 export const publicUrl = path => {

@@ -13,7 +13,9 @@ const commonFields = `
   $feeAmount: Float,
   $tenor: Float,
   $unduePercent: Float,
+  $undueCalcType: String,
   $interestRate: Float,
+  $skipInterestCalcMonth: Float,
   $repayment: String,
   $startDate: Date,
   $scheduleDays: [Float],
@@ -36,9 +38,16 @@ const commonFields = `
   $riskExpertId: String
   $weekends: [Int]
   $useHoliday: Boolean
+  $useMargin: Boolean
+  $useSkipInterest: Boolean
+  $useDebt: Boolean
   $dealId: String
 
   $relContractId: String
+  $currency:String
+  $isPayFirstMonth: Boolean
+  $downPayment: Float
+  $isBarter: Boolean
 `;
 
 const commonVariables = `
@@ -54,6 +63,8 @@ const commonVariables = `
   feeAmount: $feeAmount,
   tenor: $tenor,
   unduePercent: $unduePercent,
+  undueCalcType: $undueCalcType,
+  skipInterestCalcMonth: $skipInterestCalcMonth,
   interestRate: $interestRate,
   repayment: $repayment,
   startDate: $startDate,
@@ -77,15 +88,24 @@ const commonVariables = `
   riskExpertId: $riskExpertId
   weekends: $weekends
   useHoliday: $useHoliday
+  useMargin: $useMargin
+  useSkipInterest: $useSkipInterest
+  useDebt: $useDebt
   dealId: $dealId
 
   relContractId: $relContractId
+  currency: $currency
+  isPayFirstMonth: $isPayFirstMonth
+  downPayment: $downPayment
+  isBarter: $isBarter
 `;
 
 const contractsAdd = `
   mutation contractsAdd(${commonFields}) {
     contractsAdd(${commonVariables}) {
       _id
+      number
+      contractTypeId
       ${contractDetailFields}
     }
   }
@@ -144,6 +164,47 @@ const fixSchedules = `
   }
 `;
 
+const changeClassification = `
+  mutation ClassificationsAdd($classifications: JSON) {
+    classificationsAdd(classifications: $classifications) {
+      _id
+      description
+      invDate
+      classification
+      total
+      newClassification
+      dtl {
+        amount
+        contractId
+        currency
+      }
+    }
+  }
+`;
+
+const stopInterest = `
+mutation StopInterest($contractId: String, $stoppedDate: Date, $interestAmount: Float, $isStopLoss: Boolean, $lossAmount: Float) {
+  stopInterest(contractId: $contractId, stoppedDate: $stoppedDate, interestAmount: $interestAmount, isStopLoss: $isStopLoss, lossAmount: $lossAmount) {
+    _id
+  }
+}
+`;
+const interestChange = `
+  mutation InterestChange($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
+    interestChange(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
+      _id
+    }
+  }
+`;
+
+const interestReturn = `
+  mutation InterestReturn($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
+    interestReturn(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
+      _id
+    }
+  }
+`;
+
 export default {
   contractsAdd,
   contractsEdit,
@@ -152,5 +213,9 @@ export default {
   regenSchedules,
   fixSchedules,
   contractsClose,
-  getProductsData
+  getProductsData,
+  changeClassification,
+  stopInterest,
+  interestChange,
+  interestReturn
 };

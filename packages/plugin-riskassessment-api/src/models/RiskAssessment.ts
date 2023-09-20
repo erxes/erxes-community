@@ -1,3 +1,4 @@
+import { IUserDocument } from '@erxes/api-utils/src/types';
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
 import { sendFormsMessage } from '../messageBroker';
@@ -10,7 +11,11 @@ import {
 export interface IRiskAssessmentsModel extends Model<IRiskAssessmentsDocument> {
   addRiskAssessment(params): Promise<IRiskAssessmentsDocument>;
   addBulkRiskAssessment(params): Promise<IRiskAssessmentsDocument>;
-  riskAssessmentDetail(_id: string, params: any): Promise<any>;
+  riskAssessmentDetail(
+    _id: string,
+    params: any,
+    user: IUserDocument
+  ): Promise<any>;
   riskAssessmentFormSubmissionDetail(parmas): Promise<any>;
   editRiskAssessment(_id: string, doc: any): Promise<IRiskAssessmentsDocument>;
   removeRiskAssessment(_id: string);
@@ -260,11 +265,13 @@ export const loadRiskAssessments = (models: IModels, subdomain: string) => {
         assessmentId: riskAssessment._id
       });
 
-      await models.RiskAssessmentIndicators.deleteOne({
+      await models.RiskAssessmentIndicators.deleteMany({
         assessmentId: riskAssessment._id
       });
 
-      return riskAssessment.remove();
+      return await models.RiskAssessments.deleteOne({
+        _id: riskAssessment._id
+      });
     }
 
     public static async riskAssessmentAssignedMembers(cardId, cardType) {
@@ -483,11 +490,12 @@ export const loadRiskAssessments = (models: IModels, subdomain: string) => {
       const formIds = forms?.map(form => form.formId);
 
       const query = { contentType: 'form', contentTypeId: { $in: formIds } };
+      const sort = { order: 1 };
 
       const fields = await sendFormsMessage({
         subdomain,
         action: 'fields.find',
-        data: { query },
+        data: { query, sort },
         isRPC: true,
         defaultValue: []
       });
@@ -512,6 +520,11 @@ export const loadRiskAssessments = (models: IModels, subdomain: string) => {
             submittedField.fieldId
           ].isFlagged = !!submittedField.isFlagged;
         }
+
+        if (!!submittedField?.attachments?.length) {
+          editedSubmittedFields[submittedField.fieldId].attachments =
+            submittedField?.attachments;
+        }
       }
       return {
         fields,
@@ -520,13 +533,20 @@ export const loadRiskAssessments = (models: IModels, subdomain: string) => {
       };
     }
 
-    public static async riskAssessmentDetail(_id, params) {
+    public static async riskAssessmentDetail(_id, params, user) {
       const riskAssessment = await models.RiskAssessments.findOne({
         _id
       }).lean();
 
       if (!riskAssessment) {
         throw new Error('Cannot find assessment');
+      }
+
+      if (
+        !!riskAssessment?.permittedUserIds?.length &&
+        !riskAssessment.permittedUserIds.includes(user?._id)
+      ) {
+        throw new Error('There is no permit on you to see this assessment');
       }
 
       const { cardId, cardType, groupId, indicatorId } = riskAssessment;

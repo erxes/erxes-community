@@ -1,5 +1,4 @@
 import {
-  __,
   Button,
   MainStyleTitle as Title,
   Wrapper,
@@ -11,12 +10,13 @@ import { ContentBox } from '../styles';
 import { IConfigsMap } from '../types';
 import PerSettings from './PerUndueBonus';
 import Sidebar from './Sidebar';
+import { __ } from 'coreui/utils';
 
 function Header() {
   return (
     <HeaderDescription
       icon="/images/actions/25.svg"
-      title="Гэрээнд алданги тооцохгүй үеүүдийг тохируулах тохиргооны хэсэг"
+      title={__('Loan not calc undue settings')}
       description=""
     />
   );
@@ -50,7 +50,7 @@ class GeneralSettings extends React.Component<Props, State> {
 
     // must save prev item saved then new item
     configsMap.undueConfig.newUndueConfig = {
-      title: 'New Undue Config',
+      title: 'New Loss Config',
       startDate: new Date(),
       endDate: new Date(),
       percent: 0
@@ -98,7 +98,7 @@ class GeneralSettings extends React.Component<Props, State> {
   render() {
     const breadcrumb = [
       { title: __('Settings'), link: '/settings' },
-      { title: __('Ebarimt config') }
+      { title: __('Loan config') }
     ];
 
     const actionButtons = (
@@ -108,19 +108,19 @@ class GeneralSettings extends React.Component<Props, State> {
         icon="plus"
         uppercase={false}
       >
-        New config
+        {__('New config')}
       </Button>
     );
 
     return (
       <Wrapper
         header={
-          <Wrapper.Header title={__('Undue configs')} breadcrumb={breadcrumb} />
+          <Wrapper.Header title={__('Loss configs')} breadcrumb={breadcrumb} />
         }
         mainHead={<Header />}
         actionBar={
           <Wrapper.ActionBar
-            left={<Title>{__('Undue configs')}</Title>}
+            left={<Title>{__('Loss configs')}</Title>}
             right={actionButtons}
           />
         }

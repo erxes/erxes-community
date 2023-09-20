@@ -65,7 +65,6 @@ type Props = {
   products: IProduct[];
   paymentsData?: IPaymentsData;
   closeModal: () => void;
-  uom: string[];
   currencies: string[];
   currentProduct?: string;
   purchaseQuery: IPurchase;
@@ -86,7 +85,6 @@ type State = {
   currentTab: string;
   changePayData: { [currency: string]: number };
   tempId: string;
-  categoryId?: string;
   filterValues: any;
   advancedView?: boolean;
 };
@@ -336,7 +334,6 @@ class ProductForm extends React.Component<Props, State> {
                 productsData={productsData}
                 onChangeProductsData={onChangeProductsData}
                 updateTotal={this.updateTotal}
-                uom={this.props.uom}
                 currencies={this.props.currencies}
                 currentProduct={currentProduct}
                 onChangeDiscount={this.setDiscount}
@@ -555,10 +552,6 @@ class ProductForm extends React.Component<Props, State> {
     );
   }
 
-  onChangeCategory = (categoryId: string) => {
-    this.setState({ categoryId });
-  };
-
   calculatePerProductAmount = (
     type: string,
     productData: IProductData,
@@ -633,8 +626,6 @@ class ProductForm extends React.Component<Props, State> {
       <ProductChooser
         {...props}
         onSelect={productOnChange}
-        onChangeCategory={this.onChangeCategory}
-        categoryId={this.state.categoryId}
         data={{
           name: 'Product',
           products: []

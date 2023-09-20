@@ -1,10 +1,5 @@
 import { afterMutationHandlers } from './afterMutations';
-import {
-  confirmLoyalties,
-  getBranchesUtil,
-  statusToDone,
-  syncOrderFromClient
-} from './utils';
+import { getBranchesUtil, statusToDone, syncOrderFromClient } from './utils';
 import { generateModels } from './connectionResolver';
 import { IPosDocument } from './models/definitions/pos';
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
@@ -179,6 +174,22 @@ export const initBroker = async cl => {
     };
   });
 
+  consumeRPCQueue('pos:orders.aggregate', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+
+    const { aggregate, replacers } = data;
+    for (const repl of replacers || []) {
+      try {
+        eval(repl);
+      } catch (e) {}
+    }
+
+    return {
+      status: 'success',
+      data: await models.PosOrders.aggregate(aggregate)
+    };
+  });
+
   consumeRPCQueue('pos:configs.find', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
     return {
@@ -325,6 +336,14 @@ export const sendPosclientMessage = async (
     lastAction = `posclient:${action}_${pos.token}`;
     serviceName = '';
     args.data.thirdService = true;
+    args.isMQ = true;
+
+    if (args.isRPC) {
+      const response = await sendPosclientHealthCheck(args);
+      if (!response || response.healthy !== 'ok') {
+        throw new Error('syncing error not connected posclient');
+      }
+    }
   }
 
   args.data.token = pos.token;
@@ -335,6 +354,36 @@ export const sendPosclientMessage = async (
     serviceName,
     ...args,
     action: lastAction
+  });
+};
+
+export const sendPosclientHealthCheck = async ({
+  subdomain,
+  pos
+}: {
+  subdomain: string;
+  pos: IPosDocument;
+}) => {
+  const { ALL_AUTO_INIT } = process.env;
+
+  if (
+    [true, 'true', 'True', '1'].includes(ALL_AUTO_INIT || '') ||
+    pos.onServer
+  ) {
+    return { healthy: 'ok' };
+  }
+
+  return await sendMessage({
+    subdomain,
+    client,
+    serviceDiscovery,
+    isRPC: true,
+    isMQ: true,
+    serviceName: '',
+    action: `posclient:health_check_${pos.token}`,
+    data: { token: pos.token, thirdService: true },
+    timeout: 1000,
+    defaultValue: { healthy: 'no' }
   });
 };
 
@@ -355,6 +404,37 @@ export const sendCommonMessage = async (
   return sendMessage({
     serviceDiscovery,
     client,
+    ...args
+  });
+};
+export const sendSegmentsMessage = async (
+  args: ISendMessageArgs
+): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'segments',
+    ...args
+  });
+};
+export const fetchSegment = (
+  subdomain: string,
+  segmentId: string,
+  options?,
+  segmentData?: any
+) =>
+  sendSegmentsMessage({
+    subdomain,
+    action: 'fetchSegment',
+    data: { segmentId, options, segmentData },
+    isRPC: true
+  });
+
+export const sendFormsMessage = (args: ISendMessageArgs): Promise<any> => {
+  return sendMessage({
+    client,
+    serviceDiscovery,
+    serviceName: 'forms',
     ...args
   });
 };

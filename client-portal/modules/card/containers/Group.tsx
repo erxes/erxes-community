@@ -1,13 +1,14 @@
-import { Config, IUser, Store } from "../../types";
-import { gql, useQuery } from "@apollo/client";
+import { Config, IUser, Store, IDateColumn } from '../../types';
+import { gql, useQuery } from '@apollo/client';
 
-import { AppConsumer } from "../../appContext";
-import BoardItem from "../components/BoardItem";
-import Group from "../components/Group";
-import React from "react";
-import Spinner from "../../common/Spinner";
-import { capitalize } from "../../common/utils";
-import { queries } from "../graphql";
+import AnimatedLoader from '../../common/AnimatedLoader';
+import { AppConsumer } from '../../appContext';
+import BoardItem from '../components/BoardItem';
+import Group from '../components/Group';
+import React from 'react';
+import { capitalize } from '../../common/utils';
+import { queries } from '../graphql';
+import { Dayjs } from 'dayjs';
 
 type Props = {
   currentUser: IUser;
@@ -16,6 +17,8 @@ type Props = {
   groupType: string;
   viewType: string;
   id: any;
+  item: any;
+  date?: IDateColumn;
 };
 
 function GroupContainer({ currentUser, type, viewType, ...props }: Props) {
@@ -23,24 +26,25 @@ function GroupContainer({ currentUser, type, viewType, ...props }: Props) {
     gql(queries[`clientPortal${capitalize(type)}s`]),
     {
       skip: !currentUser,
-      fetchPolicy: "network-only",
+      fetchPolicy: 'network-only',
       variables: {
-        ...(props.groupType === "priority" && { priority: [props.id] }),
-        ...(props.groupType === "label" && { labelIds: [props.id] }),
-        ...(props.groupType === "duedate" && { closeDateType: props.id }),
-        ...(props.groupType === "stage" && { stageId: props.id }),
-        ...(props.groupType === "user" && { userIds: [props.id] }),
+        ...(props.groupType === 'priority' && { priority: [props.id] }),
+        ...(props.groupType === 'label' && { labelIds: [props.id] }),
+        ...(props.groupType === 'duedate' && { closeDateType: props.id }),
+        ...(props.groupType === 'stage' && { stageId: props.id }),
+        ...(props.groupType === 'user' && { userIds: [props.id] }),
+        ...(props.date && { date: props.date })
       },
       context: {
         headers: {
-          "erxes-app-token": props.config?.erxesAppToken,
-        },
-      },
+          'erxes-app-token': props.config?.erxesAppToken
+        }
+      }
     }
   );
 
   if (loading) {
-    return <Spinner objective={true} />;
+    return <AnimatedLoader loaderStyle={{ isBox: true }} />;
   }
 
   const items = data[`clientPortal${capitalize(type)}s`] || [];
@@ -50,17 +54,24 @@ function GroupContainer({ currentUser, type, viewType, ...props }: Props) {
     type,
     items,
     loading,
-    currentUser,
+    currentUser
   };
 
-  if (viewType === "board") {
-    return <BoardItem items={items} />;
+  if (viewType === 'board' || viewType === 'calendar') {
+    return (
+      <BoardItem
+        items={items}
+        type={type}
+        stageId={props.id}
+        viewType={viewType}
+      />
+    );
   }
 
   return <Group {...updatedProps} />;
 }
 
-const WithConsumer = (props) => {
+const WithConsumer = props => {
   return (
     <AppConsumer>
       {({ currentUser, config }: Store) => {

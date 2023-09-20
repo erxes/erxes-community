@@ -1,23 +1,29 @@
+import { __ } from 'coreui/utils';
 export const menuContracts = [
   {
-    title: 'Contracts',
+    title: __('Contracts'),
     link: '/erxes-plugin-loan/contract-list',
     permission: 'showContracts'
   },
   {
-    title: 'Collaterals',
+    title: __('Collaterals'),
     link: '/erxes-plugin-loan/collateral-list',
     permission: 'showCollaterals'
   },
   {
-    title: 'Transactions',
+    title: __('Transactions'),
     link: '/erxes-plugin-loan/transaction-list',
     permission: 'showTransactions'
   },
   {
-    title: 'PeriodLocks',
+    title: __('PeriodLocks'),
     link: '/erxes-plugin-loan/periodLock-list',
     permission: 'showPeriodLocks'
+  },
+  {
+    title: __('Classification History'),
+    link: '/erxes-plugin-loan/classificationHistory',
+    permission: 'showContracts'
   }
 ];
 

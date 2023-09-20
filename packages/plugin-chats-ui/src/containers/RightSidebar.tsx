@@ -7,6 +7,7 @@ import Spinner from '@erxes/ui/src/components/Spinner';
 // local
 import Component from '../components/RightSidebar';
 import { queries } from '../graphql';
+import { Alert } from '@erxes/ui/src/utils';
 
 type Props = {
   chatId: string;
@@ -32,14 +33,14 @@ const RightSidebarContainer = (props: Props) => {
   }
 
   if (error) {
-    return <p>{error.message}</p>;
+    Alert.error(error.message);
   }
 
   if (data.chatDetail) {
     return <Component chatDetail={data.chatDetail} />;
   }
 
-  return <></>;
+  return null;
 };
 
 export default RightSidebarContainer;

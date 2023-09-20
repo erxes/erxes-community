@@ -8,7 +8,7 @@ import Select from 'react-select-plus';
 import Button from '@erxes/ui/src/components/Button';
 import ReportRow from './ReportRow';
 import { IReport } from '../../types';
-import { FilterItem, FlexRow, ToggleButton } from '../../styles';
+import { FilterItem, FlexRow, FlexRowEven, ToggleButton } from '../../styles';
 import Pagination from '@erxes/ui/src/components/pagination/Pagination';
 import Icon from '@erxes/ui/src/components/Icon';
 
@@ -23,6 +23,8 @@ type Props = {
   getPagination: (pagination: any) => void;
 
   exportReport: () => void;
+
+  isCurrentUserAdmin: boolean;
 };
 
 function ReportList(props: Props) {
@@ -34,12 +36,21 @@ function ReportList(props: Props) {
     getActionBar,
     getPagination,
     exportReport,
-    showSideBar
+    showSideBar,
+    isCurrentUserAdmin
   } = props;
-
   const [reportType, setType] = useState(queryParams.reportType);
+
+  const [showDepartment, setShowDepartment] = useState(
+    queryParams.showDepartment ? JSON.parse(queryParams.showDepartment) : false
+  );
+
+  const [showBranch, setShowBranch] = useState(
+    queryParams.showBranch ? JSON.parse(queryParams.showBranch) : false
+  );
+
   const [isSideBarOpen, setIsOpen] = useState(
-    localStorage.getItem('isSideBarOpen') === 'true' ? true : false
+    JSON.parse(localStorage.getItem('isSideBarOpen') || 'false')
   );
 
   const onToggleSidebar = () => {
@@ -48,11 +59,24 @@ function ReportList(props: Props) {
     localStorage.setItem('isSideBarOpen', toggleIsOpen.toString());
   };
 
+  const toggleShowDepartment = () => {
+    const toggle = !showDepartment;
+    setShowDepartment(toggle);
+    router.setParams(history, { showDepartment: toggle });
+  };
+
+  const toggleShowBranch = () => {
+    const toggle = !showBranch;
+    setShowBranch(toggle);
+    router.setParams(history, { showBranch: toggle });
+  };
+
   const renderTableHead = () => {
     switch (reportType) {
       case 'Урьдчилсан':
         return (
           <tr>
+            <th>{'№'}</th>
             <th>{__('Team member Id')}</th>
             <th>{__('Last Name')}</th>
             <th>{__('First Name')}</th>
@@ -66,6 +90,9 @@ function ReportList(props: Props) {
         return (
           <>
             <tr>
+              <th rowSpan={2}>{'№'}</th>
+              {showDepartment && <th rowSpan={2}>{__('Department')}</th>}
+              {showBranch && <th rowSpan={2}>{__('Branch')}</th>}
               <th rowSpan={2}>{__('Team member Id')}</th>
               <th rowSpan={2}>{__('Last Name')}</th>
               <th rowSpan={2}>{__('First Name')}</th>
@@ -103,12 +130,12 @@ function ReportList(props: Props) {
           <>
             <tr>
               <th
-                colSpan={4}
+                colSpan={5}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('General Information')}
               </th>
-              <th>{__('Time')}</th>
+              <th colSpan={1}>{__('Time')}</th>
               <th
                 colSpan={4}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
@@ -116,17 +143,18 @@ function ReportList(props: Props) {
                 {__('Schedule')}
               </th>
               <th
-                colSpan={7}
+                colSpan={9}
                 style={{ textAlign: 'center', border: '1px solid #EEE' }}
               >
                 {__('Performance')}
               </th>
             </tr>
             <tr>
-              <td>{__('Team member Id')}</td>
-              <td>{__('Last Name')}</td>
-              <td>{__('First Name')}</td>
-              <td style={{ textAlign: 'left' }}>{__('Position')}</td>
+              <th>{'№'}</th>
+              <th>{__('Team member Id')}</th>
+              <th>{__('Last Name')}</th>
+              <th>{__('First Name')}</th>
+              <th style={{ textAlign: 'left' }}>{__('Position')}</th>
               <th>{__('Date')}</th>
               <th>{__('Planned Check In')}</th>
               <th>{__('Planned Check Out')}</th>
@@ -151,7 +179,8 @@ function ReportList(props: Props) {
     // custom report for bichil-globus
     const bichilTable = loadDynamicComponent('bichilReportTable', {
       reportType,
-      queryParams
+      queryParams,
+      isCurrentUserAdmin
     });
 
     if (bichilTable) {
@@ -162,11 +191,14 @@ function ReportList(props: Props) {
       <Table>
         <thead>{renderTableHead()}</thead>
         {reports &&
-          reports.map(reportt => (
+          reports.map((reportt, i) => (
             <ReportRow
+              index={i + 1}
               key={Math.random()}
               reportType={reportType}
               report={reportt}
+              showBranch={showBranch}
+              showDepartment={showDepartment}
             />
           ))}
       </Table>
@@ -181,13 +213,33 @@ function ReportList(props: Props) {
 
     return (
       <FlexRow>
-        <ToggleButton
-          id="btn-inbox-channel-visible"
-          isActive={isSideBarOpen}
-          onClick={onToggleSidebar}
-        >
-          <Icon icon="subject" />
-        </ToggleButton>
+        <FlexRowEven>
+          <ToggleButton
+            id="btn-inbox-channel-visible"
+            isActive={isSideBarOpen}
+            onClick={onToggleSidebar}
+          >
+            <Icon icon="subject" />
+          </ToggleButton>
+          {reportType === 'Сүүлд' && (
+            <>
+              <ToggleButton
+                style={{ width: 'auto' }}
+                isActive={showDepartment}
+                onClick={toggleShowDepartment}
+              >
+                <ControlLabel>{__('Department')}</ControlLabel>
+              </ToggleButton>
+              <ToggleButton
+                style={{ width: 'auto' }}
+                isActive={showBranch}
+                onClick={toggleShowBranch}
+              >
+                <ControlLabel>{__('Branch')}</ControlLabel>
+              </ToggleButton>
+            </>
+          )}
+        </FlexRowEven>
         <FilterItem>
           <FormGroup>
             <ControlLabel>Select type</ControlLabel>

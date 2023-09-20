@@ -47,6 +47,7 @@ const orderTypeFields = `
   items: [PosOrderItem]
   user: PosUser
   putResponses: [PosPutResponse]
+  returnInfo: JSON
 
   slotCode: String
 `;
@@ -63,7 +64,9 @@ const addEditParams = `
   registerNumber: String,
   slotCode: String,
   origin: String,
-  dueDate: Date
+  dueDate: Date,
+  status: String,
+  buttonType: String
 `;
 
 export const types = `
@@ -87,6 +90,8 @@ export const types = `
     productImgUrl: String
     status: String
     manufacturedDate: String
+    description: String
+    attachment: JSON
   }
 
   type PosPutResponse {
@@ -140,6 +145,8 @@ export const types = `
     isTake: Boolean
     status: String
     manufacturedDate: String
+    description: String
+    attachment: JSON
   }
 
   input PaidAmountInput {
@@ -176,9 +183,11 @@ export const mutations = `
   ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput] ): Order
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
+  ordersFinish(_id: String, ${addEditParams}): Order
   orderItemChangeStatus(_id: String!, status: String): PosOrderItem
   ordersConvertToDeal(_id: String!): Order
   afterFormSubmit(_id: String!, conversationId: String!): Order
+  ordersReturn(_id: String!, cashAmount: Float, paidAmounts: [PaidAmountInput]): Order
 `;
 
 export const queries = `

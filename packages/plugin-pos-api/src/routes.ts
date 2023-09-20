@@ -69,6 +69,14 @@ export const getProductsData = async (
 ) => {
   const groups = await models.ProductGroups.groups(pos._id);
 
+  let checkExcludeCategoryIds: string[] = [];
+  if (pos.isCheckRemainder && pos.checkExcludeCategoryIds.length) {
+    checkExcludeCategoryIds = await getChildCategories(
+      subdomain,
+      pos.checkExcludeCategoryIds
+    );
+  }
+
   const productGroups: any = [];
 
   for (const group of groups) {
@@ -156,6 +164,7 @@ export const getProductsData = async (
         }))
       },
       isRPC: true,
+      isMQ: true,
       defaultValue: {},
       timeout: 50000
     });
@@ -168,6 +177,15 @@ export const getProductsData = async (
         if (product.unitPrice < 0) {
           product.unitPrice = 0;
         }
+      }
+
+      if (
+        pos.isCheckRemainder &&
+        !checkExcludeCategoryIds.includes(product.categoryId)
+      ) {
+        product.isCheckRem = true;
+      } else {
+        product.isCheckRem = false;
       }
 
       if (!Object.keys(productsByCatId).includes(product.categoryId)) {
@@ -268,6 +286,15 @@ export const posSyncConfig = async (req, res) => {
       return res.send({
         slots: await models.PosSlots.find({ posId: pos._id }).lean()
       });
+    case 'productsConfigs':
+      return res.send(
+        await sendProductsMessage({
+          subdomain,
+          action: 'productsConfigs.getConfig',
+          data: { code: 'similarityGroup' },
+          isRPC: true
+        })
+      );
   }
 
   return res.send({ error: 'wrong type' });

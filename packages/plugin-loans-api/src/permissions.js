@@ -13,12 +13,13 @@ module.exports = {
           'contractsClose',
           'contractsRemove',
           'showContracts',
+          'manageContracts',
           'manageSchedule',
           'showCollaterals',
           'manageLoanConfigs',
           'manageInsuranceTypes',
           'manageInvoices',
-          'showInvoices',
+          'showLoanInvoices',
           'manageTransactions',
           'showTransactions',
           'transactionsEdit',
@@ -82,6 +83,10 @@ module.exports = {
         description: 'Show Contracts'
       },
       {
+        name: 'manageContracts',
+        description: 'Manage Contracts'
+      },
+      {
         name: 'manageSchedule',
         description: 'Manage Schedule'
       },
@@ -104,7 +109,7 @@ module.exports = {
         description: 'Manage Invoices'
       },
       {
-        name: 'showInvoices',
+        name: 'showLoanInvoices',
         description: 'Show Invoices'
       },
       //transaction

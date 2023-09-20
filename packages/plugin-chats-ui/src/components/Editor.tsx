@@ -1,17 +1,16 @@
+import { SmallLoader } from '@erxes/ui/src/components/ButtonMutate';
+import { getMentionedUserIds } from '@erxes/ui/src/components/EditorCK';
 import React, { useState, useEffect, useRef } from 'react';
-// erxes
-import Alert from '@erxes/ui/src/utils/Alert';
-import Button from '@erxes/ui/src/components/Button';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import Tip from '@erxes/ui/src/components/Tip';
-import Icon from '@erxes/ui/src/components/Icon';
-import { SmallLoader } from '@erxes/ui/src/components/ButtonMutate';
+import Alert from '@erxes/ui/src/utils/Alert';
 import {
-  readFile,
   uploadHandler,
+  __,
+  readFile,
   uploadDeleteHandler
 } from '@erxes/ui/src/utils';
-// local
+import Icon from '@erxes/ui/src/components/Icon';
 import {
   ChatEditor,
   Attachment,
@@ -20,19 +19,24 @@ import {
   FileName,
   PreviewImg
 } from '../styles';
+import VoiceRecorder from './voice/VoiceRecorder';
+import { IAttachment } from '@erxes/ui/src/types';
 
 type Props = {
   type?: string;
   reply?: any;
   setReply: (message: any) => void;
-  sendMessage: (message: string, attachments: any[]) => void;
+  sendMessage: (variables, callback: () => void) => void;
+  mentions?: any;
 };
 
 const Editor = (props: Props) => {
   const { type, reply } = props;
+  const [state, setState] = useState({ content: props.reply || '' });
+  const [attachments, setAttachments] = useState<IAttachment[]>([]);
   const [loading, setLoading] = useState<object>({});
-  const [attachments, setAttachments] = useState<any>([]);
-  const [message, setMessage] = useState<string>('');
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
+
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
@@ -47,11 +51,19 @@ const Editor = (props: Props) => {
     }
   }, [reply]);
 
-  const handleSendMessage = () => {
-    props.sendMessage(message, attachments);
-    props.setReply(null);
-    setMessage('');
+  const clearContent = () => {
+    setState({ content: '' });
     setAttachments([]);
+  };
+
+  const handleSendMessage = () => {
+    const { content } = state;
+    const mentionedUserIds = getMentionedUserIds(content);
+
+    props.sendMessage({ content, attachments, mentionedUserIds }, () => {
+      clearContent();
+    });
+    props.setReply(null);
   };
 
   const handleDeleteFile = (url: string) => {
@@ -88,18 +100,26 @@ const Editor = (props: Props) => {
 
   const handleFileInput = (event: React.FormEvent<HTMLInputElement>) => {
     const files = event.currentTarget.files;
-
+    setUploadLoading(true);
     uploadHandler({
       files,
+      maxHeight: 725,
+      maxWidth: 725,
       beforeUpload: () => {
         return;
       },
 
-      afterUpload: ({ response, fileInfo }) => {
+      afterUpload: ({ status, response, fileInfo }) => {
+        if (status !== 'ok') {
+          Alert.error(response.statusText);
+          return setUploadLoading(false);
+        }
+        Alert.success('Success');
         setAttachments([
           ...attachments,
           Object.assign({ url: response }, fileInfo)
         ]);
+        setUploadLoading(false);
       }
     });
   };
@@ -107,6 +127,7 @@ const Editor = (props: Props) => {
   const handleKeyDown = (event: any) => {
     if (event.keyCode === 13 && !event.shiftKey) {
       handleSendMessage();
+      clearContent();
     }
   };
 
@@ -130,7 +151,7 @@ const Editor = (props: Props) => {
                 ({Math.round(attachment.size / 1000)}
                 kB)
               </div>
-              {loading[attachment.url] ? (
+              {loading[attachment.url] || uploadLoading ? (
                 <SmallLoader />
               ) : (
                 <Icon
@@ -143,30 +164,62 @@ const Editor = (props: Props) => {
         </AttachmentIndicator>
       );
     }
+    if (uploadLoading && attachments.length === 0) {
+      return (
+        <AttachmentIndicator>
+          <Attachment>
+            Uploading...
+            {<SmallLoader />}
+          </Attachment>
+        </AttachmentIndicator>
+      );
+    }
 
     return null;
+  };
+
+  const onEditorChange = e => {
+    e.preventDefault();
+
+    setState({
+      content: e.target.value
+    });
   };
 
   return (
     <>
       {renderIndicator()}
       <ChatEditor>
-        <FormControl
-          autoFocus
-          autoComplete="false"
-          round
-          id="chat-widget-form-control"
-          placeholder="Aa"
-          onChange={(event: any) => setMessage(event.target.value)}
-          value={message}
-          onKeyDown={handleKeyDown}
-        />
+        <Tip text={'Audio'}>
+          <label>
+            <Icon icon="audio" />
+            <input type="file" multiple={true} />
+          </label>
+        </Tip>
+        <Tip text={'Audio'}>
+          <VoiceRecorder
+            attachments={attachments}
+            setAttachments={setAttachments}
+          />
+        </Tip>
         <Tip placement="top" text={'Attach file'}>
           <label>
             <Icon icon="clip" size={18} />
             <input type="file" onChange={handleFileInput} multiple={true} />
           </label>
         </Tip>
+        <FormControl
+          autoFocus={true}
+          autoComplete="false"
+          round={true}
+          id="chat-widget-form-control"
+          placeholder="Aa"
+          maxHeight={140}
+          onChange={(event: any) => onEditorChange(event)}
+          value={state.content}
+          onKeyDown={handleKeyDown}
+          componentClass={type !== 'widget' && 'textarea'}
+        />
         <Tip placement="top" text={'Send'}>
           <label onClick={handleSendMessage}>
             <Icon icon="send" size={18} />

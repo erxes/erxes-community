@@ -1,5 +1,5 @@
 import { colors, dimensions } from '../styles';
-import { darken, rgba } from './ecolor';
+import { darken, lighten, rgba } from './ecolor';
 
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
@@ -33,10 +33,11 @@ const CommentContainer = styled.div`
 `;
 
 const Description = styled.div`
-  background: #edeef0;
-  font-size: 13px;
-  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
-  border-radius: 5px;
+  font-size: 14px;
+
+  > p {
+    font-size: 14px;
+  }
 `;
 
 const Table = styled.table`
@@ -62,37 +63,31 @@ const Table = styled.table`
 
 const ListHead = styled.div`
   display: flex;
-  background-color: ${colors.bgLight};
-  padding: ${dimensions.unitSpacing + 5}px ${dimensions.coreSpacing}px;
-  border: 1px solid ${colors.borderPrimary};
   margin-bottom: ${dimensions.unitSpacing}px;
-  border-radius: 5px;
 
   > div {
     display: inline-block;
     font-weight: 600;
     flex: 0 0 12%;
-    color: ${colors.colorCoreGray};
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 11px;
     padding: 0 ${dimensions.unitSpacing - 5}px;
 
     &:first-child {
       flex: 0 0 30%;
       text-align: left;
     }
+
+    @media (max-width: 700px) {
+      min-width: 60px;
+    }
   }
 `;
 
-const ListBody = styled.div``;
-
 const ListRow = styled.div`
   display: flex;
-  background: ${colors.colorWhite};
-  margin-bottom: ${dimensions.unitSpacing}px;
-  padding: ${dimensions.unitSpacing + 5}px ${dimensions.coreSpacing}px;
-  border: 1px solid ${colors.borderPrimary};
-  border-radius: 5px;
+  padding: ${dimensions.unitSpacing + 2}px 0;
+  border-bottom: 1px solid ${colors.borderPrimary};
   cursor: pointer;
   transition: all ease 0.3s;
 
@@ -103,6 +98,7 @@ const ListRow = styled.div`
     font-size: 14px;
     gap: 5px;
     flex-wrap: wrap;
+    word-break: break-word;
     padding: 0 ${dimensions.unitSpacing - 5}px;
 
     &:first-child {
@@ -111,10 +107,18 @@ const ListRow = styled.div`
       font-weight: 600;
       text-transform: capitalize;
     }
+
+    @media (max-width: 700px) {
+      min-width: 60px;
+    }
   }
 
   &:hover {
     background: #f5f5f5;
+  }
+
+  &:last-child {
+    border: 0;
   }
 `;
 
@@ -122,11 +126,12 @@ const DetailHeader = styled.div`
   margin-bottom: ${dimensions.coreSpacing}px;
 
   span {
-    text-transform: uppercase;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
-    transition: all ease .3s;
+    transition: all ease 0.3s;
     color: ${colors.colorCoreGray};
+    display: flex;
+    align-items: center;
 
     &:hover {
       color: ${colors.textPrimary};
@@ -134,22 +139,26 @@ const DetailHeader = styled.div`
   }
 `;
 
-const TicketDetailContent = styled.div`
-  
-`;
+const TicketDetailContent = styled.div``;
 
-const DetailRow = styled.div`
+const DetailRow = styledTS<{ type?: string }>(styled.div)`
   margin-bottom: ${dimensions.unitSpacing + 5}px;
+  display: ${props => props.type === 'row' && 'flex'};
+  align-items: ${props => props.type === 'row' && 'center'};
 
   label {
-    font-weight: 600;
+    color: #999;
+    font-weight: 500;
+    text-transform: capitalize;
+    font-size: 13px;
+    margin: ${props => (props.type === 'row' ? 0 : '0 0 8px 0')};
+    width: ${props => props.type === 'row' && '120px'};
   }
   
   span {
     display: block;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
-    font-weight: 300;
     align-items: center;
   }
 `;
@@ -269,7 +278,16 @@ const SelectInput = styled.div`
   }
 `;
 
-const RightSidebar = styled.h6`
+const Card = styledTS<{ fullHeight?: boolean }>(styled.div)`
+  padding: ${dimensions.coreSpacing}px;
+  margin-bottom: ${dimensions.coreSpacing}px;
+  background: ${colors.colorWhite};
+  box-shadow: 0 3px 3px rgba(56,65,74,0.1);
+  border-radius: ${dimensions.unitSpacing}px;
+  height: ${props => props.fullHeight && '100%'};
+`;
+
+const RightSidebar = styled(Card)`
   position: sticky;
   overflow: auto;
   height: 100%;
@@ -277,25 +295,46 @@ const RightSidebar = styled.h6`
 
 const GroupList = styled.div`
   margin-bottom: ${dimensions.coreSpacing + dimensions.unitSpacing}px;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   border: 1px solid ${colors.borderDarker};
   background: ${colors.colorWhite};
 
   .card-header {
     font-size: 14px;
+
+    span {
+      color: #888;
+      margin-left: ${dimensions.unitSpacing - 5}px;
+    }
   }
 `;
 
 const GroupWrapper = styled.div`
-  padding: ${dimensions.unitSpacing}px;
+  padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
+
+  @media (max-width: 700px) {
+    overflow: auto;
+  }
 `;
 
-const CardTab = styledTS<{baseColor?: string}>(styled.div)`
+const GroupBoxWrapper = styled.div`
+  background: ${colors.colorWhite};
+
+  h3 {
+    padding-left: ${dimensions.coreSpacing}px;
+  }
+
+  border-radius: 12px;
+
+  border-top: 1px solid ${colors.borderPrimary};
+`;
+
+const CardTab = styledTS<{ baseColor?: string }>(styled.div)`
   margin-right: ${dimensions.coreSpacing}px;
   font-size: 13px;
   background: #f4f4f4;
   border: 1px solid ${colors.borderPrimary};
-  border-radius: ${dimensions.unitSpacing}px;
+  border-radius: ${dimensions.unitSpacing - 2}px;
   color: ${colors.colorCoreGray};
   overflow: hidden;
 
@@ -306,10 +345,175 @@ const CardTab = styledTS<{baseColor?: string}>(styled.div)`
     text-transform: capitalize;
     
     &.active {
-      background: ${props => props.baseColor ? props.baseColor : colors.colorSecondary};
+      background: ${props =>
+        props.baseColor ? props.baseColor : colors.colorSecondary};
       color: ${colors.colorWhite};
     }
   }
+`;
+
+const Assignees = styled.div`
+  margin-bottom: ${dimensions.unitSpacing - 2}px;
+  display: flex;
+  align-items: center;
+
+  img {
+    border-radius: 24px;
+    border: 1px solid ${colors.borderPrimary};
+    margin-right: ${dimensions.unitSpacing - 5}px;
+  }
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+
+  > div {
+    margin-right: ${dimensions.coreSpacing + dimensions.coreSpacing}px;
+  }
+`;
+
+const FilterGroup = styled.div`
+  label {
+    font-size: 14px;
+    margin: 0 5px 0 0;
+  }
+
+  @media (max-width: 700px) {
+    justify-content: space-between;
+    margin-bottom: ${dimensions.unitSpacing}px;
+  }
+`;
+
+const ColumnContainer = styled.div`
+  position: relative;
+  height: 100%;
+`;
+
+const ColumnContentBody = styled.div`
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 0 4px 90px;
+  margin: 10px 0;
+  overflow-y: auto;
+  display: block;
+`;
+
+const ColumnFooter = styled.div`
+  position: absolute;
+  z-index: 2;
+  bottom: 31px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background: ${colors.bgLight};
+`;
+
+const Header = styled.div`
+  display: inline-block;
+`;
+
+const HeaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const ScrolledContent = styled.div`
+  display: flex;
+  height: 100%;
+  width: 100%;
+  will-change: contents;
+  overflow: auto;
+`;
+
+const Content = styled.div`
+  flex: 1;
+  overflow: hidden;
+  background: #e5e8ec;
+  margin: 0 5px 0 0;
+  min-width: 280px;
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 1px 5px 0px;
+  height: 100%;
+`;
+
+const ContentHeader = styled.div`
+  padding: 8px 16px 2px;
+  font-weight: bold;
+  font-size: 14px;
+`;
+
+const Item = styled.div`
+  margin-left: 8px;
+
+  &:first-of-type {
+    margin: 0;
+  }
+`;
+
+const buttonColor = name => {
+  if (name === 'red') {
+    return lighten(colors.colorCoreRed, 10);
+  }
+
+  if (name === 'green') {
+    return lighten(colors.colorCoreGreen, 10);
+  }
+
+  if (name === 'yellow') {
+    return lighten(colors.colorCoreYellow, 10);
+  }
+
+  if (name === 'blue') {
+    return lighten(colors.colorCoreBlue, 10);
+  }
+
+  if (name === 'teal') {
+    return lighten(colors.colorCoreTeal, 10);
+  }
+
+  return colors.colorCoreLightGray;
+};
+
+const Button = styledTS<{
+  colorName?: string;
+  extra?: boolean;
+}>(styled.div)`
+  padding: 5px 15px;
+  background: ${props => buttonColor(props.colorName)};
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  display: inline-block;
+  text-align: center;
+
+  &:hover {
+    background: ${props => darken(buttonColor(props.colorName), 10)};
+    cursor: pointer;
+  }
+  
+  ${props => props.extra && 'padding-left: 40px;'}
+`;
+
+const CloseDateLabel = styled(Button)`
+  width: 72px;
+  padding: 3px 0;
+  line-height: 1em;
+  margin-top: 4px;
+  margin-left: 10px;
+`;
+
+const StartDateLabel = styled(Button)`
+  width: 72px;
+  padding: 3px 0;
+  line-height: 1em;
+  margin-top: 4px;
+`;
+
+const ActionBarWrapper = styled.div`
+  align-self: center;
+  margin: 0 20px;
 `;
 
 export {
@@ -319,8 +523,8 @@ export {
   Table,
   Label,
   DetailHeader,
+  FilterGroup,
   ListHead,
-  ListBody,
   ListRow,
   Description,
   TicketComment,
@@ -333,5 +537,21 @@ export {
   DetailRow,
   GroupList,
   GroupWrapper,
-  CardTab
+  CardTab,
+  Card,
+  FlexRow,
+  Assignees,
+  GroupBoxWrapper,
+  ColumnContainer,
+  ColumnContentBody,
+  ColumnFooter,
+  Header,
+  HeaderWrapper,
+  ScrolledContent,
+  Content,
+  ContentHeader,
+  Item,
+  CloseDateLabel,
+  StartDateLabel,
+  ActionBarWrapper
 };

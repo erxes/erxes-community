@@ -33,6 +33,7 @@ import { uploader } from './middlewares/fileMiddleware';
 import {
   getService,
   getServices,
+  isEnabled,
   join,
   leave,
   redis
@@ -49,6 +50,7 @@ import imports from './imports';
 import exporter from './exporter';
 import { moduleObjects } from './data/permissions/actions/permission';
 import dashboards from './dashboards';
+import { getEnabledServices } from '@erxes/api-utils/src/serviceDiscovery';
 
 const {
   JWT_TOKEN_SECRET,
@@ -213,6 +215,7 @@ app.get('/read-file', async (req: any, res, next) => {
   try {
     const key = req.query.key;
     const name = req.query.name;
+    const width = req.query.width;
 
     if (!key) {
       return res.send('Invalid key');
@@ -222,7 +225,8 @@ app.get('/read-file', async (req: any, res, next) => {
       key,
       subdomain,
       models,
-      userId: req.headers.userid
+      userId: req.headers.userid,
+      width
     });
 
     res.attachment(name || key);
@@ -244,7 +248,7 @@ app.post(
   '/delete-file',
   routeErrorHandling(async (req: any, res) => {
     // require login
-    if (!req.user) {
+    if (!req.headers.userid) {
       return res.end('forbidden');
     }
 
@@ -310,6 +314,16 @@ app.get('/get-import-file', async (req, res) => {
   res.sendFile(`${uploadsFolderPath}/${fileName}`);
 });
 
+app.get('/plugins/enabled/:name', async (req, res) => {
+  const result = await isEnabled(req.params.name);
+  res.json(result);
+});
+
+app.get('/plugins/enabled', async (_req, res) => {
+  const result = (await getEnabledServices()) || [];
+  res.json(result);
+});
+
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler());
 
@@ -326,7 +340,7 @@ httpServer.listen(PORT, async () => {
     apolloServer.applyMiddleware({ app, path: '/graphql', cors: corsOptions });
   });
 
-  initBroker({ RABBITMQ_HOST, MESSAGE_BROKER_PREFIX, redis }).catch(e => {
+  initBroker({ RABBITMQ_HOST, MESSAGE_BROKER_PREFIX, redis, app }).catch(e => {
     debugError(`Error ocurred during message broker init ${e.message}`);
   });
 

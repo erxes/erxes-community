@@ -14,15 +14,23 @@ const itemFields = `
   createdAt
   closeDate
   startDate
+  isComplete
   assignedUsers {
     _id
     email
     username
     details {
+      avatar
       firstName
       lastName
       fullName
     }
+  }
+  attachments {
+    name
+    url
+    type
+    size
   }
   createdUser {
     _id
@@ -39,6 +47,7 @@ const itemFields = `
   stageChangedDate
   stage {
     name
+    itemsTotalCount
   }
   labels {
     name
@@ -55,17 +64,18 @@ const clientPortalGetTicket = `
 `;
 
 const clientPortalGetTask = `
-  query taskDetail($_id: String!) {
-    taskDetail(_id: $_id) {
+  query taskDetail($_id: String!, $clientPortalCard: Boolean) {
+    taskDetail(_id: $_id, clientPortalCard: $clientPortalCard) {
      ${itemFields}
     }
   }
 `;
 
 const clientPortalGetDeal = `
-  query dealDetail($_id: String!) {
-    dealDetail(_id: $_id) {
+  query dealDetail($_id: String!, $clientPortalCard: Boolean) {
+    dealDetail(_id: $_id, clientPortalCard: $clientPortalCard) {
       ${itemFields}
+      productsData
     }
   }
 `;
@@ -79,32 +89,33 @@ const clientPortalGetPurchase = `
 `;
 
 const clientPortalTasks = `
-  query clientPortalTasks($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String]) {
-    clientPortalTasks(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds) {
+  query clientPortalTasks($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String], $date: ItemDate) {
+    clientPortalTasks(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds, date: $date) {
       ${itemFields}
     }
   }
 `;
 
 const clientPortalTickets = `
-  query clientPortalTickets ($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String]){
-    clientPortalTickets(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds) {
+  query clientPortalTickets ($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String], $date: ItemDate){
+    clientPortalTickets(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds, date: $date) {
       ${itemFields}
     }
   }
 `;
 
 const clientPortalDeals = `
-  query clientPortalDeals($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String]) {
-    clientPortalDeals(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds) {
+  query clientPortalDeals($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String], $date: ItemDate) {
+    clientPortalDeals(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds, date: $date) {
       ${itemFields}
+      productsData  
     }
   }
 `;
 
 const clientPortalPurchases = `
-  query clientPortalPurchases($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String]) {
-    clientPortalPurchases(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds) {
+  query clientPortalPurchases($priority: [String], $labelIds: [String], $stageId: String, $closeDateType: String, $userIds: [String], $date: ItemDate) {
+    clientPortalPurchases(priority: $priority, labelIds: $labelIds, stageId: $stageId, closeDateType: $closeDateType, userIds: $userIds, date: $date) {
       ${itemFields}
     }
   }
@@ -115,7 +126,15 @@ const clientPortalComments = `
     clientPortalComments(typeId: $typeId, type: $type) {
       _id
       content
-      createdUser 
+      createdUser {
+        _id
+        avatar
+        firstName
+        fullName
+        lastName
+        email
+        username
+      }
       createdAt
       userType
       type
@@ -327,6 +346,59 @@ query pipelineAssignedUsers($_id: String!) {
     __typename
   }
 }`;
+
+const productCategories = `
+  query productCategories($status: String) {
+    productCategories(status: $status) {
+      _id
+      name
+      order
+      code
+      parentId
+      description
+      status
+      meta
+      attachment {
+        name
+        url
+        type
+        size
+      }
+
+      isRoot
+      productCount
+    }
+  }
+`;
+
+const checklists = `
+    query checklists($contentType: String, $contentTypeId: String) {
+      checklists( contentType: $contentType, contentTypeId: $contentTypeId  ) {
+        _id
+      }
+    }
+`;
+
+const checklistDetail = `
+  query checklistDetail($_id: String!) {
+    checklistDetail(_id: $_id) {
+      _id
+      contentType
+      contentTypeId
+      title
+      createdUserId
+      createdDate
+      items {
+        _id
+        checklistId
+        isChecked
+        content
+      }
+      percent    
+    }
+  }
+`;
+
 export default {
   clientPortalGetTicket,
   clientPortalGetDeal,
@@ -343,5 +415,8 @@ export default {
   products,
   pipelineLabels,
   pipelineAssignedUsers,
-  stages
+  stages,
+  productCategories,
+  checklists,
+  checklistDetail
 };

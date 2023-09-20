@@ -118,10 +118,9 @@ class Form extends React.Component<Props, State> {
     for (const product of products) {
       const { uom } = product;
       const productName = product.product ? product.product.name : 'not name';
-      const uomCode = uom ? uom.code : 'not uom';
 
       result.push(
-        this.renderView(productName, product.quantity * workInfo.count, uomCode)
+        this.renderView(productName, product.quantity * workInfo.count, uom)
       );
     }
 
@@ -282,10 +281,9 @@ class Form extends React.Component<Props, State> {
             const productsData: IProductsData = {
               _id: Math.random().toString(),
               productId,
-              uomId: product.uomId,
+              uom: product.uom,
               quantity: 1,
-              product,
-              uom: product.uom
+              product
             };
             let needProducts: IProductsData[] = [];
             let resultProducts: IProductsData[] = [];
@@ -414,7 +412,7 @@ class Form extends React.Component<Props, State> {
         <FormWrapper>
           <FormColumn>
             <FormGroup>
-              <ControlLabel>{__(`In Branch`)}</ControlLabel>
+              <ControlLabel>{__(`Spend Branch`)}</ControlLabel>
               <SelectBranches
                 label="Choose branch"
                 name="inBranchId"
@@ -430,7 +428,7 @@ class Form extends React.Component<Props, State> {
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>{__(`In Department`)}</ControlLabel>
+              <ControlLabel>{__(`Spend Department`)}</ControlLabel>
               <SelectDepartments
                 label="Choose department"
                 name="inDepartmentId"
@@ -449,7 +447,7 @@ class Form extends React.Component<Props, State> {
 
           <FormColumn>
             <FormGroup>
-              <ControlLabel>{__(`Out Branch`)}</ControlLabel>
+              <ControlLabel>{__(`Receipt Branch`)}</ControlLabel>
               <SelectBranches
                 label="Choose branch"
                 name="outBranchId"
@@ -465,7 +463,7 @@ class Form extends React.Component<Props, State> {
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>{__(`Out Department`)}</ControlLabel>
+              <ControlLabel>{__(`Receipt Department`)}</ControlLabel>
               <SelectDepartments
                 label="Choose department"
                 name="outDepartmentId"

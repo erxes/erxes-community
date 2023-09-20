@@ -34,6 +34,7 @@ const allUsers = `
       details {
         avatar
         fullName
+        position
         ${nameFields}
       }
     }
@@ -63,6 +64,8 @@ const listParamsDef = `
   $branchId: String
   $departmentIds: [String]
   $branchIds: [String]
+  $segment: String,
+  $segmentData: String
 `;
 
 const listParamsValue = `
@@ -75,6 +78,8 @@ const listParamsValue = `
   branchId: $branchId,
   departmentIds: $departmentIds
   branchIds:$branchIds
+  segment: $segment,
+  segmentData: $segmentData
 `;
 
 const users = `

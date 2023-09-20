@@ -1,17 +1,11 @@
-import { gatherDescriptions } from '../../../utils';
-import {
-  checkPermission,
-  putCreateLog,
-  putDeleteLog,
-  putUpdateLog
-} from '@erxes/api-utils/src';
+import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
-import redis from '../../../redis';
+import { sendMessageBroker } from '../../../messageBroker';
 import {
   ITransaction,
   ITransactionDocument
 } from '../../../models/definitions/transactions';
+import { createLog, deleteLog, updateLog } from '../../../logUtils';
 
 const transactionMutations = {
   transactionsAdd: async (
@@ -31,17 +25,7 @@ const transactionMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putCreateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await createLog(subdomain, user, logData);
 
     return transaction;
   },
@@ -60,7 +44,7 @@ const transactionMutations = {
     });
 
     const updated = await models.Transactions.updateTransaction(
-      redis,
+      subdomain,
       _id,
       doc
     );
@@ -73,17 +57,7 @@ const transactionMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -111,17 +85,7 @@ const transactionMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -137,10 +101,11 @@ const transactionMutations = {
   ) => {
     // TODO: contracts check
     const transactions = await models.Transactions.find({
-      _id: { $in: transactionIds }
+      _id: { $in: transactionIds },
+      isManual: true
     }).lean();
 
-    await models.Transactions.removeTransactions(transactionIds);
+    await models.Transactions.removeTransactions(transactions.map(a => a._id));
 
     for (const transaction of transactions) {
       const logData = {
@@ -149,18 +114,49 @@ const transactionMutations = {
         extraParams: { models }
       };
 
-      const descriptions = gatherDescriptions(logData);
+      if (!!transaction.ebarimt && transaction.isManual)
+        await sendMessageBroker(
+          {
+            action: 'putresponses.returnBill',
+            data: {
+              contentType: 'loans:transaction',
+              contentId: transaction._id,
+              number: transaction.number
+            },
+            subdomain
+          },
+          'ebarimt'
+        );
 
-      await putDeleteLog(
-        subdomain,
-        messageBroker(),
-
-        { ...logData, ...descriptions },
-        user
-      );
+      await deleteLog(subdomain, user, logData);
     }
 
     return transactionIds;
+  },
+  createEBarimtOnTransaction: async (
+    _root,
+    {
+      id,
+      isGetEBarimt,
+      isOrganization,
+      organizationRegister
+    }: {
+      id: string;
+      isGetEBarimt?: boolean;
+      isOrganization?: boolean;
+      organizationRegister?: string;
+    },
+    { models, subdomain }: IContext
+  ) => {
+    const transaction = await models.Transactions.createEBarimtOnTransaction(
+      subdomain,
+      id,
+      isGetEBarimt,
+      isOrganization,
+      organizationRegister
+    );
+
+    return transaction;
   }
 };
 checkPermission(transactionMutations, 'transactionsAdd', 'manageTransactions');

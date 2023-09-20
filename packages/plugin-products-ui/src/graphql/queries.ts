@@ -31,8 +31,30 @@ const productsGroupCounts = `
 `;
 
 const productsCount = `
-  query productsTotalCount($type: String, $segment: String, $segmentData: String) {
-    productsTotalCount(type: $type, segment: $segment, segmentData: $segmentData)
+  query productsTotalCount(
+    $type: String,
+    $categoryId: String,
+    $status: String,
+    $tag: String,
+    $searchValue: String,
+    $excludeIds: Boolean,
+    $pipelineId: String,
+    $boardId: String,
+    $segment: String,
+    $segmentData: String
+  ) {
+    productsTotalCount(
+      type: $type,
+      status: $status,
+      categoryId: $categoryId,
+      tag: $tag,
+      searchValue: $searchValue,
+      excludeIds: $excludeIds,
+      pipelineId: $pipelineId,
+      boardId: $boardId,
+      segment: $segment,
+      segmentData: $segmentData
+    )
   }
 `;
 
@@ -42,6 +64,7 @@ const productCategoryDetail = `
   query productCategoryDetail($_id: String) {
     productCategoryDetail(_id: $_id) {
       _id
+      code
       name
       productCount
     }

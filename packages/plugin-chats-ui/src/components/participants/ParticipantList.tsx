@@ -6,53 +6,76 @@ import Icon from '@erxes/ui/src/components/Icon';
 import ParticipantItem from '../../containers/participants/ParticipantItem';
 import AddMember from '../../containers/modals/AddMember';
 import {
-  SidebarHeader,
   Title,
   ParticipantListWrapper,
-  ParticipantItemWrapper
-  // ParticipantDetails,
-  // ParticipantSubDetails
+  ParticipantItemWrapper,
+  FlexColumn
 } from '../../styles';
+import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   chat: any;
+  type?: string;
 };
-
-const ParticipantList = (props: Props) => {
-  const { chat } = props;
+type FinalProps = {
+  currentUser: IUser;
+} & Props;
+const ParticipantList = (props: FinalProps) => {
+  const { chat, currentUser, type } = props;
+  const participantUserIds = chat?.participantUsers.map(user => {
+    return user._id;
+  });
 
   const renderAdd = () => {
-    <ModalTrigger
-      title="Add people"
-      trigger={
-        <ParticipantItemWrapper>
-          <a href="#">
-            <Icon
-              icon="plus"
-              size={18}
-              color="black"
-              style={{ margin: '0 0.6em' }}
-            />
-          </a>
-        </ParticipantItemWrapper>
-      }
-      content={props => <AddMember {...props} chatId={chat._id} />}
-      hideHeader
-      isAnimate
-    />;
+    return (
+      <ModalTrigger
+        title="Add Member"
+        trigger={
+          <ParticipantItemWrapper isWidget={type === 'widget'}>
+            <a>
+              <Icon icon="plus" size={15} color="#444" />
+              Add Member
+            </a>
+          </ParticipantItemWrapper>
+        }
+        content={modalProps => (
+          <AddMember
+            {...modalProps}
+            chatId={chat._id}
+            participantUserIds={participantUserIds}
+          />
+        )}
+        isAnimate={true}
+      />
+    );
   };
 
+  const isAdmin = (chat?.participantUsers || []).find(
+    pUser => pUser._id === currentUser._id
+  )?.isAdmin;
+
   return (
-    <>
-      <Title>Participants</Title>
-      <ParticipantListWrapper>
-        {(chat.participantUsers || []).map(u => (
-          <ParticipantItem key={u._id} chatId={chat._id} user={u} />
+    <FlexColumn>
+      {type !== 'widget' && <Title>Participants</Title>}
+      <ParticipantListWrapper isWidget={type === 'widget'}>
+        {(chat?.participantUsers || []).map(u => (
+          <ParticipantItem
+            key={u._id}
+            chatId={chat._id}
+            user={u}
+            isAdmin={isAdmin}
+            isWidget={type === 'widget'}
+          />
         ))}
-        {renderAdd()}
+        {isAdmin && renderAdd()}
       </ParticipantListWrapper>
-    </>
+    </FlexColumn>
   );
 };
 
-export default ParticipantList;
+const WithCurrentUser = withCurrentUser(ParticipantList);
+
+export default (props: Props) => {
+  return <WithCurrentUser {...props} />;
+};

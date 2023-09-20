@@ -83,6 +83,10 @@ const timeclocksMain = `
             employeeId
             deviceName
             deviceType
+            inDevice
+            inDeviceType  
+            outDevice
+            outDeviceType
         }
         totalCount
     }
@@ -112,6 +116,7 @@ const schedulesMain = `
             solved
             status
             scheduleConfigId
+            lunchBreakInMins
           }
           scheduleConfigId
           solved
@@ -207,7 +212,12 @@ const timeclockReports = `
             
                 deviceName
                 deviceType
-            
+                
+                inDevice
+                inDeviceType
+                outDevice
+                outDeviceType
+
                 scheduledStart
                 scheduledEnd
                 scheduledDuration
@@ -218,6 +228,10 @@ const timeclockReports = `
                 totalHoursOvertime
                 totalHoursOvernight
               }
+
+              branchTitles
+              departmentTitles
+              
               totalMinsLate
               totalAbsenceMins
               totalMinsWorked
@@ -327,6 +341,7 @@ const timeLogsPerUser = `
     timeLogsPerUser(userId: $userId, startDate: $startDate, endDate: $endDate){
       _id
       timelog
+      deviceName
       deviceSerialNo
     }
   }
@@ -350,6 +365,20 @@ query timeclockDepartments($searchValue: String){
   }
 }`;
 
+const scheduleConfigOrder = `
+query scheduleConfigOrder($userId: String){
+  scheduleConfigOrder(userId: $userId){
+    _id
+    userId
+    orderedList {
+      order
+      pinned
+      scheduleConfigId
+      label
+    }
+  }
+}`;
+
 export default {
   timeclockReports,
   branches,
@@ -370,6 +399,7 @@ export default {
 
   scheduleConfigs,
   deviceConfigs,
+  scheduleConfigOrder,
 
   timeclockBranches,
   timeclockDepartments

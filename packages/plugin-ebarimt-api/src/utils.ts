@@ -40,7 +40,7 @@ export const validCompanyCode = async (config, companyCode) => {
 
 export const companyCheckCode = async (params, subdomain) => {
   if (!params.code) {
-    return;
+    return params;
   }
 
   const config = await getConfig(subdomain, 'EBARIMT', {});
@@ -50,13 +50,13 @@ export const companyCheckCode = async (params, subdomain) => {
     !config.checkCompanyUrl ||
     !config.checkCompanyUrl.includes('http')
   ) {
-    return;
+    return params;
   }
 
   const companyName = await validCompanyCode(config, params.code);
 
   if (!companyName) {
-    throw new Error(`Байгууллагын код буруу бөглөсөн байна. "${params.code}"`);
+    return params;
   }
 
   if (companyName.includes('**') && params.primaryName) {
@@ -147,7 +147,7 @@ const arrangeTaxType = async (deal, productsById, billType) => {
       discount: productData.discount,
       productCode: product.code,
       productName: product.name,
-      sku: product.sku || 'ш',
+      uom: product.uom || 'ш',
       productId: productData.productId
     };
 
@@ -416,4 +416,21 @@ export const getPostData = async (subdomain, config, deal) => {
     });
   }
   return result;
+};
+
+export const getCompany = async (subdomain, companyRD) => {
+  const config = await getConfig(subdomain, 'EBARIMT', {});
+  const re = new RegExp('(^[А-ЯЁӨҮ]{2}[0-9]{8}$)|(^\\d{7}$)', 'gui');
+
+  if (!re.test(companyRD)) {
+    return { status: 'notValid' };
+  }
+
+  const info = await sendRequest({
+    url: config.checkCompanyUrl,
+    method: 'GET',
+    params: { regno: companyRD }
+  });
+
+  return { status: 'checked', info };
 };

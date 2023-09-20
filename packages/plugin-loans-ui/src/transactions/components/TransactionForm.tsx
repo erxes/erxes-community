@@ -19,7 +19,7 @@ import { Amount } from '../../contracts/styles';
 import { DateContainer } from '@erxes/ui/src/styles/main';
 import { IInvoice } from '../../invoices/types';
 import React from 'react';
-import { __ } from '@erxes/ui/src/utils';
+import { __ } from 'coreui/utils';
 import SelectContracts, {
   Contracts
 } from '../../contracts/components/common/SelectContract';
@@ -45,6 +45,11 @@ type State = {
   description: string;
   total: number;
   paymentInfo: any;
+  isGetEBarimt?: boolean;
+  isOrganization?: boolean;
+  organizationRegister?: string;
+  organizationName?: string;
+  storedInterest: number;
 };
 
 class TransactionForm extends React.Component<Props, State> {
@@ -65,7 +70,8 @@ class TransactionForm extends React.Component<Props, State> {
       customerId:
         transaction.customerId || (invoice && invoice.customerId) || '',
       invoice: invoice || transaction.invoice || null,
-      paymentInfo: null
+      paymentInfo: null,
+      storedInterest: 0
     };
   }
 
@@ -81,6 +87,7 @@ class TransactionForm extends React.Component<Props, State> {
     return {
       _id: finalValues._id,
       ...this.state,
+      isManual: true,
       payDate: finalValues.payDate,
       total: Number(this.state.total)
     };
@@ -123,7 +130,7 @@ class TransactionForm extends React.Component<Props, State> {
     );
   };
 
-  renderRowTr = (label, fieldName, isFromState) => {
+  renderRowTr = (label, fieldName, isFromState?: any) => {
     const { transaction } = this.props;
     const { paymentInfo } = this.state;
     let trVal = '';
@@ -135,7 +142,7 @@ class TransactionForm extends React.Component<Props, State> {
     return (
       <FormWrapper>
         <FormColumn>
-          <ControlLabel>{`${label}:`}</ControlLabel>
+          <ControlLabel>{`${__(label)}:`}</ControlLabel>
         </FormColumn>
         <FormColumn>
           <Amount>{Number(trVal).toLocaleString()}</Amount>
@@ -151,19 +158,19 @@ class TransactionForm extends React.Component<Props, State> {
         <>
           <FormWrapper>
             <FormColumn>
-              <ControlLabel>Type</ControlLabel>
+              <ControlLabel>{__('Type')}</ControlLabel>
             </FormColumn>
             <FormColumn>
               <ControlLabel>Transaction</ControlLabel>
             </FormColumn>
           </FormWrapper>
-          {this.renderRowTr('total', 'total')}
-          {this.renderRowTr('payment', 'payment')}
-          {this.renderRowTr('interest eve', 'interestEve')}
-          {this.renderRowTr('interest nonce', 'interestNonce')}
-          {this.renderRowTr('undue', 'undue')}
-          {this.renderRowTr('insurance', 'insurance')}
-          {this.renderRowTr('debt', 'debt')}
+          {this.renderRowTr('Total must pay', 'total')}
+          {this.renderRowTr('Payment', 'payment')}
+          {this.renderRowTr('Stored Interest', 'storedInterest')}
+          {this.renderRowTr('Interest Nonce', 'calcInterest')}
+          {this.renderRowTr('Loss', 'undue')}
+          {this.renderRowTr('Insurance', 'insurance')}
+          {this.renderRowTr('Debt', 'debt')}
         </>
       );
     }
@@ -186,8 +193,8 @@ class TransactionForm extends React.Component<Props, State> {
         </FormWrapper>
         {this.renderRow('total', 'total')}
         {this.renderRow('payment', 'payment')}
-        {this.renderRow('interest eve', 'interestEve')}
-        {this.renderRow('interest nonce', 'interestNonce')}
+        {this.renderRow('interest eve', 'storedInterest')}
+        {this.renderRow('interest nonce', 'calcInterest')}
         {this.renderRow('undue', 'undue')}
         {this.renderRow('insurance', 'insurance')}
         {this.renderRow('debt', 'debt')}
@@ -205,7 +212,7 @@ class TransactionForm extends React.Component<Props, State> {
 
     const getPaymentInfo = (
       contractId,
-      payDate = dayjs()
+      payDate: any = dayjs()
         .locale('en')
         .format('MMM, D YYYY')
     ) => {
@@ -219,16 +226,56 @@ class TransactionForm extends React.Component<Props, State> {
         });
     };
 
+    const getCompanyName = register => {
+      if (register && register.length === 7)
+        client
+          .query({
+            query: gql(queries.getCompanyName),
+            variables: { companyRd: register }
+          })
+          .then(({ data }) => {
+            data?.ebarimtGetCompany?.info;
+            this.setState({
+              organizationName: data?.ebarimtGetCompany?.info?.name
+            });
+          });
+    };
+
     const onChangePayDate = value => {
       if (this.state.contractId && this.state.payDate !== value)
         getPaymentInfo(this.state.contractId, value);
+
       this.setState({ payDate: value });
     };
 
     const onChangeField = e => {
+      if (
+        (e.target as HTMLInputElement).name === 'total' &&
+        this.state.paymentInfo
+      ) {
+        const value = Number((e.target as HTMLInputElement).value);
+
+        if (value > this.state.paymentInfo.closeAmount) {
+          (e.target as HTMLInputElement).value = this.state.paymentInfo.closeAmount;
+        }
+      }
+      if (
+        (e.target as HTMLInputElement).name === 'organizationRegister' &&
+        this.state.isOrganization &&
+        this.state.isGetEBarimt
+      ) {
+        if ((e.target as HTMLInputElement).value.length > 7) return;
+        if ((e.target as HTMLInputElement).value.length < 7) {
+          this.setState({ organizationName: '' });
+        }
+        getCompanyName((e.target as HTMLInputElement).value);
+      }
+      const value =
+        e.target.type === 'checkbox'
+          ? (e.target as HTMLInputElement).checked
+          : (e.target as HTMLInputElement).value;
       this.setState({
-        [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement)
-          .value
+        [(e.target as HTMLInputElement).name]: value
       } as any);
     };
 
@@ -238,7 +285,7 @@ class TransactionForm extends React.Component<Props, State> {
           <FormWrapper>
             <FormColumn>
               <FormGroup>
-                <ControlLabel>Pay Date</ControlLabel>
+                <ControlLabel>{__('Pay Date')}</ControlLabel>
                 <DateContainer>
                   <DateControl
                     {...formProps}
@@ -249,9 +296,8 @@ class TransactionForm extends React.Component<Props, State> {
                   />
                 </DateContainer>
               </FormGroup>
-
               <FormGroup>
-                <ControlLabel>Description</ControlLabel>
+                <ControlLabel>{__('Description')}</ControlLabel>
                 <DateContainer>
                   <FormControl
                     {...formProps}
@@ -264,13 +310,14 @@ class TransactionForm extends React.Component<Props, State> {
               </FormGroup>
 
               <FormGroup>
-                <ControlLabel>Total</ControlLabel>
+                <ControlLabel>{__('Total')}</ControlLabel>
                 <FormControl
                   {...formProps}
                   type={'number'}
                   useNumberFormat
                   fixed={2}
                   name="total"
+                  max={this.state?.paymentInfo?.closeAmount}
                   value={this.state.total}
                   onChange={onChangeField}
                   onClick={this.onFieldClick}
@@ -278,22 +325,84 @@ class TransactionForm extends React.Component<Props, State> {
               </FormGroup>
 
               <FormGroup>
-                <ControlLabel>Contract</ControlLabel>
+                <ControlLabel>{__('Contract')}</ControlLabel>
                 <SelectContracts
-                  label="Choose an customer"
+                  label={__('Choose an contract')}
                   name="contractId"
                   initialValue={this.state.contractId}
                   onSelect={(v, n) => {
                     onSelect(v, n);
-                    typeof v === 'string' &&
+                    if (typeof v === 'string') {
                       onSelect(Contracts[v].customerId, 'customerId');
+                      onSelect(Contracts[v].storedInterest, 'storedInterest');
+                    }
+
                     if (this.state.contractId !== v)
-                      getPaymentInfo(v, values.payDate);
+                      getPaymentInfo(v, this.state.payDate);
                   }}
                   multi={false}
                 />
               </FormGroup>
-              {this.renderRowTr('total', 'total', true)}
+              {this.renderRowTr('Total', 'total', true)}
+              <FormGroup>
+                <ControlLabel>{__('Is get E-Barimt')}</ControlLabel>
+                <FormControl
+                  {...formProps}
+                  type={'checkbox'}
+                  componentClass="checkbox"
+                  useNumberFormat
+                  fixed={0}
+                  name="isGetEBarimt"
+                  value={this.state.isGetEBarimt}
+                  onChange={onChangeField}
+                  onClick={this.onFieldClick}
+                />
+              </FormGroup>
+              {this.state.isGetEBarimt && (
+                <FormGroup>
+                  <ControlLabel>{__('Is organization')}</ControlLabel>
+                  <FormControl
+                    {...formProps}
+                    type={'checkbox'}
+                    componentClass="checkbox"
+                    useNumberFormat
+                    fixed={0}
+                    name="isOrganization"
+                    value={this.state.isOrganization}
+                    onChange={onChangeField}
+                    onClick={this.onFieldClick}
+                  />
+                </FormGroup>
+              )}
+              {this.state.isGetEBarimt && this.state.isOrganization && (
+                <FormWrapper>
+                  <FormColumn>
+                    <FormGroup>
+                      <ControlLabel>{__('Organization Register')}</ControlLabel>
+                      <FormControl
+                        {...formProps}
+                        type={'number'}
+                        fixed={2}
+                        name="organizationRegister"
+                        value={this.state.organizationRegister}
+                        onChange={onChangeField}
+                        onClick={this.onFieldClick}
+                      />
+                    </FormGroup>
+                  </FormColumn>
+                  <FormColumn>
+                    <FormGroup>
+                      <ControlLabel>{__('Organization Name')}</ControlLabel>
+                      <FormControl
+                        {...formProps}
+                        disabled
+                        maxLength={7}
+                        value={this.state.organizationName}
+                      />
+                    </FormGroup>
+                  </FormColumn>
+                </FormWrapper>
+              )}
             </FormColumn>
           </FormWrapper>
 
@@ -302,7 +411,7 @@ class TransactionForm extends React.Component<Props, State> {
 
         <ModalFooter>
           <Button btnStyle="simple" onClick={closeModal} icon="cancel-1">
-            Close
+            {__('Close')}
           </Button>
 
           {renderButton({

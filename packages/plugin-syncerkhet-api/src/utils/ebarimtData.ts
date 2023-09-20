@@ -79,9 +79,15 @@ export const getPostData = async (subdomain, config, deal, dateType = '') => {
     }
   }
 
-  const assignUserIds = deal.productsData
-    .filter(item => item.assignUserId)
-    .map(item => item.assignUserId);
+  const assignUserIds = deal.assignedUserIds;
+
+  for (const item of deal.productsData) {
+    if (!item.assignUserId || assignUserIds.includes(item.assignUserId)) {
+      continue;
+    }
+
+    assignUserIds.push(item.assignUserId);
+  }
 
   const assignUsers = await sendCoreMessage({
     subdomain,
@@ -208,6 +214,17 @@ export const getPostData = async (subdomain, config, deal, dateType = '') => {
   if (sumSaleAmount > 0.005) {
     payments[config.defaultPay] =
       (payments[config.defaultPay] || 0) + sumSaleAmount;
+  } else if (sumSaleAmount < -0.005) {
+    if ((payments[config.defaultPay] || 0) > 0.005) {
+      payments[config.defaultPay] = payments[config.defaultPay] + sumSaleAmount;
+    } else {
+      for (const key of Object.keys(payments)) {
+        if (payments[key] > 0.005) {
+          payments[key] = payments[key] + sumSaleAmount;
+          continue;
+        }
+      }
+    }
   }
 
   let date = new Date().toISOString().slice(0, 10);
@@ -251,6 +268,10 @@ export const getPostData = async (subdomain, config, deal, dateType = '') => {
       billType,
       customerCode,
       description: deal.name,
+      workerEmail:
+        (deal.assignedUserIds.length &&
+          userEmailById[deal.assignedUserIds[0]]) ||
+        undefined,
       details,
       ...payments
     }

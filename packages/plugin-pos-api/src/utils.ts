@@ -1,5 +1,4 @@
-import { generateFieldsFromSchema } from '@erxes/api-utils/src';
-import { generateModels, IModels } from './connectionResolver';
+import { IModels } from './connectionResolver';
 import {
   sendAutomationsMessage,
   sendCardsMessage,
@@ -8,6 +7,7 @@ import {
   sendEbarimtMessage,
   sendInventoriesMessage,
   sendLoyaltiesMessage,
+  sendPosclientHealthCheck,
   sendPosclientMessage,
   sendProductsMessage,
   sendSyncerkhetMessage
@@ -53,31 +53,22 @@ export const getBranchesUtil = async (
     branchId: { $in: pos.allowBranchIds }
   }).lean();
 
-  const healthyBranchIds = [] as any;
+  let healthyBranchIds = [] as any;
 
-  for (const allowPos of allowsPos) {
-    const longTask = async () =>
-      await sendPosclientMessage({
+  const { ALL_AUTO_INIT } = process.env;
+
+  if ([true, 'true', 'True', '1'].includes(ALL_AUTO_INIT || '')) {
+    healthyBranchIds = allowsPos.map(p => p.branchId);
+  } else {
+    for (const allowPos of allowsPos) {
+      const response = await sendPosclientHealthCheck({
         subdomain,
-        action: 'health_check',
-        data: { token: allowPos.token },
-        pos: allowPos,
-        isRPC: true
+        pos: allowPos
       });
 
-    const timeout = (cb, interval) => () =>
-      new Promise(resolve => setTimeout(() => cb(resolve), interval));
-
-    const onTimeout = timeout(resolve => resolve({}), 3000);
-
-    let response = { healthy: 'down' };
-    await Promise.race([longTask, onTimeout].map(f => f())).then(
-      result => (response = result as { healthy: string })
-    );
-
-    if (response && response.healthy === 'ok') {
-      healthyBranchIds.push(allowPos.branchId);
-      break;
+      if (response && response.healthy === 'ok') {
+        healthyBranchIds.push(allowPos.branchId);
+      }
     }
   }
 
@@ -116,52 +107,6 @@ export const confirmLoyalties = async (subdomain: string, order: IPosOrder) => {
   } catch (e) {
     console.log(e.message);
   }
-};
-
-export const generateFields = async ({ subdomain, data }) => {
-  const { type } = data;
-
-  const models = await generateModels(subdomain);
-
-  const { PosOrders } = models;
-
-  let schema: any;
-  let fields: Array<{
-    _id: number;
-    name: string;
-    group?: string;
-    label?: string;
-    type?: string;
-    validation?: string;
-    options?: string[];
-    selectOptions?: Array<{ label: string; value: string }>;
-  }> = [];
-
-  switch (type) {
-    case 'posOrder':
-      schema = PosOrders.schema;
-
-      break;
-  }
-
-  if (schema) {
-    // generate list using customer or company schema
-    fields = [...fields, ...(await generateFieldsFromSchema(schema, ''))];
-
-    for (const name of Object.keys(schema.paths)) {
-      const path = schema.paths[name];
-
-      // extend fields list using sub schema fields
-      if (path.schema) {
-        fields = [
-          ...fields,
-          ...(await generateFieldsFromSchema(path.schema, `${name}.`))
-        ];
-      }
-    }
-  }
-
-  return fields;
 };
 
 const updateCustomer = async ({ subdomain, doneOrder }) => {
@@ -464,19 +409,35 @@ const syncErkhetRemainder = async ({ subdomain, models, pos, newOrder }) => {
   if (!(pos.erkhetConfig && pos.erkhetConfig.isSyncErkhet)) {
     return;
   }
-  const resp = await sendSyncerkhetMessage({
-    subdomain,
-    action: 'toOrder',
-    data: {
-      pos,
-      order: newOrder
-    },
-    isRPC: true,
-    defaultValue: {},
-    timeout: 50000
-  });
+  let resp;
 
-  if (resp.message || resp.error) {
+  if (newOrder.status === 'return') {
+    resp = await sendSyncerkhetMessage({
+      subdomain,
+      action: 'returnOrder',
+      data: {
+        pos,
+        order: newOrder
+      },
+      isRPC: true,
+      defaultValue: {},
+      timeout: 50000
+    });
+  } else {
+    resp = await sendSyncerkhetMessage({
+      subdomain,
+      action: 'toOrder',
+      data: {
+        pos,
+        order: newOrder
+      },
+      isRPC: true,
+      defaultValue: {},
+      timeout: 50000
+    });
+  }
+
+  if (resp && (resp.message || resp.error)) {
     const txt = JSON.stringify({
       message: resp.message,
       error: resp.error
@@ -499,6 +460,11 @@ const syncInventoriesRem = async ({
     return;
   }
 
+  let multiplier = 1;
+  if (newOrder.status === 'return') {
+    multiplier = -1;
+  }
+
   if (
     (!oldBranchId && newOrder.branchId) ||
     (oldBranchId && oldBranchId !== newOrder.branchId)
@@ -511,8 +477,8 @@ const syncInventoriesRem = async ({
         departmentId: newOrder.departmentId,
         productsData: (newOrder.items || []).map(item => ({
           productId: item.productId,
-          uomId: item.uomId,
-          diffCount: -1 * item.count
+          uom: item.uom,
+          diffCount: -1 * item.count * multiplier
         }))
       }
     });
@@ -527,8 +493,8 @@ const syncInventoriesRem = async ({
         departmentId: newOrder.departmentId,
         productsData: (newOrder.items || []).map(item => ({
           productId: item.productId,
-          uomId: item.uomId,
-          diffCount: item.count
+          uom: item.uom,
+          diffCount: item.count * multiplier
         }))
       }
     });
@@ -581,6 +547,10 @@ export const syncOrderFromClient = async ({
 
   const newOrder = await models.PosOrders.findOne({ _id: order._id }).lean();
 
+  if (!newOrder) {
+    return;
+  }
+
   if (newOrder.customerId) {
     await sendAutomationsMessage({
       subdomain,
@@ -595,19 +565,6 @@ export const syncOrderFromClient = async ({
   await confirmLoyalties(subdomain, newOrder);
 
   await createDealPerOrder({ subdomain, pos, newOrder });
-
-  // return info saved
-  await sendPosclientMessage({
-    subdomain,
-    action: `updateSynced`,
-    data: {
-      status: 'ok',
-      posToken,
-      responseIds: (responses || []).map(resp => resp._id),
-      orderId: order._id
-    },
-    pos
-  });
 
   if (pos.isOnline && newOrder.branchId) {
     const toPos = await models.Pos.findOne({
@@ -630,4 +587,29 @@ export const syncOrderFromClient = async ({
   await syncErkhetRemainder({ subdomain, models, pos, newOrder });
 
   await syncInventoriesRem({ subdomain, newOrder, oldBranchId, pos });
+
+  const syncedResponeIds = (
+    (await sendEbarimtMessage({
+      subdomain,
+      action: 'putresponses.find',
+      data: {
+        query: { _id: { $in: (responses || []).map(resp => resp._id) } }
+      },
+      isRPC: true,
+      defaultValue: []
+    })) || []
+  ).map(r => r._id);
+
+  // return info saved
+  await sendPosclientMessage({
+    subdomain,
+    action: `updateSynced`,
+    data: {
+      status: 'ok',
+      posToken,
+      responseIds: syncedResponeIds,
+      orderId: newOrder._id
+    },
+    pos
+  });
 };

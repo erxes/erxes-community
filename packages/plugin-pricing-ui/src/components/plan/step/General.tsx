@@ -1,20 +1,22 @@
-import Datetime from '@nateradebaugh/react-datetime';
-import DiscountInput from '../form/DiscountInput';
+import SelectCompanies from '@erxes/ui-contacts/src/companies/containers/SelectCompanies';
+import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
+import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
+import SelectSegments from '@erxes/ui-segments/src/containers/SelectSegments';
+import Button from '@erxes/ui/src/components/Button';
 import FormControl from '@erxes/ui/src/components/form/Control';
 import FormGroup from '@erxes/ui/src/components/form/Group';
 import FormLabel from '@erxes/ui/src/components/form/Label';
-import React from 'react';
-import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
-import SelectProducts from '@erxes/ui-products/src/containers/SelectProducts';
-import { __ } from '@erxes/ui/src/utils';
+import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
 import {
   DateContainer,
   FormColumn,
   FormWrapper
 } from '@erxes/ui/src/styles/main';
-import { FlexItem, LeftItem } from '@erxes/ui/src/components/step/styles';
+import { __ } from '@erxes/ui/src/utils';
+import Datetime from '@nateradebaugh/react-datetime';
+import React from 'react';
 import { PricingPlan } from '../../../types';
-import SelectSegments from '@erxes/ui-segments/src/containers/SelectSegments';
+import DiscountInput from '../form/DiscountInput';
 
 type Props = {
   formValues: PricingPlan;
@@ -91,18 +93,52 @@ export default function General(props: Props) {
             />
           </FormGroup>
         );
-      case 'bundle':
+      case 'vendor':
         return (
           <FormGroup>
-            <FormLabel>{__('Products to bundle')}</FormLabel>
-            <SelectProducts
-              name="products"
-              label="Choose products"
-              initialValue={formValues.productsBundle}
-              onSelect={products => handleState('productsBundle', products)}
+            <FormLabel>{__('Vendors')}</FormLabel>
+            <SelectCompanies
+              label="Choose companies"
+              name="vendors"
+              initialValue={formValues.vendors}
               multi={true}
+              onSelect={companyIds => handleState('vendors', companyIds)}
+              showAvatar={false}
             />
           </FormGroup>
+        );
+      case 'bundle':
+        return (
+          <FormWrapper>
+            <FormGroup>
+              <FormLabel>{__('Products to bundle')}</FormLabel>
+              {(formValues.productsBundle || []).map((bundles, index) => {
+                const onChange = productIds => {
+                  (formValues.productsBundle || [])[index] = productIds;
+                  handleState('productsBundle', formValues.productsBundle);
+                };
+                return (
+                  <SelectProducts
+                    name="products"
+                    label="Choose products"
+                    initialValue={bundles}
+                    onSelect={onChange}
+                    multi={true}
+                  />
+                );
+              })}
+              <Button
+                onClick={() =>
+                  handleState('productsBundle', [
+                    ...(formValues.productsBundle || []),
+                    []
+                  ])
+                }
+              >
+                +
+              </Button>
+            </FormGroup>
+          </FormWrapper>
         );
       default:
         return;
@@ -351,6 +387,14 @@ export default function General(props: Props) {
                 defaultChecked={formValues.applyType === 'segment'}
               >
                 Specific Segment
+              </FormControl>
+              <FormControl
+                componentClass="radio"
+                name="applyType"
+                onChange={() => handleState('applyType', 'vendor')}
+                defaultChecked={formValues.applyType === 'vendor'}
+              >
+                Specific Vendor
               </FormControl>
               <FormControl
                 componentClass="radio"

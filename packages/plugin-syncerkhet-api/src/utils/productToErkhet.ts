@@ -1,7 +1,13 @@
 import { sendProductsMessage } from '../messageBroker';
 import { getConfig, toErkhet } from './utils';
 
-export const productCategoryToErkhet = async (subdomain, params, action) => {
+export const productCategoryToErkhet = async (
+  subdomain,
+  models,
+  syncLog,
+  params,
+  action
+) => {
   const productCategory = params.updatedDocument || params.object;
   const oldProductCategory = params.object;
 
@@ -24,10 +30,16 @@ export const productCategoryToErkhet = async (subdomain, params, action) => {
     }
   };
 
-  toErkhet(config, sendData, 'product-change');
+  toErkhet(models, syncLog, config, sendData, 'product-change');
 };
 
-export const productToErkhet = async (subdomain, params, action) => {
+export const productToErkhet = async (
+  subdomain,
+  models,
+  syncLog,
+  params,
+  action
+) => {
   const product = params.updatedDocument || params.object;
   const oldProduct = params.object;
 
@@ -38,35 +50,13 @@ export const productToErkhet = async (subdomain, params, action) => {
     isRPC: true
   });
 
-  let measureUnit = product.sku || 'ш';
   let subMeasureUnit;
   let ratioMeasureUnit;
 
-  if (product.uomId) {
-    const firstSubUom = product.subUoms.length && product.subUoms[0];
-
-    const uoms: any[] = await sendProductsMessage({
-      subdomain,
-      action: 'uoms.find',
-      data: { _id: { $in: [product.uomId, firstSubUom && firstSubUom.uomId] } },
-      isRPC: true,
-      defaultValue: []
-    });
-
-    if (uoms.length) {
-      const uom = uoms.find(uom => uom._id === product.uomId);
-      if (uom) {
-        measureUnit = uom.code || measureUnit;
-      }
-
-      const subUom = uoms.find(
-        uom => uom._id === (firstSubUom ? firstSubUom.uomId : '')
-      );
-      if (subUom) {
-        subMeasureUnit = subUom.code;
-        ratioMeasureUnit = (firstSubUom && firstSubUom.ratio) || 1;
-      }
-    }
+  if (product.subUoms && product.subUoms.length) {
+    const subUom = product.subUoms[0];
+    subMeasureUnit = subUom.uom;
+    ratioMeasureUnit = subUom.ratio;
   }
 
   const config = await getConfig(subdomain, 'ERKHET', {});
@@ -75,9 +65,9 @@ export const productToErkhet = async (subdomain, params, action) => {
     action,
     oldCode: oldProduct.code || product.code || '',
     object: {
-      code: product.code || '',
+      code: product.code || 'ш',
       name: product.name || '',
-      measureUnit,
+      measureUnit: product.uom,
       subMeasureUnit,
       ratioMeasureUnit,
       barcodes: product.barcodes.join(','),
@@ -91,5 +81,5 @@ export const productToErkhet = async (subdomain, params, action) => {
     }
   };
 
-  toErkhet(config, sendData, 'product-change');
+  toErkhet(models, syncLog, config, sendData, 'product-change');
 };

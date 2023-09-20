@@ -44,7 +44,7 @@ type Props = {
   shiftStatus?: string;
 
   requestedShifts?: IShift[];
-  scheduleConfigs: IScheduleConfig[];
+  scheduleConfigs?: IScheduleConfig[];
 
   getActionBar: (actionBar: any) => void;
   showSideBar: (sideBar: boolean) => void;
@@ -88,13 +88,7 @@ const ListContainer = (props: FinalProps) => {
     });
   };
 
-  const submitRequest = (variables: {
-    userIds: string[];
-    shifts: IShift[];
-    totalBreakInMins?: number | string;
-    scheduleConfigId?: string;
-    closeModal: () => void;
-  }) => {
+  const submitRequest = (variables: any) => {
     const userId = `${variables.userIds}`;
     sendScheduleReqMutation({
       variables: {
@@ -109,15 +103,7 @@ const ListContainer = (props: FinalProps) => {
       .catch(err => Alert.error(err.message));
   };
 
-  const submitSchedule = (variables: {
-    branchIds: string[];
-    departmentIds: string[];
-    userIds: string[];
-    shifts: IShift[];
-    totalBreakInMins?: number | string;
-    scheduleConfigId?: string;
-    closeModal: () => any;
-  }) => {
+  const submitSchedule = (variables: any) => {
     submitScheduleMutation({ variables })
       .then(() => {
         Alert.success('Successfully submitted schedule');

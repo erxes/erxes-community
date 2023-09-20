@@ -1,5 +1,4 @@
 import * as mongoose from 'mongoose';
-import { mainDb } from './configs';
 import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { IPeriodLockDocument } from './models/definitions/periodLocks';
 import { IContractDocument } from './models/definitions/contracts';
@@ -21,6 +20,24 @@ import {
 import { loadInvoiceClass, IInvoiceModel } from './models/invoices';
 import { loadScheduleClass, IScheduleModel } from './models/schedules';
 import { loadTransactionClass, ITransactionModel } from './models/transactions';
+import { IGeneralModel, loadGeneralClass } from './models/general';
+import { IGeneralDocument } from './models/definitions/general';
+import { createGenerateModels } from '@erxes/api-utils/src/core';
+import {
+  IClassificationModel,
+  loadClassificationClass
+} from './models/classification';
+import { IClassificationDocument } from './models/definitions/classification';
+import {
+  IInterestCorrectionModel,
+  loanInterestCorrectionClass
+} from './models/interestCorrection';
+import { IInterestCorrectionDocument } from './models/definitions/interestCorrection';
+import {
+  IStoredInterestModel,
+  loanStoredInterestClass
+} from './models/storedInterest';
+import { IStoredInterestDocument } from './models/definitions/storedInterest';
 
 export interface IModels {
   PeriodLocks: IPeriodLockModel;
@@ -31,6 +48,10 @@ export interface IModels {
   Schedules: IScheduleModel;
   FirstSchedules: IScheduleModel;
   Transactions: ITransactionModel;
+  General: IGeneralModel;
+  Classification: IClassificationModel;
+  InterestCorrection: IInterestCorrectionModel;
+  StoredInterest: IStoredInterestModel;
 }
 
 export interface IContext extends IMainContext {
@@ -38,19 +59,7 @@ export interface IContext extends IMainContext {
   models: IModels;
 }
 
-export let models: IModels;
-
-export const generateModels = async (
-  _hostnameOrSubdomain: string
-): Promise<IModels> => {
-  if (models) {
-    return models;
-  }
-
-  loadClasses(mainDb);
-
-  return models;
-};
+export let models: IModels | null = null;
 
 export const loadClasses = (db: mongoose.Connection): IModels => {
   models = {} as IModels;
@@ -59,6 +68,11 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     'loan_period_locks',
     loadPeriodLockClass(models)
   );
+
+  models.Classification = db.model<
+    IClassificationDocument,
+    IClassificationModel
+  >('loan_classification', loadClassificationClass(models));
 
   models.Contracts = db.model<IContractDocument, IContractModel>(
     'loan_contracts',
@@ -95,5 +109,31 @@ export const loadClasses = (db: mongoose.Connection): IModels => {
     loadTransactionClass(models)
   ) as ITransactionModel;
 
+  models.General = db.model<IGeneralDocument, IGeneralModel>(
+    'loan_general',
+    loadGeneralClass(models)
+  ) as IGeneralModel;
+
+  models.InterestCorrection = db.model<
+    IInterestCorrectionDocument,
+    IInterestCorrectionModel
+  >(
+    'loan_interest_correction',
+    loanInterestCorrectionClass(models)
+  ) as IInterestCorrectionModel;
+
+  models.StoredInterest = db.model<
+    IStoredInterestDocument,
+    IStoredInterestModel
+  >(
+    'loan_stored_interest',
+    loanStoredInterestClass(models)
+  ) as IStoredInterestModel;
+
   return models;
 };
+
+export const generateModels = createGenerateModels<IModels>(
+  models,
+  loadClasses
+);

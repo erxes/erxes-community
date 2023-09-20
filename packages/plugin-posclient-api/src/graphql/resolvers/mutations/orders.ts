@@ -1,21 +1,23 @@
 import { debugError } from '@erxes/api-utils/src/debuggers';
 import { graphqlPubsub } from '../../../configs';
+import { IModels } from '../../../connectionResolver';
 import {
   sendCardsMessage,
   sendCoreMessage,
   sendInboxMessage,
   sendPosMessage
 } from '../../../messageBroker';
-import { IConfig } from '../../../models/definitions/configs';
+import { IConfig, IConfigDocument } from '../../../models/definitions/configs';
 import {
   BILL_TYPES,
   ORDER_ITEM_STATUSES,
-  ORDER_STATUSES
+  ORDER_STATUSES,
+  ORDER_TYPES
 } from '../../../models/definitions/constants';
 import { IPaidAmount } from '../../../models/definitions/orders';
+import { IPosUserDocument } from '../../../models/definitions/posUsers';
 import { PutData } from '../../../models/PutData';
 import { IContext, IOrderInput } from '../../types';
-import { checkLoyalties } from '../../utils/loyalties';
 import {
   checkOrderAmount,
   checkOrderStatus,
@@ -30,7 +32,6 @@ import {
   validateOrder,
   validateOrderPayment
 } from '../../utils/orderUtils';
-import { checkPricing } from '../../utils/pricing';
 
 interface IPaymentBase {
   billType: string;
@@ -73,87 +74,229 @@ const getTaxInfo = (config: IConfig) => {
   };
 };
 
+const getStatus = (config, buttonType, doc, order?) => {
+  if (!(config && config.kitchenScreen && config.kitchenScreen.isActive)) {
+    return ORDER_STATUSES.COMPLETE;
+  }
+
+  const type = config.kitchenScreen.showType;
+
+  if (order && order.status) {
+    if (
+      type === 'paid' &&
+      order.status === ORDER_STATUSES.PENDING &&
+      doc.paidDate
+    ) {
+      return ORDER_STATUSES.NEW;
+    }
+
+    if (
+      [ORDER_STATUSES.COMPLETE, ORDER_STATUSES.DONE].includes(order.status) &&
+      doc.items &&
+      doc.items.length
+    ) {
+      const newItems =
+        doc.items.filter(i => i.status === ORDER_ITEM_STATUSES.NEW) || [];
+      if (newItems.length) {
+        return ORDER_STATUSES.REDOING;
+      }
+    }
+
+    return order.status;
+  }
+
+  if (type === 'click' && buttonType !== 'order') {
+    return ORDER_STATUSES.COMPLETE;
+  }
+
+  if (type === 'paid' && (!order || !order.paidDate)) {
+    return ORDER_STATUSES.PENDING;
+  }
+
+  return ORDER_STATUSES.NEW;
+};
+
+const orderAdd = async (models, lastDoc, config) => {
+  try {
+    const number = await generateOrderNumber(models, config);
+
+    const order = await models.Orders.createOrder({
+      ...lastDoc,
+      number
+    });
+
+    return order;
+  } catch (e) {
+    if (e.message.includes(`E11000 duplicate key error`)) {
+      return await orderAdd(models, lastDoc, config);
+    } else {
+      throw new Error(e.message);
+    }
+  }
+};
+
+const ordersAdd = async (
+  doc: IOrderInput,
+  {
+    posUser,
+    config,
+    models,
+    subdomain
+  }: {
+    posUser: IPosUserDocument;
+    config: IConfigDocument;
+    models: IModels;
+    subdomain: string;
+  }
+) => {
+  const { totalAmount, type, customerId, customerType, branchId } = doc;
+  if (!posUser && !doc.customerId) {
+    throw new Error('order has not owner');
+  }
+
+  if (
+    posUser &&
+    ![...config.adminIds, ...config.cashierIds].includes(posUser._id)
+  ) {
+    throw new Error('Please logout and reLogin');
+  }
+
+  await validateOrder(subdomain, models, config, doc);
+
+  const orderDoc = {
+    totalAmount,
+    type,
+    branchId,
+    customerId,
+    customerType,
+    userId: posUser ? posUser._id : ''
+  };
+
+  try {
+    let preparedDoc = await prepareOrderDoc(subdomain, doc, config, models);
+
+    const status = getStatus(config, doc.buttonType, doc);
+
+    const lastDoc = {
+      ...doc,
+      ...orderDoc,
+      totalAmount: getTotalAmount(preparedDoc.items),
+      branchId: doc.branchId || config.branchId,
+      posToken: config.token,
+      departmentId: config.departmentId,
+      taxInfo: getTaxInfo(config),
+      status
+    };
+
+    const order = await orderAdd(models, lastDoc, config);
+
+    for (const item of preparedDoc.items) {
+      await models.OrderItems.createOrderItem({
+        count: item.count,
+        productId: item.productId,
+        unitPrice: item.unitPrice,
+        discountPercent: item.discountPercent,
+        discountAmount: item.discountAmount,
+        bonusCount: item.bonusCount,
+        bonusVoucherId: item.bonusVoucherId,
+        orderId: order._id,
+        isPackage: item.isPackage,
+        isTake: item.isTake,
+        status: ORDER_ITEM_STATUSES.NEW,
+        manufacturedDate: item.manufacturedDate,
+        description: item.description,
+        attachment: item.attachment
+      });
+    }
+
+    await graphqlPubsub.publish('ordersOrdered', {
+      ordersOrdered: {
+        ...order,
+        _id: order._id,
+        status: order.status,
+        customerId: order.customerId,
+        customerType: order.customerType
+      }
+    });
+
+    return order;
+  } catch (e) {
+    debugError(
+      `Error occurred when creating order: ${JSON.stringify(orderDoc)}`
+    );
+
+    return e;
+  }
+};
+
+const ordersEdit = async (
+  doc: IOrderEditParams,
+  {
+    posUser,
+    config,
+    models,
+    subdomain
+  }: {
+    posUser: IPosUserDocument;
+    config: IConfigDocument;
+    models: IModels;
+    subdomain: string;
+  }
+) => {
+  const order = await models.Orders.getOrder(doc._id);
+
+  checkOrderStatus(order);
+
+  await validateOrder(subdomain, models, config, doc);
+
+  await cleanOrderItems(doc._id, doc.items, models);
+
+  let preparedDoc = await prepareOrderDoc(subdomain, doc, config, models);
+
+  preparedDoc.items = await reverseItemStatus(models, preparedDoc.items);
+
+  await updateOrderItems(doc._id, preparedDoc.items, models);
+
+  let status = getStatus(config, doc.buttonType, doc, order);
+
+  const updatedOrder = await models.Orders.updateOrder(doc._id, {
+    deliveryInfo: doc.deliveryInfo,
+    branchId: config.isOnline ? doc.branchId : config.branchId,
+    customerId: doc.customerId,
+    customerType: doc.customerType,
+    userId: posUser ? posUser._id : '',
+    type: doc.type,
+    totalAmount: getTotalAmount(preparedDoc.items),
+    billType: doc.billType || BILL_TYPES.CITIZEN,
+    registerNumber: doc.registerNumber || '',
+    slotCode: doc.slotCode,
+    posToken: config.token,
+    departmentId: config.departmentId,
+    taxInfo: getTaxInfo(config),
+    dueDate: doc.dueDate,
+    status
+  });
+
+  await graphqlPubsub.publish('ordersOrdered', {
+    ordersOrdered: {
+      ...updatedOrder,
+      _id: updatedOrder._id,
+      status: updatedOrder.status,
+      customerId: updatedOrder.customerId,
+      customerType: order.customerType
+    }
+  });
+
+  return updatedOrder;
+};
+
 const orderMutations = {
   async ordersAdd(
     _root,
     doc: IOrderInput,
     { posUser, config, models, subdomain }: IContext
   ) {
-    const { totalAmount, type, customerId, customerType, branchId } = doc;
-    if (!posUser && !doc.customerId) {
-      throw new Error('order has not owner');
-    }
-
-    if (
-      posUser &&
-      ![...config.adminIds, ...config.cashierIds].includes(posUser._id)
-    ) {
-      throw new Error('Please logout and reLogin');
-    }
-
-    await validateOrder(models, doc);
-    const number = await generateOrderNumber(models, config);
-
-    const orderDoc = {
-      number,
-      totalAmount,
-      type,
-      branchId,
-      customerId,
-      customerType,
-      userId: posUser ? posUser._id : ''
-    };
-
-    try {
-      let preparedDoc = await prepareOrderDoc(doc, config, models);
-      preparedDoc = await checkLoyalties(subdomain, preparedDoc);
-      preparedDoc = await checkPricing(subdomain, preparedDoc, config);
-
-      const order = await models.Orders.createOrder({
-        ...doc,
-        ...orderDoc,
-        totalAmount: getTotalAmount(preparedDoc.items),
-        branchId: doc.branchId || config.branchId,
-        posToken: config.token,
-        departmentId: config.departmentId,
-        taxInfo: getTaxInfo(config)
-      });
-
-      for (const item of preparedDoc.items) {
-        await models.OrderItems.createOrderItem({
-          count: item.count,
-          productId: item.productId,
-          unitPrice: item.unitPrice,
-          discountPercent: item.discountPercent,
-          discountAmount: item.discountAmount,
-          bonusCount: item.bonusCount,
-          bonusVoucherId: item.bonusVoucherId,
-          orderId: order._id,
-          isPackage: item.isPackage,
-          isTake: item.isTake,
-          status: ORDER_ITEM_STATUSES.NEW,
-          manufacturedDate: item.manufacturedDate
-        });
-      }
-
-      await graphqlPubsub.publish('ordersOrdered', {
-        ordersOrdered: {
-          ...order,
-          _id: order._id,
-          status: order.status,
-          customerId: order.customerId,
-          customerType: order.customerType
-        }
-      });
-
-      return order;
-    } catch (e) {
-      debugError(
-        `Error occurred when creating order: ${JSON.stringify(orderDoc)}`
-      );
-
-      return e;
-    }
+    return ordersAdd(doc, { posUser, config, models, subdomain });
   },
 
   async ordersEdit(
@@ -161,64 +304,7 @@ const orderMutations = {
     doc: IOrderEditParams,
     { posUser, config, models, subdomain }: IContext
   ) {
-    const order = await models.Orders.getOrder(doc._id);
-
-    checkOrderStatus(order);
-
-    await validateOrder(models, doc);
-
-    await cleanOrderItems(doc._id, doc.items, models);
-
-    let preparedDoc = await prepareOrderDoc(doc, config, models);
-    preparedDoc = await checkLoyalties(subdomain, preparedDoc);
-    preparedDoc = await checkPricing(subdomain, preparedDoc, config);
-
-    preparedDoc.items = await reverseItemStatus(models, preparedDoc.items);
-
-    await updateOrderItems(doc._id, preparedDoc.items, models);
-
-    let status = order.status;
-
-    if (
-      [ORDER_STATUSES.COMPLETE, ORDER_STATUSES.DONE].includes(
-        order.status || ''
-      )
-    ) {
-      const newItems =
-        doc.items.filter(i => i.status === ORDER_ITEM_STATUSES.NEW) || [];
-      if (newItems.length) {
-        status = ORDER_STATUSES.REDOING;
-      }
-    }
-
-    const updatedOrder = await models.Orders.updateOrder(doc._id, {
-      deliveryInfo: doc.deliveryInfo,
-      branchId: config.isOnline ? doc.branchId : config.branchId,
-      customerId: doc.customerId,
-      customerType: doc.customerType,
-      userId: posUser ? posUser._id : '',
-      type: doc.type,
-      totalAmount: getTotalAmount(preparedDoc.items),
-      billType: doc.billType || BILL_TYPES.CITIZEN,
-      registerNumber: doc.registerNumber || '',
-      slotCode: doc.slotCode,
-      posToken: config.token,
-      departmentId: config.departmentId,
-      taxInfo: getTaxInfo(config),
-      status
-    });
-
-    await graphqlPubsub.publish('ordersOrdered', {
-      ordersOrdered: {
-        ...updatedOrder,
-        _id: updatedOrder._id,
-        status: updatedOrder.status,
-        customerId: updatedOrder.customerId,
-        customerType: order.customerType
-      }
-    });
-
-    return updatedOrder;
+    return ordersEdit(doc, { posUser, config, models, subdomain });
   },
 
   async orderChangeStatus(
@@ -413,7 +499,13 @@ const orderMutations = {
             $set: {
               ...doc,
               paidDate: now,
-              modifiedAt: now
+              modifiedAt: now,
+              status: getStatus(
+                config,
+                '',
+                { ...order, paidDate: now },
+                { ...order }
+              )
             }
           }
         );
@@ -529,6 +621,12 @@ const orderMutations = {
   ) {
     let order = await models.Orders.getOrder(_id);
 
+    if (!ORDER_TYPES.SALES.includes(order.type || '')) {
+      throw new Error(
+        'Зөвхөн борлуулах төрөлтэй захиалгын төлбөрийг төлөх боломжтой'
+      );
+    }
+
     checkOrderStatus(order);
 
     const items = await models.OrderItems.find({
@@ -559,7 +657,8 @@ const orderMutations = {
           ebarimtConfig,
           items,
           billType,
-          registerNumber
+          registerNumber,
+          config.paymentTypes
         );
 
         ebarimtConfig.districtName = getDistrictName(
@@ -615,7 +714,13 @@ const orderMutations = {
               billType,
               registerNumber,
               paidDate: now,
-              modifiedAt: now
+              modifiedAt: now,
+              status: getStatus(
+                config,
+                '',
+                { ...order, paidDate: now },
+                { ...order }
+              )
             }
           }
         );
@@ -806,6 +911,201 @@ const orderMutations = {
       },
       isRPC: true
     });
+  },
+
+  async ordersFinish(
+    _root,
+    doc: IOrderInput & { _id?: string },
+    { config, models, subdomain, posUser }: IContext
+  ) {
+    if (!ORDER_TYPES.OUT.includes(doc.type || '')) {
+      throw new Error(
+        'Зөвхөн зарлагадах төрөлтэй захиалгыг л шууд хаах боломжтой'
+      );
+    }
+
+    let _id = doc._id || '';
+    if (doc._id) {
+      await ordersEdit(doc as IOrderEditParams, {
+        posUser,
+        config,
+        models,
+        subdomain
+      });
+    } else {
+      const addedOrder = await ordersAdd(doc, {
+        posUser,
+        config,
+        models,
+        subdomain
+      });
+      _id = addedOrder._id;
+    }
+
+    let order = await models.Orders.getOrder(_id);
+
+    checkOrderStatus(order);
+
+    const items = await models.OrderItems.find({
+      orderId: order._id
+    }).lean();
+
+    await validateOrderPayment(order, { billType: BILL_TYPES.INNER });
+    const now = new Date();
+
+    try {
+      await models.Orders.updateOne(
+        { _id },
+        {
+          $set: {
+            paidDate: now,
+            modifiedAt: now,
+            billType: BILL_TYPES.INNER,
+            status: getStatus(
+              config,
+              '',
+              { ...order, paidDate: now },
+              { ...order }
+            )
+          }
+        }
+      );
+
+      order = await models.Orders.getOrder(_id);
+
+      graphqlPubsub.publish('ordersOrdered', {
+        ordersOrdered: {
+          ...order,
+          _id,
+          status: order.status,
+          customerId: order.customerId
+        }
+      });
+
+      try {
+        sendPosMessage({
+          subdomain,
+          action: 'createOrUpdateOrders',
+          data: {
+            posToken: config.token,
+            action: 'makePayment',
+            order,
+            items
+          }
+        });
+      } catch (e) {
+        debugError(`Error occurred while sending data to erxes: ${e.message}`);
+      }
+
+      return order;
+    } catch (e) {
+      debugError(e);
+
+      return e;
+    }
+  },
+
+  async ordersReturn(
+    _root,
+    {
+      _id,
+      cashAmount,
+      paidAmounts
+    }: {
+      _id: string;
+      cashAmount?: number;
+      paidAmounts?: IPaidAmount[];
+    },
+    { subdomain, models, posUser, config }: IContext
+  ) {
+    if (!config.adminIds.includes(posUser._id)) {
+      throw new Error('Order return admin required');
+    }
+
+    let order = await models.Orders.getOrder(_id);
+
+    const amount =
+      (cashAmount || 0) +
+      (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
+
+    if (!order.paidDate) {
+      throw new Error('Order yet not paid');
+    }
+
+    if (order.totalAmount != amount) {
+      throw new Error('Amount exceeds total amount');
+    }
+
+    if (order.returnInfo && order.returnInfo.returnAt) {
+      throw new Error('Order is already returned');
+    }
+
+    const modifier: any = {
+      $set: {
+        status: ORDER_STATUSES.RETURN,
+        returnInfo: {
+          cashAmount,
+          paidAmounts,
+          returnAt: new Date(),
+          returnBy: posUser._id
+        },
+        cashAmount: cashAmount
+          ? (order.cashAmount || 0) - Number(cashAmount.toFixed(2))
+          : order.cashAmount || 0,
+        paidAmounts: (order.paidAmounts || []).concat(
+          (paidAmounts || []).map(a => ({ ...a, amount: -1 * a.amount }))
+        )
+      }
+    };
+
+    const ebarimtConfig = config.ebarimtConfig;
+
+    if (!ebarimtConfig) {
+      throw new Error('Please check ebarimt config');
+    }
+
+    let returnResponses = (await models.PutResponses.returnBill({
+      contentId: _id,
+      contentType: 'pos',
+      number: order.number || '',
+      config: ebarimtConfig
+    })) as any;
+
+    if (returnResponses.error) {
+      returnResponses = [];
+    }
+
+    await models.Orders.updateOne({ _id: order._id }, modifier);
+
+    order = await models.Orders.getOrder(_id);
+
+    await graphqlPubsub.publish('ordersOrdered', {
+      ordersOrdered: {
+        ...order,
+        _id: order._id,
+        status: order.status,
+        customerId: order.customerId,
+        customerType: order.customerType
+      }
+    });
+
+    try {
+      sendPosMessage({
+        subdomain,
+        action: 'createOrUpdateOrders',
+        data: {
+          posToken: config.token,
+          action: 'makePayment',
+          responses: returnResponses,
+          order,
+          items: await models.OrderItems.find({ orderId: _id }).lean()
+        }
+      });
+    } catch (e) {
+      debugError(`Error occurred while sending data to erxes: ${e.message}`);
+    }
+
+    return models.Orders.findOne({ _id: order._id });
   }
 };
 

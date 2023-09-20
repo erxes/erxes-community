@@ -18,6 +18,8 @@ type Props = {
   user: any;
   makeOrRemoveAdmin: () => void;
   addOrRemoveMember: () => void;
+  isAdmin: boolean;
+  isWidget?: boolean;
 };
 
 type FinalProps = {
@@ -25,29 +27,38 @@ type FinalProps = {
 } & Props;
 
 const ParticipantItem = (props: FinalProps) => {
-  const { user, currentUser } = props;
-  const actionsRef = useRef<HTMLElement>(null);
+  const { user, isAdmin, isWidget } = props;
 
-  const handleMouseEnter = () => {
-    if (actionsRef && actionsRef.current) {
-      actionsRef.current.style.display = 'inline-block';
+  const renderActionButtons = () => {
+    if (!isAdmin) {
+      return null;
     }
-  };
 
-  const handleMouseLeave = () => {
-    if (actionsRef && actionsRef.current) {
-      actionsRef.current.style.display = 'none';
-    }
+    return (
+      <ChatActions>
+        <Tip
+          text={user.isAdmin ? 'Remove as Admin' : 'Make admin'}
+          placement="bottom"
+        >
+          <ChatActionItem onClick={props.makeOrRemoveAdmin}>
+            <Icon icon="shield-slash" size={14} />
+          </ChatActionItem>
+        </Tip>
+
+        <Tip text="Remove user" placement="bottom">
+          <ChatActionItem onClick={props.addOrRemoveMember}>
+            <Icon icon="removeuser" size={14} />
+          </ChatActionItem>
+        </Tip>
+      </ChatActions>
+    );
   };
 
   return (
-    <ParticipantItemWrapper
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <ParticipantItemWrapper isWidget={isWidget}>
       <Link to={`/erxes-plugin-chat?userId=${user._id}`}>
-        <Avatar user={user} size={36} />
-        <ParticipantDetails>
+        <Avatar user={user} size={isWidget ? 28 : 36} />
+        <ParticipantDetails isWidget={isWidget}>
           <p>{user.details.fullName || user.email}</p>
           <span>
             {user.isAdmin ? 'Admin ' : ''}
@@ -55,28 +66,7 @@ const ParticipantItem = (props: FinalProps) => {
           </span>
         </ParticipantDetails>
       </Link>
-      {user.isAdmin && user._id === currentUser._id && (
-        <ChatActions innerRef={actionsRef}>
-          {user.isAdmin ? (
-            <Tip text="Remove as Admin" placement="bottom">
-              <ChatActionItem onClick={props.makeOrRemoveAdmin}>
-                <Icon icon="shield-slash" size={14} />
-              </ChatActionItem>
-            </Tip>
-          ) : (
-            <Tip text="Make admin" placement="bottom">
-              <ChatActionItem onClick={props.makeOrRemoveAdmin}>
-                <Icon icon="shield-slash" size={14} />
-              </ChatActionItem>
-            </Tip>
-          )}
-          <Tip text="Remove user" placement="bottom">
-            <ChatActionItem onClick={props.addOrRemoveMember}>
-              <Icon icon="removeuser" size={14} />
-            </ChatActionItem>
-          </Tip>
-        </ChatActions>
-      )}
+      {renderActionButtons()}
     </ParticipantItemWrapper>
   );
 };

@@ -1,21 +1,22 @@
 import * as React from 'react';
-import client from '@erxes/ui/src/apolloClient';
 import * as compose from 'lodash.flowright';
 
 import { Alert, withProps } from '@erxes/ui/src/utils';
 import { IMail, IMessage } from '@erxes/ui-inbox/src/inbox/types';
 import { mutations, queries } from '../../graphql';
 
+import { IRouterProps } from '@erxes/ui/src/types';
 import { IUser } from '@erxes/ui/src/auth/types';
 import MailForm from '../../components/mail/MailForm';
+import client from '@erxes/ui/src/apolloClient';
 import debounce from 'lodash/debounce';
-import { queries as engageQueries } from '@erxes/ui-engage/src/graphql';
 import { mutations as engageMutations } from '@erxes/ui-engage/src/graphql';
+import { queries as engageQueries } from '@erxes/ui-engage/src/graphql';
 import { gql } from '@apollo/client';
 import { graphql } from '@apollo/client/react/hoc';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
+import { isEnabled } from '@erxes/ui/src/utils/core';
 import queryString from 'query-string';
-import { IRouterProps } from '@erxes/ui/src/types';
+import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
 import { withRouter } from 'react-router-dom';
 
 type Props = {
@@ -27,6 +28,7 @@ type Props = {
   conversationId?: string;
   refetchQueries?: string[];
   fromEmail?: string;
+  emailTo?: string;
   customerId?: string;
   mailData?: IMail;
   isReply?: boolean;
@@ -40,6 +42,9 @@ type Props = {
   closeReply?: () => void;
   callback?: () => void;
   queryParams?: any;
+  shrink?: boolean;
+  clear?: boolean;
+  conversationStatus?: string;
 } & IRouterProps;
 
 type FinalProps = {
@@ -50,21 +55,25 @@ type FinalProps = {
 
 class MailFormContainer extends React.Component<
   FinalProps,
-  { loadedEmails: boolean; verifiedEmails: string[] }
+  {
+    loadedEmails: boolean;
+    verifiedImapEmails: string[];
+    verifiedEngageEmails: string[];
+  }
 > {
   constructor(props: FinalProps) {
     super(props);
 
     this.state = {
       loadedEmails: false,
-      verifiedEmails: []
+      verifiedImapEmails: [],
+      verifiedEngageEmails: []
     };
   }
 
   render() {
     const {
       detailQuery,
-      source = 'engage',
       integrationId,
       customerId,
       conversationId,
@@ -77,10 +86,14 @@ class MailFormContainer extends React.Component<
       messageId
     } = this.props;
 
-    const { loadedEmails, verifiedEmails } = this.state;
+    const {
+      loadedEmails,
+      verifiedImapEmails,
+      verifiedEngageEmails
+    } = this.state;
 
     if (!loadedEmails) {
-      if (source === 'engage') {
+      if (isEnabled('engages')) {
         client
           .query({
             query: gql(engageQueries.verifiedEmails)
@@ -88,13 +101,14 @@ class MailFormContainer extends React.Component<
           .then(({ data }) => {
             this.setState({
               loadedEmails: true,
-              verifiedEmails: data.engageVerifiedEmails || []
+              verifiedEngageEmails: data.engageVerifiedEmails || []
             });
           })
           .catch(() => {
-            this.setState({ loadedEmails: true, verifiedEmails: [] });
+            this.setState({ loadedEmails: true, verifiedEngageEmails: [] });
           });
-      } else {
+      }
+      if (isEnabled('imap')) {
         client
           .query({
             query: gql(queries.imapIntegrations),
@@ -120,16 +134,17 @@ class MailFormContainer extends React.Component<
 
             this.setState({
               loadedEmails: true,
-              verifiedEmails: emails
+              verifiedImapEmails: emails
             });
           })
           .catch(() => {
-            this.setState({ loadedEmails: true, verifiedEmails: [] });
+            this.setState({ loadedEmails: true, verifiedImapEmails: [] });
           });
       }
     }
 
-    const { emailTemplatesTotalCount } = emailTemplatesTotalCountQuery;
+    const { emailTemplatesTotalCount } =
+      emailTemplatesTotalCountQuery || ({} as any);
 
     const fetchMoreEmailTemplates = (page: number) => {
       const { fetchMore, emailTemplates } = emailTemplatesQuery;
@@ -222,7 +237,7 @@ class MailFormContainer extends React.Component<
     }) => {
       let sendEmailMutation = mutations.imapSendMail;
 
-      if (source === 'engage') {
+      if (!variables.replyToMessageId) {
         sendEmailMutation = engageMutations.sendMail;
       }
 
@@ -243,12 +258,13 @@ class MailFormContainer extends React.Component<
       sendMail,
       currentUser,
       fetchMoreEmailTemplates,
-      emailTemplates: emailTemplatesQuery.emailTemplates,
+      emailTemplates: emailTemplatesQuery?.emailTemplates || [],
       emailSignatures: currentUser.emailSignatures || [],
       totalCount: emailTemplatesTotalCount,
       mails,
       messageId,
-      verifiedEmails
+      verifiedImapEmails: verifiedImapEmails || [],
+      verifiedEngageEmails: verifiedEngageEmails || []
     };
 
     return <MailForm {...updatedProps} />;
@@ -263,8 +279,9 @@ const WithMailForm = withProps<Props>(
         variables: {
           searchValue: queryParams.emailTemplatesSearch || ''
         },
-        fetchPolicy: 'network-only'
-      })
+        fetchPolicy: 'cache-first'
+      }),
+      skip: !isEnabled('emailtemplates')
     }),
     graphql<Props, any>(gql(queries.templateTotalCount), {
       name: 'emailTemplatesTotalCountQuery',
@@ -272,8 +289,9 @@ const WithMailForm = withProps<Props>(
         variables: {
           searchValue: queryParams.emailTemplatesSearch || ''
         },
-        fetchPolicy: 'network-only'
-      })
+        fetchPolicy: 'cache-first'
+      }),
+      skip: !isEnabled('emailtemplates')
     })
   )(withCurrentUser(MailFormContainer))
 );

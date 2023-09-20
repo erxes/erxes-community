@@ -1,4 +1,4 @@
-import { IModels, generateModels } from '../../connectionResolver';
+import { IModels } from '../../connectionResolver';
 import { IInvoiceDocument } from '../../models/definitions/invoices';
 import { PAYMENTS, PAYMENT_STATUS } from '../constants';
 import { VendorBaseAPI } from './vendorBase';
@@ -121,7 +121,7 @@ export class QPayQuickQrAPI extends VendorBaseAPI {
   }
 
   async createInvoice(invoice: IInvoiceDocument) {
-    return await this.makeRequest({
+    const res = await this.makeRequest({
       method: 'POST',
       path: meta.paths.invoice,
       data: {
@@ -144,9 +144,34 @@ export class QPayQuickQrAPI extends VendorBaseAPI {
         ]
       }
     });
+
+    return {
+      ...res,
+      qrData: res.qr_image
+    };
   }
 
   async checkInvoice(invoice: IInvoiceDocument) {
+    try {
+      const res = await this.makeRequest({
+        method: 'POST',
+        path: meta.paths.checkInvoice,
+        data: {
+          invoice_id: invoice.apiResponse.id
+        }
+      });
+
+      if (res.invoice_status === 'PAID') {
+        return PAYMENT_STATUS.PAID;
+      }
+
+      return PAYMENT_STATUS.PENDING;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async manualCheck(invoice: IInvoiceDocument) {
     try {
       const res = await this.makeRequest({
         method: 'POST',

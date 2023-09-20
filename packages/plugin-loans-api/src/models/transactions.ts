@@ -14,6 +14,7 @@ import { IModels } from '../connectionResolver';
 import { FilterQuery } from 'mongodb';
 import { IContractDocument } from './definitions/contracts';
 import { getPureDate } from '@erxes/api-utils/src';
+import { createEbarimt } from './utils/ebarimtUtils';
 
 export interface ITransactionModel extends Model<ITransactionDocument> {
   getTransaction(selector: FilterQuery<ITransactionDocument>);
@@ -21,10 +22,22 @@ export interface ITransactionModel extends Model<ITransactionDocument> {
     subdomain: string,
     doc: ITransaction
   ): Promise<ITransactionDocument>;
-  updateTransaction(memoryStorage: any, _id: string, doc: ITransaction);
+  updateTransaction(subdomain: any, _id: string, doc: ITransaction);
   changeTransaction(_id: string, doc: ITransaction);
   removeTransactions(_ids: string[]);
-  getPaymentInfo(id: string, payDate: Date, subdomain: string);
+  getPaymentInfo(
+    id: string,
+    payDate: Date,
+    subdomain: string,
+    scheduleDate?: Date
+  );
+  createEBarimtOnTransaction(
+    subdomain: string,
+    id: string,
+    isGetEBarimt?: boolean,
+    isOrganization?: boolean,
+    organizationRegister?: string
+  );
 }
 export const loadTransactionClass = (models: IModels) => {
   class Transaction {
@@ -50,7 +63,12 @@ export const loadTransactionClass = (models: IModels) => {
      */
     public static async createTransaction(
       subdomain: string,
-      doc: ITransaction
+      {
+        isGetEBarimt,
+        isOrganization,
+        organizationRegister,
+        ...doc
+      }: ITransaction
     ) {
       doc = { ...doc, ...(await findContractOfTr(models, doc)) };
 
@@ -69,9 +87,15 @@ export const loadTransactionClass = (models: IModels) => {
         _id: doc.contractId
       }).lean<IContractDocument>();
 
+      if (!doc.currency && contract?.currency) {
+        doc.currency = contract?.currency;
+      }
+
       if (!contract || !contract._id) {
         return models.Transactions.create({ ...doc });
       }
+
+      doc.number = `${contract.number}${new Date().getTime().toString()}`;
 
       if (doc.invoiceId) {
         const invoiceData: any = {
@@ -84,9 +108,60 @@ export const loadTransactionClass = (models: IModels) => {
         ...doc
       });
 
+      trInfo.calcInterest = trInfo.interestEve + trInfo.interestNonce;
+      if (contract.storedInterest) {
+        let payedInterest = trInfo.interestEve + trInfo.interestNonce;
+
+        const mustPayInterst =
+          trInfo.calcedInfo.interestEve + trInfo.calcedInfo.interestNonce;
+
+        if (payedInterest > mustPayInterst) payedInterest = mustPayInterst;
+
+        if (payedInterest > 0) {
+          if (payedInterest > trInfo.calcedInfo.storedInterest) {
+            trInfo.storedInterest = trInfo.calcedInfo.storedInterest;
+            trInfo.calcInterest =
+              payedInterest - trInfo.calcedInfo.storedInterest;
+          } else {
+            trInfo.storedInterest = payedInterest;
+            trInfo.calcInterest = 0;
+          }
+        }
+
+        const interest =
+          trInfo.calcedInfo.interestEve + trInfo.calcedInfo.interestNonce;
+        trInfo.calcedInfo.storedInterest = contract.storedInterest;
+        trInfo.calcedInfo.calcInterest = interest - contract.storedInterest;
+      }
+
       const tr = await models.Transactions.create({ ...doc, ...trInfo });
 
       await trAfterSchedule(models, tr);
+
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract.contractTypeId
+      });
+
+      if (trInfo.storedInterest > 0)
+        await models.Contracts.updateOne(
+          {
+            _id: tr.contractId
+          },
+          { $inc: { storedInterest: trInfo.storedInterest * -1 } }
+        );
+
+      if (
+        contractType?.config?.isAutoSendEBarimt === true ||
+        (isGetEBarimt && doc.isManual)
+      )
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
+        );
 
       return tr;
     }
@@ -95,7 +170,7 @@ export const loadTransactionClass = (models: IModels) => {
      * Update Transaction
      */
     public static async updateTransaction(
-      memoryStorage,
+      subdomain,
       _id: string,
       doc: ITransaction
     ) {
@@ -133,7 +208,7 @@ export const loadTransactionClass = (models: IModels) => {
         await models.Invoices.updateInvoice(doc.invoiceId, invoiceData);
       }
 
-      const trInfo = await transactionRule(models, memoryStorage, { ...doc });
+      const trInfo = await transactionRule(models, subdomain, { ...doc });
 
       await models.Transactions.updateOne(
         { _id },
@@ -344,6 +419,11 @@ export const loadTransactionClass = (models: IModels) => {
               'At this moment transaction can not been created because this date closed'
             );
           await removeTrAfterSchedule(models, oldTr);
+          oldTr.contractId &&
+            (await models.Contracts.updateOne(
+              { _id: oldTr.contractId },
+              { $set: { storedInterest: oldTr.calcedInfo.storedInterest } }
+            ));
           await models.Transactions.deleteOne({ _id: oldTr._id });
         }
       }
@@ -357,19 +437,62 @@ export const loadTransactionClass = (models: IModels) => {
         payDate: today
       });
 
-      const {
+      let {
         payment = 0,
         undue = 0,
         interestEve = 0,
         interestNonce = 0,
         insurance = 0,
-        debt = 0
+        debt = 0,
+        balance = 0
       } = paymentInfo;
+
+      paymentInfo.calcInterest =
+        paymentInfo.interestEve +
+        paymentInfo.interestNonce -
+        paymentInfo.storedInterest;
 
       paymentInfo.total =
         payment + undue + interestEve + interestNonce + insurance + debt;
 
+      paymentInfo.closeAmount =
+        balance +
+        payment +
+        undue +
+        interestEve +
+        interestNonce +
+        insurance +
+        debt;
+
       return paymentInfo;
+    }
+
+    public static async createEBarimtOnTransaction(
+      subdomain: string,
+      id: string,
+      isGetEBarimt?: boolean,
+      isOrganization?: boolean,
+      organizationRegister?: string
+    ) {
+      const tr = await models.Transactions.findOne({ _id: id });
+      if (!tr) throw new Error('Transaction not found');
+      const contract = await models.Contracts.findOne({ _id: tr?.contractId });
+      if (!contract) throw new Error('Contract not found');
+      const contractType = await models.ContractTypes.findOne({
+        _id: contract?.contractTypeId
+      });
+      if (!contractType) throw new Error('Contract type not found');
+      if (isGetEBarimt)
+        await createEbarimt(
+          models,
+          subdomain,
+          contractType?.config,
+          tr,
+          contract,
+          { isGetEBarimt, isOrganization, organizationRegister }
+        );
+
+      return tr;
     }
   }
   transactionSchema.loadClass(Transaction);

@@ -9,7 +9,6 @@ import {
   IScheduleDocument,
   IShiftDocument,
   IUserAbsenceInfo,
-  IUserReport,
   IUsersReport
 } from '../../models/definitions/timeclock';
 import { customFixDate } from '../../utils';
@@ -31,6 +30,20 @@ export const findBranches = async (subdomain: string, branchIds: string[]) => {
     subdomain,
     action: 'branches.find',
     data: { query: { _id: { $in: branchIds } } },
+    isRPC: true
+  });
+
+  return branches;
+};
+
+export const findDepartments = async (
+  subdomain: string,
+  departmentIds: string[]
+) => {
+  const branches = await sendCoreMessage({
+    subdomain,
+    action: 'departments.find',
+    data: { _id: { $in: departmentIds } },
     isRPC: true
   });
 
@@ -134,6 +147,7 @@ export const createScheduleShiftsByUserIds = async (
             shiftStart: shift.shiftStart,
             shiftEnd: shift.shiftEnd,
             scheduleConfigId: shift.scheduleConfigId,
+            lunchBreakInMins: shift.lunchBreakInMins,
             solved: true,
             status: 'Approved'
           }
@@ -149,14 +163,12 @@ export const createScheduleShiftsByUserIds = async (
 };
 
 export const timeclockReportByUser = async (
-  subdomain: string,
+  models: IModels,
   userId: string,
   selectedMonth: string,
   selectedYear: string,
   selectedDate?: string
 ) => {
-  const models = await generateModels(subdomain);
-
   let report: any = {
     scheduleReport: [],
     userId,
@@ -175,8 +187,7 @@ export const timeclockReportByUser = async (
   // get 1st of month
   const startOfSelectedMonth = new Date(
     parseFloat(selectedYear),
-    selectedMonthIndex,
-    1
+    selectedMonthIndex
   );
   // start of the next month
   const startOfNextMonth = new Date(
@@ -201,8 +212,8 @@ export const timeclockReportByUser = async (
   // get the schedule data of selected month
   const totalSchedulesOfUser = await models.Schedules.find({
     userId,
-    status: 'Approved',
-    solved: true
+    solved: true,
+    status: 'Approved'
   });
 
   const totalScheduleIds = totalSchedulesOfUser.map(schedule => schedule._id);
@@ -245,6 +256,60 @@ export const timeclockReportByUser = async (
       { shiftActive: false }
     ]
   });
+
+  const totalRequestsOfUser = await models.Absences.find({
+    userId,
+    solved: true,
+    checkInOutRequest: { $exists: false },
+    status: { $regex: /Approved/, $options: 'gi' }
+  });
+
+  const requestsOfSelectedMonth = totalRequestsOfUser.filter(
+    req =>
+      dayjs(req.startTime) >= dayjs(startOfSelectedMonth) &&
+      dayjs(req.startTime) < dayjs(startOfNextMonth)
+  );
+
+  const absenceTypeIds = requestsOfSelectedMonth.map(req => req.absenceTypeId);
+  let totalHoursAbsenceSelectedMonth = 0;
+
+  const absenceTypes = await models.AbsenceTypes.find({
+    _id: { $in: absenceTypeIds }
+  });
+
+  for (const request of requestsOfSelectedMonth) {
+    if (request.totalHoursOfAbsence) {
+      totalHoursAbsenceSelectedMonth += parseFloat(request.totalHoursOfAbsence);
+      continue;
+    }
+    // absence by hour
+    if (request.absenceTimeType === 'by hour' && request.endTime) {
+      const getTotalHoursOfAbsence =
+        (new Date(request.endTime).getTime() -
+          new Date(request.startTime).getTime()) /
+        MMSTOHRS;
+
+      totalHoursAbsenceSelectedMonth += getTotalHoursOfAbsence;
+      continue;
+    }
+    // absence by day
+    if (request.absenceTimeType === 'by day' && request.requestDates) {
+      const getAbsenceType = absenceTypes.find(
+        absType => absType._id === request.absenceTypeId
+      );
+
+      const getTotalHoursOfAbsence =
+        request.requestDates.length * (getAbsenceType?.requestHoursPerDay || 0);
+
+      totalHoursAbsenceSelectedMonth += getTotalHoursOfAbsence;
+    }
+  }
+
+  let scheduledShiftStartSelectedDay;
+  let scheduledShiftEndSelectedDay;
+
+  let recordedShiftStartSelectedDay;
+  let recordedShiftEndSelectedDay;
 
   let totalHoursWorkedSelectedMonth = 0;
   let totalHoursWorkedSelectedDay = 0;
@@ -349,6 +414,9 @@ export const timeclockReportByUser = async (
             !shift.checked
         );
 
+        scheduledShiftStartSelectedDay = scheduleShift.shiftStart;
+        scheduledShiftEndSelectedDay = scheduleShift.shiftEnd;
+
         if (
           recordedShiftOfSelectedDay &&
           recordedShiftOfSelectedDay.recordedStart &&
@@ -358,6 +426,10 @@ export const timeclockReportByUser = async (
           const shiftStartDiff =
             recordedShiftOfSelectedDay.recordedStart.getTime() -
             scheduleShift.shiftStart.getTime();
+
+          recordedShiftStartSelectedDay =
+            recordedShiftOfSelectedDay.recordedStart;
+          recordedShiftEndSelectedDay = recordedShiftOfSelectedDay.recordedEnd;
 
           if (shiftStartDiff > 0) {
             totalMinsLateSelectedDay += shiftStartDiff / MMSTOMINS;
@@ -413,6 +485,17 @@ export const timeclockReportByUser = async (
 
     totalDaysNotWorked = new Set(notWorkedDays).size;
 
+    const scheduleReport = [
+      {
+        timeclockDate: selectedDayString,
+        timeclockStart: recordedShiftStartSelectedDay,
+        timeclockEnd: recordedShiftEndSelectedDay,
+
+        scheduledStart: scheduledShiftStartSelectedDay,
+        scheduledEnd: scheduledShiftEndSelectedDay
+      }
+    ];
+
     report = {
       ...report,
       totalDaysNotWorked,
@@ -426,7 +509,13 @@ export const timeclockReportByUser = async (
       totalDaysWorkedSelectedMonth,
       totalHoursBreakTaken,
       totalHoursBreakScheduled,
-      totalHoursBreakSelecteDay
+      totalHoursBreakSelecteDay,
+      totalHoursAbsenceSelectedMonth,
+
+      scheduledShifts: scheduleShiftsSelectedMonth,
+      timeclocks: timeclocksOfSelectedMonth,
+
+      scheduleReport
     };
   }
 
@@ -701,9 +790,12 @@ export const timeclockReportFinal = async (
 
     // calculate total break time from schedules of an user
     const totalBreakOfSchedulesInHrs =
-      currUserSchedules.reduce(
-        (partialBreakSum, userSchedule) =>
-          partialBreakSum + (userSchedule.totalBreakInMins || 0),
+      currUserScheduleShifts.reduce(
+        (partialBreakSum, userScheduleShift) =>
+          partialBreakSum +
+          (userScheduleShift.lunchBreakInMins ||
+            scheduleShiftConfigsMap[userScheduleShift.scheduleConfigId] ||
+            0),
         0
       ) / 60;
 
@@ -1051,6 +1143,10 @@ export const timeclockReportPivot = async (
 
             deviceType: currUserTimeclock.deviceType,
             deviceName: currUserTimeclock.deviceName,
+            inDevice: currUserTimeclock.inDevice,
+            inDeviceType: currUserTimeclock.inDeviceType,
+            outDevice: currUserTimeclock.outDevice,
+            outDeviceType: currUserTimeclock.outDeviceType,
 
             scheduledStart: scheduleShiftStart,
             scheduledEnd: scheduleShiftEnd,

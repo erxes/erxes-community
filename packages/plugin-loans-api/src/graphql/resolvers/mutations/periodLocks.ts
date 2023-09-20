@@ -1,16 +1,11 @@
-import { gatherDescriptions } from '../../../utils';
-import {
-  checkPermission,
-  putCreateLog,
-  putDeleteLog,
-  putUpdateLog
-} from '@erxes/api-utils/src';
+import { checkPermission } from '@erxes/api-utils/src';
 import { IContext } from '../../../connectionResolver';
-import messageBroker from '../../../messageBroker';
+import { sendMessageBroker } from '../../../messageBroker';
 import {
   IPeriodLock,
   IPeriodLockDocument
 } from '../../../models/definitions/periodLocks';
+import { createLog, deleteLog, updateLog } from '../../../logUtils';
 
 const periodLockMutations = {
   periodLocksAdd: async (
@@ -19,7 +14,10 @@ const periodLockMutations = {
     { user, models, subdomain }: IContext
   ) => {
     doc.createdBy = user._id;
-    const periodLock = await models.PeriodLocks.createPeriodLock(doc);
+    const periodLock = await models.PeriodLocks.createPeriodLock(
+      doc,
+      subdomain
+    );
 
     const logData = {
       type: 'periodLock',
@@ -27,18 +25,7 @@ const periodLockMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putCreateLog(
-      subdomain,
-      messageBroker(),
-      {
-        newData: doc,
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await createLog(subdomain, user, logData);
 
     return periodLock;
   },
@@ -51,7 +38,11 @@ const periodLockMutations = {
     { models, user, subdomain }: IContext
   ) => {
     const periodLock = await models.PeriodLocks.getPeriodLock({ _id });
-    const updated = await models.PeriodLocks.updatePeriodLock(_id, doc);
+    const updated = await models.PeriodLocks.updatePeriodLock(
+      _id,
+      doc,
+      subdomain
+    );
 
     const logData = {
       type: 'periodLock',
@@ -59,19 +50,7 @@ const periodLockMutations = {
       extraParams: { models }
     };
 
-    const descriptions = gatherDescriptions(logData);
-
-    await putUpdateLog(
-      subdomain,
-      messageBroker(),
-      {
-        newData: { ...doc },
-        updatedDocument: updated,
-        ...logData,
-        ...descriptions
-      },
-      user
-    );
+    await updateLog(subdomain, user, logData);
 
     return updated;
   },
@@ -93,22 +72,23 @@ const periodLockMutations = {
     await models.PeriodLocks.removePeriodLocks(periodLockIds);
 
     for (const periodLock of periodLocks) {
+      await sendMessageBroker(
+        {
+          action: 'deleteTransaction',
+          subdomain,
+          data: { orderId: periodLock._id, config: {} },
+          isRPC: true
+        },
+        'syncerkhet'
+      );
+
       const logData = {
         type: 'periodLock',
         object: periodLock,
         extraParams: { models }
       };
 
-      const descriptions = gatherDescriptions(logData);
-      await putDeleteLog(
-        subdomain,
-        messageBroker(),
-        {
-          ...logData,
-          ...descriptions
-        },
-        user
-      );
+      await deleteLog(subdomain, user, logData);
     }
 
     return periodLockIds;

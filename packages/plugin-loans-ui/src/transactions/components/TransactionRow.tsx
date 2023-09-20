@@ -1,11 +1,20 @@
-import { formatValue, FormControl, Icon, ModalTrigger } from '@erxes/ui/src';
+import {
+  Button,
+  ButtonMutate,
+  formatValue,
+  FormControl,
+  Icon,
+  ModalTrigger,
+  Tip
+} from '@erxes/ui/src';
 import _ from 'lodash';
 import React from 'react';
 import { TrNumberCols, TrRows } from '../../contracts/styles';
 import ChangeTrForm from '../containers/ChangeTrForm';
 import TransactionForm from '../containers/TransactionForm';
 import { ITransaction } from '../types';
-
+import { __ } from 'coreui/utils';
+import EBarimtForm from './EBarimtForm';
 type Props = {
   transaction: ITransaction;
   history: any;
@@ -51,9 +60,48 @@ function TransactionRow({
       <>
         <ModalTrigger
           title="Edit amounts info"
-          trigger={<Icon icon="calcualtor" />}
+          trigger={
+            <Tip text="Calculator" placement="left">
+              <Icon icon="calcualtor" />
+            </Tip>
+          }
           size="lg"
           content={trAmountForm}
+        />
+        &nbsp; &nbsp;
+      </>
+    );
+  };
+
+  const renderEBarimtBtn = (isGotEBarimt: boolean) => {
+    if (!transaction.calcedInfo || !transaction.contractId) {
+      return null;
+    }
+
+    const ebarimtForm = props => (
+      <EBarimtForm
+        {...props}
+        transaction={transaction}
+        isGotEBarimt={isGotEBarimt}
+      />
+    );
+    return (
+      <>
+        <ModalTrigger
+          title="EBarimt info"
+          trigger={
+            isGotEBarimt ? (
+              <Tip text="See Info" placement="left">
+                <Icon icon="print" />
+              </Tip>
+            ) : (
+              <Tip text="Get Ebarimt" placement="left">
+                <Icon icon="invoice" />
+              </Tip>
+            )
+          }
+          size="lg"
+          content={ebarimtForm}
         />
         &nbsp; &nbsp;
       </>
@@ -68,10 +116,15 @@ function TransactionRow({
     const trBaseForm = props => (
       <TransactionForm {...props} transaction={transaction} />
     );
+
     return (
       <ModalTrigger
-        title="Edit basic info"
-        trigger={<Icon icon="edit" />}
+        title={__('Edit basic info')}
+        trigger={
+          <Tip text="Edit" placement="left">
+            <Icon icon="edit" />
+          </Tip>
+        }
         size="lg"
         content={trBaseForm}
       />
@@ -97,11 +150,11 @@ function TransactionRow({
       <TrNumberCols key={'payment'}>
         {displayNumber(transaction, 'payment')}
       </TrNumberCols>
-      <TrNumberCols key={'interestEve'}>
-        {displayNumber(transaction, 'interestEve')}
+      <TrNumberCols key={'storedInterest'}>
+        {displayNumber(transaction, 'storedInterest')}
       </TrNumberCols>
-      <TrNumberCols key={'interestNonce'}>
-        {displayNumber(transaction, 'interestNonce')}
+      <TrNumberCols key={'calcInterest'}>
+        {displayNumber(transaction, 'calcInterest')}
       </TrNumberCols>
       <TrNumberCols key={'undue'}>
         {displayNumber(transaction, 'undue')}
@@ -115,6 +168,7 @@ function TransactionRow({
       <td key={'manage'}>
         {renderChangeBtn()}
 
+        {renderEBarimtBtn(!!transaction.ebarimt)}
         {renderEditBrn()}
       </td>
     </TrRows>

@@ -16,6 +16,7 @@ export const commonFields = `
   categories
   categoriesExcluded
   segments
+  vendors
 
   isStartDateEnabled
   isEndDateEnabled
@@ -80,9 +81,49 @@ export const commonFields = `
   }
 `;
 
+const pricingParamsDefs = `
+  $status: String
+  $prioritizeRule: String
+  $branchId: String
+  $departmentId: String
+  $productId: String
+  $date: Date
+  $findOne: Boolean
+  $page: Int
+  $perPage: Int
+  $sortField: String
+  $sortDirection: Int
+  $isQuantityEnabled: Boolean
+  $isPriceEnabled: Boolean
+  $isExpiryEnabled: Boolean
+  $isRepeatEnabled: Boolean
+  $totalAmount: String
+  $quantity: Float
+`;
+
+const pricingParamsValues = `
+  status: $status
+  prioritizeRule: $prioritizeRule
+  branchId: $branchId
+  departmentId: $departmentId
+  productId: $productId
+  date: $date
+  findOne: $findOne
+  page: $page
+  perPage: $perPage
+  sortField: $sortField
+  sortDirection: $sortDirection
+  isQuantityEnabled: $isQuantityEnabled
+  isPriceEnabled: $isPriceEnabled
+  isExpiryEnabled: $isExpiryEnabled
+  isRepeatEnabled: $isRepeatEnabled
+  totalAmount: $totalAmount
+  quantity: $quantity
+`;
+
 const pricingPlans = `
-  query PricingPlans($status: String) {
-    pricingPlans(status: $status) {
+  query PricingPlans(${pricingParamsDefs}) {
+    pricingPlans(${pricingParamsValues}) {
       _id
       name
       status
@@ -94,13 +135,21 @@ const pricingPlans = `
         details {
           fullName
         }
+        email
       }
       updatedUser {
         details {
           fullName
         }
+        email
       }
     }
+  }
+`;
+
+const pricingPlansCount = `
+  query pricingPlansCount(${pricingParamsDefs}) {
+    pricingPlansCount(${pricingParamsValues})
   }
 `;
 
@@ -115,5 +164,6 @@ const pricingPlanDetail = `
 
 export default {
   pricingPlans,
+  pricingPlansCount,
   pricingPlanDetail
 };

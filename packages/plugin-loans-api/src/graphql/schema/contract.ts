@@ -38,7 +38,9 @@ export const types = () => `
     feeAmount: Float
     tenor: Float
     unduePercent: Float
+    undueCalcType: String
     interestRate: Float
+    skipInterestCalcMonth: Float
     repayment: String
     startDate: Date
     scheduleDays: [Float]
@@ -72,6 +74,9 @@ export const types = () => `
 
     weekends: [Int]
     useHoliday: Boolean
+    useMargin: Boolean
+    useSkipInterest: Boolean
+    useDebt: Boolean
 
     closeDate: Date
     closeType: String
@@ -85,6 +90,14 @@ export const types = () => `
     nextPayment:Float
     payedAmountSum:Float
     loanBalanceAmount:Float
+    expiredDays:Float
+    loanTransactionHistory:JSON
+    currency:String
+    storedInterest:Float
+    lastStoredDate:Date
+    isPayFirstMonth: Boolean
+    downPayment: Float
+    isBarter: Boolean
   }
 
 
@@ -102,6 +115,7 @@ export const types = () => `
     insurance: Float,
     debt: Float,
     total: Float,
+    storedInterest: Float,
   }
   type ContractsListResponse {
     list: [LoanContract],
@@ -137,6 +151,7 @@ const queryParams = `
   closeDate: Date
   closeDateType: String
   branchId: String
+  status: String
 `;
 
 export const queries = `
@@ -162,6 +177,7 @@ const commonFields = `
   feeAmount: Float
   tenor: Float
   unduePercent: Float
+  undueCalcType: String
   interestRate: Float
   repayment: String
   startDate: Date
@@ -181,8 +197,24 @@ const commonFields = `
   riskExpertId: String
   weekends: [Int]
   useHoliday: Boolean
+  useMargin: Boolean
+  useSkipInterest: Boolean
+  useDebt: Boolean
   relContractId: String
   dealId: String
+  skipInterestCalcMonth: Float
+  currency:String
+  isPayFirstMonth: Boolean
+  downPayment: Float
+  isBarter: Boolean
+`;
+
+const interestCorrectionFields = `
+  contractId: String
+  stoppedDate: Date
+  isStopLoss: Boolean
+  interestAmount: Float
+  lossAmount: Float
 `;
 
 export const mutations = `
@@ -192,4 +224,7 @@ export const mutations = `
   contractsClose(contractId: String, closeDate: Date, closeType: String, description: String): LoanContract
   contractsRemove(contractIds: [String]): [String]
   getProductsData(contractId: String): CollateralsDataResponse
+  stopInterest(${interestCorrectionFields}): LoanContract
+  interestChange(${interestCorrectionFields}): LoanContract
+  interestReturn(${interestCorrectionFields}): LoanContract
 `;

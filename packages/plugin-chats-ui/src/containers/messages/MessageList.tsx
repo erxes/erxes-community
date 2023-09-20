@@ -3,19 +3,21 @@ import { useQuery, useSubscription } from '@apollo/client';
 import { gql } from '@apollo/client';
 // erxes
 import Spinner from '@erxes/ui/src/components/Spinner';
-import withCurrentUser from '@erxes/ui/src/auth/containers/withCurrentUser';
-import { IUser } from '@erxes/ui/src/auth/types';
 // local
 import Component from '../../components/messages/MessageList';
 import { queries, subscriptions } from '../../graphql';
+import { Alert } from '@erxes/ui/src/utils';
+import { IUser } from '@erxes/ui/src/auth/types';
 
 type Props = {
   chatId: string;
   setReply: (message: any) => void;
+  currentUser: IUser;
+  isWidget?: boolean;
 };
 
 const MessageListContainer = (props: Props) => {
-  const { chatId } = props;
+  const { chatId, isWidget } = props;
 
   const [page, setPage] = useState<number>(0);
   const [latestMessages, setLatestMessages] = useState<any[]>([]);
@@ -26,6 +28,10 @@ const MessageListContainer = (props: Props) => {
     }
   );
 
+  const chatDetailQuery = useQuery(gql(queries.chatDetail), {
+    variables: { id: chatId }
+  });
+
   useEffect(() => {
     refetch();
     setLatestMessages([]);
@@ -34,13 +40,11 @@ const MessageListContainer = (props: Props) => {
 
   useSubscription(gql(subscriptions.chatMessageInserted), {
     variables: { chatId },
-    onSubscriptionData: ({ subscriptionData }) => {
-      if (!subscriptionData.data) return;
-
-      setLatestMessages([
-        subscriptionData.data.chatMessageInserted,
-        ...latestMessages
-      ]);
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      if (!data) {
+        return null;
+      }
+      setLatestMessages([data.chatMessageInserted, ...latestMessages]);
     }
   });
 
@@ -84,10 +88,10 @@ const MessageListContainer = (props: Props) => {
   }
 
   if (error) {
-    return <p>{error.message}</p>;
+    Alert.error(error.message);
   }
 
-  const chatMessages = (data && data.chatMessages.list) || [];
+  const chatMessages = (data && data.chatMessages?.list) || [];
 
   return (
     <Component
@@ -96,6 +100,8 @@ const MessageListContainer = (props: Props) => {
       isAllMessages={chatMessages.length < (page + 1) * 20}
       setReply={props.setReply}
       loadEarlierMessage={loadEarlierMessage}
+      isWidget={isWidget}
+      chatType={chatDetailQuery?.data?.chatDetail?.type}
     />
   );
 };

@@ -123,6 +123,7 @@ export interface IField {
   optionsValues?: string;
 
   relationType?: string;
+  subFieldIds?: string[];
 }
 
 export interface IFormProps {
@@ -185,6 +186,7 @@ export type IEditorProps = {
   name?: string;
   isSubmitted?: boolean;
   formItems?: any;
+  contentType?: string;
 };
 
 export type QueryResponse = {

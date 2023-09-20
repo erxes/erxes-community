@@ -3,7 +3,10 @@ import { Model } from 'mongoose';
 import * as _ from 'underscore';
 import { IModels } from '../connectionResolver';
 import { sendProductsMessage } from '../messageBroker';
-import { SAFE_REMAINDER_STATUSES } from './definitions/constants';
+import {
+  SAFE_REMAINDER_STATUSES,
+  SAFE_REMAINDER_ITEM_STATUSES
+} from './definitions/constants';
 import {
   ISafeRemainder,
   ISafeRemainderDocument,
@@ -86,14 +89,13 @@ export const loadSafeRemainderClass = (models: IModels) => {
         data: {
           categoryId: productCategoryId,
           query: { status: { $ne: 'deleted' } },
-          sort: {},
+          sort: { code: 1 },
           limit
         },
         isRPC: true
       });
 
       // Create remainder items for every product
-      const defaultUomId = '';
       const productIds = products.map((item: any) => item._id);
       const liveRemainders = await models.Remainders.find({
         departmentId,
@@ -107,8 +109,10 @@ export const loadSafeRemainderClass = (models: IModels) => {
       }
 
       const bulkOps: any[] = [];
+      let order = 0;
 
       for (const product of products) {
+        order++;
         const live = liveRemByProductId[product._id] || {};
 
         bulkOps.push({
@@ -118,9 +122,11 @@ export const loadSafeRemainderClass = (models: IModels) => {
           productId: product._id,
           preCount: live.count || 0,
           count: live.count || 0,
-          uomId: product.uomId || defaultUomId,
+          status: SAFE_REMAINDER_ITEM_STATUSES.NEW,
+          uom: product.uom,
           modifiedAt: new Date(),
-          modifiedBy: userId
+          modifiedBy: userId,
+          order
         });
       }
 

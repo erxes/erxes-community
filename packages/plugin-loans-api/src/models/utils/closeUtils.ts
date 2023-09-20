@@ -7,9 +7,9 @@ import { getFullDate } from './utils';
 
 export const getCloseInfo = async (
   models: IModels,
-  memoryStorage,
+  subdomain,
   contract: IContractDocument,
-  date: Date
+  date: Date = new Date()
 ) => {
   const closeDate = getFullDate(date);
   const contractId = contract._id;
@@ -37,7 +37,7 @@ export const getCloseInfo = async (
     interestEve,
     interestNonce,
     insurance
-  } = (await getCalcedAmounts(models, memoryStorage, {
+  } = (await getCalcedAmounts(models, subdomain, {
     contractId,
     payDate: closeDate
   })) as any;
@@ -63,6 +63,7 @@ export const getCloseInfo = async (
     insurance,
     payment: lastPaySchedule.balance,
     debt,
+    storedInterest: contract.storedInterest,
     total:
       lastPaySchedule.balance +
       (undue || 0) +

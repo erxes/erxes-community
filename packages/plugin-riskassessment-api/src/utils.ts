@@ -3,11 +3,12 @@ import { IModels, models } from './connectionResolver';
 import {
   sendCardsMessage,
   sendCoreMessage,
-  sendFormsMessage
+  sendFormsMessage,
+  sendTagsMessage
 } from './messageBroker';
 
 export const validRiskIndicators = async params => {
-  if (serviceDiscovery.isEnabled('tags') && !params.tagIds) {
+  if (serviceDiscovery.isEnabled('tags') && !params?.tagIds?.length) {
     throw new Error('Please select some tags');
   }
   if (await models?.RiskIndicators.findOne({ name: params.name })) {
@@ -206,6 +207,23 @@ export const getAsssignedUsers = async (
   return assignedUsers;
 };
 
+const getOptionsValues = optionsValues => {
+  return optionsValues
+    .split('\n')
+    .map(item => {
+      if (item.match(/=/g)) {
+        const label = item?.substring(0, item.indexOf('=')).trim();
+        const value = Number(
+          item.substring(item?.indexOf('=') + 1, item.length)
+        );
+        if (!Number.isNaN(value)) {
+          return { label, value };
+        }
+      }
+    }, [])
+    .filter(item => item);
+};
+
 export const calculateFormResponses = async ({
   responses,
   fields,
@@ -231,20 +249,7 @@ export const calculateFormResponses = async ({
     const field = fields.find(field => field._id === key);
 
     if (field?.optionsValues) {
-      const optValues = field?.optionsValues
-        .split('\n')
-        .map(item => {
-          if (item.match(/=/g)) {
-            const label = item?.substring(0, item.indexOf('=')).trim();
-            const value = parseInt(
-              item.substring(item?.indexOf('=') + 1, item.length)
-            );
-            if (!Number.isNaN(value)) {
-              return { label, value };
-            }
-          }
-        }, [])
-        .filter(item => item);
+      const optValues = getOptionsValues(field?.optionsValues);
 
       if (generalcalculateMethod === 'ByPercent') {
         const scores = optValues.map(option => option.value);
@@ -256,12 +261,12 @@ export const calculateFormResponses = async ({
       );
       switch (calculateMethod) {
         case 'Multiply':
-          sumNumber *= parseInt(fieldValue?.value || 0);
+          sumNumber *= Number(fieldValue?.value || 0);
           break;
         case 'Addition':
         case 'Average':
         case 'ByPercent':
-          sumNumber += parseInt(fieldValue?.value || 0);
+          sumNumber += Number(fieldValue?.value || 0);
           break;
       }
       submissions.push({
@@ -513,4 +518,32 @@ export const roundResult = (number, places = 2) => {
   fixed += 44; // round down on anything less than x.xxx56
   fixed = Math.floor(fixed / 100); // chop off last 2 digits
   return fixed / Math.pow(10, places);
+};
+
+export const generateSort = (sortField, sortDirection) => {
+  let sort: any = { createdAt: -1 };
+
+  if (sortField && sortDirection) {
+    sort = {};
+    sort = { [sortField]: sortDirection };
+  }
+  return sort;
+};
+
+export const getFilterTagIds = async (subdomain, ids) => {
+  let tagIds: string[] = [];
+  for (const _id of ids) {
+    const childrenIds = (
+      await sendTagsMessage({
+        subdomain,
+        action: 'withChilds',
+        data: { query: { _id }, fields: { _id: 1 } },
+        isRPC: true,
+        defaultValue: []
+      })
+    ).map(child => child._id);
+    tagIds = [...tagIds, ...childrenIds];
+  }
+
+  return tagIds;
 };

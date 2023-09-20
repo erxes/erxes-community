@@ -23,6 +23,11 @@ export type IOrder = {
   oldBillId: string;
   type: string;
   userId: string;
+  branchId: string;
+  departmentId: string;
+
+  branch: any;
+  department: any;
 
   items: any;
   posToken: string;
@@ -39,7 +44,10 @@ export type IOrder = {
   origin?: string;
   syncedErkhet: boolean;
   convertDealId: string;
+  returnInfo?: any;
 };
+
+export type IOrderRecord = {} & IOrder;
 
 export type IOrderDet = {
   syncErkhetInfo: string;
@@ -51,6 +59,18 @@ export type IOrderDet = {
 
 export type OrdersQueryResponse = {
   posOrders: IOrder[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type OrderRecordsQueryResponse = {
+  posOrderRecords: IOrderRecord[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type OrderRecordsCountQueryResponse = {
+  posOrderRecordsCount: number;
   loading: boolean;
   refetch: () => void;
 };
@@ -73,6 +93,12 @@ export type OrdersSummaryQueryResponse = {
   refetch: () => void;
 };
 
+export type OrdersGroupSummaryQueryResponse = {
+  posOrdersGroupSummary: any;
+  loading: boolean;
+  refetch: () => void;
+};
+
 export type IPosProduct = {
   counts: any;
   count: number;
@@ -88,12 +114,6 @@ export type ProductCategoriesQueryResponse = {
 } & QueryResponse;
 
 // mutation
-export type PosOrderSyncErkhetMutationResponse = {
-  posOrderSyncErkhet: (mutation: {
-    variables: { _id: string };
-  }) => Promise<any>;
-};
-
 export type PosOrderReturnBillMutationResponse = {
   posOrderReturnBill: (mutation: {
     variables: { _id: string };
@@ -149,6 +169,12 @@ export type ICover = {
 
 export type CoversQueryResponse = {
   posCovers: ICover[];
+  loading: boolean;
+  refetch: () => void;
+};
+
+export type CoversCountQueryResponse = {
+  posCoversCount: number;
   loading: boolean;
   refetch: () => void;
 };

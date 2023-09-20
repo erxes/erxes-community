@@ -1,4 +1,5 @@
-import { __, Wrapper } from '@erxes/ui/src';
+import { Wrapper } from '@erxes/ui/src';
+import { __ } from 'coreui/utils';
 import React from 'react';
 
 import { IContractTypeDetail } from '../types';
@@ -30,7 +31,7 @@ class ContractDetails extends React.Component<Props, State> {
     const breadcrumb = [
       {
         title: __('Contract types'),
-        link: '/contract-types'
+        link: '/erxes-plugin-loan/contract-types'
       },
       { title }
     ];

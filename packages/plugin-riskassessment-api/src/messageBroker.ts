@@ -15,7 +15,7 @@ export const initBroker = async cl => {
   });
 
   consumeRPCQueue(
-    'riskassessment:riskAssessments:find',
+    'riskassessment:riskAssessments.find',
     async ({ subdomain, data }) => {
       const models = await generateModels(subdomain);
 
@@ -70,6 +70,16 @@ export const sendRiskAssessmentMessage = (
     client,
     serviceDiscovery,
     serviceName: 'riskassessment',
+    ...args
+  });
+};
+
+export const sendCommonMessage = async (
+  args: ISendMessageArgs & { serviceName: string }
+): Promise<any> => {
+  return sendMessage({
+    serviceDiscovery,
+    client,
     ...args
   });
 };

@@ -1,4 +1,5 @@
-import { __, Spinner, Table, Button } from '@erxes/ui/src';
+import { Spinner, Table, Button } from '@erxes/ui/src';
+import { __ } from 'coreui/utils';
 import { IRouterProps } from '@erxes/ui/src/types';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
@@ -52,7 +53,7 @@ class SchedulesList extends React.Component<IProps> {
               <th>{__('Loan Balance')}</th>
               <th>{__('Loan Payment')}</th>
               <th>{__('Interest')}</th>
-              <th>{__('Undue')}</th>
+              <th>{__('Loss')}</th>
               <th>{__('Insurance')}</th>
               <th>{__('Debt')}</th>
               <th>{__('Total')}</th>

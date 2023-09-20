@@ -34,12 +34,12 @@ type State = {
   paidAmounts: any[];
 };
 
-class PutResponseDetail extends React.Component<Props, State> {
+class OrderDetail extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
     const { order, pos } = this.props;
-    const paidAmounts = order.paidAmounts;
+    const paidAmounts: any[] = [...order.paidAmounts] || [];
     const paidKeys: string[] = paidAmounts.map(pa => pa.type);
 
     for (const emptyType of (pos.paymentTypes || []).filter(
@@ -187,6 +187,18 @@ class PutResponseDetail extends React.Component<Props, State> {
     return value;
   };
 
+  renderReturnInfo() {
+    const { order } = this.props;
+    if (!order.returnInfo || !order.returnInfo.returnAt) {
+      return <></>;
+    }
+
+    return this.renderRow(
+      'return Date',
+      dayjs(order.returnInfo.returnAt).format('lll')
+    );
+  }
+
   render() {
     const { order } = this.props;
 
@@ -232,6 +244,7 @@ class PutResponseDetail extends React.Component<Props, State> {
               <th>{__('Count')}</th>
               <th>{__('Unit Price')}</th>
               <th>{__('Amount')}</th>
+              <th>{__('Diff')}</th>
             </tr>
           </thead>
           <tbody id="orderItems">
@@ -241,6 +254,7 @@ class PutResponseDetail extends React.Component<Props, State> {
                 <td>{item.count}</td>
                 <td>{item.unitPrice}</td>
                 <td>{item.count * item.unitPrice}</td>
+                <td>{item.discountAmount}</td>
               </tr>
             ))}
           </tbody>
@@ -250,7 +264,7 @@ class PutResponseDetail extends React.Component<Props, State> {
           'Total Amount',
           this.displayValue(order, 'totalAmount')
         )}
-
+        {this.renderReturnInfo()}
         <ul>
           {this.renderEditRow('Cash Amount', 'cashAmount')}
           {this.renderEditRow('Mobile Amount', 'mobileAmount')}
@@ -265,4 +279,4 @@ class PutResponseDetail extends React.Component<Props, State> {
   }
 }
 
-export default PutResponseDetail;
+export default OrderDetail;
