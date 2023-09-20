@@ -24,7 +24,6 @@ type State = {
 class ChannelForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-
     this.state = {
       selectedMembers: props.selectedMembers || []
     };
@@ -91,7 +90,7 @@ class ChannelForm extends React.Component<Props, State> {
           <SelectTeamMembers
             label="Choose members"
             name="selectedMembers"
-            initialValue={selectedMembers}
+            initialValue={this.state.selectedMembers}
             onSelect={onChange}
           />
         </FormGroup>
