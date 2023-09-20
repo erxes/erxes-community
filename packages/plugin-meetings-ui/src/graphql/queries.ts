@@ -43,6 +43,7 @@ export const meetingsFilterParamsDef = `
     dealIds: $dealIds
     perPage: $perPage
     page: $page
+    searchValue: $searchValue
 `;
 
 export const meetingsFilterParams = `
@@ -56,6 +57,7 @@ export const meetingsFilterParams = `
     $dealIds: [String]
     $perPage: Int
     $page: Int
+    $searchValue: String
 `;
 
 const meetings = `
@@ -78,6 +80,14 @@ query MeetingDetail($_id: String!) {
     createdAt
     status
     companyId
+    deals{
+      _id
+      boardId
+      pipeline{
+        _id
+      }
+      name
+    }
     participantUser{
       _id
       details {
