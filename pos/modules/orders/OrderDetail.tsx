@@ -30,7 +30,8 @@ const OrderDetail = ({ children }: { children: React.ReactNode }) => {
   }, [_id, data, setOrderStates])
 
   if (loading) return <Loader />
-  return children
+
+  return <>{children}</>
 }
 
 export default OrderDetail
