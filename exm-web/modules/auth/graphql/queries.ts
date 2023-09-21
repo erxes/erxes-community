@@ -1,8 +1,10 @@
+import { gql } from "@apollo/client"
+
 const nameFields = `
   firstName
   middleName
   lastName
-`;
+`
 
 const detailFields = `
   avatar
@@ -15,7 +17,7 @@ const detailFields = `
   description
   operatorPhone
   ${nameFields}
-`;
+`
 
 const contactInfoFields = `
   phoneNumber
@@ -31,7 +33,7 @@ const contactInfoFields = `
     type
     size
   }
-`;
+`
 
 export const branchField = `
   _id
@@ -52,8 +54,7 @@ export const branchField = `
   }
   radius
   ${contactInfoFields}
-`;
-
+`
 
 export const departmentField = `
   _id
@@ -87,9 +88,9 @@ export const departmentField = `
       ${detailFields}
     }
   }
-`;
+`
 
-const currentUser = `
+const currentUser = gql`
   query currentUser {
     currentUser {
       _id
@@ -135,9 +136,8 @@ const currentUser = `
       score
     }
   }
-`;
+`
 
 export default {
-  currentUser
+  currentUser,
 }
-

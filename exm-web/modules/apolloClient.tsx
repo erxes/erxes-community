@@ -1,68 +1,69 @@
-'use client';
+"use client"
 
+import { ReactNode } from "react"
 import {
   ApolloClient,
   HttpLink,
   InMemoryCache,
+  ApolloProvider as Provider,
   split,
-  ApolloProvider
-} from '@apollo/client';
-import { getMainDefinition } from '@apollo/client/utilities';
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
-import { setContext } from '@apollo/client/link/context';
-
-console.log(process.env.ERXES_API_URL);
+} from "@apollo/client"
+import { setContext } from "@apollo/client/link/context"
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
+import { getMainDefinition } from "@apollo/client/utilities"
+import { createClient } from "graphql-ws"
 
 const httpLink: any = new HttpLink({
-  uri: `${process.env.NEXT_PUBLIC_ERXES_API_URL}/graphql`,
-  credentials: 'include'
-});
+  uri: `${process.env.NEXT_PUBLIC_MAIN_API_DOMAIN}/graphql`,
+  credentials: "include",
+})
 
 const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      'Access-Control-Allow-Origin': `${process.env.NEXT_PUBLIC_ERXES_API_URL}/graphql`
-    }
-  };
-});
+      "Access-Control-Allow-Origin": (
+        process.env.NEXT_PUBLIC_MAIN_API_DOMAIN || ""
+      ).replace("/gateway", ""),
+    },
+  }
+})
 
 const wsLink: any =
-  typeof window !== 'undefined'
+  typeof window !== "undefined"
     ? new GraphQLWsLink(
         createClient({
-          url: process.env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || ''
+          url: process.env.NEXT_PUBLIC_MAIN_SUBS_DOMAIN || "",
         })
       )
-    : null;
+    : null
 
-const httpLinkWithMiddleware = authLink.concat(httpLink);
+const httpLinkWithMiddleware = authLink.concat(httpLink)
 
 type Definintion = {
-  kind: string;
-  operation?: string;
-};
+  kind: string
+  operation?: string
+}
 const splitLink =
-  typeof window !== 'undefined'
+  typeof window !== "undefined"
     ? split(
         ({ query }) => {
-          const { kind, operation }: Definintion = getMainDefinition(query);
-          return kind === 'OperationDefinition' && operation === 'subscription';
+          const { kind, operation }: Definintion = getMainDefinition(query)
+          return kind === "OperationDefinition" && operation === "subscription"
         },
         wsLink,
         httpLinkWithMiddleware
       )
-    : httpLinkWithMiddleware;
+    : httpLinkWithMiddleware
 
-const client = new ApolloClient({
-  ssrMode: typeof window !== 'undefined',
+export const client = new ApolloClient({
+  ssrMode: typeof window !== "undefined",
   cache: new InMemoryCache(),
-  link: splitLink
-});
+  link: splitLink,
+})
 
-const Provider = ({ children }: any) => {
-  return <ApolloProvider client={client}>{children}</ApolloProvider>;
-};
+const ApolloProvider = ({ children }: { children: ReactNode }) => (
+  <Provider client={client}>{children}</Provider>
+)
 
-export default Provider;
+export default ApolloProvider

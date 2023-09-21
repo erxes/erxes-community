@@ -1,4 +1,4 @@
-import { QueryResponse } from '../types';
+import { QueryResponse } from "../types";
 
 interface IStructureCommon {
   _id: string;
