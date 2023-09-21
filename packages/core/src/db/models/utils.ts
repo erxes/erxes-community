@@ -1,4 +1,4 @@
-import { randomLowercase } from '@erxes/api-utils/src/random';
+import { randomAlphanumeric } from '@erxes/api-utils/src/random';
 import * as faker from 'faker';
 
 export const getUniqueValue = async (
@@ -7,7 +7,7 @@ export const getUniqueValue = async (
   defaultValue?: string
 ) => {
   const getRandomValue = (type: string) =>
-    type === 'email' ? faker.internet.email().toLowerCase() : randomLowercase();
+    type === 'email' ? faker.internet.email().toLowerCase() : randomAlphanumeric();
 
   let uniqueValue = defaultValue || getRandomValue(fieldName);
 
