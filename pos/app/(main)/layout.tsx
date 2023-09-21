@@ -2,11 +2,11 @@ import "@/styles/globals.css"
 import CheckAuth from "@/modules/auth/checkAuth"
 import Configs from "@/modules/auth/configs"
 
-interface LayoutProps {
+interface ILayoutProps {
   children: React.ReactNode
 }
 
-export default function RootLayout({ children }: LayoutProps) {
+export default function RootLayout({ children }: ILayoutProps) {
   return (
     <Configs>
       <CheckAuth>
