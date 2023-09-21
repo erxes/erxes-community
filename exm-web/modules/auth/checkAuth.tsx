@@ -21,8 +21,6 @@ const checkValidAuth = (currentUser: any) => {
 const CheckAuth = ({ children }: any) => {
   const currentUser = useAtomValue(currentUserAtom)
 
-  console.log(currentUser)
-
   const pathname = usePathname()
   const router = useRouter()
   const LOGIN = "/login"
