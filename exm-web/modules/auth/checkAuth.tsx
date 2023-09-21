@@ -8,29 +8,44 @@ import { Loader2 } from "lucide-react"
 
 import { currentUserAtom } from "../JotaiProiveder"
 
+const checkValidAuth = (currentUser: any) => {
+  const { _id } = currentUser || {}
+
+  if (!_id) {
+    return false
+  }
+
+  return true
+}
+
 const CheckAuth = ({ children }: any) => {
   const currentUser = useAtomValue(currentUserAtom)
+
+  console.log(currentUser)
 
   const pathname = usePathname()
   const router = useRouter()
   const LOGIN = "/login"
 
   useEffect(() => {
-    if (!currentUser && pathname !== LOGIN) {
+    const valid = checkValidAuth(currentUser)
+
+    if (!valid && pathname !== LOGIN) {
       router.push(LOGIN)
       return
     }
 
-    if (currentUser && pathname === LOGIN) {
+    if (valid && pathname === LOGIN) {
       router.push("/")
     }
   }, [currentUser, pathname])
 
-  if (!currentUser && pathname === LOGIN) {
-    return <>{children}</>
-  }
+  const checkValid = checkValidAuth(currentUser)
 
-  if (currentUser || pathname === LOGIN) {
+  if (checkValid && pathname === LOGIN) {
+    return null
+  }
+  if (checkValid || pathname === LOGIN) {
     return <>{children}</>
   }
 

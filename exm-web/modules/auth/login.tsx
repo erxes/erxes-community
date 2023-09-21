@@ -16,7 +16,7 @@ const LoginContainer = () => {
     onError(error) {
       return toast({ description: error.message, variant: "destructive" })
     },
-    refetchQueries: ["posCurrentUser"],
+    refetchQueries: ["currentUser"],
   })
 
   const handleLogin: IHandleLogin = ({ email, password }) => {
