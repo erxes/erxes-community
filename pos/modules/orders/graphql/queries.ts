@@ -101,6 +101,19 @@ const orderDetail = gql`
   }
 `
 
+const historyItemDetail = gql`
+  query OrderPaymentDetail($_id: String) {
+    orderDetail(_id: $_id) {
+      cashAmount
+      mobileAmount
+      paidAmounts {
+        amount
+        type
+      }
+    }
+  }
+`
+
 const historyDetail = gql`
   query HistoryDetail($id: String) {
     orderDetail(_id: $id) {
@@ -297,6 +310,8 @@ const progressHistory = gql`
         productName
         count
         status
+        attachment
+        description
       }
       modifiedAt
       paidDate
@@ -352,6 +367,7 @@ const queries = {
   progressDoneOrders,
   progressDetail,
   ordersAtWaiting,
+  historyItemDetail,
 }
 
 export default queries
