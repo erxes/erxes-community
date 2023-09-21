@@ -1,3 +1,6 @@
+import AppProvider from '@/modules/appContexts'
+import ApolloProvider from '@/modules/apolloClient'
+
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -16,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}><ApolloProvider><AppProvider>{children}</AppProvider></ApolloProvider></body>
     </html>
   )
 }
