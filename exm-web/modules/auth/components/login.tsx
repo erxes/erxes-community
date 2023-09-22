@@ -53,7 +53,7 @@ const Login = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="cashier@erxes.io" {...field} />
+                  <Input placeholder="Enter your email address" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
