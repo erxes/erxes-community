@@ -1,5 +1,4 @@
-import { generateFieldsFromSchema } from '@erxes/api-utils/src';
-import { generateModels, IModels } from './connectionResolver';
+import { IModels } from './connectionResolver';
 import {
   sendAutomationsMessage,
   sendCardsMessage,
@@ -8,6 +7,7 @@ import {
   sendEbarimtMessage,
   sendInventoriesMessage,
   sendLoyaltiesMessage,
+  sendPosclientHealthCheck,
   sendPosclientMessage,
   sendProductsMessage,
   sendSyncerkhetMessage
@@ -53,31 +53,22 @@ export const getBranchesUtil = async (
     branchId: { $in: pos.allowBranchIds }
   }).lean();
 
-  const healthyBranchIds = [] as any;
+  let healthyBranchIds = [] as any;
 
-  for (const allowPos of allowsPos) {
-    const longTask = async () =>
-      await sendPosclientMessage({
+  const { ALL_AUTO_INIT } = process.env;
+
+  if ([true, 'true', 'True', '1'].includes(ALL_AUTO_INIT || '')) {
+    healthyBranchIds = allowsPos.map(p => p.branchId);
+  } else {
+    for (const allowPos of allowsPos) {
+      const response = await sendPosclientHealthCheck({
         subdomain,
-        action: 'health_check',
-        data: { token: allowPos.token },
-        pos: allowPos,
-        isRPC: true
+        pos: allowPos
       });
 
-    const timeout = (cb, interval) => () =>
-      new Promise(resolve => setTimeout(() => cb(resolve), interval));
-
-    const onTimeout = timeout(resolve => resolve({}), 3000);
-
-    let response = { healthy: 'down' };
-    await Promise.race([longTask, onTimeout].map(f => f())).then(
-      result => (response = result as { healthy: string })
-    );
-
-    if (response && response.healthy === 'ok') {
-      healthyBranchIds.push(allowPos.branchId);
-      break;
+      if (response && response.healthy === 'ok') {
+        healthyBranchIds.push(allowPos.branchId);
+      }
     }
   }
 
@@ -475,8 +466,8 @@ const syncInventoriesRem = async ({
   }
 
   if (
-    (!oldBranchId && newOrder.branchId) ||
-    (oldBranchId && oldBranchId !== newOrder.branchId)
+    newOrder.branchId &&
+    (!oldBranchId || oldBranchId !== newOrder.branchId)
   ) {
     sendInventoriesMessage({
       subdomain,
@@ -517,8 +508,7 @@ export const syncOrderFromClient = async ({
   items,
   pos,
   posToken,
-  responses,
-  oldBranchId
+  responses
 }: {
   subdomain: string;
   models: IModels;
@@ -527,8 +517,10 @@ export const syncOrderFromClient = async ({
   pos: IPosDocument;
   posToken: string;
   responses;
-  oldBranchId: string;
 }) => {
+  const oldOrder = await models.PosOrders.findOne({ _id: order._id }).lean();
+  const oldBranchId = oldOrder ? oldOrder.branchId : '';
+
   for (const response of responses || []) {
     if (response && response._id) {
       await sendEbarimtMessage({
@@ -589,6 +581,26 @@ export const syncOrderFromClient = async ({
           order: { ...newOrder, posToken, subToken: toPos.token }
         },
         pos: toPos
+      });
+    }
+
+    // change branch and before another pos synced then remove from befort sync
+    if (
+      oldOrder &&
+      oldOrder.branchId &&
+      newOrder.branchId !== oldOrder.branchId
+    ) {
+      const toCancelPos = await models.Pos.findOne({
+        branchId: oldOrder.branchId
+      }).lean();
+
+      await sendPosclientMessage({
+        subdomain,
+        action: 'erxes-posclient-to-pos-api-remove',
+        data: {
+          order: { ...newOrder, posToken, subToken: toPos.token }
+        },
+        pos: toCancelPos
       });
     }
   }

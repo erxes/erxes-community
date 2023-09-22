@@ -20,7 +20,7 @@ export const initBroker = async cl => {
   consumeQueue('pos:createOrUpdateOrders', async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
-    const { action, posToken, responses, order, items, oldBranchId } = data;
+    const { action, posToken, responses, order, items } = data;
     const pos = await models.Pos.findOne({ token: posToken }).lean();
 
     // ====== if (action === 'statusToDone')
@@ -37,9 +37,32 @@ export const initBroker = async cl => {
       items,
       pos,
       posToken,
-      responses,
-      oldBranchId
+      responses
     });
+
+    return {
+      status: 'success'
+    };
+  });
+
+  consumeQueue('pos:createOrUpdateOrdersMany', async ({ subdomain, data }) => {
+    const models = await generateModels(subdomain);
+    const { posToken, syncOrders } = data;
+    const pos = await models.Pos.findOne({ token: posToken }).lean();
+
+    for (const perData of syncOrders) {
+      const { responses, order, items } = perData;
+
+      await syncOrderFromClient({
+        subdomain,
+        models,
+        order,
+        items,
+        pos,
+        posToken,
+        responses
+      });
+    }
 
     return {
       status: 'success'
@@ -339,18 +362,8 @@ export const sendPosclientMessage = async (
     args.isMQ = true;
 
     if (args.isRPC) {
-      const response: any = await sendMessage({
-        client,
-        serviceDiscovery,
-        serviceName,
-        ...args,
-        action: `posclient:health_check_${pos.token}`,
-        data: { token: pos.token, thirdService: true },
-        timeout: 1000,
-        defaultValue: { healthy: 'no' }
-      });
-
-      if (response.healthy !== 'ok') {
+      const response = await sendPosclientHealthCheck(args);
+      if (!response || response.healthy !== 'ok') {
         throw new Error('syncing error not connected posclient');
       }
     }
@@ -364,6 +377,36 @@ export const sendPosclientMessage = async (
     serviceName,
     ...args,
     action: lastAction
+  });
+};
+
+export const sendPosclientHealthCheck = async ({
+  subdomain,
+  pos
+}: {
+  subdomain: string;
+  pos: IPosDocument;
+}) => {
+  const { ALL_AUTO_INIT } = process.env;
+
+  if (
+    [true, 'true', 'True', '1'].includes(ALL_AUTO_INIT || '') ||
+    pos.onServer
+  ) {
+    return { healthy: 'ok' };
+  }
+
+  return await sendMessage({
+    subdomain,
+    client,
+    serviceDiscovery,
+    isRPC: true,
+    isMQ: true,
+    serviceName: '',
+    action: `posclient:health_check_${pos.token}`,
+    data: { token: pos.token, thirdService: true },
+    timeout: 1000,
+    defaultValue: { healthy: 'no' }
   });
 };
 
