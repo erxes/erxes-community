@@ -267,30 +267,43 @@ class ContractForm extends React.Component<Props, State> {
     if (
       name === 'tenor' ||
       name === 'leaseAmount' ||
-      name === 'customPayment'
+      name === 'customPayment' ||
+      name === 'customInterest'
     ) {
       const tenor = Number(name === 'tenor' ? value : this.state.tenor);
       const leaseAmount = Number(
         name === 'leaseAmount' ? value : this.state.leaseAmount
       );
       const customPayment = Number(name === 'customPayment' ? value : 0);
+      const customInterest = Number(name === 'customInterest' ? value : 0);
       let schedules: Schedule[] = [];
       let payment = customPayment || leaseAmount / tenor;
       let sumAmount = 0;
+      const dateRange = this.state.scheduleDays.sort((a, b) => a - b);
+      let mainDate = this.state.startDate;
       for (let index = 0; index < tenor; index++) {
-        let amount = payment;
-        if (sumAmount + amount > leaseAmount || tenor === index + 1)
-          amount = leaseAmount - sumAmount;
-        amount = Number(amount.toFixed(2));
-        const element: Schedule = {
-          order: index + 1,
-          payment: amount,
-          interest: 0,
-          date: new Date()
-        };
-        sumAmount += amount;
+        dateRange.map((day, i) => {
+          const ndate = new Date(mainDate);
+          const year = ndate.getFullYear();
+          const month = i === 0 ? ndate.getMonth() + 1 : ndate.getMonth();
 
-        schedules.push(element);
+          if (day > 28 && new Date(year, month, day).getDate() !== day)
+            mainDate = new Date(year, month + 1, 0);
+          else mainDate = new Date(year, month, day);
+
+          let amount = payment;
+          if (sumAmount + amount > leaseAmount || tenor === index + 1)
+            amount = leaseAmount - sumAmount;
+          amount = Number(amount.toFixed(2));
+          const element: Schedule = {
+            order: index + 1,
+            payment: amount,
+            interest: 0,
+            date: mainDate
+          };
+          sumAmount += amount;
+          schedules.push(element);
+        });
       }
       this.setState({ schedule: schedules });
     }
@@ -821,6 +834,11 @@ class ContractForm extends React.Component<Props, State> {
     const onChangeStartDate = value => {
       this.setState({ startDate: value });
     };
+
+    const onSelectScheduleDays = values => {
+      this.setState({ scheduleDays: values.map(val => val.value) });
+    };
+
     return (
       <>
         <ScrollWrapper>
@@ -888,7 +906,16 @@ class ContractForm extends React.Component<Props, State> {
                   value: this.state.skipInterestCalcMonth,
                   onChange: this.onChangeField
                 })}
-
+              {this.renderFormGroup('Custom Interest', {
+                ...formProps,
+                type: 'number',
+                useNumberFormat: true,
+                fixed: 2,
+                name: 'customInterest',
+                value: this.state.customInterest || 0,
+                onChange: this.onChangeField,
+                onClick: this.onFieldClick
+              })}
               {this.renderFormGroup('Interest Rate', {
                 ...formProps,
                 type: 'number',
@@ -909,7 +936,7 @@ class ContractForm extends React.Component<Props, State> {
                   className="flex-item"
                   placeholder={__('Choose an schedule Days')}
                   value={this.state.scheduleDays}
-                  onChange={this.onChangeField}
+                  onChange={onSelectScheduleDays}
                   multi={true}
                   options={new Array(31).fill(1).map((row, index) => ({
                     value: row + index,
@@ -963,16 +990,7 @@ class ContractForm extends React.Component<Props, State> {
                 {this.state.schedule.map(mur => (
                   <tr key={`schedule${mur.order}`}>
                     <td>{mur.order}</td>
-                    <td>
-                      {this.renderFormGroup('', {
-                        className: 'flex-item',
-                        type: 'date',
-                        componentClass: 'date',
-                        name: 'date',
-                        value: mur.date,
-                        onChange: this.onChangeField
-                      })}
-                    </td>
+                    <td>{mur.date.toLocaleDateString()}</td>
                     <td>
                       {this.renderFormGroup('', {
                         className: 'flex-item',
