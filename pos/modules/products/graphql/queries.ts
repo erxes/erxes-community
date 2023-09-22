@@ -59,6 +59,8 @@ const productSimilarities = gql`
   }
 `
 
+
+
 const productsCount = gql`
   query productsCount(
     $categoryId: String

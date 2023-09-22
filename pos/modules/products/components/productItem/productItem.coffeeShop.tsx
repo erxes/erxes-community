@@ -7,7 +7,7 @@ import { IProduct } from "@/types/product.types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import Image from "@/components/ui/image"
 
 const ChooseSimilarities = dynamic(() => import("../ChooseFromSimilarities"), {
@@ -16,34 +16,24 @@ const ChooseSimilarities = dynamic(() => import("../ChooseFromSimilarities"), {
 
 const ProductItem = (props: IProduct) => {
   const [open, setOpen] = useState(false)
-  const { attachment, name, unitPrice, description, hasSimilarity, _id } = props
+  const { name, unitPrice, _id, hasSimilarity } = props
   const addToCart = useSetAtom(addToCartAtom)
 
-  const renderContent = () => (
-    <>
-      <ProductItemImage src={attachment?.url || ""} />
-      <ProductItemTitle>{name}</ProductItemTitle>
-      <ProductItemDescription>{description || ""}</ProductItemDescription>
-      <ProductItemPriceWithWrapper unitPrice={unitPrice}>
-        <ProductItemButton>Нэмэх</ProductItemButton>
-      </ProductItemPriceWithWrapper>
-    </>
-  )
-
-  if (!hasSimilarity)
-    return (
-      <ProductItemWrapper onClick={() => addToCart({ name, _id, unitPrice })}>
-        {renderContent()}
-      </ProductItemWrapper>
-    )
-
   return (
-    <Dialog open={open} onOpenChange={() => setOpen(!open)}>
-      <DialogTrigger asChild>
-        <ProductItemWrapper>{renderContent()}</ProductItemWrapper>
-      </DialogTrigger>
-      <DialogContent>{open && <ChooseSimilarities {...props} />}</DialogContent>
-    </Dialog>
+    <>
+      <ProductItemWrapper
+        onClick={() =>
+          hasSimilarity ? setOpen(true) : addToCart({ name, _id, unitPrice })
+        }
+      >
+        <ProductContent {...props} />
+      </ProductItemWrapper>
+      <Dialog open={open} onOpenChange={() => setOpen(false)}>
+        <DialogContent>
+          {open && <ChooseSimilarities {...props} />}
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
@@ -59,6 +49,24 @@ export const ProductItemWrapper = forwardRef<
     {children}
   </div>
 ))
+
+const ProductContent = ({
+  attachment,
+  name,
+  unitPrice,
+  description,
+  hasSimilarity,
+  _id,
+}: IProduct) => (
+  <>
+    <ProductItemImage src={attachment?.url || ""} />
+    <ProductItemTitle>{name}</ProductItemTitle>
+    <ProductItemDescription>{description || ""}</ProductItemDescription>
+    <ProductItemPriceWithWrapper unitPrice={unitPrice}>
+      <ProductItemButton>Нэмэх</ProductItemButton>
+    </ProductItemPriceWithWrapper>
+  </>
+)
 
 export const ProductItemImage = ({
   src,
