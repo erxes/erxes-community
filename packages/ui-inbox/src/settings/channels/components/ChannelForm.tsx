@@ -91,7 +91,7 @@ class ChannelForm extends React.Component<Props, State> {
           <SelectTeamMembers
             label="Choose members"
             name="selectedMembers"
-            initialValue={selectedMembers}
+            initialValue={this.state.selectedMembers}
             onSelect={onChange}
           />
         </FormGroup>

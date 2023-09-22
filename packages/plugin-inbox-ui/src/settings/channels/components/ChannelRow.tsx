@@ -12,7 +12,7 @@ import MemberAvatars from '@erxes/ui/src/components/MemberAvatars';
 import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 import React from 'react';
 import Tip from '@erxes/ui/src/components/Tip';
-import { __ } from 'coreui/utils';
+import { __ } from '@erxes/ui/src/utils';
 
 type Props = {
   channel: IChannel;
