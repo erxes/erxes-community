@@ -11,8 +11,8 @@ import React from 'react';
 import Select from 'react-select-plus';
 import Toggle from '@erxes/ui/src/components/Toggle';
 import { ToggleWrapper } from '../widgetPreview/styles';
-import { __ } from 'coreui/utils';
 import timezones from '@erxes/ui/src/constants/timezones';
+import { __ } from '@erxes/ui/src/utils';
 
 type Props = {
   onChange: (
