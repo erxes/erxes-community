@@ -22,6 +22,7 @@ import { IProductDocument } from '../../models/definitions/products';
 import { checkLoyalties } from './loyalties';
 import { checkPricing } from './pricing';
 import { checkRemainders } from './products';
+import { getPureDate } from '@erxes/api-utils/src';
 
 interface IDetailItem {
   count: number;
@@ -102,6 +103,12 @@ export const validateOrder = async (
     throw new Error('Products missing in order. Please add products');
   }
 
+  if (doc.isPre && (!doc.dueDate || doc.dueDate < getPureDate(new Date()))) {
+    throw new Error(
+      'The due date of the pre-order must be recorded in the future'
+    );
+  }
+
   const products = await models.Products.find({
     _id: { $in: items.map(i => i.productId) }
   }).lean();
@@ -115,9 +122,9 @@ export const validateOrder = async (
   }
 
   if (
+    !doc.isPre &&
     config.isCheckRemainder &&
-    (doc.branchId || config.branchId) &&
-    doc.type !== 'before'
+    (doc.branchId || config.branchId)
   ) {
     const checkProducts = products.filter(
       p => (p.isCheckRems || {})[config.token] || false
