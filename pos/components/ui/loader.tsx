@@ -7,7 +7,7 @@ const Loader = ({
   style,
 }: {
   className?: string
-  style: object
+  style?: object
 }) => {
   return (
     <LoaderWrapper className={className} style={style}>
@@ -33,7 +33,7 @@ export const LoaderWrapper = ({
 }: {
   className?: string
   children: React.ReactNode
-  style: object
+  style?: object
 }) => {
   return (
     <div
@@ -50,4 +50,3 @@ export const LoaderText = () => {
 }
 
 export default Loader
-
