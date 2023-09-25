@@ -32,6 +32,8 @@ const generateFilter = (config: IConfig, params: ISearchParams) => {
     isPaid,
     dateType,
     customerType,
+    dueStartDate,
+    dueEndDate,
     isPreExclude
   } = params;
   const filter: any = {
@@ -75,10 +77,20 @@ const generateFilter = (config: IConfig, params: ISearchParams) => {
     const dateTypes = {
       paid: 'paidDate',
       created: 'createdAt',
-      due: 'dueDate',
       default: 'modifiedAt'
     };
     filter[dateTypes[dateType || 'default']] = dateQry;
+  }
+
+  const dueDateQry: any = {};
+  if (dueStartDate) {
+    dueDateQry.$gte = getPureDate(dueStartDate);
+  }
+  if (dueEndDate) {
+    dueDateQry.$lte = getPureDate(dueEndDate);
+  }
+  if (Object.keys(dueDateQry).length) {
+    filter.dueDate = dueDateQry;
   }
 
   return { ...filter, status: { $in: statuses } };
