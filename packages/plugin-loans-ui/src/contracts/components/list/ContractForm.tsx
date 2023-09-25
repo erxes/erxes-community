@@ -81,6 +81,8 @@ type State = {
   isPayFirstMonth?: boolean;
   isBarter?: boolean;
   downPayment?: number;
+  customPayment?: number;
+  customInterest?: number;
   config?: {
     maxAmount: number;
     minAmount: number;
@@ -97,6 +99,7 @@ type Schedule = {
   date: Date;
   payment: number;
   interest: number;
+  balance: number;
 };
 
 function isGreaterNumber(value: any, compareValue: any) {
@@ -183,7 +186,7 @@ class ContractForm extends React.Component<Props, State> {
       relContractId: contract.relContractId || '',
       currency:
         contract.currency || this.props.currentUser.configs?.dealCurrency[0],
-      schedule: [{ order: 1, date: new Date(), interest: 1, payment: 1 }]
+      schedule: []
     };
   }
 
@@ -236,7 +239,7 @@ class ContractForm extends React.Component<Props, State> {
       relContractId: this.state.relContractId,
       currency: this.state.currency,
       downPayment: Number(this.state.downPayment || 0),
-      schedule: [{}]
+      schedule: this.state.schedule
     };
 
     if (this.state.leaseType === 'salvage') {
@@ -261,14 +264,20 @@ class ContractForm extends React.Component<Props, State> {
   };
 
   onChangeField = e => {
-    const name = (e.target as HTMLInputElement).name;
-    const value = (e.target as HTMLInputElement).value;
+    const name = (e?.target as HTMLInputElement)?.name;
+    let value: any = (e?.target as HTMLInputElement)?.value;
+
+    if ((e?.target as HTMLInputElement)?.type === 'checkbox')
+      value = (e.target as HTMLInputElement).checked;
 
     if (
       name === 'tenor' ||
       name === 'leaseAmount' ||
       name === 'customPayment' ||
-      name === 'customInterest'
+      name === 'customInterest' ||
+      name === 'scheduleDays' ||
+      name === 'isPayFirstMonth' ||
+      name === 'interestRate'
     ) {
       const tenor = Number(name === 'tenor' ? value : this.state.tenor);
       const leaseAmount = Number(
@@ -276,36 +285,66 @@ class ContractForm extends React.Component<Props, State> {
       );
       const customPayment = Number(name === 'customPayment' ? value : 0);
       const customInterest = Number(name === 'customInterest' ? value : 0);
+      const isPayFirstMonth =
+        name === 'isPayFirstMonth' ? value : this.state.isPayFirstMonth;
+      const interestRate =
+        name === 'interestRate' ? value : this.state.interestRate;
+
       let schedules: Schedule[] = [];
-      let payment = customPayment || leaseAmount / tenor;
+      let payment =
+        customPayment || leaseAmount / (tenor * this.state.scheduleDays.length);
       let sumAmount = 0;
       const dateRange = this.state.scheduleDays.sort((a, b) => a - b);
+
       let mainDate = this.state.startDate;
-      for (let index = 0; index < tenor; index++) {
+      let balance = this.state.leaseAmount;
+      for (let index = 0; index < tenor + 1; index++) {
         dateRange.map((day, i) => {
-          const ndate = new Date(mainDate);
-          const year = ndate.getFullYear();
-          const month = i === 0 ? ndate.getMonth() + 1 : ndate.getMonth();
+          const nDate = new Date(mainDate);
+          const year = nDate.getFullYear();
+          let month = nDate.getMonth();
+          if (i === 0 && (index !== 0 || isPayFirstMonth !== true))
+            month = nDate.getMonth() + 1;
 
           if (day > 28 && new Date(year, month, day).getDate() !== day)
             mainDate = new Date(year, month + 1, 0);
           else mainDate = new Date(year, month, day);
 
+          if (isPayFirstMonth === true && mainDate < this.state.startDate) {
+            return;
+          }
+
           let amount = payment;
-          if (sumAmount + amount > leaseAmount || tenor === index + 1)
+          if (
+            sumAmount + amount > leaseAmount ||
+            tenor * dateRange.length == schedules.length + 1
+          )
             amount = leaseAmount - sumAmount;
-          amount = Number(amount.toFixed(2));
+          amount = Number(amount.toFixed(0));
           const element: Schedule = {
-            order: index + 1,
+            order: schedules.length + 1,
             payment: amount,
-            interest: 0,
+            interest:
+              customInterest ||
+              Number(((balance * interestRate) / 100 / 365).toFixed(0)),
+            balance,
             date: mainDate
           };
+          balance -= amount;
           sumAmount += amount;
-          schedules.push(element);
+          if (tenor * dateRange.length > schedules.length)
+            schedules.push(element);
         });
       }
+
       this.setState({ schedule: schedules });
+    }
+    if (name === 'interestRate') {
+      this.setState({
+        interestRate: Number(value),
+        interestMonth: Number(value || 0) / 12
+      });
+      return;
     }
 
     this.setState({ [name]: value } as any);
@@ -863,7 +902,6 @@ class ContractForm extends React.Component<Props, State> {
                   name="repayment"
                   componentClass="select"
                   value={this.state.repayment}
-                  required={true}
                   onChange={this.onChangeField}
                 >
                   {['fixed', 'equal', 'custom'].map((typeName, index) => (
@@ -878,6 +916,7 @@ class ContractForm extends React.Component<Props, State> {
                 name: 'tenor',
                 useNumberFormat: true,
                 value: this.state.tenor || 0,
+                max: 30,
                 onChange: this.onChangeField
               })}
             </FormColumn>
@@ -906,16 +945,17 @@ class ContractForm extends React.Component<Props, State> {
                   value: this.state.skipInterestCalcMonth,
                   onChange: this.onChangeField
                 })}
-              {this.renderFormGroup('Custom Interest', {
-                ...formProps,
-                type: 'number',
-                useNumberFormat: true,
-                fixed: 2,
-                name: 'customInterest',
-                value: this.state.customInterest || 0,
-                onChange: this.onChangeField,
-                onClick: this.onFieldClick
-              })}
+              {this.state.repayment === 'custom' &&
+                this.renderFormGroup('Custom Interest', {
+                  ...formProps,
+                  type: 'number',
+                  useNumberFormat: true,
+                  fixed: 2,
+                  name: 'customInterest',
+                  value: this.state.customInterest || 0,
+                  onChange: this.onChangeField,
+                  onClick: this.onFieldClick
+                })}
               {this.renderFormGroup('Interest Rate', {
                 ...formProps,
                 type: 'number',
@@ -923,7 +963,7 @@ class ContractForm extends React.Component<Props, State> {
                 fixed: 2,
                 name: 'interestRate',
                 value: this.state.interestRate || 0,
-                onChange: this.onChangeInterest,
+                onChange: this.onChangeField,
                 onClick: this.onFieldClick
               })}
             </FormColumn>
@@ -1014,21 +1054,18 @@ class ContractForm extends React.Component<Props, State> {
                   </tr>
                 ))}
                 <tr>
+                  <td>sum</td>
+                  <td>{this.state.schedule.length}</td>
                   <td>
-                    <button>+</button>
+                    {this.state.schedule
+                      .reduce((a, b) => a + b.payment, 0)
+                      .toLocaleString()}
                   </td>
                   <td>
-                    {this.renderFormGroup('Is Pay First Month', {
-                      className: 'flex-item',
-                      type: 'date',
-                      componentClass: 'date',
-                      name: 'isPayFirstMonth',
-                      checked: this.state.isPayFirstMonth || false,
-                      onChange: this.onChangeField
-                    })}
+                    {this.state.schedule
+                      .reduce((a, b) => a + b.interest, 0)
+                      .toLocaleString()}
                   </td>
-                  <td>1,000,000.00</td>
-                  <td>15,000</td>
                 </tr>
               </tbody>
             </Table>

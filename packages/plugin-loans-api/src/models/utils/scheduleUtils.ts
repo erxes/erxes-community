@@ -233,7 +233,7 @@ export const reGenerateSchedules = async (
   // diff from startDate to nextDate valid: max 42 min 10 day, IsValid then undefined or equal nextMonthDay
   let nextDate: any = undefined;
 
-  if (diffDay > 42 || contract.isPayFirstMonth === true) {
+  if (diffDay > 42) {
     nextDate = new Date(
       contract.startDate.getFullYear(),
       contract.startDate.getMonth(),
@@ -363,7 +363,7 @@ export const getGraphicValue = async (
   // diff from startDate to nextDate valid: max 42 min 10 day, IsValid then undefined or equal nextMonthDay
   let nextDate: any = undefined;
 
-  if (diffDay > 42 || contract.isPayFirstMonth === true) {
+  if (diffDay > 42) {
     nextDate = new Date(
       contract.startDate.getFullYear(),
       contract.startDate.getMonth(),
