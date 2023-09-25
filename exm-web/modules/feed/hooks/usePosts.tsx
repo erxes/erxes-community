@@ -1,10 +1,11 @@
 import { useQuery } from "@apollo/client"
 
 import { queries } from "../graphql"
+import { IFeed } from "../types"
 
 export interface IUsePosts {
   loading: boolean
-  posts: any
+  posts: IFeed[]
   postsCount: number
   handleLoadMore: () => void
 }

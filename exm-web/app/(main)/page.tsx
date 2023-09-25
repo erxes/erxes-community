@@ -1,10 +1,12 @@
-import { Feed } from "@/modules/feed/component/Feed"
+import dynamic from "next/dynamic"
+
+const Feed = dynamic(() => import("@/modules/feed/component/Feed"))
 
 export default function IndexPage() {
   return (
     <>
       <div className="flex h-full w-full flex-col">
-        <div className="mt-1 flex flex-none items-center pb-3 pr-3">
+        <div className="flex flex-none items-center mt-5">
           <Feed />
         </div>
       </div>
