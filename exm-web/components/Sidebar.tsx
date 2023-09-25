@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import {
   AwardIcon,
   HomeIcon,
@@ -14,15 +14,23 @@ import {
 
 import Image from "@/components/ui/image"
 
-export const Sidebar = ({ isSlim }: { isSlim: boolean }) => {
-  const [activeClass, setActiveClass] = useState("feed")
+export const Sidebar = () => {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [activeClass, setActiveClass] = useState(pathname)
+
+  const handleLink = (href: string) => {
+    router.push(`/${href}`)
+    setActiveClass(`/${href}`)
+  }
 
   const NavigationItem = ({ href, active, Icon, value, color }: any) => {
     return (
       <li
         className={`${
-          active === activeClass ? "bg-white shadow-md text-[#444]" : ""
+          activeClass === active ? "bg-white shadow-md text-[#444]" : ""
         } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-[#A0AEC0] hover:text-[#444] cursor-pointer hover:transition-all`}
+        onClick={() => handleLink(href)}
       >
         <div
           className={`${
@@ -57,50 +65,56 @@ export const Sidebar = ({ isSlim }: { isSlim: boolean }) => {
 }
 
 export const MAIN_NAVIGATION = [
-  { active: "feed", url: "/", value: "Feed", Icon: HomeIcon, color: "#6569DF" },
   {
-    active: "chats",
-    url: "/chats",
+    active: "/",
+    href: "",
+    value: "Feed",
+    Icon: HomeIcon,
+    color: "#6569DF",
+  },
+  {
+    active: "/chats",
+    href: "chats",
     value: "Chats",
     Icon: MessageCircleIcon,
     color: "#A0AEC0",
     desc: "Coming soon",
   },
   {
-    active: "team",
-    url: "#",
+    active: "/team",
+    href: "#",
     value: "Team members",
     Icon: Users2Icon,
     color: "#3B85F4",
     desc: "Coming soon",
   },
   {
-    active: "discover",
-    url: "#",
+    active: "/discover",
+    href: "#",
     value: "Discover",
     Icon: StarIcon,
     color: "#EA475D",
     desc: "Coming soon",
   },
   {
-    active: "learn",
-    url: "/learn",
+    active: "/learn",
+    href: "#",
     value: "Learn",
     Icon: ScrollTextIcon,
     color: "#3CCC38",
     desc: "Coming soon",
   },
   {
-    active: "leaderboard",
-    url: "#",
+    active: "/leaderboard",
+    href: "#",
     value: "Leaderboard",
     Icon: AwardIcon,
     color: "#FF6600",
     desc: "Coming soon",
   },
   {
-    active: "structure",
-    url: "#",
+    active: "/structure",
+    href: "#",
     value: "Structure",
     Icon: LayersIcon,
     color: "#63D2D6",

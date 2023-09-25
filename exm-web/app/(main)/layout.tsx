@@ -16,7 +16,7 @@ export default function RootLayout({ children }: ILayoutProps) {
           <>
             <section className="flex flex-auto items-stretch bg-[#F8F9FA]">
               <div className="flex w-1/5 flex-col border-r">
-                <Sidebar isSlim={false} />
+                <Sidebar />
               </div>
               <div className="flex h-full w-full flex-col">
                 <div className="mt-1 flex flex-none items-center pb-3 pr-3">
