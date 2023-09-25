@@ -14,6 +14,7 @@ export const usePosts = (): IUsePosts => {
   const { data, loading, fetchMore } = useQuery(queries.feed, {
     variables: {
       contentTypes: ["post"],
+      limit: 10,
     },
   })
 
