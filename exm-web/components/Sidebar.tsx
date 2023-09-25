@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { ChatList } from "@/modules/chat/component/ChatList"
 import {
   AwardIcon,
   HomeIcon,
@@ -25,6 +26,26 @@ export const Sidebar = () => {
   }
 
   const NavigationItem = ({ href, active, Icon, value, color }: any) => {
+    if (pathname === "/chats") {
+      return (
+        <li
+          className={`mb-4 flex p-3 cursor-pointer`}
+          onClick={() => handleLink(href)}
+        >
+          <div
+            className={`${
+              active === activeClass ? "bg-[#6569DF]" : ""
+            } mr-2 bg-white shadow-md p-2 rounded-lg`}
+          >
+            <Icon
+              size={18}
+              color={`${active === activeClass ? "#FFF" : color}`}
+            />
+          </div>
+        </li>
+      )
+    }
+
     return (
       <li
         className={`${
@@ -44,6 +65,30 @@ export const Sidebar = () => {
         </div>
         <span>{value}</span>
       </li>
+    )
+  }
+
+  if (pathname === "/chats") {
+    return (
+      <div className="flex w-1/4 border-r">
+        <div className="h-full p-4 border-r w-1/5">
+          <div className="mb-4 w-full border-b border-[#EEE] p-3">
+            <Image alt="" src="/glyph_dark.svg" height={50} width={100} />
+          </div>
+
+          <div className="w-full h-full">
+            <ul className="list-none">
+              {MAIN_NAVIGATION.map((item, i) => (
+                <NavigationItem {...item} key={i} />
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="w-full">
+          <ChatList />
+        </div>
+      </div>
     )
   }
 
