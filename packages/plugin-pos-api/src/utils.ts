@@ -337,6 +337,29 @@ export const statusToDone = async ({
 
   await updateCustomer({ subdomain, doneOrder });
 
+  if (pos.isOnline && doneOrder.branchId) {
+    const toPos = await models.Pos.findOne({
+      branchId: doneOrder.branchId
+    }).lean();
+
+    // paid order info to offline pos
+    if (toPos) {
+      await sendPosclientMessage({
+        subdomain,
+        action: 'erxes-posclient-to-pos-api',
+        data: {
+          order: {
+            ...doneOrder,
+            posToken: doneOrder.posToken,
+            subToken: toPos.token,
+            status: 'reDoing'
+          }
+        },
+        pos: toPos
+      });
+    }
+  }
+
   return {
     status: 'success'
   };
