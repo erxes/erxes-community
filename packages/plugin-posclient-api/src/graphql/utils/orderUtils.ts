@@ -122,9 +122,9 @@ export const validateOrder = async (
   }
 
   if (
-    !doc.isPre &&
     config.isCheckRemainder &&
-    (doc.branchId || config.branchId)
+    (doc.branchId || config.branchId) &&
+    config.departmentId
   ) {
     const checkProducts = products.filter(
       p => (p.isCheckRems || {})[config.token] || false
@@ -150,9 +150,18 @@ export const validateOrder = async (
           continue;
         }
 
-        if (product.remainder < item.count) {
+        if (!doc.isPre && product.remainder < item.count) {
           errors.push(
             `#${product.code} - ${product.name} have a potential sales balance of ${product.remainder}`
+          );
+        }
+
+        if (
+          doc.isPre &&
+          product.remainder + product.soonIn - product.soonOut < item.count
+        ) {
+          errors.push(
+            `#${product.code} - ${product.name} have a potential sales limit of ${product.remainder}`
           );
         }
       }

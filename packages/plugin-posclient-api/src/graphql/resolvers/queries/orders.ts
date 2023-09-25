@@ -17,6 +17,9 @@ interface ISearchParams {
   customerType?: string;
   isPaid?: boolean;
   statuses: string[];
+  dueStartDate?: Date;
+  dueEndDate?: Date;
+  isPreExclude?: boolean;
 }
 
 const generateFilter = (config: IConfig, params: ISearchParams) => {
@@ -28,7 +31,8 @@ const generateFilter = (config: IConfig, params: ISearchParams) => {
     endDate,
     isPaid,
     dateType,
-    customerType
+    customerType,
+    isPreExclude
   } = params;
   const filter: any = {
     $or: [{ posToken: config.token }, { subToken: config.token }]
@@ -54,6 +58,10 @@ const generateFilter = (config: IConfig, params: ISearchParams) => {
 
   if (isPaid !== undefined) {
     filter.paidDate = { $exists: isPaid };
+  }
+
+  if (isPreExclude) {
+    filter.isPre = { $ne: true };
   }
 
   const dateQry: any = {};

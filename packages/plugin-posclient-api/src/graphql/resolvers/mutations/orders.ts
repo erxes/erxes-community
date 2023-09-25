@@ -255,6 +255,13 @@ const ordersEdit = async (
 
   checkOrderStatus(order);
 
+  if (
+    order.isPre &&
+    (order.cashAmount || order.mobileAmount || (order.paidAmounts || []).length)
+  ) {
+    throw new Error('Confirmed and isPre orders cannot be edited');
+  }
+
   await validateOrder(subdomain, models, config, doc);
 
   await cleanOrderItems(doc._id, doc.items, models);
@@ -636,6 +643,13 @@ const orderMutations = {
         .length > 0
     ) {
       throw new Error('Card payment exists for this order');
+    }
+
+    if (
+      order.isPre &&
+      (order.cashAmount || order.mobileAmount || order.paidAmounts?.length)
+    ) {
+      throw new Error('Cannot cancel cause PreOrder added payment');
     }
 
     if (order.synced === true) {
@@ -1072,20 +1086,40 @@ const orderMutations = {
 
     let order = await models.Orders.getOrder(_id);
 
+    if (order.returnInfo && order.returnInfo.returnAt) {
+      throw new Error('Order is already returned');
+    }
+
     const amount =
       (cashAmount || 0) +
       (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
 
-    if (!order.paidDate) {
-      throw new Error('Order yet not paid');
-    }
+    if (order.isPre) {
+      if (
+        !(order.cashAmount || order.mobileAmount || order.paidAmounts?.length)
+      ) {
+        throw new Error('Order yet not paid');
+      }
 
-    if (order.totalAmount != amount) {
-      throw new Error('Amount exceeds total amount');
-    }
+      const savedPaidAmount =
+        (order.cashAmount || 0) +
+        (order.mobileAmount || 0) +
+        (order.paidAmounts || []).reduce(
+          (sum, i) => Number(sum) + Number(i.amount),
+          0
+        );
 
-    if (order.returnInfo && order.returnInfo.returnAt) {
-      throw new Error('Order is already returned');
+      if (savedPaidAmount !== amount) {
+        throw new Error('Amount exceeds total amount');
+      }
+    } else {
+      if (!order.paidDate) {
+        throw new Error('Order yet not paid');
+      }
+
+      if (order.totalAmount != amount) {
+        throw new Error('Amount exceeds total amount');
+      }
     }
 
     const modifier: any = {
