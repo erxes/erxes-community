@@ -1,10 +1,11 @@
 import { useQuery } from "@apollo/client"
 
 import { queries } from "../graphql"
+import { IFeed } from "../types"
 
 export interface IUsePosts {
   loading: boolean
-  posts: any
+  posts: IFeed[]
   postsCount: number
   handleLoadMore: () => void
 }
@@ -13,6 +14,7 @@ export const usePosts = (): IUsePosts => {
   const { data, loading, fetchMore } = useQuery(queries.feed, {
     variables: {
       contentTypes: ["post"],
+      limit: 10,
     },
   })
 

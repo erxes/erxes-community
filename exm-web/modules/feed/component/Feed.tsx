@@ -1,9 +1,11 @@
 "use client"
 
-import { usePosts } from "../hooks/usePosts"
+import dynamic from "next/dynamic"
 
-export const Feed = () => {
-  const { posts, postsCount, loading, handleLoadMore } = usePosts()
+const Posts = dynamic(() => import("./Posts"))
 
-  return <div>123</div>
+const Feed = () => {
+  return <Posts />
 }
+
+export default Feed

@@ -51,10 +51,20 @@ const commonFeedFields = `
 `
 
 const feed = gql`
-  query feed($title: String, $limit: Int, $skip: Int, $contentTypes: [ContentType]) {
-    exmFeed(title: $title, limit: $limit, skip: $skip, contentTypes: $contentTypes) {
+  query feed(
+    $title: String
+    $limit: Int
+    $skip: Int
+    $contentTypes: [ContentType]
+  ) {
+    exmFeed(
+      title: $title
+      limit: $limit
+      skip: $skip
+      contentTypes: $contentTypes
+    ) {
       list {
-        ${commonFeedFields}
+        _id
       }
 
       totalCount
@@ -308,6 +318,14 @@ const emojiCount = `
   }
 `
 
+const exmFeedDetail = gql`
+  query exmFeedDetail($_id: String!) {
+    exmFeedDetail(_id: $_id) {
+      ${commonFeedFields}
+    }
+  }
+`
+
 const emojiIsReacted = `
   query emojiIsReacted($contentId: String!, $contentType: ReactionContentType!, $type: String!) {
     emojiIsReacted(contentId: $contentId, contentType: $contentType, type: $type)
@@ -316,6 +334,7 @@ const emojiIsReacted = `
 
 export default {
   feed,
+  exmFeedDetail,
   thanks,
   fields,
   users,
