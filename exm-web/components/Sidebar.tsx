@@ -48,17 +48,19 @@ export const Sidebar = () => {
   }
 
   return (
-    <div className="h-full p-8">
-      <div className="mb-4 w-full border-b border-[#EEE] p-3">
-        <Image alt="" src="/erxes-dark.svg" height={50} width={100} />
-      </div>
+    <div className="flex w-1/5 flex-col border-r">
+      <div className="h-full p-8">
+        <div className="mb-4 w-full border-b border-[#EEE] p-3">
+          <Image alt="" src="/erxes-dark.svg" height={50} width={100} />
+        </div>
 
-      <div className="w-full h-full">
-        <ul className="list-none">
-          {MAIN_NAVIGATION.map((item, i) => (
-            <NavigationItem {...item} key={i} />
-          ))}
-        </ul>
+        <div className="w-full h-full">
+          <ul className="list-none">
+            {MAIN_NAVIGATION.map((item, i) => (
+              <NavigationItem {...item} key={i} />
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   )
