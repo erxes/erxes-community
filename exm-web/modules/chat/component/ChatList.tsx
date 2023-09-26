@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 
 import { useChats } from "../hooks/useChats"
 import { ChatItem } from "./ChatItem"
+import { CreateChat } from "./modals/CreateChat"
 
 dayjs.extend(relativeTime)
 
@@ -33,6 +34,10 @@ const ChatList = () => {
 
   if (loading) {
     return <div className="mt-4">loading...</div>
+  }
+
+  const renderAction = () => {
+    return <CreateChat />
   }
 
   const handleSearch = (event: any) => {
@@ -75,9 +80,7 @@ const ChatList = () => {
     <div className="w-full overflow-auto h-screen">
       <div className="flex items-center justify-between p-6">
         <h3 className="text-2xl font-semibold text-[#444]">Chats</h3>
-        <div className="p-4 bg-[#F0F0F0] rounded-full">
-          <PenSquareIcon size={18} />
-        </div>
+        {renderAction()}
       </div>
 
       <div className="px-6">
