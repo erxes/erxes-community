@@ -11,7 +11,7 @@ export interface IUseChats {
 
 export const useChats = (): IUseChats => {
   const { data, loading, fetchMore } = useQuery(queries.chats, {
-    variables: {},
+    variables: { limit: 5 },
   })
 
   const handleLoadMore = () => {
