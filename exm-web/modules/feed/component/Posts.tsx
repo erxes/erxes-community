@@ -1,10 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import { InView, useInView } from "react-intersection-observer"
+import { useInView } from "react-intersection-observer"
 
-import { Button } from "@/components/ui/button"
-import { LoaderIcon } from "@/components/ui/loader"
+import LoadingCard from "@/components/ui/loading-card"
 
 import { usePosts } from "../hooks/usePosts"
 import PostItem from "./PostItem"
@@ -23,7 +22,7 @@ const Posts = () => {
   }, [inView, handleLoadMore])
 
   if (loading) {
-    return <></>
+    return <LoadingCard />
   }
 
   if (!posts || postsCount === 0) {
@@ -31,17 +30,13 @@ const Posts = () => {
   }
 
   return (
-    <div ref={ref} className="w-full pr-3 h-screen overflow-auto pb-10">
+    <div className="w-full pr-3 h-screen overflow-auto pb-10">
       {posts.map((post) => {
         return <PostItem key={post._id} postId={post._id} />
       })}
       {!loading && postsCount > 20 && posts.length < postsCount && (
-        <div className="max-w-2xl mx-auto my-4 bg-white border-light border-gray-300">
-          <Button
-            className="max-w-2xl mx-auto my-4 bg-white border-light border-none"
-            ref={ref}
-            variant="outline"
-          />
+        <div ref={ref}>
+          <LoadingCard />
         </div>
       )}
     </div>
