@@ -2,40 +2,40 @@ import { useQuery } from "@apollo/client"
 
 import { queries } from "../graphql"
 
-export interface IUsePosts {
+export interface IUseChats {
   loading: boolean
-  posts: any
-  postsCount: number
+  chats: any
+  chatsCount: number
   handleLoadMore: () => void
 }
 
-export const useChats = (): IUsePosts => {
+export const useChats = (): IUseChats => {
   const { data, loading, fetchMore } = useQuery(queries.chats, {
     variables: {},
   })
 
   const handleLoadMore = () => {
-    const feedLength = data.exmFeed.list.length || 0
+    const chatLength = data.chats.list.length || 0
 
     fetchMore({
       variables: {
-        skip: feedLength,
+        skip: chatLength,
       },
       updateQuery(prev, { fetchMoreResult }) {
         if (!fetchMoreResult) {
           return prev
         }
 
-        const fetchedExmFeed = fetchMoreResult.exmFeed.list || []
+        const fetchedChats = fetchMoreResult.chats.list || []
 
-        const prevExmFeed = prev.exmFeed.list || []
+        const prevChats = prev.chats.list || []
 
-        if (fetchedExmFeed) {
+        if (fetchedChats) {
           return {
             ...prev,
-            exmFeed: {
-              ...prev.exmFeed,
-              list: [...prevExmFeed, ...fetchedExmFeed],
+            chats: {
+              ...prev.chats,
+              list: [...prevChats, ...fetchedChats],
             },
           }
         }
@@ -43,13 +43,13 @@ export const useChats = (): IUsePosts => {
     })
   }
 
-  const posts = (data || {}).exmFeed ? (data || {}).exmFeed.list : []
-  const postsCount = (data || {}).exmFeed ? (data || {}).exmFeed.totalCount : 0
+  const chats = (data || {}).chats ? (data || {}).chats.list : []
+  const chatsCount = (data || {}).chats ? (data || {}).chats.totalCount : 0
 
   return {
     loading,
-    posts,
-    postsCount,
+    chats,
+    chatsCount,
     handleLoadMore,
   }
 }

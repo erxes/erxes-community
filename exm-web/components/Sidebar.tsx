@@ -34,8 +34,8 @@ export const Sidebar = () => {
         >
           <div
             className={`${
-              active === activeClass ? "bg-[#6569DF]" : ""
-            } mr-2 bg-white shadow-md p-2 rounded-lg`}
+              active === activeClass ? "bg-[#6569DF]" : "bg-white"
+            } mr-2 shadow-md p-2 rounded-lg`}
           >
             <Icon
               size={18}
@@ -55,12 +55,12 @@ export const Sidebar = () => {
       >
         <div
           className={`${
-            active === activeClass ? "bg-[#6569DF]" : ""
-          } mr-2 bg-white shadow-md p-2 rounded-lg`}
+            activeClass === active ? "bg-[#6569DF]" : "bg-white"
+          } mr-2 shadow-md p-2 rounded-lg`}
         >
           <Icon
             size={18}
-            color={`${active === activeClass ? "#FFF" : color}`}
+            color={`${activeClass === active ? "#FFF" : color}`}
           />
         </div>
         <span>{value}</span>
@@ -85,9 +85,7 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        <div className="w-full">
-          <ChatList />
-        </div>
+        <ChatList />
       </div>
     )
   }
