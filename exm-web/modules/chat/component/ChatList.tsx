@@ -15,7 +15,7 @@ import { ChatItem } from "./ChatItem"
 
 dayjs.extend(relativeTime)
 
-export const ChatList = () => {
+const ChatList = () => {
   const { ref, inView } = useInView({
     threshold: 0,
   })
@@ -29,7 +29,7 @@ export const ChatList = () => {
     if (inView) {
       handleLoadMore()
     }
-  }, [inView, handleLoadMore])
+  }, [inView])
 
   if (loading) {
     return <div className="mt-4">loading...</div>
@@ -72,7 +72,7 @@ export const ChatList = () => {
   }
 
   return (
-    <div ref={ref} className="w-full ">
+    <div className="w-full overflow-auto h-screen">
       <div className="flex items-center justify-between p-6">
         <h3 className="text-2xl font-semibold text-[#444]">Chats</h3>
         <div className="p-4 bg-[#F0F0F0] rounded-full">
@@ -98,7 +98,29 @@ export const ChatList = () => {
         ) : (
           <>{renderFilteredChats()}</>
         )}
+        <div ref={ref}>
+          {!loading && chatsCount > 20 && chats.length < chatsCount && (
+            <>
+              <div className="bg-white p-6 flex items-center">
+                <div className="rounded-full bg-slate-100 w-14 h-14 mr-4" />
+                <div className="w-full h-full flex flex-col justify-between">
+                  <div className="rounded-full bg-slate-100 w-full h-6 mb-2" />
+                  <div className="rounded-full bg-slate-100 w-4/5 h-4" />
+                </div>
+              </div>
+              <div className="bg-white p-6 flex items-center">
+                <div className="rounded-full bg-slate-100 w-14 h-14 mr-4" />
+                <div className="w-full h-full flex flex-col justify-between">
+                  <div className="rounded-full bg-slate-100 w-full h-6 mb-2" />
+                  <div className="rounded-full bg-slate-100 w-4/5 h-4" />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
 }
+
+export default ChatList

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { ChatList } from "@/modules/chat/component/ChatList"
+import Chat from "@/modules/chat/component/Chat"
 import {
   AwardIcon,
   HomeIcon,
@@ -85,7 +85,7 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        <ChatList />
+        <Chat />
       </div>
     )
   }
