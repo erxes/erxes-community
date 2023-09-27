@@ -25,6 +25,19 @@ const ChatList = () => {
   const { chats, chatsCount, loading, handleLoadMore } = useChats()
   const [searchValue, setSearchValue] = useState("")
   const [filteredChats, setFilteredChats] = useState<any[]>([])
+  const [pinnedChatIds, setPinnedChatIds] = useState(
+    chats?.filter((chat: any) =>
+      chat.isPinnedUserIds.includes(currentUser?._id)
+    ) || []
+  )
+
+  useEffect(() => {
+    const aa =
+      chats?.filter((chat: any) =>
+        chat.isPinnedUserIds.includes(currentUser?._id)
+      ) || []
+    setPinnedChatIds(aa)
+  }, [chats])
 
   useEffect(() => {
     if (inView) {
@@ -38,6 +51,22 @@ const ChatList = () => {
 
   const renderAction = () => {
     return <CreateChat />
+  }
+
+  const handlePin = (_chatId: string) => {
+    if (checkPinned(_chatId)) {
+      updatePinned(pinnedChatIds.filter((c: any) => c !== _chatId))
+    } else {
+      updatePinned([...pinnedChatIds, _chatId])
+    }
+  }
+
+  const updatePinned = (_chats: any[]) => {
+    setPinnedChatIds(_chats)
+  }
+
+  const checkPinned = (_chatId: string) => {
+    return pinnedChatIds.indexOf(_chatId) !== -1
   }
 
   const handleSearch = (event: any) => {
@@ -70,10 +99,45 @@ const ChatList = () => {
   }
 
   const renderChats = () =>
-    chats.map((c: any) => <ChatItem key={c._id} chat={c} />)
+    chats.map((c: any) => (
+      <ChatItem
+        key={c._id}
+        chat={c}
+        isPinned={c.isPinnedUserIds.includes(currentUser?._id)}
+        handlePin={handlePin}
+      />
+    ))
+
+  const renderPinnedChats = () => {
+    if (pinnedChatIds.length !== 0) {
+      return (
+        <>
+          <h3>Pinned</h3>
+          {chats.map(
+            (c: any) =>
+              c.isPinnedUserIds.includes(currentUser?._id) && (
+                <ChatItem
+                  key={c._id}
+                  chat={c}
+                  isPinned={c.isPinnedUserIds.includes(currentUser?._id)}
+                  handlePin={handlePin}
+                />
+              )
+          )}
+        </>
+      )
+    }
+  }
 
   const renderFilteredChats = () => {
-    return filteredChats.map((c) => <ChatItem key={c._id} chat={c} />)
+    return filteredChats.map((c) => (
+      <ChatItem
+        key={c._id}
+        chat={c}
+        isPinned={c.isPinnedUserIds.includes(currentUser?._id)}
+        handlePin={handlePin}
+      />
+    ))
   }
 
   return (
@@ -95,7 +159,7 @@ const ChatList = () => {
       <div className="mt-4">
         {searchValue.length === 0 ? (
           <>
-            {/* {renderPinnedChats()} */}
+            {renderPinnedChats()}
             {renderChats()}
           </>
         ) : (

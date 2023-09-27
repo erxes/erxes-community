@@ -1,95 +1,5 @@
 import gql from "graphql-tag"
 
-const commonVariables = `
-  $title: String!
-  $description: String
-  $contentType: ContentType!
-  $images: [JSON]
-  $attachments: [JSON]
-  $recipientIds: [String]
-  $customFieldsData: JSON
-  $eventData: ExmEventDataInput
-  $createdAt: Date
-  $departmentIds : [String]
-  $branchIds: [String]
-  $unitId: String
-`
-
-const commonParams = `
-  title: $title
-  description: $description
-  contentType: $contentType
-  images: $images
-  attachments: $attachments
-  recipientIds: $recipientIds
-  customFieldsData: $customFieldsData
-  eventData: $eventData
-  createdAt: $createdAt
-  departmentIds : $departmentIds
-  branchIds: $branchIds
-  unitId: $unitId
-`
-
-const addFeed = gql`
-  mutation addFeed(${commonVariables}) {
-    exmFeedAdd(${commonParams}) {
-      _id
-    }
-  }
-`
-
-const editFeed = gql`
-  mutation editFeed($_id: String! ${commonVariables}) {
-    exmFeedEdit(_id: $_id ${commonParams}) {
-      _id
-    }
-  }
-`
-
-const pinFeed = gql`
-  mutation pinFeed($_id: String) {
-    exmFeedToggleIsPinned(_id: $_id)
-  }
-`
-
-const deleteFeed = gql`
-  mutation deleteFeed($_id: String!) {
-    exmFeedRemove(_id: $_id)
-  }
-`
-
-const thankCommonVariables = `
-  $description: String!
-  $recipientIds: [String]!
-`
-
-const thankCommonParams = `
-  description: $description
-  recipientIds: $recipientIds
-`
-
-const addThank = gql`
-  mutation addThank(${thankCommonVariables}) {
-    exmThankAdd(${thankCommonParams}) {
-      _id
-    }
-  }
-`
-
-const editThank = gql`
-  mutation editThank($_id: String!, ${thankCommonVariables}) {
-    exmThankEdit(_id: $_id, ${thankCommonParams}) {
-      _id
-    }
-  }
-`
-
-const deleteThank = gql`
-  mutation deleteThank($_id: String!) {
-    exmThankRemove(_id: $_id)
-  }
-`
-
 const chatAdd = gql`
   mutation chatAdd($name: String, $type: ChatType!, $participantIds: [String]) {
     chatAdd(name: $name, type: $type, participantIds: $participantIds) {
@@ -211,13 +121,6 @@ const chatForward = gql`
 `
 
 export default {
-  addFeed,
-  editFeed,
-  deleteFeed,
-  addThank,
-  editThank,
-  deleteThank,
-  pinFeed,
   chatAdd,
   chatEdit,
   chatRemove,

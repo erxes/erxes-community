@@ -1,3 +1,5 @@
+import { gql } from "@apollo/client"
+
 const channels = `
   query channels($memberIds: [String]) {
     channels(memberIds: $memberIds) {
@@ -41,7 +43,7 @@ export const commonStructureParamsValue = `
     status: $status
 `
 
-const allUsers = `
+const allUsers = gql`
   query allUsers($isActive: Boolean,$ids:[String],$assignedToMe: String) {
     allUsers(isActive: $isActive,ids:$ids,assignedToMe: $assignedToMe) {
       _id
@@ -91,7 +93,7 @@ const listParamsValue = `
   branchId: $branchId
 `
 
-const users = `
+const users = gql`
   query users($page: Int, $perPage: Int, $status: String, $excludeIds: Boolean, ${listParamsDef}) {
     users(page: $page, perPage: $perPage, status: $status, excludeIds: $excludeIds, ${listParamsValue}) {
       _id
