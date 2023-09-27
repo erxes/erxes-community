@@ -6,9 +6,7 @@ export default function IndexPage() {
   return (
     <>
       <div className="flex h-full w-full flex-col">
-        <div className="flex flex-none items-center mt-5">
-          <Feed />
-        </div>
+        <Feed />
       </div>
       <div className="flex w-1/3 flex-col border-l">
         <p>31</p>

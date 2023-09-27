@@ -27,7 +27,7 @@ const Configs = ({ children }: { children: ReactNode }) => {
   })
 
   if (loadingConfigs) {
-    return <Loader className="h-screen" />
+    return <div />
   } else {
     return <>{children}</>
   }

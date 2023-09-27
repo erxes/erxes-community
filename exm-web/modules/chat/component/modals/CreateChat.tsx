@@ -31,8 +31,6 @@ import { queries } from "../../graphql"
 dayjs.extend(relativeTime)
 
 export const CreateChat = ({}: {}) => {
-  const { data, loading } = useQuery(queries.users)
-
   return (
     <>
       <Dialog>
@@ -47,14 +45,8 @@ export const CreateChat = ({}: {}) => {
           </DialogHeader>
 
           <DialogFooter>
-            <Button
-              type="submit"
-              // disabled={disabled}
-              // onClick={printBill}
-              // loading={loading}
-              className="font-semibold"
-            >
-              Create
+            <Button type="submit" className="font-semibold">
+              Баримт хэвлэх
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -7,9 +7,9 @@ import { formatDate, readFile } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import LoadingCard from "@/components/ui/loading-card"
 
-import { useFeedDetail } from "../hooks/useFeedDetail"
+import { useFeedDetail } from "../../hooks/useFeedDetail"
 
-const PostDetail = ({ postId }: { postId: string }) => {
+const BravoDetail = ({ postId }: { postId: string }) => {
   const { feed, loading } = useFeedDetail({ feedId: postId })
 
   if (loading) {
@@ -103,4 +103,4 @@ const PostDetail = ({ postId }: { postId: string }) => {
   )
 }
 
-export default PostDetail
+export default BravoDetail
