@@ -47,11 +47,7 @@ const CheckAuth = ({ children }: any) => {
     return <>{children}</>
   }
 
-  return (
-    <div className="flex h-screen  items-center justify-center">
-      <Loader2 className="mr-2 animate-spin" /> Уншиж байна...
-    </div>
-  )
+  return <div />
 }
 
 export default CheckAuth

@@ -7,7 +7,7 @@ import { formatDate, readFile } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import LoadingCard from "@/components/ui/loading-card"
 
-import { useFeedDetail } from "../hooks/useFeedDetail"
+import { useFeedDetail } from "../../hooks/useFeedDetail"
 
 const PostDetail = ({ postId }: { postId: string }) => {
   const { feed, loading } = useFeedDetail({ feedId: postId })
@@ -72,7 +72,6 @@ const PostDetail = ({ postId }: { postId: string }) => {
           </div>
         </CardHeader>
         <CardContent className="px-2 pb-2 items-center ">
-          {/* <Icon className="mr-1 h-5 w-5 text-slate-800" strokeWidth={1.9} /> */}
           <div className="text-sm font-semibold text-slate-800">
             {feed.title}
           </div>

@@ -5,15 +5,15 @@ import { IFeed } from "../types"
 
 export interface IUsePosts {
   loading: boolean
-  posts: IFeed[]
-  postsCount: number
+  feeds: IFeed[]
+  feedsCount: number
   handleLoadMore: () => void
 }
 
-export const usePosts = (): IUsePosts => {
+export const useFeeds = (contentType: string): IUsePosts => {
   const { data, loading, fetchMore } = useQuery(queries.feed, {
     variables: {
-      contentTypes: ["post"],
+      contentTypes: [contentType],
       limit: 10,
     },
   })
@@ -47,13 +47,13 @@ export const usePosts = (): IUsePosts => {
     })
   }
 
-  const posts = (data || {}).exmFeed ? (data || {}).exmFeed.list : []
-  const postsCount = (data || {}).exmFeed ? (data || {}).exmFeed.totalCount : 0
+  const feeds = (data || {}).exmFeed ? (data || {}).exmFeed.list : []
+  const feedsCount = (data || {}).exmFeed ? (data || {}).exmFeed.totalCount : 0
 
   return {
     loading,
-    posts,
-    postsCount,
+    feeds,
+    feedsCount,
     handleLoadMore,
   }
 }

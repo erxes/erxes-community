@@ -17,11 +17,8 @@ import {
 dayjs.extend(relativeTime)
 
 export const CreateChat = ({}: {}) => {
-  console.log("hihihi")
-
   return (
     <>
-      {" "}
       <Dialog>
         <DialogTrigger asChild>
           <div className="p-4 bg-[#F0F0F0] rounded-full cursor-pointer">
@@ -33,13 +30,7 @@ export const CreateChat = ({}: {}) => {
             <DialogTitle>Төлбөрийн баримт авах</DialogTitle>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              type="submit"
-              // disabled={disabled}
-              // onClick={printBill}
-              // loading={loading}
-              className="font-semibold"
-            >
+            <Button type="submit" className="font-semibold">
               Баримт хэвлэх
             </Button>
           </DialogFooter>
