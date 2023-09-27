@@ -34,12 +34,12 @@ export const Sidebar = () => {
         >
           <div
             className={`${
-              active === activeClass ? "bg-[#6569DF]" : "bg-white"
+              active === activeClass ? "bg-black" : "bg-white"
             } mr-2 shadow-md p-2 rounded-lg`}
           >
             <Icon
               size={18}
-              color={`${active === activeClass ? "#FFF" : color}`}
+              color={`${active === activeClass ? "#FFF" : "black"}`}
             />
           </div>
         </li>
@@ -49,18 +49,18 @@ export const Sidebar = () => {
     return (
       <li
         className={`${
-          activeClass === active ? "bg-white shadow-md text-[#444]" : ""
-        } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-[#A0AEC0] hover:text-[#444] cursor-pointer hover:transition-all`}
+          activeClass === active ? "shadow-md text-black" : ""
+        } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-black hover:text-black cursor-pointer hover:transition-all`}
         onClick={() => handleLink(href)}
       >
         <div
           className={`${
-            activeClass === active ? "bg-[#6569DF]" : "bg-white"
+            activeClass === active ? "bg-black" : "bg-white"
           } mr-2 shadow-md p-2 rounded-lg`}
         >
           <Icon
             size={18}
-            color={`${activeClass === active ? "#FFF" : color}`}
+            color={`${activeClass === active ? "#FFF" : "black"}`}
           />
         </div>
         <span>{value}</span>
@@ -73,7 +73,7 @@ export const Sidebar = () => {
       <div className="flex w-1/4 border-r">
         <div className="h-full p-4 border-r w-1/5">
           <div className="mb-4 w-full border-b border-[#EEE] p-3">
-            <Image alt="" src="/glyph_dark.svg" height={50} width={100} />
+            <Image alt="" src="/logo.svg" height={50} width={100} />
           </div>
 
           <div className="w-full h-full">

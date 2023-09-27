@@ -35,7 +35,12 @@ const List = ({ contentType }: { contentType: string }) => {
   }, [inView, handleLoadMore])
 
   if (loading) {
-    return <LoadingCard />
+    return (
+      <>
+        <FeedForm contentType={contentType} />
+        <LoadingCard />
+      </>
+    )
   }
 
   if (!feeds || feedsCount === 0) {

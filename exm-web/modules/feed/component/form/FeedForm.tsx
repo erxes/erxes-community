@@ -5,16 +5,8 @@ import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { useAtomValue } from "jotai"
 
 import { readFile } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Card, CardHeader } from "@/components/ui/card"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
 import PostForm from "./PostForm"
