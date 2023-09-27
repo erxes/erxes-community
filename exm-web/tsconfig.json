@@ -30,6 +30,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/(main)/cover/detail"
-  ],
+, "app/(main)/chats/detail"  ],
   "exclude": ["node_modules"]
 }

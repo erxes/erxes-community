@@ -26,7 +26,7 @@ export const Sidebar = () => {
   }
 
   const NavigationItem = ({ href, active, Icon, value, color }: any) => {
-    if (pathname === "/chats") {
+    if (pathname.includes("/chats")) {
       return (
         <li
           className={`mb-4 flex p-3 cursor-pointer`}
@@ -68,9 +68,9 @@ export const Sidebar = () => {
     )
   }
 
-  if (pathname === "/chats") {
+  if (pathname.includes("/chats")) {
     return (
-      <div className="flex w-1/4 border-r">
+      <div className="flex w-1/4 border-r shrink-0">
         <div className="h-full p-4 border-r w-1/5">
           <div className="mb-4 w-full border-b border-[#EEE] p-3">
             <Image alt="" src="/logo.svg" height={50} width={100} />
