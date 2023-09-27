@@ -57,7 +57,7 @@ const chats = gql`
   }
 `
 
-const chatDetail = `
+const chatDetail = gql`
   query chatDetail($id: String!) {
     chatDetail(_id: $id) {
       _id
@@ -103,7 +103,7 @@ const chatDetail = `
   }
 `
 
-const chatMessages = `
+const chatMessages = gql`
   query chatMessages($chatId: String, $limit: Int, $skip: Int) {
     chatMessages(chatId: $chatId, limit: $limit, skip: $skip) {
       list {
@@ -140,7 +140,7 @@ const chatMessages = `
   }
 `
 
-const getChatIdByUserIds = `
+const getChatIdByUserIds = gql`
   query getChatIdByUserIds($userIds: [String]) {
     getChatIdByUserIds(userIds: $userIds)
   }
