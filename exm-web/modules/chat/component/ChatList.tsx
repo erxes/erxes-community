@@ -5,7 +5,6 @@ import { currentUserAtom } from "@/modules/JotaiProiveder"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useAtomValue } from "jotai"
-import { PenSquareIcon } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
 import { Input } from "@/components/ui/input"

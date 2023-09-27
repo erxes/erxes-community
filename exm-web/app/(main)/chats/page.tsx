@@ -1,3 +1,3 @@
 export default function IndexPage() {
-  return <>this is chat</>
+  return <>Select a chat or start a new conversation</>
 }
