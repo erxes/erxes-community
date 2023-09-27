@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import clientMain from "@/modules/apolloClientMain"
-import { paymentConfigAtom } from "@/store/config.store"
+import { configAtom, paymentConfigAtom } from "@/store/config.store"
 import {
   activeOrderAtom,
   customerAtom,
@@ -22,14 +22,15 @@ const useMobilePayment = ({
   onCompleted?: (paidAmount: number) => void
   amount?: number
 }) => {
-  const [config] = useAtom(paymentConfigAtom)
+  const [config] = useAtom(configAtom)
+  const [paymentConfig] = useAtom(paymentConfigAtom)
   const [activeOrder] = useAtom(activeOrderAtom)
   const [orderNumber] = useAtom(orderNumberAtom)
   const [mobileAmount] = useAtom(mobileAmountAtom)
   const [customer] = useAtom(customerAtom)
   const [customerType] = useAtom(customerTypeAtom)
 
-  const { erxesAppToken, paymentIds } = config || {}
+  const { erxesAppToken, paymentIds } = paymentConfig || {}
 
   const { onError } = useToast()
 
@@ -71,6 +72,7 @@ const useMobilePayment = ({
           customerType: customerType || "customer",
           description: `${activeOrder} - ${orderNumber}`,
           paymentIds: paymentIds,
+          data: { posToken: config?.token }
         },
       })
     },
@@ -88,7 +90,7 @@ const useMobilePayment = ({
 
     getInvoices()
 
-    return removeEventListener("message", () => {})
+    return removeEventListener("message", () => { })
   }, [getInvoices])
 
   return { invoiceUrl, loading }

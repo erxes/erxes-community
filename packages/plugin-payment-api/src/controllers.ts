@@ -43,7 +43,7 @@ router.post('/gateway/manualCheck', async (req, res) => {
   const status = await models.Invoices.checkInvoice(invoiceId);
 
   if (status === 'paid') {
-    const invoice = await models.Invoices.getInvoice({ _id: invoiceId });
+    const invoice = await models.Invoices.getInvoice({ _id: invoiceId }, true);
 
     graphqlPubsub.publish('invoiceUpdated', {
       invoiceUpdated: {

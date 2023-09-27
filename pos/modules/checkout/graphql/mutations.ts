@@ -49,6 +49,7 @@ const generateInvoiceUrl = `
     $email: String
     $paymentIds: [String]
     $phone: String
+    $data: JSON
   ) {
     generateInvoiceUrl(
       amount: $amount
@@ -60,6 +61,7 @@ const generateInvoiceUrl = `
       email: $email
       paymentIds: $paymentIds
       phone: $phone
+      data: $data
     )
   }
 `
