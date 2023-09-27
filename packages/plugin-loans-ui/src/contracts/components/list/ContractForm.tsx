@@ -1024,6 +1024,7 @@ class ContractForm extends React.Component<Props, State> {
                   <th>{__('Schedule day')}</th>
                   <th>{__('Payment')}</th>
                   <th>{__('Interest')}</th>
+                  <th>{__('Total')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1048,6 +1049,17 @@ class ContractForm extends React.Component<Props, State> {
                         name: 'interest',
                         value: mur.interest || 0,
                         useNumberFormat: true,
+                        onChange: this.onChangeField
+                      })}
+                    </td>
+                    <td>
+                      {this.renderFormGroup('', {
+                        className: 'flex-item',
+                        type: 'number',
+                        name: 'interest',
+                        value: (mur.payment || 0) + (mur.interest || 0) || 0,
+                        useNumberFormat: true,
+                        disabled: true,
                         onChange: this.onChangeField
                       })}
                     </td>
