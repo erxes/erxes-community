@@ -118,7 +118,6 @@ const EventDetail = ({ postId }: { postId: string }) => {
           </div>
         </CardHeader>
         <CardContent className="px-2 pb-2 items-center ">
-          {/* <Icon className="mr-1 h-5 w-5 text-slate-800" strokeWidth={1.9} /> */}
           <div className="text-sm font-semibold text-slate-800">
             {feed.title}
           </div>

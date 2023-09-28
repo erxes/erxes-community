@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -32,6 +33,7 @@ import {
 
 import { queries } from "../../graphql"
 import useFeedMutation from "../../hooks/useFeedMutation"
+import { useTeammembers } from "../../hooks/useTeammembers"
 import { IFeed } from "../../types"
 
 const FormSchema = z.object({
@@ -53,18 +55,17 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
   })
 
   const { feedMutation } = useFeedMutation()
+  const { branches, departments, unitsMain, loading } = useTeammembers()
 
-  const { data: departmentsData, loading: loadingDepartments } = useQuery(
-    queries.departments
-  )
-  const { data: branchesData, loading: loadingBranches } = useQuery(
-    queries.branches
-  )
-  const { data: unitsData, loading: loadingUnits } = useQuery(queries.unitsMain)
+  useEffect(() => {
+    let defaultValues = {} as any
 
-  const { departments } = departmentsData || {}
-  const { branches } = branchesData || {}
-  const { unitsMain } = unitsData || {}
+    if (feed) {
+      defaultValues = { ...feed }
+    }
+
+    form.reset({ ...defaultValues })
+  }, [feed])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -137,11 +138,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="title"
-                    {...field}
-                    defaultValue={feed?.title || ""}
-                  />
+                  <Input placeholder="title" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -191,7 +188,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Departments</FormLabel>
                 <FormControl>
-                  {loadingDepartments ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
                     <FacetedFilter
@@ -217,7 +214,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Branches</FormLabel>
                 <FormControl>
-                  {loadingBranches ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
                     <FacetedFilter
@@ -243,7 +240,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Unit</FormLabel>
                 <FormControl>
-                  {loadingUnits ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
                     <Select

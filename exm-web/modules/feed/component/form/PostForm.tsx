@@ -52,18 +52,6 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
 
   const { feedMutation } = useFeedMutation()
 
-  const { data: departmentsData, loading: loadingDepartments } = useQuery(
-    queries.departments
-  )
-  const { data: branchesData, loading: loadingBranches } = useQuery(
-    queries.branches
-  )
-  const { data: unitsData, loading: loadingUnits } = useQuery(queries.unitsMain)
-
-  const { departments } = departmentsData || {}
-  const { branches } = branchesData || {}
-  const { unitsMain } = unitsData || {}
-
   const [images, setImage] = useState(feed?.images || [])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
