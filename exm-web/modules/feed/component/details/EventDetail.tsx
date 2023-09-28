@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { IUser } from "@/modules/auth/types"
 import { MoreHorizontalIcon } from "lucide-react"
@@ -18,6 +19,7 @@ import { useFeedDetail } from "../../hooks/useFeedDetail"
 import EventForm from "../form/EventForm"
 
 const EventDetail = ({ postId }: { postId: string }) => {
+  const [open, setOpen] = useState(false)
   const { feed, loading } = useFeedDetail({ feedId: postId })
 
   if (loading) {
@@ -57,11 +59,11 @@ const EventDetail = ({ postId }: { postId: string }) => {
 
   const editAction = () => {
     const renderForm = () => {
-      return <EventForm feed={feed} />
+      return <EventForm feed={feed} setOpen={setOpen} />
     }
 
     return (
-      <Dialog>
+      <Dialog open={open} onOpenChange={() => setOpen(!open)}>
         <DialogTrigger asChild={true}>
           <div className="text-black">edit</div>
         </DialogTrigger>

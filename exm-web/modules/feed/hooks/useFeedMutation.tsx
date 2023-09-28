@@ -32,6 +32,8 @@ const useFeedMutation = () => {
     if (!_id) {
       feedAdd({
         variables,
+      }).then(() => {
+        toast({ description: "added", variant: "destructive" })
       })
     }
 

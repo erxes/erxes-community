@@ -44,13 +44,19 @@ const FormSchema = z.object({
   unitId: z.string().optional(),
 })
 
-const PostForm = ({ feed }: { feed?: IFeed }) => {
+const PostForm = ({
+  feed,
+  setOpen,
+}: {
+  feed?: IFeed
+  setOpen: (open: boolean) => void
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
 
   const { departments, branches, unitsMain, loading } = useTeamMembers()
-  const { feedMutation } = useFeedMutation()
+  const { feedMutation, loading: mutationLoading } = useFeedMutation()
 
   const [images, setImage] = useState(feed?.images || [])
 
@@ -63,6 +69,10 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
 
     form.reset({ ...defaultValues })
   }, [feed])
+
+  if (mutationLoading) {
+    setOpen(false)
+  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(

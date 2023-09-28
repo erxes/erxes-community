@@ -48,7 +48,13 @@ const FormSchema = z.object({
   unitId: z.string().optional(),
 })
 
-const EventForm = ({ feed }: { feed?: IFeed }) => {
+const EventForm = ({
+  feed,
+  setOpen,
+}: {
+  feed?: IFeed
+  setOpen: (open: boolean) => void
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
@@ -67,6 +73,10 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
 
     form.reset({ ...defaultValues, ...date })
   }, [feed])
+
+  if (mutationLoading) {
+    setOpen(false)
+  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -93,7 +103,6 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
       <DialogHeader>
         <DialogTitle>Create post</DialogTitle>
       </DialogHeader>
-      {mutationLoading ? <div>131231312</div> : "13"}
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>

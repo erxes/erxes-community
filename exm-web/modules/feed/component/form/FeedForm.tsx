@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { useAtomValue } from "jotai"
@@ -16,27 +17,28 @@ import PostForm from "./PostForm"
 
 const FeedForm = ({ contentType }: { contentType: string }) => {
   const currentUser = useAtomValue(currentUserAtom)
+  const [open, setOpen] = useState(false)
 
   const userDetail = currentUser?.details || {}
 
   const renderForm = () => {
     switch (contentType) {
       case "post":
-        return <PostForm />
+        return <PostForm setOpen={setOpen} />
       case "publicHoliday":
-        return <HolidayForm />
+        return <HolidayForm setOpen={setOpen} />
       case "welcome":
         return null
       case "bravo":
-        return <BravoForm />
+        return <BravoForm setOpen={setOpen} />
       case "event":
-        return <EventForm />
+        return <EventForm setOpen={setOpen} />
     }
   }
 
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={() => setOpen(!open)}>
         <div className="w-full">
           <Card className="max-w-2xl mx-auto my-4 border-0">
             <CardHeader className="flex">

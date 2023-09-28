@@ -34,12 +34,18 @@ const FormSchema = z.object({
   createdAt: z.date().optional(),
 })
 
-const HolidayForm = ({ feed }: { feed?: IFeed }) => {
+const HolidayForm = ({
+  feed,
+  setOpen,
+}: {
+  feed?: IFeed
+  setOpen: (open: boolean) => void
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
 
-  const { feedMutation } = useFeedMutation()
+  const { feedMutation, loading: mutationLoading } = useFeedMutation()
 
   useEffect(() => {
     let defaultValues = {} as any
@@ -52,6 +58,10 @@ const HolidayForm = ({ feed }: { feed?: IFeed }) => {
 
     form.reset({ ...defaultValues, ...date })
   }, [feed])
+
+  if (mutationLoading) {
+    setOpen(false)
+  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(

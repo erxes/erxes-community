@@ -36,12 +36,18 @@ const FormSchema = z.object({
   recipientIds: z.array(z.string()).optional(),
 })
 
-const BravoForm = ({ feed }: { feed?: IFeed }) => {
+const BravoForm = ({
+  feed,
+  setOpen,
+}: {
+  feed?: IFeed
+  setOpen: (open: boolean) => void
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
 
-  const { feedMutation } = useFeedMutation()
+  const { feedMutation, loading: mutationLoading } = useFeedMutation()
 
   const { data: usersData, loading } = useQuery(queries.users)
 
@@ -56,6 +62,10 @@ const BravoForm = ({ feed }: { feed?: IFeed }) => {
 
     form.reset({ ...defaultValues })
   }, [feed])
+
+  if (mutationLoading) {
+    setOpen(false)
+  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
