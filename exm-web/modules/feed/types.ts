@@ -1,5 +1,12 @@
 import { IUser } from "../auth/types"
 
+export interface IAttachment {
+  name: string
+  type: string
+  url: string
+  size?: number
+  duration?: number
+}
 export interface IEventData {
   where: string
   startDate: Date
@@ -11,7 +18,7 @@ export interface IFeed {
   _id: string
   title: string
   description: string
-  images: string
+  images: IAttachment[]
   attachments: string
   isPinned: boolean
   contentType: string

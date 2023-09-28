@@ -9,6 +9,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -127,11 +128,23 @@ const BravoForm = ({ feed }: { feed?: IFeed }) => {
             )}
           />
 
-          <Button type="submit" className="font-semibold w-full rounded-full">
+          <DialogFooter>
+            <Button type="submit" className="font-semibold">
+              hahhaha
+            </Button>
+          </DialogFooter>
+
+          {/* <Button type="submit" className="font-semibold w-full rounded-full">
             Post
-          </Button>
+          </Button> */}
         </form>
       </Form>
+
+      {/* <DialogFooter>
+        <Button type="submit" className="font-semibold">
+          hahhaha
+        </Button>
+      </DialogFooter> */}
     </DialogContent>
   )
 }

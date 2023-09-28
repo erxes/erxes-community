@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -28,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Uploader from "@/components/uploader/Uploader"
 
 import { queries } from "../../graphql"
 import useFeedMutation from "../../hooks/useFeedMutation"
@@ -62,12 +64,15 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
   const { branches } = branchesData || {}
   const { unitsMain } = unitsData || {}
 
+  const [images, setImage] = useState(feed?.images || [])
+
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
       {
         title: data.title,
         description: data.description ? data.description : null,
         contentType: "post",
+        images,
         departmentIds: data.departmentIds,
         branchIds: data.branchIds,
         unitId: data.unitId,
@@ -202,6 +207,12 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
                 <FormMessage />
               </FormItem>
             )}
+          />
+
+          <Uploader
+            defaultFileList={images || []}
+            onChange={setImage}
+            multiple={true}
           />
 
           <Button type="submit" className="font-semibold w-full rounded-full">
