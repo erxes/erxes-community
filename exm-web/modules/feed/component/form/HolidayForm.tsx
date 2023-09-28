@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -20,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
 import { IFeed } from "../../types"
@@ -38,6 +40,18 @@ const HolidayForm = ({ feed }: { feed?: IFeed }) => {
   })
 
   const { feedMutation } = useFeedMutation()
+
+  useEffect(() => {
+    let defaultValues = {} as any
+    let date = {} as any
+
+    if (feed) {
+      defaultValues = { ...feed }
+      date = { ...feed.eventData }
+    }
+
+    form.reset({ ...defaultValues, ...date })
+  }, [feed])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -84,7 +98,8 @@ const HolidayForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
+                    className="rounded-md px-3 py-2"
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}

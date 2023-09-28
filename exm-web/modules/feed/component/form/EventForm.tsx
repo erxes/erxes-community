@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect } from "react"
-import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -30,10 +29,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
-import { queries } from "../../graphql"
 import useFeedMutation from "../../hooks/useFeedMutation"
-import { useTeammembers } from "../../hooks/useTeammembers"
+import { useTeamMembers } from "../../hooks/useTeamMembers"
 import { IFeed } from "../../types"
 
 const FormSchema = z.object({
@@ -55,16 +54,18 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
   })
 
   const { feedMutation, loading: mutationLoading } = useFeedMutation()
-  const { branches, departments, unitsMain, loading } = useTeammembers()
+  const { branches, departments, unitsMain, loading } = useTeamMembers()
 
   useEffect(() => {
     let defaultValues = {} as any
+    let date = {} as any
 
     if (feed) {
       defaultValues = { ...feed }
+      date = { ...feed.eventData }
     }
 
-    form.reset({ ...defaultValues })
+    form.reset({ ...defaultValues, ...date })
   }, [feed])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -73,9 +74,9 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
         title: data.title,
         description: data.description ? data.description : null,
         contentType: "event",
-        departmentIds: data.departmentIds,
-        branchIds: data.branchIds,
-        unitId: data.unitId,
+        departmentIds: data?.departmentIds || [],
+        branchIds: data?.branchIds || [],
+        unitId: data.unitId || "",
         eventData: {
           visibility: "public",
           where: data.where || "",
@@ -153,7 +154,8 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
+                    className="rounded-md px-3 py-2"
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}
@@ -171,7 +173,8 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Where</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
+                    className="rounded-md px-3 py-2"
                     placeholder="where"
                     {...field}
                     defaultValue={feed?.eventData?.where || ""}
@@ -224,7 +227,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
                         value: branch._id,
                       }))}
                       title="Branches"
-                      values={feed?.branchIds || field.value}
+                      values={field.value}
                       onSelect={field.onChange}
                     />
                   )}
@@ -244,10 +247,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
                   {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
-                    <Select
-                      value={feed?.unitId || field.value}
-                      onValueChange={field.onChange}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="">
                         <SelectValue placeholder="сонгох" />
                       </SelectTrigger>

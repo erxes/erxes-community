@@ -1,15 +1,16 @@
 import { useQuery } from "@apollo/client"
 
 import { queries } from "../graphql"
+import { IBranch, IDepartment, UnitsMainQueryResponse } from "../types"
 
 export interface IUseFeedDetail {
-  departments: any[]
-  branches: any[]
-  unitsMain: any[]
+  departments: IDepartment[]
+  branches: IBranch[]
+  unitsMain: UnitsMainQueryResponse
   loading: boolean
 }
 
-export const useTeammembers = (): IUseFeedDetail => {
+export const useTeamMembers = (): IUseFeedDetail => {
   const { data: departmentsData, loading: loadingDepartments } = useQuery(
     queries.departments
   )

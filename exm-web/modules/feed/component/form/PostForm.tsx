@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { useQuery } from "@apollo/client"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -31,8 +30,8 @@ import {
 } from "@/components/ui/select"
 import Uploader from "@/components/uploader/Uploader"
 
-import { queries } from "../../graphql"
 import useFeedMutation from "../../hooks/useFeedMutation"
+import { useTeamMembers } from "../../hooks/useTeamMembers"
 import { IFeed } from "../../types"
 
 const FormSchema = z.object({
@@ -50,9 +49,20 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
     resolver: zodResolver(FormSchema),
   })
 
+  const { departments, branches, unitsMain, loading } = useTeamMembers()
   const { feedMutation } = useFeedMutation()
 
   const [images, setImage] = useState(feed?.images || [])
+
+  useEffect(() => {
+    let defaultValues = {} as any
+
+    if (feed) {
+      defaultValues = { ...feed }
+    }
+
+    form.reset({ ...defaultValues })
+  }, [feed])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -63,7 +73,7 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
         images,
         departmentIds: data.departmentIds,
         branchIds: data.branchIds,
-        unitId: data.unitId,
+        unitId: data.unitId || "",
       },
       feed?._id || ""
     )
@@ -120,7 +130,7 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Departments</FormLabel>
                 <FormControl>
-                  {loadingDepartments ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
                     <FacetedFilter
@@ -146,7 +156,7 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Branches</FormLabel>
                 <FormControl>
-                  {loadingBranches ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
                     <FacetedFilter
@@ -155,7 +165,7 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
                         value: branch._id,
                       }))}
                       title="Branches"
-                      values={feed?.branchIds || field.value}
+                      values={field.value}
                       onSelect={field.onChange}
                     />
                   )}
@@ -172,18 +182,15 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Unit</FormLabel>
                 <FormControl>
-                  {loadingUnits ? (
+                  {loading ? (
                     <Input disabled={true} placeholder="Loading..." />
                   ) : (
-                    <Select
-                      value={feed?.unitId || field.value}
-                      onValueChange={field.onChange}
-                    >
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="">
-                        <SelectValue placeholder="сонгох" />
+                        <SelectValue placeholder="choose unit" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(unitsMain?.list || []).map((unit: any) => (
+                        {(unitsMain.list || []).map((unit: any) => (
                           <SelectItem key={unit._id} value={unit._id}>
                             {unit.title}
                           </SelectItem>

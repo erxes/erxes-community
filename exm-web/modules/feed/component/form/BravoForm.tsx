@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { queries } from "@/common/team/graphql"
 import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -9,7 +10,6 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
 import { IFeed } from "../../types"
@@ -45,6 +46,16 @@ const BravoForm = ({ feed }: { feed?: IFeed }) => {
   const { data: usersData, loading } = useQuery(queries.users)
 
   const { users } = usersData || {}
+
+  useEffect(() => {
+    let defaultValues = {} as any
+
+    if (feed) {
+      defaultValues = { ...feed }
+    }
+
+    form.reset({ ...defaultValues })
+  }, [feed])
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -91,7 +102,8 @@ const BravoForm = ({ feed }: { feed?: IFeed }) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
+                    className="rounded-md px-3 py-2"
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}
@@ -128,23 +140,11 @@ const BravoForm = ({ feed }: { feed?: IFeed }) => {
             )}
           />
 
-          <DialogFooter>
-            <Button type="submit" className="font-semibold">
-              hahhaha
-            </Button>
-          </DialogFooter>
-
-          {/* <Button type="submit" className="font-semibold w-full rounded-full">
+          <Button type="submit" className="font-semibold w-full rounded-full">
             Post
-          </Button> */}
+          </Button>
         </form>
       </Form>
-
-      {/* <DialogFooter>
-        <Button type="submit" className="font-semibold">
-          hahhaha
-        </Button>
-      </DialogFooter> */}
     </DialogContent>
   )
 }

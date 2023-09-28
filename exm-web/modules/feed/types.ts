@@ -1,5 +1,44 @@
 import { IUser } from "../auth/types"
 
+export interface IBranch extends IStructureCommon {
+  address: string
+  parentId: string | null
+  parent: IBranch
+  order: string
+  userIds: string[] | string
+  userCount: number
+  users: IUser[]
+  radius: number
+}
+interface IStructureCommon {
+  _id: string
+  title: string
+  code: string
+  supervisorId: string
+  supervisor: IUser
+}
+
+export interface IDepartment extends IStructureCommon {
+  description: string
+  parentId?: string | null
+  order: string
+  userIds: string[]
+  userCount: number
+  users: IUser
+}
+
+export interface IUnit extends IStructureCommon {
+  departmentId: string
+  department: IDepartment
+  description: string
+  userIds: string[]
+  users: IUser
+}
+
+export type UnitsMainQueryResponse = {
+  list: IUnit[]
+  totalCount: number
+}
 export interface IAttachment {
   name: string
   type: string
