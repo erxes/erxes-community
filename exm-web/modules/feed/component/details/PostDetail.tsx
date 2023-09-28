@@ -6,7 +6,7 @@ import { MoreHorizontalIcon } from "lucide-react"
 
 import { formatDate, readFile } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import LoadingCard from "@/components/ui/loading-card"
 import {
   Popover,
@@ -92,26 +92,30 @@ const PostDetail = ({ postId }: { postId: string }) => {
     <>
       <Card className="max-w-2xl mx-auto my-4 border-0">
         <CardHeader>
-          <div className="flex items-center">
-            <Image
-              src={
-                userDetail.avatar ? readFile(userDetail.avatar) : "/user.png"
-              }
-              alt="User Profile"
-              width={500}
-              height={500}
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="ml-2">
-              <div className="text-sm font-bold text-gray-700">
-                {userDetail.fullName || userDetail.username || userDetail.email}
-              </div>
-              <div className="text-xs text-gray-600">
-                {formatDate(feed.createdAt || "")}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Image
+                src={
+                  userDetail.avatar ? readFile(userDetail.avatar) : "/user.png"
+                }
+                alt="User Profile"
+                width={500}
+                height={500}
+                className="w-10 h-10 rounded-full"
+              />
+              <div className="ml-2">
+                <div className="text-sm font-bold text-gray-700">
+                  {userDetail.fullName ||
+                    userDetail.username ||
+                    userDetail.email}
+                </div>
+                <div className="text-xs text-gray-600">
+                  {formatDate(feed.createdAt || "")}
+                </div>
               </div>
             </div>
+            {renderFeedActions()}
           </div>
-          {renderFeedActions()}
         </CardHeader>
         <CardContent className="px-2 pb-2 items-center ">
           <div className="text-sm font-semibold text-slate-800">

@@ -1,5 +1,12 @@
 import { IUser } from "../auth/types"
 
+export interface IEventData {
+  where: string
+  startDate: Date
+  endDate: Date
+  visibility: string
+}
+
 export interface IFeed {
   _id: string
   title: string
@@ -8,10 +15,10 @@ export interface IFeed {
   attachments: string
   isPinned: boolean
   contentType: string
-  recipientIds: string
+  recipientIds: string[]
   customFieldsData: string
   ceremonyData: string
-  eventData: string
+  eventData: IEventData
   startDate: Date
   endDate: Date
   createdBy: string
