@@ -178,6 +178,14 @@ export const initBroker = async cl => {
     }
   );
 
+  consumeQueue(
+    `posclient:paymentCallbackClient${channelToken}`,
+    async ({ subdomain, data }) => {
+      const models = await generateModels(subdomain);
+      const { contentTypeId, contentType, status, amount } = data;
+    }
+  );
+
   consumeRPCQueue(
     `posclient:health_check${channelToken}`,
     async ({ subdomain, data }) => {

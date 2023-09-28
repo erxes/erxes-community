@@ -1,13 +1,9 @@
 import { generateModels } from './connectionResolver';
-import * as moment from 'moment';
 import { sendPosclientMessage } from './messageBroker';
 
 export default {
   callback: async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
-    console.log('data', data);
-
-    const { contentTypeId, contentType, status, amount } = data;
 
     if (data.contentType !== 'pos:orders') {
       return;
@@ -20,7 +16,7 @@ export default {
     sendPosclientMessage({
       subdomain,
       action: 'paymentCallbackClient',
-      data: {},
+      data,
       pos,
       isRPC: false
     });
