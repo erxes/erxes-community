@@ -54,7 +54,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
     resolver: zodResolver(FormSchema),
   })
 
-  const { feedMutation } = useFeedMutation()
+  const { feedMutation, loading: mutationLoading } = useFeedMutation()
   const { branches, departments, unitsMain, loading } = useTeammembers()
 
   useEffect(() => {
@@ -92,6 +92,7 @@ const EventForm = ({ feed }: { feed?: IFeed }) => {
       <DialogHeader>
         <DialogTitle>Create post</DialogTitle>
       </DialogHeader>
+      {mutationLoading ? <div>131231312</div> : "13"}
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
