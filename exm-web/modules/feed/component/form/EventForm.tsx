@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
+import { DatePicker } from "@/components/ui/date-picker"
 import {
   DialogContent,
   DialogHeader,
@@ -29,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import Uploader from "@/components/uploader/Uploader"
 
 import { queries } from "../../graphql"
 import useFeedMutation from "../../hooks/useFeedMutation"
@@ -40,12 +39,15 @@ const FormSchema = z.object({
     required_error: "Please enter an title",
   }),
   description: z.string().optional(),
+  where: z.string().optional(),
+  startDate: z.date(),
+  endDate: z.date(),
   departmentIds: z.array(z.string()).optional(),
   branchIds: z.array(z.string()).optional(),
   unitId: z.string().optional(),
 })
 
-const PostForm = ({ feed }: { feed?: IFeed }) => {
+const EventForm = ({ feed }: { feed?: IFeed }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
@@ -64,18 +66,21 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
   const { branches } = branchesData || {}
   const { unitsMain } = unitsData || {}
 
-  const [images, setImage] = useState(feed?.images || [])
-
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
       {
         title: data.title,
         description: data.description ? data.description : null,
-        contentType: "post",
-        images,
+        contentType: "event",
         departmentIds: data.departmentIds,
         branchIds: data.branchIds,
         unitId: data.unitId,
+        eventData: {
+          visibility: "public",
+          where: data.where || "",
+          startDate: data.startDate,
+          endDate: data.endDate,
+        },
       },
       feed?._id || ""
     )
@@ -89,6 +94,42 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block">Start Date</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    date={field.value}
+                    setDate={field.onChange}
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block">End Date</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    date={field.value}
+                    setDate={field.onChange}
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="title"
@@ -118,6 +159,24 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="where"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Where</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="where"
+                    {...field}
+                    defaultValue={feed?.eventData?.where || ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -209,12 +268,6 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
             )}
           />
 
-          <Uploader
-            defaultFileList={images || []}
-            onChange={setImage}
-            multiple={true}
-          />
-
           <Button type="submit" className="font-semibold w-full rounded-full">
             Post
           </Button>
@@ -224,4 +277,4 @@ const PostForm = ({ feed }: { feed?: IFeed }) => {
   )
 }
 
-export default PostForm
+export default EventForm

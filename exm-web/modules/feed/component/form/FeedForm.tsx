@@ -9,6 +9,9 @@ import { Card, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
+import BravoForm from "./BravoForm"
+import EventForm from "./EventForm"
+import HolidayForm from "./HolidayForm"
 import PostForm from "./PostForm"
 
 const FeedForm = ({ contentType }: { contentType: string }) => {
@@ -21,13 +24,13 @@ const FeedForm = ({ contentType }: { contentType: string }) => {
       case "post":
         return <PostForm />
       case "publicHoliday":
-        return <PostForm />
+        return <HolidayForm />
       case "welcome":
-        return <PostForm />
+        return null
       case "bravo":
-        return <PostForm />
+        return <BravoForm />
       case "event":
-        return <PostForm />
+        return <EventForm />
     }
   }
 
@@ -50,7 +53,7 @@ const FeedForm = ({ contentType }: { contentType: string }) => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div className="w-full ml-4">
-                  <DialogTrigger asChild>
+                  <DialogTrigger asChild={true}>
                     <div>
                       <Input
                         className="border-sm rounded-full"

@@ -43,9 +43,9 @@ const List = ({ contentType }: { contentType: string }) => {
     )
   }
 
-  if (!feeds || feedsCount === 0) {
-    return <div>Empty</div>
-  }
+  // if (!feeds || feedsCount === 0) {
+  //   return <div>Empty</div>
+  // }
 
   const renderDetail = (feedId: string) => {
     switch (contentType) {
