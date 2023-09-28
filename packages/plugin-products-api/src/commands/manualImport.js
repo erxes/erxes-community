@@ -59,18 +59,19 @@ const command = async () => {
         continue;
       }
     }
+    let attachment;
+
     if (!extention) {
       notFoundImages.push(imageName);
-      continue;
-    }
+    } else {
+      const imgFullName = `${imageName.replace('jurur/', '')}.${extention}`
 
-    const imgFullName = `${imageName.replace('jurur/', '')}.${extention}`
-
-    const attachment = {
-      url: imgFullName,
-      name: imgFullName,
-      type: `image/${extention}`,
-      size: 405740
+      attachment = {
+        url: imgFullName,
+        name: imgFullName,
+        type: `image/${extention}`,
+        size: 405740
+      }
     }
 
     let category = await ProductCategories.findOne({ name: categoryName });
