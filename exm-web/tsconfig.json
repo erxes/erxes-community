@@ -29,7 +29,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/(main)/cover/detail"
-, "app/(main)/chats/detail"  ],
+    "app/(main)/cover/detail",
+    "app/(main)/chats/detail",
+    "app/(main)/chats/..................................................................................................................................tsx"
+  ],
   "exclude": ["node_modules"]
 }

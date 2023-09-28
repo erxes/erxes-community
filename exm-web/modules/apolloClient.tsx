@@ -56,6 +56,8 @@ const splitLink =
       )
     : httpLinkWithMiddleware
 
+console.log(splitLink, wsLink)
+
 export const client = new ApolloClient({
   ssrMode: typeof window !== "undefined",
   cache: new InMemoryCache(),

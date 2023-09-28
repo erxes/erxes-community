@@ -1,12 +1,23 @@
 import { useSearchParams } from "next/navigation"
-import { useQuery } from "@apollo/client"
+import { useMutation, useQuery, useSubscription } from "@apollo/client"
 
-import { queries } from "../graphql"
+import { mutations, queries, subscriptions } from "../graphql"
+import { IChatMessage } from "../types"
 
 export interface IUseChats {
   loading: boolean
-  chatMessages: any
+  chatMessages: IChatMessage[]
+  error: any
   handleLoadMore: () => void
+  sendMessage: ({
+    content,
+    relatedId,
+    attachments,
+  }: {
+    content?: string
+    relatedId?: string
+    attachments?: string[]
+  }) => void
 }
 
 export const useChatMessages = (): IUseChats => {
@@ -14,12 +25,37 @@ export const useChatMessages = (): IUseChats => {
 
   const id = searchParams.get("id") as string
 
-  const { data, loading, fetchMore } = useQuery(queries.chatMessages, {
-    variables: { chatId: id, skip: 0 },
+  const { data, loading, fetchMore, error } = useQuery(queries.chatMessages, {
+    variables: { chatId: id, skip: 0, limit: 30 },
   })
 
-  const chatDetailQuery = useQuery(queries.chatDetail, {
-    variables: { id },
+  const [sendMessageMutation] = useMutation(mutations.chatMessageAdd, {
+    refetchQueries: ["chatMessages", "chats"],
+  })
+
+  const sendMessage = ({
+    content,
+    relatedId,
+    attachments,
+  }: {
+    content?: string
+    relatedId?: string
+    attachments?: string[]
+  }) => {
+    sendMessageMutation({
+      variables: { chatId: id, content, relatedId, attachments },
+    }).catch((e) => console.log(e))
+  }
+
+  useSubscription(subscriptions.chatMessageInserted, {
+    variables: { chatId: id },
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      if (!data) {
+        return null
+      }
+
+      fetchMore({})
+    },
   })
 
   const handleLoadMore = () => {
@@ -58,7 +94,9 @@ export const useChatMessages = (): IUseChats => {
   return {
     loading,
     chatMessages,
+    error,
     handleLoadMore,
+    sendMessage,
   }
 }
 

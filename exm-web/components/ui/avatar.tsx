@@ -17,7 +17,7 @@ const Avatar: FC<
     src,
     fill = true,
     alt = "",
-    onError = () => setSrcI(props.fallBack || "/product.png"),
+    onError = () => setFixedSrc(props.fallBack || "/user.png"),
     width,
     height,
     fallBack,
@@ -25,20 +25,20 @@ const Avatar: FC<
     className,
     ...rest
   } = props
-  const fixedSrc = readFile(src || "")
+  // const fixedSrc = readFile(src || "")
+
+  const [fixedSrc, setFixedSrc] = useState(readFile(src || ""))
 
   const [isImageLoading, setIsImageLoading] = useState(true)
-  const [srcI, setSrcI] = useState(fixedSrc || fallBack || "/product.png")
   const handleComplete = () => setIsImageLoading(false)
 
   useEffect(() => {
     const srcFixed = readFile(src || "")
-    setSrcI(srcFixed)
   }, [src])
 
   const updatedProps = {
     ...rest,
-    src: srcI,
+    src: fixedSrc,
     alt,
     fill: !width && !height ? true : undefined,
     width,
@@ -46,16 +46,9 @@ const Avatar: FC<
     onError,
   }
 
-  if (srcI === "/user.png" || !srcI) {
-    return (
-      <Package className={cn("text-zinc-300", className)} strokeWidth={0.8} />
-    )
-  }
-
   return (
     <NextImage
       {...updatedProps}
-      loader={!srcI.startsWith("/") ? cloudflareLoader : undefined}
       onLoadingComplete={handleComplete}
       className={cn(className, isImageLoading && "blur-2xl", "text-black")}
       sizes={

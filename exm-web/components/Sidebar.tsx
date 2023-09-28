@@ -26,26 +26,6 @@ export const Sidebar = () => {
   }
 
   const NavigationItem = ({ href, active, Icon, value, color }: any) => {
-    if (pathname.includes("/chats")) {
-      return (
-        <li
-          className={`mb-4 flex p-3 cursor-pointer`}
-          onClick={() => handleLink(href)}
-        >
-          <div
-            className={`${
-              active === activeClass ? "bg-black" : "bg-white"
-            } mr-2 shadow-md p-2 rounded-lg`}
-          >
-            <Icon
-              size={18}
-              color={`${active === activeClass ? "#FFF" : "black"}`}
-            />
-          </div>
-        </li>
-      )
-    }
-
     return (
       <li
         className={`${
@@ -63,47 +43,29 @@ export const Sidebar = () => {
             color={`${activeClass === active ? "#FFF" : "black"}`}
           />
         </div>
-        <span>{value}</span>
+        {pathname.includes("/chat") ? "" : <span>{value}</span>}
       </li>
     )
   }
 
-  if (pathname.includes("/chats")) {
-    return (
-      <div className="flex w-1/4 border-r shrink-0">
-        <div className="h-full p-4 border-r w-1/5">
-          <div className="mb-4 w-full border-b border-[#EEE] p-3">
-            <Image alt="" src="/logo.svg" height={50} width={100} />
-          </div>
-
-          <div className="w-full h-full">
-            <ul className="list-none">
-              {MAIN_NAVIGATION.map((item, i) => (
-                <NavigationItem {...item} key={i} />
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <Chat />
-      </div>
-    )
-  }
-
   return (
-    <div className="flex w-1/5 flex-col border-r">
-      <div className="h-full p-8">
-        <div className="mb-4 w-full border-b border-[#EEE] p-3">
-          <Image alt="" src="/erxes-dark.svg" height={50} width={100} />
-        </div>
+    <div className="h-full p-4 border-r">
+      <div className="w-full border-b">
+        <Image
+          alt=""
+          src="/erxes-dark.svg"
+          height={30}
+          width={30}
+          className="w-10 h-10"
+        />
+      </div>
 
-        <div className="w-full h-full">
-          <ul className="list-none">
-            {MAIN_NAVIGATION.map((item, i) => (
-              <NavigationItem {...item} key={i} />
-            ))}
-          </ul>
-        </div>
+      <div className="w-full h-full">
+        <ul className="list-none">
+          {MAIN_NAVIGATION.map((item, i) => (
+            <NavigationItem {...item} key={i} />
+          ))}
+        </ul>
       </div>
     </div>
   )

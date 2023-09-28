@@ -33,7 +33,7 @@ const chatMessageInserted = gql`
   }
 `
 
-const chatInserted = `
+const chatInserted = gql`
   subscription chatInserted($userId: String!) {
     chatInserted(userId: $userId) {
       _id
