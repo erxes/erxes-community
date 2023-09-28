@@ -114,7 +114,7 @@ const departmentField = `
   userIds
 `
 
-const departments = `
+const departments = gql`
   query departments {
     departments {
       ${departmentField}
@@ -122,18 +122,18 @@ const departments = `
   }
 `
 
-const branches = `
+const branches = gql`
   query branches {
     branches {
-      _id,
-      code,
-      title,
+      _id
+      code
+      title
       parentId
     }
   }
 `
 
-const unitsMain = `
+const unitsMain = gql`
   query unitsMain {
     unitsMain {
       list {

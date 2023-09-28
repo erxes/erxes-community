@@ -58,7 +58,7 @@ const FeedForm = ({ contentType }: { contentType: string }) => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div className="w-full ml-4">
-                  <DialogTrigger asChild>
+                  <DialogTrigger asChild={true}>
                     <div>
                       <Input
                         className="border-sm rounded-full"

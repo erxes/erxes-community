@@ -2,12 +2,20 @@
 
 import Image from "next/image"
 import { IUser } from "@/modules/auth/types"
+import { MoreHorizontalIcon } from "lucide-react"
 
 import { formatDate, readFile } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import LoadingCard from "@/components/ui/loading-card"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import { useFeedDetail } from "../../hooks/useFeedDetail"
+import PostForm from "../form/PostForm"
 
 const PostDetail = ({ postId }: { postId: string }) => {
   const { feed, loading } = useFeedDetail({ feedId: postId })
@@ -47,6 +55,39 @@ const PostDetail = ({ postId }: { postId: string }) => {
       break
   }
 
+  const editAction = () => {
+    const renderForm = () => {
+      return <PostForm feed={feed} />
+    }
+
+    return (
+      <Dialog>
+        <DialogTrigger asChild={true}>
+          <div className="text-black">edit</div>
+        </DialogTrigger>
+
+        {renderForm()}
+      </Dialog>
+    )
+  }
+
+  const renderFeedActions = () => {
+    return (
+      <Popover>
+        <PopoverTrigger asChild={true}>
+          <div className="p-2 bg-white rounded-full">
+            <MoreHorizontalIcon size={16} />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-40 p-3">
+          <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
+            {editAction()}
+          </div>
+        </PopoverContent>
+      </Popover>
+    )
+  }
+
   return (
     <>
       <Card className="max-w-2xl mx-auto my-4 border-0">
@@ -70,6 +111,7 @@ const PostDetail = ({ postId }: { postId: string }) => {
               </div>
             </div>
           </div>
+          {renderFeedActions()}
         </CardHeader>
         <CardContent className="px-2 pb-2 items-center ">
           <div className="text-sm font-semibold text-slate-800">
