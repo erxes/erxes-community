@@ -9,7 +9,7 @@ export default function IndexPage() {
         <Feed />
       </div>
       <div className="flex w-1/3 flex-col border-l">
-        <p>31</p>
+        <p>events</p>
       </div>
     </>
   )

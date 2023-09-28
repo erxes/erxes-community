@@ -1,3 +1,3 @@
-export default function IndexPage() {
-  return <>Select a chat or start a new conversation</>
+export default function Detail() {
+  return <div>lolzmaa</div>
 }

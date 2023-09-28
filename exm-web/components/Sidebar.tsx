@@ -26,84 +26,46 @@ export const Sidebar = () => {
   }
 
   const NavigationItem = ({ href, active, Icon, value, color }: any) => {
-    if (pathname.includes("/chats")) {
-      return (
-        <li
-          className={`mb-4 flex p-3 cursor-pointer`}
-          onClick={() => handleLink(href)}
-        >
-          <div
-            className={`${
-              active === activeClass ? "bg-[#6569DF]" : "bg-white"
-            } mr-2 shadow-md p-2 rounded-lg`}
-          >
-            <Icon
-              size={18}
-              color={`${active === activeClass ? "#FFF" : color}`}
-            />
-          </div>
-        </li>
-      )
-    }
-
     return (
       <li
         className={`${
-          activeClass === active ? "bg-white shadow-md text-[#444]" : ""
-        } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-[#A0AEC0] hover:text-[#444] cursor-pointer hover:transition-all`}
+          activeClass === active ? "shadow-md text-black" : ""
+        } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-black hover:text-black cursor-pointer hover:transition-all`}
         onClick={() => handleLink(href)}
       >
         <div
           className={`${
-            activeClass === active ? "bg-[#6569DF]" : "bg-white"
+            activeClass === active ? "bg-black" : "bg-white"
           } mr-2 shadow-md p-2 rounded-lg`}
         >
           <Icon
             size={18}
-            color={`${activeClass === active ? "#FFF" : color}`}
+            color={`${activeClass === active ? "#FFF" : "black"}`}
           />
         </div>
-        <span>{value}</span>
+        {pathname.includes("/chat") ? "" : <span>{value}</span>}
       </li>
     )
   }
 
-  if (pathname.includes("/chats")) {
-    return (
-      <div className="flex w-1/4 border-r shrink-0">
-        <div className="h-full p-4 border-r w-1/5">
-          <div className="mb-4 w-full border-b border-[#EEE] p-3">
-            <Image alt="" src="/glyph_dark.svg" height={50} width={100} />
-          </div>
-
-          <div className="w-full h-full">
-            <ul className="list-none">
-              {MAIN_NAVIGATION.map((item, i) => (
-                <NavigationItem {...item} key={i} />
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <Chat />
-      </div>
-    )
-  }
-
   return (
-    <div className="flex w-1/5 flex-col border-r">
-      <div className="h-full p-8">
-        <div className="mb-4 w-full border-b border-[#EEE] p-3">
-          <Image alt="" src="/erxes-dark.svg" height={50} width={100} />
-        </div>
+    <div className="h-full p-4 border-r">
+      <div className="w-full border-b">
+        <Image
+          alt=""
+          src="/erxes-dark.svg"
+          height={30}
+          width={30}
+          className="w-10 h-10"
+        />
+      </div>
 
-        <div className="w-full h-full">
-          <ul className="list-none">
-            {MAIN_NAVIGATION.map((item, i) => (
-              <NavigationItem {...item} key={i} />
-            ))}
-          </ul>
-        </div>
+      <div className="w-full h-full">
+        <ul className="list-none">
+          {MAIN_NAVIGATION.map((item, i) => (
+            <NavigationItem {...item} key={i} />
+          ))}
+        </ul>
       </div>
     </div>
   )

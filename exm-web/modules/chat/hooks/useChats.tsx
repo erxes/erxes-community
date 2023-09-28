@@ -1,6 +1,6 @@
-import { useQuery } from "@apollo/client"
+import { useQuery, useSubscription } from "@apollo/client"
 
-import { queries } from "../graphql"
+import { queries, subscriptions } from "../graphql"
 
 export interface IUseChats {
   loading: boolean
