@@ -660,7 +660,7 @@ class ContractForm extends React.Component<Props, State> {
                 >
                   {['fixed', 'equal', 'custom'].map((typeName, index) => (
                     <option key={index} value={typeName}>
-                      {__(typeName)}
+                      {__(typeName + 'Method')}
                     </option>
                   ))}
                 </FormControl>
