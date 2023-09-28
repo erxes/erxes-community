@@ -22,7 +22,8 @@ const Editor = ({ sendMessage }: IProps) => {
   }
 
   const handleAttachmentChange = (e: any) => {
-    const file = e.target.files[0]
+    const file = e.target.files
+
     setAttachment(file)
   }
 
@@ -54,10 +55,12 @@ const Editor = ({ sendMessage }: IProps) => {
         onChange={handleInputChange}
         placeholder="Type a message..."
         style={textareaStyle}
-        className="resize-none rounded-2xl px-4 pt-2 w-full  focus:outline-none"
+        className="resize-none rounded-2xl px-4 pt-4 w-full  focus:outline-none"
       />
+
       <label className="cursor-pointer mx-2">
         <input
+          multiple={true}
           type="file"
           accept="image/*, .pdf, .doc, .docx"
           onChange={handleAttachmentChange}
