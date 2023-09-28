@@ -17,7 +17,7 @@ let db;
 let ProductCategories;
 let Products;
 
-const nanoid = (len=21) => {
+const nanoid = (len = 21) => {
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
   let randomString = '';
@@ -50,7 +50,7 @@ const command = async () => {
 
   for (const info of data) {
     const { categoryName } = info;
-    const imageName = `jurur/${categoryName.replace(/ /g, '_').replace(/\\./g, '_')}`
+    const imageName = `jurur/${categoryName.replace(/ /g, '_').replace(/\\./g, '_').replace('`', '')}`
 
     let extention = ''
     for (const ext of extentions) {
