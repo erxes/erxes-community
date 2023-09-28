@@ -28,7 +28,7 @@ type Props = {
   queryParams: any;
   loading: boolean;
   participantUsers: IUser[];
-  pinnedUsers?: {
+  pinnedUsers: {
     pinnedUserIds: string[];
     userId: string;
     pinnedUsersInfo: IUser[];
@@ -149,7 +149,7 @@ export const SideBar = (props: Props) => {
 
   const data = (
     <SidebarList style={{ padding: '10px 20px' }}>
-      {pinnedUsersInfo.map((user: any) => {
+      {pinnedUsersInfo?.map((user: any) => {
         return (
           <ParticipantList key={user._id}>
             <FormControl
