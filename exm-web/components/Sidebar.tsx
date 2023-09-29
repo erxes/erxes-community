@@ -66,7 +66,7 @@ export const Sidebar = () => {
       <div className="w-full pb-2 mb-4 border-b flex justify-center">
         <Image
           alt=""
-          src="/erxes-dark.svg"
+          src="/logo-dark.svg"
           height={100}
           width={100}
           className={`${pathname.includes("/chat") ? "w-10 h-10" : ""}`}

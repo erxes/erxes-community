@@ -11,13 +11,21 @@ const Feed = () => {
     <div>
       <Tabs defaultValue="post">
         <TabsList className="w-full items-center flex">
-          <TabsTrigger className="" value="post">
+          <TabsTrigger className="text-[#444]" value="post">
             Post
           </TabsTrigger>
-          <TabsTrigger value="event">Event</TabsTrigger>
-          <TabsTrigger value="bravo">Bravo</TabsTrigger>
-          <TabsTrigger value="publicHoliday">Public holiday</TabsTrigger>
-          <TabsTrigger value="welcome">Welcome</TabsTrigger>
+          <TabsTrigger className="text-[#444]" value="event">
+            Event
+          </TabsTrigger>
+          <TabsTrigger className="text-[#444]" value="bravo">
+            Bravo
+          </TabsTrigger>
+          <TabsTrigger className="text-[#444]" value="publicHoliday">
+            Public holiday
+          </TabsTrigger>
+          <TabsTrigger className="text-[#444]" value="welcome">
+            Welcome
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="post">
