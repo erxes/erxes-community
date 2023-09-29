@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import LoadingPost from "@/components/ui/loadingPost"
 import {
   Select,
   SelectContent,
@@ -59,8 +60,6 @@ const PostForm = ({
     if (result === "success") {
       setOpen(false)
     }
-
-    setOpen(errro)
   }
 
   const { departments, branches, unitsMain, loading } = useTeamMembers()
@@ -79,10 +78,6 @@ const PostForm = ({
 
     form.reset({ ...defaultValues })
   }, [feed])
-
-  if (mutationLoading) {
-    setOpen(false)
-  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -104,6 +99,8 @@ const PostForm = ({
       <DialogHeader>
         <DialogTitle>Create post</DialogTitle>
       </DialogHeader>
+
+      {mutationLoading ? <LoadingPost /> : null}
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>

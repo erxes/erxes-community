@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import Chat from "@/modules/chat/component/Chat"
 import {
   AwardIcon,
   HomeIcon,
@@ -35,28 +34,42 @@ export const Sidebar = () => {
       >
         <div
           className={`${
-            activeClass === active ? "bg-black" : "bg-white"
+            activeClass === active ? "bg-[#6569DF]" : "bg-white"
           } mr-2 shadow-md p-2 rounded-lg`}
         >
           <Icon
             size={18}
-            color={`${activeClass === active ? "#FFF" : "black"}`}
+            color={`${activeClass === active ? "#FFF" : color}`}
           />
         </div>
-        {pathname.includes("/chat") ? "" : <span>{value}</span>}
+        {pathname.includes("/chat") ? (
+          ""
+        ) : (
+          <span
+            className={`${
+              activeClass === active ? "text-[#444]" : "text-[#A0AEC0]"
+            }`}
+          >
+            {value}
+          </span>
+        )}
       </li>
     )
   }
 
   return (
-    <div className="h-full p-4 border-r">
-      <div className="w-full border-b">
+    <div
+      className={`h-full p-4 border-r  ${
+        pathname.includes("/chat") ? "" : "w-1/5"
+      }`}
+    >
+      <div className="w-full pb-2 mb-4 border-b flex justify-center">
         <Image
           alt=""
           src="/erxes-dark.svg"
-          height={30}
-          width={30}
-          className="w-10 h-10"
+          height={100}
+          width={100}
+          className={`${pathname.includes("/chat") ? "w-10 h-10" : ""}`}
         />
       </div>
 
