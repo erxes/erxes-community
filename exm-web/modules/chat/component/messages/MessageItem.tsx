@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useMemo } from "react"
 import dayjs from "dayjs"
 import calendar from "dayjs/plugin/calendar"
 import { useAtomValue } from "jotai"
 
 import Avatar from "@/components/ui/avatar"
+import { Card } from "@/components/ui/card"
 
 import { currentUserAtom } from "../../../JotaiProiveder"
 import { IChatMessage } from "../../types"
@@ -16,36 +17,43 @@ const MessageItem = ({ message }: { message: IChatMessage }) => {
 
   const currentUser = useAtomValue(currentUserAtom)
 
-  const isMe = currentUser?._id === createdUser._id
+  const isMe = useMemo(
+    () => currentUser?._id === createdUser._id,
+    [createdUser]
+  )
 
   const userDetail = createdUser.details || {}
 
   return (
     <>
-      <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-        <div>
+      <div className={`flex ${isMe ? "justify-end" : "justify-start"} h-full`}>
+        <div className="items-end flex">
           {isMe ? null : (
             <Avatar
               src={userDetail.avatar}
               alt="avatar"
               width={500}
               height={500}
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full mb-2"
             />
           )}
         </div>
+        <div className="m-2">
+          <Card className="p-4 rounded-2xl">
+            <div dangerouslySetInnerHTML={{ __html: content || "" }} />
+          </Card>
+        </div>
 
-        <div className="" dangerouslySetInnerHTML={{ __html: content || "" }} />
-        <div>
-          {isMe ? (
+        <div className="items-end flex">
+          {!isMe ? null : (
             <Avatar
               src={userDetail.avatar}
               alt="avatar"
               width={500}
               height={500}
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 rounded-full mb-2"
             />
-          ) : null}
+          )}
         </div>
       </div>
     </>

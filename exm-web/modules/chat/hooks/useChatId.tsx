@@ -37,7 +37,7 @@ export const useChatId = (): IUseChats => {
       variables: { name, type: "group", participantIds: userIds || [] },
       refetchQueries: ["chats"],
     })
-      .then(() => {
+      .then((data) => {
         console.log("ok")
       })
       .catch((error) => {

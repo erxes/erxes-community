@@ -30,12 +30,8 @@ const PostDetail = ({ postId }: { postId: string }) => {
   const user = feed.createdUser || ({} as IUser)
   const userDetail = user.details
 
-  const images = [
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-  ]
+  const images = feed.images || []
+  console.log(images)
 
   let gridCols = ""
 
@@ -127,19 +123,17 @@ const PostDetail = ({ postId }: { postId: string }) => {
           <div className="mt-2">
             <p>{feed.description}</p>
           </div>
-          <div className={`grid grid-cols-2 my-4`}>
-            {images.map((image, index) => (
-              <div key={index} className="relative">
-                <Image
-                  src={image.image}
-                  alt={`Post ${index}`}
-                  width={500}
-                  height={500}
-                  className={`h-32 w-full object-cover ${gridCols}`}
-                />
-              </div>
-            ))}
-          </div>
+          {images.map((image, index) => (
+            <div key={index} className="relative">
+              <Image
+                src={readFile(image.url)}
+                alt={`Post bad`}
+                width={500}
+                height={500}
+                className={`h-full w-full object-cover strech ${gridCols}`}
+              />
+            </div>
+          ))}
         </CardContent>
         <CardFooter className="flex px-2 pb-2 items-center">
           <div className="text-sm font-semibold text-slate-800">
