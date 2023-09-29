@@ -55,8 +55,18 @@ const PostForm = ({
     resolver: zodResolver(FormSchema),
   })
 
+  const callBack = (result: string) => {
+    if (result === "success") {
+      setOpen(false)
+    }
+
+    setOpen(errro)
+  }
+
   const { departments, branches, unitsMain, loading } = useTeamMembers()
-  const { feedMutation, loading: mutationLoading } = useFeedMutation()
+  const { feedMutation, loading: mutationLoading } = useFeedMutation({
+    callBack,
+  })
 
   const [images, setImage] = useState(feed?.images || [])
 

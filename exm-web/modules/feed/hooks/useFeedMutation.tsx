@@ -5,7 +5,11 @@ import { useToast } from "@/components/ui/use-toast"
 import { mutations } from "../graphql"
 import { IFeed } from "../types"
 
-const useFeedMutation = ({ callBack }: { callBack: () => void }) => {
+const useFeedMutation = ({
+  callBack,
+}: {
+  callBack: (result: string) => void
+}) => {
   const { toast } = useToast()
 
   const onError = (error: ApolloError) => {
@@ -33,6 +37,7 @@ const useFeedMutation = ({ callBack }: { callBack: () => void }) => {
       feedAdd({
         variables,
       }).then(() => {
+        callBack("success")
         toast({ description: "added", variant: "destructive" })
       })
     }
