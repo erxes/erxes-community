@@ -20,11 +20,11 @@ export const Sidebar = () => {
   const [activeClass, setActiveClass] = useState(pathname)
 
   const handleLink = (href: string) => {
-    router.push(`/${href}`)
-    setActiveClass(`/${href}`)
+    router.push(href)
+    setActiveClass(href)
   }
 
-  const NavigationItem = ({ href, active, Icon, value, color }: any) => {
+  const NavigationItem = ({ href, active, Icon, value, color, desc }: any) => {
     return (
       <li
         className={`${
@@ -45,13 +45,16 @@ export const Sidebar = () => {
         {pathname.includes("/chat") ? (
           ""
         ) : (
-          <span
-            className={`${
-              activeClass === active ? "text-[#444]" : "text-[#A0AEC0]"
-            }`}
-          >
-            {value}
-          </span>
+          <div className="flex flex-col">
+            <span
+              className={`${
+                activeClass === active ? "text-[#444]" : "text-[#A0AEC0]"
+              }`}
+            >
+              {value}
+            </span>
+            <span className="text-[8px] text-[#A0AEC0]">{desc}</span>
+          </div>
         )}
       </li>
     )
@@ -87,21 +90,20 @@ export const Sidebar = () => {
 export const MAIN_NAVIGATION = [
   {
     active: "/",
-    href: "",
+    href: "/",
     value: "Feed",
     Icon: HomeIcon,
     color: "#6569DF",
   },
   {
-    active: "/chats",
+    active: "chats",
     href: "chats",
     value: "Chats",
     Icon: MessageCircleIcon,
     color: "#A0AEC0",
-    desc: "Coming soon",
   },
   {
-    active: "/team",
+    active: "team",
     href: "#",
     value: "Team members",
     Icon: Users2Icon,
@@ -109,7 +111,7 @@ export const MAIN_NAVIGATION = [
     desc: "Coming soon",
   },
   {
-    active: "/discover",
+    active: "discover",
     href: "#",
     value: "Discover",
     Icon: StarIcon,
@@ -117,7 +119,7 @@ export const MAIN_NAVIGATION = [
     desc: "Coming soon",
   },
   {
-    active: "/learn",
+    active: "learn",
     href: "#",
     value: "Learn",
     Icon: ScrollTextIcon,
@@ -125,7 +127,7 @@ export const MAIN_NAVIGATION = [
     desc: "Coming soon",
   },
   {
-    active: "/leaderboard",
+    active: "leaderboard",
     href: "#",
     value: "Leaderboard",
     Icon: AwardIcon,
@@ -133,7 +135,7 @@ export const MAIN_NAVIGATION = [
     desc: "Coming soon",
   },
   {
-    active: "/structure",
+    active: "structure",
     href: "#",
     value: "Structure",
     Icon: LayersIcon,

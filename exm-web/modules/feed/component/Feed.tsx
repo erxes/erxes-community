@@ -10,7 +10,7 @@ const Feed = () => {
   return (
     <div>
       <Tabs defaultValue="post">
-        <TabsList className="w-full items-center flex">
+        <TabsList className="w-full items-center flex p-4">
           <TabsTrigger className="text-[#444]" value="post">
             Post
           </TabsTrigger>
