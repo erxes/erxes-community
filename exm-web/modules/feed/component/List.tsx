@@ -36,10 +36,10 @@ const List = ({ contentType }: { contentType: string }) => {
 
   if (loading) {
     return (
-      <div className="h-screen pb-16 pr-3">
+      <ScrollArea className="h-screen pb-16 pr-3">
         <FeedForm contentType={contentType} />
         <LoadingCard />
-      </div>
+      </ScrollArea>
     )
   }
 
@@ -64,7 +64,14 @@ const List = ({ contentType }: { contentType: string }) => {
       {feeds.map((feed) => {
         return renderDetail(feed._id)
       })}
-      {!loading && feedsCount > 20 && feeds.length < feedsCount && (
+
+      {loading && (
+        <>
+          <LoadingCard type="chatlist" />
+        </>
+      )}
+
+      {feedsCount > 20 && feeds.length < feedsCount && (
         <div ref={ref}>
           <LoadingCard />
         </div>
