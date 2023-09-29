@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import LoadingPost from "@/components/ui/loadingPost"
 import {
   Select,
   SelectContent,
@@ -59,7 +60,15 @@ const EventForm = ({
     resolver: zodResolver(FormSchema),
   })
 
-  const { feedMutation, loading: mutationLoading } = useFeedMutation()
+  const callBack = (result: string) => {
+    if (result === "success") {
+      setOpen(false)
+    }
+  }
+
+  const { feedMutation, loading: mutationLoading } = useFeedMutation({
+    callBack,
+  })
   const { branches, departments, unitsMain, loading } = useTeamMembers()
 
   useEffect(() => {
@@ -77,10 +86,6 @@ const EventForm = ({
 
     form.reset({ ...defaultValues, ...date })
   }, [feed])
-
-  if (mutationLoading) {
-    setOpen(false)
-  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -107,6 +112,8 @@ const EventForm = ({
       <DialogHeader>
         <DialogTitle>Create post</DialogTitle>
       </DialogHeader>
+
+      {mutationLoading ? <LoadingPost /> : null}
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>

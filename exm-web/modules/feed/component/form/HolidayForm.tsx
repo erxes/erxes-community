@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import LoadingPost from "@/components/ui/loadingPost"
 import { Textarea } from "@/components/ui/textarea"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
@@ -45,7 +46,15 @@ const HolidayForm = ({
     resolver: zodResolver(FormSchema),
   })
 
-  const { feedMutation, loading: mutationLoading } = useFeedMutation()
+  const callBack = (result: string) => {
+    if (result === "success") {
+      setOpen(false)
+    }
+  }
+
+  const { feedMutation, loading: mutationLoading } = useFeedMutation({
+    callBack,
+  })
 
   useEffect(() => {
     let defaultValues = {} as any
@@ -58,10 +67,6 @@ const HolidayForm = ({
 
     form.reset({ ...defaultValues, ...date })
   }, [feed])
-
-  if (mutationLoading) {
-    setOpen(false)
-  }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     feedMutation(
@@ -80,6 +85,8 @@ const HolidayForm = ({
       <DialogHeader>
         <DialogTitle>Create public holiday</DialogTitle>
       </DialogHeader>
+
+      {mutationLoading ? <LoadingPost /> : null}
 
       <Form {...form}>
         <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>

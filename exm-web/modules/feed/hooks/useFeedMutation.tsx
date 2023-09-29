@@ -38,7 +38,6 @@ const useFeedMutation = ({
         variables,
       }).then(() => {
         callBack("success")
-        toast({ description: "added", variant: "destructive" })
       })
     }
 
