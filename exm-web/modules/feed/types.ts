@@ -56,22 +56,46 @@ export interface IEventData {
 export interface IFeed {
   _id: string
   title: string
-  description: string
-  images: IAttachment[]
-  attachments: string
-  isPinned: boolean
-  contentType: string
-  recipientIds: string[]
-  customFieldsData: string
-  ceremonyData: string
-  eventData: IEventData
-  startDate: Date
-  endDate: Date
-  createdBy: string
-  createdAt: string
-  updatedBy: string
-  updatedAt: Date
-  department: string
+  description?: string
+  images?: IAttachment[]
+  attachments?: string
+  isPinned?: boolean
+  contentType?: string
+  recipientIds?: string[]
+  customFieldsData?: string
+  ceremonyData?: string
+  eventData?: IEventData
+  startDate?: Date
+  endDate?: Date
+  createdBy?: string
+  createdAt?: Date
+  updatedBy?: string
+  updatedAt?: Date
+  department?: string
+  departmentIds?: string[]
+  branchIds?: string[]
+  unitId?: string
+  createdUser?: IUser
+}
+
+export interface IFeedVariable {
+  title?: string
+  description?: string
+  images?: IAttachment[]
+  attachments?: string
+  isPinned?: boolean
+  contentType?: string
+  recipientIds?: string[]
+  customFieldsData?: string
+  ceremonyData?: string
+  eventData?: IEventData
+  startDate?: Date
+  endDate?: Date
+  createdBy?: string
+  createdAt?: Date
+  updatedBy?: string
+  updatedAt?: Date
+  department?: string
   departmentIds?: string[]
   branchIds?: string[]
   unitId?: string

@@ -3,7 +3,7 @@ import { ApolloError, useMutation } from "@apollo/client"
 import { useToast } from "@/components/ui/use-toast"
 
 import { mutations } from "../graphql"
-import { IFeed } from "../types"
+import { IFeed, IFeedVariable } from "../types"
 
 const useFeedMutation = ({
   callBack,
@@ -32,7 +32,7 @@ const useFeedMutation = ({
     onError,
   })
 
-  const feedMutation = (variables: IFeed, _id?: string) => {
+  const feedMutation = (variables: IFeedVariable, _id?: string) => {
     if (!_id) {
       feedAdd({
         variables,

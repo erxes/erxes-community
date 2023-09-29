@@ -83,7 +83,7 @@ const PostForm = ({
     feedMutation(
       {
         title: data.title,
-        description: data.description ? data.description : null,
+        description: data.description ? data.description : "",
         contentType: "post",
         images,
         departmentIds: data.departmentIds,
