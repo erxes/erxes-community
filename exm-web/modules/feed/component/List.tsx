@@ -36,16 +36,14 @@ const List = ({ contentType }: { contentType: string }) => {
 
   if (loading) {
     return (
-      <>
+      <div className="h-screen pb-16 pr-3">
         <FeedForm contentType={contentType} />
-        <LoadingCard />
-      </>
+        <div className="mt-4">
+          <LoadingCard />
+        </div>
+      </div>
     )
   }
-
-  // if (!feeds || feedsCount === 0) {
-  //   return <div>Empty</div>
-  // }
 
   const renderDetail = (feedId: string) => {
     switch (contentType) {

@@ -91,7 +91,7 @@ const EventForm = ({
     feedMutation(
       {
         title: data.title,
-        description: data.description ? data.description : null,
+        description: data.description ? data.description : "",
         contentType: "event",
         departmentIds: data?.departmentIds || [],
         branchIds: data?.branchIds || [],

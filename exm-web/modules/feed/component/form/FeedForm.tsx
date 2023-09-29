@@ -36,36 +36,55 @@ const FeedForm = ({ contentType }: { contentType: string }) => {
     }
   }
 
+  const getPLaceHolder = () => {
+    switch (contentType) {
+      case "post":
+        return "Write a post"
+      case "publicHoliday":
+        return "Create a holiday"
+      case "welcome":
+        return "Write a welcome"
+      case "bravo":
+        return "Create a bravo"
+      case "event":
+        return "Create event"
+    }
+  }
+
+  const placeHolder = getPLaceHolder()
+
   return (
     <>
       <Dialog open={open} onOpenChange={() => setOpen(!open)}>
         <div className="w-full">
           <Card className="max-w-2xl mx-auto my-4 border-0">
-            <CardHeader className="flex">
-              <div className="flex items-center">
-                <Image
-                  src={
-                    userDetail.avatar
-                      ? readFile(userDetail.avatar)
-                      : "/user.png"
-                  }
-                  alt="User Profile"
-                  width={500}
-                  height={500}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div className="w-full ml-4">
-                  <DialogTrigger asChild={true}>
-                    <div>
-                      <Input
-                        className="border-sm rounded-full"
-                        placeholder="Write a post"
-                      />
-                    </div>
-                  </DialogTrigger>
+            {contentType !== "welcome" ? (
+              <CardHeader className="flex">
+                <div className="flex items-center">
+                  <Image
+                    src={
+                      userDetail.avatar
+                        ? readFile(userDetail.avatar)
+                        : "/user.png"
+                    }
+                    alt="User Profile"
+                    width={500}
+                    height={500}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div className="w-full ml-4">
+                    <DialogTrigger asChild={true}>
+                      <div>
+                        <Input
+                          className="border-sm rounded-full"
+                          placeholder={`${placeHolder || "place"}`}
+                        />
+                      </div>
+                    </DialogTrigger>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
+            ) : null}
           </Card>
         </div>
 

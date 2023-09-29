@@ -72,7 +72,7 @@ const HolidayForm = ({
     feedMutation(
       {
         title: data.title,
-        description: data.description ? data.description : null,
+        description: data.description ? data.description : "",
         contentType: "publicHoliday",
         createdAt: data.createdAt,
       },

@@ -4,8 +4,8 @@ const LoadingCard = ({ type }: { type?: string }) => {
   if (type === "chatlist") {
     return (
       <div className="w-full">
-        <Card className="px-6 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none bg-transparent hover:bg-[#F0F0F0]">
-          <div className="rounded-full bg-slate-100  w-12 h-12 mr-4 shrink-0" />
+        <Card className=" rounded-none  cursor-pointer flex items-center shadow-none border-none bg-transparent hover:bg-[#F0F0F0]">
+          <div className="rounded-full bg-slate-100  w-12 h-12 shrink-0" />
 
           <div className="w-full">
             <div className="rounded-full bg-slate-100 w-full h-6 mb-2" />
