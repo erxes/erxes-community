@@ -69,6 +69,10 @@ const EventForm = ({
     if (feed) {
       defaultValues = { ...feed }
       date = { ...feed.eventData }
+
+      date.startDate = new Date(date.startDate)
+
+      date.endDate = new Date(date.endDate)
     }
 
     form.reset({ ...defaultValues, ...date })
