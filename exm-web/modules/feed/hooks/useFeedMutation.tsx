@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { mutations } from "../graphql"
 import { IFeed } from "../types"
 
-const useFeedMutation = () => {
+const useFeedMutation = ({ callBack }: { callBack: () => void }) => {
   const { toast } = useToast()
 
   const onError = (error: ApolloError) => {
