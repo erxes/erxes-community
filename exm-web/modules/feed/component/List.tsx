@@ -38,9 +38,7 @@ const List = ({ contentType }: { contentType: string }) => {
     return (
       <div className="h-screen pb-16 pr-3">
         <FeedForm contentType={contentType} />
-        <div className="mt-4">
-          <LoadingCard />
-        </div>
+        <LoadingCard />
       </div>
     )
   }
