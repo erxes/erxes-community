@@ -5,8 +5,10 @@ import { currentUserAtom } from "@/modules/JotaiProiveder"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useAtomValue } from "jotai"
+import { PenSquareIcon } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
 import { useChats } from "../hooks/useChats"
@@ -22,6 +24,7 @@ const ChatList = () => {
 
   const currentUser = useAtomValue(currentUserAtom)
   const { chats, chatsCount, loading, handleLoadMore } = useChats()
+  const [open, setOpen] = useState(false)
   const [searchValue, setSearchValue] = useState("")
   const [filteredChats, setFilteredChats] = useState<any[]>([])
   const [pinnedChatIds, setPinnedChatIds] = useState(
@@ -49,7 +52,17 @@ const ChatList = () => {
   }
 
   const renderAction = () => {
-    return <CreateChat />
+    return (
+      <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+        <DialogTrigger asChild={true}>
+          <div className="p-4 bg-[#F0F0F0] rounded-full cursor-pointer">
+            <PenSquareIcon size={18} />
+          </div>
+        </DialogTrigger>
+
+        <CreateChat setOpen={setOpen} />
+      </Dialog>
+    )
   }
 
   const handlePin = (_chatId: string) => {

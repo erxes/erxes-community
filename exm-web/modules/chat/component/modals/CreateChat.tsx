@@ -1,21 +1,20 @@
 "use client"
 
+import { queries } from "@/common/team/graphql"
 import { useQuery } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { PenSquareIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
+import { FacetedFilter } from "@/components/ui/faceted-filter"
 import {
   Form,
   FormControl,
@@ -26,31 +25,110 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-import { queries } from "../../graphql"
+import { useChatId } from "../../hooks/useChatId"
 
 dayjs.extend(relativeTime)
 
-export const CreateChat = ({}: {}) => {
+const FormSchema = z.object({
+  name: z.string().optional(),
+  userIds: z.array(z.string()).optional(),
+})
+
+export const CreateChat = ({
+  setOpen,
+}: {
+  setOpen: (open: boolean) => void
+}) => {
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+  })
+
+  const { loading, loadingMutation, chatId, setChatUser, startGroupChat } =
+    useChatId()
+
+  const { data: usersData, loading: loadingUser } = useQuery(queries.users)
+  const { users } = usersData || {}
+
+  if (loading) {
+    return <>loading</>
+  }
+
+  if (loadingMutation) {
+    return <>loading</>
+  }
+
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    if (data.userIds?.length === 1) {
+      setChatUser(data?.userIds[0])
+      setOpen(false)
+    }
+
+    if (data.userIds && data.userIds?.length > 1) {
+      startGroupChat(data?.name || "", data.userIds)
+      setOpen(false)
+    }
+  }
+
   return (
     <>
-      <Dialog>
-        <DialogTrigger asChild={true}>
-          <div className="p-4 bg-[#F0F0F0] rounded-full cursor-pointer">
-            <PenSquareIcon size={18} />
-          </div>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create a chat</DialogTitle>
-          </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a chat</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
+            {
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>GroupChat Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="name"
+                        {...field}
+                        defaultValue={field.value}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            }
 
-          <DialogFooter>
-            <Button type="submit" className="font-semibold">
-              Баримт хэвлэх
+            <FormField
+              control={form.control}
+              name="userIds"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Choose one</FormLabel>
+                  <FormControl>
+                    {loadingUser ? (
+                      <Input disabled={true} placeholder="Loading..." />
+                    ) : (
+                      <FacetedFilter
+                        options={(users || []).map((user: any) => ({
+                          label: user?.details?.fullName || user.email,
+                          value: user._id,
+                        }))}
+                        title="Users"
+                        values={field.value}
+                        onSelect={field.onChange}
+                      />
+                    )}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="font-semibold w-full rounded-full">
+              Create
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </form>
+        </Form>
+      </DialogContent>
     </>
   )
 }
