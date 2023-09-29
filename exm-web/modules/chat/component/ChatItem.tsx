@@ -24,11 +24,9 @@ dayjs.extend(relativeTime)
 export const ChatItem = ({
   chat,
   isPinned,
-  handlePin,
 }: {
   chat?: any
   isPinned: boolean
-  handlePin: (chatId: string) => void
 }) => {
   const router = useRouter()
   const currentUser = useAtomValue(currentUserAtom)
@@ -49,12 +47,7 @@ export const ChatItem = ({
   }
 
   const onPin = () => {
-    handlePin(chat._id)
     togglePinned(chat._id)
-  }
-
-  const onMarkAsRead = () => {
-    console.log("read")
   }
 
   const renderChatActions = () => {
@@ -72,12 +65,12 @@ export const ChatItem = ({
           >
             {isPinned ? "Unpin" : "Pin"}
           </div>
-          <div
+          {/* <div
             className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs"
             onClick={onMarkAsRead}
           >
             {chat.isSeen ? "Mark as unread" : "Mark as read"}
-          </div>
+          </div> */}
           <div
             className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-rose-600 text-xs"
             onClick={onDelete}
@@ -107,7 +100,10 @@ export const ChatItem = ({
           {chat && chat.type === "direct" ? (
             <>
               {user?.details.fullName || user?.email}
-              <span> ({user?.details.position})</span>
+
+              {user?.details.position ? (
+                <span> ({user?.details.position})</span>
+              ) : null}
             </>
           ) : (
             chat?.name

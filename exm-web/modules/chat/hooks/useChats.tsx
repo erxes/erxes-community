@@ -5,17 +5,39 @@ import { queries, subscriptions } from "../graphql"
 export interface IUseChats {
   loading: boolean
   chats: any
+  pinnedChats: any
   chatsCount: number
   handleLoadMore: () => void
 }
 
-export const useChats = (): IUseChats => {
-  const { data, loading, fetchMore } = useQuery(queries.chats, {
-    variables: { limit: 20 },
+export const useChats = ({
+  searchValue,
+}: {
+  searchValue?: string
+}): IUseChats => {
+  const {
+    data,
+    loading: chatsLoading,
+    fetchMore,
+  } = useQuery(queries.chats, {
+    variables: { limit: 20, searchValue },
   })
 
+  let loading = true
+
+  const { data: pinnedChatsData, loading: pinnedChatsLoading } = useQuery(
+    queries.chatsPinned,
+    {
+      variables: { limit: 20 },
+    }
+  )
+
   const handleLoadMore = () => {
-    const chatLength = data.chats.list.length || 0
+    if (loading) {
+      return
+    }
+    const chats = (data || {}).chats ? (data || {}).chats.list : []
+    const chatLength = chats.length || 0
 
     fetchMore({
       variables: {
@@ -30,6 +52,8 @@ export const useChats = (): IUseChats => {
 
         const prevChats = prev.chats.list || []
 
+        console.log(fetchedChats, "12312")
+
         if (fetchedChats) {
           return {
             ...prev,
@@ -43,12 +67,20 @@ export const useChats = (): IUseChats => {
     })
   }
 
+  if (!chatsLoading && !pinnedChatsLoading) {
+    loading = false
+  }
+
   const chats = (data || {}).chats ? (data || {}).chats.list : []
+  const pinnedChats = (pinnedChatsData || {}).chatsPinned
+    ? (pinnedChatsData || {}).chatsPinned.list
+    : []
   const chatsCount = (data || {}).chats ? (data || {}).chats.totalCount : 0
 
   return {
     loading,
     chats,
+    pinnedChats,
     chatsCount,
     handleLoadMore,
   }

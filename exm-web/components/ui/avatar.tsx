@@ -25,16 +25,10 @@ const Avatar: FC<
     className,
     ...rest
   } = props
-  // const fixedSrc = readFile(src || "")
-
   const [fixedSrc, setFixedSrc] = useState(readFile(src || ""))
 
   const [isImageLoading, setIsImageLoading] = useState(true)
   const handleComplete = () => setIsImageLoading(false)
-
-  useEffect(() => {
-    const srcFixed = readFile(src || "")
-  }, [src])
 
   const updatedProps = {
     ...rest,

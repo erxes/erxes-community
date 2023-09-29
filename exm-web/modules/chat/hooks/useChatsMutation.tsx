@@ -15,7 +15,7 @@ const useChatsMutation = () => {
   const [togglePinnedChat, { loading }] = useMutation(
     mutations.chatToggleIsPinned,
     {
-      refetchQueries: ["chats"],
+      refetchQueries: ["chats", "chatsPinned"],
       onError,
     }
   )

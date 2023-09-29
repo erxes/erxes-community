@@ -5,8 +5,61 @@ const allUsers = teamQueries.allUsers
 const users = teamQueries.users
 
 const chats = gql`
-  query chats($type: ChatType, $limit: Int, $skip: Int) {
-    chats(type: $type, limit: $limit, skip: $skip) {
+  query chats($type: ChatType, $limit: Int, $skip: Int, $searchValue: String) {
+    chats(type: $type, limit: $limit, skip: $skip, searchValue: $searchValue) {
+      list {
+        _id
+        name
+        type
+        isSeen
+        isPinned
+        isPinnedUserIds
+        featuredImage
+        lastMessage {
+          content
+          createdAt
+          createdUser {
+            _id
+          }
+          seenList {
+            seenDate
+            user {
+              _id
+            }
+            lastSeenMessageId
+          }
+        }
+        createdUser {
+          _id
+          email
+          details {
+            avatar
+            description
+            fullName
+            operatorPhone
+          }
+        }
+        createdAt
+        participantUsers {
+          _id
+          email
+          details {
+            avatar
+            description
+            fullName
+            position
+            operatorPhone
+          }
+        }
+      }
+      totalCount
+    }
+  }
+`
+
+const chatsPinned = gql`
+  query chatsPinned {
+    chatsPinned {
       list {
         _id
         name
@@ -147,6 +200,7 @@ const getChatIdByUserIds = gql`
 `
 
 export default {
+  chatsPinned,
   users,
   allUsers,
   chats,

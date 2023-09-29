@@ -17,11 +17,6 @@ export const useChatId = (): IUseChats => {
   const { toast } = useToast()
   const [chatUser, setChatUser] = useState("")
 
-  // const success = () =>
-  //   toast({
-  //     description: `${configType} has been synced successfully.`,
-  //   })
-
   const { data, loading } = useQuery(queries.getChatIdByUserIds, {
     variables: { userIds: [chatUser] },
     skip: !chatUser,
@@ -37,12 +32,6 @@ export const useChatId = (): IUseChats => {
         description: `Name is required!`,
       })
     }
-
-    // if (userIds.length === 0) {
-    //   return toast({
-    //     description: `Select users!`,
-    //   })
-    // }
 
     chatAddMutation({
       variables: { name, type: "group", participantIds: userIds || [] },

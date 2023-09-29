@@ -34,17 +34,12 @@ const FormSchema = z.object({
   userIds: z.array(z.string()).optional(),
 })
 
-export const CreateChat = ({
-  setOpen,
-}: {
-  setOpen: (open: boolean) => void
-}) => {
+export const ChatForm = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
 
-  const { loading, loadingMutation, chatId, setChatUser, startGroupChat } =
-    useChatId()
+  const { loading, loadingMutation, setChatUser, startGroupChat } = useChatId()
 
   const { data: usersData, loading: loadingUser } = useQuery(queries.users)
   const { users } = usersData || {}
@@ -77,26 +72,6 @@ export const CreateChat = ({
         </DialogHeader>
         <Form {...form}>
           <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
-            {
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GroupChat Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="name"
-                        {...field}
-                        defaultValue={field.value}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            }
-
             <FormField
               control={form.control}
               name="userIds"
@@ -117,6 +92,24 @@ export const CreateChat = ({
                         onSelect={field.onChange}
                       />
                     )}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Group chat Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="name"
+                      {...field}
+                      defaultValue={field.value}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

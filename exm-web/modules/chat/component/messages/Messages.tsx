@@ -17,7 +17,7 @@ const Messages = () => {
   }
 
   if (loading) {
-    return <div>loading</div>
+    return <div />
   }
 
   return (
@@ -33,8 +33,6 @@ const Messages = () => {
       <div className="p-4">
         <Editor sendMessage={sendMessage} />
       </div>
-
-      {/* </div> */}
     </div>
   )
 }
