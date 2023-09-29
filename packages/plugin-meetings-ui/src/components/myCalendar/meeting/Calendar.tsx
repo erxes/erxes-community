@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { EventClickArg } from '@fullcalendar/core';
+import { EventClickArg, formatDate } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -73,7 +73,7 @@ function CalendarComponent(props: Props) {
 
   const renderEventContent = ({ event }: EventClickArg) => (
     <RenderEvent backgroundColor={event.backgroundColor}>
-      {/* <span style={{ whiteSpace: 'nowrap', paddingLeft: '15px' }}>
+      <span style={{ whiteSpace: 'nowrap', paddingLeft: '15px' }}>
         {event.title}
       </span>
       <span
@@ -83,7 +83,7 @@ function CalendarComponent(props: Props) {
           hour: '2-digit',
           minute: '2-digit'
         })}
-      </span> */}
+      </span>
     </RenderEvent>
   );
 
@@ -114,7 +114,6 @@ function CalendarComponent(props: Props) {
           eventClick={handleEventClick}
           eventChange={changeEvent}
           firstDay={1}
-          // dayMinWidth={100}
         />
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
