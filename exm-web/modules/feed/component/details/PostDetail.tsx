@@ -106,14 +106,15 @@ const PostDetail = ({ postId }: { postId: string }) => {
                 height={500}
                 className="w-10 h-10 rounded-full"
               />
-              <div className="ml-2">
-                <div className="text-sm font-bold text-gray-700">
+              <div className="ml-3">
+                <div className="text-sm font-bold text-gray-700 mb-1">
                   {userDetail.fullName ||
                     userDetail.username ||
                     userDetail.email}
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-gray-600 font-normal">
                   {formatDate(feed.createdAt || "")}
+                  <span className="text-green-700 font-bold text-sm ml-1">{`#${feed.contentType}`}</span>
                 </div>
               </div>
             </div>
