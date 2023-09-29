@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { EventClickArg, formatDate } from '@fullcalendar/core';
+import { EventClickArg } from '@fullcalendar/core';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -73,7 +73,7 @@ function CalendarComponent(props: Props) {
 
   const renderEventContent = ({ event }: EventClickArg) => (
     <RenderEvent backgroundColor={event.backgroundColor}>
-      <span style={{ whiteSpace: 'nowrap', paddingLeft: '15px' }}>
+      {/* <span style={{ whiteSpace: 'nowrap', paddingLeft: '15px' }}>
         {event.title}
       </span>
       <span
@@ -83,7 +83,7 @@ function CalendarComponent(props: Props) {
           hour: '2-digit',
           minute: '2-digit'
         })}
-      </span>
+      </span> */}
     </RenderEvent>
   );
 
@@ -94,25 +94,29 @@ function CalendarComponent(props: Props) {
 
   return (
     <>
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        }}
-        height="80vh"
-        initialView="dayGridMonth"
-        editable={true}
-        selectMirror={true}
-        selectable={true}
-        dayMaxEvents={true}
-        events={events}
-        select={handleDateSelect}
-        eventContent={renderEventContent}
-        eventClick={handleEventClick}
-        eventChange={changeEvent}
-      />
+      <div style={{ width: '100%' }}>
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          }}
+          height="80vh"
+          initialView="dayGridMonth"
+          editable={true}
+          selectMirror={true}
+          selectable={true}
+          dayMaxEvents={true}
+          events={{}}
+          select={handleDateSelect}
+          eventContent={renderEventContent}
+          eventClick={handleEventClick}
+          eventChange={changeEvent}
+          firstDay={1}
+          // dayMinWidth={100}
+        />
+      </div>
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton={true}>
           <Modal.Title>Create Meeting</Modal.Title>
