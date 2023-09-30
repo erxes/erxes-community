@@ -10,7 +10,7 @@ export default function ChatLayout({ children }: ILayoutProps) {
       <div className="flex h-full w-1/3 flex-col border-r">
         <ChatList />
       </div>
-      <div className="flex w-full">{children}</div>
+      {children}
     </>
   )
 }

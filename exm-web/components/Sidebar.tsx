@@ -20,7 +20,7 @@ export const Sidebar = () => {
   const [activeClass, setActiveClass] = useState(pathname)
 
   const handleLink = (href: string) => {
-    router.push(href)
+    router.replace(`/${href}`)
     setActiveClass(href)
   }
 
