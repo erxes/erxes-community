@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { IUser } from "@/modules/auth/types"
 import PostForm from "@/modules/feed/component/form/PostForm"
 import { useFeedDetail } from "@/modules/feed/hooks/useFeedDetail"
 import dayjs from "dayjs"
+import { useAtomValue } from "jotai"
 import {
   AlertTriangleIcon,
   CheckCircleIcon,
@@ -50,6 +52,7 @@ import HolidayForm from "./form/HolidayForm"
 const PostItem = ({ postId }: { postId: string }) => {
   const [open, setOpen] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
+  const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   const callBack = (result: string) => {
     if (result === "success") {
@@ -58,14 +61,10 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   const { feed, loading } = useFeedDetail({ feedId: postId })
-  const {
-    emojiCount,
-    loading: loadingReactionQuery,
-    emojiReactedUser,
-    loadingReactedUsers,
-  } = useReactionQuery({
-    feedId: postId,
-  })
+  const { emojiCount, emojiReactedUser, loadingReactedUsers } =
+    useReactionQuery({
+      feedId: postId,
+    })
 
   const {
     deleteFeed,
@@ -80,8 +79,16 @@ const PostItem = ({ postId }: { postId: string }) => {
     return <LoadingCard />
   }
 
+  if (loadingReactedUsers) {
+    return
+  }
+
   const user = feed.createdUser || ({} as IUser)
   const userDetail = user.details
+
+  const idExists = emojiReactedUser.some(
+    (item: any) => item._id === currentUser._id
+  )
 
   const urlRegex = /(https?:\/\/[^\s]+)/g
 
@@ -324,7 +331,11 @@ const PostItem = ({ postId }: { postId: string }) => {
             className="cursor-pointer flex items-center"
             onClick={reactionAdd}
           >
-            <HeartIcon size={20} className="mr-1" />
+            <HeartIcon
+              size={20}
+              className="mr-1"
+              color={`${idExists ? "#FF0000" : "#000"}`}
+            />
             <span className="font-bold text-base">{emojiCount}</span>
           </div>
         </CardFooter>

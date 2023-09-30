@@ -11,7 +11,7 @@ export const useReactionMutaion = (): IUsePosts => {
   const [reactionAdd, { loading: loadingReaction }] = useMutation(
     mutations.emojiReact,
     {
-      refetchQueries: ["emojiCount"],
+      refetchQueries: ["emojiCount", "emojiReactedUsers"],
     }
   )
 
