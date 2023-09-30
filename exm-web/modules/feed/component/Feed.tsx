@@ -11,19 +11,34 @@ const Feed = () => {
     <div>
       <Tabs defaultValue="post">
         <TabsList className="w-full items-center flex p-4">
-          <TabsTrigger className="text-[#444]" value="post">
+          <TabsTrigger
+            className="text-[#444] data-[state=active]:border-[#5629B6] data-[state=active]:border-b-2"
+            value="post"
+          >
             Post
           </TabsTrigger>
-          <TabsTrigger className="text-[#444]" value="event">
+          <TabsTrigger
+            className="text-[#444] data-[state=active]:border-[#5629B6] data-[state=active]:border-b-2"
+            value="event"
+          >
             Event
           </TabsTrigger>
-          <TabsTrigger className="text-[#444]" value="bravo">
+          <TabsTrigger
+            className="text-[#444] data-[state=active]:border-[#5629B6] data-[state=active]:border-b-2"
+            value="bravo"
+          >
             Bravo
           </TabsTrigger>
-          <TabsTrigger className="text-[#444]" value="publicHoliday">
+          <TabsTrigger
+            className="text-[#444] data-[state=active]:border-[#5629B6] data-[state=active]:border-b-2"
+            value="publicHoliday"
+          >
             Public holiday
           </TabsTrigger>
-          <TabsTrigger className="text-[#444]" value="welcome">
+          <TabsTrigger
+            className="text-[#444] data-[state=active]:border-[#5629B6] data-[state=active]:border-b-2"
+            value="welcome"
+          >
             Welcome
           </TabsTrigger>
         </TabsList>
