@@ -7,19 +7,31 @@ import PostForm from "@/modules/feed/component/form/PostForm"
 import { useFeedDetail } from "@/modules/feed/hooks/useFeedDetail"
 import dayjs from "dayjs"
 import {
+  AlertTriangleIcon,
+  CheckCircleIcon,
   ClockIcon,
   ExternalLinkIcon,
   MapPinIcon,
   MoreHorizontalIcon,
+  PencilIcon,
   PinIcon,
+  TrashIcon,
   UserIcon,
   UsersIcon,
+  XCircleIcon,
 } from "lucide-react"
 
 import { readFile } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import LoadingCard from "@/components/ui/loading-card"
+import LoadingPost from "@/components/ui/loadingPost"
 import {
   Popover,
   PopoverContent,
@@ -27,6 +39,7 @@ import {
 } from "@/components/ui/popover"
 import { AttachmentWithPreview } from "@/components/AttachmentWithPreview"
 
+import useFeedMutation from "../hooks/useFeedMutation"
 import BravoForm from "./form/BravoForm"
 import EventForm from "./form/EventForm"
 import HolidayForm from "./form/HolidayForm"
@@ -34,7 +47,20 @@ import HolidayForm from "./form/HolidayForm"
 const PostItem = ({ postId }: { postId: string }) => {
   const [open, setOpen] = useState(false)
 
+  const callBack = (result: string) => {
+    if (result === "success") {
+      setOpen(false)
+    }
+  }
+
   const { feed, loading } = useFeedDetail({ feedId: postId })
+  const {
+    deleteFeed,
+    pinFeed,
+    loading: mutationLoading,
+  } = useFeedMutation({
+    callBack,
+  })
 
   if (loading) {
     return <LoadingCard />
@@ -42,13 +68,6 @@ const PostItem = ({ postId }: { postId: string }) => {
 
   const user = feed.createdUser || ({} as IUser)
   const userDetail = user.details
-
-  const images = [
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-  ]
 
   const urlRegex = /(https?:\/\/[^\s]+)/g
 
@@ -71,27 +90,6 @@ const PostItem = ({ postId }: { postId: string }) => {
     }
   }
 
-  let gridCols = ""
-
-  switch (images.length) {
-    case 1:
-      gridCols = "col-span-1"
-      break
-    case 2:
-      gridCols = "col-span-1"
-      break
-    case 3:
-      gridCols = "col-span-3"
-      break
-    case 4:
-      gridCols = "col-span-4"
-      break
-
-    default:
-      gridCols = "col-span-2"
-      break
-  }
-
   const editAction = () => {
     const renderForm = () => {
       switch (feed.contentType) {
@@ -109,13 +107,63 @@ const PostItem = ({ postId }: { postId: string }) => {
     }
 
     return (
-      <Dialog open={open} onOpenChange={() => setOpen(!open)}>
-        <DialogTrigger asChild={true}>
-          <div className="text-black">edit</div>
-        </DialogTrigger>
+      <>
+        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+          <DialogTrigger asChild={true}>
+            <div className="text-black flex items-center">
+              <PencilIcon size={16} className="mr-1" /> Edit
+            </div>
+          </DialogTrigger>
 
-        {renderForm()}
-      </Dialog>
+          {renderForm()}
+        </Dialog>
+      </>
+    )
+  }
+
+  const deleteAction = () => {
+    const renderForm = () => {
+      return (
+        <DialogContent>
+          {mutationLoading ? <LoadingPost text={"Deleting"} /> : null}
+
+          <div className="flex flex-col items-center justify-center">
+            <AlertTriangleIcon size={30} color={"#6569DF"} /> Are you sure?
+          </div>
+
+          <DialogFooter>
+            <Button
+              className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
+              onClick={() => setOpen(false)}
+            >
+              <XCircleIcon size={16} className="mr-1" />
+              No, Cancel
+            </Button>
+            <Button
+              className="font-semibold rounded-full bg-[#3ECC38] hover:bg-[#3ECC38]"
+              onClick={() => deleteFeed(feed._id)}
+            >
+              <CheckCircleIcon size={16} className="mr-1" />
+              Yes, I am
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      )
+    }
+
+    return (
+      <>
+        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+          <DialogTrigger asChild={true}>
+            <div className="text-black flex items-center">
+              <TrashIcon size={16} className="mr-1" />
+              Delete
+            </div>
+          </DialogTrigger>
+
+          {renderForm()}
+        </Dialog>
+      </>
     )
   }
 
@@ -130,6 +178,18 @@ const PostItem = ({ postId }: { postId: string }) => {
         <PopoverContent className="w-40 p-3">
           <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
             {editAction()}
+          </div>
+          <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
+            {deleteAction()}
+          </div>
+          <div
+            className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex items-center"
+            onClick={() => pinFeed(feed._id)}
+          >
+            <PinIcon size={16} className="mr-1" />
+            <span className="text-black font-medium">
+              {feed.isPinned ? "UnPin" : "Pin"}
+            </span>
           </div>
         </PopoverContent>
       </Popover>
@@ -194,7 +254,7 @@ const PostItem = ({ postId }: { postId: string }) => {
               </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center cursor-pointer">
               {feed.isPinned && <PinIcon size={18} color={"#FF0000"} />}
               {renderFeedActions()}
             </div>
