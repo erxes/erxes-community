@@ -32,6 +32,25 @@ const useFeedMutation = ({
     onError,
   })
 
+  const [feedDelete, { loading: loadingDelete }] = useMutation(
+    mutations.deleteFeed,
+    {
+      onCompleted(data) {
+        toast({ description: "edited", variant: "destructive" })
+      },
+      refetchQueries: ["feed", "exmFeedDetail"],
+      onError,
+    }
+  )
+
+  const [feedPin, { loading: loadingPin }] = useMutation(mutations.pinFeed, {
+    onCompleted(data) {
+      toast({ description: "edited", variant: "destructive" })
+    },
+    refetchQueries: ["feed", "exmFeedDetail"],
+    onError,
+  })
+
   const feedMutation = (variables: IFeedVariable, _id?: string) => {
     if (!_id) {
       feedAdd({
@@ -50,9 +69,27 @@ const useFeedMutation = ({
     }
   }
 
+  const deleteFeed = (_id: string) => {
+    feedDelete({
+      variables: { _id },
+    }).then(() => {
+      callBack("success")
+    })
+  }
+
+  const pinFeed = (_id: string) => {
+    feedPin({
+      variables: { _id },
+    }).then(() => {
+      callBack("success")
+    })
+  }
+
   return {
     feedMutation,
-    loading: loading || loadingEdit,
+    deleteFeed,
+    pinFeed,
+    loading: loading || loadingEdit || loadingDelete || loadingPin,
   }
 }
 
