@@ -237,7 +237,7 @@ const PostItem = ({ postId }: { postId: string }) => {
           })}
 
           {feed.images && feed.images.length > 0 && (
-            <AttachmentWithPreview images={feed.images} />
+            <AttachmentWithPreview images={feed.images} className="mt-2" />
           )}
         </CardContent>
       </Card>
