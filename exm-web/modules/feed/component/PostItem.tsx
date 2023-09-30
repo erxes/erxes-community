@@ -80,10 +80,6 @@ const PostItem = ({ postId }: { postId: string }) => {
     return <LoadingCard />
   }
 
-  if (loadingReactionQuery) {
-    return null
-  }
-
   const user = feed.createdUser || ({} as IUser)
   const userDetail = user.details
 
@@ -323,12 +319,12 @@ const PostItem = ({ postId }: { postId: string }) => {
           )}
         </CardContent>
 
-        <CardFooter className="border-t pt-2">
+        <CardFooter className="border-t">
           <div
             className="cursor-pointer flex items-center"
             onClick={reactionAdd}
           >
-            <HeartIcon size={14} className="mr-1" />{" "}
+            <HeartIcon size={20} className="mr-1" />
             <span className="font-bold text-base">{emojiCount}</span>
           </div>
         </CardFooter>
