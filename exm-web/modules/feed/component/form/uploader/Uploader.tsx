@@ -1,10 +1,8 @@
-import React, { useState } from "react"
-import { Image as ImageIcon } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { Image as ImageIcon, Paperclip } from "lucide-react"
 
 import { Card } from "@/components/ui/card"
 import uploadHandler from "@/components/uploader/uploadHandler"
-
-import AttachmentsPreview from "./AttachmentsPreview"
 
 export interface IAttachment {
   name: string
@@ -16,21 +14,11 @@ export interface IAttachment {
 type Props = {
   defaultFileList: IAttachment[]
   onChange: (attachments: IAttachment[]) => void
-  single?: boolean
-  limit?: number
-  multiple?: boolean
   type?: string
 }
 
-const Uploader = ({
-  defaultFileList,
-  onChange,
-  single,
-  limit,
-  multiple,
-}: Props) => {
+const Uploader = ({ defaultFileList, onChange, type }: Props) => {
   const [loading, setLoading] = useState(false)
-  const [attachments, setAttachments] = useState(defaultFileList || [])
 
   const handleFileInput = ({ target }: { target: any }) => {
     const files = target.files
@@ -44,16 +32,14 @@ const Uploader = ({
 
       afterUpload: ({ status, response, fileInfo }) => {
         if (status !== "ok") {
-          console.log(response)
-
           return setLoading(false)
         }
 
         const attachment = { url: response, ...fileInfo }
 
-        setAttachments([...attachments, attachment])
+        const updated = [...defaultFileList, attachment]
 
-        onChange(attachments)
+        onChange(updated)
 
         setLoading(false)
       },
@@ -62,23 +48,33 @@ const Uploader = ({
     target.value = ""
   }
 
+  const uploadText =
+    type && type === "image" ? "Upload images" : "Upload Attachments"
+
+  const uploIcon = type && type === "image" ? <ImageIcon /> : <Paperclip />
+
+  const id = Math.random().toString()
+
   return (
     <Card className="bg-[#F0F0F0]">
       <div className="flex items-center space-x-2">
         <label
-          htmlFor="file-input"
+          htmlFor={id}
           className="cursor-pointer px-4 py-2  h-[50%] w-full flex items-center"
         >
-          <ImageIcon />
+          {uploIcon}
+          <p>{uploadText}</p>
         </label>
         <input
-          id="file-input"
-          accept="image/*"
+          id={id}
+          accept={type && type === "image" ? "image/*" : ""}
           type="file"
-          className="hidden"
           onChange={handleFileInput}
+          className="hidden"
         />
       </div>
+
+      {loading ? <div> Uploading</div> : null}
     </Card>
   )
 }

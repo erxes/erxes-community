@@ -84,7 +84,7 @@ export interface IFeedVariable {
   title?: string
   description?: string
   images?: IAttachment[]
-  attachments?: string
+  attachments?: IAttachment[]
   isPinned?: boolean
   contentType?: string
   recipientIds?: string[]

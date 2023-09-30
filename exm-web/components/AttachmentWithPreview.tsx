@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import NextImage from "next/image"
+import { XCircle } from "lucide-react"
 
 import { cn, readFile } from "@/lib/utils"
 
@@ -10,9 +11,11 @@ import Image from "./ui/image"
 export const AttachmentWithPreview = ({
   images,
   className,
+  deleteImage,
 }: {
   images: any[]
   className?: string
+  deleteImage?: (index: number) => void
 }) => {
   const [index, setIndex] = useState(0)
 
@@ -38,6 +41,16 @@ export const AttachmentWithPreview = ({
             />
           </div>
         </div>
+
+        {deleteImage && (
+          <button
+            type="button"
+            className="absolute top-0 right-0"
+            onClick={() => deleteImage(index)}
+          >
+            <XCircle size={18} onClick={() => deleteImage(index)} />
+          </button>
+        )}
 
         {index > 0 && (
           <button

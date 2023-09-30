@@ -5,7 +5,7 @@ import NextImage, { ImageProps } from "next/image"
 
 import { cn, readFile } from "@/lib/utils"
 
-const Avatar: FC<
+const Image: FC<
   ImageProps & {
     src?: string
     alt?: string
@@ -16,7 +16,7 @@ const Avatar: FC<
     src,
     fill = true,
     alt = "",
-    onError = () => setFixedSrc(props.fallBack || "/user.png"),
+
     width,
     height,
     fallBack,
@@ -24,24 +24,27 @@ const Avatar: FC<
     className,
     ...rest
   } = props
-  const [fixedSrc, setFixedSrc] = useState(readFile(src || ""))
 
   const [isImageLoading, setIsImageLoading] = useState(true)
   const handleComplete = () => setIsImageLoading(false)
 
+  const [error, setError] = useState(null)
+
+  const fallbackImage = "user.png"
+
   const updatedProps = {
     ...rest,
-    src: fixedSrc,
+    src: error ? fallbackImage : readFile(src),
     alt,
     fill: !width && !height ? true : undefined,
     width,
     height,
-    onError,
   }
 
   return (
     <NextImage
       {...updatedProps}
+      onError={() => setError}
       onLoadingComplete={handleComplete}
       className={cn(className, isImageLoading && "blur-2xl", "text-black")}
       sizes={
@@ -54,4 +57,4 @@ const Avatar: FC<
   )
 }
 
-export default memo(Avatar)
+export default memo(Image)
