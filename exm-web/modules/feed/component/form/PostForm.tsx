@@ -114,8 +114,6 @@ const PostForm = ({
     )
   }
 
-  console.log(attachments, "1321")
-
   return (
     <DialogContent className="max-h-[80vh] overflow-auto">
       <DialogHeader>
