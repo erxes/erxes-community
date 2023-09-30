@@ -5,7 +5,7 @@ import NextImage, { ImageProps } from "next/image"
 
 import { cn, readFile } from "@/lib/utils"
 
-const Image: FC<
+const Avatar: FC<
   ImageProps & {
     src?: string
     alt?: string
@@ -57,4 +57,4 @@ const Image: FC<
   )
 }
 
-export default memo(Image)
+export default memo(Avatar)

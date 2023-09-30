@@ -121,8 +121,6 @@ const ChatList = () => {
         {!loading && chats.length < chatsCount && (
           <div ref={ref}>
             <LoadingCard type="chatlist" />
-
-            <LoadingCard type="chatlist" />
           </div>
         )}
       </div>
