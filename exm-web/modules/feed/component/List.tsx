@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import dynamic from "next/dynamic"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
+import { IUser } from "@/modules/auth/types"
 import { useAtomValue } from "jotai"
 import { useInView } from "react-intersection-observer"
 
@@ -25,7 +26,7 @@ const HolidayDetail = dynamic(
 const FeedForm = dynamic(() => import("../component/form/FeedForm"))
 
 const List = ({ contentType }: { contentType: string }) => {
-  const currentUser = useAtomValue(currentUserAtom)
+  const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   const { ref, inView } = useInView({
     threshold: 0,
