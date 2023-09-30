@@ -24,7 +24,8 @@ export const useReactionQuery = ({
     }
   )
 
-  const emojiCount = (data || {}).emojiCount || {}
+  const emojiCount = (data || {}).emojiCount || 0
+
   return {
     loading,
     emojiCount,
