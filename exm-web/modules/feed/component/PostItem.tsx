@@ -8,8 +8,10 @@ import { useFeedDetail } from "@/modules/feed/hooks/useFeedDetail"
 import dayjs from "dayjs"
 import {
   ClockIcon,
+  ExternalLinkIcon,
   MapPinIcon,
   MoreHorizontalIcon,
+  PinIcon,
   UserIcon,
   UsersIcon,
 } from "lucide-react"
@@ -23,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { AttachmentWithPreview } from "@/components/AttachmentWithPreview"
 
 import BravoForm from "./form/BravoForm"
 import EventForm from "./form/EventForm"
@@ -190,7 +193,11 @@ const PostItem = ({ postId }: { postId: string }) => {
                 </div>
               </div>
             </div>
-            {renderFeedActions()}
+
+            <div className="flex items-center">
+              {feed.isPinned && <PinIcon size={18} color={"#FF0000"} />}
+              {renderFeedActions()}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -219,19 +226,19 @@ const PostItem = ({ postId }: { postId: string }) => {
             })}
           </div>
 
-          <div className={`grid grid-cols-2 my-4`}>
-            {images.map((image, index) => (
-              <div key={index} className="relative">
-                <Image
-                  src={image.image}
-                  alt={`Post ${index}`}
-                  width={500}
-                  height={500}
-                  className={`h-32 w-full object-cover ${gridCols}`}
-                />
-              </div>
-            ))}
-          </div>
+          {(feed.attachments || []).map((a, index) => {
+            return (
+              <a key={index} href={readFile(a.url)}>
+                <div className="flex items-center border-y text-sm font-semibold text-[#444] p-2.5">
+                  {a.name} <ExternalLinkIcon size={18} />
+                </div>
+              </a>
+            )
+          })}
+
+          {feed.images && feed.images.length > 0 && (
+            <AttachmentWithPreview images={feed.images} />
+          )}
         </CardContent>
       </Card>
     </>

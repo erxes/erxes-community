@@ -60,10 +60,10 @@ export interface IFeed {
   title: string
   description?: string
   images?: IAttachment[]
-  attachments?: string
+  attachments?: IAttachment[]
   isPinned?: boolean
   contentType?: string
-  recipientIds?: string[]
+  recipientIds: string[]
   customFieldsData?: string
   ceremonyData?: string
   eventData?: IEventData

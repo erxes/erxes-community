@@ -65,6 +65,16 @@ const feed = gql`
     ) {
       list {
         _id
+        isPinned
+        recipientIds
+        eventData {
+          visibility
+          where
+          startDate
+          endDate
+          interestedUserIds
+          goingUserIds
+        }
       }
 
       totalCount
