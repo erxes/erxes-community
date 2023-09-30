@@ -46,6 +46,7 @@ import HolidayForm from "./form/HolidayForm"
 
 const PostItem = ({ postId }: { postId: string }) => {
   const [open, setOpen] = useState(false)
+  const [formOpen, setFormOpen] = useState(false)
 
   const callBack = (result: string) => {
     if (result === "success") {
@@ -122,7 +123,7 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   const deleteAction = () => {
-    const renderForm = () => {
+    const renderDeleteForm = () => {
       return (
         <DialogContent>
           {mutationLoading ? <LoadingPost text={"Deleting"} /> : null}
@@ -134,7 +135,7 @@ const PostItem = ({ postId }: { postId: string }) => {
           <DialogFooter>
             <Button
               className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
-              onClick={() => setOpen(false)}
+              onClick={() => setFormOpen(false)}
             >
               <XCircleIcon size={16} className="mr-1" />
               No, Cancel
@@ -153,7 +154,7 @@ const PostItem = ({ postId }: { postId: string }) => {
 
     return (
       <>
-        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+        <Dialog open={formOpen} onOpenChange={() => setOpen(!formOpen)}>
           <DialogTrigger asChild={true}>
             <div className="text-black flex items-center">
               <TrashIcon size={16} className="mr-1" />
@@ -161,7 +162,7 @@ const PostItem = ({ postId }: { postId: string }) => {
             </div>
           </DialogTrigger>
 
-          {renderForm()}
+          {renderDeleteForm()}
         </Dialog>
       </>
     )
