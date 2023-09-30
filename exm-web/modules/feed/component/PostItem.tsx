@@ -24,8 +24,14 @@ import {
 import { readFile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import LoadingCard from "@/components/ui/loading-card"
+import LoadingPost from "@/components/ui/loadingPost"
 import {
   Popover,
   PopoverContent,
@@ -44,7 +50,7 @@ const PostItem = ({ postId }: { postId: string }) => {
 
   const callBack = (result: string) => {
     if (result === "success") {
-      setOpen(false)
+      setFormOpen(false)
     }
   }
 
@@ -116,51 +122,51 @@ const PostItem = ({ postId }: { postId: string }) => {
     )
   }
 
-  // const deleteAction = () => {
-  //   const renderDeleteForm = () => {
-  //     return (
-  //       <DialogContent>
-  //         {mutationLoading ? <LoadingPost text={"Deleting"} /> : null}
+  const deleteAction = () => {
+    const renderDeleteForm = () => {
+      return (
+        <DialogContent>
+          {mutationLoading ? <LoadingPost text={"Deleting"} /> : null}
 
-  //         <div className="flex flex-col items-center justify-center">
-  //           <AlertTriangleIcon size={30} color={"#6569DF"} /> Are you sure?
-  //         </div>
+          <div className="flex flex-col items-center justify-center">
+            <AlertTriangleIcon size={30} color={"#6569DF"} /> Are you sure?
+          </div>
 
-  //         <DialogFooter>
-  //           <Button
-  //             className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
-  //             onClick={() => setOpen(false)}
-  //           >
-  //             <XCircleIcon size={16} className="mr-1" />
-  //             No, Cancel
-  //           </Button>
-  //           <Button
-  //             className="font-semibold rounded-full bg-[#3ECC38] hover:bg-[#3ECC38]"
-  //             onClick={() => deleteFeed(feed._id)}
-  //           >
-  //             <CheckCircleIcon size={16} className="mr-1" />
-  //             Yes, I am
-  //           </Button>
-  //         </DialogFooter>
-  //       </DialogContent>
-  //     )
-  //   }
+          <DialogFooter>
+            <Button
+              className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
+              onClick={() => setOpen(false)}
+            >
+              <XCircleIcon size={16} className="mr-1" />
+              No, Cancel
+            </Button>
+            <Button
+              className="font-semibold rounded-full bg-[#3ECC38] hover:bg-[#3ECC38]"
+              onClick={() => deleteFeed(feed._id)}
+            >
+              <CheckCircleIcon size={16} className="mr-1" />
+              Yes, I am
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      )
+    }
 
-  //   return (
-  //     <>
-  //       <Dialog open={open} onOpenChange={() => setOpen(!open)}>
-  //         <DialogTrigger asChild={true}>
-  //           <div className="text-black flex items-center">
-  //             <TrashIcon size={16} className="mr-1" />
-  //             Delete
-  //           </div>
-  //         </DialogTrigger>
+    return (
+      <>
+        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+          <DialogTrigger asChild={true}>
+            <div className="text-black flex items-center">
+              <TrashIcon size={16} className="mr-1" />
+              Delete
+            </div>
+          </DialogTrigger>
 
-  //         {renderDeleteForm()}
-  //       </Dialog>
-  //     </>
-  //   )
-  // }
+          {renderDeleteForm()}
+        </Dialog>
+      </>
+    )
+  }
 
   const renderFeedActions = () => {
     return (
@@ -175,7 +181,7 @@ const PostItem = ({ postId }: { postId: string }) => {
             {editAction()}
           </div>
           <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
-            {/* {deleteAction()} */}
+            {deleteAction()}
           </div>
           <div
             className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex items-center"

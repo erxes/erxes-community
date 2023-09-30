@@ -93,8 +93,8 @@ const RightSideBar = () => {
                   </div>
                 )}
                 <div>
-                  <h3>{item.title}</h3>
-                  <div>{item.eventData.where}</div>
+                  <h3 className="font-semibold">{item.title}</h3>
+                  <div className="text-[#888]">{item.eventData.where}</div>
                 </div>
               </CardContent>
             </Card>
