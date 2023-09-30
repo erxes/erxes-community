@@ -118,19 +118,13 @@ const ChatList = () => {
           {renderChats()}
         </>
 
-        {loading && (
-          <>
+        {!loading && chats.length < chatsCount && (
+          <div ref={ref}>
             <LoadingCard type="chatlist" />
-          </>
-        )}
 
-        <div ref={ref}>
-          {!loading && chatsCount > 20 && chats.length < chatsCount && (
-            <>
-              <LoadingCard type="chatlist" />
-            </>
-          )}
-        </div>
+            <LoadingCard type="chatlist" />
+          </div>
+        )}
       </div>
     </div>
   )

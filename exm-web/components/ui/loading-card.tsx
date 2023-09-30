@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader } from "./card"
 const LoadingCard = ({ type }: { type?: string }) => {
   if (type === "chatlist") {
     return (
-      <div className="w-full">
-        <Card className=" rounded-none  cursor-pointer flex items-center shadow-none border-none bg-transparent hover:bg-[#F0F0F0]">
+      <div className="w-full mb-4">
+        <Card className="px-6 rounded-none  cursor-pointer flex items-center shadow-none border-none bg-transparent hover:bg-[#F0F0F0]">
           <div className="rounded-full bg-slate-100  w-12 h-12 shrink-0" />
 
-          <div className="w-full">
+          <div className="w-full px-6">
             <div className="rounded-full bg-slate-100 w-full h-6 mb-2" />
           </div>
         </Card>
