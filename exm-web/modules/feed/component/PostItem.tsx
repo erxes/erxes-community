@@ -58,7 +58,12 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   const { feed, loading } = useFeedDetail({ feedId: postId })
-  const { emojiCount, loading: loadingReactionQuery } = useReactionQuery({
+  const {
+    emojiCount,
+    loading: loadingReactionQuery,
+    emojiReactedUser,
+    loadingReactedUsers,
+  } = useReactionQuery({
     feedId: postId,
   })
 
@@ -69,14 +74,10 @@ const PostItem = ({ postId }: { postId: string }) => {
   } = useFeedMutation({
     callBack,
   })
-  const { reactionMutation, loadingReaction } = useReactionMutaion()
+  const { reactionMutation } = useReactionMutaion()
 
   if (loading) {
     return <LoadingCard />
-  }
-
-  if (loadingReaction) {
-    return null
   }
 
   if (loadingReactionQuery) {

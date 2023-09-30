@@ -1,11 +1,12 @@
 import { useQuery } from "@apollo/client"
 
 import { queries } from "../graphql"
-import { IFeed } from "../types"
 
 export interface IReactionDetail {
   loading: boolean
+  loadingReactedUsers: boolean
   emojiCount: number
+  emojiReactedUser: string[]
 }
 
 export const useReactionQuery = ({
@@ -17,17 +18,19 @@ export const useReactionQuery = ({
     variables: { contentId: feedId, contentType: "exmFeed", type: "heart" },
   })
 
-  const { data: emojiReactedUsers, loading: loadingReactedUsers } = useQuery(
-    queries.emojiReactedUsers,
-    {
+  const { data: emojiReactedUsersData, loading: loadingReactedUsers } =
+    useQuery(queries.emojiReactedUsers, {
       variables: { contentId: feedId, contentType: "exmFeed", type: "heart" },
-    }
-  )
+    })
 
-  const emojiCount = (data || {}).emojiCount || {}
+  const emojiCount = (data || {}).emojiCount || 0
+  const emojiReactedUser = (emojiReactedUsersData || {}).emojiReactedUsers || []
+
   return {
     loading,
+    loadingReactedUsers,
     emojiCount,
+    emojiReactedUser,
   }
 }
 
