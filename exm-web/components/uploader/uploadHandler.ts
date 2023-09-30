@@ -141,9 +141,9 @@ const uploadHandler = (params: Params) => {
         credentials: "include",
         ...(userId ? { headers: { userId } } : {}),
       })
-        .then((response) => {
+        .then((response: any) => {
           response[responseType]()
-            .then((text) => {
+            .then((text: string) => {
               if (!response.ok) {
                 return afterUpload({
                   status: "error",
@@ -157,7 +157,7 @@ const uploadHandler = (params: Params) => {
                 afterUpload({ status: "ok", response: text, fileInfo })
               }
             })
-            .catch((error) => {
+            .catch((error: any) => {
               toast({ description: error.message })
             })
         })

@@ -3,7 +3,7 @@ import { ApolloError, useMutation } from "@apollo/client"
 import { useToast } from "@/components/ui/use-toast"
 
 import { mutations } from "../graphql"
-import { IFeed, IFeedVariable } from "../types"
+import { IFeedVariable } from "../types"
 
 const useFeedMutation = ({
   callBack,

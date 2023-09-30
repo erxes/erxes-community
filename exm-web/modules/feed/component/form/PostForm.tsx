@@ -29,11 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import Uploader from "@/components/uploader/Uploader"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
 import { useTeamMembers } from "../../hooks/useTeamMembers"
 import { IFeed } from "../../types"
+import Uploader from "./uploader/Uploader"
 
 const FormSchema = z.object({
   title: z.string({
@@ -221,11 +221,13 @@ const PostForm = ({
             )}
           />
 
-          <Uploader
-            defaultFileList={images || []}
-            onChange={setImage}
-            multiple={true}
-          />
+          <div>
+            <Uploader
+              defaultFileList={images || []}
+              onChange={setImage}
+              multiple={true}
+            />
+          </div>
 
           <Button type="submit" className="font-semibold w-full rounded-full">
             Post
