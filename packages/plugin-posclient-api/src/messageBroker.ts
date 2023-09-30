@@ -183,6 +183,9 @@ export const initBroker = async cl => {
     async ({ subdomain, data }) => {
       const models = await generateModels(subdomain);
       const { contentTypeId, contentType, status, amount } = data;
+      const { posToken } = data.data;
+
+      const order = await models.Orders.findOne({ _id: contentTypeId }).lean();
     }
   );
 

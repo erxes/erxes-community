@@ -5,7 +5,7 @@ export default {
   callback: async ({ subdomain, data }) => {
     const models = await generateModels(subdomain);
 
-    if (data.contentType !== 'pos:orders') {
+    if (data.contentType !== 'pos:orders' || data.status !== 'paid') {
       return;
     }
 
