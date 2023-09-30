@@ -33,9 +33,9 @@ export const Sidebar = () => {
         onClick={() => handleLink(href)}
       >
         <div
-          className={`${
-            activeClass === active ? "bg-[#6569DF]" : "bg-white"
-          } mr-2 shadow-md p-2 rounded-lg`}
+          className={`${activeClass === active ? "bg-[#6569DF]" : "bg-white"} ${
+            pathname.includes("/chat") ? "" : "mr-2 "
+          } shadow-md p-2 rounded-lg`}
         >
           <Icon
             size={18}
