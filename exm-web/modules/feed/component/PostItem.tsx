@@ -11,6 +11,7 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExternalLinkIcon,
+  HeartIcon,
   MapPinIcon,
   MoreHorizontalIcon,
   PencilIcon,
@@ -40,6 +41,8 @@ import {
 import { AttachmentWithPreview } from "@/components/AttachmentWithPreview"
 
 import useFeedMutation from "../hooks/useFeedMutation"
+import { useReactionMutaion } from "../hooks/useReactionMutation"
+import { useReactionQuery } from "../hooks/useReactionQuery"
 import BravoForm from "./form/BravoForm"
 import EventForm from "./form/EventForm"
 import HolidayForm from "./form/HolidayForm"
@@ -55,6 +58,10 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   const { feed, loading } = useFeedDetail({ feedId: postId })
+  const { emojiCount, loading: loadingReactionQuery } = useReactionQuery({
+    feedId: postId,
+  })
+
   const {
     deleteFeed,
     pinFeed,
@@ -62,9 +69,18 @@ const PostItem = ({ postId }: { postId: string }) => {
   } = useFeedMutation({
     callBack,
   })
+  const { reactionMutation, loadingReaction } = useReactionMutaion()
 
   if (loading) {
     return <LoadingCard />
+  }
+
+  if (loadingReaction) {
+    return null
+  }
+
+  if (loadingReactionQuery) {
+    return null
   }
 
   const user = feed.createdUser || ({} as IUser)
@@ -89,6 +105,10 @@ const PostItem = ({ postId }: { postId: string }) => {
     } else {
       updatedDescription = feed.description
     }
+  }
+
+  const reactionAdd = () => {
+    reactionMutation(feed._id)
   }
 
   const editAction = () => {
@@ -302,7 +322,15 @@ const PostItem = ({ postId }: { postId: string }) => {
           )}
         </CardContent>
 
-        <CardFooter />
+        <CardFooter className="border-t pt-2">
+          <div
+            className="cursor-pointer flex items-center"
+            onClick={reactionAdd}
+          >
+            <HeartIcon size={14} className="mr-1" />{" "}
+            <span className="font-bold text-base">{emojiCount}</span>
+          </div>
+        </CardFooter>
       </Card>
     </>
   )

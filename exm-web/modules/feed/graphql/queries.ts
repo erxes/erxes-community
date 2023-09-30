@@ -323,8 +323,12 @@ const comments = `
   }
 `
 
-const emojiCount = `
-  query emojiCount($contentId: String!, $contentType: ReactionContentType!, $type: String!) {
+const emojiCount = gql`
+  query emojiCount(
+    $contentId: String!
+    $contentType: ReactionContentType!
+    $type: String!
+  ) {
     emojiCount(contentId: $contentId, contentType: $contentType, type: $type)
   }
 `
@@ -340,6 +344,22 @@ const exmFeedDetail = gql`
 const emojiIsReacted = `
   query emojiIsReacted($contentId: String!, $contentType: ReactionContentType!, $type: String!) {
     emojiIsReacted(contentId: $contentId, contentType: $contentType, type: $type)
+  }
+`
+
+const emojiReactedUsers = gql`
+  query emojiReactedUsers(
+    $contentId: String!
+    $contentType: ReactionContentType!
+    $type: String!
+  ) {
+    emojiReactedUsers(
+      contentId: $contentId
+      contentType: $contentType
+      type: $type
+    ) {
+      _id
+    }
   }
 `
 
@@ -360,4 +380,5 @@ export default {
   comments,
   emojiCount,
   emojiIsReacted,
+  emojiReactedUsers,
 }
