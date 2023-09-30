@@ -51,6 +51,8 @@ export interface IEventData {
   startDate: Date
   endDate: Date
   visibility: string
+  goingUserIds: string[]
+  interestedUserIds: string[]
 }
 
 export interface IFeed {

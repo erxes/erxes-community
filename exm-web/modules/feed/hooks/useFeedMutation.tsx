@@ -44,6 +44,8 @@ const useFeedMutation = ({
     if (_id) {
       feedEdit({
         variables: { _id, ...variables },
+      }).then(() => {
+        callBack("success")
       })
     }
   }
