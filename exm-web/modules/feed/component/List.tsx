@@ -13,15 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useFeeds } from "../hooks/useFeed"
 import { IFeed } from "../types"
 
-const PostDetail = dynamic(() => import("../component/details/PostDetail"))
-const EventDetail = dynamic(() => import("../component/details/EventDetail"))
-const BravoDetail = dynamic(() => import("../component/details/BravoDetail"))
-const WelcomeDetail = dynamic(
-  () => import("../component/details/WelcomeDetail")
-)
-const HolidayDetail = dynamic(
-  () => import("../component/details/HolidayDetail")
-)
+const PostItem = dynamic(() => import("./PostItem"))
 
 const FeedForm = dynamic(() => import("../component/form/FeedForm"))
 
@@ -71,7 +63,7 @@ const List = ({ contentType }: { contentType: string }) => {
 
   if (loading) {
     return (
-      <ScrollArea className="h-screen pb-16 pr-3">
+      <ScrollArea className="h-screen">
         <FeedForm contentType={contentType} />
         <LoadingCard />
       </ScrollArea>
@@ -79,22 +71,11 @@ const List = ({ contentType }: { contentType: string }) => {
   }
 
   const renderDetail = (feedId: string) => {
-    switch (contentType) {
-      case "post":
-        return <PostDetail key={feedId} postId={feedId} />
-      case "publicHoliday":
-        return <HolidayDetail key={feedId} postId={feedId} />
-      case "welcome":
-        return <WelcomeDetail key={feedId} postId={feedId} />
-      case "bravo":
-        return <BravoDetail key={feedId} postId={feedId} />
-      case "event":
-        return <EventDetail key={feedId} postId={feedId} />
-    }
+    return <PostItem postId={feedId} />
   }
 
   return (
-    <ScrollArea className="h-screen pb-16 pr-3">
+    <ScrollArea className="h-[94vh]">
       <FeedForm contentType={contentType} />
       {showList(pinnedList)}
       {showList(normalList)}
@@ -105,7 +86,7 @@ const List = ({ contentType }: { contentType: string }) => {
         </>
       )}
 
-      {feedsCount > 20 && feeds.length < feedsCount && (
+      {!loading && feeds.length < feedsCount && (
         <div ref={ref}>
           <LoadingCard />
         </div>

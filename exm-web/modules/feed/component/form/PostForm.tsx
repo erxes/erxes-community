@@ -73,16 +73,17 @@ const PostForm = ({
   })
 
   const deleteAttachment = (index: number) => {
-    console.log(index)
-    const updated = attachments.splice(index, 1)
+    const updated = [...attachments]
+
+    updated.splice(index, 1)
 
     setAttachments(updated)
   }
 
   const deleteImage = (index: number) => {
-    const updated = images.splice(index, 1)
+    const updated = [...images]
 
-    console.log(updated, "12312")
+    updated.splice(index, 1)
 
     setImage(updated)
   }
@@ -112,6 +113,8 @@ const PostForm = ({
       feed?._id || ""
     )
   }
+
+  console.log(attachments, "1321")
 
   return (
     <DialogContent>
