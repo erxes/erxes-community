@@ -90,7 +90,7 @@ export interface IFeedVariable {
   recipientIds?: string[]
   customFieldsData?: string
   ceremonyData?: string
-  eventData?: IEventData
+  eventData?: any
   startDate?: Date
   endDate?: Date
   createdBy?: string

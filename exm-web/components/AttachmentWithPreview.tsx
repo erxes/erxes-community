@@ -5,6 +5,8 @@ import NextImage from "next/image"
 
 import { cn, readFile } from "@/lib/utils"
 
+import Image from "./ui/image"
+
 export const AttachmentWithPreview = ({
   images,
   className,
@@ -29,11 +31,10 @@ export const AttachmentWithPreview = ({
       <div id="gallery" className={cn("relative w-full", className)}>
         <div className="relative h-56 overflow-hidden md:h-96">
           <div className="relative aspect-[5/3]" data-carousel-item={true}>
-            <NextImage
-              alt=""
-              src={readFile(images[index].url)}
-              layout={"fill"}
-              className="h-auto max-w-full object-contain cursor-pointer"
+            <Image
+              alt="image"
+              src={images[index].url}
+              className="w-full h-56 object-contain cursor-pointer"
             />
           </div>
         </div>

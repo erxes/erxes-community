@@ -1,8 +1,7 @@
 "use client"
 
-import { FC, memo, useEffect, useState } from "react"
-import NextImage, { ImageLoaderProps, ImageProps } from "next/image"
-import { Package } from "lucide-react"
+import { FC, memo, useState } from "react"
+import NextImage, { ImageProps } from "next/image"
 
 import { cn, readFile } from "@/lib/utils"
 
@@ -53,11 +52,6 @@ const Avatar: FC<
       }
     />
   )
-}
-
-export function cloudflareLoader({ src, width, quality }: ImageLoaderProps) {
-  const params = [`width=${width}`, `quality=${quality || 75}`, "format=auto"]
-  return `https://erxes.io/cdn-cgi/image/${params.join(",")}/${src}`
 }
 
 export default memo(Avatar)
