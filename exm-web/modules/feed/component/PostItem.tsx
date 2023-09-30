@@ -50,7 +50,7 @@ const PostItem = ({ postId }: { postId: string }) => {
 
   const callBack = (result: string) => {
     if (result === "success") {
-      setFormOpen(false)
+      setOpen(false)
     }
   }
 
@@ -95,21 +95,21 @@ const PostItem = ({ postId }: { postId: string }) => {
     const renderForm = () => {
       switch (feed.contentType) {
         case "post":
-          return <PostForm feed={feed} setOpen={setFormOpen} />
+          return <PostForm feed={feed} setOpen={setOpen} />
         case "publicHoliday":
-          return <HolidayForm feed={feed} setOpen={setFormOpen} />
+          return <HolidayForm feed={feed} setOpen={setOpen} />
         case "welcome":
           return null
         case "bravo":
-          return <BravoForm feed={feed} setOpen={setFormOpen} />
+          return <BravoForm feed={feed} setOpen={setOpen} />
         case "event":
-          return <EventForm feed={feed} setOpen={setFormOpen} />
+          return <EventForm feed={feed} setOpen={setOpen} />
       }
     }
 
     return (
       <>
-        <Dialog open={formOpen} onOpenChange={() => setFormOpen(!open)}>
+        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
           <DialogTrigger asChild={true}>
             <div className="text-black flex items-center">
               <PencilIcon size={16} className="mr-1" /> Edit
@@ -135,7 +135,7 @@ const PostItem = ({ postId }: { postId: string }) => {
           <DialogFooter>
             <Button
               className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
-              onClick={() => setOpen(false)}
+              onClick={() => setFormOpen(false)}
             >
               <XCircleIcon size={16} className="mr-1" />
               No, Cancel
@@ -154,7 +154,7 @@ const PostItem = ({ postId }: { postId: string }) => {
 
     return (
       <>
-        <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+        <Dialog open={formOpen} onOpenChange={() => setOpen(!formOpen)}>
           <DialogTrigger asChild={true}>
             <div className="text-black flex items-center">
               <TrashIcon size={16} className="mr-1" />
