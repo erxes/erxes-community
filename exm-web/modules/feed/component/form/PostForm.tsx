@@ -226,6 +226,7 @@ const PostForm = ({
               defaultFileList={images || []}
               onChange={setImage}
               multiple={true}
+              type={"image"}
             />
           </div>
 

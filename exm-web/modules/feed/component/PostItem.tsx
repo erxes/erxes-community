@@ -43,13 +43,6 @@ const PostItem = ({ postId }: { postId: string }) => {
   const user = feed.createdUser || ({} as IUser)
   const userDetail = user.details
 
-  const images = [
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-    { image: "/user.png" },
-  ]
-
   const urlRegex = /(https?:\/\/[^\s]+)/g
 
   let links: string[] = []
@@ -72,25 +65,6 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   let gridCols = ""
-
-  switch (images.length) {
-    case 1:
-      gridCols = "col-span-1"
-      break
-    case 2:
-      gridCols = "col-span-1"
-      break
-    case 3:
-      gridCols = "col-span-3"
-      break
-    case 4:
-      gridCols = "col-span-4"
-      break
-
-    default:
-      gridCols = "col-span-2"
-      break
-  }
 
   const editAction = () => {
     const renderForm = () => {
