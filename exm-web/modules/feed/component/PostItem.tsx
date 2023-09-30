@@ -326,7 +326,7 @@ const PostItem = ({ postId }: { postId: string }) => {
           )}
         </CardContent>
 
-        <CardFooter className="border-t">
+        <CardFooter className="border-t mt-5 pb-2">
           <div
             className="cursor-pointer flex items-center pt-2"
             onClick={reactionAdd}
@@ -334,7 +334,8 @@ const PostItem = ({ postId }: { postId: string }) => {
             <HeartIcon
               size={20}
               className="mr-1"
-              color={`${idExists ? "#FF0000" : "#000"}`}
+              fill={`${idExists ? "#FF0000" : "white"}`}
+              color={`${idExists ? "#FF0000" : "black"}`}
             />
             <span className="font-bold text-base">{emojiCount}</span>
           </div>
