@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ExternalLinkIcon, XCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -29,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { AttachmentWithPreview } from "@/components/AttachmentWithPreview"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
 import { useTeamMembers } from "../../hooks/useTeamMembers"
@@ -52,6 +54,9 @@ const PostForm = ({
   feed?: IFeed
   setOpen: (open: boolean) => void
 }) => {
+  const [images, setImage] = useState(feed?.images || [])
+  const [attachments, setAttachments] = useState(feed?.attachments || [])
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
@@ -67,7 +72,20 @@ const PostForm = ({
     callBack,
   })
 
-  const [images, setImage] = useState(feed?.images || [])
+  const deleteAttachment = (index: number) => {
+    console.log(index)
+    const updated = attachments.splice(index, 1)
+
+    setAttachments(updated)
+  }
+
+  const deleteImage = (index: number) => {
+    const updated = images.splice(index, 1)
+
+    console.log(updated, "12312")
+
+    setImage(updated)
+  }
 
   useEffect(() => {
     let defaultValues = {} as any
@@ -86,6 +104,7 @@ const PostForm = ({
         description: data.description ? data.description : "",
         contentType: "post",
         images,
+        attachments,
         departmentIds: data.departmentIds,
         branchIds: data.branchIds,
         unitId: data.unitId || "",
@@ -221,14 +240,32 @@ const PostForm = ({
             )}
           />
 
-          <div>
-            <Uploader
-              defaultFileList={images || []}
-              onChange={setImage}
-              multiple={true}
-              type={"image"}
+          <Uploader
+            defaultFileList={images || []}
+            onChange={setImage}
+            type={"image"}
+          />
+          {images && images.length > 0 && (
+            <AttachmentWithPreview
+              images={images}
+              className="mt-2"
+              deleteImage={deleteImage}
             />
-          </div>
+          )}
+
+          <Uploader
+            defaultFileList={attachments || []}
+            onChange={setAttachments}
+          />
+
+          {(attachments || []).map((attachment, index) => {
+            return (
+              <div className="flex items-center border-y text-sm font-semibold text-[#444] p-2.5">
+                {attachment.name}{" "}
+                <XCircle size={18} onClick={() => deleteAttachment(index)} />
+              </div>
+            )
+          })}
 
           <Button type="submit" className="font-semibold w-full rounded-full">
             Post

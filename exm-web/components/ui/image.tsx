@@ -16,7 +16,7 @@ const Image: FC<
     src,
     fill = true,
     alt = "",
-    onError = () => setFixedSrc(props.fallBack || "/user.png"),
+
     width,
     height,
     fallBack,
@@ -24,31 +24,34 @@ const Image: FC<
     className,
     ...rest
   } = props
-  const [fixedSrc, setFixedSrc] = useState(readFile(src || ""))
 
   const [isImageLoading, setIsImageLoading] = useState(true)
   const handleComplete = () => setIsImageLoading(false)
 
+  const [error, setError] = useState(null)
+
+  const fallbackImage = "user.png"
+
   const updatedProps = {
     ...rest,
-    src: fixedSrc,
+    src: error ? fallbackImage : readFile(src),
     alt,
     fill: !width && !height ? true : undefined,
     width,
     height,
-    onError,
   }
 
   return (
     <NextImage
       {...updatedProps}
+      onError={() => setError}
       onLoadingComplete={handleComplete}
       className={cn(className, isImageLoading && "blur-2xl", "text-black")}
       sizes={
         sizes ||
-        `(max-width: full) full,
-  (max-width: full) 1full,
-  full`
+        `(max-width: 768px) 20vw,
+  (max-width: 1200px) 15vw,
+  15vw`
       }
     />
   )
