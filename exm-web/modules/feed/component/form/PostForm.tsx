@@ -73,19 +73,19 @@ const PostForm = ({
   })
 
   const deleteAttachment = (index: number) => {
-    const uploader = [...attachments]
+    const updated = [...attachments]
 
-    uploader.splice(index, 1)
+    updated.splice(index, 1)
 
-    setAttachments(uploader)
+    setAttachments(updated)
   }
 
   const deleteImage = (index: number) => {
-    const uploader = [...images]
+    const updated = [...images]
 
-    uploader.splice(index, 1)
+    updated.splice(index, 1)
 
-    setImage(uploader)
+    setImage(updated)
   }
 
   useEffect(() => {

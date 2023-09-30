@@ -19,6 +19,18 @@ export const AttachmentWithPreview = ({
 }) => {
   const [index, setIndex] = useState(0)
 
+  const onDelete = (index: number) => {
+    if (index > 0) {
+      setIndex(index - 1)
+    }
+
+    if (deleteImage) {
+      deleteImage(index)
+    }
+
+    return
+  }
+
   const renderAttachmentPreview = () => {
     const handleClick = (type: string) => {
       if (type === "previous" && index > 0) {
@@ -30,13 +42,17 @@ export const AttachmentWithPreview = ({
       }
     }
 
+    if (images && images.length === 0) {
+      return null
+    }
+
     return (
       <div id="gallery" className={cn("relative w-full", className)}>
         <div className="relative h-56 overflow-hidden md:h-96">
           <div className="relative aspect-[5/3]" data-carousel-item={true}>
             <Image
               alt="image"
-              src={images[index].url}
+              src={images[index]?.url || ""}
               className="w-full h-56 object-contain cursor-pointer"
             />
           </div>
@@ -46,7 +62,7 @@ export const AttachmentWithPreview = ({
           <button
             type="button"
             className="absolute top-0 right-0"
-            onClick={() => deleteImage(index)}
+            onClick={() => onDelete(index)}
           >
             <XCircle size={18} />
           </button>
