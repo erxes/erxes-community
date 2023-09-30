@@ -48,7 +48,7 @@ export const AttachmentWithPreview = ({
             className="absolute top-0 right-0"
             onClick={() => deleteImage(index)}
           >
-            <XCircle size={18} onClick={() => deleteImage(index)} />
+            <XCircle size={18} />
           </button>
         )}
 
