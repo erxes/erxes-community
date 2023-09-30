@@ -6,7 +6,7 @@ import {
   unPaidAmountAtom,
 } from "@/store/order.store"
 import { ebarimtSheetAtom } from "@/store/ui.store"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 
 import useReciept from "@/lib/useReciept"
 import { Button } from "@/components/ui/button"
@@ -25,10 +25,11 @@ const EbarimtMain = () => {
   const unpaidAmount = useAtomValue(unPaidAmountAtom)
   const setInitial = useSetAtom(setInitialAtom)
   const activeOrder = useAtomValue(activeOrderAtom)
-  const [open] = useAtom(ebarimtSheetAtom)
+  const open = useAtomValue(ebarimtSheetAtom)
   const router = useRouter()
 
   const { changeVisiblity, loading, disabled, printBill } = usePrintBill()
+
   const { iframeRef } = useReciept({
     onCompleted() {
       changeVisiblity(false)
