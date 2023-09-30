@@ -5,6 +5,7 @@ import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { IUser } from "@/modules/auth/types"
 import dayjs from "dayjs"
 import { useAtomValue } from "jotai"
+import { ClockIcon, MapPinIcon, UsersIcon } from "lucide-react"
 
 import { readFile } from "@/lib/utils"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -94,7 +95,32 @@ const RightSideBar = () => {
                 )}
                 <div>
                   <h3 className="font-semibold">{item.title}</h3>
-                  <div className="text-[#888]">{item.eventData.where}</div>
+                  <div className="text-[#444]">{item.eventData.where}</div>
+
+                  <div className="text-[#444] text-xs mt-1">
+                    <div className="flex items-center mb-2">
+                      <ClockIcon size={16} className="mr-1" />
+                      {dayjs(item.eventData?.startDate).format(
+                        "MM/DD/YYYY h:mm A"
+                      )}{" "}
+                      ~{" "}
+                      {dayjs(item.eventData?.endDate).format(
+                        "MM/DD/YYYY h:mm A"
+                      )}
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <UsersIcon size={16} className="mr-1" />
+                      <b>{item.eventData?.goingUserIds.length}</b>&nbsp;Going
+                      •&nbsp;
+                      <b>{item.eventData?.interestedUserIds?.length}</b>
+                      &nbsp;Interested
+                    </div>
+
+                    <div className="flex items-center mb-2">
+                      <MapPinIcon size={16} className="mr-1" />
+                      {item.eventData?.where || ""}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

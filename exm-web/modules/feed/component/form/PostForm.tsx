@@ -260,7 +260,10 @@ const PostForm = ({
 
           {(attachments || []).map((attachment, index) => {
             return (
-              <div className="flex items-center border-y text-sm font-semibold text-[#444] p-2.5">
+              <div
+                key={index}
+                className="flex items-center border-y text-sm font-semibold text-[#444] p-2.5"
+              >
                 {attachment.name}{" "}
                 <XCircle size={18} onClick={() => deleteAttachment(index)} />
               </div>

@@ -23,7 +23,7 @@ import {
 
 import { readFile } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -301,6 +301,8 @@ const PostItem = ({ postId }: { postId: string }) => {
             <AttachmentWithPreview images={feed.images} className="mt-2" />
           )}
         </CardContent>
+
+        <CardFooter />
       </Card>
     </>
   )
