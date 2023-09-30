@@ -21,8 +21,6 @@ export const useReactionMutaion = (): IUsePosts => {
     })
   }
 
-  // const events = (data || {}).exmFeed ? (data || {}).exmFeed.list : []
-
   return {
     reactionMutation,
     loadingReaction,

@@ -114,8 +114,6 @@ const PostForm = ({
     )
   }
 
-  console.log(attachments, "1321")
-
   return (
     <DialogContent>
       <DialogHeader>

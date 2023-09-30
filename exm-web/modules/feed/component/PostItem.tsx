@@ -328,7 +328,7 @@ const PostItem = ({ postId }: { postId: string }) => {
 
         <CardFooter className="border-t">
           <div
-            className="cursor-pointer flex items-center"
+            className="cursor-pointer flex items-center pt-2"
             onClick={reactionAdd}
           >
             <HeartIcon
