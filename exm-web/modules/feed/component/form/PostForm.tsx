@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ExternalLinkIcon, XCircle } from "lucide-react"
+import { XCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { AttachmentWithPreview } from "@/components/AttachmentWithPreview"
 
 import useFeedMutation from "../../hooks/useFeedMutation"
@@ -94,7 +95,6 @@ const PostForm = ({
     if (feed) {
       defaultValues = { ...feed }
     }
-
     form.reset({ ...defaultValues })
   }, [feed])
 
@@ -117,7 +117,7 @@ const PostForm = ({
   console.log(attachments, "1321")
 
   return (
-    <DialogContent>
+    <DialogContent className="max-h-[80vh] overflow-auto">
       <DialogHeader>
         <DialogTitle>Create post</DialogTitle>
       </DialogHeader>
@@ -151,7 +151,7 @@ const PostForm = ({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}

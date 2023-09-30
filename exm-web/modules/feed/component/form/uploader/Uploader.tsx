@@ -51,7 +51,7 @@ const Uploader = ({ defaultFileList, onChange, type }: Props) => {
   const uploadText =
     type && type === "image" ? "Upload images" : "Upload Attachments"
 
-  const uploIcon = type && type === "image" ? <ImageIcon /> : <Paperclip />
+  const uploadIcon = type && type === "image" ? <ImageIcon /> : <Paperclip />
 
   const id = Math.random().toString()
 
@@ -62,8 +62,11 @@ const Uploader = ({ defaultFileList, onChange, type }: Props) => {
           htmlFor={id}
           className="cursor-pointer px-4 py-2  h-[50%] w-full flex items-center"
         >
-          {uploIcon}
-          <p>{uploadText}</p>
+          {uploadIcon}
+
+          <div className="mx-5">
+            {loading ? <p>Uploading ...</p> : <p>{uploadText}</p>}
+          </div>
         </label>
         <input
           id={id}
@@ -73,8 +76,6 @@ const Uploader = ({ defaultFileList, onChange, type }: Props) => {
           className="hidden"
         />
       </div>
-
-      {loading ? <div> Uploading</div> : null}
     </Card>
   )
 }

@@ -110,7 +110,7 @@ const EventForm = ({
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Create post</DialogTitle>
+        <DialogTitle>Create event</DialogTitle>
       </DialogHeader>
 
       {mutationLoading ? <LoadingPost /> : null}
@@ -175,7 +175,6 @@ const EventForm = ({
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="rounded-md px-3 py-2"
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}

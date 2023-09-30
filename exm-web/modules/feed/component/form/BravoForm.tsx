@@ -120,7 +120,6 @@ const BravoForm = ({
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="rounded-md px-3 py-2"
                     placeholder="description"
                     {...field}
                     defaultValue={feed?.description || ""}
