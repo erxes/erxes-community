@@ -65,6 +65,7 @@ const feed = gql`
     ) {
       list {
         _id
+        title
         isPinned
         recipientIds
         eventData {
