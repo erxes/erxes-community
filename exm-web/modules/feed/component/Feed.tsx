@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 const List = dynamic(() => import("./List"))
 
 const Feed = () => {
+  localStorage.getItem("exm_env_REACT_APP_DOMAIN")
   return (
     <div>
       <Tabs defaultValue="post">

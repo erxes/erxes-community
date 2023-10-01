@@ -27,7 +27,7 @@ const MessageItem = ({ message }: { message: IChatMessage }) => {
   const userDetail = createdUser.details || {}
 
   return (
-    <>
+    <div>
       <div className={`flex ${isMe ? "justify-end" : "justify-start"} h-full`}>
         <div className="items-end flex">
           {isMe ? null : (
@@ -58,7 +58,7 @@ const MessageItem = ({ message }: { message: IChatMessage }) => {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

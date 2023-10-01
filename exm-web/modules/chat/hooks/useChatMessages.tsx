@@ -18,6 +18,7 @@ export interface IUseChats {
     relatedId?: string
     attachments?: string[]
   }) => void
+  messagesTotalCount: number
 }
 
 export const useChatMessages = (): IUseChats => {
@@ -91,12 +92,17 @@ export const useChatMessages = (): IUseChats => {
     ? (data || {}).chatMessages.list
     : []
 
+  const messagesTotalCount = (data || {}).chatMessages
+    ? (data || {}).chatMessages.totalCount
+    : 0
+
   return {
     loading,
     chatMessages,
     error,
     handleLoadMore,
     sendMessage,
+    messagesTotalCount,
   }
 }
 

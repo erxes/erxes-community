@@ -14,6 +14,7 @@ const LoadingCard = ({ type }: { type?: string }) => {
       </div>
     )
   }
+
   return (
     <div className="w-full">
       <Card className="max-w-2xl mx-auto my-4 border-0">
