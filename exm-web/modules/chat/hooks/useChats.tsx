@@ -1,4 +1,9 @@
+"use client"
+
+import { currentUserAtom } from "@/modules/JotaiProiveder"
+import { IUser } from "@/modules/types"
 import { useQuery, useSubscription } from "@apollo/client"
+import { useAtomValue } from "jotai"
 
 import { queries, subscriptions } from "../graphql"
 
@@ -24,6 +29,7 @@ export const useChats = ({
   } = useQuery(queries.chats, {
     variables: { limit: 20, searchValue },
   })
+  const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   let loading = true
 
@@ -55,8 +61,6 @@ export const useChats = ({
 
         const prevChats = prev.chats.list || []
 
-        console.log(fetchedChats, "12312")
-
         if (fetchedChats) {
           return {
             ...prev,
@@ -69,6 +73,18 @@ export const useChats = ({
       },
     })
   }
+
+  useSubscription(subscriptions.chatUnreadCountChanged, {
+    variables: { userId: currentUser._id },
+    onSubscriptionData: ({ subscriptionData: { data } }) => {
+      console.log(data)
+      if (!data) {
+        return null
+      }
+
+      refetch()
+    },
+  })
 
   if (!chatsLoading && !pinnedChatsLoading) {
     loading = false

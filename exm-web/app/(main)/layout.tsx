@@ -1,8 +1,7 @@
 import "@/styles/globals.css"
 import CheckAuth from "@/modules/auth/checkAuth"
 import Configs from "@/modules/auth/configs"
-
-import { Sidebar } from "@/components/Sidebar"
+import { Sidebar } from "@/modules/sidebar/component/Sidebar"
 
 interface ILayoutProps {
   children: React.ReactNode

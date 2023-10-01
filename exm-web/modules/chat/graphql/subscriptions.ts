@@ -41,7 +41,10 @@ const chatInserted = gql`
   }
 `
 
-export default {
-  chatMessageInserted,
-  chatInserted,
-}
+const chatUnreadCountChanged = gql`
+  subscription chatUnreadCountChanged($userId: String!) {
+    chatUnreadCountChanged(userId: $userId)
+  }
+`
+
+export default { chatUnreadCountChanged, chatMessageInserted, chatInserted }

@@ -146,12 +146,6 @@ const chatQueries = {
 
     const chat = await models.Chats.getChat(chatId, user._id);
 
-    if (await getIsSeen(models, chat, user)) {
-      graphqlPubsub.publish('chatUnreadCountChanged', {
-        userId: user._id
-      });
-    }
-
     const seenList: any[] = [];
 
     for (const info of chat.seenInfos || []) {
@@ -189,6 +183,10 @@ const chatQueries = {
         s => s.lastSeenMessageId === message._id
       );
     }
+
+    graphqlPubsub.publish('chatUnreadCountChanged', {
+      userId: user._id
+    });
 
     return {
       list,

@@ -30,8 +30,6 @@ export const useChatId = ({ refetch }: { refetch: () => void }): IUseChats => {
     if (data && !loading) {
       refetch()
 
-      console.log(data)
-
       router.push(
         `${
           data.getChatIdByUserIds

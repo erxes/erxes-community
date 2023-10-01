@@ -1,5 +1,4 @@
 import { ApolloError, useMutation } from "@apollo/client"
-import { useAtomValue } from "jotai"
 
 import { useToast } from "@/components/ui/use-toast"
 

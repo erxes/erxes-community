@@ -22,7 +22,7 @@ const Messages = () => {
         className="flex-1 flex-col-reverse overflow-y-scroll p-4 border-0 "
         style={{ scrollBehavior: "smooth" }}
       >
-        {chatMessages.reverse().map((message) => (
+        {chatMessages.map((message) => (
           <MessageItem key={message._id} message={message} />
         ))}
       </div>

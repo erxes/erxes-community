@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
   AwardIcon,
@@ -14,6 +14,8 @@ import {
 
 import Image from "@/components/ui/image"
 
+import { useChatNotif } from "../hooks/useChatNotif"
+
 export const Sidebar = () => {
   const router = useRouter()
   const pathname = usePathname()
@@ -21,30 +23,49 @@ export const Sidebar = () => {
     pathname ? pathname.split("/")[1] || "/" : "/"
   )
 
+  const { unreadCount, refetch } = useChatNotif()
+
   const handleLink = (href: string) => {
     router.replace(`/${href}`)
     setActiveClass(href)
   }
+
+  useEffect(() => {
+    if (pathname) {
+      refetch()
+    }
+  }, [pathname])
 
   const NavigationItem = ({ href, active, Icon, value, color, desc }: any) => {
     return (
       <li
         className={`${
           activeClass === active ? "shadow-md text-black" : ""
-        } mb-4 flex items-center p-3 hover:bg-white rounded-xl hover:shadow-md text-black hover:text-black cursor-pointer hover:transition-all`}
+        } mb-4 flex items-center hover:bg-white rounded-xl hover:shadow-md text-black hover:text-black cursor-pointer hover:transition-all`}
         onClick={() => handleLink(href)}
       >
-        <div
-          className={`${activeClass === active ? "bg-[#6569DF]" : "bg-white"} ${
-            pathname.includes("/chat") ? "" : "mr-2 "
-          } shadow-md p-2 rounded-lg`}
-        >
-          <Icon
-            size={18}
-            color={`${activeClass === active ? "#FFF" : color}`}
-          />
+        <div className="relative p-3">
+          <div
+            className={`${
+              activeClass === active ? "bg-[#6569DF]" : "bg-white"
+            } ${
+              pathname.includes("/chat") ? "" : ""
+            } shadow-md p-2 rounded-lg relative`}
+          >
+            <Icon
+              size={18}
+              color={`${activeClass === active ? "#FFF" : color}`}
+            />
+          </div>
+          {active === "chats" && unreadCount > 0 ? (
+            <div className="absolute top-2 right-2">
+              <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                {unreadCount}
+              </span>
+            </div>
+          ) : null}
         </div>
-        {pathname.includes("/chat") ? (
+        {activeClass.includes("chat") ? (
           ""
         ) : (
           <div className="flex flex-col">

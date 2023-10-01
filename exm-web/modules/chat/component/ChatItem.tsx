@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { __DEV__ } from "@apollo/client/utilities/globals"
@@ -11,6 +10,7 @@ import { useAtomValue } from "jotai"
 import { MoreHorizontalIcon } from "lucide-react"
 
 import { readFile } from "@/lib/utils"
+import Avatar from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card"
 import {
   Popover,
@@ -92,7 +92,7 @@ export const ChatItem = ({
       onMouseEnter={() => setShowAction(true)}
       onMouseLeave={() => setShowAction(false)}
     >
-      <Image
+      <Avatar
         src={readFile((user && user.details?.avatar) || "/avatar-colored.svg")}
         alt="User Profile"
         width={500}

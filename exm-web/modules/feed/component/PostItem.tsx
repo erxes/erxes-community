@@ -179,7 +179,7 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
     return (
       <>
         <Dialog open={formOpen} onOpenChange={() => setOpen(!formOpen)}>
-          <DialogTrigger asChild={true}>
+          <DialogTrigger asChild={true} id="delete-form">
             <div className="text-black flex items-center">
               <TrashIcon size={16} className="mr-1" />
               Delete

@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useMemo } from "react"
 import dayjs from "dayjs"
 import calendar from "dayjs/plugin/calendar"
