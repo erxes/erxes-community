@@ -49,7 +49,7 @@ import BravoForm from "./form/BravoForm"
 import EventForm from "./form/EventForm"
 import HolidayForm from "./form/HolidayForm"
 
-const PostItem = ({ postId }: { postId: string }) => {
+const PostItem = ({ postId }: { postId: string }): JSX.Element => {
   const [open, setOpen] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
@@ -80,7 +80,7 @@ const PostItem = ({ postId }: { postId: string }) => {
   }
 
   if (loadingReactedUsers) {
-    return
+    return <div />
   }
 
   const user = feed.createdUser || ({} as IUser)

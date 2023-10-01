@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import NextImage from "next/image"
 import { XCircle } from "lucide-react"
 
-import { cn, readFile } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 import Image from "./ui/image"
 
@@ -86,7 +85,7 @@ export const AttachmentWithPreview = ({
                   stroke="black"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeWidth="2"
                   d="M5 1 1 5l4 4"
                 />
               </svg>
@@ -113,7 +112,7 @@ export const AttachmentWithPreview = ({
                   stroke="black"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeWidth="2"
                   d="m1 9 4-4-4-4"
                 />
               </svg>

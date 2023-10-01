@@ -1,11 +1,11 @@
-'use client';
+"use client"
 
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic"
 
-const Apollo = dynamic(() => import('./apolloClient'));
+const Apollo = dynamic(() => import("./apolloClient"))
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
-  return <Apollo>{children}</Apollo>;
-};
+  return <Apollo>{children}</Apollo>
+}
 
-export default Provider;
+export default Provider

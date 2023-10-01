@@ -10,7 +10,7 @@ const commonParamsDef = `
   $branchIds: [String]
   $customFieldsData: JSON
   $employeeId: String
-`;
+`
 
 const commonParams = `
   username: $username,
@@ -24,7 +24,7 @@ const commonParams = `
   brandIds: $brandIds
   customFieldsData: $customFieldsData
   employeeId: $employeeId
-`;
+`
 
 const usersEdit = `
   mutation usersEdit($_id: String!, ${commonParamsDef}) {
@@ -32,7 +32,7 @@ const usersEdit = `
       _id
     }
   }
-`;
+`
 
 const usersEditProfile = `
   mutation usersEditProfile(
@@ -54,19 +54,19 @@ const usersEditProfile = `
       _id
     }
   }
-`;
+`
 
 const usersInvite = `
   mutation usersInvite($entries: [InvitationEntry]) {
     usersInvite(entries: $entries)
   }
-`;
+`
 
 const usersResendInvitation = `
   mutation usersResendInvitation($email: String!) {
     usersResendInvitation(email: $email)
   }
-`;
+`
 
 const usersSetActiveStatus = `
   mutation usersSetActiveStatus($_id: String!) {
@@ -74,7 +74,7 @@ const usersSetActiveStatus = `
       _id
     }
   }
-`;
+`
 
 const usersConfirmInvitation = `
   mutation usersConfirmInvitation($token: String, $password: String, $passwordConfirmation: String, $fullName: String, $username: String) {
@@ -82,7 +82,7 @@ const usersConfirmInvitation = `
       _id
     }
   }
-`;
+`
 
 const usersResetMemberPassword = `
   mutation usersResetMemberPassword($_id: String!, $newPassword: String!) {
@@ -90,19 +90,19 @@ const usersResetMemberPassword = `
       _id
     }
   }
-`;
+`
 
 const userExcludeSkill = `
   mutation excludeUserSkill($_id: String!, $memberIds: [String]!) {
     excludeUserSkill(_id: $_id, memberIds: $memberIds)
   }
-`;
+`
 
 const userAddSkill = `
   mutation addUserSkills($memberId: String!, $skillIds: [String]!) {
     addUserSkills(memberId: $memberId, skillIds: $skillIds)
   }
-`;
+`
 
 const commonContactInfoParamsDef = `
   $phoneNumber: String
@@ -110,7 +110,7 @@ const commonContactInfoParamsDef = `
   $links: JSON
   $coordinate: CoordinateInput
   $image: AttachmentInput
-`;
+`
 
 const commonContactInfoParams = `
   phoneNumber: $phoneNumber
@@ -118,7 +118,7 @@ const commonContactInfoParams = `
   links: $links
   coordinate: $coordinate
   image: $image
-`;
+`
 
 const commonStructureParamsDef = `
   $title: String!
@@ -126,7 +126,7 @@ const commonStructureParamsDef = `
   $code: String
   $supervisorId: String
   ${commonContactInfoParamsDef}
-`;
+`
 
 const commonStructureParams = `
   title: $title
@@ -134,7 +134,7 @@ const commonStructureParams = `
   code: $code
   supervisorId: $supervisorId
   ${commonContactInfoParams}
-`;
+`
 
 const structuresAdd = `
   mutation structuresAdd(${commonStructureParamsDef}) {
@@ -142,7 +142,7 @@ const structuresAdd = `
       _id
     }
   }
-`;
+`
 
 const structuresEdit = `
   mutation structuresEdit($_id: String!, ${commonStructureParamsDef}) {
@@ -150,7 +150,7 @@ const structuresEdit = `
       _id
     }
   }
-`;
+`
 
 const commonDeparmentParamsDef = `
   $title: String,
@@ -159,7 +159,7 @@ const commonDeparmentParamsDef = `
   $code: String
   $supervisorId: String
   $userIds: [String]
-`;
+`
 
 const commonDeparmentParams = `
   title: $title,
@@ -168,7 +168,7 @@ const commonDeparmentParams = `
   code: $code
   supervisorId: $supervisorId
   userIds: $userIds
-`;
+`
 
 const departmentsAdd = `
   mutation departmentsAdd(${commonDeparmentParamsDef}) {
@@ -176,7 +176,7 @@ const departmentsAdd = `
       _id
     }
   }
-`;
+`
 
 const departmentsEdit = `
   mutation departmentsEdit($_id: String!, ${commonDeparmentParamsDef}) {
@@ -184,13 +184,13 @@ const departmentsEdit = `
       _id
     }
   }
-`;
+`
 
 const departmentsRemove = `
   mutation departmentsRemove($ids: [String!]) {
     departmentsRemove(ids: $ids)
   }
-`;
+`
 
 const commonUnitParamsDef = `
   $title: String
@@ -199,7 +199,7 @@ const commonUnitParamsDef = `
   $code: String
   $departmentId: String
   $userIds: [String]
-`;
+`
 
 const commonUnitParams = `
   title: $title,
@@ -208,7 +208,7 @@ const commonUnitParams = `
   code: $code
   supervisorId: $supervisorId
   userIds: $userIds
-`;
+`
 
 const unitsAdd = `
   mutation unitsAdd(${commonUnitParamsDef}) {
@@ -216,7 +216,7 @@ const unitsAdd = `
       _id
     }
   }
-`;
+`
 
 const unitsEdit = `
   mutation unitsEdit($_id: String!, ${commonUnitParamsDef}) {
@@ -224,13 +224,13 @@ const unitsEdit = `
       _id
     }
   }
-`;
+`
 
 const unitsRemove = `
   mutation unitsRemove($ids: [String!]) {
     unitsRemove(ids: $ids)
   }
-`;
+`
 
 const commonBranchParamsDef = `
   $title: String
@@ -241,7 +241,7 @@ const commonBranchParamsDef = `
   $userIds: [String]
   $radius: Int
   ${commonContactInfoParamsDef}
-`;
+`
 
 const commonBranchParams = `
   title: $title,
@@ -252,7 +252,7 @@ const commonBranchParams = `
   userIds: $userIds
   radius: $radius
   ${commonContactInfoParams}
-`;
+`
 
 const branchesAdd = `
   mutation branchesAdd(${commonBranchParamsDef}) {
@@ -260,7 +260,7 @@ const branchesAdd = `
       _id
     }
   }
-`;
+`
 
 const branchesEdit = `
   mutation branchesEdit($_id: String!, ${commonBranchParamsDef}) {
@@ -268,13 +268,13 @@ const branchesEdit = `
       _id
     }
   }
-`;
+`
 
 const branchesRemove = `
   mutation branchesRemove($ids: [String!]) {
     branchesRemove(ids: $ids)
   }
-`;
+`
 
 export default {
   usersEditProfile,
@@ -296,5 +296,5 @@ export default {
   unitsRemove,
   branchesAdd,
   branchesEdit,
-  branchesRemove
-};
+  branchesRemove,
+}

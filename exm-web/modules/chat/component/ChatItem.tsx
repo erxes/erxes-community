@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
@@ -33,6 +34,8 @@ export const ChatItem = ({
   const { togglePinned } = useChatsMutation()
   const searchParams = useSearchParams()
 
+  const [showAction, setShowAction] = useState(false)
+
   const chatId = searchParams.get("id")
 
   const users: any[] = chat?.participantUsers || []
@@ -57,7 +60,7 @@ export const ChatItem = ({
     return (
       <Popover>
         <PopoverTrigger asChild={true}>
-          <div className="p-2 bg-white rounded-full">
+          <div className="p-2 bg-white rounded-full absolute right-1 ">
             <MoreHorizontalIcon size={16} />
           </div>
         </PopoverTrigger>
@@ -84,8 +87,10 @@ export const ChatItem = ({
     <Card
       className={`${
         chatId === chat._id ? "bg-[#F0F0F0]" : "bg-transparent"
-      } px-6 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0]`}
+      } px-6 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] relative`}
       onClick={handleClick}
+      onMouseEnter={() => setShowAction(true)}
+      onMouseLeave={() => setShowAction(false)}
     >
       <Image
         src={readFile((user && user.details?.avatar) || "/avatar-colored.svg")}
@@ -119,7 +124,7 @@ export const ChatItem = ({
         </div>
       </div>
 
-      {renderChatActions()}
+      {showAction ? renderChatActions() : null}
     </Card>
   )
 }

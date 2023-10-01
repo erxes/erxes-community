@@ -8,6 +8,7 @@ export interface IUseChats {
   pinnedChats: any
   chatsCount: number
   handleLoadMore: () => void
+  refetch: () => void
 }
 
 export const useChats = ({
@@ -19,18 +20,20 @@ export const useChats = ({
     data,
     loading: chatsLoading,
     fetchMore,
+    refetch: refetchChat,
   } = useQuery(queries.chats, {
     variables: { limit: 20, searchValue },
   })
 
   let loading = true
 
-  const { data: pinnedChatsData, loading: pinnedChatsLoading } = useQuery(
-    queries.chatsPinned,
-    {
-      variables: { limit: 20 },
-    }
-  )
+  const {
+    data: pinnedChatsData,
+    loading: pinnedChatsLoading,
+    refetch: refetchPinnedChat,
+  } = useQuery(queries.chatsPinned, {
+    variables: { limit: 20 },
+  })
 
   const handleLoadMore = () => {
     if (loading) {
@@ -77,12 +80,18 @@ export const useChats = ({
     : []
   const chatsCount = (data || {}).chats ? (data || {}).chats.totalCount : 0
 
+  const refetch = () => {
+    refetchChat()
+    refetchPinnedChat()
+  }
+
   return {
     loading,
     chats,
     pinnedChats,
     chatsCount,
     handleLoadMore,
+    refetch,
   }
 }
 

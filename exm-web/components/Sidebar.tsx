@@ -17,7 +17,9 @@ import Image from "@/components/ui/image"
 export const Sidebar = () => {
   const router = useRouter()
   const pathname = usePathname()
-  const [activeClass, setActiveClass] = useState(pathname)
+  const [activeClass, setActiveClass] = useState(
+    pathname ? pathname.split("/")[1] || "/" : "/"
+  )
 
   const handleLink = (href: string) => {
     router.replace(`/${href}`)
@@ -72,7 +74,9 @@ export const Sidebar = () => {
           src="/logo-dark.svg"
           height={100}
           width={100}
-          className={`${pathname.includes("/chat") ? "w-10 h-10" : ""}`}
+          className={`${
+            pathname.includes("/chat") ? "w-10 h-10" : "w-20 h-10"
+          }`}
         />
       </div>
 

@@ -33,5 +33,5 @@
     "app/(main)/chats/detail",
     "app/(main)/chats/..................................................................................................................................tsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "tailwind.config.ts"]
 }

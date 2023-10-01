@@ -25,16 +25,17 @@ const ChatList = () => {
 
   const currentUser = useAtomValue(currentUserAtom)
   const [searchValue, setSearchValue] = useState("")
-  const { chats, chatsCount, loading, handleLoadMore, pinnedChats } = useChats({
-    searchValue,
-  })
+  const { chats, chatsCount, loading, handleLoadMore, pinnedChats, refetch } =
+    useChats({
+      searchValue,
+    })
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (inView) {
       handleLoadMore()
     }
-  }, [inView])
+  }, [inView, handleLoadMore])
 
   const renderAction = () => {
     return (
@@ -45,7 +46,7 @@ const ChatList = () => {
           </div>
         </DialogTrigger>
 
-        <ChatForm setOpen={setOpen} />
+        <ChatForm setOpen={setOpen} refetch={refetch} />
       </Dialog>
     )
   }

@@ -34,12 +34,20 @@ const FormSchema = z.object({
   userIds: z.array(z.string()).optional(),
 })
 
-export const ChatForm = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
+export const ChatForm = ({
+  setOpen,
+  refetch,
+}: {
+  setOpen: (open: boolean) => void
+  refetch: () => void
+}) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
 
-  const { loading, loadingMutation, setChatUser, startGroupChat } = useChatId()
+  const { loading, loadingMutation, setChatUser, startGroupChat } = useChatId({
+    refetch,
+  })
 
   const { data: usersData, loading: loadingUser } = useQuery(queries.users)
   const { users } = usersData || {}

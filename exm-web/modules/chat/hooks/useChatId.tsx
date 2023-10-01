@@ -1,4 +1,7 @@
-import { useState } from "react"
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useMutation, useQuery } from "@apollo/client"
 
 import { useToast } from "@/components/ui/use-toast"
@@ -13,14 +16,31 @@ export interface IUseChats {
   startGroupChat: (name: string, userIds: string[]) => void
 }
 
-export const useChatId = (): IUseChats => {
+export const useChatId = ({ refetch }: { refetch: () => void }): IUseChats => {
+  const router = useRouter()
   const { toast } = useToast()
-  const [chatUser, setChatUser] = useState("")
+  const [chatUser, setChatUserState] = useState("")
 
   const { data, loading } = useQuery(queries.getChatIdByUserIds, {
     variables: { userIds: [chatUser] },
     skip: !chatUser,
   })
+
+  useEffect(() => {
+    if (data && !loading) {
+      refetch()
+
+      console.log(data)
+
+      router.push(
+        `${
+          data.getChatIdByUserIds
+            ? `/chats/detail?id=${data.getChatIdByUserIds}`
+            : "/chats"
+        }`
+      )
+    }
+  }, [chatUser, loading, data])
 
   const [chatAddMutation, { loading: loadingMutation }] = useMutation(
     mutations.chatAdd
@@ -48,6 +68,11 @@ export const useChatId = (): IUseChats => {
   const chatId = (data || {}).getChatIdByUserIds
     ? (data || {}).getChatIdByUserIds
     : ""
+
+  const setChatUser = (value: string) => {
+    setChatUserState(value)
+    refetch()
+  }
 
   return {
     loading,

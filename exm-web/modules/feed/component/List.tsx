@@ -12,8 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { useFeeds } from "../hooks/useFeed"
 import { IFeed } from "../types"
-
-const PostItem = dynamic(() => import("./PostItem"))
+import PostItem from "./PostItem"
 
 const FeedForm = dynamic(() => import("../component/form/FeedForm"))
 
@@ -52,7 +51,9 @@ const List = ({ contentType }: { contentType: string }) => {
   }
 
   const showList = (items: IFeed[]) => {
-    return items.map((filteredItem: any) => renderDetail(filteredItem._id))
+    return items.map((filteredItem: any) => (
+      <PostItem postId={filteredItem._id} key={filteredItem._id} />
+    ))
   }
 
   useEffect(() => {
@@ -68,10 +69,6 @@ const List = ({ contentType }: { contentType: string }) => {
         <LoadingCard />
       </ScrollArea>
     )
-  }
-
-  const renderDetail = (feedId: string) => {
-    return <PostItem postId={feedId} />
   }
 
   return (
