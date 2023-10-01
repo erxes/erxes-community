@@ -14,6 +14,7 @@ const invoices = `
       status
       apiResponse
       pluginData
+      data
     }
   }
 `

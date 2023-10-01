@@ -567,8 +567,6 @@ const orderMutations = {
     {
       _id,
       cashAmount,
-      mobileAmount,
-      mobileData,
       paidAmounts
     }: {
       _id: string;
@@ -583,15 +581,10 @@ const orderMutations = {
 
     const amount =
       (cashAmount || 0) +
-      (mobileAmount || 0) +
       (paidAmounts || []).reduce((sum, i) => Number(sum) + Number(i.amount), 0);
 
     checkOrderStatus(order);
     checkOrderAmount(order, amount);
-
-    if (mobileAmount && mobileData) {
-      await updateMobileAmount(models, mobileData);
-    }
 
     const modifier: any = {
       $set: {
@@ -643,6 +636,7 @@ const orderMutations = {
     checkOrderStatus(order);
 
     if (
+      order.mobileAmount ||
       (order.paidAmounts || []).filter(pa => Object.keys(pa.info).length)
         .length > 0
     ) {

@@ -18,13 +18,7 @@ const MobileSheet = () => {
   const { invoiceUrl, loading } = useMobilePayment({
     amount: currentAmount,
     onCompleted: (paidAmount) => {
-      addPayment({
-        variables: {
-          _id,
-          mobileAmount: paidAmount,
-        },
-        onCompleted: () => setOpenSheet(false),
-      })
+      // todo refetch
     },
   })
 

@@ -4,12 +4,10 @@ const ordersAddPayment = gql`
   mutation ordersAddPayment(
     $_id: String!
     $cashAmount: Float
-    $mobileAmount: Float
     $paidAmounts: [PaidAmountInput]
   ) {
     ordersAddPayment(
       _id: $_id
-      mobileAmount: $mobileAmount
       cashAmount: $cashAmount
       paidAmounts: $paidAmounts
     ) {

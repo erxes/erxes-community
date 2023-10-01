@@ -9,8 +9,7 @@ export default {
       return;
     }
 
-    const extra = data.data;
-    const posToken = extra.posToken;
+    const { posToken } = data.data;
     const pos = await models.Pos.getPos({ token: posToken });
 
     sendPosclientMessage({

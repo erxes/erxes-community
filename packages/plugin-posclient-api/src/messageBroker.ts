@@ -188,7 +188,6 @@ export const initBroker = async cl => {
         return;
       }
 
-      console.log(data);
       await updateMobileAmount(models, [data]);
     }
   );
