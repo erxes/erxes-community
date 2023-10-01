@@ -73,7 +73,7 @@ const ordersFinish = gql`
     $branchId: String
     $customerId: String
     $customerType: String
-    $deliveryInfo: JSON
+    $description: string
     $billType: String
     $registerNumber: String
     $slotCode: String
@@ -88,7 +88,7 @@ const ordersFinish = gql`
       branchId: $branchId
       customerId: $customerId
       customerType: $customerType
-      deliveryInfo: $deliveryInfo
+      description: $description
       billType: $billType
       registerNumber: $registerNumber
       slotCode: $slotCode
