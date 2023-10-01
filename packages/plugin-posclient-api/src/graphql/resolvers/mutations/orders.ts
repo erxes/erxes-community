@@ -18,6 +18,7 @@ import {
 import { IPaidAmount } from '../../../models/definitions/orders';
 import { IPosUserDocument } from '../../../models/definitions/posUsers';
 import { PutData } from '../../../models/PutData';
+import { updateMobileAmount } from '../../../utils';
 import { IContext, IOrderInput } from '../../types';
 import {
   checkOrderAmount,
@@ -567,11 +568,13 @@ const orderMutations = {
       _id,
       cashAmount,
       mobileAmount,
+      mobileData,
       paidAmounts
     }: {
       _id: string;
       cashAmount?: number;
       mobileAmount?: number;
+      mobileData?: any[];
       paidAmounts?: IPaidAmount[];
     },
     { models, config, subdomain }: IContext
@@ -586,14 +589,15 @@ const orderMutations = {
     checkOrderStatus(order);
     checkOrderAmount(order, amount);
 
+    if (mobileAmount && mobileData) {
+      await updateMobileAmount(models, mobileData);
+    }
+
     const modifier: any = {
       $set: {
         cashAmount: cashAmount
           ? (order.cashAmount || 0) + Number(cashAmount.toFixed(2))
           : order.cashAmount || 0,
-        mobileAmount: mobileAmount
-          ? (order.mobileAmount || 0) + Number(mobileAmount.toFixed(2))
-          : order.mobileAmount || 0,
         paidAmounts: (order.paidAmounts || []).concat(paidAmounts || [])
       }
     };

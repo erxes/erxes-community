@@ -86,8 +86,7 @@ class Row extends React.Component<Props> {
       resolvedAt,
       customer,
       customerType,
-      status,
-      pluginData
+      status
     } = invoice;
 
     let labelStyle = 'danger';

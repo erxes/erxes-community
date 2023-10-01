@@ -168,11 +168,11 @@ export class QpayAPI extends BaseAPI {
         headers: await this.getHeaders()
       });
 
-      // if (res.invoice_status === 'CLOSED') {
-      return PAYMENT_STATUS.PAID;
-      // }
+      if (res.invoice_status === 'CLOSED') {
+        return PAYMENT_STATUS.PAID;
+      }
 
-      // return PAYMENT_STATUS.PENDING;
+      return PAYMENT_STATUS.PENDING;
     } catch (e) {
       throw new Error(e.message);
     }

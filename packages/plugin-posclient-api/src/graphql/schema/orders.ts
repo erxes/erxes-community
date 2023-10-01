@@ -183,7 +183,7 @@ export const mutations = `
   ordersMakePayment(_id: String!, doc: OrderPaymentInput): PosPutResponse
   orderChangeStatus(_id: String!, status: String): Order
   ordersChange(_id: String!, dueDate: Date, branchId: String, deliveryInfo: JSON, description: String): Order
-  ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, paidAmounts: [PaidAmountInput] ): Order
+  ordersAddPayment(_id: String!, cashAmount: Float, mobileAmount: Float, mobileData: JSON, paidAmounts: [PaidAmountInput] ): Order
   ordersCancel(_id: String!): JSON
   ordersSettlePayment(_id: String!, billType: String!, registerNumber: String): PosPutResponse
   ordersFinish(_id: String, ${addEditParams}): Order
