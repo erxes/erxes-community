@@ -32,6 +32,7 @@ const ParticipantItem = ({
   isAdmin: boolean
 }) => {
   const [open, setOpen] = useState(false)
+  const [showAction, setShowAction] = useState(false)
 
   const { makeOrRemoveAdmin, addOrRemoveMember } = useChatsMutation()
 
@@ -97,7 +98,11 @@ const ParticipantItem = ({
   }
 
   return (
-    <div className="mt-4">
+    <div
+      className="mt-4"
+      onMouseEnter={() => setShowAction(true)}
+      onMouseLeave={() => setShowAction(false)}
+    >
       <div className="flex items-center justify-between mb-2 p-2 hover:bg-[#F0F0F0]">
         <div className="flex items-center">
           <Avatar
@@ -120,7 +125,7 @@ const ParticipantItem = ({
             </p>
           </div>
         </div>
-        {renderActionButtons()}
+        {showAction ? renderActionButtons() : null}
       </div>
     </div>
   )
