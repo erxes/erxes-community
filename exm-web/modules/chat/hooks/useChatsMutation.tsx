@@ -19,14 +19,33 @@ const useChatsMutation = () => {
     }
   )
 
+  const [adminMutation] = useMutation(mutations.chatMakeOrRemoveAdmin)
+  const [memberMutation] = useMutation(mutations.chatAddOrRemoveMember)
+
   const togglePinned = (chatId: string) => {
     togglePinnedChat({
       variables: { id: chatId },
     })
   }
 
+  const makeOrRemoveAdmin = (chatId: string, userId: string) => {
+    adminMutation({
+      variables: { id: chatId, userId },
+      refetchQueries: ["chats", "chatDetail"],
+    })
+  }
+
+  const addOrRemoveMember = (chatId: string, userId: string) => {
+    memberMutation({
+      variables: { id: chatId, type: "remove", userIds: [userId] },
+      refetchQueries: ["chats", "chatDetail"],
+    })
+  }
+
   return {
     togglePinned,
+    makeOrRemoveAdmin,
+    addOrRemoveMember,
     loading,
   }
 }
