@@ -1,4 +1,4 @@
-name: POS UI CI
+name: EXM WEB CI
 
 on:
   push:
@@ -41,5 +41,5 @@ jobs:
         run: |
           cd pos
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          DOCKER_BUILDKIT=1 docker build -t erxes/exmweb:${GITHUB_REF#refs/heads/} -f Dockerfile .
-          docker push erxes/exmweb:${GITHUB_REF#refs/heads/}
+          DOCKER_BUILDKIT=1 docker build -t erxes/exm:${GITHUB_REF#refs/heads/} -f Dockerfile .
+          docker push erxes/exm:${GITHUB_REF#refs/heads/}

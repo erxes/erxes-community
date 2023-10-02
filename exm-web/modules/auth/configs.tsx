@@ -1,10 +1,9 @@
 "use client"
 
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode, useState } from "react"
 import { useQuery } from "@apollo/client"
 import { useSetAtom } from "jotai"
 
-import Loader from "@/components/ui/loader"
 import { useToast } from "@/components/ui/use-toast"
 
 import { setCurrentUserAtom } from "../JotaiProiveder"

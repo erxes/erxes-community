@@ -35,13 +35,13 @@ export const deleteHandler = (params: {
   url?: string
   afterUpload: ({ status }: { status: string }) => any
 }) => {
-  // const { REACT_APP_DOMAIN } = getEnv()
-  const REACT_APP_DOMAIN = "http://localhost:4200"
+  const NEXT_PUBLIC_MAIN_API_DOMAIN =
+    process.env.NEXT_PUBLIC_MAIN_API_DOMAIN || ""
 
-  let url = `${REACT_APP_DOMAIN}/gateway/pl:core/delete-file`
+  let url = `${NEXT_PUBLIC_MAIN_API_DOMAIN}/gateway/pl:core/delete-file`
 
-  if (REACT_APP_DOMAIN.includes("localhost")) {
-    url = `${REACT_APP_DOMAIN}/pl:core/delete-file`
+  if (NEXT_PUBLIC_MAIN_API_DOMAIN.includes("localhost")) {
+    url = `${NEXT_PUBLIC_MAIN_API_DOMAIN}/pl:core/delete-file`
   }
 
   const { fileName, afterUpload } = params
@@ -72,13 +72,13 @@ export const deleteHandler = (params: {
 }
 
 const getURL = () => {
-  // const { REACT_APP_DOMAIN } = getEnv()
-  const REACT_APP_DOMAIN = "http://localhost:4000"
+  const NEXT_PUBLIC_MAIN_API_DOMAIN =
+    process.env.NEXT_PUBLIC_MAIN_API_DOMAIN || ""
 
-  if (REACT_APP_DOMAIN.includes("localhost")) {
-    return `${REACT_APP_DOMAIN}/upload-file`
+  if (NEXT_PUBLIC_MAIN_API_DOMAIN.includes("localhost")) {
+    return `${NEXT_PUBLIC_MAIN_API_DOMAIN}/upload-file`
   }
-  return `${REACT_APP_DOMAIN}/gateway/pl:core/upload-file`
+  return `${NEXT_PUBLIC_MAIN_API_DOMAIN}/gateway/pl:core/upload-file`
 }
 
 const uploadHandler = (params: Params) => {
