@@ -1,3 +1,4 @@
+import { IAttachment } from "@/modules/types"
 import { ApolloError, useMutation } from "@apollo/client"
 
 import { useToast } from "@/components/ui/use-toast"
@@ -19,6 +20,10 @@ const useChatsMutation = () => {
     }
   )
 
+  const [editChatMutation, { loading: loadingEdit }] = useMutation(
+    mutations.chatEdit
+  )
+
   const [adminMutation] = useMutation(mutations.chatMakeOrRemoveAdmin)
   const [memberMutation] = useMutation(mutations.chatAddOrRemoveMember)
 
@@ -35,6 +40,17 @@ const useChatsMutation = () => {
     })
   }
 
+  const chatEdit = (
+    chatId: string,
+    name?: string,
+    featuredImage?: IAttachment[]
+  ) => {
+    editChatMutation({
+      variables: { _id: chatId, name, featuredImage },
+      refetchQueries: ["chats", "chatDetail"],
+    })
+  }
+
   const addOrRemoveMember = (chatId: string, userId: string) => {
     memberMutation({
       variables: { id: chatId, type: "remove", userIds: [userId] },
@@ -46,7 +62,9 @@ const useChatsMutation = () => {
     togglePinned,
     makeOrRemoveAdmin,
     addOrRemoveMember,
+    chatEdit,
     loading,
+    loadingEdit,
   }
 }
 

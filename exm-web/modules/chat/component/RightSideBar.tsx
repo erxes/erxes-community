@@ -11,12 +11,14 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 
 import { useChatDetail } from "../hooks/useChatDetail"
 import ParticipantList from "./ParticipantList"
-import UserDetail from "./UserDetail""
+import UserDetail from "./UserDetail"
+import { GroupChatAction } from "./form/GroupChatAction"
 
 const RightSideBar = () => {
-  const [open, setOpen] = useState(false)
   const currentUser = useAtomValue(currentUserAtom)
   const { chatDetail, loading } = useChatDetail()
+
+  const [open, setOpen] = useState(false)
 
   if (loading) {
     return null
@@ -37,7 +39,7 @@ const RightSideBar = () => {
           </div>
         </DialogTrigger>
 
-        {/* <ChatForm setOpen={setOpen} /> */}
+        <GroupChatAction chat={chatDetail} setOpen={setOpen} />
       </Dialog>
     )
   }
@@ -49,7 +51,8 @@ const RightSideBar = () => {
           <div className="flex items-center">
             <Avatar
               src={readFile(
-                (user && user.details?.avatar) || "/avatar-colored.svg"
+                (chatDetail && chatDetail.featuredImage[0]?.url) ||
+                  "/avatar-colored.svg"
               )}
               alt="User Profile"
               width={500}

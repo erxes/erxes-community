@@ -93,7 +93,11 @@ export const ChatItem = ({
       onMouseLeave={() => setShowAction(false)}
     >
       <Avatar
-        src={readFile((user && user.details?.avatar) || "/avatar-colored.svg")}
+        src={readFile(
+          (chat.type === "direct"
+            ? user && user.details?.avatar
+            : chat && chat.featuredImage[0]?.url) || "/avatar-colored.svg"
+        )}
         alt="User Profile"
         width={500}
         height={500}

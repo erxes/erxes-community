@@ -1,4 +1,5 @@
 import { IUser } from "../auth/types"
+import { IAttachment } from "../types"
 
 export interface IChatMessage {
   _id: string
@@ -16,7 +17,7 @@ export interface IChat {
   name: string
   type: string
   isSeen: string
-  featuredImage: string
+  featuredImage: IAttachment[]
   createdAt: string
   createdUser: IUser
   participantUsers: IUser[]
