@@ -18,7 +18,6 @@ import {
 import { IPaidAmount } from '../../../models/definitions/orders';
 import { IPosUserDocument } from '../../../models/definitions/posUsers';
 import { PutData } from '../../../models/PutData';
-import { updateMobileAmount } from '../../../utils';
 import { IContext, IOrderInput } from '../../types';
 import {
   checkOrderAmount,
@@ -571,8 +570,6 @@ const orderMutations = {
     }: {
       _id: string;
       cashAmount?: number;
-      mobileAmount?: number;
-      mobileData?: any[];
       paidAmounts?: IPaidAmount[];
     },
     { models, config, subdomain }: IContext

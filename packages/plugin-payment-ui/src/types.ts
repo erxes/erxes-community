@@ -81,7 +81,6 @@ export interface IInvoice {
   paymentKind: string;
   errorDescription?: string;
   pluginData?: any;
-  data?: any;
   idOfProvider: string;
 }
 
