@@ -61,7 +61,7 @@ const ProductContent = ({
   <>
     <ProductItemImage src={attachment?.url || ""} />
     <ProductItemTitle>{`${code} - ${name}`}</ProductItemTitle>
-    <ProductItemDescription>{description || ""}</ProductItemDescription>
+    <ProductItemDescription description={description} />
     <ProductItemPriceWithWrapper unitPrice={unitPrice}>
       {hasSimilarity && <ProductItemButton>Нэмэх</ProductItemButton>}
     </ProductItemPriceWithWrapper>
@@ -110,16 +110,16 @@ export const ProductItemTitle = ({
 }
 
 export const ProductItemDescription = ({
-  children,
+  description,
   className,
 }: {
-  children: string
+  description?: string | null
   className?: string
 }) => {
   return (
     <div
       className={cn("text-neutral-500 mb-3", className)}
-      dangerouslySetInnerHTML={{ __html: children }}
+      dangerouslySetInnerHTML={{ __html: description || "" }}
     />
   )
 }
