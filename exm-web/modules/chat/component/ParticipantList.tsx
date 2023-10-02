@@ -26,6 +26,7 @@ import ParticipantItem from "./ParticipantItem"
 const ParticipantList = ({ chat }: { chat: IChat }) => {
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
   const [userIds, setUserIds] = useState([])
+  const [open, setOpen] = useState(false)
 
   const { data: usersData, loading } = useQuery(queries.users)
 
@@ -35,6 +36,7 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
 
   const addMember = () => {
     addOrRemoveMember(chat._id, "add", userIds)
+    setOpen(false)
   }
 
   const isAdmin =
@@ -74,7 +76,7 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
     }
 
     return (
-      <Dialog>
+      <Dialog open={open} onOpenChange={() => setOpen(!open)}>
         <DialogTrigger asChild={true}>
           <div className="flex items-center mb-2 p-2 hover:bg-[#F0F0F0] cursor-pointer">
             <div className="p-2 bg-[#F0F0F0] rounded-full cursor-pointer mr-2">
