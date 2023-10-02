@@ -8,7 +8,7 @@ import { LoaderIcon } from "@/components/ui/loader"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 import ProductItem from "./components/productItem/productItem.main"
-import { useProducts } from "./hooks/useProducts"
+import { FETCH_MORE_PER_PAGE, useProducts } from "./hooks/useProducts"
 
 const Products = () => {
   const { ref, inView } = useInView({
@@ -30,12 +30,13 @@ const Products = () => {
           <ProductItem key={product._id} {...product} />
         ))}
       </div>
-      {productsCount > 10 && products.length < productsCount && (
-        <Button className="w-full my-3" ref={ref} variant="outline">
-          <LoaderIcon />
-          Уншиж байна ( {products.length} / {productsCount} )
-        </Button>
-      )}
+      {productsCount > FETCH_MORE_PER_PAGE &&
+        products.length < productsCount && (
+          <Button className="w-full my-3" ref={ref} variant="outline">
+            <LoaderIcon />
+            Уншиж байна ( {products.length} / {productsCount} )
+          </Button>
+        )}
     </ScrollArea>
   )
 }
