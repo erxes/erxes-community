@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { useMutation, useQuery, useSubscription } from "@apollo/client"
 
@@ -26,9 +27,16 @@ export const useChatMessages = (): IUseChats => {
 
   const id = searchParams.get("id") as string
 
-  const { data, loading, fetchMore, error } = useQuery(queries.chatMessages, {
-    variables: { chatId: id, skip: 0, limit: 30 },
-  })
+  const { data, loading, fetchMore, error, refetch } = useQuery(
+    queries.chatMessages,
+    {
+      variables: { chatId: id, skip: 0, limit: 30 },
+    }
+  )
+
+  useEffect(() => {
+    refetch()
+  }, [id])
 
   const [sendMessageMutation] = useMutation(mutations.chatMessageAdd, {
     refetchQueries: ["chatMessages", "chats"],

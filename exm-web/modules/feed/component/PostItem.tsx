@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { IUser } from "@/modules/auth/types"
 import PostForm from "@/modules/feed/component/form/PostForm"
@@ -10,7 +9,6 @@ import dayjs from "dayjs"
 import { useAtomValue } from "jotai"
 import {
   AlertTriangleIcon,
-  CheckCircleIcon,
   ClockIcon,
   ExternalLinkIcon,
   HeartIcon,
@@ -21,7 +19,6 @@ import {
   TrashIcon,
   UserIcon,
   UsersIcon,
-  XCircleIcon,
 } from "lucide-react"
 
 import { readFile } from "@/lib/utils"
@@ -33,6 +30,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import Image from "@/components/ui/image"
 import LoadingCard from "@/components/ui/loading-card"
 import LoadingPost from "@/components/ui/loadingPost"
 import {
@@ -156,19 +154,19 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
             <AlertTriangleIcon size={30} color={"#6569DF"} /> Are you sure?
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col items-center justify-center sm:justify-center sm:space-x-2">
             <Button
               className="font-semibold rounded-full bg-[#F2F2F2] hover:bg-[#F2F2F2] text-black"
               onClick={() => setFormOpen(false)}
             >
-              <XCircleIcon size={16} className="mr-1" />
               No, Cancel
             </Button>
+
             <Button
-              className="font-semibold rounded-full bg-[#3ECC38] hover:bg-[#3ECC38]"
+              type="submit"
+              className="font-semibold rounded-full"
               onClick={() => deleteFeed(feed._id)}
             >
-              <CheckCircleIcon size={16} className="mr-1" />
               Yes, I am
             </Button>
           </DialogFooter>
@@ -178,7 +176,7 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
 
     return (
       <>
-        <Dialog open={formOpen} onOpenChange={() => setOpen(!formOpen)}>
+        <Dialog open={formOpen} onOpenChange={() => setFormOpen(!formOpen)}>
           <DialogTrigger asChild={true} id="delete-form">
             <div className="text-black flex items-center">
               <TrashIcon size={16} className="mr-1" />
@@ -202,10 +200,14 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
         </PopoverTrigger>
         <PopoverContent className="w-40 p-3">
           <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
-            {editAction()}
+            {currentUser.isOwner || currentUser._id === user._id
+              ? editAction()
+              : ""}
           </div>
           <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs">
-            {deleteAction()}
+            {currentUser.isOwner || currentUser._id === user._id
+              ? deleteAction()
+              : ""}
           </div>
           <div
             className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex items-center"
@@ -258,19 +260,17 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Image
-                src={
-                  userDetail.avatar ? readFile(userDetail.avatar) : "/user.png"
-                }
+                src={userDetail?.avatar || "/user.png"}
                 alt="User Profile"
-                width={500}
-                height={500}
+                width={100}
+                height={100}
                 className="w-10 h-10 rounded-full"
               />
               <div className="ml-3">
                 <div className="text-sm font-bold text-gray-700 mb-1">
-                  {userDetail.fullName ||
-                    userDetail.username ||
-                    userDetail.email}
+                  {userDetail?.fullName ||
+                    userDetail?.username ||
+                    userDetail?.email}
                 </div>
                 <div className="text-xs text-[#666] font-normal">
                   {dayjs(feed.createdAt).format("MM/DD/YYYY h:mm A")}{" "}
@@ -287,10 +287,10 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
         </CardHeader>
         <CardContent className="p-0">
           <div className="px-4">
-            <div className="text-sm font-semibold text-slate-800">
+            <div className="text-sm font-semibold text-slate-800 overflow-x-hidden">
               <b className="text-[#444] text-base font-bold">{feed.title}</b>
             </div>
-            <div className="my-1">
+            <div className="my-1 overflow-x-hidden">
               <p className="text-[#666]">{updatedDescription}</p>
             </div>
             {feed.contentType === "event" && renderEventInfo()}

@@ -1,5 +1,4 @@
 import { IUser } from "../auth/types"
-import { IAttachment } from "../types"
 
 export interface IChatMessage {
   _id: string

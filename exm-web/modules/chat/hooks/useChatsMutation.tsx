@@ -1,4 +1,3 @@
-import { IAttachment } from "@/modules/types"
 import { ApolloError, useMutation } from "@apollo/client"
 
 import { useToast } from "@/components/ui/use-toast"

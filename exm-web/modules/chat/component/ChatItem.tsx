@@ -111,7 +111,7 @@ export const ChatItem = ({
               {user?.details.fullName || user?.email}
 
               {user?.details.position ? (
-                <span> ({user?.details.position})</span>
+                <span className="text-[10px]"> ({user?.details.position})</span>
               ) : null}
             </>
           ) : (
@@ -119,7 +119,14 @@ export const ChatItem = ({
           )}
         </p>
         <div className="flex justify-between w-full text-xs font-normal">
-          <p>{(chat?.lastMessage && chat?.lastMessage.content) || ""}</p>
+          <p
+            dangerouslySetInnerHTML={
+              {
+                __html: (chat?.lastMessage && chat?.lastMessage.content) || "",
+              } || ""
+            }
+          />
+
           <p>
             {chat.lastMessage &&
               chat.lastMessage.createdAt &&
