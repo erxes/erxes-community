@@ -47,9 +47,13 @@ const useChatsMutation = () => {
     })
   }
 
-  const addOrRemoveMember = (chatId: string, userId: string) => {
+  const addOrRemoveMember = (
+    chatId: string,
+    type: string,
+    userIds: string[]
+  ) => {
     memberMutation({
-      variables: { id: chatId, type: "remove", userIds: [userId] },
+      variables: { id: chatId, type, userIds },
       refetchQueries: ["chats", "chatDetail"],
     })
   }

@@ -40,7 +40,7 @@ const ParticipantItem = ({
   }
 
   const userMutation = () => {
-    addOrRemoveMember(chatId, participant._id)
+    addOrRemoveMember(chatId, "remove", [participant._id])
   }
 
   const renderActionButtons = () => {

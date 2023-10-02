@@ -1,12 +1,12 @@
 "use client"
 
+import { useState } from "react"
+import { queries } from "@/common/team/graphql"
 import { currentUserAtom } from "@/modules/JotaiProiveder"
 import { IUser } from "@/modules/auth/types"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useQuery } from "@apollo/client"
 import { useAtomValue } from "jotai"
 import { PlusIcon } from "lucide-react"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,35 +16,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { FacetedFilter } from "@/components/ui/faceted-filter"
+import { Input } from "@/components/ui/input"
 
 import useChatsMutation from "../hooks/useChatsMutation"
 import { IChat } from "../types"
 import ParticipantItem from "./ParticipantItem"
 
-const FormSchema = z.object({
-  title: z.string({
-    required_error: "Please enter an title",
-  }),
-  description: z.string().optional(),
-  recipientIds: z.array(z.string()).optional(),
-})
-
 const ParticipantList = ({ chat }: { chat: IChat }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-  })
-
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
+  const [userIds, setUserIds] = useState([])
 
-  const { makeOrRemoveAdmin, addOrRemoveMember } = useChatsMutation()
+  const { data: usersData, loading } = useQuery(queries.users)
+
+  const { users } = usersData || {}
+
+  const { addOrRemoveMember } = useChatsMutation()
+
+  const addMember = () => {
+    addOrRemoveMember(chat._id, "add", userIds)
+  }
 
   const isAdmin =
     (chat?.participantUsers || []).find(
@@ -59,51 +50,25 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
             <DialogTitle>Create bravo</DialogTitle>
           </DialogHeader>
 
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create bravo</DialogTitle>
-            </DialogHeader>
-
-            <Form {...form}>
-              <form
-                className="space-y-3"
-                // onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <FormField
-                  control={form.control}
-                  name="recipientIds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Choose one</FormLabel>
-                      {/* <FormControl>
-                        {loading ? (
-                          <Input disabled={true} placeholder="Loading..." />
-                        ) : (
-                          <FacetedFilter
-                            options={(users || []).map((user: any) => ({
-                              label: user?.details?.fullName || user.email,
-                              value: user._id,
-                            }))}
-                            title="Users"
-                            values={field.value}
-                            onSelect={field.onChange}
-                          />
-                        )}
-                      </FormControl> */}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="submit"
-                  className="font-semibold w-full rounded-full"
-                >
-                  Add
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
+          {loading ? (
+            <Input disabled={true} placeholder="Loading..." />
+          ) : (
+            <FacetedFilter
+              options={(users || []).map((user: any) => ({
+                label: user?.details?.fullName || user.email,
+                value: user._id,
+              }))}
+              title="Users"
+              values={userIds}
+              onSelect={setUserIds}
+            />
+          )}
+          <Button
+            className="font-semibold w-full rounded-full"
+            onClick={addMember}
+          >
+            Add
+          </Button>
         </DialogContent>
       )
     }
