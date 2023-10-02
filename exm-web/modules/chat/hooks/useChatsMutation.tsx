@@ -40,11 +40,7 @@ const useChatsMutation = () => {
     })
   }
 
-  const chatEdit = (
-    chatId: string,
-    name?: string,
-    featuredImage?: IAttachment[]
-  ) => {
+  const chatEdit = (chatId: string, name?: string, featuredImage?: any[]) => {
     editChatMutation({
       variables: { _id: chatId, name, featuredImage },
       refetchQueries: ["chats", "chatDetail"],

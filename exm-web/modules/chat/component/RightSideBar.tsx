@@ -51,7 +51,9 @@ const RightSideBar = () => {
           <div className="flex items-center">
             <Avatar
               src={readFile(
-                (chatDetail && chatDetail.featuredImage[0]?.url) ||
+                (chatDetail &&
+                  chatDetail.featuredImage &&
+                  chatDetail.featuredImage[0]?.url) ||
                   "/avatar-colored.svg"
               )}
               alt="User Profile"

@@ -59,7 +59,7 @@ export const GroupChatAction = ({
 
         <Label>Change group chat image</Label>
         <Uploader
-          defaultFileList={featuredImage}
+          defaultFileList={featuredImage || []}
           onChange={setFeaturedImage}
           type={"image"}
         />
