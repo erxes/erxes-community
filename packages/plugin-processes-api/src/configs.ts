@@ -8,6 +8,9 @@ import beforeResolvers from './beforeResolvers';
 import documents from './documents';
 import logs from './logUtils';
 import { initBroker } from './messageBroker';
+import { exportFileRunner } from './exporterByUrl';
+import imports from './imports';
+import forms from './forms';
 
 export let debug;
 export let graphqlPubsub;
@@ -17,6 +20,7 @@ export let serviceDiscovery;
 export default {
   name: 'processes',
   permissions,
+  getHandlers: [{ path: `/file-export`, method: exportFileRunner }],
   graphql: async sd => {
     serviceDiscovery = sd;
     return {
@@ -46,6 +50,8 @@ export default {
     logs: { consumers: logs },
     beforeResolvers,
     permissions,
-    documents
+    documents,
+    imports,
+    forms
   }
 };

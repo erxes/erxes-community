@@ -1,7 +1,8 @@
 import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 import Bulk from '@erxes/ui/src/components/Bulk';
-import { Alert, router, withProps } from '@erxes/ui/src/utils';
+import queryString from 'query-string';
+import { Alert, getEnv, router, withProps } from '@erxes/ui/src/utils';
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import List from '../components/List';
@@ -56,12 +57,28 @@ class WorkListContainer extends React.Component<FinalProps> {
         });
     };
 
+    const exportPerforms = orign => {
+      const { REACT_APP_API_URL } = getEnv();
+      const { queryParams } = this.props;
+      const params = generateParams({ queryParams });
+
+      const stringified = queryString.stringify({
+        ...params
+      });
+
+      window.open(
+        `${REACT_APP_API_URL}/pl:pos/file-export?orign=${orign}&${stringified}`,
+        '_blank'
+      );
+    };
+
     const updatedProps = {
       ...this.props,
       queryParams,
       performs,
       performsCount,
       removePerform,
+      exportPerforms,
       loading: performsQuery.loading
     };
 

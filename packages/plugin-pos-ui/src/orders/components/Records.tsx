@@ -33,7 +33,7 @@ interface IProps extends IRouterProps {
   onSelect: (values: string[] | string, key: string) => void;
   isFiltered: boolean;
   clearFilter: () => void;
-  exportRecord: (headers: any) => void;
+  exportRecord: () => void;
 }
 
 class Orders extends React.Component<IProps, {}> {
@@ -104,11 +104,7 @@ class Orders extends React.Component<IProps, {}> {
     const actionBarRight = (
       <BarItems>
         {this.props.count > 0 && (
-          <Button
-            icon="export"
-            btnStyle="success"
-            onClick={exportRecord.bind(this.tableHeaders)}
-          >
+          <Button icon="export" btnStyle="success" onClick={exportRecord}>
             {__(`Export`)}
           </Button>
         )}

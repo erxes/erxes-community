@@ -12,8 +12,11 @@ const generalHistoryQueries = {
 
       const meta = service.config?.meta || {};
 
-      if (meta && meta.exporter) {
-        const types = meta.exporter.importExportTypes || [];
+      if (meta && (meta.exporter || meta.imports)) {
+        const types =
+          meta.exporter?.importExportTypes ||
+          meta.imports?.importExportTypes ||
+          [];
 
         for (const type of types) {
           importExportTypes.push({

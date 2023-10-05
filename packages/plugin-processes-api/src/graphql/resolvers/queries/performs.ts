@@ -6,7 +6,7 @@ import { getPureDate, paginate } from '@erxes/api-utils/src/core';
 import { IContext } from '../../../connectionResolver';
 import { sendProductsMessage } from '../../../messageBroker';
 
-interface IParam {
+export interface IParam {
   search: string;
   type: string;
   status: string;

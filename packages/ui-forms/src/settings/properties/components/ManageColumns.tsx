@@ -120,6 +120,16 @@ class ManageColumns extends React.Component<Props, State> {
       });
     };
 
+    const onChangeCheckbox = e => {
+      const isCheck = e.target.checked;
+      const { columns } = this.state;
+
+      columns.forEach(col => {
+        const element = document.getElementById(col._id) as HTMLInputElement;
+        element.checked = isCheck;
+      });
+    };
+
     return (
       <form onSubmit={this.onSubmit}>
         <FormGroup>
@@ -132,7 +142,15 @@ class ManageColumns extends React.Component<Props, State> {
         </FormGroup>
         <Header>
           <span>{__('Column name')}</span>
-          <span>{__('Visible')}</span>
+          <span>
+            {__('Visible')}
+            <FormControl
+              id={'allCheck'}
+              defaultChecked={false}
+              componentClass="checkbox"
+              onChange={onChangeCheckbox}
+            />
+          </span>
         </Header>
 
         <ScrollWrapper calcHeight="320">

@@ -17,7 +17,7 @@ import {
 import { Count } from '@erxes/ui/src/styles/main';
 import { IPerform } from '../types';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { menuNavs } from '../../constants';
+import { ExportPerfomsHeaders, menuNavs } from '../../constants';
 
 interface IProps extends IRouterProps {
   history: any;
@@ -26,6 +26,7 @@ interface IProps extends IRouterProps {
   performsCount: number;
   loading: boolean;
   removePerform: (_id: string) => void;
+  exportPerforms: (headers: any) => void;
 }
 
 type State = {
@@ -93,7 +94,13 @@ class List extends React.Component<IProps, State> {
   };
 
   render() {
-    const { performsCount, loading, queryParams, history } = this.props;
+    const {
+      performsCount,
+      loading,
+      queryParams,
+      history,
+      exportPerforms
+    } = this.props;
 
     const trigger = (
       <Button btnStyle="success" icon="plus-circle">
@@ -105,6 +112,15 @@ class List extends React.Component<IProps, State> {
 
     const actionBarRight = (
       <BarItems>
+        {this.props.performsCount > 0 && (
+          <Button
+            icon="export"
+            btnStyle="success"
+            onClick={exportPerforms.bind(ExportPerfomsHeaders)}
+          >
+            {__(`Export`)}
+          </Button>
+        )}
         <ModalTrigger
           title={__('Add Performance')}
           size="xl"

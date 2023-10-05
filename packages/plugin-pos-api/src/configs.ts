@@ -11,7 +11,6 @@ import automations from './automations';
 import forms from './forms';
 import segments from './segments';
 import dashboards from './dashboards';
-import imports from './imports';
 import exporter from './exporter';
 import payment from './payment';
 import { exportFileRunner } from './exporterByUrl';
@@ -61,7 +60,6 @@ export default {
     segments,
     permissions,
     dashboards,
-    imports,
     exporter,
     payment
   }

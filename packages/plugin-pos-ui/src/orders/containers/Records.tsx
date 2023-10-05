@@ -5,13 +5,16 @@ import queryString from 'query-string';
 import React from 'react';
 import { graphql } from '@apollo/client/react/hoc';
 import { IRouterProps } from '@erxes/ui/src/types';
-import { ListQueryVariables, OrderRecordsQueryResponse } from '../types';
+import {
+  ListQueryVariables,
+  OrderRecordsCountQueryResponse,
+  OrderRecordsQueryResponse
+} from '../types';
 import { queries } from '../graphql';
 import { withRouter } from 'react-router-dom';
 import { Bulk, getEnv, withProps, router, Spinner } from '@erxes/ui/src';
 import { FILTER_PARAMS } from '../../constants';
 import { IQueryParams } from '@erxes/ui/src/types';
-import { OrderRecordsCountQueryResponse } from '../../../.erxes/plugin-src/orders/types';
 import { generateParams } from './List';
 
 type Props = {
@@ -104,7 +107,7 @@ class OrdersContainer extends React.Component<FinalProps, State> {
     const list = ordersQuery.posOrderRecords || [];
     const count = ordersCountQuery.posOrderRecordsCount || [];
 
-    const exportOrderRecords = headers => {
+    const exportOrderRecords = () => {
       const { REACT_APP_API_URL } = getEnv();
       const { queryParams } = this.props;
       const params = generateParams({ queryParams });
