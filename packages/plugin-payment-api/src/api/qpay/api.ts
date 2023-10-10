@@ -167,10 +167,9 @@ export class QpayAPI extends BaseAPI {
         path: `${PAYMENTS.qpay.actions.invoice}/${invoice.apiResponse.invoice_id}`,
         headers: await this.getHeaders()
       });
-      console.log('=====');
-      // if (res.invoice_status === 'CLOSED') {
-      return PAYMENT_STATUS.PAID;
-      // }
+      if (res.invoice_status === 'CLOSED') {
+        return PAYMENT_STATUS.PAID;
+      }
 
       return PAYMENT_STATUS.PENDING;
     } catch (e) {
