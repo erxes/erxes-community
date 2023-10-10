@@ -109,20 +109,13 @@ const Amount = styledTS<{ unUsed: boolean }>(styled.ul)`
 
   display: inline-block;
   li {
-    float: left;
+    float: right;
     ${props => props.unUsed && `text-decoration: line-through;`}
     padding-right: 5px;
     line-height: 22px;
     span {
       font-weight: bold;
       font-size: 10px;
-    }
-    &:after {
-      content: '/';
-      margin-left: 5px;
-    }
-    &:last-child:after {
-      content: '';
     }
   }
 `;
@@ -197,6 +190,34 @@ export const StageTitle = styled.h4`
   position: relative;
   display: flex;
   justify-content: space-between;
+
+  i {
+    cursor: pointer;
+  }
+`;
+
+export const StageInfo = styledTS<{ showAll?: boolean }>(styled.div)`
+  ${props =>
+    props.showAll === false
+      ? `
+  height: 25px;
+  overflow: hidden;
+  transition: all 300ms ease-out;
+  `
+      : `
+  height: unset;
+  `}
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    min-height: unset !important;
+    align-items: center;
+  }
+
+  ul {
+    margin: 0;
+  }
 `;
 
 export const GroupTitle = styled.div`

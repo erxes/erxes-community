@@ -20,7 +20,6 @@ import Pipeline from './Pipeline';
 import PipelineActivity from './PipelineActivity';
 import ViewGroupBy from './ViewGroupBy';
 import ChartStack from './chart/ChartRenderer';
-import TimeItems from './time/TimeItems';
 
 type Props = {
   pipelineDetailQuery: PipelineDetailQueryResponse;
