@@ -186,6 +186,7 @@ export class SocialPayAPI extends BaseAPI {
         headers: { 'Content-Type': 'application/json' },
         data
       });
+
       if (body.error) {
         return body.error.errorDesc;
       }
