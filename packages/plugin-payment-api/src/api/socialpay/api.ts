@@ -187,6 +187,7 @@ export class SocialPayAPI extends BaseAPI {
         data
       });
 
+      return PAYMENT_STATUS.PAID;
       if (body.error) {
         return body.error.errorDesc;
       }
