@@ -379,11 +379,11 @@ export default class Stage extends React.Component<Props, State> {
                     }
                   >
                     <div>
-                      {__('Total') + ':'}
+                      <span>{__('Total') + ':'}</span>
                       {renderAmount(stage.amount)}
                     </div>
                     <div>
-                      {__('Forecasted') + `(${probability}):`}
+                      <span>{__('Forecasted') + `(${probability}):`}</span>
                       {renderPercentedAmount(
                         stage.amount,
                         parseInt(probability, 10)

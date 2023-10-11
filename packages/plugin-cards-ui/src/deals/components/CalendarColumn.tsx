@@ -44,6 +44,10 @@ const Amount = styledTS<{ showAll: boolean }>(styled.ul)`
     padding-right: 5px;
     font-size: 12px;
 
+    > div {
+      float: right;
+    }
+
     span {
       font-weight: bold;
       font-size: 10px;
@@ -181,7 +185,7 @@ class DealColumn extends React.Component<Props, {}> {
             <li>
               <span>Total ({deals.length}): </span>
               {Object.keys(sumByName).map((key, index) => (
-                <div key={index} style={{ display: 'inline' }}>
+                <div key={index}>
                   {sumByName[key].toLocaleString(undefined, {
                     maximumFractionDigits: 0
                   })}{' '}

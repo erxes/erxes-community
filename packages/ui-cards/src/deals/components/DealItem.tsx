@@ -137,7 +137,9 @@ class DealItem extends React.PureComponent<Props> {
 
         <PriceContainer>
           <StageInfo>
-            <Flex>Total: {renderAmount(item.amount)}</Flex>
+            <Flex>
+              <span>Total:</span> {renderAmount(item.amount)}
+            </Flex>
             <Flex>
               <span>Forecasted ({probability}):</span>{' '}
               {renderPercentedAmount(item.amount, parseInt(probability, 10))}
