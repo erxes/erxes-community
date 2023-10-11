@@ -370,7 +370,7 @@ class MainActionBar extends React.Component<Props, State> {
 
   renderSalesDetail = () => {
     return (
-      (window.location.pathname.includes('deal/board' || 'deal/calendar') ||
+      (window.location.pathname.includes('deal/board') ||
         window.location.pathname.includes('deal/calendar')) && (
         <Button
           btnStyle="link"

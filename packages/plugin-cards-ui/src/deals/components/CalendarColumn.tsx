@@ -115,7 +115,7 @@ class DealColumn extends React.Component<Props, {}> {
     const sumByName = {};
 
     currencies.forEach(item => {
-      const { name, amount, probability } = item;
+      const { name, amount, probability = 100 } = item;
       if (sumByName[name] === undefined) {
         sumByName[name] = (amount * probability) / 100;
       } else {
@@ -130,7 +130,7 @@ class DealColumn extends React.Component<Props, {}> {
         })}{' '}
         <span>
           {key}
-          {index < Object.keys(sumByName).length - 1 && ', '}
+          {index < Object.keys(sumByName).length - 1 && ','}&nbsp;
         </span>
       </div>
     ));
@@ -142,20 +142,10 @@ class DealColumn extends React.Component<Props, {}> {
 
     const forecastArray = [];
     const totalAmountArray = [];
-    const sumByName = {};
 
     dealTotalAmounts.map(total =>
       total.currencies.map(currency => totalAmountArray.push(currency))
     );
-
-    totalAmountArray.forEach(item => {
-      const { name, amount } = item;
-      if (sumByName[name] === undefined) {
-        sumByName[name] = amount;
-      } else {
-        sumByName[name] += amount;
-      }
-    });
 
     this.props.deals.map(deal => {
       const probability =
@@ -184,17 +174,7 @@ class DealColumn extends React.Component<Props, {}> {
           <>
             <li>
               <span>Total ({deals.length}): </span>
-              {Object.keys(sumByName).map((key, index) => (
-                <div key={index}>
-                  {sumByName[key].toLocaleString(undefined, {
-                    maximumFractionDigits: 0
-                  })}{' '}
-                  <span>
-                    {key}
-                    {index < Object.keys(sumByName).length - 1 && ', '}
-                  </span>
-                </div>
-              ))}
+              {this.renderPercentedAmount(totalAmountArray)}
             </li>
             <li>
               <span>Forecasted: </span>
