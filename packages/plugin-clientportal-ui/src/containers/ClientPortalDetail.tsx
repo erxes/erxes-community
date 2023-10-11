@@ -13,14 +13,12 @@ import { ClientPortalConfig, ClientPortalConfigQueryResponse } from '../types';
 type Props = {
   queryParams: any;
   history: any;
+  kind: 'client' | 'vendor';
   closeModal?: () => void;
 };
 
-function ClientPortalDetailContainer({
-  queryParams,
-  history,
-  closeModal
-}: Props) {
+function ClientPortalDetailContainer(props: Props) {
+  const { queryParams, history, closeModal } = props;
   const { loading, data = {} } = useQuery<ClientPortalConfigQueryResponse>(
     gql(queries.getConfig),
     {
@@ -46,7 +44,7 @@ function ClientPortalDetailContainer({
           routerUtils.setParams(history, { _id: clientPortalConfigUpdate._id });
         }
 
-        Alert.success('Successfully updated the Client portal config');
+        Alert.success('Successfully updated the Business portal config');
 
         if (closeModal) {
           closeModal();
@@ -56,10 +54,11 @@ function ClientPortalDetailContainer({
   };
 
   const updatedProps = {
+    ...props,
     queryParams,
     history,
     loading,
-    config: data.clientPortalGetConfig || {},
+    config: data.clientPortalGetConfig || { tokenPassMethod: 'cookie' },
     handleUpdate
   };
 

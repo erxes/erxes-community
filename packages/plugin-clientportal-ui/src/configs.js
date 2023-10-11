@@ -16,11 +16,11 @@ module.exports = {
   },
   menus: [
     {
-      text: 'Client Portal',
-      to: '/settings/client-portal',
+      text: 'Business Portal',
+      to: '/settings/business-portal',
       image: '/images/icons/erxes-32.png',
       location: 'settings',
-      scope: 'clientportal',
+      scope: 'businessportal',
       action: '',
       permissions: []
     }

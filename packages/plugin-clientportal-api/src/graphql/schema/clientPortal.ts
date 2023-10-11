@@ -92,9 +92,15 @@ ${
     header
   }
 
+  enum BusinessPortalKind {
+    client
+    vendor
+  }
+
   type ClientPortal {
     _id: String!
     name: String!
+    kind: BusinessPortalKind!
     description: String
     url: String
     logo: String
@@ -236,6 +242,7 @@ export const mutations = cardAvailable => `
   clientPortalConfigUpdate (
     _id: String
     name: String
+    kind: BusinessPortalKind
     description: String
     logo: String
     icon: String

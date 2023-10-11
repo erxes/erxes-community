@@ -254,11 +254,11 @@ function General({
   const renderMain = () => {
     return (
       <Block>
-        <h4>{__('Client portal')}</h4>
+        <h4>{__('Business portal')}</h4>
         <BlockRow>
           {renderControl({
             required: true,
-            label: 'Client Portal Name',
+            label: 'Business Portal Name',
             subtitle: 'Displayed in the header area',
             formValueName: 'name',
             formValue: name,
@@ -298,7 +298,7 @@ function General({
         <ToggleWrap>
           <FormGroup>
             <ControlLabel>Show {title}</ControlLabel>
-            <p>{__('Show in Client Portal')}</p>
+            <p>{__('Show in Business Portal')}</p>
             <Toggle
               checked={toggle}
               onChange={() => onChangeToggle(toggleName, !toggle)}
@@ -342,7 +342,7 @@ function General({
                 <ControlLabel required={true}>
                   Knowledge base topic
                 </ControlLabel>
-                <p>{__('Knowledge base topic in Client Portal')}</p>
+                <p>{__('Knowledge base topic in Business Portal')}</p>
                 <Select
                   placeholder="Select a knowledge base topic"
                   value={knowledgeBaseTopicId}
