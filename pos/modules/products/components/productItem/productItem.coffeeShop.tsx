@@ -65,9 +65,11 @@ const ProductContent = ({
     <ProductItemTitle>{`${code} - ${name}`}</ProductItemTitle>
     <ProductItemDescription description={description} />
     <ProductItemPriceWithWrapper unitPrice={unitPrice}>
-      <Button className="absolute h-auto rounded-r-none right-0 px-3 border-r">
-        Сонгох...
-      </Button>
+      {hasSimilarity && (
+        <Button className="absolute h-auto rounded-r-none right-0 px-3 border-r">
+          Сонгох...
+        </Button>
+      )}
     </ProductItemPriceWithWrapper>
   </>
 )

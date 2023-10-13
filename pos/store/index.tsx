@@ -32,6 +32,8 @@ export const kioskDialogOpenAtom = atom<boolean>(false)
 
 export const ebarimtMainDialogOpenAtom = atom<boolean>(false)
 
+export const scrollWidth = atom<number>(8)
+
 const JotaiProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <Provider>
