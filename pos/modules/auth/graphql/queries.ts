@@ -168,8 +168,29 @@ const uiOptions = gql`
   query UiOptions {
     currentConfig {
       uiOptions {
-        bgImage
+        texts
         logo
+      }
+    }
+  }
+`
+const kioskHomeHeader = gql`
+  query UiOptions {
+    currentConfig {
+      uiOptions {
+        logo
+        kioskHeaderImage
+      }
+    }
+  }
+`
+
+const bgImage = gql`
+  query UiOptions {
+    currentConfig {
+      uiOptions {
+        bgImage
+        texts
       }
     }
   }
@@ -191,6 +212,8 @@ const queries = {
   getWaitingConfig,
   getPaymentTypes,
   uiOptions,
+  bgImage,
+  kioskHomeHeader,
 }
 
 export default queries

@@ -1,16 +1,19 @@
+import { useState } from "react"
 import { currentPaymentTypeAtom } from "@/store"
 import { useSetAtom } from "jotai"
-import { XIcon } from "lucide-react"
+import { Percent, XIcon } from "lucide-react"
 
 import { HARD_PAYMENT_TYPES } from "@/lib/constants"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Toggle } from "@/components/ui/toggle"
 import Keys from "@/app/(main)/checkout/components/Keys"
 
 import useHandlePayment from "../../hooks/useHandlePayment"
 import { useCheckNotSplit } from "../../hooks/usePaymentType"
 
 const PaymentType = () => {
+  const [pressed, setPressed] = useState(false)
   const setPaymentTerm = useSetAtom(currentPaymentTypeAtom)
   const {
     handleValueChange,
@@ -21,14 +24,20 @@ const PaymentType = () => {
     type,
   } = useHandlePayment()
   const { disableInput } = useCheckNotSplit()
-  
 
   return (
     <div>
       <div className="flex justify-between items-center p-1 border-b border-slate-500 pb-2 mb-4">
         <div className="flex-auto">
           <div className="flex items-center text-3xl font-black mb-2">
-            <div className="translate-y-[1px]">₮</div>
+            <Toggle
+              className="text-3xl font-black w-11 px-2"
+              colorMode="dark"
+              pressed={pressed}
+              onPressedChange={() => setPressed(!pressed)}
+            >
+              {pressed ? <Percent className='h-6 w-6' strokeWidth={3}/> : "₮"}
+            </Toggle>
             <Input
               className="border-none px-2 "
               focus={false}
