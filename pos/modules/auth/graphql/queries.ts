@@ -85,6 +85,7 @@ const getSettingsConfig = gql`
 const getEbarimtConfig = gql`
   query EbarimtConfig {
     currentConfig {
+      paymentTypes
       ebarimtConfig {
         footerText
         hasCopy
@@ -157,10 +158,11 @@ const getInitialCategories = gql`
     }
   }
 `
-const getAllowTypes = gql`
-  query AllowTypes {
+const getCheckoutConfig = gql`
+  query checkoutConfig {
     currentConfig {
       allowTypes
+      kitchenScreen
     }
   }
 `
@@ -208,7 +210,7 @@ const queries = {
   posUsers,
   getWholeConfig,
   getInitialCategories,
-  getAllowTypes,
+  getCheckoutConfig,
   getWaitingConfig,
   getPaymentTypes,
   uiOptions,

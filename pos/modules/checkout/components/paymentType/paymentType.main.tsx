@@ -1,6 +1,7 @@
-import { useState } from "react"
-import { currentPaymentTypeAtom } from "@/store"
-import { useSetAtom } from "jotai"
+import { ChangeEvent } from "react"
+import { byPercentTypesAtom, currentPaymentTypeAtom } from "@/store"
+import { orderTotalAmountAtom } from "@/store/order.store"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { Percent, XIcon } from "lucide-react"
 
 import { HARD_PAYMENT_TYPES } from "@/lib/constants"
@@ -13,8 +14,9 @@ import useHandlePayment from "../../hooks/useHandlePayment"
 import { useCheckNotSplit } from "../../hooks/usePaymentType"
 
 const PaymentType = () => {
-  const [pressed, setPressed] = useState(false)
+  const [byPercentTypes, setByPercentTypes] = useAtom(byPercentTypesAtom)
   const setPaymentTerm = useSetAtom(currentPaymentTypeAtom)
+  const totalAmount = useAtomValue(orderTotalAmountAtom)
   const {
     handleValueChange,
     handlePay,
@@ -24,6 +26,23 @@ const PaymentType = () => {
     type,
   } = useHandlePayment()
   const { disableInput } = useCheckNotSplit()
+  const pressed = byPercentTypes.includes(type)
+
+  const onPressedChange = () =>
+    setByPercentTypes(
+      pressed
+        ? byPercentTypes.filter((paymentType) => paymentType !== type)
+        : [...byPercentTypes, type]
+    )
+
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!pressed) return handleValueChange(e.target.value)
+    return handleValueChange(
+      ((Number(e.target.value) / 100) * totalAmount).toString()
+    )
+  }
+
+  const value = pressed ? (currentAmount / totalAmount) * 100 : currentAmount
 
   return (
     <div>
@@ -34,15 +53,15 @@ const PaymentType = () => {
               className="text-3xl font-black w-11 px-2"
               colorMode="dark"
               pressed={pressed}
-              onPressedChange={() => setPressed(!pressed)}
+              onPressedChange={onPressedChange}
             >
-              {pressed ? <Percent className='h-6 w-6' strokeWidth={3}/> : "₮"}
+              {pressed ? <Percent className="h-6 w-6" strokeWidth={3} /> : "₮"}
             </Toggle>
             <Input
               className="border-none px-2 "
               focus={false}
-              value={currentAmount.toLocaleString()}
-              onChange={(e) => handleValueChange(e.target.value)}
+              value={value.toLocaleString()}
+              onChange={onChange}
               disabled={disableInput}
             />
           </div>

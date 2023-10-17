@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
+import { scrollWidthAtom } from "@/store"
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+import { useAtomValue } from "jotai"
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -57,7 +59,7 @@ const ScrollAreaXWithButton = ({
         {scrollLeft > 0 && (
           <Button
             variant="ghost"
-            className="flex-auto rounded-none w-full p-0 bg-white"
+            className="flex-auto rounded-none w-full p-0 bg-neutral-100"
             onClick={scrollToLeft}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -65,7 +67,7 @@ const ScrollAreaXWithButton = ({
         )}
         <Button
           variant="ghost"
-          className="flex-auto rounded-none w-full p-0 bg-white"
+          className="flex-auto rounded-none w-full p-0 bg-neutral-100"
           onClick={scrollToRight}
         >
           <ChevronRight className="h-5 w-5" />
@@ -74,8 +76,6 @@ const ScrollAreaXWithButton = ({
     </ScrollAreaPrimitive.Root>
   )
 }
-ScrollAreaXWithButton.displayName = ScrollAreaPrimitive.Root.displayName
-
 const ScrollAreaYWithButton = ({
   className,
   children,
@@ -143,50 +143,59 @@ const ScrollAreaYWithButton = ({
     </ScrollAreaPrimitive.Root>
   )
 }
-ScrollAreaYWithButton.displayName = ScrollAreaPrimitive.Root.displayName
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden rounded-xs", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-))
+>(({ className, children, type, ...props }, ref) => {
+  const width = useAtomValue(scrollWidthAtom)
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden rounded-xs", className)}
+      type={type || width > 8 ? "always" : undefined}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  )
+})
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
->(({ className, orientation = "vertical", ...props }, ref) => (
-  <ScrollAreaPrimitive.ScrollAreaScrollbar
-    ref={ref}
-    orientation={orientation}
-    className={cn(
-      "flex touch-none select-none transition-colors bg-border rounded",
-      orientation === "vertical" && "h-full w-2.5 max-w-[10px] p-[1px]",
-      orientation === "horizontal" &&
-        "h-1 border-t border-t-transparent p-[1px]",
-      className
-    )}
-    {...props}
-  >
-    <ScrollAreaPrimitive.ScrollAreaThumb
+>(({ className, orientation = "vertical", ...props }, ref) => {
+  const width = useAtomValue(scrollWidthAtom)
+  return (
+    <ScrollAreaPrimitive.ScrollAreaScrollbar
+      ref={ref}
+      orientation={orientation}
       className={cn(
-        "relative rounded-full bg-black/10",
-        orientation === "vertical" && "flex-1"
+        "flex touch-none select-none transition-colors bg-neutral-100 rounded",
+        orientation === "vertical" && "h-full p-[1px]",
+        orientation === "vertical" && width <= 8 && "w-2.5 max-w-[10px]",
+        orientation === "horizontal" &&
+          "h-1 border-t border-t-transparent p-[1px]",
+        className
       )}
-    />
-  </ScrollAreaPrimitive.ScrollAreaScrollbar>
-))
+      style={{ width }}
+      {...props}
+    >
+      <ScrollAreaPrimitive.ScrollAreaThumb
+        className={cn(
+          "relative rounded-full bg-neutral-300",
+          orientation === "vertical" && "flex-1"
+        )}
+        style={{ width }}
+      />
+    </ScrollAreaPrimitive.ScrollAreaScrollbar>
+  )
+})
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
 export { ScrollArea, ScrollBar, ScrollAreaYWithButton, ScrollAreaXWithButton }
