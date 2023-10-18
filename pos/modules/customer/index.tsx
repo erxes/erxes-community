@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { customerSearchAtom } from "@/store"
 import { customerAtom, customerTypeAtom } from "@/store/order.store"
 import { customerPopoverAtom } from "@/store/ui.store"
@@ -7,7 +8,7 @@ import { useLazyQuery } from "@apollo/client"
 import { AnimatePresence, motion } from "framer-motion"
 import { useAtom } from "jotai"
 
-import { CustomerType as CustomerTypeT } from "@/types/customer.types"
+import { Customer, CustomerType as CustomerTypeT } from "@/types/customer.types"
 import { Input } from "@/components/ui/input"
 import {
   Popover,
@@ -17,6 +18,7 @@ import {
 
 import CustomerType from "./CustomerType"
 import { queries } from "./graphql"
+import { Button } from '@/components/ui/button'
 
 const Content = motion(PopoverContent)
 
@@ -30,36 +32,22 @@ const Customer = () => {
   const [open, setOpen] = useAtom(customerPopoverAtom)
   const [customerType] = useAtom(customerTypeAtom)
   const [customer, setCustomer] = useAtom(customerAtom)
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [value, setValue] = useAtom(customerSearchAtom)
 
-  const [searchCustomer, { loading }] = useLazyQuery(
-    queries.poscCustomerDetail,
-    {
-      fetchPolicy: "network-only",
-      onCompleted(data) {
-        const { poscCustomerDetail: detail } = data || {}
-        if (detail) {
-          const { _id, code, primaryPhone, firstName, primaryEmail, lastName } =
-            detail
-          return setCustomer({
-            _id,
-            code,
-            primaryPhone,
-            firstName,
-            primaryEmail,
-            lastName,
-          })
-        }
-        return setCustomer(null)
-      },
-    }
-  )
+  const [searchCustomer, { loading }] = useLazyQuery(queries.poscCustomers, {
+    fetchPolicy: "network-only",
+    onCompleted(data) {
+      const { poscCustomers } = data
+      setCustomers(poscCustomers)
+    },
+  })
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     searchCustomer({
       variables: {
-        _id: value,
+        searchValue: value,
         type: customerType,
       },
     })
@@ -111,10 +99,24 @@ const Customer = () => {
                   tabIndex={-1}
                 />
                 <CustomerType className="absolute left-3 top-1/2 h-5 w-5 -translate-y-2/4" />
-                <p className="absolute top-full pt-2 font-bold">
+                {/* <p className="absolute top-full pt-2 font-bold">
                   {customerInfo}
-                </p>
+                </p> */}
+                
               </form>
+              {
+                customers.length && (
+                  <div className="py-3 space-y-1">
+                    {
+                      customers.map(c => 
+                        <Button key={c._id} >
+                          {`${c.firstName || ""} ${c.lastName || ""} ${c.primaryPhone || ""}`}
+                         </Button>
+                       )
+                    }
+                  </div>
+                )
+              }
             </Content>
           )}
         </AnimatePresence>
