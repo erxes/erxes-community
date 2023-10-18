@@ -2454,5 +2454,11 @@
   "daily":"Өдөр бүр", 
   "montly":"Сар бүр", 
   "endOfMonth":"Сарын эцэст", 
-  "endOfContract":"Гэрээний төгсгөлд"
+  "endOfContract":"Гэрээний төгсгөлд",
+  "Interest Change":"Хүүгийн өөрчлөлт",
+  "Interest Return":"Хүүгийн буцаалт",
+  "Repayment Transaction":"Эргэн төлөлт",
+  "Interest Change to":"Хүү өөрчлөх дүн",
+  "Income Transaction":"Орлогын гүйлгээ",
+  "Outcome Transaction":"Зарлагын гүйлгээ"
 }
