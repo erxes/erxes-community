@@ -201,10 +201,10 @@ ${
 `;
 
 export const queries = (cardAvailable, kbAvailable, formsAvailable) => `
-  clientPortalGetConfigs(page: Int, perPage: Int): [ClientPortal]
+  clientPortalGetConfigs(kind:BusinessPortalKind, page: Int, perPage: Int): [ClientPortal]
   clientPortalGetConfig(_id: String!): ClientPortal
   clientPortalGetConfigByDomain: ClientPortal
-  clientPortalGetLast: ClientPortal
+  clientPortalGetLast(kind: BusinessPortalKind): ClientPortal
   clientPortalConfigsTotalCount: Int
   ${
     formsAvailable

@@ -5,6 +5,7 @@ const createOrUpdateConfig = `
     $_id: String
     $name: String
     $description: String
+    $kind: BusinessPortalKind
     $logo: String
     $icon: String
     $headerHtml: String
@@ -62,6 +63,7 @@ const createOrUpdateConfig = `
       description: $description,
       url: $url,
       logo: $logo,
+      kind: $kind,
       icon: $icon,
       headerHtml: $headerHtml,
       footerHtml: $footerHtml,

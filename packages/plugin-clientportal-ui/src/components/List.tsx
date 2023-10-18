@@ -37,6 +37,10 @@ function ClientPortalList({
     ? 'Vendor Portal'
     : 'Client Portal';
 
+  const kind = history.location.pathname.includes('vendor')
+    ? 'vendor'
+    : 'client';
+
   const renderRow = () => {
     return configs.map(config => {
       const onRemove = () => {
@@ -81,6 +85,7 @@ function ClientPortalList({
         {...props}
         queryParams=""
         history={history}
+        kind={kind}
       />
     );
 

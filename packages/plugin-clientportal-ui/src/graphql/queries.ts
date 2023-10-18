@@ -8,6 +8,7 @@ export const commonFields = `
   _id
   name
   url
+  kind
   description
   logo
   icon
@@ -182,8 +183,8 @@ const getTotalCount = `
 `;
 
 const getConfigs = `
-  query clientPortalGetConfigs($page: Int, $perPage: Int) {
-    clientPortalGetConfigs(page: $page, perPage: $perPage) {
+  query clientPortalGetConfigs($kind: BusinessPortalKind $page: Int, $perPage: Int) {
+    clientPortalGetConfigs(kind: $kind, page: $page, perPage: $perPage) {
       ${commonFields}
     }
   }
@@ -198,8 +199,8 @@ const getConfig = `
 `;
 
 const getConfigLast = `
-  query clientPortalGetLast {
-    clientPortalGetLast {
+  query clientPortalGetLast($kind: BusinessPortalKind) {
+    clientPortalGetLast(kind: $kind) {
       ${commonFields}
     }
   }

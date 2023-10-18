@@ -89,10 +89,11 @@ const ListContainer = withProps<ListProps & IRouterProps>(
   compose(
     graphql(gql(queries.getConfigs), {
       name: 'configsQuery',
-      options: ({ queryParams }: { queryParams: any }) => ({
+      options: ({ queryParams, kind }: { queryParams: any; kind: string }) => ({
         variables: {
           page: queryParams.page,
-          perPage: queryParams.perPage
+          perPage: queryParams.perPage,
+          kind
         }
       })
     }),
@@ -132,12 +133,18 @@ const LastConfig = (props: LastConfigProps & ListProps & IRouterProps) => {
   return <ListContainer {...extendedProps} />;
 };
 
-const LastConfigContainer = withProps<ListProps>(
+const LastConfigContainer = withProps<ListProps & IRouterProps>(
   compose(
-    graphql<Props, ClientPortalGetLastQueryResponse, {}>(
+    graphql<Props, ClientPortalGetLastQueryResponse>(
       gql(queries.getConfigLast),
       {
-        name: 'configGetLastQuery'
+        name: 'configGetLastQuery',
+        options: (props: any) => ({
+          fetchPolicy: 'network-only',
+          variables: {
+            kind: props.kind
+          }
+        })
       }
     )
   )(LastConfig)
@@ -147,6 +154,8 @@ const LastConfigContainer = withProps<ListProps>(
 const MainContainer = (props: ListProps) => {
   const { history } = props;
   const _id = routerUtils.getParam(history, '_id');
+
+  console.log('LastConfigContainer', props);
 
   if (_id) {
     const extendedProps = { ...props, _id };

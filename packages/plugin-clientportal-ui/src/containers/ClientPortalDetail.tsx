@@ -18,7 +18,8 @@ type Props = {
 };
 
 function ClientPortalDetailContainer(props: Props) {
-  const { queryParams, history, closeModal } = props;
+  const { queryParams, history, kind, closeModal } = props;
+  console.log('@###### ', kind);
   const { loading, data = {} } = useQuery<ClientPortalConfigQueryResponse>(
     gql(queries.getConfig),
     {
@@ -28,7 +29,7 @@ function ClientPortalDetailContainer(props: Props) {
   );
 
   const [mutate] = useMutation(gql(mutations.createOrUpdateConfig), {
-    refetchQueries: [{ query: gql(queries.getConfigs) }]
+    refetchQueries: [{ query: gql(queries.getConfigs), variables: { kind } }]
   });
 
   if (loading) {
@@ -36,7 +37,8 @@ function ClientPortalDetailContainer(props: Props) {
   }
 
   const handleUpdate = (doc: ClientPortalConfig) => {
-    mutate({ variables: { _id: queryParams._id, ...doc } })
+    console.log('doc', kind);
+    mutate({ variables: { _id: queryParams._id, kind, ...doc } })
       .then((response = {}) => {
         const { clientPortalConfigUpdate = {} } = response.data || {};
 
