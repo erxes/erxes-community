@@ -2432,5 +2432,7 @@
   "equalMethod":"Үндсэн зээл тэнцүү",
   "customMethod":"Дурын",
   "Schedule day": "Хуваарьт өдөр",
-  "Day": "Өдөр"
+  "Day": "Өдөр",
+  "Loan Purpose":"Зээлийн зориулалт",
+  "Contract Date":"Гэрээний огноо"
 }
