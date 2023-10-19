@@ -53,6 +53,7 @@ export interface IContract {
   unduePercent: number;
   repayment: string;
   startDate: Date;
+  endDate: Date;
   scheduleDays: number[];
   insuranceAmount: number;
   /**
@@ -243,7 +244,8 @@ export const contractSchema = schemaHooksWrapper(
       label: 'Schedule Type',
       selectOptions: REPAYMENT_TYPE
     }),
-    startDate: field({ type: Date, label: 'Rate Start Date' }),
+    startDate: field({ type: Date, label: 'Start Date' }),
+    endDate: field({ type: Date, label: 'End Date' }),
     scheduleDays: field({
       type: [Number],
       min: 1,

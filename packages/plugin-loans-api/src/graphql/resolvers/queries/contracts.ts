@@ -265,6 +265,25 @@ const contractQueries = {
       _id: contractId
     });
     return getCloseInfo(models, subdomain, contract, date);
+  },
+
+  contractsAlert: async (_root, { date }, { models }: IContext) => {
+    var alerts: { name: string; count: number; filter: any }[] = [];
+    const filterDate = getFullDate(new Date(date));
+    //expired contracts
+    const expiredContracts = await models.Contracts.countDocuments({
+      endDate: { $lt: filterDate }
+    });
+
+    if (expiredContracts) {
+      alerts.push({
+        name: 'Expired contracts',
+        count: expiredContracts,
+        filter: { endDate: { $lt: filterDate } }
+      });
+    }
+
+    return alerts;
   }
 };
 
