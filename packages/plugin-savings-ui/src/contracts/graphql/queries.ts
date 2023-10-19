@@ -149,8 +149,8 @@ export const scheduleYears = `
 `;
 
 export const closeInfo = `
-  query closeInfo($contractId: String, $date: Date) {
-    closeInfo(contractId: $contractId, date: $date) {
+  query savingsCloseInfo($contractId: String, $date: Date) {
+    savingsCloseInfo(contractId: $contractId, date: $date) {
       balance
       storedInterest
       total

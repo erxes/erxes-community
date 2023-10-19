@@ -108,10 +108,20 @@ const commonFields = `
   storeInterestInterval: String
 `;
 
+const interestCorrectionFields = `
+  contractId: String
+  stoppedDate: Date
+  isStopLoss: Boolean
+  interestAmount: Float
+  lossAmount: Float
+`;
+
 export const mutations = `
   savingsContractsAdd(${commonFields}): SavingContract
   savingsContractsEdit(_id: String!, ${commonFields}): SavingContract
   savingsContractsDealEdit(_id: String!, ${commonFields}): SavingContract
   savingsContractsClose(contractId: String, closeDate: Date, closeType: String, description: String): SavingContract
   savingsContractsRemove(contractIds: [String]): [String]
+  savingsInterestChange(${interestCorrectionFields}): SavingContract
+  savingsInterestReturn(${interestCorrectionFields}): SavingContract
 `;

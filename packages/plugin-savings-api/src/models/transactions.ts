@@ -75,7 +75,6 @@ export const loadTransactionClass = (models: IModels) => {
       doc.number = `${contract.number}${new Date().getTime().toString()}`;
       doc.payment = doc.total;
       doc.balance = contract.savingAmount;
-      console.log('doc', doc);
       switch (doc.transactionType) {
         case TRANSACTION_TYPE.INCOME:
           await models.Contracts.updateOne(

@@ -136,16 +136,16 @@ mutation StopInterest($contractId: String, $stoppedDate: Date, $interestAmount: 
 }
 `;
 const interestChange = `
-  mutation InterestChange($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
-    interestChange(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
+  mutation savingsInterestChange($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
+    savingsInterestChange(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
       _id
     }
   }
 `;
 
 const interestReturn = `
-  mutation InterestReturn($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
-    interestReturn(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
+  mutation savingsInterestReturn($contractId: String, $stoppedDate: Date, $isStopLoss: Boolean, $interestAmount: Float, $lossAmount: Float) {
+    savingsInterestReturn(contractId: $contractId, stoppedDate: $stoppedDate, isStopLoss: $isStopLoss, interestAmount: $interestAmount, lossAmount: $lossAmount) {
       _id
     }
   }
