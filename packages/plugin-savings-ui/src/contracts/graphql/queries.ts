@@ -169,6 +169,16 @@ const documents = `
   }
 `;
 
+const savingsContractsAlert = `
+  query savingsContractsAlert($date: Date) {
+    savingsContractsAlert(date: $date) {
+      name
+      count
+      filter
+    }
+  }
+`;
+
 export default {
   contracts,
   contractsMain,
@@ -176,5 +186,6 @@ export default {
   schedules,
   scheduleYears,
   closeInfo,
-  documents
+  documents,
+  savingsContractsAlert
 };

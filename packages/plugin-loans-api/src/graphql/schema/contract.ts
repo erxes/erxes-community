@@ -128,6 +128,11 @@ export const types = () => `
     list: [LoanContract],
     totalCount: Float,
   }
+  type LoanAlert {
+    name: String,
+    count: Float,
+    filter: JSON,
+  }
 `;
 
 const queryParams = `
@@ -168,6 +173,7 @@ export const queries = `
   cpContracts(cpUserType: String cpUserEmail: String cpUserPhone: String): [LoanContract]
   cpContractDetail(_id: String!): LoanContract
   closeInfo(contractId: String, date: Date): CloseInfo
+  contractsAlert(date: Date): [LoanAlert]
 `;
 
 const commonFields = `

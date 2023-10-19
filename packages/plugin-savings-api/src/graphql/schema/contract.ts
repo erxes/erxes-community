@@ -42,6 +42,13 @@ export const types = () => `
     preCloseInterest: Float,
     total: Float
   }
+
+  type SavingAlert {
+    name: String,
+    count: Float,
+    filter: JSON,
+  }
+
   type SavingContractsListResponse {
     list: [SavingContract],
     totalCount: Float,
@@ -83,6 +90,7 @@ export const queries = `
   savingsContracts(${queryParams}): [SavingContract]
   savingsContractDetail(_id: String!): SavingContract
   savingsCloseInfo(contractId: String, date: Date): SavingCloseInfo
+  savingsContractsAlert(date: Date): [SavingAlert]
 `;
 
 const commonFields = `
