@@ -5,7 +5,7 @@ import {
 } from '@erxes/api-utils/src/permissions';
 import { IContext, IModels } from '../../../connectionResolver';
 import { sendCoreMessage } from '../../../messageBroker';
-import { Builder } from '../../../utils';
+import { Builder, countBySegment } from '../../../utils';
 
 const generateFilter = async (
   subdomain: string,
@@ -161,6 +161,32 @@ const carQueries = {
 
   carCategoryDetail: async (_root, { _id }, { models }: IContext) => {
     return models.CarCategories.findOne({ _id });
+  },
+
+  carCounts: async (
+    _root,
+    params,
+    { commonQuerySelector, commonQuerySelectorElk, models, subdomain }: IContext
+  ) => {
+    const counts = {
+      bySegment: {},
+      byTag: {}
+    };
+
+    const { only } = params;
+
+    const qb = new Builder(models, subdomain, params, {
+      commonQuerySelector,
+      commonQuerySelectorElk
+    });
+
+    switch (only) {
+      case 'bySegment':
+        counts.bySegment = await countBySegment(subdomain, 'cars:car', qb);
+        break;
+    }
+
+    return counts;
   },
 
   cpCarDetail: async (_root, { _id }, { models }: IContext) => {

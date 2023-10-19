@@ -12,8 +12,6 @@ const SegmentFilterContainer = (props: {
 }) => {
   const { carsCountsQuery } = props;
 
-  console.log(carsCountsQuery, 'carsCountsQuery');
-
   const counts = (carsCountsQuery ? carsCountsQuery.carCounts : null) || {
     bySegment: {}
   };
