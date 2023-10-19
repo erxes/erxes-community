@@ -13,6 +13,7 @@ export const types = () => `
     interestRate: Float
     closeInterestRate: Float
     startDate: Date
+    endDate: Date
     customerId: String
     customerType: String
 
@@ -132,4 +133,5 @@ export const mutations = `
   savingsContractsRemove(contractIds: [String]): [String]
   savingsInterestChange(${interestCorrectionFields}): SavingContract
   savingsInterestReturn(${interestCorrectionFields}): SavingContract
+  savingsExpandDuration(_id: String!):SavingContract
 `;

@@ -97,6 +97,13 @@ const contractsClose = `
     }
   }
 `;
+const expandContract = `
+  mutation SavingsExpandDuration($id: String!) {
+    savingsExpandDuration(_id: $id) {
+      _id
+    }
+  }
+`;
 
 const regenSchedules = `
   mutation regenSchedules($contractId: String!) {
@@ -163,5 +170,6 @@ export default {
   changeClassification,
   stopInterest,
   interestChange,
-  interestReturn
+  interestReturn,
+  expandContract
 };

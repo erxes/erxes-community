@@ -24,6 +24,7 @@ import { queries } from '../../graphql';
 import { can, isEnabled } from '@erxes/ui/src/utils/core';
 import withConsumer from '../../../withConsumer';
 import { IUser } from '@erxes/ui/src/auth/types';
+import ExpandForm from '../../containers/detail/ExpandForm';
 
 type Props = {
   contract: IContract;
@@ -82,6 +83,8 @@ class BasicInfoSection extends React.Component<Props, State> {
 
     const closeForm = props => <CloseForm {...props} contract={contract} />;
 
+    const expandForm = props => <ExpandForm {...props} contract={contract} />;
+
     return (
       <Action>
         <Dropdown onToggle={isShown => isShown && onOpen()}>
@@ -112,6 +115,15 @@ class BasicInfoSection extends React.Component<Props, State> {
                 />
               </li>
             )}
+            <li>
+              <ModalTrigger
+                title={__('Expand Contract')}
+                trigger={<a href="#toClose">{__('Expand Contract')}</a>}
+                size="lg"
+                content={expandForm}
+              />
+            </li>
+
             {can('contractsRemove', currentUser) && (
               <li>
                 <a href="#delete" onClick={onDelete}>

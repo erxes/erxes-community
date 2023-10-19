@@ -21,6 +21,7 @@ export interface IContractModel extends Model<IContractDocument> {
   closeContract(subdomain, doc: ICloseVariable);
   getContractAlert();
   removeContracts(_ids);
+  expandDuration(_id): Promise<IContractDocument>;
   interestChange({
     contractId,
     stoppedDate,
@@ -129,6 +130,22 @@ export const loadContractClass = (models: IModels) => {
 
       return models.Contracts.deleteMany({ _id: { $in: _ids } });
     }
+
+    public static async expandDuration(_id) {
+      const contract = await models.Contracts.findOne({ _id: _id });
+
+      if (contract) {
+        const endDate = addMonths(new Date(), contract?.duration);
+        console.log('endDate', endDate);
+        await models.Contracts.updateOne(
+          { _id: contract._id },
+          { $set: { endDate: endDate } }
+        );
+      }
+
+      return contract;
+    }
+
     public static async interestChange({
       contractId,
       interestAmount

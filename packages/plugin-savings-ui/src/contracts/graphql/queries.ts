@@ -27,6 +27,7 @@ const contractFields = `
   currency
   closeInterestRate
   storedInterest
+  endDate
 `;
 
 const listParamsDef = `
