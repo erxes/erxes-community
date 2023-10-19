@@ -51,6 +51,7 @@ const contractFields = `
   useManualNumbering
   useFee
   loanPurpose
+  givenAmount
 `;
 
 const listParamsDef = `

@@ -42,6 +42,7 @@ export interface IContract {
   createdBy: string;
   createdAt: Date;
   marginAmount?: number;
+  givenAmount?: number;
   leaseAmount: number;
   feeAmount?: number;
   /**
@@ -205,6 +206,12 @@ export const contractSchema = schemaHooksWrapper(
       type: Number,
       optional: true,
       label: 'Loan amount'
+    }),
+    givenAmount: field({
+      type: Number,
+      optional: true,
+      default: 0,
+      label: 'Given amount'
     }),
     feeAmount: field({
       type: Number,

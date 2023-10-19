@@ -35,6 +35,7 @@ export const types = () => `
     createdAt: Date
     marginAmount: Float
     leaseAmount: Float
+    givenAmount: Float
     feeAmount: Float
     tenor: Float
     unduePercent: Float
@@ -180,6 +181,7 @@ const commonFields = `
   createdAt: Date
   marginAmount: Float
   leaseAmount: Float
+  givenAmount: Float
   feeAmount: Float
   tenor: Float
   unduePercent: Float
