@@ -88,6 +88,8 @@ const queryParams = `
   conformityRelType: String
   conformityIsRelated: Boolean
   conformityIsSaved: Boolean
+  segment: String
+  segmentData: String
 `;
 
 export const queries = `
