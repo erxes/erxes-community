@@ -257,6 +257,16 @@ const documents = `
   }
 `;
 
+const contractsAlert = `
+  query contractsAlert($date: Date) {
+    contractsAlert(date: $date) {
+      name
+      count
+      filter
+    }
+  }
+`;
+
 export default {
   contracts,
   contractsMain,
@@ -264,5 +274,6 @@ export default {
   schedules,
   scheduleYears,
   closeInfo,
-  documents
+  documents,
+  contractsAlert
 };

@@ -273,7 +273,7 @@ const contractQueries = {
 
     if (expiredContracts.length > 0) {
       alerts.push({
-        name: 'Expired contracts',
+        name: 'End contracts',
         count: expiredContracts.length,
         filter: expiredContracts.map(a => a._id)
       });

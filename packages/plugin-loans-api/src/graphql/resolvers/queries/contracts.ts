@@ -16,9 +16,9 @@ const generateFilter = async (models, params, commonQuerySelector) => {
     filter.status = params.status;
   }
 
-  // if (params.ids) {
-  //   filter._id = { $in: params.ids };
-  // }
+  if (params.ids) {
+    filter._id = { $in: params.ids };
+  }
 
   if (params.closeDate) {
     const date = getFullDate(params.closeDate);
@@ -271,15 +271,17 @@ const contractQueries = {
     var alerts: { name: string; count: number; filter: any }[] = [];
     const filterDate = getFullDate(new Date(date));
     //expired contracts
-    const expiredContracts = await models.Contracts.countDocuments({
+    const expiredContracts = await models.Contracts.find({
       endDate: { $lt: filterDate }
-    });
+    })
+      .select({ _id: 1 })
+      .lean();
 
-    if (expiredContracts) {
+    if (expiredContracts.length > 0) {
       alerts.push({
         name: 'Expired contracts',
-        count: expiredContracts,
-        filter: { endDate: { $lt: filterDate } }
+        count: expiredContracts.length,
+        filter: expiredContracts.map(a => a._id)
       });
     }
 
