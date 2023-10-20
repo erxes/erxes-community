@@ -43,7 +43,7 @@ export const useChatMessages = (): IUseChats => {
 
   const [sendMessageMutation] = useMutation(mutations.chatMessageAdd, {
     update(cache, { data }: any) {
-      let messagesQuery = queries.chatMessages
+      const messagesQuery = queries.chatMessages
 
       const chatMessageAdd = data.chatMessageAdd ? data.chatMessageAdd : data
 

@@ -67,7 +67,7 @@ const Messages = () => {
         )}
       </div>
       <ReplyInfo reply={reply} setReply={setReply} />
-      <div className="p-4">
+      <div className="p-4 border-t border-slate-200">
         <Editor sendMessage={sendMessage} reply={reply} setReply={setReply} />
       </div>
     </div>

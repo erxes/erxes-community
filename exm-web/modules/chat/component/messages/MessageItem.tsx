@@ -76,7 +76,7 @@ const MessageItem = ({
             <div className="flex">
               <ReplyIcon size={16} /> {renderReplyText()}
             </div>
-            <p className="truncate bg-[#ededfb] p-2 rounded-2xl">
+            <p className="truncate bg-[#ededfb] p-2 sm:rounded-lg">
               {relatedMessage.content}
             </p>
           </div>
@@ -102,41 +102,58 @@ const MessageItem = ({
           )}
         </div>
 
-        <div
-          className={`${
-            isMe ? "flex-row" : "flex-row-reverse"
-          } max-w-xs flex items-center`}
-        >
-          {showAction ? (
-            <div className={`flex ${isMe ? "flex-row" : "flex-row-reverse"}`}>
-              <ReplyIcon
-                size={16}
-                className={`${isMe ? "mr-1" : "ml-1"} cursor-pointer`}
-                onClick={() => setReply(message)}
-              />
-            </div>
-          ) : null}
+          <div
+            className={`${
+              isMe ? "flex-row" : "flex-row-reverse"
+            } max-w-xs flex items-center`}
+          >
+            {showAction ? (
+              <div className={`flex ${isMe ? "flex-row" : "flex-row-reverse"}`}>
+                <ReplyIcon
+                  size={16}
+                  className={`${isMe ? "mr-1" : "ml-1"} cursor-pointer`}
+                  onClick={() => setReply(message)}
+                />
+              </div>
+            ) : null}
 
-          <div>
-            {attachments && attachments.length > 0 ? (
-              <>
-                <Card className="p-4 rounded-2xl">
+            <div>
+              {attachments && attachments.length > 0 ? (
+                <>
+                  <Card className="p-4 sm:rounded-lg">
+                    <div dangerouslySetInnerHTML={{ __html: content || "" }} />
+                  </Card>
+                  <AttachmentWithChatPreview
+                    attachments={attachments}
+                    className="m-2 overflow-x-auto w-60"
+                    isDownload={true}
+                  />
+                </>
+              ) : (
+                <Card className="p-3 sm:rounded-lg">
                   <div dangerouslySetInnerHTML={{ __html: content || "" }} />
                 </Card>
-                <AttachmentWithChatPreview
-                  attachments={attachments}
-                  className="m-2 overflow-x-auto w-60"
-                  isDownload={true}
-                />
-              </>
-            ) : (
-              <Card className="p-4 rounded-2xl">
-                <div dangerouslySetInnerHTML={{ __html: content || "" }} />
-              </Card>
-            )}
+              )}
+            </div>
           </div>
-        </div>
       </div>
+        <div className={`flex justify-end mt-1`}>
+          {message.seenList.map((item) => {
+            if (currentUser._id === item.user._id) {
+              return null
+            }
+            return (
+              <Image
+                key={item.user._id}
+                src={item.user.details.avatar}
+                alt="avatar"
+                width={60}
+                height={60}
+                className="w-5 h-5 rounded-full object-cover p-1px"
+              />
+            )
+          })}
+        </div>
     </div>
   )
 }

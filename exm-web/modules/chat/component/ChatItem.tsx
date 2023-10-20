@@ -155,12 +155,12 @@ export const ChatItem = ({
     <Card
       className={`${chatId === chat._id ? "bg-[#f0eef9]" : "bg-transparent"} ${
         isSeen ? "" : "font-bold"
-      } px-6 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] relative`}
+      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] relative mb-5 sm:rounded-lg`}
       onClick={handleClick}
       onMouseEnter={() => setShowAction(true)}
       onMouseLeave={() => setShowAction(false)}
     >
-      <div className="items-end flex mr-2">
+      <div className="items-end flex mr-3">
         <div className="w-12 h-12 rounded-full">
           <Image
             src={
@@ -179,18 +179,26 @@ export const ChatItem = ({
       <div className={`text-sm text-[#444] w-full`}>
         <p>
           {chat && chat.type === "direct" ? (
-            <>
-              {user?.details.fullName || user?.email}
-
-              {user?.details.position ? (
-                <span className="text-[10px]"> ({user?.details.position})</span>
-              ) : null}
-            </>
+            <>{user?.details.fullName || user?.email}</>
           ) : (
             chat?.name
           )}
         </p>
         <div className="flex justify-between w-full text-xs">
+          <p>
+            {user?.details.position ? (
+              <span className="text-[10px]"> ({user?.details.position})</span>
+            ) : (
+              ""
+            )}
+          </p>
+          <p className="text-primary-light">
+            {chat.lastMessage &&
+              chat.lastMessage.createdAt &&
+              dayjs(chat.lastMessage.createdAt).fromNow()}
+          </p>
+        </div>
+        <div className="">
           <p
             className="truncate max-w-[150px]"
             dangerouslySetInnerHTML={
@@ -199,12 +207,6 @@ export const ChatItem = ({
               } || ""
             }
           />
-
-          <p>
-            {chat.lastMessage &&
-              chat.lastMessage.createdAt &&
-              dayjs(chat.lastMessage.createdAt).fromNow()}
-          </p>
         </div>
       </div>
 

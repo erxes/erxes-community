@@ -186,6 +186,12 @@ const chatMessages = gql`
         }
         seenList {
           lastSeenMessageId
+          user {
+            _id
+            details {
+              avatar
+            }
+          }
         }
       }
       totalCount
