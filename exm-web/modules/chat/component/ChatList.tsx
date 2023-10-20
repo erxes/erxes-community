@@ -178,7 +178,7 @@ const ChatList = () => {
               </button>
             ))}
           </div>
-          <div className="p-4">
+          <div className="p-4 overflow-auto chat-list-max-height">
             {activeTabIndex === 0 && renderChats()}
             {activeTabIndex === 1 && renderGroupChats()}
             {activeTabIndex === 2 && renderPinnedChats()}

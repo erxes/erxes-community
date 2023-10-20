@@ -15,6 +15,7 @@ const chats = gql`
         isPinned
         isPinnedUserIds
         featuredImage
+        muteUserIds
         lastMessage {
           content
           createdAt
@@ -68,6 +69,7 @@ const chatsPinned = gql`
         isPinned
         isPinnedUserIds
         featuredImage
+        muteUserIds
         lastMessage {
           content
           createdAt
