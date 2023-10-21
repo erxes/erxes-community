@@ -37,8 +37,10 @@ function ClientPortalDetailContainer(props: Props) {
   }
 
   const handleUpdate = (doc: ClientPortalConfig) => {
-    console.log('doc', kind);
-    mutate({ variables: { _id: queryParams._id, kind, ...doc } })
+    const config: any = { _id: queryParams._id, kind, ...doc };
+    delete config.__typename;
+
+    mutate({ variables: { config } })
       .then((response = {}) => {
         const { clientPortalConfigUpdate = {} } = response.data || {};
 

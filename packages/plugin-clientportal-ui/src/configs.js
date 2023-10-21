@@ -5,7 +5,9 @@ module.exports = {
   exposes: {
     './routes': './src/routes.tsx',
     './cardDetailAction': './src/containers/comments/CardDetailAction.tsx',
-    './fieldConfig': './src/containers/FieldConfigForm.tsx'
+    './fieldConfig': './src/containers/FieldConfigForm.tsx',
+    './vendorSection': './src/containers/cardsRightSidebarSection/VendorSection.tsx',
+    './clientSection': './src/containers/cardsRightSidebarSection/ClientSection.tsx',
   },
   cardDetailAction: './cardDetailAction',
   fieldConfig: './fieldConfig',
@@ -23,6 +25,19 @@ module.exports = {
       scope: 'businessportal',
       action: '',
       permissions: []
+    }
+  ],
+
+  ticketRightSidebarSection: [
+    {
+      text: "vendorSection",
+      component: "./vendorSection",
+      scope: "clientportal"
+    },
+    {
+      text: "clientSection",
+      component: "./clientSection",
+      scope: "clientportal"
     }
   ]
 };

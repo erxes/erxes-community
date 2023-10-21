@@ -22,11 +22,17 @@ import Icon from '@erxes/ui/src/components/Icon';
 import { OverlayTrigger } from 'react-bootstrap';
 import Select from 'react-select-plus';
 import Toggle from '@erxes/ui/src/components/Toggle';
+import CategoryForm from '@erxes/ui-products/src/containers/CategoryForm';
+import SelectProductCategory from '@erxes/ui-products/src/containers/SelectProductCategory';
+import Button from '@erxes/ui/src/components/Button';
+import Tip from '@erxes/ui/src/components/Tip';
+import ModalTrigger from '@erxes/ui/src/components/ModalTrigger';
 
 type Props = {
   topics: ITopic[];
   boards: IBoard[];
   pipelines: IPipeline[];
+  kind: 'client' | 'vendor';
   fetchPipelines: (boardId: string) => void;
   handleFormChange: (name: string, value: string | boolean) => void;
 } & ClientPortalConfig;
@@ -83,7 +89,9 @@ function General({
   taskToggle,
   dealToggle,
   purchaseToggle,
-  ticketToggle
+  ticketToggle,
+  vendorParentProductCategoryId,
+  kind
 }: Props) {
   const [show, setShow] = useState<boolean>(false);
 
@@ -316,11 +324,53 @@ function General({
     );
   };
 
+  const renderSelectCategory = () => {
+    const trigger = (
+      <Button btnStyle="primary" icon="plus-circle">
+        Create Category
+      </Button>
+    );
+
+    const renderTrigger = () => {
+      const content = props => <CategoryForm {...props} categories={[]} />;
+      return (
+        <ModalTrigger
+          title="Manage category"
+          trigger={trigger}
+          size="lg"
+          content={content}
+        />
+      );
+    };
+
+    return (
+      <>
+        <ControlLabel>Parent Product Category for Vendors</ControlLabel>
+        <div style={{ display: 'flex' }}>
+          <SelectProductCategory
+            label="Choose product category"
+            name="productCategoryId"
+            initialValue={vendorParentProductCategoryId || ''}
+            onSelect={categoryId =>
+              handleFormChange(
+                'vendorParentProductCategoryId',
+                categoryId as string
+              )
+            }
+            multi={false}
+          />
+          {renderTrigger()}
+        </div>
+      </>
+    );
+  };
+
   const renderFeatures = () => {
     if (
       !isEnabled('knowledgebase') &&
       !isEnabled('cards') &&
-      !isEnabled('inbox')
+      !isEnabled('inbox') &&
+      !isEnabled('products')
     ) {
       return null;
     }
@@ -456,6 +506,8 @@ function General({
             formValueName: 'messengerBrandCode',
             formValue: messengerBrandCode
           })}
+
+        {isEnabled('products') && kind === 'vendor' && renderSelectCategory()}
       </Block>
     );
   };

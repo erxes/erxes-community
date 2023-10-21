@@ -31,6 +31,7 @@ export interface IUser {
   clientPortalId: string;
   erxesCustomerId?: string;
   erxesCompanyId?: string;
+  companyIds?: string[];
   createdAt?: Date;
   modifiedAt?: Date;
   resetPasswordToken?: string;
@@ -168,7 +169,7 @@ export const clientPortalUserSchema = new Schema({
     label: 'Company registration number'
   }),
   clientPortalId: field({ type: String, required: true }),
-
+  companyIds: field({ type: [String], default: [] }),
   erxesCompanyId: field({ type: String, optional: true }),
   erxesCustomerId: field({ type: String, optional: true }),
   phoneVerificationCode: field({ type: String, optional: true }),

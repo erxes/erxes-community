@@ -3,6 +3,8 @@ import { sendCardsMessage, sendContactsMessage } from '../../../messageBroker';
 import { IClientPortal } from '../../../models/definitions/clientPortal';
 import { IContext } from '../../../connectionResolver';
 import { checkPermission } from '@erxes/api-utils/src';
+import { putActivityLog } from '../../../logUtils';
+import { getUserName } from '../../../utils';
 
 export interface IVerificationParams {
   userId: string;
@@ -11,8 +13,12 @@ export interface IVerificationParams {
 }
 
 const clientPortalMutations = {
-  clientPortalConfigUpdate(_root, args: IClientPortal, { models }: IContext) {
-    return models.ClientPortals.createOrUpdateConfig(args);
+  clientPortalConfigUpdate(
+    _root,
+    { config }: { config: IClientPortal },
+    { models }: IContext
+  ) {
+    return models.ClientPortals.createOrUpdateConfig(config);
   },
 
   clientPortalRemove(_root, { _id }: { _id: string }, { models }: IContext) {
@@ -89,6 +95,24 @@ const clientPortalMutations = {
       },
       cpUser._id
     );
+
+    const cp = await models.ClientPortals.findOne({
+      _id: cpUser.clientPortalId
+    }).lean();
+
+    const userName = getUserName(cpUser);
+
+    // putActivityLog(subdomain, {
+    //   action: 'create',
+    //   data: {
+    //     contentType: `cards:${type}`,
+    //     action: 'create',
+    //     contentId: card._id,
+    //     content: `${userName} created a cards:${type} from ${cp.url}`,
+    //     createdBy: cpUser._id,
+    //     clientPortalId: cp._id,
+    //   },
+    // });
 
     return card;
   }

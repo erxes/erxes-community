@@ -22,6 +22,7 @@ import {
 
 type ListProps = {
   _id?: string;
+  kind: 'client' | 'vendor';
   queryParams: any;
 } & IRouterProps;
 
@@ -38,8 +39,11 @@ class List extends React.Component<Props & ListProps> {
       removeMutation,
       configsQuery,
       totalCountQuery,
+
       ...props
     } = this.props;
+
+    const configs = configsQuery.clientPortalGetConfigs || [];
 
     // remove action
     const remove = _id => {
@@ -48,9 +52,17 @@ class List extends React.Component<Props & ListProps> {
           variables: { _id }
         })
           .then(() => {
-            Alert.success('You successfully deleted a client portal.');
+            Alert.success('You successfully deleted a business portal.');
 
-            history.push('/settings/client-portal');
+            if (configs.length > 1) {
+              history.push(
+                `/settings/business-portal/${props.kind}?_id=${configs[0]._id}`
+              );
+            } else {
+              history.push('/settings/business-portal');
+            }
+
+            configsQuery.refetch();
           })
           .catch(error => {
             Alert.error(error.message);
@@ -58,7 +70,6 @@ class List extends React.Component<Props & ListProps> {
       });
     };
 
-    const configs = configsQuery.clientPortalGetConfigs || [];
     const totalCount = totalCountQuery.clientPortalConfigsTotalCount || 0;
 
     const updatedProps = {

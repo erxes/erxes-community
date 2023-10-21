@@ -99,6 +99,7 @@ export const commonFields = `
   tokenExpiration
   refreshTokenExpiration
   tokenPassMethod
+  vendorParentProductCategoryId
 `;
 
 export const basicFields = `
@@ -275,6 +276,24 @@ query ClientPortalFieldConfig($fieldId: String) {
 }
 `;
 
+const usersOfCard = `
+query ClientPortalCardUsers($contentType: String!, $contentTypeId: String!, $userKind: BusinessPortalKind) {
+  clientPortalCardUsers(contentType: $contentType, contentTypeId: $contentTypeId, userKind: $userKind) {
+    _id
+    firstName
+    lastName
+    email
+    phone
+    username
+    clientPortal {
+      _id
+      name
+      url
+    }
+  }
+}
+`;
+
 export default {
   getConfig,
   getConfigs,
@@ -285,5 +304,6 @@ export default {
   clientPortalUserDetail,
   clientPortalUserCounts,
   clientPortalComments,
-  fieldConfig
+  fieldConfig,
+  usersOfCard
 };

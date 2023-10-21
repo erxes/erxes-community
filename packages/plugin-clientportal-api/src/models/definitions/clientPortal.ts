@@ -90,6 +90,8 @@ export interface IClientPortal {
   dealToggle?: boolean;
   purchaseToggle?: boolean;
   taskToggle?: boolean;
+
+  vendorParentProductCategoryId?: string;
 }
 
 interface IStyles {
@@ -267,5 +269,10 @@ export const clientPortalSchema = new Schema({
     default: 'cookie',
     label: 'Token pass method',
     enum: ['cookie', 'header']
+  }),
+
+  vendorParentProductCategoryId: field({
+    type: String,
+    optional: true
   })
 });

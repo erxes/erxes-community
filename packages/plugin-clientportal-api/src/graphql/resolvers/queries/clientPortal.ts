@@ -255,6 +255,47 @@ const configClientPortalQueries = {
         isRequired: true
       };
     });
+  },
+
+  async clientPortalCardUsers(
+    _root,
+    { contentType, contentTypeId, userKind },
+    { models }: IContext
+  ) {
+    const userIds = await models.ClientPortalUserCards.find({
+      type: contentType,
+      cardId: contentTypeId
+    }).distinct('userIds');
+
+    if (!userIds || userIds.length === 0) {
+      return [];
+    }
+
+    const users = await models.ClientPortalUsers.aggregate([
+      {
+        $match: {
+          _id: { $in: userIds }
+        }
+      },
+      {
+        $lookup: {
+          from: 'client_portals',
+          localField: 'clientPortalId',
+          foreignField: '_id',
+          as: 'clientPortal'
+        }
+      },
+      {
+        $unwind: '$clientPortal'
+      },
+      {
+        $match: {
+          'clientPortal.kind': userKind
+        }
+      }
+    ]);
+
+    return users;
   }
 };
 
