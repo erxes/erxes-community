@@ -1,28 +1,19 @@
 import { ISendMessageArgs, sendMessage } from '@erxes/api-utils/src/core';
+import { IContext as IMainContext } from '@erxes/api-utils/src';
 import { serviceDiscovery } from './configs';
-import { Msdynamics } from './models';
+import { IModels } from './connectionResolver';
 
 let client;
+
+export interface IContext extends IMainContext {
+  subdomain: string;
+  models: IModels;
+}
 
 export const initBroker = async cl => {
   client = cl;
 
   const { consumeQueue, consumeRPCQueue } = client;
-
-  consumeQueue('msdynamic:send', async ({ data }) => {
-    Msdynamics.send(data);
-
-    return {
-      status: 'success'
-    };
-  });
-
-  consumeRPCQueue('msdynamic:find', async ({ data }) => {
-    return {
-      status: 'success',
-      data: await Msdynamics.find({})
-    };
-  });
 };
 
 export const sendCommonMessage = async (
