@@ -16,25 +16,15 @@ export interface IDynamicModel extends Model<IDynamicDocument> {
 
 export const loadDynamicClass = (model: IModels) => {
   class Msdynamic {
-    public static async getMsdynamic(_id: string) {
-      const msdynamic = await model.Msdynamics.findOne({ _id });
-
-      if (!msdynamic) {
-        throw new Error('Msdynamic not found');
-      }
-
-      return msdynamic;
-    }
-
     // create
-    public static async createMsdynamic(doc) {
-      return model.Msdynamics.create({
+    public static async createMsdynamic(doc: IDynamic) {
+      return await model.Msdynamics.create({
         ...doc,
         createdAt: new Date()
       });
     }
     // update
-    public static async updateMsdynamic(doc) {
+    public static async updateMsdynamic(doc: IDynamic) {
       await model.Msdynamics.updateOne(
         { _id: doc._id },
         { $set: { ...doc } }

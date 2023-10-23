@@ -5,19 +5,21 @@ const msdynamicMutations = {
    * Creates a new msdynamic
    */
   async msdynamicsAdd(_root, doc, { models }: IContext) {
-    return models.Msdynamics.createMsdynamic(doc);
+    const dynamic = await models.Msdynamics.createMsdynamic(doc);
+
+    return dynamic;
   },
   /**
    * Edits a new msdynamic
    */
   async msdynamicsEdit(_root, doc, { models }: IContext) {
-    return models.Msdynamics.updateMsdynamic(doc);
+    return await models.Msdynamics.updateMsdynamic(doc);
   },
   /**
    * Removes a single msdynamic
    */
   async msdynamicsRemove(_root, { _id }, { models }: IContext) {
-    return models.Msdynamics.removeMsdynamic(_id);
+    return await models.Msdynamics.removeMsdynamic(_id);
   }
 };
 

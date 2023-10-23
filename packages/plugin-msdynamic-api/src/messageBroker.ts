@@ -12,8 +12,6 @@ export interface IContext extends IMainContext {
 
 export const initBroker = async cl => {
   client = cl;
-
-  const { consumeQueue, consumeRPCQueue } = client;
 };
 
 export const sendCommonMessage = async (
