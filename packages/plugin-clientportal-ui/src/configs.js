@@ -39,5 +39,29 @@ module.exports = {
       component: "./clientSection",
       scope: "clientportal"
     }
+  ],
+  taskRightSidebarSection: [
+    {
+      text: "vendorSection",
+      component: "./vendorSection",
+      scope: "clientportal"
+    },
+    {
+      text: "clientSection",
+      component: "./clientSection",
+      scope: "clientportal"
+    }
+  ],
+  dealRightSidebarSection: [
+    {
+      text: "vendorSection",
+      component: "./vendorSection",
+      scope: "clientportal"
+    },
+    {
+      text: "clientSection",
+      component: "./clientSection",
+      scope: "clientportal"
+    }
   ]
 };

@@ -88,31 +88,11 @@ const clientPortalMutations = {
       isRPC: true
     });
 
-    await models.ClientPortalUserCards.createOrUpdateCard(
-      {
-        type,
-        cardId: card._id
-      },
-      cpUser._id
-    );
-
-    const cp = await models.ClientPortals.findOne({
-      _id: cpUser.clientPortalId
-    }).lean();
-
-    const userName = getUserName(cpUser);
-
-    // putActivityLog(subdomain, {
-    //   action: 'create',
-    //   data: {
-    //     contentType: `cards:${type}`,
-    //     action: 'create',
-    //     contentId: card._id,
-    //     content: `${userName} created a cards:${type} from ${cp.url}`,
-    //     createdBy: cpUser._id,
-    //     clientPortalId: cp._id,
-    //   },
-    // });
+    await models.ClientPortalUserCards.createOrUpdateCard({
+      contentType: type,
+      contentTypeId: card._id,
+      cpUserId: cpUser._id
+    });
 
     return card;
   }

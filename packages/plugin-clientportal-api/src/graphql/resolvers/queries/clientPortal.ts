@@ -262,10 +262,10 @@ const configClientPortalQueries = {
     { contentType, contentTypeId, userKind },
     { models }: IContext
   ) {
-    const userIds = await models.ClientPortalUserCards.find({
-      type: contentType,
-      cardId: contentTypeId
-    }).distinct('userIds');
+    const userIds = await models.ClientPortalUserCards.getUserIds(
+      contentType,
+      contentTypeId
+    );
 
     if (!userIds || userIds.length === 0) {
       return [];

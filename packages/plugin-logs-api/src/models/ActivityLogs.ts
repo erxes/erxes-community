@@ -10,7 +10,6 @@ export interface IActivityLogInput {
   contentType: string;
   contentId: string;
   createdBy: string;
-  clientPortalId?: string;
 }
 
 export interface IActivityLog {
@@ -19,7 +18,6 @@ export interface IActivityLog {
   contentType: string;
   contentId: string;
   createdBy: string;
-  clientPortalId?: string;
 }
 
 export interface IActivityLogDocument extends IActivityLog, Document {
@@ -34,7 +32,6 @@ export const activityLogSchema = new Schema({
   action: field({ type: String, index: true }),
   content: Schema.Types.Mixed,
   createdBy: field({ type: String, optional: true }),
-  clientPortalId: field({ type: String, optional: true }),
   createdAt: field({
     type: Date,
     required: true,

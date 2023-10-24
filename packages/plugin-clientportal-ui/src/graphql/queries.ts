@@ -285,6 +285,12 @@ query ClientPortalCardUsers($contentType: String!, $contentTypeId: String!, $use
     email
     phone
     username
+    company {
+      _id
+      primaryName
+      primaryEmail
+      primaryPhone
+    }
     clientPortal {
       _id
       name

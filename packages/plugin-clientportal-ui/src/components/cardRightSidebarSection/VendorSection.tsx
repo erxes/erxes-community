@@ -11,6 +11,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { IClientPortalUser } from '../../types';
+import Detail from './Detail';
+import { ParticipantsWrapper } from '../../styles';
+import { ItemContainer } from '@erxes/ui-cards/src/boards/styles/common';
 
 export type Props = {
   users: IClientPortalUser[];
@@ -18,96 +21,30 @@ export type Props = {
 };
 
 export default function Component({ users, kind }: Props) {
-  //   const renderActionSection = customer => {
-  //     if (!actionSection) {
-  //       return;
-  //     }
-
-  //     const ActionSection = actionSection;
-  //     return <ActionSection customer={customer} isSmall={true} />;
-  //   };
-
   const renderBody = () => {
     if (!users || !users.length) {
       return <EmptyState icon="user-6" text="No data" />;
     }
 
     return (
-      //     <SectionBodyItem>
-
-      //         <SidebarList className="no-link">
-      //         {users.map((participant, index) => (
-      //             <>
-      //           <div
-      //             key={index}
-      //             style={{
-      //               backgroundColor: '#f0f0f0',
-      //               borderRadius: '8px',
-      //               margin: '5px',
-      //             }}
-      //           >
-      //             {/* <Link
-      //               to={`/settings/client-portal/users/details/${participant._id}`}
-      //               target="_blank"
-      //               rel="noopener noreferrer" */}
-      //             {/* > */}
-      //               <li>
-      //                 <FieldStyle>{kind} portal</FieldStyle>
-      //                 <SidebarCounter>
-      //                   {participant.clientPortal.name}
-      //                 </SidebarCounter>
-      //               </li>
-      //               <li>
-      //                 <FieldStyle>User</FieldStyle>
-      //                 <SidebarCounter>
-      //                   {renderFullName(participant)}
-      //                 </SidebarCounter>
-      //               </li>
-      //             {/* </Link> */}
-      //           </div>
-      //           </>
-
-      //     )}
-      //     </SidebarList>
-      //   </SectionBodyItem>
-      <SectionBodyItem>
-        <SidebarList className="no-link">
-          {users.map((participant, index) => (
-            <>
+      <>
+        {users.map((participant, index) => (
+          <ParticipantsWrapper key={index}>
+            <ItemContainer key={index}>
               <Link
+                key={index}
                 to={`/settings/client-portal/users/details/${participant._id}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <div
-                  key={index}
-                  style={{
-                    backgroundColor: '#f0f0f0',
-                    borderRadius: '8px',
-                    margin: '5px'
-                  }}
-                >
-                  <li>
-                    <FieldStyle>
-                      {kind.charAt(0).toUpperCase() + kind.slice(1)} portal
-                    </FieldStyle>
-                    <SidebarCounter>
-                      {participant.clientPortal.name}
-                    </SidebarCounter>
-                  </li>
-
-                  <li>
-                    <FieldStyle>User</FieldStyle>
-                    <SidebarCounter>
-                      {renderFullName(participant)}
-                    </SidebarCounter>
-                  </li>
-                </div>
+                <Detail color="#F7CE53" item={participant.clientPortal} />
+                <Detail color="#b49cf1" item={participant} />
+                <Detail color="#EA475D" item={participant.company} />
               </Link>
-            </>
-          ))}
-        </SidebarList>
-      </SectionBodyItem>
+            </ItemContainer>
+          </ParticipantsWrapper>
+        ))}
+      </>
     );
   };
 
