@@ -32,6 +32,7 @@ export const AttachmentWithChatPreview = ({
               fileIndex={i}
               isDownload={isDownload}
               attachments={attachments}
+              indexProp={i}
             />
           ))}
         </div>

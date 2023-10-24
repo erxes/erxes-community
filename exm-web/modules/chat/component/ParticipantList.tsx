@@ -49,21 +49,33 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
   const renderAdd = () => {
     const renderForm = () => {
       return (
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add member</DialogTitle>
+        <DialogContent className="p-0 gap-0 max-w-md">
+          <DialogHeader className="border-b p-4">
+            <DialogTitle className="flex justify-around">
+              Add people
+            </DialogTitle>
           </DialogHeader>
 
           {mutationLoading ? <LoadingPost text="Adding" /> : null}
 
-          <SelectUsers userIds={userIds} onChange={setUserIds} />
+          <div className="p-6">
+            <SelectUsers userIds={userIds} onChange={setUserIds} />
 
-          <Button
-            className="font-semibold w-full rounded-full"
-            onClick={addMember}
-          >
-            Add
-          </Button>
+            <div className="flex gap-3 mt-6">
+              <Button
+                className="rounded-lg w-full bg-[#E6E6E6] text-[#444] hover:bg-[#F0F0F0]"
+                onClick={() => setOpen(!open)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="rounded-lg w-full bg-primary-light"
+                onClick={addMember}
+              >
+                Add
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       )
     }
@@ -71,13 +83,10 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
     return (
       <Dialog open={open} onOpenChange={() => setOpen(!open)}>
         <DialogTrigger asChild={true}>
-          <div className="flex items-center mb-2 p-2 hover:bg-[#F0F0F0] cursor-pointer">
-            <div className="p-2 bg-[#F0F0F0] rounded-full cursor-pointer mr-2">
-              <PlusIcon size={18} />
-            </div>
-            <div className="">
-              <p className="text-sm font-medium text-[#444]">Add member</p>
-            </div>
+          <div className="p-3 cursor-pointer bg-primary-light rounded-lg">
+            <p className="text-sm font-medium text-white w-full text-center">
+              Add People
+            </p>
           </div>
         </DialogTrigger>
 
@@ -87,18 +96,21 @@ const ParticipantList = ({ chat }: { chat: IChat }) => {
   }
 
   return (
-    <div className="mt-4">
-      {chat.participantUsers.map((user: any, index: number) => (
-        <ParticipantItem
-          key={index}
-          participant={user}
-          chatId={chat._id}
-          isAdmin={isAdmin}
-        />
-      ))}
-
-      {isAdmin && renderAdd()}
-    </div>
+    <>
+      <div className="px-6 pt-6 max-h-[70vh] overflow-auto">
+        <div className="">
+          {chat.participantUsers.map((user: any, index: number) => (
+            <ParticipantItem
+              key={index}
+              participant={user}
+              chatId={chat._id}
+              isAdmin={isAdmin}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="px-6 pb-6">{isAdmin && renderAdd()}</div>
+    </>
   )
 }
 

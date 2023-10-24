@@ -14,6 +14,7 @@ export const FilePreview = ({
   fileIndex,
   isDownload,
   attachments,
+  indexProp
 }: {
   fileUrl: string
   fileName?: string
@@ -21,6 +22,8 @@ export const FilePreview = ({
   deleteImage?: (index: number) => void
   isDownload?: boolean
   attachments?: any[]
+  indexProp?: number
+
 }) => {
   if (!fileUrl || !fileUrl.split) {
     return null
@@ -36,9 +39,9 @@ export const FilePreview = ({
 
   const renderImageForm = () => {
     return (
-      <DialogContent>
+      <DialogContent className="bg-transparent border-0 shadow-none max-w-2xl">
         <DialogHeader />
-        <AttachmentWithPreview images={attachments || []} />
+        <AttachmentWithPreview images={attachments || []} indexProp={indexProp} />
       </DialogContent>
     )
   }

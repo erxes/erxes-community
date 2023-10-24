@@ -120,6 +120,7 @@ const chatDetail = gql`
       type
       isSeen
       featuredImage
+      muteUserIds
       lastMessage {
         createdAt
         content
@@ -165,12 +166,14 @@ const chatMessages = gql`
         _id
         content
         attachments
+        isPinned
         createdUser {
           _id
           email
           details {
             avatar
             fullName
+            position
           }
         }
         createdAt

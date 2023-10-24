@@ -146,6 +146,13 @@
   max-height: calc(100vh - 270px);
 }
 
+.user-shared-files-max-height {
+  max-height: calc(100vh - 510px);
+}
+.group-shared-files-max-height {
+  max-height: calc(100vh - 460px);
+}
+
 .w-300 {
   width: 300px;
 }
@@ -168,4 +175,13 @@
   background-color: rgba(245, 246, 255, 1);
   border-radius: 50%;
   color: rgba(238, 216, 255, 1);
+}
+.gap-0 {
+  gap: 0;
+}
+.max-h-\[60vh\] {
+  max-height: 60vh;
+}
+.w-fit {
+  width: fit-content;
 }

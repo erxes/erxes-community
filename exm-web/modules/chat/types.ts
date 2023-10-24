@@ -16,6 +16,7 @@ export interface IChatMessage {
   createdUser: IUser
   seenList: ISeenList[]
   relatedMessage: IChatMessage
+  isPinned: boolean
 }
 
 export interface IChat {

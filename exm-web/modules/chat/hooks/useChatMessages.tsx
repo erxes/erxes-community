@@ -21,6 +21,7 @@ export interface IUseChats {
     relatedId?: string
     attachments?: string[]
   }) => void
+  pinMessage: (id: string) => void
   messagesTotalCount: number
 }
 
@@ -76,6 +77,14 @@ export const useChatMessages = (): IUseChats => {
 
     refetchQueries: ["chatMessages", "chats"],
   })
+
+  const [pinMessageMutation] = useMutation(mutations.pinMessage)
+
+  const pinMessage = (id: string) => {
+    pinMessageMutation({ variables: { id } })
+      .then(() => refetch())
+      .catch((e) => console.log(e))
+  }
 
   const sendMessage = ({
     content,
@@ -165,6 +174,7 @@ export const useChatMessages = (): IUseChats => {
     handleLoadMore,
     sendMessage,
     messagesTotalCount,
+    pinMessage,
   }
 }
 

@@ -147,6 +147,12 @@ const chatForward = gql`
   }
 `
 
+const pinMessage = gql`
+  mutation ChatMessageToggleIsPinned($id: String!) {
+    chatMessageToggleIsPinned(_id: $id)
+  }
+`
+
 export default {
   chatAdd,
   chatEdit,
@@ -160,5 +166,6 @@ export default {
   commentAdd,
   commentRemove,
   chatForward,
-  chatToggleIsWithNotification
+  chatToggleIsWithNotification,
+  pinMessage
 }

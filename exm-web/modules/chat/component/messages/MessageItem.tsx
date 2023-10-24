@@ -5,13 +5,14 @@ import { IUser } from "@/modules/auth/types"
 import dayjs from "dayjs"
 import calendar from "dayjs/plugin/calendar"
 import { useAtomValue } from "jotai"
-import { ReplyIcon } from "lucide-react"
+import { Pin, PinOff, ReplyIcon } from "lucide-react"
 
 import { Card } from "@/components/ui/card"
 import Image from "@/components/ui/image"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
 import { currentUserAtom } from "../../../JotaiProiveder"
+import { useChatMessages } from "../../hooks/useChatMessages"
 import { IChatMessage } from "../../types"
 
 dayjs.extend(calendar)
@@ -23,8 +24,9 @@ const MessageItem = ({
   message: IChatMessage
   setReply: (message: any) => void
 }) => {
-  const { relatedMessage, content, attachments, createdAt, createdUser } =
-    message
+  const { relatedMessage, content, attachments, createdUser } = message
+
+  const { pinMessage } = useChatMessages()
 
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
   const [showAction, setShowAction] = useState(false)
@@ -102,58 +104,65 @@ const MessageItem = ({
           )}
         </div>
 
-          <div
-            className={`${
-              isMe ? "flex-row" : "flex-row-reverse"
-            } max-w-xs flex items-center`}
-          >
-            {showAction ? (
-              <div className={`flex ${isMe ? "flex-row" : "flex-row-reverse"}`}>
-                <ReplyIcon
-                  size={16}
-                  className={`${isMe ? "mr-1" : "ml-1"} cursor-pointer`}
-                  onClick={() => setReply(message)}
-                />
+        <div
+          className={`${
+            isMe ? "flex-row" : "flex-row-reverse"
+          } flex items-center gap-3`}
+        >
+          {showAction ? (
+            <div
+              className={`flex gap-3 ${isMe ? "flex-row" : "flex-row-reverse"}`}
+            >
+              <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+                <ReplyIcon size={16} onClick={() => setReply(message)} />
               </div>
-            ) : null}
+              <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+                {message.isPinned ? (
+                  <PinOff size={16} onClick={() => pinMessage(message._id)} />
+                ) : (
+                  <Pin size={16} onClick={() => pinMessage(message._id)} />
+                )}
+              </div>
+            </div>
+          ) : null}
 
-            <div>
-              {attachments && attachments.length > 0 ? (
-                <>
-                  <Card className="p-4 sm:rounded-lg">
-                    <div dangerouslySetInnerHTML={{ __html: content || "" }} />
-                  </Card>
-                  <AttachmentWithChatPreview
-                    attachments={attachments}
-                    className="m-2 overflow-x-auto w-60"
-                    isDownload={true}
-                  />
-                </>
-              ) : (
-                <Card className="p-3 sm:rounded-lg">
+          <div className="max-w-md">
+            {attachments && attachments.length > 0 ? (
+              <>
+                <Card className="p-4 sm:rounded-lg">
                   <div dangerouslySetInnerHTML={{ __html: content || "" }} />
                 </Card>
-              )}
-            </div>
+                <AttachmentWithChatPreview
+                  attachments={attachments}
+                  className="m-2 overflow-x-auto w-60"
+                  isDownload={true}
+                />
+              </>
+            ) : (
+              <Card className="p-3 sm:rounded-lg">
+                <div dangerouslySetInnerHTML={{ __html: content || "" }} />
+              </Card>
+            )}
           </div>
-      </div>
-        <div className={`flex justify-end mt-1`}>
-          {message.seenList.map((item) => {
-            if (currentUser._id === item.user._id) {
-              return null
-            }
-            return (
-              <Image
-                key={item.user._id}
-                src={item.user.details.avatar}
-                alt="avatar"
-                width={60}
-                height={60}
-                className="w-5 h-5 rounded-full object-cover p-1px"
-              />
-            )
-          })}
         </div>
+      </div>
+      <div className={`flex justify-end mt-1`}>
+        {message.seenList.map((item) => {
+          if (currentUser._id === item.user._id) {
+            return null
+          }
+          return (
+            <Image
+              key={item.user._id}
+              src={item.user.details.avatar}
+              alt="avatar"
+              width={60}
+              height={60}
+              className="w-5 h-5 rounded-full object-cover p-1px"
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
