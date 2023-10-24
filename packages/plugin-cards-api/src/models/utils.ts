@@ -395,7 +395,8 @@ export const createBoardItem = async (
   models: IModels,
   subdomain: string,
   doc: IItemCommonFields,
-  type: string
+  type: string,
+  clientPortalId?: string
 ) => {
   const { collection } = await getCollection(models, type);
 
@@ -449,7 +450,8 @@ export const createBoardItem = async (
       action,
       content,
       createdBy: item.userId || '',
-      contentId: item._id
+      contentId: item._id,
+      clientPortalId
     }
   });
 
