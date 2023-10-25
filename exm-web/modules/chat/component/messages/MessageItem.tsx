@@ -91,7 +91,7 @@ const MessageItem = ({
 
   const messageSection = (messageSectionContent: string) => {
     const style = isMe
-      ? ` ${"bg-[#4F33AF] text-[#fff] rounded-tr-none rounded-tl-lg rounded-br-lg rounded-bl-lg"}  font-medium`
+      ? ` ${"bg-primary-light text-[#fff] rounded-tr-none rounded-tl-lg rounded-br-lg rounded-bl-lg"}  font-medium`
       : ` ${"bg-[#F2F3F5] text-[#000] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium`
     return (
       <div
@@ -163,6 +163,8 @@ const MessageItem = ({
       className={`w-full my-1 flex items-start gap-[10px] ${
         isMe ? "flex-row-reverse" : "flex-row"
       }`}
+      onMouseEnter={() => setShowAction(true)}
+      onMouseLeave={() => setShowAction(false)}
     >
       <div className={`shrink-0 w-11 h-11 ${relatedMessage && "pt-4"}`}>
         <Image
@@ -192,8 +194,6 @@ const MessageItem = ({
             className={`flex gap-2 items-center ${
               isMe ? "flex-row-reverse" : "flex-row"
             }`}
-            onMouseEnter={() => setShowAction(true)}
-            onMouseLeave={() => setShowAction(false)}
           >
             {messageSection(messageContent(content))}
             {showAction ? (
