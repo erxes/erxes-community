@@ -5,7 +5,7 @@ const msdynamicMutations = {
   /**
    * Creates a new msdynamic
    */
-  async msdynamicConfigs(_root, doc, { models }: IContext) {
+  async msdynamicAddConfigs(_root, doc, { models }: IContext) {
     return await models.Msdynamics.createMsdynamicConfig(doc);
   },
   /**
@@ -16,7 +16,6 @@ const msdynamicMutations = {
   },
 
   async msdynamicsAdd(_root, doc, { models }: IContext) {
-    // const dynamic = await models.Msdynamics.createMsdynamic(doc);
     const end =
       "https://bc.erpmsm.mn:7048/MSM-DATA/ODataV4/Company('ZZBETA0529-DEV')/Item_Card_Api";
 

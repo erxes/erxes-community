@@ -11,8 +11,8 @@ const commonParams = `
 `;
 
 const addConfigs = `
-  mutation msdynamicConfigs(${commonParamDefs}) {
-    msdynamicConfigs(${commonParams}) {
+  mutation msdynamicAddConfigs(${commonParamDefs}) {
+    msdynamicAddConfigs(${commonParams}) {
       _id
     }
   }

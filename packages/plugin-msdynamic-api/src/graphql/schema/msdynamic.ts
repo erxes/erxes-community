@@ -10,6 +10,7 @@ export const queries = `
 `;
 
 export const mutations = `
-  msdynamicConfigs(${params}): Msdynamic
+  msdynamicAddConfigs(${params}): Msdynamic
   msdynamicEditConfigs(_id:String!, ${params}): Msdynamic
+  toCheckProducts(productCodes: [String]): JSON
 `;
