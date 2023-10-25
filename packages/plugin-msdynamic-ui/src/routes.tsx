@@ -1,17 +1,15 @@
 import asyncComponent from '@erxes/ui/src/components/AsyncComponent';
-import queryString from 'query-string';
 import React from 'react';
 import { Route } from 'react-router-dom';
 
-const List = asyncComponent(() =>
-  import(/* webpackChunkName: "List - Msdynamics" */ './containers/List')
+const GeneralSettings = asyncComponent(() =>
+  import(
+    /* webpackChunkName: "List - Msdynamics" */ './containers/GeneralSettings'
+  )
 );
 
-const msdynamics = ({ location, history }) => {
-  const queryParams = queryString.parse(location.search);
-  const { type } = queryParams;
-
-  return <List typeId={type} history={history} />;
+const msdynamics = ({ history }) => {
+  return <GeneralSettings history={history} />;
 };
 
 const routes = () => {

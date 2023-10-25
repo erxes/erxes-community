@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 import { graphql } from '@apollo/client/react/hoc';
 import { Alert, confirm, router, withProps } from '@erxes/ui/src/utils';
-import List from '../components/List';
+import List from '../components/GeneralSettings';
 import {
   EditMutationResponse,
   RemoveMutationResponse,
@@ -27,7 +27,7 @@ type FinalProps = {
   RemoveMutationResponse &
   EditMutationResponse;
 
-const ListContainer = (props: FinalProps) => {
+const GeneralSettingsContainer = (props: FinalProps) => {
   const {
     listQuery,
     listMsdynamicTypeQuery,
@@ -140,5 +140,5 @@ export default withProps<Props>(
     graphql(gql(mutations.edit), {
       name: 'editMutation'
     })
-  )(ListContainer)
+  )(GeneralSettingsContainer)
 );
