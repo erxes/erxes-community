@@ -1,21 +1,7 @@
 const params = `
-  name: String,
-  expiryDate: Date,
-  checked: Boolean,
-  typeId:String
-`;
-
-export const meetingFilters = `
-    companyId:String,
-    createdAtFrom:String,
-    createdAtTo:String,
-    searchValue:String
-    userId:String,
-    participantIds: [String]
-    dealIds: [String]
-    isPreviousSession: Boolean
-    perPage: Int
-    page: Int
+  endPoint: String
+  username: String
+  password: String
 `;
 
 export const queries = `
@@ -24,7 +10,6 @@ export const queries = `
 `;
 
 export const mutations = `
-  msdynamicsAdd(${params}): Msdynamic
-  msdynamicsRemove(_id: String!): JSON
-  msdynamicsEdit(_id:String!, ${params}): Msdynamic
+  msdynamicConfigs(${params}): Msdynamic
+  msdynamicEditConfigs(_id:String!, ${params}): Msdynamic
 `;

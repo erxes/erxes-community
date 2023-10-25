@@ -4,11 +4,10 @@ import { mutations, queries } from './schema/msdynamic';
 const types = `
   type Msdynamic {
     _id: String!
-    name: String
+    endPoint: String
+    username: String
+    password: String
     createdAt:Date
-    expiryDate:Date
-    checked:Boolean
-    typeId: String
   }
 `;
 

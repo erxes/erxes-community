@@ -3,12 +3,10 @@ import { field } from './utils';
 
 export interface IDynamic {
   _id: string;
-  name: string;
-  description: string;
+  endPoint: string;
+  username: string;
+  password: string;
   createdAt: Date;
-  expiryDate: Date;
-  checked: boolean;
-  typeId: string;
 }
 
 export interface IDynamicDocument extends IDynamic, Document {
@@ -17,15 +15,24 @@ export interface IDynamicDocument extends IDynamic, Document {
 
 export const msdynamicSchema = new Schema({
   _id: field({ pkey: true }),
-  name: field({ type: String }),
-  description: field({ type: String }),
-
+  endPoint: field({
+    type: String,
+    label: 'EndPoint URL',
+    optional: true
+  }),
+  username: field({
+    type: String,
+    label: 'Auth User Name',
+    optional: true
+  }),
+  password: field({
+    type: String,
+    label: 'Auth Password',
+    optional: true
+  }),
   createdAt: field({
     type: Date,
     default: Date.now,
-    label: 'Registered at'
-  }),
-  expiryDate: field({ type: Date }),
-  typeId: field({ type: String }),
-  checked: field({ type: Boolean })
+    label: 'Created at'
+  })
 });
