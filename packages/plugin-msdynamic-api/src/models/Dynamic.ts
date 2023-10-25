@@ -5,11 +5,11 @@ import {
 } from './definitions/dynamic';
 import { Model } from 'mongoose';
 import { IModels } from '../connectionResolver';
+import { IUser } from '@erxes/api-utils/src/types';
 
 export interface IDynamicModel extends Model<IDynamicDocument> {
-  meetingDetail(_id: string, userId: string): Promise<IDynamicDocument>;
   createMsdynamicConfig(args: IDynamic): Promise<IDynamicDocument>;
-  updateMsdynamicConfig(args: IDynamic): Promise<IDynamicDocument>;
+  updateMsdynamicConfig(args: IDynamic, user: IUser): Promise<IDynamicDocument>;
 }
 
 export const loadDynamicClass = (model: IModels) => {
@@ -22,11 +22,22 @@ export const loadDynamicClass = (model: IModels) => {
       });
     }
     // update
-    public static async updateMsdynamicConfig(doc: IDynamic) {
-      await model.Msdynamics.updateOne(
-        { _id: doc._id },
-        { $set: { ...doc } }
-      ).then(err => console.error(err));
+    public static async updateMsdynamicConfig(doc: IDynamic, user: IUser) {
+      if (!user) {
+        throw new Error('You are not logged in');
+      }
+
+      const result = await model.Msdynamics.findOne({
+        _id: doc._id
+      });
+
+      if (result) {
+        await model.Msdynamics.updateOne(
+          { _id: result._id },
+          { $set: { ...doc } }
+        );
+        return result;
+      }
     }
   }
 

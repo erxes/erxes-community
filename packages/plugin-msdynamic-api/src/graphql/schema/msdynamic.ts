@@ -5,7 +5,7 @@ const params = `
 `;
 
 export const queries = `
-  msdynamics(typeId: String): [Msdynamic]
+  msdynamicConfigs: [Msdynamic]
   msdynamicsTotalCount: Int
 `;
 

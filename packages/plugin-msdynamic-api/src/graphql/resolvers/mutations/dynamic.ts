@@ -6,15 +6,13 @@ const msdynamicMutations = {
    * Creates a new msdynamic
    */
   async msdynamicConfigs(_root, doc, { models }: IContext) {
-    const dynamic = await models.Msdynamics.createMsdynamicConfig(doc);
-
-    return dynamic;
+    return await models.Msdynamics.createMsdynamicConfig(doc);
   },
   /**
    * Edits a new msdynamic
    */
-  async msdynamicEditConfigs(_root, doc, { models }: IContext) {
-    return await models.Msdynamics.updateMsdynamicConfig(doc);
+  async msdynamicEditConfigs(_root, doc, { models, user }: IContext) {
+    return await models.Msdynamics.updateMsdynamicConfig(doc, user);
   },
 
   async msdynamicsAdd(_root, doc, { models }: IContext) {
