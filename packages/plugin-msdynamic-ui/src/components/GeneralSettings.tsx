@@ -1,8 +1,7 @@
 import Button from '@erxes/ui/src/components/Button';
-import { IMsdynamic, IType } from '../types';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
+import { IDynamic } from '../types';
 import { __ } from '@erxes/ui/src/utils';
-import React from 'react';
+import React, { useState } from 'react';
 import { MainStyleTitle as Title } from '@erxes/ui/src/styles/eindex';
 import { Wrapper } from '@erxes/ui/src/layout';
 import SideBar from './SideBar';
@@ -16,46 +15,61 @@ import { ContentBox } from '../styles';
 import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
 
 type Props = {
-  msdynamics: IMsdynamic[];
-  types: IType[];
-  typeId?: string;
-  renderButton: (props: IButtonMutateProps) => JSX.Element;
-  remove: (msdynamic: IMsdynamic) => void;
-  edit: (msdynamic: IMsdynamic) => void;
-  loading: boolean;
+  msdynamics: IDynamic;
+  configsSave: (doc: IDynamic) => void;
 };
 
-function GeneralSettings({ loading }: Props) {
+function GeneralSettings({ msdynamics, configsSave }: Props) {
+  const [endPoint, setEndpoint] = useState(msdynamics.endPoint || '');
+  const [username, setUsername] = useState(msdynamics.username || '');
+  const [password, setPassword] = useState(msdynamics.password || '');
+
   const breadcrumb = [
     { title: __('Settings'), link: '/settings' },
     { title: __('Msdynamics'), link: '/msdynamics' }
   ];
 
-  const renderItem = (key: string) => {
-    return (
-      <FormGroup>
-        <ControlLabel>{key}</ControlLabel>
-        <FormControl
-          defaultValue={''}
-          // onChange={this.onChangeInput.bind(this, key)}
-        />
-      </FormGroup>
-    );
+  const onSave = () => {
+    const doc = {
+      _id: msdynamics && msdynamics._id,
+      endPoint,
+      username,
+      password
+    };
+
+    configsSave(doc);
   };
 
   const content = (
     <ContentBox id={'GeneralSettingsMenu'}>
       <CollapseContent title="General settings" open={true}>
-        {renderItem('endpoint')}
-        {renderItem('username')}
-        {renderItem('password')}
+        <FormGroup>
+          <ControlLabel>Endpoint</ControlLabel>
+          <FormControl
+            defaultValue={endPoint}
+            onChange={(e: any) => setEndpoint(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>UserName</ControlLabel>
+          <FormControl
+            defaultValue={username}
+            onChange={(e: any) => setUsername(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>password</ControlLabel>
+          <FormControl
+            defaultValue={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+          />
+        </FormGroup>
         <ModalFooter>
           <Button
             btnStyle="primary"
             icon="check-circle"
-            // onClick={this.onSave}
+            onClick={onSave}
             uppercase={false}
-            // disabled={config.stageId ? false : true}
           >
             Save
           </Button>

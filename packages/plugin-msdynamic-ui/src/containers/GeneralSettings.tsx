@@ -1,144 +1,84 @@
 import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 import { graphql } from '@apollo/client/react/hoc';
-import { Alert, confirm, router, withProps } from '@erxes/ui/src/utils';
+import { Alert, withProps } from '@erxes/ui/src/utils';
 import List from '../components/GeneralSettings';
 import {
   EditMutationResponse,
-  RemoveMutationResponse,
+  AddMutationResponse,
   MsdynamicQueryResponse,
-  TypeQueryResponse
+  IDynamic
 } from '../types';
 import { mutations, queries } from '../graphql';
 import React from 'react';
-import { IButtonMutateProps } from '@erxes/ui/src/types';
-import ButtonMutate from '@erxes/ui/src/components/ButtonMutate';
 import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   history: any;
-  typeId: string;
 };
 
 type FinalProps = {
   listQuery: MsdynamicQueryResponse;
-  listMsdynamicTypeQuery: TypeQueryResponse;
 } & Props &
-  RemoveMutationResponse &
+  AddMutationResponse &
   EditMutationResponse;
 
 const GeneralSettingsContainer = (props: FinalProps) => {
-  const {
-    listQuery,
-    listMsdynamicTypeQuery,
-    removeMutation,
-    editMutation,
-    history,
-    typeId
-  } = props;
+  const { listQuery, addMutation, editMutation } = props;
 
   if (listQuery.loading) {
     return <Spinner />;
   }
 
-  const types = listMsdynamicTypeQuery.msdynamicTypes || [];
-
-  const renderButton = ({
-    passedName,
-    values,
-    isSubmitted,
-    callback,
-    object
-  }: IButtonMutateProps) => {
-    return (
-      <ButtonMutate
-        mutation={object ? mutations.edit : mutations.add}
-        variables={values}
-        callback={callback}
-        isSubmitted={isSubmitted}
-        type="submit"
-        successMessage={`You successfully ${
-          object ? 'updated' : 'added'
-        } a ${passedName}`}
-        refetchQueries={['listQuery']}
-      />
-    );
-  };
-
-  const remove = msdynamic => {
-    confirm('You are about to delete the item. Are you sure? ')
-      .then(() => {
-        removeMutation({ variables: { _id: msdynamic._id } })
-          .then(() => {
-            Alert.success('Successfully deleted an item');
-          })
-          .catch(e => Alert.error(e.message));
+  const configsSave = (doc: IDynamic) => {
+    if (!doc._id) {
+      addMutation({
+        variables: doc
       })
-      .catch(e => Alert.error(e.message));
-  };
+        .then(() => {
+          Alert.success('Successfully added an configs');
+          listQuery.refetch();
+        })
+        .catch(e => Alert.error(e.message));
+    }
 
-  const edit = msdynamic => {
-    editMutation({
-      variables: {
-        _id: msdynamic._id,
-        name: msdynamic.name,
-        checked: msdynamic.checked,
-        expiryDate: msdynamic.expiryDate,
-        type: msdynamic.type
-      }
-    })
-      .then(() => {
-        Alert.success('Successfully updated an item');
-        listQuery.refetch();
+    if (doc._id) {
+      editMutation({
+        variables: doc
       })
-      .catch(e => Alert.error(e.message));
+        .then(() => {
+          Alert.success('Successfully updated an configs');
+          listQuery.refetch();
+        })
+        .catch(e => Alert.error(e.message));
+    }
   };
 
   const updatedProps = {
     ...props,
-    msdynamics: listQuery.msdynamics || [],
-    types: listMsdynamicTypeQuery.msdynamicTypes || [],
-    typeId,
-    loading: listQuery.loading,
-    remove,
-    edit,
-    renderButton
+    msdynamics: listQuery?.msdynamicConfigs[0] || {},
+    configsSave
   };
   return <List {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql(gql(queries.listMsdynamicTypes), {
-      name: 'listMsdynamicTypeQuery',
+    graphql<Props, MsdynamicQueryResponse, {}>(gql(queries.dynamicConfigs), {
+      name: 'listQuery'
+    }),
+
+    graphql(gql(mutations.addConfigs), {
+      name: 'addMutation',
       options: () => ({
-        fetchPolicy: 'network-only'
+        refetchQueries: ['msdynamicConfigs']
       })
     }),
-
-    graphql<Props, MsdynamicQueryResponse, { typeId: string }>(
-      gql(queries.list),
-      {
-        name: 'listQuery',
-        options: ({ typeId }) => ({
-          variables: { typeId: typeId || '' },
-          fetchPolicy: 'network-only'
-        })
-      }
-    ),
-    graphql(gql(queries.totalCount), {
-      name: 'totalCountQuery'
-    }),
-
-    graphql(gql(mutations.remove), {
-      name: 'removeMutation',
+    graphql(gql(mutations.editConfigs), {
+      name: 'editMutation',
       options: () => ({
-        refetchQueries: ['listQuery']
+        refetchQueries: ['msdynamicConfigs']
       })
-    }),
-
-    graphql(gql(mutations.edit), {
-      name: 'editMutation'
     })
   )(GeneralSettingsContainer)
 );

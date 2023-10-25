@@ -1,27 +1,13 @@
-export interface IMsdynamic {
-  _id: string;
-  name?: string;
-  createdAt?: Date;
-  expiryDate?: Date;
-  totalObjectCount?: number;
-  checked?: boolean;
-  typeId?: string;
-  currentType?: IType;
-}
-
-export interface IType {
-  _id: string;
-  name: string;
+export interface IDynamic {
+  _id?: string;
+  endPoint?: string;
+  username?: string;
+  password?: string;
 }
 
 // queries
 export type MsdynamicQueryResponse = {
-  msdynamics: IMsdynamic[];
-  refetch: () => void;
-  loading: boolean;
-};
-export type TypeQueryResponse = {
-  msdynamicTypes: IType[];
+  msdynamicConfigs: IDynamic[];
   refetch: () => void;
   loading: boolean;
 };
@@ -29,11 +15,9 @@ export type TypeQueryResponse = {
 // mutations
 export type MutationVariables = {
   _id?: string;
-  name: string;
-  createdAt?: Date;
-  expiryDate?: Date;
-  checked?: boolean;
-  type?: string;
+  endPoint?: string;
+  username?: string;
+  password?: string;
 };
 export type AddMutationResponse = {
   addMutation: (params: { variables: MutationVariables }) => Promise<any>;
@@ -41,16 +25,4 @@ export type AddMutationResponse = {
 
 export type EditMutationResponse = {
   editMutation: (params: { variables: MutationVariables }) => Promise<any>;
-};
-
-export type RemoveMutationResponse = {
-  removeMutation: (params: { variables: { _id: string } }) => Promise<any>;
-};
-
-export type EditTypeMutationResponse = {
-  typesEdit: (params: { variables: MutationVariables }) => Promise<any>;
-};
-
-export type RemoveTypeMutationResponse = {
-  typesRemove: (params: { variables: { _id: string } }) => Promise<any>;
 };

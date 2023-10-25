@@ -1,37 +1,14 @@
-const list = `
-  query listQuery($typeId: String) {
-    msdynamics(typeId: $typeId) {
+const dynamicConfigs = `
+  query msdynamicConfigs {
+    msdynamicConfigs {
       _id
-      name
-      expiryDate
-      createdAt
-      checked
-      typeId
-      currentType{
-        _id
-        name
-      }
+      endPoint
+      username
+      password
     }
-  }
-`;
-
-const listMsdynamicTypes = `
-  query listMsdynamicTypeQuery{
-    msdynamicTypes{
-      _id
-      name
-    }
-  }
-`;
-
-const totalCount = `
-  query msdynamicsTotalCount{
-    msdynamicsTotalCount
   }
 `;
 
 export default {
-  list,
-  totalCount,
-  listMsdynamicTypes
+  dynamicConfigs
 };
