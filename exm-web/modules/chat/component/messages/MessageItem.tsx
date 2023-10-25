@@ -7,7 +7,6 @@ import calendar from "dayjs/plugin/calendar"
 import { useAtomValue } from "jotai"
 import { ReplyIcon } from "lucide-react"
 
-import { Card } from "@/components/ui/card"
 import Image from "@/components/ui/image"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
@@ -19,9 +18,11 @@ dayjs.extend(calendar)
 const MessageItem = ({
   message,
   setReply,
+  type,
 }: {
   message: IChatMessage
   setReply: (message: any) => void
+  type: string
 }) => {
   const { relatedMessage, content, attachments, createdAt, createdUser } =
     message
@@ -42,102 +43,167 @@ const MessageItem = ({
     (relatedMessage.createdUser.details.fullName ||
       relatedMessage.createdUser.email)
 
-  const renderReplyText = () => {
-    if (isMe) {
-      return (
-        <div className="text-xs text-[#444] font-medium">
-          You replied to{" "}
-          {relatedMessage.createdUser._id === currentUser._id
-            ? "yourself"
-            : userInfo}
-        </div>
-      )
-    }
+  const messageContent = (message: string) => {
+    var urlRegex =
+      /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi
+    return message.replace(urlRegex, (url) => {
+      return `<a href="${url}" target="_blank" class="text-blue-500 font-bold">${url}</a>`
+    })
+  }
 
+  const renderReplyText = () => {
     return (
-      <div className="text-xs text-[#444] font-medium">
-        {(userDetail.fullName || createdUser.email) + "replied to "}
-        {relatedMessage.createdUser._id === createdUser._id
-          ? "themself"
-          : userInfo}
+      <div className="flex gap-2 text-xs text-[#444] font-medium">
+        <ReplyIcon size={16} />
+        {isMe
+          ? `You replied to ${
+              relatedMessage.createdUser._id === createdUser._id
+                ? "yourself"
+                : userInfo
+            } `
+          : `
+        ${userDetail.fullName || createdUser.email} replied to ${
+              relatedMessage.createdUser._id === createdUser._id
+                ? "themself"
+                : userInfo
+            }
+        `}
       </div>
     )
   }
 
-  return (
-    <div className="mt-2">
-      {relatedMessage && (
+  const messageReplySection = (messageContent: string) => {
+    const style = isMe
+      ? ` ${"bg-[#F8F8F8] text-[#000] rounded-lg"} font-medium`
+      : ` ${"bg-[#F8F8F8] text-[#000] rounded-lg"} font-medium`
+    return (
+      <>
+        {renderReplyText()}
         <div
-          className={`flex ${
-            isMe ? "justify-end" : "justify-start"
-          } text-xs text-[#444] font-medium`}
-        >
-          <div className="max-w-md">
-            <div className="flex">
-              <ReplyIcon size={16} /> {renderReplyText()}
-            </div>
-            <p className="truncate bg-[#ededfb] p-2 rounded-2xl">
-              {relatedMessage.content}
-            </p>
-          </div>
-        </div>
-      )}
+          className={`${style} py-2.5 px-5 max-w-xs h-10 overflow-hidden truncate drop-shadow-md`}
+          dangerouslySetInnerHTML={{ __html: messageContent || "" }}
+        />
+      </>
+    )
+  }
 
+  const messageSection = (messageContent: string) => {
+    const style = isMe
+      ? ` ${"bg-[#4F33AF] text-[#fff] rounded-tr-none rounded-tl-lg rounded-br-lg rounded-bl-lg"}  font-medium`
+      : ` ${"bg-[#F2F3F5] text-[#000] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium`
+    return (
       <div
-        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-        onMouseEnter={() => setShowAction(true)}
-        onMouseLeave={() => setShowAction(false)}
+        className={`${style} py-2.5 px-5 max-w-md drop-shadow-md`}
+        dangerouslySetInnerHTML={{ __html: messageContent || "" }}
+      />
+    )
+  }
+
+  const attachmentSection = () => {
+    const medias = attachments.filter((attachment) =>
+      attachment.type.startsWith("image/")
+    )
+    const files = attachments.filter((attachment) =>
+      attachment.type.startsWith("application/")
+    )
+
+    let cols = medias.length < 3 ? medias.length : 3
+    return (
+      <>
+        {medias && (
+          <AttachmentWithChatPreview
+            attachments={medias}
+            className={`grid grid-cols-${cols} gap-1 py-1`}
+            isDownload={true}
+          />
+        )}
+        {files && (
+          <AttachmentWithChatPreview
+            attachments={files}
+            className={`flex flex-col gap-1 py-1`}
+            isDownload={true}
+          />
+        )}
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div
+        className={`w-full my-1 flex items-start gap-[10px] ${
+          isMe ? "flex-row-reverse" : "flex-row"
+        }`}
       >
-        <div className="flex items-end">
-          {isMe ? null : (
-            <div className="w-10 h-10 rounded-full mr-2 mb-2">
-              <Image
-                src={userDetail.avatar}
-                alt="avatar"
-                width={60}
-                height={60}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+        <div className={`shrink-0 w-11 h-11 ${relatedMessage && "pt-4"}`}>
+          <Image
+            src={userDetail.avatar ? userDetail.avatar : "/avatar-colored.svg"}
+            alt="avatar"
+            width={60}
+            height={60}
+            className="w-11 h-11 rounded-full object-cover"
+          />
+        </div>
+
+        <div
+          className={`flex flex-col gap-1 ${
+            isMe ? "items-end" : "items-start"
+          }`}
+        >
+          {isMe || relatedMessage || type === "direct" ? null : (
+            <div className="flex gap-1 items-center">
+              <span className="font-semibold text-[#000]">
+                {userDetail.fullName || userDetail?.email}
+              </span>
+              {userDetail.position ? (
+                <span className="font-medium text-[#7B7B7B]">
+                  ({`${userDetail.position}`})
+                </span>
+              ) : null}
             </div>
           )}
-        </div>
 
-        <div
-          className={`${
-            isMe ? "flex-row" : "flex-row-reverse"
-          } max-w-xs flex items-center`}
-        >
-          {showAction ? (
-            <div className={`flex ${isMe ? "flex-row" : "flex-row-reverse"}`}>
-              <ReplyIcon
-                size={16}
-                className={`${isMe ? "mr-1" : "ml-1"} cursor-pointer`}
-                onClick={() => setReply(message)}
-              />
+          <div
+            className={`flex flex-col gap-1 ${
+              isMe ? "items-end" : "items-start"
+            }`}
+          >
+            <div className="flex flex-col gap-1">
+              {relatedMessage &&
+                messageReplySection(messageContent(relatedMessage.content))}
             </div>
-          ) : null}
+            <div
+              className={`flex gap-2 items-center ${
+                isMe ? "flex-row-reverse" : "flex-row"
+              }`}
+              onMouseEnter={() => setShowAction(true)}
+              onMouseLeave={() => setShowAction(false)}
+            >
+              {messageSection(messageContent(content))}
+              {showAction ? (
+                <div className={``}>
+                  <ReplyIcon
+                    size={16}
+                    className={`${isMe ? "mr-1" : "ml-1"} cursor-pointer`}
+                    onClick={() => setReply(message)}
+                  />
+                </div>
+              ) : null}
+            </div>
+          </div>
+          {attachments && attachments.length > 0 && attachmentSection()}
 
-          <div>
-            {attachments && attachments.length > 0 ? (
-              <>
-                <Card className="p-4 rounded-2xl">
-                  <div dangerouslySetInnerHTML={{ __html: content || "" }} />
-                </Card>
-                <AttachmentWithChatPreview
-                  attachments={attachments}
-                  className="m-2 overflow-x-auto w-60"
-                  isDownload={true}
-                />
-              </>
-            ) : (
-              <Card className="p-4 rounded-2xl">
-                <div dangerouslySetInnerHTML={{ __html: content || "" }} />
-              </Card>
-            )}
+          <div className="text-[#BBBABA] text-[10px]">
+            {dayjs(createdAt).calendar(null, {
+              sameDay: "h:mm A",
+              lastDay: "[Yesterday], h:mm A",
+              lastWeek: "dddd, h:mm A",
+              sameElse: "MMMM DD, YYYY h:mm A",
+            })}
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

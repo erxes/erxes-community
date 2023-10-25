@@ -169,6 +169,7 @@ const chatMessages = gql`
           details {
             avatar
             fullName
+            position
           }
         }
         createdAt
@@ -181,6 +182,7 @@ const chatMessages = gql`
             details {
               avatar
               fullName
+              position
             }
           }
         }

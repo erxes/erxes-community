@@ -10,7 +10,7 @@ const ReplyInfo = ({
 }) => {
   if (reply) {
     return (
-      <div className="flex flex-col px-4 py-2 bg-white rounded-2xl text-xs text-[#444]">
+      <div className="flex flex-col px-4 py-2 bg-white border-t-2 text-xs text-[#444]">
         <div className="flex justify-between">
           <p>
             Replying to{" "}
@@ -25,7 +25,7 @@ const ReplyInfo = ({
             onClick={() => setReply(null)}
           />
         </div>
-        <p>{reply.content}</p>
+        <p className="max-w-md overflow-hidden truncate">{reply.content}</p>
       </div>
     )
   } else {

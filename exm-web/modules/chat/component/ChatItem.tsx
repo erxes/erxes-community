@@ -161,7 +161,7 @@ export const ChatItem = ({
       onMouseLeave={() => setShowAction(false)}
     >
       <div className="items-end flex mr-2">
-        <div className="w-12 h-12 rounded-full">
+        <div className="w-10 h-10 rounded-full">
           <Image
             src={
               (chat.type === "direct"
@@ -171,7 +171,7 @@ export const ChatItem = ({
             alt="avatar"
             width={60}
             height={60}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover"
           />
         </div>
       </div>
