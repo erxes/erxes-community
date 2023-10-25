@@ -52,7 +52,7 @@ export const FilePreview = ({
         {deleteImage && (
           <button
             type="button"
-            className="absolute top-0 bg-white p-1 rounded-full"
+            className="absolute -top-2 -right-2 bg-white rounded-full"
             onClick={() => onDelete(fileIndex)}
           >
             <XCircle size={18} />
@@ -61,17 +61,17 @@ export const FilePreview = ({
 
         {isDownload ? (
           <a href={readFile(fileUrl)}>
-            <div className="mr-1 p-2 rounded-lg bg-[#F0F0F0]">
-              <div className="flex items-center text-sm font-semibold text-[#444] break-words">
+            <div className="w-full p-2 rounded-md bg-[#F0F0F0]">
+              <div className="flex gap-2 items-center font-semibold text-[#444] break-words">
                 <ExternalLinkIcon size={18} /> {fileName}
-              </div>{" "}
+              </div>
             </div>
           </a>
         ) : (
-          <div className="mr-1 p-2 rounded-lg bg-[#F0F0F0]">
-            <div className="flex items-center text-sm font-semibold text-[#444] break-words">
+          <div className="p-2 rounded-md bg-[#F0F0F0] ">
+            <div className="flex gap-2 items-center font-semibold text-[#444] break-words">
               <ExternalLinkIcon size={18} /> {fileName}
-            </div>{" "}
+            </div>
           </div>
         )}
       </div>
@@ -81,10 +81,10 @@ export const FilePreview = ({
   const renderImagePreview = () => {
     if (deleteImage) {
       return (
-        <div className="mr-1 w-[80px] h-[80px] shrink-0">
+        <div className="relative shrink-0 w-14 h-14">
           <button
             type="button"
-            className="absolute top-0 bg-white p-1 rounded-full"
+            className="absolute -top-2 -right-2 bg-white rounded-full"
             onClick={() => onDelete(fileIndex)}
           >
             <XCircle size={18} />
@@ -93,9 +93,9 @@ export const FilePreview = ({
           <Image
             alt="image"
             src={fileUrl || ""}
-            width={500}
-            height={500}
-            className="object-contain w-[80px] h-[80px]"
+            width={100}
+            height={100}
+            className="object-cover rounded-md w-14 h-14"
           />
         </div>
       )
@@ -105,13 +105,13 @@ export const FilePreview = ({
       <>
         <Dialog>
           <DialogTrigger asChild={true}>
-            <div className="mr-1 w-[80px] h-[80px] shrink-0 cursor-pointer">
+            <div className="shrink-0 w-[80px] h-[80px] cursor-pointer bg-slate-600 rounded-lg">
               <Image
                 alt="image"
                 src={fileUrl || ""}
                 width={500}
                 height={500}
-                className="object-contain w-[80px] h-[80px]"
+                className="object-cover w-[80px] h-[80px] rounded-lg"
               />
             </div>
           </DialogTrigger>

@@ -186,6 +186,7 @@ const chatMessages = gql`
             details {
               avatar
               fullName
+              position
             }
           }
         }
