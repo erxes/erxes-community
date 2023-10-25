@@ -12,6 +12,7 @@ import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPrevie
 
 import { currentUserAtom } from "../../../JotaiProiveder"
 import { IChatMessage } from "../../types"
+import AudioVisualizer from "./AudioVisualizer"
 
 dayjs.extend(calendar)
 
@@ -42,6 +43,11 @@ const MessageItem = ({
     relatedMessage.createdUser &&
     (relatedMessage.createdUser.details.fullName ||
       relatedMessage.createdUser.email)
+
+  const commonStyle = {
+    items: `flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`,
+    flex: `${isMe ? "flex-row-reverse" : "flex-row"}`,
+  }
 
   const messageContent = (message: string) => {
     var urlRegex =
@@ -92,8 +98,11 @@ const MessageItem = ({
       ? ` ${"bg-[#4F33AF] text-[#fff] rounded-tr-none rounded-tl-lg rounded-br-lg rounded-bl-lg"}  font-medium`
       : ` ${"bg-[#F2F3F5] text-[#000] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium`
     return (
+      // <div className={`${style} py-2.5 px-5 max-w-md drop-shadow-md `}>
+      //   <AudioVisualizer />
+      // </div>
       <div
-        className={`${style} py-2.5 px-5 max-w-md drop-shadow-md`}
+        className={`${style} py-2.5 px-5 max-w-md drop-shadow-md `}
         dangerouslySetInnerHTML={{ __html: messageContent || "" }}
       />
     )
@@ -131,9 +140,7 @@ const MessageItem = ({
   return (
     <>
       <div
-        className={`w-full my-1 flex items-start gap-[10px] ${
-          isMe ? "flex-row-reverse" : "flex-row"
-        }`}
+        className={`w-full my-1 flex items-start gap-[10px] ${commonStyle.flex}`}
       >
         <div className={`shrink-0 w-11 h-11 ${relatedMessage && "pt-4"}`}>
           <Image
@@ -144,12 +151,7 @@ const MessageItem = ({
             className="w-11 h-11 rounded-full object-cover"
           />
         </div>
-
-        <div
-          className={`flex flex-col gap-1 ${
-            isMe ? "items-end" : "items-start"
-          }`}
-        >
+        <div className={commonStyle.items}>
           {isMe || relatedMessage || type === "direct" ? null : (
             <div className="flex gap-1 items-center">
               <span className="font-semibold text-[#000]">
@@ -162,20 +164,13 @@ const MessageItem = ({
               ) : null}
             </div>
           )}
-
-          <div
-            className={`flex flex-col gap-1 ${
-              isMe ? "items-end" : "items-start"
-            }`}
-          >
-            <div className="flex flex-col gap-1">
+          <div className={commonStyle.items}>
+            <div className={commonStyle.items}>
               {relatedMessage &&
                 messageReplySection(messageContent(relatedMessage.content))}
             </div>
             <div
-              className={`flex gap-2 items-center ${
-                isMe ? "flex-row-reverse" : "flex-row"
-              }`}
+              className={`flex gap-2 items-center ${commonStyle.flex}`}
               onMouseEnter={() => setShowAction(true)}
               onMouseLeave={() => setShowAction(false)}
             >
@@ -193,7 +188,7 @@ const MessageItem = ({
           </div>
           {attachments && attachments.length > 0 && attachmentSection()}
 
-          <div className="text-[#BBBABA] text-[10px]">
+          <div className="text-[#BBBABA]">
             {dayjs(createdAt).calendar(null, {
               sameDay: "h:mm A",
               lastDay: "[Yesterday], h:mm A",

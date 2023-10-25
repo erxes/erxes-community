@@ -1,14 +1,13 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react"
-import { ChevronLeft } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
-import Image from "@/components/ui/image"
 import Loader from "@/components/ui/loader"
 
 import { useChatDetail } from "../../hooks/useChatDetail"
 import { useChatMessages } from "../../hooks/useChatMessages"
+import AudioVisualizer from "./AudioVisualizer"
 import Editor from "./Editor"
 import MessageItem from "./MessageItem"
 import MessagesHeader from "./MessagesHeader"
@@ -41,7 +40,10 @@ const Messages = () => {
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      })
     }
   }, [chatMessages])
 
@@ -60,10 +62,8 @@ const Messages = () => {
       </div>
       <button
         onClick={() => {
-          console.log(chatContainerRef)
-
           chatContainerRef.current.scrollTo({
-            top: 0,
+            top: -chatContainerRef.current.scrollHeight,
             behavior: "smooth",
           })
         }}
@@ -75,11 +75,18 @@ const Messages = () => {
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden p-4 border-0 flex flex-col-reverse scrollbar-hide "
       >
-        <div className="w-full pt-2">
+        {/* <div className="w-full pt-2">
           {chatDetail.participantUsers && (
             <TypingIndicator participants={chatDetail.participantUsers} />
           )}
-        </div>
+        </div> */}
+
+        {/* <div
+          className={` ${"bg-[#4F33AF] text-[#fff] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium py-2.5 px-5 max-w-md drop-shadow-md`}
+        >
+          
+        </div> */}
+
         {chatMessages.map((message) => (
           <MessageItem
             key={message._id}
@@ -95,6 +102,7 @@ const Messages = () => {
           </div>
         )}
       </div>
+      <div className="h-[200px] w-full bg-red-300">{<AudioVisualizer />}</div>
       <ReplyInfo reply={reply} setReply={setReply} />
 
       <Editor sendMessage={sendMessage} reply={reply} setReply={setReply} />
