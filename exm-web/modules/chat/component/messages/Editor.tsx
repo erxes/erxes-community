@@ -89,7 +89,7 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
 
   const attachmentsSection = () => {
     return (
-      <div className="pt-2 overflow-auto scrollbar-hide">
+      <div className="pt-2 overflow-auto w-full">
         {attachments && attachments.length > 0 && (
           <AttachmentWithChatPreview
             attachments={attachments || []}
@@ -106,7 +106,7 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
   }
 
   return (
-    <div className="border-t-2 py-4 px-10">
+    <div className="border-t py-4 px-5">
       {attachments && attachments.length > 0 && attachmentsSection()}
       <div className="flex items-center justify-around gap-7 ">
         <div className="flex gap-4">
@@ -151,7 +151,7 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
 
         <button
           type="submit"
-          className="rounded-md bg-[#4F33AF] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5532c7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-primary-light px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5532c7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           onClick={onSubmit}
         >
           Send

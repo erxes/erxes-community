@@ -55,7 +55,7 @@ const MessageItem = ({
 
   const renderReplyText = () => {
     return (
-      <div className="flex gap-2 text-xs text-[#444] font-medium">
+      <div className="flex gap-2 text-xs text-[#444] font-medium whitespace-nowrap">
         <ReplyIcon size={16} />
         {isMe
           ? `You replied to ${
@@ -76,13 +76,13 @@ const MessageItem = ({
 
   const messageReplySection = (messageReplyContent: string) => {
     const style = isMe
-      ? ` ${"bg-[#F8F8F8] text-[#000] rounded-lg"} font-medium`
-      : ` ${"bg-[#F8F8F8] text-[#000] rounded-lg"} font-medium`
+      ? ` ${"bg-[#f8f8f8] text-[#000] rounded-lg"} font-medium`
+      : ` ${"bg-[#F9F7FF] text-[#000] rounded-lg"} font-medium`
     return (
       <>
         {renderReplyText()}
         <div
-          className={`${style} py-2.5 px-5 max-w-xs h-10 overflow-hidden truncate drop-shadow-md`}
+          className={`${style} pt-2.5 pb-[2.3rem] px-5 max-w-xs h-10 overflow-hidden truncate`}
           dangerouslySetInnerHTML={{ __html: messageReplyContent || "" }}
         />
       </>
@@ -159,83 +159,90 @@ const MessageItem = ({
   }
 
   return (
-    <div
-      className={`w-full my-1 flex items-start gap-[10px] ${
-        isMe ? "flex-row-reverse" : "flex-row"
-      }`}
-      onMouseEnter={() => setShowAction(true)}
-      onMouseLeave={() => setShowAction(false)}
-    >
-      <div className={`shrink-0 w-11 h-11 ${relatedMessage && "pt-4"}`}>
-        <Image
-          src={userDetail.avatar ? userDetail.avatar : "/avatar-colored.svg"}
-          alt="avatar"
-          width={60}
-          height={60}
-          className="w-11 h-11 rounded-full object-cover"
-        />
-      </div>
-
+    <>
       <div
-        className={`flex flex-col gap-1 ${isMe ? "items-end" : "items-start"}`}
+        className={`w-full my-1 flex items-start gap-[10px]  ${
+          isMe ? "flex-row-reverse" : "flex-row"
+        }`}
+        onMouseEnter={() => setShowAction(true)}
+        onMouseLeave={() => setShowAction(false)}
       >
-        {renderNamePositions()}
-
-        <div
-          className={`flex flex-col gap-1 ${
-            isMe ? "items-end" : "items-start"
-          }`}
-        >
-          <div className="flex flex-col gap-1">
-            {relatedMessage &&
-              messageReplySection(messageContent(relatedMessage.content))}
-          </div>
-          <div
-            className={`flex gap-2 items-center ${
-              isMe ? "flex-row-reverse" : "flex-row"
-            }`}
-          >
-            {messageSection(messageContent(content))}
-            {showAction ? (
-              <div
-                className={`flex gap-3 ${
-                  isMe ? "flex-row" : "flex-row-reverse"
-                }`}
-              >
-                <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
-                  <ReplyIcon size={16} onClick={() => setReply(message)} />
-                </div>{" "}
-                <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
-                  {message.isPinned ? (
-                    <PinOff size={16} onClick={() => pinMessage(message._id)} />
-                  ) : (
-                    <Pin size={16} onClick={() => pinMessage(message._id)} />
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
+        <div className={`shrink-0 w-11 h-11 mt-auto`}>
+          <Image
+            src={userDetail.avatar ? userDetail.avatar : "/avatar-colored.svg"}
+            alt="avatar"
+            width={60}
+            height={60}
+            className="w-11 h-11 rounded-full object-cover border border-primary"
+          />
         </div>
-        {attachments && attachments.length > 0 && attachmentSection()}
-        <div className={`flex justify-end mt-1`}>
-          {message.seenList.map((item) => {
-            if (currentUser._id === item.user._id) {
-              return null
-            }
-            return (
-              <Image
-                key={item.user._id}
-                src={item.user.details.avatar}
-                alt="avatar"
-                width={60}
-                height={60}
-                className="w-5 h-5 rounded-full object-cover p-1px"
-              />
-            )
-          })}
+
+        <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+          {renderNamePositions()}
+
+          <div
+            className={`flex flex-col gap-1 relative ${
+              isMe ? "items-end" : "items-start"
+            } ${relatedMessage && "mt-[80px]"}`}
+          >
+            <div
+              className={`flex flex-col gap-1 absolute ${
+                relatedMessage && "top-[-56px]"
+              }`}
+            >
+              {relatedMessage &&
+                messageReplySection(messageContent(relatedMessage.content))}
+            </div>
+            <div
+              className={`flex gap-2 items-center ${
+                isMe ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
+              {messageSection(messageContent(content))}
+              {showAction ? (
+                <div
+                  className={`flex gap-3 ${
+                    isMe ? "flex-row" : "flex-row-reverse"
+                  }`}
+                >
+                  <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+                    <ReplyIcon size={16} onClick={() => setReply(message)} />
+                  </div>{" "}
+                  <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+                    {message.isPinned ? (
+                      <PinOff
+                        size={16}
+                        onClick={() => pinMessage(message._id)}
+                      />
+                    ) : (
+                      <Pin size={16} onClick={() => pinMessage(message._id)} />
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+          {attachments && attachments.length > 0 && attachmentSection()}
         </div>
       </div>
-    </div>
+      <div className={`flex justify-end mt-1`}>
+        {message.seenList.map((item) => {
+          if (currentUser._id === item.user._id) {
+            return null
+          }
+          return (
+            <Image
+              key={item.user._id}
+              src={item.user.details.avatar}
+              alt="avatar"
+              width={60}
+              height={60}
+              className="w-5 h-5 rounded-full object-cover p-1px"
+            />
+          )
+        })}
+      </div>
+    </>
   )
 }
 

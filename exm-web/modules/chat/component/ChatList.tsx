@@ -112,28 +112,28 @@ const ChatList = () => {
   const renderCurrentUserStatus = () => {
     return (
       <div>
-        <div className="p-4 flex items-center">
+        <div className="pt-2 px-6 flex items-center">
           <Image
             src={currentUser?.details.avatar || "/avatar-colored.svg"}
             alt="avatar"
-            width={60}
-            height={60}
-            className="w-14 h-14 rounded-full object-cover ml-5 mr-3"
+            width={30}
+            height={30}
+            className="w-10 h-10 rounded-full object-cover mr-3 border border-primary"
           />
-          <div className="flex sm:flex-col items-start">
-            <div className="text-lg mb-2">
+          <div className="flex items-start flex-col">
+            <div className="text-sm w-[280px] truncate mb-1">
               {currentUser?.details.fullName || currentUser?.email}
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <button className="bg-success text-success-foreground px-4 py-2 sm:rounded-lg flex items-center">
+                <div className="bg-success text-success-foreground text-[11px] px-4 py-[2px] rounded-lg flex items-center">
                   <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1" />
                   Active
                   <ChevronDown size={18} />
-                </button>
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-transparent border-0 shadow-none px-2.5">
-                <button className="bg-warning-foreground text-warning px-4 py-2 sm:rounded-lg flex items-center w-full">
+                <button className="bg-warning-foreground text-warning text-[11px] px-4 py-1 rounded-lg flex items-center w-full">
                   <div className="indicator bg-warning w-3 h-3 rounded-full border border-white mr-1" />
                   Busy
                 </button>
@@ -146,7 +146,7 @@ const ChatList = () => {
   }
 
   return (
-    <ScrollArea className="w-full overflow-auto h-screen">
+    <div className="w-full overflow-auto h-screen">
       {renderCurrentUserStatus()}
 
       <div className="flex items-center justify-between p-6">
@@ -191,7 +191,7 @@ const ChatList = () => {
           </div>
         )}
       </div>
-    </ScrollArea>
+    </div>
   )
 }
 

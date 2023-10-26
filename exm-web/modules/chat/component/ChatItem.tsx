@@ -193,7 +193,7 @@ export const ChatItem = ({
     <Card
       className={`${chatId === chat._id ? "bg-[#f0eef9]" : "bg-transparent"} ${
         isSeen ? "" : "font-bold"
-      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0]  mb-5 sm:rounded-lg`}
+      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0]  mb-5 sm:rounded-lg `}
       onClick={handleClick}
     >
       <div className="items-end flex mr-3">
@@ -207,13 +207,13 @@ export const ChatItem = ({
             alt="avatar"
             width={60}
             height={60}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover border border-primary"
           />
           <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1 absolute bottom-0 right-0" />
         </div>
       </div>
 
-      <div className={`text-sm text-[#444] w-full`}>
+      <div className={`text-sm text-[#444] w-9/12`}>
         <div className="flex justify-between">
           <p className="w-4/5 truncate">
             {chat && chat.type === "direct" ? (
