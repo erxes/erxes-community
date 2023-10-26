@@ -5,14 +5,23 @@ import { IUser } from "@/modules/auth/types"
 import dayjs from "dayjs"
 import calendar from "dayjs/plugin/calendar"
 import { useAtomValue } from "jotai"
-import { Pin, PinOff, ReplyIcon } from "lucide-react"
+import { MoveLeft, MoveRight, Pin, PinOff, ReplyIcon } from "lucide-react"
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import Image from "@/components/ui/image"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
 import { currentUserAtom } from "../../../JotaiProiveder"
 import { useChatMessages } from "../../hooks/useChatMessages"
 import { IChatMessage } from "../../types"
+import AudioVisualizer from "./AudioVisualizer"
+import ForwardMessage from "./ForwardMessage"
 
 dayjs.extend(calendar)
 
@@ -27,10 +36,11 @@ const MessageItem = ({
 }) => {
   const { relatedMessage, content, attachments, createdUser } = message
 
-  const { pinMessage } = useChatMessages()
+  const { loading, error, pinMessage, chatForward } = useChatMessages()
 
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
   const [showAction, setShowAction] = useState(false)
+  const [showForward, setShowForward] = useState(false)
 
   const isMe = useMemo(
     () => currentUser?._id === createdUser._id,
@@ -52,8 +62,8 @@ const MessageItem = ({
 
   const messageContent = (message: string) => {
     var urlRegex =
-      /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi
-    return content.replace(urlRegex, (url) => {
+      /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]|\bwww\.[^\s()<>]+|\b[^\s()<>]+\.com\b)/gi
+    return message.replace(urlRegex, (url) => {
       return `<a href="${url}" target="_blank" class="text-blue-500 font-bold">${url}</a>`
     })
   }
@@ -79,6 +89,15 @@ const MessageItem = ({
     )
   }
 
+  const renderForwardText = () => {
+    return (
+      <div className="flex gap-2 text-xs text-[#444] font-medium">
+        {isMe ? <MoveRight size={16} /> : <MoveLeft size={16} />}
+        Forwarded Message
+      </div>
+    )
+  }
+
   const messageReplySection = (messageReplyContent: string) => {
     const style = isMe
       ? ` ${"bg-[#F8F8F8] text-[#000] rounded-lg"} font-medium`
@@ -99,13 +118,43 @@ const MessageItem = ({
       ? ` ${"bg-[#4F33AF] text-[#fff] rounded-tr-none rounded-tl-lg rounded-br-lg rounded-bl-lg"}  font-medium`
       : ` ${"bg-[#F2F3F5] text-[#000] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium`
     return (
-      // <div className={`${style} py-2.5 px-5 max-w-md drop-shadow-md `}>
-      //   <AudioVisualizer />
-      // </div>
       <div
         className={`${style} py-2.5 px-5 max-w-md drop-shadow-md`}
         dangerouslySetInnerHTML={{ __html: messageSectionContent || "" }}
       />
+    )
+  }
+
+  const handleForward = (id: string, type: string) => {
+    chatForward({ id, type, content: content, attachments })
+    console.log(type, " clicked ", id)
+  }
+
+  const forwardFormSection = () => {
+    return (
+      <Dialog
+        open={showForward}
+        onOpenChange={() => setShowForward(!showForward)}
+      >
+        <DialogTrigger asChild={true}>
+          <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+            <MoveLeft size={16} />
+          </div>
+        </DialogTrigger>
+
+        <DialogContent className="p-0 gap-0 max-w-md max-h-[640px]">
+          <DialogHeader className="border-b p-4">
+            <DialogTitle className="flex justify-around">
+              Forward Chat
+            </DialogTitle>
+          </DialogHeader>
+          <div className="px-4 pt-4 max-h-[60vh] overflow-y-auto">
+            <ForwardMessage
+              handleForward={(id, type) => handleForward(id, type)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     )
   }
 
@@ -168,7 +217,9 @@ const MessageItem = ({
 
   return (
     <div
-      className={`w-full my-1 flex items-start gap-[10px] ${commonStyle.flex}`}
+      className={`w-full my-1 flex items-start gap-[10px] ${
+        isMe ? "flex-row-reverse" : "flex-row"
+      }`}
     >
       <div className={`shrink-0 w-11 h-11 ${relatedMessage && "pt-4"}`}>
         <Image
@@ -185,32 +236,44 @@ const MessageItem = ({
       >
         {renderNamePositions()}
 
-        <div className={commonStyle.items}>
-          <div className={commonStyle.items}>
+        <div
+          className={`flex flex-col gap-1 ${
+            isMe ? "items-end" : "items-start"
+          }`}
+        >
+          <div
+            className={`flex flex-col gap-1 ${
+              isMe ? "items-end" : "items-start"
+            }`}
+          >
             {relatedMessage &&
               messageReplySection(messageContent(relatedMessage.content))}
           </div>
           <div
-            className={`flex gap-2 items-center ${commonStyle.flex}`}
+            className={`flex gap-2 items-center ${
+              isMe ? "flex-row-reverse" : "flex-row"
+            }`}
             onMouseEnter={() => setShowAction(true)}
             onMouseLeave={() => setShowAction(false)}
           >
             {messageSection(messageContent(content))}
+
             {showAction ? (
               <div
                 className={`flex gap-3 ${
                   isMe ? "flex-row" : "flex-row-reverse"
                 }`}
               >
-                <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
-                  <ReplyIcon size={16} onClick={() => setReply(message)} />
-                </div>{" "}
+                {forwardFormSection()}
                 <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
                   {message.isPinned ? (
                     <PinOff size={16} onClick={() => pinMessage(message._id)} />
                   ) : (
                     <Pin size={16} onClick={() => pinMessage(message._id)} />
                   )}
+                </div>
+                <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+                  <ReplyIcon size={16} onClick={() => setReply(message)} />
                 </div>
               </div>
             ) : null}

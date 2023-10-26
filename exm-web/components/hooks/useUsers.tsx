@@ -37,7 +37,7 @@ export const useUsers = ({
     const details = user.details || {}
 
     const label = details.fullName || user.username || user.email
-    return { label, value: user._id }
+    return { label, value: user._id, details }
   })
 
   return {

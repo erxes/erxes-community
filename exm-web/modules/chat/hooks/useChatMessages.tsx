@@ -22,6 +22,17 @@ export interface IUseChats {
     attachments?: string[]
   }) => void
   pinMessage: (id: string) => void
+  chatForward: ({
+    id,
+    type,
+    content,
+    attachments,
+  }: {
+    id?: string
+    type?: string
+    content?: string
+    attachments?: any[]
+  }) => void
   messagesTotalCount: number
 }
 
@@ -84,6 +95,36 @@ export const useChatMessages = (): IUseChats => {
     pinMessageMutation({ variables: { id } })
       .then(() => refetch())
       .catch((e) => console.log(e))
+  }
+
+  const [chatForwardMutation] = useMutation(mutations.chatForward, {})
+
+  const chatForward = ({
+    id,
+    type,
+    content,
+    attachments,
+  }: {
+    id?: string
+    type?: string
+    content?: string
+    attachments?: any[]
+  }) => {
+    console.log(type)
+
+    if (type === "group") {
+      chatForwardMutation({
+        variables: { chatId: id, content, attachments },
+        refetchQueries: ["chatMessages", "chats"],
+      }).catch((e) => console.log(e))
+    }
+
+    if (type === "direct") {
+      chatForwardMutation({
+        variables: { userIds: [id], content, attachments },
+        refetchQueries: ["chatMessages", "chats"],
+      }).catch((e) => console.log(e))
+    }
   }
 
   const sendMessage = ({
@@ -175,6 +216,7 @@ export const useChatMessages = (): IUseChats => {
     sendMessage,
     messagesTotalCount,
     pinMessage,
+    chatForward,
   }
 }
 

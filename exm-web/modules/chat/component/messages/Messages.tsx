@@ -1,6 +1,9 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { currentUserAtom } from "@/modules/JotaiProiveder"
+import { IUser } from "@/modules/auth/types"
+import { useAtomValue } from "jotai"
 import { useInView } from "react-intersection-observer"
 
 import Loader from "@/components/ui/loader"
@@ -32,6 +35,8 @@ const Messages = () => {
     threshold: 0,
   })
 
+  // const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
+
   useEffect(() => {
     if (inView) {
       handleLoadMore()
@@ -60,7 +65,7 @@ const Messages = () => {
       <div className="h-24 border-b-2 flex items-center justify-between px-10">
         <MessagesHeader chatDetail={chatDetail} />
       </div>
-      <button
+      {/* <button
         onClick={() => {
           chatContainerRef.current.scrollTo({
             top: -chatContainerRef.current.scrollHeight,
@@ -70,21 +75,23 @@ const Messages = () => {
         className="bg-[#EED8FF] text-center p-1 mx-10 rounded-b-lg"
       >
         new messages since 9:00 OM On October 11, 2023
-      </button>
+      </button> */}
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto overflow-x-hidden p-4 border-0 flex flex-col-reverse scrollbar-hide "
       >
         {/* <div className="w-full pt-2">
           {chatDetail.participantUsers && (
-            <TypingIndicator participants={chatDetail.participantUsers} />
+            <TypingIndicator
+              participants={chatDetail.participantUsers.filter(
+                (participant) => participant._id !== currentUser._id
+              )}
+            />
           )}
         </div> */}
 
-        {/* <div
-          className={` ${"bg-[#4F33AF] text-[#fff] rounded-tl-none rounded-tr-lg rounded-br-lg rounded-bl-lg"} font-medium py-2.5 px-5 max-w-md drop-shadow-md`}
-        >
-          
+        {/* <div className="h-[200px] w-[300px] bg-blue-200">
+          <AudioVisualizer />
         </div> */}
 
         {chatMessages.map((message) => (
@@ -102,7 +109,6 @@ const Messages = () => {
           </div>
         )}
       </div>
-      <div className="h-[200px] w-full bg-red-300">{<AudioVisualizer />}</div>
       <ReplyInfo reply={reply} setReply={setReply} />
 
       <Editor sendMessage={sendMessage} reply={reply} setReply={setReply} />

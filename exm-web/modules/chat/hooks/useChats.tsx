@@ -29,6 +29,9 @@ export const useChats = ({
   } = useQuery(queries.chats, {
     variables: { limit: 20, searchValue },
   })
+
+  console.log(searchValue)
+
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   let loading = true
