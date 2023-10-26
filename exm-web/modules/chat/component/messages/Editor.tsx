@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 import uploadHandler from "@/components/uploader/uploadHandler"
 
-import Recorder from "./Recorder"
+import AudioRecorder from "./Recorder"
 
 type IProps = {
   reply: any
@@ -32,30 +32,16 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
 
   const [loading, setLoading] = useState(false)
 
-  const mediaRecorder = useRef<MediaRecorder | null>(null)
-  const audioChunks = useRef<Blob[]>([])
-
-  const [audioUrl, setAudioUrl] = useState<any>(null)
-
   const [showEmoji, setShowEmoji] = useState(false)
-
-  const [isRecording, setIsRecording] = useState(false)
-  const [onPause, setOnPause] = useState(false)
-  const [recordingTime, setRecordingTime] = useState(0)
-  const intervalRef = useRef<number | null>(null)
 
   const textareaRef = useRef<any>(null)
   const audioContext = new ((window as any).AudioContext ||
     (window as any).webkitAudioContext)()
 
   useEffect(() => {
-    if (recordingTime >= 60) {
-      stopRecording()
-    }
-
     // textareaRef.current.style.height = "auto"
     // textareaRef.current.style.height = textareaRef.current?.scrollHeight + "px"
-  }, [recordingTime, message])
+  }, [message])
 
   const handleInputChange = (e: any) => {
     setMessage(e.target.value)
@@ -125,77 +111,6 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
     )
   }
 
-  const startRecording = () => {
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        const audioInput = audioContext.createMediaStreamSource(stream)
-
-        const scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1)
-
-        scriptProcessor.onaudioprocess = (event: any) => {
-          const inputData = event.inputBuffer.getChannelData(0)
-          // Process the audio data here
-          console.log(inputData)
-        }
-
-        // Connect the audio input to the script processor
-        audioInput.connect(scriptProcessor)
-        scriptProcessor.connect(audioContext.destination)
-
-        setIsRecording(true)
-      })
-      .catch((error) => {
-        return toast({
-          description: `Error accessing microphone`,
-        })
-      })
-  }
-
-  const stopRecording = () => {
-    audioContext.close()
-
-    setIsRecording(false)
-    setOnPause(false)
-  }
-
-  const pauseRecording = () => {
-    setOnPause(true)
-  }
-
-  const resumeRecording = () => {
-    audioContext.resume()
-
-    setOnPause(false)
-  }
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0")
-    const remainingSeconds = (seconds % 60).toString().padStart(2, "0")
-    return `${minutes}:${remainingSeconds}`
-  }
-
-  const audioRecordSection = () => {
-    return (
-      <div className="flex w-full items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
-        {/* <div className="bg-blue-200 w-1/12">{formatTime(recordingTime)}</div> */}
-        <div className="bg-red-200 w-full">
-          {/* {
-            audioUrl && (
-              <audio controls>
-                <source src={audioUrl} type="audio/mpeg" />
-              </audio>
-            )
-            // console.log("audioUrl", audioUrl)
-          } */}
-          <Recorder />
-        </div>
-      </div>
-    )
-  }
-
   const emojiHandler = (emojiData: any, event: MouseEvent) => {
     setMessage((inputValue) => inputValue + emojiData.native)
   }
@@ -203,60 +118,44 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
   return (
     <div className="border-t-2 py-4 px-10">
       {attachments && attachments.length > 0 && attachmentsSection()}
-      <div className="flex h-[200px] w-[400px]">{audioRecordSection()}</div>
       <div className="flex items-center justify-around gap-7 ">
-        <div className="flex gap-4">
-          <button onClick={isRecording ? stopRecording : startRecording}>
-            {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
-          </button>
+        <label className="cursor-pointer">
+          <input
+            autoComplete="off"
+            type="file"
+            multiple={true}
+            onChange={handleAttachmentChange}
+            className="hidden"
+          />
+          <Paperclip size={16} />
+        </label>
 
-          {isRecording ? (
-            <button onClick={onPause ? resumeRecording : pauseRecording}>
-              {onPause ? <Play size={16} /> : <Pause size={16} />}
-            </button>
-          ) : (
-            <label className="cursor-pointer">
-              <input
-                autoComplete="off"
-                type="file"
-                multiple={true}
-                onChange={handleAttachmentChange}
-                className="hidden"
+        <div className="relative flex flex-1 items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
+          <textarea
+            value={message}
+            onChange={handleInputChange}
+            onKeyDown={onEnterPress}
+            autoComplete="off"
+            ref={textareaRef}
+            className="outline-none w-full h-auto bg-transparent resize-none scrollbar-hide"
+            placeholder="Type your message"
+            rows={1}
+          />
+          {showEmoji && (
+            <div className="absolute bottom-16 right-0 z-10">
+              <Picker
+                data={data}
+                onEmojiSelect={emojiHandler}
+                previewPosition="none"
+                searchPosition="none"
+                theme="light"
               />
-              <Paperclip size={16} />
-            </label>
+            </div>
           )}
+          <button onClick={() => setShowEmoji(!showEmoji)}>
+            <Smile size={16} />
+          </button>
         </div>
-        {isRecording ? (
-          audioRecordSection()
-        ) : (
-          <div className="relative flex flex-1 items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
-            <textarea
-              value={message}
-              onChange={handleInputChange}
-              onKeyDown={onEnterPress}
-              autoComplete="off"
-              ref={textareaRef}
-              className="outline-none w-full h-auto bg-transparent resize-none scrollbar-hide"
-              placeholder="Type your message"
-              rows={1}
-            />
-            {showEmoji && (
-              <div className="absolute bottom-16 right-0 z-10">
-                <Picker
-                  data={data}
-                  onEmojiSelect={emojiHandler}
-                  previewPosition="none"
-                  searchPosition="none"
-                  theme="light"
-                />
-              </div>
-            )}
-            <button onClick={() => setShowEmoji(!showEmoji)}>
-              <Smile size={16} />
-            </button>
-          </div>
-        )}
 
         <button
           type="submit"
