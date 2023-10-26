@@ -24,9 +24,16 @@ const editConfigs = `
       _id
     }
   }
-  `;
+`;
+
+const updateConfigs = `
+  mutation configsUpdate($configsMap: JSON!) {
+    configsUpdate(configsMap: $configsMap)
+  }
+`;
 
 export default {
   addConfigs,
-  editConfigs
+  editConfigs,
+  updateConfigs
 };

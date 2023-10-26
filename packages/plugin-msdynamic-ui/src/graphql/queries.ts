@@ -9,6 +9,13 @@ const dynamicConfigs = `
   }
 `;
 
+const configs = `
+  query configsGetValue($code: String!) {
+    configsGetValue(code: $code)
+  }
+`;
+
 export default {
-  dynamicConfigs
+  dynamicConfigs,
+  configs
 };

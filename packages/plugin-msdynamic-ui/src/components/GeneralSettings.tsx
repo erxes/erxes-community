@@ -1,5 +1,5 @@
 import Button from '@erxes/ui/src/components/Button';
-import { IDynamic } from '../types';
+import { IConfigsMap } from '../types';
 import { __ } from '@erxes/ui/src/utils';
 import React, { useState } from 'react';
 import { MainStyleTitle as Title } from '@erxes/ui/src/styles/eindex';
@@ -12,92 +12,108 @@ import {
   FormGroup
 } from '@erxes/ui/src/components';
 import { ContentBox } from '../styles';
-import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
+import { KEY_LABELS } from '../constants';
 
 type Props = {
-  msdynamics: IDynamic;
-  configsSave: (doc: IDynamic) => void;
+  save: (configsMap: IConfigsMap) => void;
+  configsMap: IConfigsMap;
 };
 
-function GeneralSettings({ msdynamics, configsSave }: Props) {
-  const [endPoint, setEndpoint] = useState(msdynamics.endPoint || '');
-  const [username, setUsername] = useState(msdynamics.username || '');
-  const [password, setPassword] = useState(msdynamics.password || '');
+type State = {
+  currentMap: IConfigsMap;
+};
 
-  const breadcrumb = [
-    { title: __('Settings'), link: '/settings' },
-    { title: __('Msdynamics'), link: '/msdynamics' }
-  ];
+class GeneralSettings extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
 
-  const onSave = () => {
-    const doc = {
-      _id: msdynamics && msdynamics._id,
-      endPoint,
-      username,
-      password
+    this.state = {
+      currentMap: props.configsMap.DYNAMIC || {}
     };
+  }
 
-    configsSave(doc);
+  onSave = e => {
+    e.preventDefault();
+
+    const { currentMap } = this.state;
+    const { configsMap } = this.props;
+    configsMap.DYNAMIC = currentMap;
+    this.props.save(configsMap);
   };
 
-  const content = (
-    <ContentBox id={'GeneralSettingsMenu'}>
-      <CollapseContent title="General settings" open={true}>
-        <FormGroup>
-          <ControlLabel>Endpoint</ControlLabel>
-          <FormControl
-            defaultValue={endPoint}
-            onChange={(e: any) => setEndpoint(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <ControlLabel>UserName</ControlLabel>
-          <FormControl
-            defaultValue={username}
-            onChange={(e: any) => setUsername(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <ControlLabel>password</ControlLabel>
-          <FormControl
-            defaultValue={password}
-            onChange={(e: any) => setPassword(e.target.value)}
-          />
-        </FormGroup>
-        <ModalFooter>
-          <Button
-            btnStyle="primary"
-            icon="check-circle"
-            onClick={onSave}
-            uppercase={false}
-          >
-            Save
-          </Button>
-        </ModalFooter>
-      </CollapseContent>
-    </ContentBox>
-  );
+  onChangeConfig = (code: string, value) => {
+    const { currentMap } = this.state;
 
-  return (
-    <Wrapper
-      header={
-        <Wrapper.Header
-          title={__('Msdynamics config')}
-          breadcrumb={breadcrumb}
+    currentMap[code] = value;
+
+    this.setState({ currentMap });
+  };
+
+  onChangeInput = (code: string, e) => {
+    this.onChangeConfig(code, e.target.value);
+  };
+
+  renderItem = (key: string) => {
+    const { currentMap } = this.state;
+
+    return (
+      <FormGroup>
+        <ControlLabel>{KEY_LABELS[key]}</ControlLabel>
+        <FormControl
+          defaultValue={currentMap[key]}
+          onChange={this.onChangeInput.bind(this, key)}
         />
-      }
-      actionBar={
-        <Wrapper.ActionBar
-          left={<Title>{__('Msdynamic')}</Title>}
-          background="colorWhite"
-        />
-      }
-      leftSidebar={<SideBar />}
-      content={content}
-      transparent={true}
-      hasBorder={true}
-    />
-  );
+      </FormGroup>
+    );
+  };
+
+  render() {
+    const breadcrumb = [
+      { title: __('Settings'), link: '/settings' },
+      { title: __('Msdynamics'), link: '/msdynamics' }
+    ];
+
+    const content = (
+      <ContentBox id={'GeneralSettingsMenu'}>
+        <CollapseContent title="General settings" open={true}>
+          {this.renderItem('endpoint')}
+          {this.renderItem('username')}
+          {this.renderItem('password')}
+        </CollapseContent>
+      </ContentBox>
+    );
+
+    return (
+      <Wrapper
+        header={
+          <Wrapper.Header
+            title={__('Msdynamics config')}
+            breadcrumb={breadcrumb}
+          />
+        }
+        actionBar={
+          <Wrapper.ActionBar
+            left={<Title>{__('Msdynamic')}</Title>}
+            right={
+              <Button
+                btnStyle="primary"
+                icon="check-circle"
+                onClick={this.onSave}
+                uppercase={false}
+              >
+                Save
+              </Button>
+            }
+            background="colorWhite"
+          />
+        }
+        leftSidebar={<SideBar />}
+        content={content}
+        transparent={true}
+        hasBorder={true}
+      />
+    );
+  }
 }
 
 export default GeneralSettings;

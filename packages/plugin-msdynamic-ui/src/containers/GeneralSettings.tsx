@@ -3,12 +3,7 @@ import * as compose from 'lodash.flowright';
 import { graphql } from '@apollo/client/react/hoc';
 import { Alert, withProps } from '@erxes/ui/src/utils';
 import List from '../components/GeneralSettings';
-import {
-  EditMutationResponse,
-  AddMutationResponse,
-  MsdynamicQueryResponse,
-  IDynamic
-} from '../types';
+import { ConfigsQueryResponse, IConfigsMap } from '../types';
 import { mutations, queries } from '../graphql';
 import React from 'react';
 import Spinner from '@erxes/ui/src/components/Spinner';
@@ -18,67 +13,56 @@ type Props = {
 };
 
 type FinalProps = {
-  listQuery: MsdynamicQueryResponse;
-} & Props &
-  AddMutationResponse &
-  EditMutationResponse;
+  configsQuery: ConfigsQueryResponse;
+  updateConfigs: (configsMap: IConfigsMap) => Promise<void>;
+} & Props;
 
 const GeneralSettingsContainer = (props: FinalProps) => {
-  const { listQuery, addMutation, editMutation } = props;
+  const { updateConfigs, configsQuery } = props;
 
-  if (listQuery.loading) {
-    return <Spinner />;
+  if (configsQuery.loading) {
+    return <Spinner objective={true} />;
   }
 
-  const configsSave = (doc: IDynamic) => {
-    if (!doc._id) {
-      addMutation({
-        variables: doc
-      })
-        .then(() => {
-          Alert.success('Successfully added an configs');
-          listQuery.refetch();
-        })
-        .catch(e => Alert.error(e.message));
-    }
+  const config = configsQuery.configsGetValue || [];
 
-    if (doc._id) {
-      editMutation({
-        variables: doc
+  const configsMap = { [config.code]: config.value };
+
+  const save = (map: IConfigsMap) => {
+    updateConfigs({
+      variables: { configsMap: map }
+    })
+      .then(() => {
+        configsQuery.refetch();
+
+        Alert.success('You successfully updated stage in syncerkhet settings');
       })
-        .then(() => {
-          Alert.success('Successfully updated an configs');
-          listQuery.refetch();
-        })
-        .catch(e => Alert.error(e.message));
-    }
+      .catch(error => {
+        Alert.error(error.message);
+      });
   };
 
   const updatedProps = {
     ...props,
-    msdynamics: listQuery?.msdynamicConfigs[0] || {},
-    configsSave
+    save,
+    configsMap
   };
   return <List {...updatedProps} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, MsdynamicQueryResponse, {}>(gql(queries.dynamicConfigs), {
-      name: 'listQuery'
-    }),
-
-    graphql(gql(mutations.addConfigs), {
-      name: 'addMutation',
-      options: () => ({
-        refetchQueries: ['msdynamicConfigs']
+    graphql<Props, ConfigsQueryResponse>(gql(queries.configs), {
+      name: 'configsQuery',
+      options: props => ({
+        variables: {
+          code: 'DYNAMIC'
+        },
+        fetchPolicy: 'network-only'
       })
     }),
-    graphql(gql(mutations.editConfigs), {
-      name: 'editMutation',
-      options: () => ({
-        refetchQueries: ['msdynamicConfigs']
-      })
+    graphql<{}>(gql(mutations.updateConfigs), {
+      name: 'updateConfigs'
     })
   )(GeneralSettingsContainer)
 );
