@@ -13,7 +13,6 @@ import {
 } from '@erxes/ui/src/components';
 import { ContentBox } from '../styles';
 import { MainStyleModalFooter as ModalFooter } from '@erxes/ui/src/styles/eindex';
-import { menuDynamic } from '../constants';
 
 type Props = {
   msdynamics: IDynamic;
@@ -85,7 +84,6 @@ function GeneralSettings({ msdynamics, configsSave }: Props) {
         <Wrapper.Header
           title={__('Msdynamics config')}
           breadcrumb={breadcrumb}
-          submenu={menuDynamic}
         />
       }
       actionBar={

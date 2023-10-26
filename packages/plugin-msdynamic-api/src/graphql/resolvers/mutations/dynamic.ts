@@ -15,9 +15,9 @@ const msdynamicMutations = {
     return await models.Msdynamics.updateMsdynamicConfig(doc, user);
   },
 
-  async msdynamicsAdd(_root, doc, { models }: IContext) {
+  async toCheckProducts(_root, doc, { models }: IContext) {
     const end =
-      "https://bc.erpmsm.mn:7048/MSM-DATA/ODataV4/Company('ZZBETA0529-DEV')/Item_Card_Api";
+      "https://bc.erpmsm.mn:7048/MSM-DATA/ODataV4/Company('ZZBETA0529-DEV')/Item_Card_Api?$top=1";
 
     const username = `MSM\\msmit`;
     const password = 'Tsonh$2h@@';
