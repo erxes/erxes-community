@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState } from "react"
 import data from "@emoji-mart/data"
 import Picker from "@emoji-mart/react"
-import { Mic, MicOff, Paperclip, Pause, Play, Smile } from "lucide-react"
+import { Paperclip, Smile } from "lucide-react"
 
-import { readFile } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 import uploadHandler from "@/components/uploader/uploadHandler"
-
-import AudioRecorder from "./Recorder"
 
 type IProps = {
   reply: any
@@ -119,17 +116,18 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
     <div className="border-t-2 py-4 px-10">
       {attachments && attachments.length > 0 && attachmentsSection()}
       <div className="flex items-center justify-around gap-7 ">
-        <label className="cursor-pointer">
-          <input
-            autoComplete="off"
-            type="file"
-            multiple={true}
-            onChange={handleAttachmentChange}
-            className="hidden"
-          />
-          <Paperclip size={16} />
-        </label>
-
+        <div className="flex gap-4">
+          <label className="cursor-pointer">
+            <input
+              autoComplete="off"
+              type="file"
+              multiple={true}
+              onChange={handleAttachmentChange}
+              className="hidden"
+            />
+            <Paperclip size={16} />
+          </label>
+        </div>
         <div className="relative flex flex-1 items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
           <textarea
             value={message}

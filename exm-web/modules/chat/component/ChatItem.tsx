@@ -8,7 +8,17 @@ import { __DEV__ } from "@apollo/client/utilities/globals"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useAtomValue } from "jotai"
-import { AlertTriangleIcon, MoreHorizontalIcon } from "lucide-react"
+import {
+  AlertTriangleIcon,
+  Archive,
+  Bell,
+  BellOff,
+  LogOut,
+  MoreVerticalIcon,
+  Pin,
+  PinOff,
+  Trash,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -49,11 +59,11 @@ export const ChatItem = ({
   const {
     togglePinned,
     chatDelete,
+    toggleMute,
     loading: mutationLoading,
   } = useChatsMutation({ callBack })
   const searchParams = useSearchParams()
 
-  const [showAction, setShowAction] = useState(false)
   const [open, setOpen] = useState(false)
 
   const chatId = searchParams.get("id")
@@ -80,6 +90,10 @@ export const ChatItem = ({
 
   const onPin = () => {
     togglePinned(chat._id)
+  }
+
+  const onMute = () => {
+    toggleMute(chat._id)
   }
 
   const renderChatActions = () => {
@@ -113,15 +127,17 @@ export const ChatItem = ({
     }
 
     const renderDelete = () => {
-      if (chat.type === "direct") {
-        return null
-      }
-
       return (
         <Dialog open={open} onOpenChange={() => setOpen(!open)}>
           <DialogTrigger asChild={true}>
-            <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-rose-600 text-xs">
-              Leave Chat
+            <div className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-rose-600 text-xs flex">
+              {chat.type === "direct" ? (
+                <Trash size={14} />
+              ) : (
+                <LogOut size={14} />
+              )}
+              &nbsp;
+              {chat.type === "direct" ? "Delete chat" : "Leave Chat"}
             </div>
           </DialogTrigger>
 
@@ -133,17 +149,39 @@ export const ChatItem = ({
     return (
       <Popover>
         <PopoverTrigger asChild={true}>
-          <div className="p-2 bg-white rounded-full absolute right-1 ">
-            <MoreHorizontalIcon size={16} />
-          </div>
+          <MoreVerticalIcon size={16} />
         </PopoverTrigger>
-        <PopoverContent className="w-40 p-3">
+        <PopoverContent className="w-44 p-3" align="start">
           <div
-            className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs"
+            className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex"
             onClick={onPin}
           >
+            {isPinned ? <PinOff size={14} /> : <Pin size={14} />}&nbsp;
             {isPinned ? "Unpin" : "Pin"}
           </div>
+          <div
+            className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex"
+            onClick={onMute}
+          >
+            {chat.muteUserIds.includes(currentUser._id) ? (
+              <Bell size={14} />
+            ) : (
+              <BellOff size={14} />
+            )}
+            &nbsp;
+            {chat.muteUserIds.includes(currentUser._id)
+              ? "Unmute notification"
+              : "Mute notification"}
+          </div>
+          {
+            <div
+              className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex"
+              // onClick={onPin}
+            >
+              <Archive size={14} />
+              &nbsp; Archive chat
+            </div>
+          }
 
           {renderDelete()}
         </PopoverContent>
@@ -155,13 +193,11 @@ export const ChatItem = ({
     <Card
       className={`${chatId === chat._id ? "bg-[#f0eef9]" : "bg-transparent"} ${
         isSeen ? "" : "font-bold"
-      } px-6 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] relative`}
+      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0]  mb-5 sm:rounded-lg`}
       onClick={handleClick}
-      onMouseEnter={() => setShowAction(true)}
-      onMouseLeave={() => setShowAction(false)}
     >
-      <div className="items-end flex mr-2">
-        <div className="w-10 h-10 rounded-full">
+      <div className="items-end flex mr-3">
+        <div className="w-12 h-12 rounded-full relative">
           <Image
             src={
               (chat.type === "direct"
@@ -171,26 +207,40 @@ export const ChatItem = ({
             alt="avatar"
             width={60}
             height={60}
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover"
           />
+          <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1 absolute bottom-0 right-0" />
         </div>
       </div>
 
       <div className={`text-sm text-[#444] w-full`}>
-        <p>
-          {chat && chat.type === "direct" ? (
-            <>
-              {user?.details.fullName || user?.email}
-
-              {user?.details.position ? (
-                <span className="text-[10px]"> ({user?.details.position})</span>
-              ) : null}
-            </>
-          ) : (
-            chat?.name
-          )}
-        </p>
+        <div className="flex justify-between">
+          <p className="w-4/5 truncate">
+            {chat && chat.type === "direct" ? (
+              <>{user?.details.fullName || user?.email}</>
+            ) : (
+              chat?.name
+            )}
+          </p>
+          {chat.muteUserIds.includes(currentUser._id) && <BellOff size={14} />}
+        </div>
         <div className="flex justify-between w-full text-xs">
+          <p className="w-1/2 truncate">
+            {chat.type === "direct" ? (
+              user?.details.position ? (
+                <span className="text-[10px]"> ({user?.details.position})</span>
+              ) : null
+            ) : (
+              "(Active now)"
+            )}
+          </p>
+          <p className="text-primary-light text-[10px]">
+            {chat.lastMessage &&
+              chat.lastMessage.createdAt &&
+              "⋅" + dayjs(chat.lastMessage.createdAt).fromNow()}
+          </p>
+        </div>
+        <div className="">
           <p
             className="truncate max-w-[150px]"
             dangerouslySetInnerHTML={
@@ -199,16 +249,10 @@ export const ChatItem = ({
               } || ""
             }
           />
-
-          <p>
-            {chat.lastMessage &&
-              chat.lastMessage.createdAt &&
-              dayjs(chat.lastMessage.createdAt).fromNow()}
-          </p>
         </div>
       </div>
 
-      {showAction ? renderChatActions() : null}
+      {renderChatActions()}
     </Card>
   )
 }

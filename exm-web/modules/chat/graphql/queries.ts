@@ -15,6 +15,7 @@ const chats = gql`
         isPinned
         isPinnedUserIds
         featuredImage
+        muteUserIds
         lastMessage {
           content
           createdAt
@@ -68,6 +69,7 @@ const chatsPinned = gql`
         isPinned
         isPinnedUserIds
         featuredImage
+        muteUserIds
         lastMessage {
           content
           createdAt
@@ -118,6 +120,7 @@ const chatDetail = gql`
       type
       isSeen
       featuredImage
+      muteUserIds
       lastMessage {
         createdAt
         content
@@ -163,6 +166,7 @@ const chatMessages = gql`
         _id
         content
         attachments
+        isPinned
         createdUser {
           _id
           email
@@ -188,6 +192,12 @@ const chatMessages = gql`
         }
         seenList {
           lastSeenMessageId
+          user {
+            _id
+            details {
+              avatar
+            }
+          }
         }
       }
       totalCount

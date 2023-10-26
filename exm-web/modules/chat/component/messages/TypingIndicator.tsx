@@ -21,7 +21,7 @@ const TypingIndicator = ({ participants }: Props) => {
             alt="avatar"
             width={100}
             height={100}
-            className="inline-block w-11 h-11 rounded-full object-cover ring-2 ring-white "
+            className="inline-block w-11 h-11 rounded-full object-cover ring-1 ring-primary "
           />
         ))}
       </div>

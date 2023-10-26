@@ -172,7 +172,6 @@ const PostItem = ({ postId }: { postId: string }): JSX.Element => {
           <DialogTrigger asChild={true} id="delete-form">
             <div className="cursor-pointer flex items-center pt-2">
               <MessageCircleIcon size={20} className="mr-1" color="black" />
-              <span className="font-bold text-base">{feed.commentCount}</span>
             </div>
           </DialogTrigger>
 
