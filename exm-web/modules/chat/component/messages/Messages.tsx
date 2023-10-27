@@ -12,10 +12,9 @@ import { useChatMessages } from "../../hooks/useChatMessages"
 import Editor from "./Editor"
 import MessageItem from "./MessageItem"
 import MessagesHeader from "./MessagesHeader"
-import ReplyInfo from "./ReplyInfo"
 import TypingIndicator from "./TypingIndicator"
 
-const Messages = () => {
+const Messages = ({ setShowSidebar, showSidebar }: { setShowSidebar: () => void, showSidebar: boolean }) => {
   const {
     chatMessages,
     loading,
@@ -39,12 +38,6 @@ const Messages = () => {
     }
   }, [inView, handleLoadMore])
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-    }
-  }, [chatMessages])
-
   if (error) {
     return <div>Something went wrong</div>
   }
@@ -55,31 +48,21 @@ const Messages = () => {
 
   return (
     <div className="flex flex-col h-screen relative">
-      <div className="h-24 border-b-2 flex items-center justify-between px-10">
-        <MessagesHeader chatDetail={chatDetail} />
+      <div className="h-16 border-b flex items-center justify-between px-5">
+        <MessagesHeader
+          chatDetail={chatDetail}
+          setShowSidebar={setShowSidebar}
+        />
       </div>
-      <button
-        onClick={() => {
-          console.log(chatContainerRef)
-
-          chatContainerRef.current.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          })
-        }}
-        className="bg-[#EED8FF] text-center p-1 mx-10 rounded-b-lg"
-      >
-        new messages since 9:00 OM On October 11, 2023
-      </button>
       <div
         ref={chatContainerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden p-4 border-0 flex flex-col-reverse scrollbar-hide "
+        className="flex-1 overflow-y-auto overflow-x-hidden p-5 border-0 flex flex-col-reverse scrollbar-hide "
       >
-        <div className="w-full pt-2">
+        {/* <div className="w-full pt-2">
           {chatDetail.participantUsers && (
             <TypingIndicator participants={chatDetail.participantUsers} />
           )}
-        </div>
+        </div> */}
         {chatMessages.map((message) => (
           <MessageItem
             key={message._id}
@@ -95,9 +78,8 @@ const Messages = () => {
           </div>
         )}
       </div>
-      <ReplyInfo reply={reply} setReply={setReply} />
 
-      <Editor sendMessage={sendMessage} reply={reply} setReply={setReply} />
+      <Editor sendMessage={sendMessage} reply={reply} setReply={setReply} showSidebar={showSidebar} />
     </div>
   )
 }

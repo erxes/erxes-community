@@ -143,7 +143,10 @@
 }
 
 .chat-list-max-height {
-  max-height: calc(100vh - 225px);
+  max-height: calc(100vh - 230px);
+}
+.chat-list-search-max-height {
+  max-height: calc(100vh - 195px);
 }
 
 .user-shared-files-max-height {
@@ -181,4 +184,7 @@
 }
 .max-h-\[60vh\] {
   max-height: 60vh;
+}
+.w-message {
+  width: calc(75% - 90px);
 }

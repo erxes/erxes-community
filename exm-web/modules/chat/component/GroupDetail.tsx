@@ -19,11 +19,16 @@ import { useToast } from "@/components/ui/use-toast"
 import useChatsMutation from "../hooks/useChatsMutation"
 import AddParticipant from "./AddParticipant"
 import ParticipantList from "./ParticipantList"
-import SharedFiles from "./SharedFiles"
 import { GroupChatAction } from "./form/GroupChatAction"
 import { PinnedMessages } from "./messages/PinnedMessages"
 
-const UserDetail = ({ chatDetail }: { chatDetail: any }) => {
+const UserDetail = ({
+  chatDetail,
+  setShowSidebar,
+}: {
+  chatDetail: any
+  setShowSidebar: () => void
+}) => {
   const { toast } = useToast()
   const callBack = (result: string) => {
     if (result === "success") {
@@ -53,7 +58,7 @@ const UserDetail = ({ chatDetail }: { chatDetail: any }) => {
           width={60}
           height={60}
           className={`${
-            size === "small" ? "w-12 h-12" : "w-20 h-20"
+            size === "small" ? "w-10 h-10" : "w-20 h-20"
           } rounded-full object-cover border-primary border`}
         />
       )
@@ -192,7 +197,10 @@ const UserDetail = ({ chatDetail }: { chatDetail: any }) => {
 
   return (
     <>
-      <div className="bg-[#F2F2F2] p-1 rounded-full w-fit cursor-pointer">
+      <div
+        className="bg-[#F2F2F2] p-1 rounded-full w-fit cursor-pointer"
+        onClick={() => setShowSidebar()}
+      >
         <ChevronRight size={18} />
       </div>
 
@@ -211,7 +219,6 @@ const UserDetail = ({ chatDetail }: { chatDetail: any }) => {
       <div className="mt-6">
         {renderMembers()}
         {renderPinnedMessage()}
-        <SharedFiles />
       </div>
     </>
   )

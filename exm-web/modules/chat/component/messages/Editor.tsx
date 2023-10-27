@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 import uploadHandler from "@/components/uploader/uploadHandler"
 
+import ReplyInfo from "./ReplyInfo"
 
 type IProps = {
   reply: any
@@ -20,9 +21,10 @@ type IProps = {
     relatedId?: string
     attachments?: string[]
   }) => void
+  showSidebar: boolean
 }
 
-const Editor = ({ sendMessage, reply, setReply }: IProps) => {
+const Editor = ({ sendMessage, reply, setReply, showSidebar }: IProps) => {
   const [message, setMessage] = useState("")
   const [attachments, setAttachments] = useState<any[]>([])
   const relatedId = (reply && reply._id) || null
@@ -106,47 +108,49 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
   }
 
   return (
-    <div className="border-t py-4 px-5">
+    <div className={`border-t py-4 px-5 ${showSidebar && "w-[72.5%]"}`}>
       {attachments && attachments.length > 0 && attachmentsSection()}
       <div className="flex items-center justify-around gap-7 ">
         <div className="flex gap-4">
-
-            <label className="cursor-pointer">
-              <input
-                autoComplete="off"
-                type="file"
-                multiple={true}
-                onChange={handleAttachmentChange}
-                className="hidden"
-              />
-              <Paperclip size={16} />
-            </label>
+          <label className="cursor-pointer">
+            <input
+              autoComplete="off"
+              type="file"
+              multiple={true}
+              onChange={handleAttachmentChange}
+              className="hidden"
+            />
+            <Paperclip size={16} />
+          </label>
         </div>
-        <div className="relative flex flex-1 items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
-          <textarea
-            value={message}
-            onChange={handleInputChange}
-            onKeyDown={onEnterPress}
-            autoComplete="off"
-            ref={textareaRef}
-            className="outline-none w-full h-auto bg-transparent resize-none scrollbar-hide"
-            placeholder="Type your message"
-            rows={1}
-          />
-          {showEmoji && (
-            <div className="absolute bottom-16 right-0 z-10">
-              <Picker
-                data={data}
-                onEmojiSelect={emojiHandler}
-                previewPosition="none"
-                searchPosition="none"
-                theme="light"
-              />
-            </div>
-          )}
-          <button onClick={() => setShowEmoji(!showEmoji)}>
-            <Smile size={16} />
-          </button>
+        <div className="w-full">
+          <ReplyInfo reply={reply} setReply={setReply} />
+          <div className="relative flex flex-1 items-center gap-4 p-5 rounded-lg bg-[#F5FAFF] drop-shadow-md">
+            <textarea
+              value={message}
+              onChange={handleInputChange}
+              onKeyDown={onEnterPress}
+              autoComplete="off"
+              ref={textareaRef}
+              className="outline-none w-full h-auto bg-transparent resize-none scrollbar-hide"
+              placeholder="Type your message"
+              rows={1}
+            />
+            {showEmoji && (
+              <div className="absolute bottom-16 right-0 z-10">
+                <Picker
+                  data={data}
+                  onEmojiSelect={emojiHandler}
+                  previewPosition="none"
+                  searchPosition="none"
+                  theme="light"
+                />
+              </div>
+            )}
+            <button onClick={() => setShowEmoji(!showEmoji)}>
+              <Smile size={16} />
+            </button>
+          </div>
         </div>
 
         <button

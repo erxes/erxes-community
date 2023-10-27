@@ -193,7 +193,7 @@ export const ChatItem = ({
     <Card
       className={`${chatId === chat._id ? "bg-[#f0eef9]" : "bg-transparent"} ${
         isSeen ? "" : "font-bold"
-      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0]  mb-5 sm:rounded-lg `}
+      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] mb-3 sm:rounded-lg `}
       onClick={handleClick}
     >
       <div className="items-end flex mr-3">

@@ -5,17 +5,16 @@ import { ChevronRight } from "lucide-react"
 
 import Image from "@/components/ui/image"
 
-import SharedFiles from "./SharedFiles"
 import { PinnedMessages } from "./messages/PinnedMessages"
 
-const UserDetail = ({ user }: { user: IUser }) => {
+const UserDetail = ({ user, setShowSidebar }: { user: IUser, setShowSidebar: () => void }) => {
   const renderPinnedMessage = () => {
     return <PinnedMessages />
   }
 
   return (
     <>
-      <div className="bg-[#F2F2F2] p-1 rounded-full w-fit cursor-pointer">
+      <div className="bg-[#F2F2F2] p-1 rounded-full w-fit cursor-pointer" onClick={() => setShowSidebar()}>
         <ChevronRight size={18} />
       </div>
       <div className="flex flex-col justify-center items-center pb-3">
@@ -68,7 +67,6 @@ const UserDetail = ({ user }: { user: IUser }) => {
           {/* <p className="text-[#444] text-xs">{user?.branches || "-"}</p> */}
         </div>
         {renderPinnedMessage()}
-        <SharedFiles />
       </div>
     </>
   )

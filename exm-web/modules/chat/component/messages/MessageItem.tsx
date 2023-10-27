@@ -82,7 +82,7 @@ const MessageItem = ({
       <>
         {renderReplyText()}
         <div
-          className={`${style} pt-2.5 pb-[2.3rem] px-5 max-w-xs h-10 overflow-hidden truncate`}
+          className={`${style} py-2.5 px-5 max-w-xs h-10 overflow-hidden truncate`}
           dangerouslySetInnerHTML={{ __html: messageReplyContent || "" }}
         />
       </>
@@ -116,7 +116,7 @@ const MessageItem = ({
         {medias && (
           <AttachmentWithChatPreview
             attachments={medias}
-            className={`grid grid-cols-${cols} gap-1 py-1`}
+            className={`grid ${medias.length >= 3 ? 'grid-cols-3' : medias.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} gap-1 py-1`}
             isDownload={true}
           />
         )}
@@ -181,14 +181,12 @@ const MessageItem = ({
           {renderNamePositions()}
 
           <div
-            className={`flex flex-col gap-1 relative ${
+            className={`flex flex-col   ${
               isMe ? "items-end" : "items-start"
-            } ${relatedMessage && "mt-[80px]"}`}
+            }`}
           >
             <div
-              className={`flex flex-col gap-1 absolute ${
-                relatedMessage && "top-[-56px]"
-              }`}
+              className={`flex flex-col gap-1 `}
             >
               {relatedMessage &&
                 messageReplySection(messageContent(relatedMessage.content))}

@@ -17,7 +17,6 @@ import {
 import Image from "@/components/ui/image"
 import { Input } from "@/components/ui/input"
 import LoadingCard from "@/components/ui/loading-card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { useChats } from "../hooks/useChats"
 import { ChatItem } from "./ChatItem"
@@ -67,7 +66,7 @@ const ChatList = () => {
     setActiveTabIndex(index)
   }
 
-  const renderChats = () => {
+  const renderDirectChats = () => {
     return chats.map((c: any) => {
       if (c.type === "group") {
         return null
@@ -111,35 +110,71 @@ const ChatList = () => {
 
   const renderCurrentUserStatus = () => {
     return (
-      <div>
-        <div className="pt-2 px-6 flex items-center">
-          <Image
-            src={currentUser?.details.avatar || "/avatar-colored.svg"}
-            alt="avatar"
-            width={30}
-            height={30}
-            className="w-10 h-10 rounded-full object-cover mr-3 border border-primary"
-          />
-          <div className="flex items-start flex-col">
-            <div className="text-sm w-[280px] truncate mb-1">
-              {currentUser?.details.fullName || currentUser?.email}
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="bg-success text-success-foreground text-[11px] px-4 py-[2px] rounded-lg flex items-center">
-                  <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1" />
-                  Active
-                  <ChevronDown size={18} />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-transparent border-0 shadow-none px-2.5">
-                <button className="bg-warning-foreground text-warning text-[11px] px-4 py-1 rounded-lg flex items-center w-full">
-                  <div className="indicator bg-warning w-3 h-3 rounded-full border border-white mr-1" />
-                  Busy
-                </button>
-              </DropdownMenuContent>
-            </DropdownMenu>
+      <div className="pt-2 px-6 flex items-center h-16">
+        <Image
+          src={currentUser?.details.avatar || "/avatar-colored.svg"}
+          alt="avatar"
+          width={45}
+          height={45}
+          className="w-[45px] h-[45px] rounded-full object-cover mr-3 border border-primary"
+        />
+        <div className="flex items-start flex-col">
+          <div className="text-[16px] w-[280px] truncate mb-1">
+            {currentUser?.details.fullName || currentUser?.email}
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="bg-success text-success-foreground text-[11px] px-4 py-[1px] rounded-lg flex items-center">
+                <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1" />
+                Active
+                <ChevronDown size={18} />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-transparent border-0 shadow-none px-2.5">
+              <button className="bg-warning-foreground text-warning text-[11px] px-4 py-[1px] rounded-lg flex items-center w-full">
+                <div className="indicator bg-warning w-3 h-3 rounded-full border border-white mr-1" />
+                Busy
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    )
+  }
+
+  const renderChats = () => {
+    if (searchValue) {
+      return (
+        <div className="px-4 pb-4 overflow-auto chat-list-search-max-height">
+          <p className="pb-3">Direct chats</p>
+          {renderDirectChats()}
+          <p className="pb-3">Group chats</p>
+          {renderGroupChats()}
+          <p className="pb-3">Pinned chats</p>
+          {renderPinnedChats()}
+        </div>
+      )
+    }
+
+    return (
+      <div>
+        <div className="flex px-4">
+          {["Chat", "Groups", "Pinned"].map((type, index) => (
+            <button
+              key={index}
+              className={`py-2 px-4 flex-1 ${
+                activeTabIndex === index && "border-b border-primary"
+              }`}
+              onClick={() => handleTabClick(index)}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+        <div className="p-4 overflow-auto chat-list-max-height">
+          {activeTabIndex === 0 && renderDirectChats()}
+          {activeTabIndex === 1 && renderGroupChats()}
+          {activeTabIndex === 2 && renderPinnedChats()}
         </div>
       </div>
     )
@@ -164,26 +199,7 @@ const ChatList = () => {
       </div>
 
       <div className="mt-4">
-        <div>
-          <div className="flex px-4">
-            {["Chat", "Groups", "Pinned"].map((type, index) => (
-              <button
-                key={index}
-                className={`py-2 px-4 flex-1 ${
-                  activeTabIndex === index && "border-b border-primary"
-                }`}
-                onClick={() => handleTabClick(index)}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-          <div className="p-4 overflow-auto chat-list-max-height">
-            {activeTabIndex === 0 && renderChats()}
-            {activeTabIndex === 1 && renderGroupChats()}
-            {activeTabIndex === 2 && renderPinnedChats()}
-          </div>
-        </div>
+        {renderChats()}
 
         {!loading && chats.length < chatsCount && (
           <div ref={ref}>

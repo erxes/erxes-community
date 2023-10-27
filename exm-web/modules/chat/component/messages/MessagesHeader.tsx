@@ -5,9 +5,10 @@ import Image from "@/components/ui/image"
 
 type Props = {
   chatDetail: any
+  setShowSidebar: () => void
 }
 
-const MessagesHeader = ({ chatDetail }: Props) => {
+const MessagesHeader = ({ chatDetail, setShowSidebar }: Props) => {
   const renderAvatar = () => {
     if (chatDetail.type === "direct") {
       return (
@@ -20,7 +21,7 @@ const MessagesHeader = ({ chatDetail }: Props) => {
           alt="avatar"
           width={100}
           height={100}
-          className="bg-blue-200 w-[60px] h-[60px] rounded-full object-cover ring-1 ring-black"
+          className="bg-blue-200 w-[40px] h-[40px] rounded-full object-cover ring-1 ring-black"
         />
       )
     }
@@ -40,7 +41,7 @@ const MessagesHeader = ({ chatDetail }: Props) => {
           height={100}
           className={`absolute top-${index * 4} right-${
             index * 6
-          } w-[40px] h-[40px] rounded-full object-cover ring-1 ring-black`}
+          } w-[25px] h-[25px] rounded-full object-cover ring-1 ring-black`}
         />
       ))
   }
@@ -48,11 +49,11 @@ const MessagesHeader = ({ chatDetail }: Props) => {
   return (
     <>
       <div className={`flex gap-2 items-center`}>
-        <div className="relative shrink-0 w-[60px] h-[60px]">
+        <div className="relative shrink-0 w-[40px] h-[40px]">
           {renderAvatar()}
-          <div className="indicator bg-success-foreground w-4 h-4 rounded-full border border-white mr-1 absolute bottom-0 right-0" />
+          <div className="indicator bg-success-foreground w-4 h-4 rounded-full border border-white mr-1 absolute bottom-[-3px] right-[-10px]" />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-0 ml-2">
           <div className="font-semibold text-[16px]">
             {chatDetail.type === "direct"
               ? chatDetail
@@ -63,7 +64,7 @@ const MessagesHeader = ({ chatDetail }: Props) => {
           <div className="text-[12px] text-green-400">Active Now</div>
         </div>
       </div>
-      <button className="bg-gray-200 rounded-full p-1">
+      <button className="bg-gray-200 rounded-full p-1 cursor-pointer" onClick={() => setShowSidebar()}>
         <ChevronLeft size={16} />
       </button>
     </>
