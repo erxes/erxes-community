@@ -30,8 +30,6 @@ export const useChats = ({
     variables: { limit: 20, searchValue },
   })
 
-  console.log(searchValue)
-
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   let loading = true

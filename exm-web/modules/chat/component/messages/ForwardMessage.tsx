@@ -1,11 +1,22 @@
 import React, { useState } from "react"
-import { Search } from "lucide-react"
+import { currentUserAtom } from "@/modules/JotaiProiveder"
+import { IUser } from "@/modules/auth/types"
+import { useAtomValue } from "jotai"
+import { MoveLeft, Search } from "lucide-react"
 
-import avatar from "@/components/ui/avatar"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import Image from "@/components/ui/image"
+import Loader from "@/components/ui/loader"
 import { useAllUsers } from "@/components/hooks/useAllUsers "
 
 import { useChats } from "../../hooks/useChats"
+import { IChat } from "../../types"
 
 type Props = {
   handleForward: (id: string, type: string) => void
@@ -13,6 +24,9 @@ type Props = {
 
 const ForwardMessage = ({ handleForward }: Props) => {
   const [searchValue, setSearchValue] = useState("")
+  const [open, setOpen] = useState(false)
+
+  const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
 
   const { users, loading: usersLoading } = useAllUsers({ searchValue })
   const { chats, loading: chatsLoading } = useChats({ searchValue })
@@ -20,17 +34,37 @@ const ForwardMessage = ({ handleForward }: Props) => {
   const userList = users ? users : []
   const chatList = chats ? chats : []
 
-  console.log(userList)
-  console.log(chatList)
+  const filterChat = (currentUser: IUser, participantUser: IUser) => {
+    return chatList.find(
+      (chat: IChat) =>
+        chat.type === "direct" &&
+        chat.participantUsers.length === 2 &&
+        chat.participantUsers.some(
+          (participant) =>
+            participant._id === currentUser._id ||
+            participant._id === participantUser._id
+        )
+    )
+  }
+
+  const filteredChats = chatList.filter(
+    (chat: IChat) =>
+      chat.type !== "direct" ||
+      !filterChat(currentUser, chat.participantUsers[0])
+  )
 
   const forwardList =
     !usersLoading && !chatsLoading
-      ? [...userList, ...chatList].map((list) => {
+      ? [...userList, ...filteredChats].map((list) => {
           const _id = list._id
           const type = list.type || "direct"
-          const avatar = list?.details?.avatar || ""
+          const avatar = list.participantUsers
+            ? list.participantUsers[0].details.avatar
+            : list?.details?.avatar || ""
           const fullName = list.name
             ? list.name
+            : list.participantUsers
+            ? list.participantUsers[0].details.fullName
             : list.details?.fullName
             ? list.details?.fullName
             : list.email
@@ -46,18 +80,21 @@ const ForwardMessage = ({ handleForward }: Props) => {
         })
       : []
 
-  console.log(forwardList)
-
   const handleInputChange = (e: any) => {
     setSearchValue(e.target.value)
   }
 
-  return (
-    <>
-      <div className="flex flex-col items-start justify-between w-full px-10">
-        <div className="flex gap-1 py-3 px-4 border border-[#0000001F] rounded-lg items-center w-full">
+  const renderForwardMessage = () => {
+    if (usersLoading && chatsLoading) {
+      return <Loader />
+    }
+
+    return (
+      <div className="flex flex-col gap-3 items-start w-full px-10">
+        <div className="flex gap-1 py-3 px-4 border border-[#0000001F] rounded-lg w-full">
           <input
             value={searchValue}
+            autoFocus
             type="text"
             placeholder="Search..."
             className="outline-none bg-transparent w-full"
@@ -68,7 +105,7 @@ const ForwardMessage = ({ handleForward }: Props) => {
         </div>
         <div className="py-2 text-left">Recent</div>
         <div className="flex flex-col pb-4 gap-4 w-full">
-          {forwardList?.map((list: any, index: number) => (
+          {forwardList.slice(0, 5)?.map((list: any, index: number) => (
             <div className="flex justify-between" key={index}>
               <div className="flex gap-2">
                 <Image
@@ -89,8 +126,9 @@ const ForwardMessage = ({ handleForward }: Props) => {
                 </div>
               </div>
               <button
-                className="p-2 bg-[#4F33AF] items-end rounded-md text-[#fff]"
+                className="py-2 px-3 bg-[#4F33AF] items-end rounded-md text-[#fff]"
                 onClick={() => handleForward(list._id, list.type)}
+                disabled={true}
               >
                 Send
               </button>
@@ -98,7 +136,26 @@ const ForwardMessage = ({ handleForward }: Props) => {
           ))}
         </div>
       </div>
-    </>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={() => setOpen(!open)}>
+      <DialogTrigger asChild={true}>
+        <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
+          <MoveLeft size={16} />
+        </div>
+      </DialogTrigger>
+
+      <DialogContent className="p-0 gap-0 h-[500px] max-w-md max-h-[640px] items-start">
+        <DialogHeader className="border-b p-4">
+          <DialogTitle className="flex justify-around py-3">
+            Forward Chat
+          </DialogTitle>
+        </DialogHeader>
+        <div className="px-4 py-6 ">{renderForwardMessage()}</div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

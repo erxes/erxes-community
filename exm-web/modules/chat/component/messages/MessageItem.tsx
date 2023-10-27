@@ -7,13 +7,6 @@ import calendar from "dayjs/plugin/calendar"
 import { useAtomValue } from "jotai"
 import { MoveLeft, MoveRight, Pin, PinOff, ReplyIcon } from "lucide-react"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import Image from "@/components/ui/image"
 import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
@@ -40,7 +33,6 @@ const MessageItem = ({
 
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
   const [showAction, setShowAction] = useState(false)
-  const [showForward, setShowForward] = useState(false)
 
   const isMe = useMemo(
     () => currentUser?._id === createdUser._id,
@@ -128,34 +120,6 @@ const MessageItem = ({
   const handleForward = (id: string, type: string) => {
     chatForward({ id, type, content: content, attachments })
     console.log(type, " clicked ", id)
-  }
-
-  const forwardFormSection = () => {
-    return (
-      <Dialog
-        open={showForward}
-        onOpenChange={() => setShowForward(!showForward)}
-      >
-        <DialogTrigger asChild={true}>
-          <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
-            <MoveLeft size={16} />
-          </div>
-        </DialogTrigger>
-
-        <DialogContent className="p-0 gap-0 max-w-md max-h-[640px]">
-          <DialogHeader className="border-b p-4">
-            <DialogTitle className="flex justify-around">
-              Forward Chat
-            </DialogTitle>
-          </DialogHeader>
-          <div className="px-4 pt-4 max-h-[60vh] overflow-y-auto">
-            <ForwardMessage
-              handleForward={(id, type) => handleForward(id, type)}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    )
   }
 
   const attachmentSection = () => {
@@ -264,7 +228,9 @@ const MessageItem = ({
                   isMe ? "flex-row" : "flex-row-reverse"
                 }`}
               >
-                {forwardFormSection()}
+                <ForwardMessage
+                  handleForward={(id, type) => handleForward(id, type)}
+                />
                 <div className="p-2.5 bg-[#F2F2F2] rounded-full cursor-pointer">
                   {message.isPinned ? (
                     <PinOff size={16} onClick={() => pinMessage(message._id)} />

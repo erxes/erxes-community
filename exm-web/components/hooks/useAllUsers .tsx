@@ -16,7 +16,7 @@ export const useAllUsers = ({
   searchValue?: string
   reload?: boolean
 }): IUseFeedDetail => {
-  const { data: usersData, loading } = useQuery(queries.allUsers, {
+  const { data: usersData, loading } = useQuery(queries.users, {
     variables: {
       ids: userIds,
       searchValue,
@@ -24,10 +24,10 @@ export const useAllUsers = ({
     },
   })
 
-  const { allUsers } = usersData || {}
+  const { users } = usersData || {}
 
   return {
     loading,
-    users: allUsers,
+    users,
   }
 }

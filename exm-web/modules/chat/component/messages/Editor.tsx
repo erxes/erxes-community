@@ -24,6 +24,7 @@ type IProps = {
 const Editor = ({ sendMessage, reply, setReply }: IProps) => {
   const [message, setMessage] = useState("")
   const [attachments, setAttachments] = useState<any[]>([])
+
   const relatedId = (reply && reply._id) || null
   const { toast } = useToast()
 
@@ -32,12 +33,10 @@ const Editor = ({ sendMessage, reply, setReply }: IProps) => {
   const [showEmoji, setShowEmoji] = useState(false)
 
   const textareaRef = useRef<any>(null)
-  const audioContext = new ((window as any).AudioContext ||
-    (window as any).webkitAudioContext)()
 
   useEffect(() => {
-    // textareaRef.current.style.height = "auto"
-    // textareaRef.current.style.height = textareaRef.current?.scrollHeight + "px"
+    textareaRef.current.style.height = "auto"
+    textareaRef.current.style.height = textareaRef.current?.scrollHeight + "px"
   }, [message])
 
   const handleInputChange = (e: any) => {
