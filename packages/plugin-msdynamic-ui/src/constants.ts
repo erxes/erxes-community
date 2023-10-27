@@ -6,5 +6,6 @@ export const menuDynamic = [
 export const KEY_LABELS = {
   endpoint: 'endpoint',
   username: 'username',
-  password: 'password'
+  password: 'password',
+  category: 'category'
 };

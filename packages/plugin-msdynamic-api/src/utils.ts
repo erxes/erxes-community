@@ -10,10 +10,18 @@ export const getConfig = async (subdomain, code, defaultValue?) => {
 };
 
 export const consumeInventory = async (subdomain, doc, action) => {
+  const updateCode = doc.No.replace(/\s/g, '');
+
+  const config = await getConfig(subdomain, 'DYNAMIC', {});
+
+  if (!config.category) {
+    throw new Error('MS Dynamic config category not found.');
+  }
+
   const product = await sendProductsMessage({
     subdomain,
     action: 'findOne',
-    data: { code: doc.No },
+    data: { code: updateCode },
     isRPC: true,
     defaultValue: {}
   });
@@ -22,7 +30,7 @@ export const consumeInventory = async (subdomain, doc, action) => {
     const productCategory = await sendProductsMessage({
       subdomain,
       action: 'categories.findOne',
-      data: { code: doc.category_code },
+      data: { name: config.category },
       isRPC: true
     });
 
@@ -33,7 +41,7 @@ export const consumeInventory = async (subdomain, doc, action) => {
       unitPrice: doc?.Unit_Price || 0,
       code: doc.No,
       uom: doc?.Base_Unit_of_Measure || 'PCS',
-      categoryId: 'oCXiVwy25OSU3y1wnBGML',
+      categoryId: productCategory ? productCategory._id : product.categoryId,
       status: 'active'
     };
 

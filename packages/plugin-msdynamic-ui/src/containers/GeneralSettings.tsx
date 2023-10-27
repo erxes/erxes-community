@@ -19,7 +19,6 @@ type FinalProps = {
 
 const GeneralSettingsContainer = (props: FinalProps) => {
   const { updateConfigs, configsQuery } = props;
-
   if (configsQuery.loading) {
     return <Spinner objective={true} />;
   }
@@ -54,7 +53,7 @@ export default withProps<Props>(
   compose(
     graphql<Props, ConfigsQueryResponse>(gql(queries.configs), {
       name: 'configsQuery',
-      options: props => ({
+      options: () => ({
         variables: {
           code: 'DYNAMIC'
         },
