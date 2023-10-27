@@ -38,7 +38,7 @@ const msdynamicMutations = {
         }
       });
     } catch (e) {
-      throw new Error('Error while checking products. ' + e);
+      console.log(e, 'error');
     }
 
     return 'success';
@@ -99,7 +99,7 @@ const msdynamicMutations = {
         };
       }
     } catch (e) {
-      throw new Error('Error while syncing products. ' + e);
+      console.log(e, 'error');
     }
   }
 };
