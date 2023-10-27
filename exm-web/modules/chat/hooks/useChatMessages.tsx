@@ -6,10 +6,12 @@ import { useAtomValue } from "jotai"
 
 import { mutations, queries, subscriptions } from "../graphql"
 import { IChatMessage } from "../types"
+import { IAttachment } from "@/modules/types"
 
 export interface IUseChats {
   loading: boolean
   chatMessages: IChatMessage[]
+  chatPinnedMessages: IChatMessage[]
   error: any
   handleLoadMore: () => void
   sendMessage: ({
@@ -22,6 +24,17 @@ export interface IUseChats {
     attachments?: string[]
   }) => void
   pinMessage: (id: string) => void
+  chatForward: ({
+    id,
+    type,
+    content,
+    attachments,
+  }: {
+    id?: string
+    type?: string
+    content?: string
+    attachments?: any[]
+  }) => void
   messagesTotalCount: number
 }
 
@@ -37,6 +50,10 @@ export const useChatMessages = (): IUseChats => {
       variables: { chatId: id, skip: 0, limit: 30 },
     }
   )
+
+  const chatPinnedMessagesQuery = useQuery(queries.chatMessages, {
+    variables: { chatId: id, isPinned: true, skip: 0, limit: 30 },
+  })
 
   useEffect(() => {
     refetch()
@@ -80,6 +97,8 @@ export const useChatMessages = (): IUseChats => {
 
   const [pinMessageMutation] = useMutation(mutations.pinMessage)
 
+  const [chatForwardMutation] = useMutation(mutations.chatForward)
+
   const pinMessage = (id: string) => {
     pinMessageMutation({ variables: { id } })
       .then(() => refetch())
@@ -117,6 +136,34 @@ export const useChatMessages = (): IUseChats => {
         },
       },
     }).catch((e) => console.log(e))
+  }
+
+  const chatForward = ({
+    id,
+    type,
+    content,
+    attachments,
+  }: {
+    id?: string
+    type?: string
+    content?: string
+    attachments?: IAttachment[]
+  }) => {
+    console.log(type)
+
+    if (type === "group") {
+      chatForwardMutation({
+        variables: { chatId: id, content, attachments },
+        refetchQueries: ["chatMessages", "chats"],
+      }).catch((e) => console.log(e))
+    }
+
+    if (type === "direct") {
+      chatForwardMutation({
+        variables: { userIds: [id], content, attachments },
+        refetchQueries: ["chatMessages", "chats"],
+      }).catch((e) => console.log(e))
+    }
   }
 
   useSubscription(subscriptions.chatMessageInserted, {
@@ -163,6 +210,10 @@ export const useChatMessages = (): IUseChats => {
     ? (data || {}).chatMessages.list
     : []
 
+  const chatPinnedMessages = chatPinnedMessagesQuery.data && chatPinnedMessagesQuery.data.chatMessages
+    ? chatPinnedMessagesQuery.data.chatMessages.list
+    : []
+
   const messagesTotalCount = (data || {}).chatMessages
     ? (data || {}).chatMessages.totalCount
     : 0
@@ -174,7 +225,9 @@ export const useChatMessages = (): IUseChats => {
     handleLoadMore,
     sendMessage,
     messagesTotalCount,
+    chatPinnedMessages,
     pinMessage,
+    chatForward,
   }
 }
 

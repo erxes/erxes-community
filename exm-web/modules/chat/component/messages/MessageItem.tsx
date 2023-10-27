@@ -8,11 +8,12 @@ import { useAtomValue } from "jotai"
 import { Pin, PinOff, ReplyIcon } from "lucide-react"
 
 import Image from "@/components/ui/image"
-import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
 import { currentUserAtom } from "../../../JotaiProiveder"
 import { useChatMessages } from "../../hooks/useChatMessages"
 import { IChatMessage } from "../../types"
+import ForwardMessage from "./ForwardMessage"
+import MessageAttachmentSection from "./MessageAttachment"
 
 dayjs.extend(calendar)
 
@@ -30,7 +31,7 @@ const MessageItem = ({
   const { pinMessage } = useChatMessages()
 
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
-  const [showAction, setShowAction] = useState(false)
+  const [showAction, setShowAction] = useState(true)
 
   const isMe = useMemo(
     () => currentUser?._id === createdUser._id,
@@ -101,36 +102,6 @@ const MessageItem = ({
     )
   }
 
-  const attachmentSection = () => {
-    const medias = attachments.filter((attachment) =>
-      attachment.type.startsWith("image/")
-    )
-    const files = attachments.filter((attachment) =>
-      attachment.type.startsWith("application/")
-    )
-
-    const cols = medias.length < 3 ? medias.length : 3
-
-    return (
-      <>
-        {medias && (
-          <AttachmentWithChatPreview
-            attachments={medias}
-            className={`grid ${medias.length >= 3 ? 'grid-cols-3' : medias.length === 2 ? 'grid-cols-2' : 'grid-cols-1'} gap-1 py-1`}
-            isDownload={true}
-          />
-        )}
-        {files && (
-          <AttachmentWithChatPreview
-            attachments={files}
-            className={`flex flex-col gap-1 py-1`}
-            isDownload={true}
-          />
-        )}
-      </>
-    )
-  }
-
   const renderPosition = () => {
     if (!userDetail.position) {
       return null
@@ -181,13 +152,9 @@ const MessageItem = ({
           {renderNamePositions()}
 
           <div
-            className={`flex flex-col   ${
-              isMe ? "items-end" : "items-start"
-            }`}
+            className={`flex flex-col   ${isMe ? "items-end" : "items-start"}`}
           >
-            <div
-              className={`flex flex-col gap-1 `}
-            >
+            <div className={`flex flex-col gap-1 `}>
               {relatedMessage &&
                 messageReplySection(messageContent(relatedMessage.content))}
             </div>
@@ -216,11 +183,14 @@ const MessageItem = ({
                       <Pin size={16} onClick={() => pinMessage(message._id)} />
                     )}
                   </div>
+                  <ForwardMessage content={content} attachments={attachments} />
                 </div>
               ) : null}
             </div>
           </div>
-          {attachments && attachments.length > 0 && attachmentSection()}
+          {attachments && attachments.length > 0 && (
+            <MessageAttachmentSection attachments={attachments} />
+          )}
         </div>
       </div>
       <div className={`flex justify-end mt-1`}>

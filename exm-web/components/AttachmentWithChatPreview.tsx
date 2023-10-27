@@ -21,7 +21,7 @@ export const AttachmentWithChatPreview = ({
     }
 
     return (
-      <div id="gallery" className={"relative"}>
+      <div id="gallery" className={"relative flex"}>
         <div className={cn(className)}>
           {attachments.map((image: any, i: number) => (
             <FilePreview

@@ -1,34 +1,30 @@
 "use client"
 
+import { useState } from "react"
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { MessageCircle, ChevronRight } from "lucide-react"
-import { useState } from "react"
+import { ChevronRight, MessageCircle } from "lucide-react"
 
 import {
+  Dialog,
   DialogContent,
   DialogHeader,
-  Dialog,
-  DialogTrigger,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import Image from "@/components/ui/image"
-import { AttachmentWithChatPreview } from "@/components/AttachmentWithChatPreview"
 
 import { useChatMessages } from "../../hooks/useChatMessages"
-import { IChatMessage } from "../../types"
+import MessageAttachmentSection from "./MessageAttachment"
 
 dayjs.extend(relativeTime)
 
 export const PinnedMessages = () => {
-  const { chatMessages } = useChatMessages()
+  const { chatPinnedMessages } = useChatMessages()
   const [open, setOpen] = useState(false)
 
-  const messages: IChatMessage[] = chatMessages.filter(
-    (m) => m.isPinned === true
-  )
   const renderPinnedMessages = () => {
-    if (messages.length === 0) {
+    if (chatPinnedMessages.length === 0) {
       return (
         <div className="flex justify-center items-center flex-col p-4 mb-4">
           <MessageCircle size={25} className="mb-2" />
@@ -37,7 +33,7 @@ export const PinnedMessages = () => {
       )
     }
 
-    return messages.map((message) => {
+    return chatPinnedMessages.map((message) => {
       const { createdAt, createdUser, _id, content, attachments } = message
 
       const renderContent = () => {
@@ -83,11 +79,7 @@ export const PinnedMessages = () => {
           </div>
           {renderContent()}
           {attachments && attachments.length > 0 && (
-            <AttachmentWithChatPreview
-              attachments={attachments}
-              className="m-2 overflow-x-auto w-60"
-              isDownload={true}
-            />
+            <MessageAttachmentSection attachments={attachments} />
           )}
         </div>
       )
@@ -96,23 +88,23 @@ export const PinnedMessages = () => {
 
   return (
     <Dialog open={open} onOpenChange={() => setOpen(!open)}>
-        <DialogTrigger asChild={true}>
-          <div className="flex justify-between cursor-pointer text-black text-sm my-7">
-            View pinned messages
-            <ChevronRight size={18} />
-          </div>
-        </DialogTrigger>
+      <DialogTrigger asChild={true}>
+        <div className="flex justify-between cursor-pointer text-black text-sm my-7">
+          View pinned messages
+          <ChevronRight size={18} />
+        </div>
+      </DialogTrigger>
 
-    <DialogContent className="p-0 gap-0 max-w-md">
-      <DialogHeader className="border-b p-4">
-        <DialogTitle className="flex justify-around">
-          Pinned messages
-        </DialogTitle>
-      </DialogHeader>
-      <div className="px-4 pt-4 max-h-[60vh] overflow-y-auto">
-        {renderPinnedMessages()}
-      </div>
-    </DialogContent>
-      </Dialog>
+      <DialogContent className="p-0 gap-0 max-w-md">
+        <DialogHeader className="border-b p-4">
+          <DialogTitle className="flex justify-around">
+            Pinned messages
+          </DialogTitle>
+        </DialogHeader>
+        <div className="px-4 pt-4 max-h-[60vh] overflow-y-auto">
+          {renderPinnedMessages()}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -43,9 +43,13 @@ dayjs.extend(relativeTime)
 export const ChatItem = ({
   chat,
   isPinned,
+  notContactedUser,
+  handleForward,
 }: {
   chat?: any
   isPinned: boolean
+  notContactedUser?: IUser
+  handleForward?: (id: string, forwardType: string) => void
 }) => {
   const router = useRouter()
   const currentUser = useAtomValue(currentUserAtom) || ({} as IUser)
@@ -81,7 +85,9 @@ export const ChatItem = ({
     : true
 
   const handleClick = () => {
-    router.push(`/chats/detail?id=${chat._id}`)
+    if (chat) {
+      router.push(`/chats/detail?id=${chat._id}`)
+    }
   }
 
   const onDelete = () => {
@@ -173,15 +179,13 @@ export const ChatItem = ({
               ? "Unmute notification"
               : "Mute notification"}
           </div>
-          {
-            <div
-              className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex"
-              // onClick={onPin}
-            >
-              <Archive size={14} />
-              &nbsp; Archive chat
-            </div>
-          }
+          <div
+            className="hover:bg-[#F0F0F0] p-2 rounded-md cursor-pointer text-[#444] text-xs flex"
+            // onClick={onPin}
+          >
+            <Archive size={14} />
+            &nbsp; Archive chat
+          </div>
 
           {renderDelete()}
         </PopoverContent>
@@ -189,40 +193,108 @@ export const ChatItem = ({
     )
   }
 
-  return (
-    <Card
-      className={`${chatId === chat._id ? "bg-[#f0eef9]" : "bg-transparent"} ${
-        isSeen ? "" : "font-bold"
-      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] mb-3 sm:rounded-lg `}
-      onClick={handleClick}
-    >
-      <div className="items-end flex mr-3">
-        <div className="w-12 h-12 rounded-full relative">
-          <Image
-            src={
-              (chat.type === "direct"
-                ? user && user.details?.avatar
-                : chat && chat.featuredImage[0]?.url) || "/avatar-colored.svg"
-            }
-            alt="avatar"
-            width={60}
-            height={60}
-            className="w-12 h-12 rounded-full object-cover border border-primary"
-          />
-          <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1 absolute bottom-0 right-0" />
-        </div>
-      </div>
+  const renderForwardAction = () => {
+    if (chat && handleForward) {
+      return (
+        <button
+          className="rounded-md bg-primary-light px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5532c7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          onClick={() => {
+            handleForward(
+              chat.type === "group" ? chat._id : user._id,
+              chat.type
+            )
+          }}
+        >
+          Send
+        </button>
+      )
+    }
 
+    if (handleForward && notContactedUser) {
+      return (
+        <button
+          className="rounded-md bg-primary-light px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5532c7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          onClick={() => {
+            handleForward(notContactedUser._id, "direct")
+          }}
+        >
+          Send
+        </button>
+      )
+    }
+
+    return null
+  }
+
+  const renderAvatar = () => {
+    if (chat) {
+      return (
+        <Image
+          src={
+            (chat.type === "direct"
+              ? user && user.details?.avatar
+              : chat && chat.featuredImage[0]?.url) || "/avatar-colored.svg"
+          }
+          alt="avatar"
+          width={60}
+          height={60}
+          className="w-12 h-12 rounded-full object-cover border border-primary"
+        />
+      )
+    }
+
+    return (
+      <Image
+        src={
+          (notContactedUser &&
+            notContactedUser.details &&
+            notContactedUser.details.avatar) ||
+          "/avatar-colored.svg"
+        }
+        alt="avatar"
+        width={60}
+        height={60}
+        className="w-12 h-12 rounded-full object-cover border border-primary"
+      />
+    )
+  }
+
+  const renderName = () => {
+    if (chat) {
+      return chat.type === "direct" ? (
+        <>{user?.details.fullName || user?.email}</>
+      ) : (
+        chat?.name
+      )
+    }
+
+    return notContactedUser?.details.fullName || notContactedUser?.email
+  }
+
+  const renderInfo = () => {
+    if (notContactedUser) {
+      return (
+        <div className={`text-sm text-[#444] w-9/12`}>
+          <p className="w-4/5 truncate">{renderName()}</p>
+          <p className="w-1/2 truncate">
+            {notContactedUser?.details.position ? (
+              <span className="text-[10px]">
+                {" "}
+                ({notContactedUser?.details.position})
+              </span>
+            ) : null}
+          </p>
+        </div>
+      )
+    }
+
+    return (
       <div className={`text-sm text-[#444] w-9/12`}>
         <div className="flex justify-between">
-          <p className="w-4/5 truncate">
-            {chat && chat.type === "direct" ? (
-              <>{user?.details.fullName || user?.email}</>
-            ) : (
-              chat?.name
-            )}
-          </p>
-          {chat.muteUserIds.includes(currentUser._id) && <BellOff size={14} />}
+          <p className="w-4/5 truncate">{renderName()}</p>
+          {!handleForward &&
+            chat &&
+            chat.muteUserIds.includes(currentUser._id) && <BellOff size={14} />}
         </div>
         <div className="flex justify-between w-full text-xs">
           <p className="w-1/2 truncate">
@@ -234,13 +306,15 @@ export const ChatItem = ({
               "(Active now)"
             )}
           </p>
-          <p className="text-primary-light text-[10px]">
-            {chat.lastMessage &&
-              chat.lastMessage.createdAt &&
-              "⋅" + dayjs(chat.lastMessage.createdAt).fromNow()}
-          </p>
+          {!handleForward && (
+            <p className="text-primary-light text-[10px]">
+              {chat.lastMessage &&
+                chat.lastMessage.createdAt &&
+                "⋅" + dayjs(chat.lastMessage.createdAt).fromNow()}
+            </p>
+          )}
         </div>
-        <div className="">
+        {!handleForward && (
           <p
             className="truncate max-w-[150px]"
             dangerouslySetInnerHTML={
@@ -249,10 +323,33 @@ export const ChatItem = ({
               } || ""
             }
           />
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <Card
+      className={`${
+        !handleForward && chatId === chat._id
+          ? "bg-[#f0eef9]"
+          : "bg-transparent"
+      } ${
+        isSeen ? "" : "font-bold"
+      } px-5 rounded-none py-2.5 cursor-pointer flex items-center shadow-none border-none hover:bg-[#F0F0F0] mb-3 sm:rounded-lg `}
+      onClick={handleClick}
+    >
+      <div className="items-end flex mr-3">
+        <div className="w-12 h-12 rounded-full relative">
+          {renderAvatar()}
+          <div className="indicator bg-success-foreground w-3 h-3 rounded-full border border-white mr-1 absolute bottom-0 right-0" />
         </div>
       </div>
 
-      {renderChatActions()}
+      {renderInfo()}
+
+      {!handleForward && renderChatActions()}
+      {handleForward && renderForwardAction()}
     </Card>
   )
 }

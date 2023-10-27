@@ -160,8 +160,8 @@ const chatDetail = gql`
 `
 
 const chatMessages = gql`
-  query chatMessages($chatId: String, $limit: Int, $skip: Int) {
-    chatMessages(chatId: $chatId, limit: $limit, skip: $skip) {
+  query chatMessages($chatId: String, $limit: Int, $skip: Int, $isPinned: Boolean) {
+    chatMessages(chatId: $chatId, limit: $limit, skip: $skip, isPinned: $isPinned) {
       list {
         _id
         content
