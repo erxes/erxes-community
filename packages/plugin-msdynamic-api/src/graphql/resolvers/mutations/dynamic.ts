@@ -1,5 +1,6 @@
 import { sendRequest } from '@erxes/api-utils/src';
 import { IContext } from '../../../messageBroker';
+import { getConfig } from '../../../utils';
 
 const msdynamicMutations = {
   /**
@@ -15,16 +16,18 @@ const msdynamicMutations = {
     return await models.Msdynamics.updateMsdynamicConfig(doc, user);
   },
 
-  async toCheckProducts(_root, doc, { models }: IContext) {
-    const end =
-      "https://bc.erpmsm.mn:7048/MSM-DATA/ODataV4/Company('ZZBETA0529-DEV')/Item_Card_Api?$top=1";
+  async toCheckProducts(_root, _args, { models, subdomain }: IContext) {
+    const config = await getConfig(subdomain, 'DYNAMIC', {});
 
-    const username = `MSM\\msmit`;
-    const password = 'Tsonh$2h@@';
+    if (!config.endpoint || !config.username || !config.password) {
+      throw new Error('MS Dynamic config not found.');
+    }
+
+    const { endpoint, username, password } = config;
 
     try {
       const response = await sendRequest({
-        url: end,
+        url: endpoint,
         method: 'GET',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

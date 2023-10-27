@@ -1,5 +1,5 @@
 export const menuDynamic = [
-  { title: 'General config', link: '/msdynamics' },
+  { title: 'Sync History', link: '/sync-msdynamic-history' },
   { title: 'Check Products', link: '/msdynamics-products' }
 ];
 
