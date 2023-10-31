@@ -6,13 +6,21 @@ type Props = {
 };
 
 const Row = ({ product, action }: Props) => {
-  const { Description, No, Unit_Price, syncStatus } = product;
+  const {
+    Description,
+    No,
+    name,
+    code,
+    unitPrice,
+    Unit_Price,
+    syncStatus
+  } = product;
 
   return (
     <tr>
-      <td>{No}</td>
-      <td>{Description}</td>
-      <td>{parseFloat(Unit_Price)}</td>
+      <td>{action === 'DELETE' ? code : No}</td>
+      <td>{action === 'DELETE' ? name : Description}</td>
+      <td>{parseFloat(action === 'DELETE' ? unitPrice : Unit_Price)}</td>
       {action === 'CREATE' ? (
         <td>
           {syncStatus === false ? (

@@ -62,7 +62,8 @@ const msdynamicMutations = {
         }
       });
 
-      const resultCodes = response.value.map(r => r.No) || [];
+      const resultCodes =
+        response.value.map(r => r.No.replace(/\s/g, '')) || [];
 
       const productByCode = {};
       for (const product of products) {
@@ -74,13 +75,12 @@ const msdynamicMutations = {
       }
 
       for (const resProd of response.value) {
-        if (productCodes.includes(resProd.No)) {
-          const product = productByCode[resProd.No];
+        if (productCodes.includes(resProd.No.replace(/\s/g, ''))) {
+          const product = productByCode[resProd.No.replace(/\s/g, '')];
 
           if (
             resProd?.Description === product.name &&
             resProd?.Unit_Price === product.unitPrice &&
-            product.uom &&
             resProd?.Base_Unit_of_Measure === product.uom
           ) {
             matchedCount = matchedCount + 1;
