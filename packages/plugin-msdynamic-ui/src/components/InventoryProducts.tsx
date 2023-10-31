@@ -16,6 +16,7 @@ type Props = {
   queryParams: any;
   loading: boolean;
   toCheckProducts: () => void;
+  toSyncProducts: (action: string, products: any[]) => void;
   items: any;
 };
 
@@ -23,7 +24,8 @@ const InventoryProducts = ({
   items,
   loading,
   queryParams,
-  toCheckProducts
+  toCheckProducts,
+  toSyncProducts
 }: Props) => {
   const checkButton = (
     <>
@@ -71,16 +73,23 @@ const InventoryProducts = ({
   const renderTable = (data: any, action: string) => {
     data = calculatePagination(data);
 
-    // const onClickSync = () => {
-    //   data = excludeSyncTrue(data);
-    //   this.props.toSyncProducts(action, data);
-    // };
+    const excludeSyncTrue = (syncData: any) => {
+      return syncData.filter(d => d.syncStatus === false);
+    };
+
+    const onClickSync = () => {
+      data = excludeSyncTrue(data);
+      toSyncProducts(action, data);
+    };
 
     const renderRow = (rowData: any, rowSction: string) => {
       if (rowData.length > 100) {
         rowData = rowData.slice(0, 100);
       }
-      return data.map(p => <Row key={p.code} product={p} action={rowSction} />);
+
+      return rowData.map(p => (
+        <Row key={p.code} product={p} action={rowSction} />
+      ));
     };
 
     const syncButton = (
@@ -89,7 +98,7 @@ const InventoryProducts = ({
           btnStyle="primary"
           size="small"
           icon="check-1"
-          // onClick={onClickSync}
+          onClick={onClickSync}
         >
           Sync
         </Button>

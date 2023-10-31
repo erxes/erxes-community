@@ -30,6 +30,17 @@ const InventoryProductsContainer = (props: FinalProps) => {
     return <Spinner />;
   }
 
+  const setSyncStatusTrue = (data: any, products: any, action: string) => {
+    data[action].items = data[action].items.map(i => {
+      if (products.find(c => c.code === i.code)) {
+        const temp = i;
+        temp.syncStatus = true;
+        return temp;
+      }
+      return i;
+    });
+  };
+
   const setSyncStatus = (data: any, action: string) => {
     const createData = data[action].items.map(d => ({
       ...d,
@@ -62,11 +73,37 @@ const InventoryProductsContainer = (props: FinalProps) => {
       });
   };
 
+  const toSyncProducts = (action: string, products: any[]) => {
+    setLoading(true);
+    props
+      .toSyncProducts({
+        variables: {
+          action,
+          products
+        }
+      })
+      .then(() => {
+        setLoading(false);
+        Alert.success('Success. Please check again.');
+      })
+      .finally(() => {
+        const data = items;
+
+        setSyncStatusTrue(data, products, action.toLowerCase());
+        setItems(data);
+      })
+      .catch(e => {
+        Alert.error(e.message);
+        setLoading(false);
+      });
+  };
+
   const updatedProps = {
     ...props,
     loading,
     items,
-    toCheckProducts
+    toCheckProducts,
+    toSyncProducts
   };
 
   const content = () => <InventoryProducts {...updatedProps} />;
