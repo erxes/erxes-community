@@ -62,7 +62,7 @@ const msdynamicMutations = {
         }
       });
 
-      const resultCodes = response.value.map(r => r.code) || [];
+      const resultCodes = response.value.map(r => r.No) || [];
 
       const productByCode = {};
       for (const product of products) {
@@ -74,8 +74,8 @@ const msdynamicMutations = {
       }
 
       for (const resProd of response.value) {
-        if (productCodes.includes(resProd.code)) {
-          const product = productByCode[resProd.code];
+        if (productCodes.includes(resProd.No)) {
+          const product = productByCode[resProd.No];
 
           if (
             resProd?.Description === product.name &&
