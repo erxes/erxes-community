@@ -2,43 +2,91 @@ import { gql } from '@apollo/client';
 import * as compose from 'lodash.flowright';
 import { graphql } from '@apollo/client/react/hoc';
 import { withProps } from '@erxes/ui/src/utils';
-import { ConfigsQueryResponse, IConfigsMap } from '../types';
-import { mutations, queries } from '../graphql';
-import React from 'react';
+import {
+  ToCheckProductsMutationResponse,
+  ToSyncProductsMutationResponse
+} from '../types';
+import { Bulk } from '@erxes/ui/src/components';
+import Alert from '@erxes/ui/src/utils/Alert';
+import { mutations } from '../graphql';
+import React, { useState } from 'react';
 import InventoryProducts from '../components/InventoryProducts';
+import Spinner from '@erxes/ui/src/components/Spinner';
 
 type Props = {
   history: any;
   queryParams: any;
 };
 
-type FinalProps = {
-  configsQuery: ConfigsQueryResponse;
-  updateConfigs: (configsMap: IConfigsMap) => Promise<void>;
-} & Props;
+type FinalProps = {} & Props &
+  ToCheckProductsMutationResponse &
+  ToSyncProductsMutationResponse;
 
 const InventoryProductsContainer = (props: FinalProps) => {
-  const { updateConfigs, configsQuery } = props;
+  const [items, setItems] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  if (loading) {
+    return <Spinner />;
+  }
+
+  const setSyncStatus = (data: any, action: string) => {
+    const createData = data[action].items.map(d => ({
+      ...d,
+      syncStatus: false
+    }));
+    data[action].items = createData;
+
+    return data;
+  };
+
+  const toCheckProducts = () => {
+    setLoading(true);
+    props
+      .toCheckProducts({
+        variables: {}
+      })
+      .then(response => {
+        const data = response.data.toCheckProducts;
+
+        setSyncStatus(data, 'create');
+        setSyncStatus(data, 'update');
+        setSyncStatus(data, 'delete');
+
+        setItems(response.data.toCheckProducts);
+        setLoading(false);
+      })
+      .catch(e => {
+        Alert.error(e.message);
+        setLoading(false);
+      });
+  };
 
   const updatedProps = {
-    ...props
+    ...props,
+    loading,
+    items,
+    toCheckProducts
   };
-  return <InventoryProducts {...updatedProps} />;
+
+  const content = () => <InventoryProducts {...updatedProps} />;
+
+  return <Bulk content={content} />;
 };
 
 export default withProps<Props>(
   compose(
-    graphql<Props, ConfigsQueryResponse>(gql(queries.configs), {
-      name: 'configsQuery',
-      options: props => ({
-        variables: {
-          code: 'DYNAMIC'
-        },
-        fetchPolicy: 'network-only'
-      })
-    }),
-    graphql<{}>(gql(mutations.updateConfigs), {
-      name: 'updateConfigs'
-    })
+    graphql<Props, ToCheckProductsMutationResponse, {}>(
+      gql(mutations.toCheckProducts),
+      {
+        name: 'toCheckProducts'
+      }
+    ),
+    graphql<Props, ToSyncProductsMutationResponse, {}>(
+      gql(mutations.toSyncProducts),
+      {
+        name: 'toSyncProducts'
+      }
+    )
   )(InventoryProductsContainer)
 );

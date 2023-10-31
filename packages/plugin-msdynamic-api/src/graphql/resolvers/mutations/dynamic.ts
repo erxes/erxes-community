@@ -1,5 +1,5 @@
 import { sendRequest } from '@erxes/api-utils/src';
-import { IContext } from '../../../messageBroker';
+import { IContext, sendProductsMessage } from '../../../messageBroker';
 import { consumeInventory, getConfig } from '../../../utils';
 
 const msdynamicMutations = {
@@ -19,6 +19,11 @@ const msdynamicMutations = {
   async toCheckProducts(_root, _args, { models, subdomain }: IContext) {
     const config = await getConfig(subdomain, 'DYNAMIC', {});
 
+    const updateProducts: any = [];
+    const createProducts: any = [];
+    const deleteProducts: any = [];
+    let matchedCount = 0;
+
     if (!config.endpoint || !config.username || !config.password) {
       throw new Error('MS Dynamic config not found.');
     }
@@ -26,6 +31,25 @@ const msdynamicMutations = {
     const { endpoint, username, password } = config;
 
     try {
+      const productsCount = await sendProductsMessage({
+        subdomain,
+        action: 'count',
+        data: { query: { status: { $ne: 'deleted' } } },
+        isRPC: true
+      });
+
+      const products = await sendProductsMessage({
+        subdomain,
+        action: 'find',
+        data: {
+          query: { status: { $ne: 'deleted' } },
+          limit: productsCount
+        },
+        isRPC: true
+      });
+
+      const productCodes = products.map(p => p.code) || [];
+
       const response = await sendRequest({
         url: endpoint,
         method: 'GET',
@@ -37,17 +61,63 @@ const msdynamicMutations = {
           ).toString('base64')}`
         }
       });
+
+      const resultCodes = response.value.map(r => r.code) || [];
+
+      const productByCode = {};
+      for (const product of products) {
+        productByCode[product.code] = product;
+
+        if (!resultCodes.includes(product.code)) {
+          deleteProducts.push(product);
+        }
+      }
+
+      for (const resProd of response.value) {
+        if (productCodes.includes(resProd.code)) {
+          const product = productByCode[resProd.code];
+
+          if (
+            resProd?.Description === product.name &&
+            resProd?.Unit_Price === product.unitPrice &&
+            product.uom &&
+            resProd?.Base_Unit_of_Measure === product.uom
+          ) {
+            matchedCount = matchedCount + 1;
+          } else {
+            updateProducts.push(resProd);
+          }
+        } else {
+          createProducts.push(resProd);
+        }
+      }
     } catch (e) {
       console.log(e, 'error');
     }
 
-    return 'success';
+    return {
+      create: {
+        count: createProducts.length,
+        items: createProducts
+      },
+      update: {
+        count: updateProducts.length,
+        items: updateProducts
+      },
+      delete: {
+        count: deleteProducts.length,
+        items: deleteProducts
+      },
+      matched: {
+        count: matchedCount
+      }
+    };
   },
 
   async toSyncProducts(
     _root,
     { action }: { action: string },
-    { models, subdomain }: IContext
+    { subdomain }: IContext
   ) {
     const config = await getConfig(subdomain, 'DYNAMIC', {});
 

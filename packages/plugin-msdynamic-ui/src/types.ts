@@ -39,3 +39,13 @@ export type AddMutationResponse = {
 export type EditMutationResponse = {
   editMutation: (params: { variables: MutationVariables }) => Promise<any>;
 };
+
+export type ToSyncProductsMutationResponse = {
+  toSyncProducts: (mutation: {
+    variables: { action: string; products: any[] };
+  }) => Promise<any>;
+};
+
+export type ToCheckProductsMutationResponse = {
+  toCheckProducts: (mutation: { variables: {} }) => Promise<any>;
+};
