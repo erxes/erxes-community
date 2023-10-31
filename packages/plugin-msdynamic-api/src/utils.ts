@@ -10,7 +10,7 @@ export const getConfig = async (subdomain, code, defaultValue?) => {
 };
 
 export const consumeInventory = async (subdomain, doc, action) => {
-  const updateCode = doc.No.replace(/\s/g, '');
+  const updateCode = action === 'delete' ? doc.code : doc.No.replace(/\s/g, '');
 
   const config = await getConfig(subdomain, 'DYNAMIC', {});
 
