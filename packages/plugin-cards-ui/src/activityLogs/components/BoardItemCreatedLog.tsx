@@ -4,14 +4,13 @@ import {
   FlexCenterContent
 } from '@erxes/ui-log/src/activityLogs/styles';
 
-import { IActivityLogItemProps } from '@erxes/ui-log/src/activityLogs/types';
-import Icon from '@erxes/ui/src/components/Icon';
-import { Link } from 'react-router-dom';
-import React from 'react';
-import Tip from '@erxes/ui/src/components/Tip';
-import dayjs from 'dayjs';
-import { renderUserFullName } from '@erxes/ui/src/utils';
 import { getCPUserName } from '@erxes/ui-log/src/activityLogs/utils';
+import Icon from '@erxes/ui/src/components/Icon';
+import Tip from '@erxes/ui/src/components/Tip';
+import { renderUserFullName } from '@erxes/ui/src/utils';
+import dayjs from 'dayjs';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 type Props = {
   activity: any;

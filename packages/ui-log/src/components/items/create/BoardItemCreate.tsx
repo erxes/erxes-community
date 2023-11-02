@@ -38,6 +38,10 @@ class BoardItemCreate extends React.Component<IActivityLogItemProps> {
       </Link>
     );
 
+    if (createdByDetail && createdByDetail.type === 'clientPortalUser') {
+      userName = getCPUserName(createdByDetail.content);
+    }
+
     return (
       <span>
         <strong>{userName}</strong> created {body} {contentType}
