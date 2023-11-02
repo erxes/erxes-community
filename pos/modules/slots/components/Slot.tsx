@@ -1,83 +1,112 @@
-import { RadioGroupItem } from "@radix-ui/react-radio-group"
-import { cva } from "class-variance-authority"
+import { memo } from "react"
+import { selectedTabAtom } from "@/store"
+import { slotCodeAtom } from "@/store/order.store"
 import { motion } from "framer-motion"
-import { Check } from "lucide-react"
+import { useSetAtom } from "jotai"
+import { CheckCircle2, Circle, XCircleIcon } from "lucide-react"
 
 import { ISlot } from "@/types/slots.type"
-import { Button } from "@/components/ui/button"
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+import { cn } from "@/lib/utils"
+import { ContextMenuTrigger } from "@/components/ui/context-menu"
 import { Label } from "@/components/ui/label"
 
-const className = cva("h-10 w-10 text-base font-bold px-0 relative ", {
-  variants: {
-    status: {
-      serving: "bg-blue-300 hover:bg-blue-200",
-      available: "bg-green-300 hover:bg-green-200",
-      reserved: "bg-orange-200 hover:bg-orange-200",
-    },
-  },
-  defaultVariants: {
-    status: "available",
-  },
-})
+import SlotActions from "./slotActions"
 
 const MotionLabel = motion(Label)
 
-const Slot = ({
-  code,
-  name,
-  status,
-  active,
-  isPreDates,
-}: ISlot & {
-  status?: "serving" | "available" | "reserved"
-  active: boolean
-}) => {
+const statusIcons = {
+  serving: CheckCircle2,
+  available: Circle,
+  reserved: XCircleIcon,
+}
+
+const Slot = (
+  props: ISlot & {
+    status?: "serving" | "available" | "reserved"
+    active: boolean
+  }
+) => {
+  const { active, code, name, option, status } = props
+
+  const {
+    rotateAngle,
+    width,
+    height,
+    top,
+    left,
+    color,
+    zIndex,
+    borderRadius,
+    isShape,
+  } = option || {}
+
+  const Icon = statusIcons[status || "available"]
+  const style = {
+    width,
+    height,
+    top,
+    left,
+    transform: `rotate(${rotateAngle}deg)`,
+    backgroundColor: color,
+    zIndex,
+    borderRadius,
+  }
+  const setActiveSlot = useSetAtom(slotCodeAtom)
+  const setSelectedTab = useSetAtom(selectedTabAtom)
+
+  if (isShape)
+    return (
+      <div
+        className={cn(
+          "absolute flex items-center font-medium justify-center",
+          active && "shadow-md shadow-primary/50"
+        )}
+        style={style}
+      />
+    )
+
+  const handleChoose = () => {
+    setActiveSlot(code)
+    setSelectedTab("products")
+  }
+
   return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
-        <Button className={className({ status })} Component={"div"}>
-          {name}
-          <RadioGroupItem
-            value={active ? "" : code}
-            id={code}
-            className="peer sr-only"
-          />
-          <MotionLabel
-            className="absolute inset-0 border-primary rounded-md border-2"
-            animate={{
-              opacity: active ? 1 : 0,
-            }}
-            initial={{
-              opacity: 0,
-            }}
-            htmlFor={code}
-          />
-          <MotionLabel
-            className="absolute -top-1.5 -right-1.5 bg-primary h-5 w-5 rounded-full border-2 border-white p-0.5 text-white"
-            initial={{ opacity: 0, translateY: 2, translateX: -2 }}
-            animate={{
-              opacity: active ? 1 : 0,
-              translateY: active ? 0 : 2,
-              translateX: active ? 0 : -2,
-            }}
-            htmlFor={code}
-          >
-            <Check className="h-3 w-3" strokeWidth={4} />
-          </MotionLabel>
-        </Button>
-      </HoverCardTrigger>
-      {isPreDates && (
-        <HoverCardContent side="right">
-          {isPreDates.toString()}
-        </HoverCardContent>
-      )}
-    </HoverCard>
+    <SlotActions {...props}>
+      <ContextMenuTrigger
+        className={cn(
+          "absolute flex items-center font-medium justify-center text-white",
+          active && "shadow-md shadow-primary/50"
+        )}
+        style={style}
+        onClick={handleChoose}
+      >
+        <div
+          style={{
+            transform: `rotate(-${rotateAngle}deg)`,
+          }}
+          className="flex items-center gap-0.5"
+        >
+          <Icon className="h-5 w-5" />
+          {name || code}
+        </div>
+        <MotionLabel
+          animate={{
+            opacity: active ? 1 : 0,
+          }}
+          initial={{
+            opacity: 0,
+          }}
+          className="absolute inset-0 ring-2 ring-ring ring-offset-2  cursor-pointer"
+          htmlFor={code}
+          style={{
+            width,
+            height,
+            borderRadius,
+          }}
+        />
+      </ContextMenuTrigger>
+    </SlotActions>
   )
 }
 
-export default Slot
+export default memo(Slot)
