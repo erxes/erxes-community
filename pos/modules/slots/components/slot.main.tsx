@@ -5,12 +5,10 @@ import { Check } from "lucide-react"
 
 import { ISlot } from "@/types/slots.type"
 import { Button } from "@/components/ui/button"
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card"
+import { ContextMenuTrigger } from "@/components/ui/context-menu"
 import { Label } from "@/components/ui/label"
+
+import SlotActions from "./slotActions"
 
 const className = cva("h-10 w-10 text-base font-bold px-0 relative ", {
   variants: {
@@ -27,19 +25,17 @@ const className = cva("h-10 w-10 text-base font-bold px-0 relative ", {
 
 const MotionLabel = motion(Label)
 
-const Slot = ({
-  code,
-  name,
-  status,
-  active,
-  isPreDates,
-}: ISlot & {
-  status?: "serving" | "available" | "reserved"
-  active: boolean
-}) => {
+const Slot = (
+  props: ISlot & {
+    status?: "serving" | "available" | "reserved"
+    active: boolean
+  }
+) => {
+  const { code, name, status, active } = props
+
   return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
+    <SlotActions {...props}>
+      <ContextMenuTrigger>
         <Button className={className({ status })} Component={"div"}>
           {name}
           <RadioGroupItem
@@ -70,13 +66,8 @@ const Slot = ({
             <Check className="h-3 w-3" strokeWidth={4} />
           </MotionLabel>
         </Button>
-      </HoverCardTrigger>
-      {isPreDates && (
-        <HoverCardContent side="right">
-          {isPreDates.toString()}
-        </HoverCardContent>
-      )}
-    </HoverCard>
+      </ContextMenuTrigger>
+    </SlotActions>
   )
 }
 
