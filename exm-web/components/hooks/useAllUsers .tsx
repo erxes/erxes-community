@@ -2,19 +2,12 @@ import { queries } from "@/common/team/graphql"
 import { IUser } from "@/modules/auth/types"
 import { useQuery } from "@apollo/client"
 
-type IOption = {
-  label: string
-  value: string
-  avatar?: string
-  extraValue?: string
-}
-
 export interface IUseFeedDetail {
   loading: boolean
-  userOptions: IOption[]
+  users: IUser[]
 }
 
-export const useUsers = ({
+export const useAllUsers = ({
   userIds = [],
   searchValue,
   reload,
@@ -33,15 +26,8 @@ export const useUsers = ({
 
   const { users } = usersData || {}
 
-  const userOptions = users?.map((user: IUser) => {
-    const details = user.details || {}
-
-    const label = details.fullName || user.username || user.email
-    return { label, value: user._id, details }
-  })
-
   return {
     loading,
-    userOptions,
+    users,
   }
 }
